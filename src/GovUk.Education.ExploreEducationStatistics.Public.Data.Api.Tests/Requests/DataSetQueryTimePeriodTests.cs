@@ -29,11 +29,7 @@ public abstract class DataSetQueryTimePeriodTests
         [InlineData("2021", "M3")]
         public void YearPeriod_DefaultYearFormatIdentifier(string period, string code)
         {
-            var timePeriod = new DataSetQueryTimePeriod
-            {
-                Period = period,
-                Code = code
-            };
+            var timePeriod = new DataSetQueryTimePeriod { Period = period, Code = code };
 
             Assert.Equal(period, timePeriod.ParsedPeriod());
         }
@@ -50,11 +46,7 @@ public abstract class DataSetQueryTimePeriodTests
         [InlineData("TYQ1")]
         public void InvalidYearPeriod_RangeIdentifier_Throws(string code)
         {
-            var timePeriod = new DataSetQueryTimePeriod
-            {
-                Period = "invalid",
-                Code = code
-            };
+            var timePeriod = new DataSetQueryTimePeriod { Period = "invalid", Code = code };
 
             Assert.Throws<ArgumentOutOfRangeException>(timePeriod.ParsedPeriod);
         }
@@ -67,11 +59,7 @@ public abstract class DataSetQueryTimePeriodTests
         [InlineData("2021/2022", "M3")]
         public void RangePeriod_DefaultYearIdentifier_Throws(string period, string code)
         {
-            var timePeriod = new DataSetQueryTimePeriod
-            {
-                Period = period,
-                Code = code
-            };
+            var timePeriod = new DataSetQueryTimePeriod { Period = period, Code = code };
 
             Assert.Throws<ArgumentOutOfRangeException>(timePeriod.ParsedPeriod);
         }
@@ -88,13 +76,10 @@ public abstract class DataSetQueryTimePeriodTests
         public void YearOrRangePeriod_AcademicYearIdentifier_ReturnsRangedPeriod(
             string period,
             string code,
-            string parsedPeriod)
+            string parsedPeriod
+        )
         {
-            var timePeriod = new DataSetQueryTimePeriod
-            {
-                Period = period,
-                Code = code
-            };
+            var timePeriod = new DataSetQueryTimePeriod { Period = period, Code = code };
 
             Assert.Equal(parsedPeriod, timePeriod.ParsedPeriod());
         }
@@ -113,13 +98,10 @@ public abstract class DataSetQueryTimePeriodTests
         public void YearOrRangePeriod_FiscalYearIdentifier_ReturnsRangedPeriod(
             string period,
             string code,
-            string parsedPeriod)
+            string parsedPeriod
+        )
         {
-            var timePeriod = new DataSetQueryTimePeriod
-            {
-                Period = period,
-                Code = code
-            };
+            var timePeriod = new DataSetQueryTimePeriod { Period = period, Code = code };
 
             Assert.Equal(parsedPeriod, timePeriod.ParsedPeriod());
         }

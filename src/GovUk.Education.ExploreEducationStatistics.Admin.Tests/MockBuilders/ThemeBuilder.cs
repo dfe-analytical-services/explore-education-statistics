@@ -11,6 +11,6 @@ public class ThemeBuilder(Guid? themeId = null)
             Title = "Theme Title",
             Summary = "Theme Summary",
             Slug = "theme-slug",
-            Publications = []
+            Publications = [],
         };
 }

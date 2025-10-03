@@ -16,8 +16,8 @@ public class IndicatorGroupRepository : IIndicatorGroupRepository
 
     public async Task<List<IndicatorGroup>> GetIndicatorGroups(Guid subjectId)
     {
-        return await _context.IndicatorGroup
-            .Include(group => group.Indicators)
+        return await _context
+            .IndicatorGroup.Include(group => group.Indicators)
             .Where(indicatorGroup => indicatorGroup.SubjectId == subjectId)
             .ToListAsync();
     }

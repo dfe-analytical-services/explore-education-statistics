@@ -14,10 +14,6 @@ public static class DbUtils
 
     private static SqlParameter CreateListType(string parameterName, object value, string typeName)
     {
-        return new SqlParameter(parameterName, value)
-        {
-            SqlDbType = SqlDbType.Structured,
-            TypeName = typeName
-        };
+        return new SqlParameter(parameterName, value) { SqlDbType = SqlDbType.Structured, TypeName = typeName };
     }
 }

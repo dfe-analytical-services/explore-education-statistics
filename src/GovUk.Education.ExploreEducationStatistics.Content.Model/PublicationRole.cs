@@ -5,5 +5,5 @@ public enum PublicationRole
     Owner,
     Allower,
     Approver,
-    Drafter
+    Drafter,
 }

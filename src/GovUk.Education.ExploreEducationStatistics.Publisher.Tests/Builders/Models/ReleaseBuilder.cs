@@ -21,7 +21,7 @@ public class ReleaseBuilder()
         };
         return release;
     }
-    
+
     public ReleaseBuilder WithPublicationId(Guid publicationId)
     {
         _publicationId = publicationId;
@@ -33,7 +33,7 @@ public class ReleaseBuilder()
         _releaseId = releaseId;
         return this;
     }
-    
+
     public ReleaseBuilder WithReleaseSlug(string releaseSlug)
     {
         _releaseSlug = releaseSlug;

@@ -45,4 +45,3 @@ public record EinFreeTextStatTileUpdateRequest
     public string? LinkUrl { get; set; }
     public string? LinkText { get; set; }
 }
-

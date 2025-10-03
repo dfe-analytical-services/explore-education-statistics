@@ -15,24 +15,22 @@ public interface IReleaseFileRepository
         Guid createdById,
         string? name = null,
         string? summary = null,
-        Guid? newFileId = null);
+        Guid? newFileId = null
+    );
 
-    Task Delete(Guid releaseVersionId,
-        Guid fileId);
+    Task Delete(Guid releaseVersionId, Guid fileId);
 
-    Task<ReleaseFile?> Find(Guid releaseVersionId,
-        Guid fileId);
+    Task<ReleaseFile?> Find(Guid releaseVersionId, Guid fileId);
 
-    Task<Either<ActionResult, ReleaseFile>> FindOrNotFound(Guid releaseVersionId,
-        Guid fileId);
+    Task<Either<ActionResult, ReleaseFile>> FindOrNotFound(Guid releaseVersionId, Guid fileId);
 
     Task<List<ReleaseFile>> GetByFileType(
         Guid releaseVersionId,
         CancellationToken cancellationToken = default,
-        params FileType[] types);
+        params FileType[] types
+    );
 
-    Task<bool> FileIsLinkedToOtherReleases(Guid releaseVersionId,
-        Guid fileId);
+    Task<bool> FileIsLinkedToOtherReleases(Guid releaseVersionId, Guid fileId);
 
     Task<ReleaseFile> Update(
         Guid releaseVersionId,
@@ -40,9 +38,10 @@ public interface IReleaseFileRepository
         Guid? newFileId = null,
         string? name = null,
         string? fileName = null,
-        string? summary = null);
+        string? summary = null
+    );
 
-    Task<Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>>
-        CheckLinkedOriginalAndReplacementReleaseFilesExist(Guid releaseVersionId,
-            Guid originalFileId);
+    Task<
+        Either<ActionResult, (ReleaseFile originalReleaseFile, ReleaseFile replacementReleaseFile)>
+    > CheckLinkedOriginalAndReplacementReleaseFilesExist(Guid releaseVersionId, Guid originalFileId);
 }

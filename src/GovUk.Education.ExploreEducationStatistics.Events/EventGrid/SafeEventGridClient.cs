@@ -8,8 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Events.EventGrid;
 /// This client will attempt to raise an event.
 /// Errors will be logged but not thrown.
 /// </summary>
-public class SafeEventGridClient(ILogger logger, EventGridPublisherClient client)
-    : IEventGridClient
+public class SafeEventGridClient(ILogger logger, EventGridPublisherClient client) : IEventGridClient
 {
     /// <summary>
     /// Publish event to event grid
@@ -19,7 +18,8 @@ public class SafeEventGridClient(ILogger logger, EventGridPublisherClient client
     /// <returns>The Azure response or null if an error occurred</returns>
     public async Task<Response?> SendEventAsync(
         EventGridEvent eventGridEvent,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
@@ -27,9 +27,10 @@ public class SafeEventGridClient(ILogger logger, EventGridPublisherClient client
             if (response.IsError)
             {
                 logger.LogError(
-                    "Error occurred whilst trying to raise event {@Event}. Response:{@SendEventResponse}", 
-                    eventGridEvent, 
-                    response);
+                    "Error occurred whilst trying to raise event {@Event}. Response:{@SendEventResponse}",
+                    eventGridEvent,
+                    response
+                );
             }
             logger.LogDebug("Event raised: {@Event}", eventGridEvent);
             return response;
@@ -37,9 +38,10 @@ public class SafeEventGridClient(ILogger logger, EventGridPublisherClient client
         catch (Exception exception)
         {
             logger.LogError(
-                "Error occurred whilst trying to raise event {@Event}. Exception:{@Exception}", 
-                eventGridEvent, 
-                exception);
+                "Error occurred whilst trying to raise event {@Event}. Exception:{@Exception}",
+                eventGridEvent,
+                exception
+            );
             return null;
         }
     }

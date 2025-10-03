@@ -13,7 +13,8 @@ public record PublicationLatestPublishedReleaseReorderedEvent : IEvent
         Guid latestPublishedReleaseVersionId,
         Guid previousReleaseId,
         Guid previousReleaseVersionId,
-        bool isPublicationArchived)
+        bool isPublicationArchived
+    )
     {
         Subject = publicationId.ToString();
         Payload = new EventPayload
@@ -24,7 +25,7 @@ public record PublicationLatestPublishedReleaseReorderedEvent : IEvent
             LatestPublishedReleaseVersionId = latestPublishedReleaseVersionId,
             PreviousReleaseId = previousReleaseId,
             PreviousReleaseVersionId = previousReleaseVersionId,
-            IsPublicationArchived = isPublicationArchived
+            IsPublicationArchived = isPublicationArchived,
         };
     }
 

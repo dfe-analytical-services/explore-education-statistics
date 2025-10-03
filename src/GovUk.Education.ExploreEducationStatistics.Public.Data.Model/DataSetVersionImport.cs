@@ -24,25 +24,20 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
     public DateTimeOffset? Updated { get; set; }
 
     public Guid? DataSetVersionToReplaceId { get; init; }
-    
+
     public DataSetVersion? DataSetVersionToReplace { get; init; }
-    
+
     internal class Config : IEntityTypeConfiguration<DataSetVersionImport>
     {
         public void Configure(EntityTypeBuilder<DataSetVersionImport> builder)
         {
-            builder.Property(i => i.Id)
-                .HasValueGenerator<UuidV7ValueGenerator>();
+            builder.Property(i => i.Id).HasValueGenerator<UuidV7ValueGenerator>();
 
-            builder.Property(i => i.Stage)
-                .HasConversion<string>();
+            builder.Property(i => i.Stage).HasConversion<string>();
 
-            builder.HasIndex(i => i.InstanceId)
-                .IsUnique();
+            builder.HasIndex(i => i.InstanceId).IsUnique();
 
-            builder.HasOne(i => i.DataSetVersionToReplace)
-                .WithMany()
-                .HasForeignKey(i => i.DataSetVersionToReplaceId);
+            builder.HasOne(i => i.DataSetVersionToReplace).WithMany().HasForeignKey(i => i.DataSetVersionToReplaceId);
         }
     }
 }

@@ -8,5 +8,6 @@ public interface ITimePeriodsDuckDbRepository
     Task CreateTimePeriodsTable(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

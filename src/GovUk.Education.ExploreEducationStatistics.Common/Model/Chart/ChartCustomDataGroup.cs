@@ -5,4 +5,3 @@ public class ChartCustomDataGroup
     public decimal Min;
     public decimal Max;
 }
-

@@ -8,5 +8,6 @@ public interface ILocationsDuckDbRepository
     Task CreateLocationsTable(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

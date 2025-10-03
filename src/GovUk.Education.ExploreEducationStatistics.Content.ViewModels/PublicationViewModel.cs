@@ -30,12 +30,12 @@ public record PublicationViewModel
 
     public List<MethodologyVersionSummaryViewModel> Methodologies { get; init; } = new();
 
-    public PublicationViewModel()
-    {
-    }
+    public PublicationViewModel() { }
 
-    public PublicationViewModel(PublicationCacheViewModel publication,
-        List<MethodologyVersionSummaryViewModel> methodologySummaries)
+    public PublicationViewModel(
+        PublicationCacheViewModel publication,
+        List<MethodologyVersionSummaryViewModel> methodologySummaries
+    )
     {
         Id = publication.Id;
         Title = publication.Title;

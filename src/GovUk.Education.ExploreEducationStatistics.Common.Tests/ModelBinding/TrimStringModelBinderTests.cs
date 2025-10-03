@@ -9,9 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.ModelBinding;
 
 public class TrimStringModelBinderTests : IntegrationTest<TestStartup>
 {
-    public TrimStringModelBinderTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-    {
-    }
+    public TrimStringModelBinderTests(TestApplicationFactory<TestStartup> testApp)
+        : base(testApp) { }
 
     [Fact]
     public async Task RouteValuesAreTrimmed()
@@ -48,11 +47,10 @@ public class TrimStringModelBinderTests : IntegrationTest<TestStartup>
     {
         var client = SetupApp().CreateClient();
 
-        var response = await client.PostAsync("api/test",
-            content: new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
-            {
-                new("query", "  query  ")
-            }));
+        var response = await client.PostAsync(
+            "api/test",
+            content: new FormUrlEncodedContent(new List<KeyValuePair<string, string>> { new("query", "  query  ") })
+        );
 
         response.AssertOk(new QueryResponse("query"));
     }
@@ -62,19 +60,19 @@ public class TrimStringModelBinderTests : IntegrationTest<TestStartup>
     {
         var client = SetupApp().CreateClient();
 
-        var response = await client.PostAsync("api/test/complex",
-            content: new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
-            {
-                new("request.query", "  query  ")
-            }));
+        var response = await client.PostAsync(
+            "api/test/complex",
+            content: new FormUrlEncodedContent(
+                new List<KeyValuePair<string, string>> { new("request.query", "  query  ") }
+            )
+        );
 
         response.AssertOk(new QueryResponse("query"));
     }
 
     private WebApplicationFactory<TestStartup> SetupApp()
     {
-        return TestApp.WithWebHostBuilder(builder => builder
-            .WithAdditionalControllers(typeof(TestController)));
+        return TestApp.WithWebHostBuilder(builder => builder.WithAdditionalControllers(typeof(TestController)));
     }
 
     [ApiController]

@@ -25,15 +25,11 @@ public class FeaturedTableServicePermissionTests
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanViewSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupService(userService: userService.Object);
-                    return service.Get(
-                        _releaseVersion.Id, Guid.NewGuid()
-                    );
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupService(userService: userService.Object);
+                return service.Get(_releaseVersion.Id, Guid.NewGuid());
+            });
     }
 
     [Fact]
@@ -41,13 +37,11 @@ public class FeaturedTableServicePermissionTests
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanViewSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupService(userService: userService.Object);
-                    return service.List(_releaseVersion.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupService(userService: userService.Object);
+                return service.List(_releaseVersion.Id);
+            });
     }
 
     [Fact]
@@ -55,13 +49,11 @@ public class FeaturedTableServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupService(userService: userService.Object);
-                    return service.Create(_releaseVersion.Id, new FeaturedTableCreateRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupService(userService: userService.Object);
+                return service.Create(_releaseVersion.Id, new FeaturedTableCreateRequest());
+            });
     }
 
     [Fact]
@@ -69,15 +61,15 @@ public class FeaturedTableServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupService(userService: userService.Object);
-                    return service.Update(releaseVersionId: _releaseVersion.Id,
-                        dataBlockId: Guid.NewGuid(),
-                        new FeaturedTableUpdateRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupService(userService: userService.Object);
+                return service.Update(
+                    releaseVersionId: _releaseVersion.Id,
+                    dataBlockId: Guid.NewGuid(),
+                    new FeaturedTableUpdateRequest()
+                );
+            });
     }
 
     [Fact]
@@ -85,14 +77,11 @@ public class FeaturedTableServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupService(userService: userService.Object);
-                    return service.Delete(releaseVersionId: _releaseVersion.Id,
-                        dataBlockId: Guid.NewGuid());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupService(userService: userService.Object);
+                return service.Delete(releaseVersionId: _releaseVersion.Id, dataBlockId: Guid.NewGuid());
+            });
     }
 
     [Fact]
@@ -100,19 +89,18 @@ public class FeaturedTableServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupService(userService: userService.Object);
-                    return service.Reorder(_releaseVersion.Id, new List<Guid>());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupService(userService: userService.Object);
+                return service.Reorder(_releaseVersion.Id, new List<Guid>());
+            });
     }
 
     private FeaturedTableService SetupService(
         ContentDbContext? contentDbContext = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new FeaturedTableService(
             contentDbContext ?? new Mock<ContentDbContext>().Object,

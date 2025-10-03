@@ -17,16 +17,19 @@ public partial class EES4467_AddReleaseIdToContentSection : Migration
             name: "ReleaseId",
             table: "ContentSections",
             type: "uniqueidentifier",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_ContentSections_ReleaseId",
             table: "ContentSections",
-            column: "ReleaseId");
+            column: "ReleaseId"
+        );
 
         migrationBuilder.SqlFromFile(
             ContentMigrationsPath,
-            $"{MigrationId}_{nameof(EES4467_AddReleaseIdToContentSection)}.sql");
+            $"{MigrationId}_{nameof(EES4467_AddReleaseIdToContentSection)}.sql"
+        );
 
         // Initially create this foreign key with "Restrict" delete cascade behaviour. This is so as to not
         // cause potential cyclical delete cascades with the existing cascade delete behaviour from
@@ -37,7 +40,8 @@ public partial class EES4467_AddReleaseIdToContentSection : Migration
             column: "ReleaseId",
             principalTable: "Releases",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Restrict);
+            onDelete: ReferentialAction.Restrict
+        );
 
         migrationBuilder.AlterColumn<Guid>(
             name: "ReleaseId",
@@ -45,21 +49,16 @@ public partial class EES4467_AddReleaseIdToContentSection : Migration
             nullable: false,
             oldClrType: typeof(Guid),
             oldType: "uniqueidentifier",
-            oldNullable: true);
+            oldNullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropForeignKey(
-            name: "FK_ContentSections_Releases_ReleaseId",
-            table: "ContentSections");
+        migrationBuilder.DropForeignKey(name: "FK_ContentSections_Releases_ReleaseId", table: "ContentSections");
 
-        migrationBuilder.DropIndex(
-            name: "IX_ContentSections_ReleaseId",
-            table: "ContentSections");
+        migrationBuilder.DropIndex(name: "IX_ContentSections_ReleaseId", table: "ContentSections");
 
-        migrationBuilder.DropColumn(
-            name: "ReleaseId",
-            table: "ContentSections");
+        migrationBuilder.DropColumn(name: "ReleaseId", table: "ContentSections");
     }
 }

@@ -6,8 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.Extensions.Logging;
 using Moq;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseVersionAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseVersionAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static Moq.MockBehavior;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
@@ -19,7 +18,7 @@ public class DeleteSpecificCommentAuthorizationHandlerTests
     [Fact]
     public async Task CanDeleteCommentAuthorizationHandler()
     {
-        var comment = new Comment { Id = Guid.NewGuid(), };
+        var comment = new Comment { Id = Guid.NewGuid() };
         var releaseVersion = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
@@ -27,8 +26,9 @@ public class DeleteSpecificCommentAuthorizationHandlerTests
             Content = ListOf(
                 new ContentSection
                 {
-                    Content = new List<ContentBlock> { new DataBlock { Comments = new List<Comment> { comment }, } }
-                })
+                    Content = new List<ContentBlock> { new DataBlock { Comments = new List<Comment> { comment } } },
+                }
+            ),
         };
 
         await AssertHandlerOnlySucceedsWithReleaseRoles<DeleteSpecificCommentRequirement, Comment>(
@@ -37,17 +37,18 @@ public class DeleteSpecificCommentAuthorizationHandlerTests
             contentDbContext => contentDbContext.Add(releaseVersion),
             CreateHandler,
             ReleaseRole.Approver,
-            ReleaseRole.Contributor);
+            ReleaseRole.Contributor
+        );
     }
 
     private static DeleteSpecificCommentAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
         var userReleaseRoleRepository = new UserReleaseRoleRepository(
             contentDbContext,
-            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>());
+            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
+        );
 
-        var userPublicationRoleRepository = new UserPublicationRoleRepository(
-            contentDbContext);
+        var userPublicationRoleRepository = new UserPublicationRoleRepository(contentDbContext);
 
         return new DeleteSpecificCommentAuthorizationHandler(
             contentDbContext,
@@ -55,6 +56,8 @@ public class DeleteSpecificCommentAuthorizationHandlerTests
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleRepository: userReleaseRoleRepository,
                 userPublicationRoleRepository: userPublicationRoleRepository,
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
     }
 }

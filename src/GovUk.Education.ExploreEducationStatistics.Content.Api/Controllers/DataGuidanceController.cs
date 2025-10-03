@@ -19,19 +19,15 @@ public class DataGuidanceController
     [HttpGet("publications/{publicationSlug}/releases/latest/data-guidance")]
     public async Task<ActionResult<DataGuidanceViewModel>> GetLatestReleaseDataGuidance(string publicationSlug)
     {
-        return await _dataGuidanceService.GetDataGuidance(publicationSlug)
-            .HandleFailuresOrOk();
+        return await _dataGuidanceService.GetDataGuidance(publicationSlug).HandleFailuresOrOk();
     }
 
     [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/data-guidance")]
     public async Task<ActionResult<DataGuidanceViewModel>> GetReleaseDataGuidance(
         string publicationSlug,
-        string releaseSlug)
+        string releaseSlug
+    )
     {
-        return await _dataGuidanceService.GetDataGuidance(
-                publicationSlug,
-                releaseSlug
-            )
-            .HandleFailuresOrOk();
+        return await _dataGuidanceService.GetDataGuidance(publicationSlug, releaseSlug).HandleFailuresOrOk();
     }
 }

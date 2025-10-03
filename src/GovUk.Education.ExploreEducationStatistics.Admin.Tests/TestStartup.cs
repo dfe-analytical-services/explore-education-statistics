@@ -40,13 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class TestStartup : Startup
 {
-    public TestStartup(
-        IConfiguration configuration,
-        IHostEnvironment hostEnvironment) : base(
-        configuration,
-        hostEnvironment)
-    {
-    }
+    public TestStartup(IConfiguration configuration, IHostEnvironment hostEnvironment)
+        : base(configuration, hostEnvironment) { }
 
     public override void ConfigureServices(IServiceCollection services)
     {
@@ -83,7 +78,8 @@ public static class TestStartupExtensions
     /// <returns></returns>
     public static WebApplicationFactory<TestStartup> SetUser(
         this WebApplicationFactory<TestStartup> testApp,
-        ClaimsPrincipal user)
+        ClaimsPrincipal user
+    )
     {
         return testApp.ConfigureServices(services =>
         {
@@ -100,8 +96,8 @@ internal class TestAuthHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,
     ILoggerFactory logger,
     UrlEncoder encoder,
-    ClaimsPrincipal? claimsPrincipal = null)
-    : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
+    ClaimsPrincipal? claimsPrincipal = null
+) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {

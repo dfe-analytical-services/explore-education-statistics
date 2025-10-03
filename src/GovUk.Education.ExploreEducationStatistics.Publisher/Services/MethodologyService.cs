@@ -17,7 +17,8 @@ public class MethodologyService : IMethodologyService
     public MethodologyService(
         ContentDbContext context,
         IMethodologyVersionRepository methodologyVersionRepository,
-        IPublicationRepository publicationRepository)
+        IPublicationRepository publicationRepository
+    )
     {
         _context = context;
         _methodologyVersionRepository = methodologyVersionRepository;
@@ -32,14 +33,13 @@ public class MethodologyService : IMethodologyService
 
     public async Task<List<MethodologyVersion>> GetLatestVersionByRelease(ReleaseVersion releaseVersion)
     {
-        return await _methodologyVersionRepository.GetLatestVersionByPublication(
-            releaseVersion.Release.PublicationId);
+        return await _methodologyVersionRepository.GetLatestVersionByPublication(releaseVersion.Release.PublicationId);
     }
 
     public async Task<List<File>> GetFiles(Guid methodologyVersionId, params FileType[] types)
     {
-        return await _context.MethodologyFiles
-            .Include(mf => mf.File)
+        return await _context
+            .MethodologyFiles.Include(mf => mf.File)
             .Where(mf => mf.MethodologyVersionId == methodologyVersionId)
             .Select(mf => mf.File)
             .Where(file => types.Contains(file.Type))
@@ -48,8 +48,9 @@ public class MethodologyService : IMethodologyService
 
     public async Task SetPublishedDatesIfApplicable(Guid publicationId)
     {
-        var methodologyVersions =
-            await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(publicationId);
+        var methodologyVersions = await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(
+            publicationId
+        );
 
         _context.MethodologyVersions.UpdateRange(methodologyVersions);
         methodologyVersions.ForEach(methodologyVersion =>
@@ -63,9 +64,7 @@ public class MethodologyService : IMethodologyService
     {
         // NOTE: Methodology files are published separately
 
-        await _context.Entry(methodologyVersion)
-            .Reference(mv => mv.Methodology)
-            .LoadAsync();
+        await _context.Entry(methodologyVersion).Reference(mv => mv.Methodology).LoadAsync();
 
         methodologyVersion.Methodology.LatestPublishedVersionId = methodologyVersion.Id;
         methodologyVersion.Published = DateTime.UtcNow;
@@ -73,7 +72,10 @@ public class MethodologyService : IMethodologyService
         await _context.SaveChangesAsync();
     }
 
-    public async Task<bool> IsBeingPublishedAlongsideRelease(MethodologyVersion methodologyVersion, ReleaseVersion releaseVersion)
+    public async Task<bool> IsBeingPublishedAlongsideRelease(
+        MethodologyVersion methodologyVersion,
+        ReleaseVersion releaseVersion
+    )
     {
         if (!methodologyVersion.Approved)
         {
@@ -83,14 +85,12 @@ public class MethodologyService : IMethodologyService
         var firstRelease = !await _publicationRepository.IsPublished(releaseVersion.Release.PublicationId);
 
         var firstReleaseAndMethodologyScheduledImmediately =
-            firstRelease &&
-            methodologyVersion.ScheduledForPublishingImmediately;
+            firstRelease && methodologyVersion.ScheduledForPublishingImmediately;
 
         var methodologyScheduledWithThisRelease =
             methodologyVersion.ScheduledForPublishingWithRelease
             && methodologyVersion.ScheduledWithReleaseVersionId == releaseVersion.Id;
 
-        return firstReleaseAndMethodologyScheduledImmediately ||
-               methodologyScheduledWithThisRelease;
+        return firstReleaseAndMethodologyScheduledImmediately || methodologyScheduledWithThisRelease;
     }
 }

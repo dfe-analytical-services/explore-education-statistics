@@ -7,23 +7,25 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.Chart.Chart
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 
-
 [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
 public enum BarChartDataLabelPosition
 {
-    Inside, Outside
+    Inside,
+    Outside,
 }
 
 [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
 public enum LineChartDataLabelPosition
 {
-    Above, Below
+    Above,
+    Below,
 }
 
 [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
 public enum LineChartDataLabelColour
 {
-    Inherit, Black
+    Inherit,
+    Black,
 }
 
 [JsonConverter(typeof(ContentBlockChartConverter))]
@@ -38,7 +40,6 @@ public interface IChart
 
     Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
     public ChartLegend? Legend { get; set; }
-
 }
 
 public abstract class Chart : IChart

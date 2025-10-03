@@ -20,10 +20,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsJsonAsync(
             requestUri: nameof(TestController.TestPersonBody),
-            value: new TestPerson
-            {
-                Name = "Test name"
-            });
+            value: new TestPerson { Name = "Test name" }
+        );
 
         var person = response.AssertOk<TestPerson>();
 
@@ -40,7 +38,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestPersonBody),
-            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8));
+            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8)
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -61,7 +60,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestPersonBody),
-            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8));
+            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8)
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -79,7 +79,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestPersonBody),
-            content: new StringContent("", mediaType: "application/json", encoding: Encoding.UTF8));
+            content: new StringContent("", mediaType: "application/json", encoding: Encoding.UTF8)
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -97,10 +98,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestPersonBody),
-            content: new StringContent(
-                "{ \"name\": null }",
-                mediaType: "application/json",
-                encoding: Encoding.UTF8));
+            content: new StringContent("{ \"name\": null }", mediaType: "application/json", encoding: Encoding.UTF8)
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -118,13 +117,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsJsonAsync(
             requestUri: nameof(TestController.TestGroupBody),
-            value: new TestGroup
-            {
-                Owner = new TestPerson
-                {
-                    Name = "Test name"
-                }
-            });
+            value: new TestGroup { Owner = new TestPerson { Name = "Test name" } }
+        );
 
         var group = response.AssertOk<TestGroup>();
 
@@ -143,7 +137,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestGroupBody),
-            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8));
+            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8)
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -164,7 +159,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestGroupBody),
-            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8));
+            content: new StringContent(body, mediaType: "application/json", encoding: Encoding.UTF8)
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -182,7 +178,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestGroupBody),
-            content: new StringContent("", mediaType: "application/json", encoding: Encoding.UTF8));
+            content: new StringContent("", mediaType: "application/json", encoding: Encoding.UTF8)
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -203,7 +200,9 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
             content: new StringContent(
                 content: "{ \"owner\": { \"name\": null } }",
                 mediaType: "application/json",
-                encoding: Encoding.UTF8));
+                encoding: Encoding.UTF8
+            )
+        );
 
         var validationProblem = response.AssertValidationProblem();
 
@@ -226,7 +225,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
         string query,
         string expectedName,
         int? expectedAge = null,
-        params string[] expectedAliases)
+        params string[] expectedAliases
+    )
     {
         var client = BuildApp().CreateClient();
 
@@ -268,12 +268,15 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         Assert.Equal(unknownFields.Length, validationProblem.Errors.Count);
 
-        Assert.All(unknownFields, field =>
-        {
-            var error = validationProblem.AssertHasUnknownFieldError(field);
+        Assert.All(
+            unknownFields,
+            field =>
+            {
+                var error = validationProblem.AssertHasUnknownFieldError(field);
 
-            Assert.Equal(ValidationMessages.UnknownField.Message, error.Message);
-        });
+                Assert.Equal(ValidationMessages.UnknownField.Message, error.Message);
+            }
+        );
     }
 
     [Theory]
@@ -305,7 +308,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
         string query,
         string expectedName,
         int? expectedAge = null,
-        params string[] expectedAliases)
+        params string[] expectedAliases
+    )
     {
         var client = BuildApp().CreateClient();
 
@@ -349,12 +353,15 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
 
         Assert.Equal(unknownFields.Length, validationProblem.Errors.Count);
 
-        Assert.All(unknownFields, field =>
-        {
-            var error = validationProblem.AssertHasUnknownFieldError(field);
+        Assert.All(
+            unknownFields,
+            field =>
+            {
+                var error = validationProblem.AssertHasUnknownFieldError(field);
 
-            Assert.Equal(ValidationMessages.UnknownField.Message, error.Message);
-        });
+                Assert.Equal(ValidationMessages.UnknownField.Message, error.Message);
+            }
+        );
     }
 
     [Theory]
@@ -382,7 +389,8 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
         string query,
         string expectedName,
         int? expectedAge = null,
-        params string[] expectedAliases)
+        params string[] expectedAliases
+    )
     {
         var client = BuildApp().CreateClient();
 
@@ -427,14 +435,17 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
             string name,
             [FromQuery(Name = "age")] int? ageNumber,
             [FromQuery] List<string>? aliases,
-            CancellationToken _)
+            CancellationToken _
+        )
         {
-            return Ok(new TestPerson
-            {
-                Name = name,
-                Age = ageNumber,
-                Aliases = aliases ?? []
-            });
+            return Ok(
+                new TestPerson
+                {
+                    Name = name,
+                    Age = ageNumber,
+                    Aliases = aliases ?? [],
+                }
+            );
         }
     }
 
@@ -453,6 +464,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     {
         public required TestPerson Owner { get; init; }
     }
+
     private WebApplicationFactory<Startup> BuildApp()
     {
         return TestApp

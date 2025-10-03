@@ -9,5 +9,6 @@ public interface IReleaseVersionsService
     Task<Either<ActionResult, ReleaseVersionSummaryDto>> GetReleaseVersionSummary(
         string publicationSlug,
         string releaseSlug,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

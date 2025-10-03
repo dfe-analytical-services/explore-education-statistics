@@ -7,9 +7,7 @@ public partial class EES2375_RemoveSummaryFromMethodology : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "Summary",
-            table: "Methodologies");
+        migrationBuilder.DropColumn(name: "Summary", table: "Methodologies");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -18,6 +16,7 @@ public partial class EES2375_RemoveSummaryFromMethodology : Migration
             name: "Summary",
             table: "Methodologies",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
     }
 }

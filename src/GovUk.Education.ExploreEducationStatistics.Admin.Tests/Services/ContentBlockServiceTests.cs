@@ -18,8 +18,8 @@ public class ContentBlockServiceTests
 
         var contentBlocks = new List<ContentBlock>
         {
-            new HtmlBlock { Order = 1, },
-            new HtmlBlock { Order = 2, },
+            new HtmlBlock { Order = 1 },
+            new HtmlBlock { Order = 2 },
             new EmbedBlockLink
             {
                 Id = contentBlockId,
@@ -31,15 +31,15 @@ public class ContentBlockServiceTests
                     Url = "http://www.test.com",
                 },
             },
-            new HtmlBlock { Order = 4, },
-            new HtmlBlock { Order = 5, },
+            new HtmlBlock { Order = 4 },
+            new HtmlBlock { Order = 5 },
         };
 
         var contentSection = new ContentSection
         {
             Id = Guid.NewGuid(),
             Content = contentBlocks,
-            ReleaseVersion = releaseVersion
+            ReleaseVersion = releaseVersion,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -57,8 +57,8 @@ public class ContentBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var dbContentSection = context.ContentSections
-                .Include(cs => cs.Content)
+            var dbContentSection = context
+                .ContentSections.Include(cs => cs.Content)
                 .Single(cs => cs.Id == contentSection.Id);
 
             Assert.Equal(4, dbContentSection.Content.Count);
@@ -90,17 +90,13 @@ public class ContentBlockServiceTests
         {
             Content = new List<ContentBlock>
             {
-                new HtmlBlock { Order = 1, },
-                new HtmlBlock { Order = 2, },
-                new DataBlock
-                {
-                    Id = contentBlockId,
-                    Order = 3,
-                },
-                new HtmlBlock { Order = 4, },
-                new HtmlBlock { Order = 5, },
+                new HtmlBlock { Order = 1 },
+                new HtmlBlock { Order = 2 },
+                new DataBlock { Id = contentBlockId, Order = 3 },
+                new HtmlBlock { Order = 4 },
+                new HtmlBlock { Order = 5 },
             },
-            ReleaseVersion = new ReleaseVersion()
+            ReleaseVersion = new ReleaseVersion(),
         };
 
         var contentBlocks = contentSection.Content;
@@ -120,8 +116,8 @@ public class ContentBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var dbContentSection = context.ContentSections
-                .Include(cs => cs.Content)
+            var dbContentSection = context
+                .ContentSections.Include(cs => cs.Content)
                 .Single(cs => cs.Id == contentSection.Id);
 
             Assert.Equal(4, dbContentSection.Content.Count);
@@ -152,17 +148,13 @@ public class ContentBlockServiceTests
         {
             Content = new List<ContentBlock>
             {
-                new HtmlBlock { Order = 1, },
-                new HtmlBlock { Order = 2, },
-                new HtmlBlock
-                {
-                    Id = contentBlockId,
-                    Order = 3,
-                },
-                new HtmlBlock { Order = 4, },
-                new HtmlBlock { Order = 5, },
+                new HtmlBlock { Order = 1 },
+                new HtmlBlock { Order = 2 },
+                new HtmlBlock { Id = contentBlockId, Order = 3 },
+                new HtmlBlock { Order = 4 },
+                new HtmlBlock { Order = 5 },
             },
-            ReleaseVersion = new ReleaseVersion()
+            ReleaseVersion = new ReleaseVersion(),
         };
 
         var contentBlocks = contentSection.Content;
@@ -182,8 +174,8 @@ public class ContentBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var dbContentSection = context.ContentSections
-                .Include(cs => cs.Content)
+            var dbContentSection = context
+                .ContentSections.Include(cs => cs.Content)
                 .Single(cs => cs.Id == contentSection.Id);
 
             Assert.Equal(4, dbContentSection.Content.Count);
@@ -210,19 +202,15 @@ public class ContentBlockServiceTests
             Content = new List<ContentBlock>
             {
                 new HtmlBlock(),
-                new DataBlock { Id = dataBlockId, },
+                new DataBlock { Id = dataBlockId },
                 new EmbedBlockLink
                 {
-                    EmbedBlock = new EmbedBlock
-                    {
-                        Title = "title",
-                        Url = "https://"
-                    }
+                    EmbedBlock = new EmbedBlock { Title = "title", Url = "https://" },
                 },
                 new HtmlBlock(),
                 new HtmlBlock(),
             },
-            ReleaseVersion = new ReleaseVersion()
+            ReleaseVersion = new ReleaseVersion(),
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -241,8 +229,8 @@ public class ContentBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var dbContentSection = context.ContentSections
-                .Include(cs => cs.Content)
+            var dbContentSection = context
+                .ContentSections.Include(cs => cs.Content)
                 .Single(cs => cs.Id == contentSection.Id);
 
             Assert.Empty(dbContentSection.Content);

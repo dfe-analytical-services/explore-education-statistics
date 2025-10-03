@@ -7,7 +7,7 @@ public enum ChartLineStyle
 {
     solid,
     dashed,
-    dotted
+    dotted,
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -20,11 +20,13 @@ public enum ChartLineSymbol
     star,
     triangle,
     wye,
-    none
+    none,
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum ChartInlinePosition
 {
-    above, below, right
+    above,
+    below,
+    right,
 }

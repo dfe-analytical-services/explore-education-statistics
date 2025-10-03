@@ -47,10 +47,7 @@ public class BlobCacheServiceTests
 
         var blobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-        blobStorageService.SetupUploadAsJson(
-            container: PublicContent,
-            path: cacheKey.Key,
-            content: "test item");
+        blobStorageService.SetupUploadAsJson(container: PublicContent, path: cacheKey.Key, content: "test item");
 
         var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
@@ -100,7 +97,8 @@ public class BlobCacheServiceTests
             container: PublicContent,
             path: cacheKey.Key,
             value: entity,
-            type: entity.GetType());
+            type: entity.GetType()
+        );
 
         var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
@@ -123,7 +121,8 @@ public class BlobCacheServiceTests
             container: PublicContent,
             path: cacheKey.Key,
             type: typeof(SampleClass),
-            exception: new JsonException("Could not deserialize"));
+            exception: new JsonException("Could not deserialize")
+        );
 
         blobStorageService.SetupDeleteBlob(PublicContent, cacheKey.Key);
 
@@ -146,7 +145,8 @@ public class BlobCacheServiceTests
         blobStorageService.SetupGetDeserializedJsonNotFound(
             container: PublicContent,
             path: cacheKey.Key,
-            type: typeof(SampleClass));
+            type: typeof(SampleClass)
+        );
 
         var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
@@ -168,7 +168,8 @@ public class BlobCacheServiceTests
             container: PublicContent,
             path: cacheKey.Key,
             type: typeof(SampleClass),
-            exception: new Exception("Something went wrong"));
+            exception: new Exception("Something went wrong")
+        );
 
         var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
@@ -181,9 +182,10 @@ public class BlobCacheServiceTests
 
     private static BlobCacheService SetupBlobStorageCacheService(
         IBlobStorageService? blobStorageService = null,
-        ILogger<BlobCacheService>? logger = null)
+        ILogger<BlobCacheService>? logger = null
+    )
     {
-        return new (
+        return new(
             blobStorageService ?? Mock.Of<IBlobStorageService>(),
             logger ?? Mock.Of<ILogger<BlobCacheService>>()
         );

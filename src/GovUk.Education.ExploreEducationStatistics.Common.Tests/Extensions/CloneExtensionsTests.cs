@@ -39,7 +39,7 @@ public static class CloneExtensionsTests
                 [
                     new TestAddress { Line1 = "123 High Street" },
                     new TestAddress { Line1 = "456 Low Street" },
-                ]
+                ],
             };
 
             var clone = obj.ShallowClone();
@@ -77,7 +77,7 @@ public static class CloneExtensionsTests
                 [
                     new TestAddress { Line1 = "123 High Street" },
                     new TestAddress { Line1 = "456 Low Street" },
-                ]
+                ],
             };
 
             var clone = obj.DeepClone();

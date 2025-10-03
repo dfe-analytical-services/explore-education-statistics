@@ -41,14 +41,14 @@ public class SubjectResultMetaServiceTests
     {
         Id = 1,
         Label = "Countries November 2021",
-        Level = GeographicLevel.Country
+        Level = GeographicLevel.Country,
     };
 
     private readonly BoundaryLevel _regionsBoundaryLevel = new()
     {
         Id = 2,
         Label = "Regions November 2021",
-        Level = GeographicLevel.Region
+        Level = GeographicLevel.Region,
     };
 
     [Fact]
@@ -61,10 +61,7 @@ public class SubjectResultMetaServiceTests
         await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
         var service = BuildService(statisticsDbContext);
 
-        var result = await service.GetSubjectMeta(
-            releaseVersionId: Guid.NewGuid(),
-            query,
-            []);
+        var result = await service.GetSubjectMeta(releaseVersionId: Guid.NewGuid(), query, []);
 
         result.AssertNotFound();
     }
@@ -74,33 +71,24 @@ public class SubjectResultMetaServiceTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture
-                .DefaultRelease(publishedVersions: 1)
-                .Generate(1));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
 
         var releaseVersion = publication.ReleaseVersions[0];
 
-        Subject subject = _dataFixture
-            .DefaultSubject();
+        Subject subject = _dataFixture.DefaultSubject();
 
         ReleaseSubject releaseSubject = _dataFixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_dataFixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id))
+            .WithReleaseVersion(
+                _dataFixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
+            )
             .WithSubject(subject);
 
-        ReleaseFile releaseFile = _dataFixture
-            .DefaultReleaseFile();
+        ReleaseFile releaseFile = _dataFixture.DefaultReleaseFile();
 
         var observations = new List<Observation>();
 
-        var query = new FullTableQuery
-        {
-            Indicators = new List<Guid>(),
-            SubjectId = subject.Id
-        };
+        var query = new FullTableQuery { Indicators = new List<Guid>(), SubjectId = subject.Id };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -126,35 +114,29 @@ public class SubjectResultMetaServiceTests
         var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict);
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
-        boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(new List<GeographicLevel>()))
-            .Returns([]);
+        boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(new List<GeographicLevel>())).Returns([]);
 
-        filterItemRepository.Setup(s => s.GetFilterItemsFromObservations(observations))
-            .ReturnsAsync([]);
+        filterItemRepository.Setup(s => s.GetFilterItemsFromObservations(observations)).ReturnsAsync([]);
 
         locationService
-            .Setup(s => s.GetLocationViewModels(
-                It.IsAny<List<Location>>(),
-                It.IsAny<Dictionary<GeographicLevel, List<string>>>(),
-                null))
+            .Setup(s =>
+                s.GetLocationViewModels(
+                    It.IsAny<List<Location>>(),
+                    It.IsAny<Dictionary<GeographicLevel, List<string>>>(),
+                    null
+                )
+            )
             .ReturnsAsync([]);
 
-        footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                releaseVersion.Id,
-                subject.Id,
-                new List<Guid>(),
-                query.Indicators))
+        footnoteRepository
+            .Setup(s => s.GetFilteredFootnotes(releaseVersion.Id, subject.Id, new List<Guid>(), query.Indicators))
             .ReturnsAsync([]);
 
-        indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
-            .Returns([]);
+        indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators)).Returns([]);
 
-        releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id))
-            .ReturnsAsync(releaseFile);
+        releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id)).ReturnsAsync(releaseFile);
 
-        timePeriodService
-            .Setup(s => s.GetTimePeriodRange(observations))
-            .Returns([]);
+        timePeriodService.Setup(s => s.GetTimePeriodRange(observations)).Returns([]);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -171,10 +153,7 @@ public class SubjectResultMetaServiceTests
                 timePeriodService: timePeriodService.Object
             );
 
-            var result = await service.GetSubjectMeta(
-                releaseVersion.Id,
-                query,
-                observations);
+            var result = await service.GetSubjectMeta(releaseVersion.Id, query, observations);
 
             VerifyAllMocks(
                 boundaryLevelRepository,
@@ -183,7 +162,8 @@ public class SubjectResultMetaServiceTests
                 indicatorRepository,
                 locationRepository,
                 releaseDataFileRepository,
-                timePeriodService);
+                timePeriodService
+            );
 
             var viewModel = result.AssertRight();
 
@@ -204,31 +184,23 @@ public class SubjectResultMetaServiceTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture
-                .DefaultRelease(publishedVersions: 1)
-                .Generate(1));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
 
         var releaseVersion = publication.ReleaseVersions[0];
 
-        Subject subject = _dataFixture
-            .DefaultSubject();
+        Subject subject = _dataFixture.DefaultSubject();
 
         ReleaseSubject releaseSubject = _dataFixture
             .DefaultReleaseSubject()
-            .WithReleaseVersion(_dataFixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(publication.Id))
+            .WithReleaseVersion(
+                _dataFixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
+            )
             .WithSubject(subject);
 
         var observations = ListOf(
             new Observation
             {
-                Location = new Location
-                {
-                    GeographicLevel = GeographicLevel.Country,
-                    Country = _england,
-                }
+                Location = new Location { GeographicLevel = GeographicLevel.Country, Country = _england },
             },
             new Observation
             {
@@ -236,8 +208,8 @@ public class SubjectResultMetaServiceTests
                 {
                     GeographicLevel = GeographicLevel.Region,
                     Country = _england,
-                    Region = _northWest
-                }
+                    Region = _northWest,
+                },
             },
             new Observation
             {
@@ -245,8 +217,8 @@ public class SubjectResultMetaServiceTests
                 {
                     GeographicLevel = GeographicLevel.Region,
                     Country = _england,
-                    Region = _northEast
-                }
+                    Region = _northEast,
+                },
             },
             new Observation
             {
@@ -254,29 +226,20 @@ public class SubjectResultMetaServiceTests
                 {
                     GeographicLevel = GeographicLevel.Region,
                     Country = _england,
-                    Region = _eastMidlands
-                }
-            });
+                    Region = _eastMidlands,
+                },
+            }
+        );
 
         var options = new LocationsOptions
         {
             Hierarchies = new Dictionary<GeographicLevel, List<string>>
             {
-                {
-                    GeographicLevel.Region,
-                    [
-                        "Country",
-                        "Region"
-                    ]
-                }
-            }
+                { GeographicLevel.Region, ["Country", "Region"] },
+            },
         }.ToOptionsWrapper();
 
-        var query = new FullTableQuery
-        {
-            Indicators = new List<Guid>(),
-            SubjectId = subject.Id
-        };
+        var query = new FullTableQuery { Indicators = new List<Guid>(), SubjectId = subject.Id };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -303,43 +266,34 @@ public class SubjectResultMetaServiceTests
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
         locationService
-            .Setup(s => s.GetLocationViewModels(
-                It.IsAny<List<Location>>(),
-                It.IsAny<Dictionary<GeographicLevel, List<string>>>(),
-                null))
+            .Setup(s =>
+                s.GetLocationViewModels(
+                    It.IsAny<List<Location>>(),
+                    It.IsAny<Dictionary<GeographicLevel, List<string>>>(),
+                    null
+                )
+            )
             .ReturnsAsync([]);
 
-        boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(
-                new List<GeographicLevel>
-                {
-                    GeographicLevel.Country,
-                    GeographicLevel.Region
-                }))
-            .Returns(new List<BoundaryLevel>
-            {
-                _countriesBoundaryLevel,
-                _regionsBoundaryLevel
-            });
+        boundaryLevelRepository
+            .Setup(s =>
+                s.FindByGeographicLevels(new List<GeographicLevel> { GeographicLevel.Country, GeographicLevel.Region })
+            )
+            .Returns(new List<BoundaryLevel> { _countriesBoundaryLevel, _regionsBoundaryLevel });
 
-        filterItemRepository.Setup(s => s.GetFilterItemsFromObservations(observations))
+        filterItemRepository.Setup(s => s.GetFilterItemsFromObservations(observations)).ReturnsAsync([]);
+
+        footnoteRepository
+            .Setup(s => s.GetFilteredFootnotes(releaseVersion.Id, subject.Id, new List<Guid>(), query.Indicators))
             .ReturnsAsync([]);
 
-        footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                releaseVersion.Id,
-                subject.Id,
-                new List<Guid>(),
-                query.Indicators))
-            .ReturnsAsync([]);
+        indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators)).Returns([]);
 
-        indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
-            .Returns([]);
-
-        releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id))
+        releaseDataFileRepository
+            .Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id))
             .ReturnsAsync(new ReleaseFile());
 
-        timePeriodService
-            .Setup(s => s.GetTimePeriodRange(observations))
-            .Returns([]);
+        timePeriodService.Setup(s => s.GetTimePeriodRange(observations)).Returns([]);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -357,10 +311,7 @@ public class SubjectResultMetaServiceTests
                 options: options
             );
 
-            var result = await service.GetSubjectMeta(
-                releaseVersion.Id,
-                query,
-                observations);
+            var result = await service.GetSubjectMeta(releaseVersion.Id, query, observations);
 
             VerifyAllMocks(
                 boundaryLevelRepository,
@@ -369,7 +320,8 @@ public class SubjectResultMetaServiceTests
                 indicatorRepository,
                 locationRepository,
                 releaseDataFileRepository,
-                timePeriodService);
+                timePeriodService
+            );
 
             var viewModel = result.AssertRight();
 
@@ -402,7 +354,8 @@ public class SubjectResultMetaServiceTests
         IUserService? userService = null,
         ISubjectRepository? subjectRepository = null,
         IReleaseDataFileRepository? releaseDataFileRepository = null,
-        IOptions<LocationsOptions>? options = null)
+        IOptions<LocationsOptions>? options = null
+    )
     {
         return new(
             contentDbContext ?? InMemoryContentDbContext(),

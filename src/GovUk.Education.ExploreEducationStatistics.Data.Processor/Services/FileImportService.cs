@@ -22,7 +22,8 @@ public class FileImportService : IFileImportService
         ILogger<FileImportService> logger,
         IPrivateBlobStorageService privateBlobStorageService,
         IDataImportService dataImportService,
-        IImporterService importerService)
+        IImporterService importerService
+    )
     {
         _logger = logger;
         _privateBlobStorageService = privateBlobStorageService;
@@ -41,17 +42,17 @@ public class FileImportService : IFileImportService
                 import.File.Filename,
                 import.Status
             );
-            
+
             return;
         }
 
         if (import.Status == CANCELLING)
         {
             _logger.LogInformation(
-                "Import for {Filename} is {ImportStatus} - ignoring Observations and marking import as " +
-                "CANCELLED",
+                "Import for {Filename} is {ImportStatus} - ignoring Observations and marking import as " + "CANCELLED",
                 import.File.Filename,
-                import.Status);
+                import.Status
+            );
 
             await _dataImportService.UpdateStatus(import.Id, CANCELLED, 100);
             return;
@@ -74,20 +75,13 @@ public class FileImportService : IFileImportService
         await CompleteImport(completedImport, context);
     }
 
-    public async Task ImportFiltersAndLocations(
-        Guid importId,
-        SubjectMeta subjectMeta,
-        StatisticsDbContext context)
+    public async Task ImportFiltersAndLocations(Guid importId, SubjectMeta subjectMeta, StatisticsDbContext context)
     {
         var import = await _dataImportService.GetImport(importId);
 
         var datafileStreamProvider = _privateBlobStorageService.GetDataFileStreamProvider(import);
 
-        await _importerService.ImportFiltersAndLocations(
-            import,
-            datafileStreamProvider,
-            subjectMeta,
-            context);
+        await _importerService.ImportFiltersAndLocations(import, datafileStreamProvider, subjectMeta, context);
     }
 
     public async Task CompleteImport(DataImport import, StatisticsDbContext context)
@@ -95,10 +89,11 @@ public class FileImportService : IFileImportService
         if (import.Status.IsFinished())
         {
             _logger.LogInformation(
-                "Import for {Filename} is already finished in state {ImportStatus} - not attempting to " +
-                "mark as completed or failed",
+                "Import for {Filename} is already finished in state {ImportStatus} - not attempting to "
+                    + "mark as completed or failed",
                 import.File.Filename,
-                import.Status);
+                import.Status
+            );
 
             if (import.Status == COMPLETE)
             {
@@ -110,26 +105,28 @@ public class FileImportService : IFileImportService
 
         if (import.Status.IsAborting())
         {
-            _logger.LogInformation("Import for {Filename} is trying to abort in " +
-                                   "state {ImportStatus} - not attempting to mark as completed or failed, but " +
-                                   "instead marking as {AbortedState}, the final state of the aborting process",
+            _logger.LogInformation(
+                "Import for {Filename} is trying to abort in "
+                    + "state {ImportStatus} - not attempting to mark as completed or failed, but "
+                    + "instead marking as {AbortedState}, the final state of the aborting process",
                 import.File.Filename,
                 import.Status,
-                import.Status.GetFinishingStateOfAbortProcess());
+                import.Status.GetFinishingStateOfAbortProcess()
+            );
 
             await _dataImportService.UpdateStatus(import.Id, import.Status.GetFinishingStateOfAbortProcess(), 100);
             return;
         }
 
-        var observationCount = await context
-            .Observation
-            .CountAsync(o => o.SubjectId.Equals(import.SubjectId));
+        var observationCount = await context.Observation.CountAsync(o => o.SubjectId.Equals(import.SubjectId));
 
         if (observationCount != import.ExpectedImportedRows)
         {
-            await _dataImportService.FailImport(import.Id,
-                $"Number of observations inserted ({observationCount}) " +
-                        $"does not equal that expected ({import.ExpectedImportedRows}) : Please delete & retry");
+            await _dataImportService.FailImport(
+                import.Id,
+                $"Number of observations inserted ({observationCount}) "
+                    + $"does not equal that expected ({import.ExpectedImportedRows}) : Please delete & retry"
+            );
         }
         else
         {

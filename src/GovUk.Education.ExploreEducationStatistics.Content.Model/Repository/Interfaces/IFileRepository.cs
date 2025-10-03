@@ -16,5 +16,6 @@ public interface IFileRepository
         string contentType,
         FileType type,
         Guid createdById,
-        Guid? newFileId = null);
+        Guid? newFileId = null
+    );
 }

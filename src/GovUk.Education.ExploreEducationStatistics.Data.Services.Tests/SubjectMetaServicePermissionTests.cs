@@ -31,16 +31,13 @@ public class SubjectMetaServicePermissionTests
     private static readonly ReleaseSubject ReleaseSubject = new()
     {
         ReleaseVersionId = ReleaseVersionId,
-        SubjectId = SubjectId
+        SubjectId = SubjectId,
     };
 
     private static readonly ReleaseFile ReleaseFile = new()
     {
         ReleaseVersionId = ReleaseVersionId,
-        File = new File
-        {
-            SubjectId = SubjectId
-        },
+        File = new File { SubjectId = SubjectId },
     };
 
     [Fact]
@@ -48,28 +45,26 @@ public class SubjectMetaServicePermissionTests
     {
         await PolicyCheckBuilder<DataSecurityPolicies>()
             .SetupResourceCheckToFail(ReleaseSubject, DataSecurityPolicies.CanViewSubjectData)
-            .AssertForbidden(
-                async userService =>
-                {
-                    var contentDbContextId = Guid.NewGuid().ToString();
-                    await using var contextDbContext = InMemoryContentDbContext(contentDbContextId);
-                    contextDbContext.ReleaseFiles.Add(ReleaseFile);
-                    await contextDbContext.SaveChangesAsync();
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using var contextDbContext = InMemoryContentDbContext(contentDbContextId);
+                contextDbContext.ReleaseFiles.Add(ReleaseFile);
+                await contextDbContext.SaveChangesAsync();
 
-                    var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
-                    releaseSubjectService
-                        .Setup(s => s.Find(SubjectId, ReleaseSubject.ReleaseVersionId))
-                        .ReturnsAsync(ReleaseSubject);
+                var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
+                releaseSubjectService
+                    .Setup(s => s.Find(SubjectId, ReleaseSubject.ReleaseVersionId))
+                    .ReturnsAsync(ReleaseSubject);
 
-                    var service = SetupService(
-                        userService: userService.Object,
-                        contentDbContext: contextDbContext,
-                        releaseSubjectService: releaseSubjectService.Object
-                    );
+                var service = SetupService(
+                    userService: userService.Object,
+                    contentDbContext: contextDbContext,
+                    releaseSubjectService: releaseSubjectService.Object
+                );
 
-                    return await service.GetSubjectMeta(releaseVersionId: ReleaseVersionId, subjectId: SubjectId);
-                }
-            );
+                return await service.GetSubjectMeta(releaseVersionId: ReleaseVersionId, subjectId: SubjectId);
+            });
     }
 
     [Fact]
@@ -77,29 +72,27 @@ public class SubjectMetaServicePermissionTests
     {
         await PolicyCheckBuilder<DataSecurityPolicies>()
             .SetupResourceCheckToFail(ReleaseSubject, DataSecurityPolicies.CanViewSubjectData)
-            .AssertForbidden(
-                async userService =>
-                {
-                    var contentDbContextId = Guid.NewGuid().ToString();
-                    await using var contextDbContext = InMemoryContentDbContext(contentDbContextId);
-                    contextDbContext.ReleaseFiles.Add(ReleaseFile);
-                    await contextDbContext.SaveChangesAsync();
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using var contextDbContext = InMemoryContentDbContext(contentDbContextId);
+                contextDbContext.ReleaseFiles.Add(ReleaseFile);
+                await contextDbContext.SaveChangesAsync();
 
-                    var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
+                var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
 
-                    releaseSubjectService
-                        .Setup(s => s.Find(SubjectId, ReleaseSubject.ReleaseVersionId))
-                        .ReturnsAsync(ReleaseSubject);
+                releaseSubjectService
+                    .Setup(s => s.Find(SubjectId, ReleaseSubject.ReleaseVersionId))
+                    .ReturnsAsync(ReleaseSubject);
 
-                    var service = SetupService(
-                        userService: userService.Object,
-                        contentDbContext: contextDbContext,
-                        releaseSubjectService: releaseSubjectService.Object
-                    );
+                var service = SetupService(
+                    userService: userService.Object,
+                    contentDbContext: contextDbContext,
+                    releaseSubjectService: releaseSubjectService.Object
+                );
 
-                    return await service.GetSubjectMeta(ReleaseSubject);
-                }
-            );
+                return await service.GetSubjectMeta(ReleaseSubject);
+            });
     }
 
     [Fact]
@@ -107,73 +100,64 @@ public class SubjectMetaServicePermissionTests
     {
         await PolicyCheckBuilder<DataSecurityPolicies>()
             .SetupResourceCheckToFail(ReleaseSubject, DataSecurityPolicies.CanViewSubjectData)
-            .AssertForbidden(
-                async userService =>
-                {
-                    var contentDbContextId = Guid.NewGuid().ToString();
-                    await using var contextDbContext = InMemoryContentDbContext(contentDbContextId);
-                    contextDbContext.ReleaseFiles.Add(ReleaseFile);
-                    await contextDbContext.SaveChangesAsync();
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using var contextDbContext = InMemoryContentDbContext(contentDbContextId);
+                contextDbContext.ReleaseFiles.Add(ReleaseFile);
+                await contextDbContext.SaveChangesAsync();
 
-                    var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
-                    releaseSubjectService
-                        .Setup(s => s.Find(SubjectId, ReleaseSubject.ReleaseVersionId))
-                        .ReturnsAsync(ReleaseSubject);
+                var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
+                releaseSubjectService
+                    .Setup(s => s.Find(SubjectId, ReleaseSubject.ReleaseVersionId))
+                    .ReturnsAsync(ReleaseSubject);
 
-                    var service = SetupService(
-                        userService: userService.Object,
-                        contentDbContext: contextDbContext,
-                        releaseSubjectService: releaseSubjectService.Object
-                    );
+                var service = SetupService(
+                    userService: userService.Object,
+                    contentDbContext: contextDbContext,
+                    releaseSubjectService: releaseSubjectService.Object
+                );
 
-                    var request = new LocationsOrTimePeriodsQueryRequest
-                    {
-                        SubjectId = SubjectId
-                    };
+                var request = new LocationsOrTimePeriodsQueryRequest { SubjectId = SubjectId };
 
-                    return await service.FilterSubjectMeta(ReleaseVersionId, request, new CancellationTokenSource().Token);
-                }
-            );
+                return await service.FilterSubjectMeta(ReleaseVersionId, request, new CancellationTokenSource().Token);
+            });
     }
 
     [Fact]
     public async Task FilterSubjectMeta_LatestRelease()
     {
         await PolicyCheckBuilder<DataSecurityPolicies>()
-            .SetupResourceCheckToFailWithMatcher<ReleaseSubject>(rs =>
+            .SetupResourceCheckToFailWithMatcher<ReleaseSubject>(
+                rs =>
                     rs.ReleaseVersionId == ReleaseSubject.ReleaseVersionId && rs.SubjectId == ReleaseSubject.SubjectId,
-                DataSecurityPolicies.CanViewSubjectData)
-            .AssertForbidden(
-                async userService =>
-                {
-                    await using var contextDbContext = InMemoryContentDbContext();
-                    contextDbContext.ReleaseFiles.Add(ReleaseFile);
-                    await contextDbContext.SaveChangesAsync();
+                DataSecurityPolicies.CanViewSubjectData
+            )
+            .AssertForbidden(async userService =>
+            {
+                await using var contextDbContext = InMemoryContentDbContext();
+                contextDbContext.ReleaseFiles.Add(ReleaseFile);
+                await contextDbContext.SaveChangesAsync();
 
-                    await using var statisticsDbContext = InMemoryStatisticsDbContext();
-                    statisticsDbContext.ReleaseSubject.Add(ReleaseSubject);
-                    await statisticsDbContext.SaveChangesAsync();
+                await using var statisticsDbContext = InMemoryStatisticsDbContext();
+                statisticsDbContext.ReleaseSubject.Add(ReleaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
 
-                    var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
+                var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
 
-                    releaseSubjectService
-                        .Setup(s => s.Find(SubjectId, null))
-                        .ReturnsAsync(ReleaseSubject);
+                releaseSubjectService.Setup(s => s.Find(SubjectId, null)).ReturnsAsync(ReleaseSubject);
 
-                    var service = SetupService(
-                        userService: userService.Object,
-                        statisticsDbContext: statisticsDbContext,
-                        contentDbContext: contextDbContext,
-                        releaseSubjectService: releaseSubjectService.Object);
+                var service = SetupService(
+                    userService: userService.Object,
+                    statisticsDbContext: statisticsDbContext,
+                    contentDbContext: contextDbContext,
+                    releaseSubjectService: releaseSubjectService.Object
+                );
 
-                    var request = new LocationsOrTimePeriodsQueryRequest
-                    {
-                        SubjectId = SubjectId
-                    };
+                var request = new LocationsOrTimePeriodsQueryRequest { SubjectId = SubjectId };
 
-                    return await service.FilterSubjectMeta(null, request, new CancellationTokenSource().Token);
-                }
-            );
+                return await service.FilterSubjectMeta(null, request, new CancellationTokenSource().Token);
+            });
     }
 
     private static SubjectMetaService SetupService(
@@ -188,7 +172,8 @@ public class SubjectMetaServicePermissionTests
         IObservationService? observationService = null,
         ITimePeriodService? timePeriodService = null,
         IUserService? userService = null,
-        IOptions<LocationsOptions>? options = null)
+        IOptions<LocationsOptions>? options = null
+    )
     {
         return new(
             statisticsDbContext ?? Mock.Of<StatisticsDbContext>(Strict),

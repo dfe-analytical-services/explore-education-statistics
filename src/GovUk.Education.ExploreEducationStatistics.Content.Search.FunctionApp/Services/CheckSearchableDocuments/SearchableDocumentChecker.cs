@@ -11,9 +11,9 @@ public class SearchableDocumentChecker(IBlobNameLister blobNameLister, IReleaseS
 
         // Retrieve the release summaries for all published publications
         var releaseSummaries = await releaseSummaryRetriever.GetAllPublishedReleaseSummaries(cancellationToken);
-        
+
         var expectedReleaseIds = releaseSummaries.Select(rs => rs.ReleaseId).ToArray();
-        
+
         // Compare the list of release summaries with the list of blobs
         var (leftOnly, both, rightOnly) = expectedReleaseIds.Diff(blobNames);
 

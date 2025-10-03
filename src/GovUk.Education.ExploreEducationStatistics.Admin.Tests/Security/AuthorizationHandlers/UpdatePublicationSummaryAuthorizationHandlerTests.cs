@@ -31,7 +31,8 @@ public class UpdatePublicationSummaryAuthorizationHandlerTests
     {
         await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdatePublicationSummaryRequirement>(
             CreateHandler,
-            Owner);
+            Owner
+        );
     }
 
     private static UpdatePublicationSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
@@ -40,8 +41,9 @@ public class UpdatePublicationSummaryAuthorizationHandlerTests
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleRepository: Mock.Of<IUserReleaseRoleRepository>(Strict),
-                userPublicationRoleRepository: new UserPublicationRoleRepository(
-                    contentDbContext: contentDbContext),
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
+                userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext: contentDbContext),
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
     }
 }

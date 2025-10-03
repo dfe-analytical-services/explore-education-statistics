@@ -13,7 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 public interface IDataSetQueryCriteria
 {
     protected static void InheritanceValidator<TCriteria>(
-        PolymorphicValidator<TCriteria, IDataSetQueryCriteria> validator)
+        PolymorphicValidator<TCriteria, IDataSetQueryCriteria> validator
+    )
         where TCriteria : IDataSetQueryCriteria
     {
         validator.Add(_ => new DataSetQueryCriteriaAnd.Validator());

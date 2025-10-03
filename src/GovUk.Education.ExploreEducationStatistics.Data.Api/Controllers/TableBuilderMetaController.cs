@@ -26,7 +26,8 @@ public class TableBuilderMetaController : ControllerBase
     public TableBuilderMetaController(
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
         IReleaseSubjectService releaseSubjectService,
-        ISubjectMetaService subjectMetaService)
+        ISubjectMetaService subjectMetaService
+    )
     {
         _contentPersistenceHelper = contentPersistenceHelper;
         _releaseSubjectService = releaseSubjectService;
@@ -36,7 +37,8 @@ public class TableBuilderMetaController : ControllerBase
     [HttpGet("meta/subject/{subjectId:guid}")]
     public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
     {
-        return _releaseSubjectService.Find(subjectId)
+        return _releaseSubjectService
+            .Find(subjectId)
             .OnSuccess(GetCacheableReleaseSubject)
             .OnSuccess(GetSubjectMeta)
             .HandleFailuresOrOk();
@@ -45,22 +47,25 @@ public class TableBuilderMetaController : ControllerBase
     [HttpGet("release/{releaseVersionId:guid}/meta/subject/{subjectId:guid}")]
     public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid releaseVersionId, Guid subjectId)
     {
-        return _releaseSubjectService.Find(releaseVersionId: releaseVersionId,
-                subjectId: subjectId)
+        return _releaseSubjectService
+            .Find(releaseVersionId: releaseVersionId, subjectId: subjectId)
             .OnSuccess(GetCacheableReleaseSubject)
             .OnSuccess(GetSubjectMeta)
             .HandleFailuresOrOk();
     }
 
     private async Task<Either<ActionResult, CacheableReleaseSubject>> GetCacheableReleaseSubject(
-        ReleaseSubject releaseSubject)
+        ReleaseSubject releaseSubject
+    )
     {
         // TODO EES-3363 CacheableReleaseSubject exists to provide the Publication slug not available from the ReleaseSubject
         // In future we should change the storage path for cached items to use Publication and Release id's in the
         // directory structure rather than slugs so that we don't need to lookup the Publication from the Content Release.
-        return await _contentPersistenceHelper.CheckEntityExists<ReleaseVersion>(releaseSubject.ReleaseVersionId,
-                q => q.Include(rv => rv.Release)
-                    .ThenInclude(r => r.Publication))
+        return await _contentPersistenceHelper
+            .CheckEntityExists<ReleaseVersion>(
+                releaseSubject.ReleaseVersionId,
+                q => q.Include(rv => rv.Release).ThenInclude(r => r.Publication)
+            )
             .OnSuccess(releaseVersion => new CacheableReleaseSubject(releaseSubject, releaseVersion));
     }
 
@@ -73,9 +78,11 @@ public class TableBuilderMetaController : ControllerBase
     [HttpPost("meta/subject")]
     public Task<ActionResult<SubjectMetaViewModel>> FilterSubjectMeta(
         [FromBody] LocationsOrTimePeriodsQueryRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return _subjectMetaService.FilterSubjectMeta(releaseVersionId: null, request, cancellationToken)
+        return _subjectMetaService
+            .FilterSubjectMeta(releaseVersionId: null, request, cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -83,9 +90,9 @@ public class TableBuilderMetaController : ControllerBase
     public Task<ActionResult<SubjectMetaViewModel>> FilterSubjectMeta(
         Guid releaseVersionId,
         [FromBody] LocationsOrTimePeriodsQueryRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return _subjectMetaService.FilterSubjectMeta(releaseVersionId, request, cancellationToken)
-            .HandleFailuresOrOk();
+        return _subjectMetaService.FilterSubjectMeta(releaseVersionId, request, cancellationToken).HandleFailuresOrOk();
     }
 }

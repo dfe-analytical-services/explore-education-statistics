@@ -57,4 +57,3 @@ public record LocationGroupOptionsViewModel : LocationGroupViewModel
     [JsonPropertyOrder(1)]
     public required IReadOnlyList<LocationOptionViewModel> Options { get; init; }
 }
-

@@ -8,24 +8,24 @@ public static class HttpClientTestUtils
 {
     private const string BaseAddress = "http://test.localhost";
 
-    public static Mock<IHttpClientFactory> CreateHttpClientFactoryMock(string clientName,
-        HttpMessageHandler httpMessageHandler)
+    public static Mock<IHttpClientFactory> CreateHttpClientFactoryMock(
+        string clientName,
+        HttpMessageHandler httpMessageHandler
+    )
     {
-        var httpClient = new HttpClient(httpMessageHandler)
-        {
-            BaseAddress = new Uri(BaseAddress)
-        };
+        var httpClient = new HttpClient(httpMessageHandler) { BaseAddress = new Uri(BaseAddress) };
 
         var httpClientFactory = new Mock<IHttpClientFactory>(MockBehavior.Strict);
-        httpClientFactory.Setup(factory => factory.CreateClient(clientName))
-            .Returns(httpClient);
+        httpClientFactory.Setup(factory => factory.CreateClient(clientName)).Returns(httpClient);
 
         return httpClientFactory;
     }
 
-    public static Mock<HttpMessageHandler> CreateHttpMessageHandlerMock(HttpMethod httpMethod,
+    public static Mock<HttpMessageHandler> CreateHttpMessageHandlerMock(
+        HttpMethod httpMethod,
         string requestUri,
-        HttpResponseMessage httpResponseMessage)
+        HttpResponseMessage httpResponseMessage
+    )
     {
         var messageHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
 
@@ -33,10 +33,13 @@ public static class HttpClientTestUtils
 
         messageHandlerMock
             .Protected()
-            .Setup<Task<HttpResponseMessage>>("SendAsync", 
-                ItExpr.Is<HttpRequestMessage>(message => message.Method == httpMethod
-                                                         && message.RequestUri == expectedRequestUri),
-                ItExpr.IsAny<CancellationToken>())
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(message =>
+                    message.Method == httpMethod && message.RequestUri == expectedRequestUri
+                ),
+                ItExpr.IsAny<CancellationToken>()
+            )
             .ReturnsAsync(httpResponseMessage);
 
         return messageHandlerMock;

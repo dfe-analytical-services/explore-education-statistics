@@ -16,18 +16,20 @@ public class Program
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<Startup>();
-                webBuilder.ConfigureKestrel(serverOptions => { serverOptions.AddServerHeader = false; });
+                webBuilder.ConfigureKestrel(serverOptions =>
+                {
+                    serverOptions.AddServerHeader = false;
+                });
             })
-            .ConfigureAppConfiguration((_, builder) =>
-            {
-                builder.AddJsonFile(
-                    "appsettings.Local.json",
-                    optional: true,
-                    reloadOnChange: false);
-            })
+            .ConfigureAppConfiguration(
+                (_, builder) =>
+                {
+                    builder.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false);
+                }
+            )
             .ConfigureLogging(builder =>
             {
-                // Capture logs from early in the application startup 
+                // Capture logs from early in the application startup
                 // pipeline from Startup.cs or Program.cs itself.
                 builder.AddApplicationInsights();
 

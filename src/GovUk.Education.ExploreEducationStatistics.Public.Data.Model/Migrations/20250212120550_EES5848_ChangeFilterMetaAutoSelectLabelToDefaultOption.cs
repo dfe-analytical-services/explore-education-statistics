@@ -15,19 +15,22 @@ public partial class EES5848_ChangeFilterMetaAutoSelectLabelToDefaultOption : Mi
             table: "FilterMetas",
             type: "integer",
             maxLength: 120,
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_FilterMetas_DefaultOptionId",
             table: "FilterMetas",
-            column: "DefaultOptionId");
+            column: "DefaultOptionId"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_FilterMetas_FilterOptionMetas_DefaultOptionId",
             table: "FilterMetas",
             column: "DefaultOptionId",
             principalTable: "FilterOptionMetas",
-            principalColumn: "Id");
+            principalColumn: "Id"
+        );
 
         migrationBuilder.Sql(
             """
@@ -39,12 +42,10 @@ public partial class EES5848_ChangeFilterMetaAutoSelectLabelToDefaultOption : Mi
                 WHERE FOM."Label" = FM."AutoSelectLabel"
             )
             WHERE FM."AutoSelectLabel" IS NOT NULL;                 
-            """);
+            """
+        );
 
-
-        migrationBuilder.DropColumn(
-            name: "AutoSelectLabel",
-            table: "FilterMetas");
+        migrationBuilder.DropColumn(name: "AutoSelectLabel", table: "FilterMetas");
     }
 
     /// <inheritdoc />
@@ -55,7 +56,8 @@ public partial class EES5848_ChangeFilterMetaAutoSelectLabelToDefaultOption : Mi
             table: "FilterMetas",
             type: "character varying(120)",
             maxLength: 120,
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.Sql(
             """
@@ -67,18 +69,13 @@ public partial class EES5848_ChangeFilterMetaAutoSelectLabelToDefaultOption : Mi
                 WHERE FOM."Id" = FM."DefaultOptionId"
             )
             WHERE FM."DefaultOptionId" IS NOT NULL;
-            """);
+            """
+        );
 
-        migrationBuilder.DropForeignKey(
-            name: "FK_FilterMetas_FilterOptionMetas_DefaultOptionId",
-            table: "FilterMetas");
+        migrationBuilder.DropForeignKey(name: "FK_FilterMetas_FilterOptionMetas_DefaultOptionId", table: "FilterMetas");
 
-        migrationBuilder.DropIndex(
-            name: "IX_FilterMetas_DefaultOptionId",
-            table: "FilterMetas");
+        migrationBuilder.DropIndex(name: "IX_FilterMetas_DefaultOptionId", table: "FilterMetas");
 
-        migrationBuilder.DropColumn(
-            name: "DefaultOptionId",
-            table: "FilterMetas");
+        migrationBuilder.DropColumn(name: "DefaultOptionId", table: "FilterMetas");
     }
 }

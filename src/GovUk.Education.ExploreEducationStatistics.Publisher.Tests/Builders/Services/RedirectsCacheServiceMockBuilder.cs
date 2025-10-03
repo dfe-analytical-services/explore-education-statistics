@@ -9,8 +9,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Se
 public class RedirectsCacheServiceMockBuilder
 {
     private readonly Mock<IRedirectsCacheService> _mock = new(MockBehavior.Strict);
+
     public IRedirectsCacheService Build() => _mock.Object;
-    
+
     public Asserter Assert => new(_mock);
 
     public RedirectsCacheServiceMockBuilder()

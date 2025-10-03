@@ -24,45 +24,37 @@ public class FilterAndIndicatorValuesReader
 
     public FilterAndIndicatorValuesReader(List<string> csvHeaders, SubjectMeta subjectMeta)
     {
-        _indicatorColumnIndexes = subjectMeta
-            .Indicators
-            .ToDictionary(
-                indicatorMeta => indicatorMeta.Indicator.Id,
-                indicatorMeta => csvHeaders.FindIndex(h => h.Equals(indicatorMeta.Column)));
+        _indicatorColumnIndexes = subjectMeta.Indicators.ToDictionary(
+            indicatorMeta => indicatorMeta.Indicator.Id,
+            indicatorMeta => csvHeaders.FindIndex(h => h.Equals(indicatorMeta.Column))
+        );
 
-        _filterColumnIndexes = subjectMeta
-            .Filters
-            .ToDictionary(
-                filterMeta => filterMeta.Filter.Id,
-                filterMeta => csvHeaders.FindIndex(h => h.Equals(filterMeta.Column)));
+        _filterColumnIndexes = subjectMeta.Filters.ToDictionary(
+            filterMeta => filterMeta.Filter.Id,
+            filterMeta => csvHeaders.FindIndex(h => h.Equals(filterMeta.Column))
+        );
 
-        _filterGroupColumnIndexes = subjectMeta
-            .Filters
-            .ToDictionary(
-                filterMeta => filterMeta.Filter.Id,
-                filterMeta => csvHeaders.FindIndex(h => h.Equals(filterMeta.Filter.GroupCsvColumn)));
+        _filterGroupColumnIndexes = subjectMeta.Filters.ToDictionary(
+            filterMeta => filterMeta.Filter.Id,
+            filterMeta => csvHeaders.FindIndex(h => h.Equals(filterMeta.Filter.GroupCsvColumn))
+        );
 
         _filterItemCache = subjectMeta
-            .Filters
-            .Select(meta => meta.Filter)
+            .Filters.Select(meta => meta.Filter)
             .SelectMany(f => f.FilterGroups)
             .SelectMany(fg => fg.FilterItems)
-            .ToDictionary(
-                fi => $"{fi.FilterGroup.Filter.Label}_{fi.FilterGroup.Label}_{fi.Label}".ToLower(),
-                fi => fi);
+            .ToDictionary(fi => $"{fi.FilterGroup.Filter.Label}_{fi.FilterGroup.Label}_{fi.Label}".ToLower(), fi => fi);
     }
 
     public Dictionary<Guid, string?> GetMeasures(List<string> rowValues)
     {
-        return _indicatorColumnIndexes
-            .ToDictionary(
-                indicatorMeta => indicatorMeta.Key,
-                indicatorMeta => indicatorMeta.Value != -1 ? rowValues[indicatorMeta.Value] : null);
+        return _indicatorColumnIndexes.ToDictionary(
+            indicatorMeta => indicatorMeta.Key,
+            indicatorMeta => indicatorMeta.Value != -1 ? rowValues[indicatorMeta.Value] : null
+        );
     }
 
-    public string GetFilterItemLabel(
-        IReadOnlyList<string> rowValues,
-        Guid filterId)
+    public string GetFilterItemLabel(IReadOnlyList<string> rowValues, Guid filterId)
     {
         var columnIndex = _filterColumnIndexes[filterId];
 
@@ -74,9 +66,7 @@ public class FilterAndIndicatorValuesReader
         return rowValues[columnIndex].Trim().NullIfWhiteSpace() ?? NotSpecifiedFilterItemLabel;
     }
 
-    public string GetFilterGroupLabel(
-        IReadOnlyList<string> rowValues,
-        Guid filterId)
+    public string GetFilterGroupLabel(IReadOnlyList<string> rowValues, Guid filterId)
     {
         var columnIndex = _filterGroupColumnIndexes[filterId];
 

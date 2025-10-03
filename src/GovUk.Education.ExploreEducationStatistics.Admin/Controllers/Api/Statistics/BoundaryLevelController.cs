@@ -15,8 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 [Route("api")]
 [ApiController]
 [Authorize(Roles = RoleNames.BauUser)]
-public class BoundaryLevelController(
-    IBoundaryLevelService boundaryLevelService) : ControllerBase
+public class BoundaryLevelController(IBoundaryLevelService boundaryLevelService) : ControllerBase
 {
     [HttpGet("boundary-level")]
     public async Task<ActionResult<List<BoundaryLevelViewModel>>> ListBoundaryLevels()
@@ -30,10 +29,7 @@ public class BoundaryLevelController(
     [HttpGet("boundary-level/{id:long}")]
     public async Task<ActionResult<BoundaryLevelViewModel>> GetBoundaryLevel(long id)
     {
-        return await boundaryLevelService
-            .GetBoundaryLevel(id)
-            .OnSuccess(BuildViewModel)
-            .HandleFailuresOrOk();
+        return await boundaryLevelService.GetBoundaryLevel(id).OnSuccess(BuildViewModel).HandleFailuresOrOk();
     }
 
     [HttpPatch("boundary-level")]
@@ -45,8 +41,7 @@ public class BoundaryLevelController(
     }
 
     [HttpPost("boundary-level")]
-    public async Task<ActionResult<Unit>> CreateBoundaryLevel(
-        [FromForm] BoundaryLevelCreateRequest request)
+    public async Task<ActionResult<Unit>> CreateBoundaryLevel([FromForm] BoundaryLevelCreateRequest request)
     {
         return await boundaryLevelService
             .CreateBoundaryLevel(request.Level, request.Label, request.Published, request.File)

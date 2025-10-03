@@ -48,14 +48,14 @@ public enum AxisGroupBy
     timePeriod,
     locations,
     filters,
-    indicators
+    indicators,
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum AxisType
 {
     major,
-    minor
+    minor,
 }
 
 public class AxisLabel
@@ -69,7 +69,7 @@ public class AxisReferenceLine
 {
     public string Label = null!;
     public string Position = null!;
-    
+
     [JsonConverter(typeof(StringEnumConverter))]
     public AxisReferenceLineStyle? Style;
 
@@ -85,10 +85,11 @@ public class AxisReferenceLine
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum AxisTickConfig
 {
-    [EnumMember(Value = "default")] Default,
+    [EnumMember(Value = "default")]
+    Default,
     startEnd,
     showAll,
-    custom
+    custom,
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -96,5 +97,5 @@ public enum AxisReferenceLineStyle
 {
     dashed,
     solid,
-    none
+    none,
 }

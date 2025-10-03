@@ -22,34 +22,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class FootnoteServicePermissionTests
 {
-    private static readonly ReleaseVersion ReleaseVersion = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private static readonly ReleaseVersion ReleaseVersion = new() { Id = Guid.NewGuid() };
 
-    private static readonly Subject Subject = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private static readonly Subject Subject = new() { Id = Guid.NewGuid() };
 
     private static readonly Footnote Footnote = new()
     {
         Id = Guid.NewGuid(),
-        Subjects = new List<SubjectFootnote>
-        {
-            new()
-            {
-                SubjectId = Subject.Id
-            }
-        }
+        Subjects = new List<SubjectFootnote> { new() { SubjectId = Subject.Id } },
     };
 
     [Fact]
     public async Task CreateFootnote()
     {
         await AssertSecurityPolicyChecked(
-            service => service
-                .CreateFootnote(
+            service =>
+                service.CreateFootnote(
                     ReleaseVersion.Id,
                     "",
                     filterIds: SetOf<Guid>(),
@@ -67,10 +55,7 @@ public class FootnoteServicePermissionTests
     public async Task DeleteFootnote()
     {
         await AssertSecurityPolicyChecked(
-            service => service
-                .DeleteFootnote(
-                    releaseVersionId: ReleaseVersion.Id,
-                    footnoteId: Footnote.Id),
+            service => service.DeleteFootnote(releaseVersionId: ReleaseVersion.Id, footnoteId: Footnote.Id),
             ReleaseVersion,
             SecurityPolicies.CanUpdateSpecificReleaseVersion
         );
@@ -80,10 +65,7 @@ public class FootnoteServicePermissionTests
     public async Task GetFootnote()
     {
         await AssertSecurityPolicyChecked(
-            service => service
-                .GetFootnote(
-                    releaseVersionId: ReleaseVersion.Id,
-                    footnoteId: Footnote.Id),
+            service => service.GetFootnote(releaseVersionId: ReleaseVersion.Id, footnoteId: Footnote.Id),
             ReleaseVersion,
             ContentSecurityPolicies.CanViewSpecificReleaseVersion
         );
@@ -93,8 +75,7 @@ public class FootnoteServicePermissionTests
     public async Task GetFootnotes()
     {
         await AssertSecurityPolicyChecked(
-            service => service
-                .GetFootnotes(ReleaseVersion.Id),
+            service => service.GetFootnotes(ReleaseVersion.Id),
             ReleaseVersion,
             ContentSecurityPolicies.CanViewSpecificReleaseVersion
         );
@@ -104,8 +85,8 @@ public class FootnoteServicePermissionTests
     public async Task UpdateFootnote()
     {
         await AssertSecurityPolicyChecked(
-            service => service
-                .UpdateFootnote(
+            service =>
+                service.UpdateFootnote(
                     releaseVersionId: ReleaseVersion.Id,
                     footnoteId: Footnote.Id,
                     "",
@@ -124,13 +105,10 @@ public class FootnoteServicePermissionTests
     public async Task UpdateFootnotes()
     {
         await AssertSecurityPolicyChecked(
-            service => service
-                .UpdateFootnotes(
+            service =>
+                service.UpdateFootnotes(
                     ReleaseVersion.Id,
-                    new FootnotesUpdateRequest
-                    {
-                        FootnoteIds = new List<Guid>()
-                    }
+                    new FootnotesUpdateRequest { FootnoteIds = new List<Guid>() }
                 ),
             ReleaseVersion,
             SecurityPolicies.CanUpdateSpecificReleaseVersion
@@ -140,7 +118,9 @@ public class FootnoteServicePermissionTests
     private static Task AssertSecurityPolicyChecked<T, TResource, TPolicy>(
         Func<FootnoteService, Task<Either<ActionResult, T>>> protectedAction,
         TResource resource,
-        TPolicy policy) where TPolicy : Enum
+        TPolicy policy
+    )
+        where TPolicy : Enum
     {
         var (
             contentPersistenceHelper,
@@ -148,26 +128,25 @@ public class FootnoteServicePermissionTests
             footnoteService,
             statisticsPersistenceHelper,
             releaseSubjectRepository
-            ) = Mocks();
+        ) = Mocks();
 
-        return PermissionTestUtils.PolicyCheckBuilder<TPolicy>()
+        return PermissionTestUtils
+            .PolicyCheckBuilder<TPolicy>()
             .SetupResourceCheck(resource, policy, false)
-            .AssertForbidden(
-                async userService =>
-                {
-                    var service = new FootnoteService(
-                        InMemoryStatisticsDbContext(),
-                        contentPersistenceHelper.Object,
-                        userService.Object,
-                        dataBlockService.Object,
-                        footnoteService.Object,
-                        releaseSubjectRepository.Object,
-                        statisticsPersistenceHelper.Object
-                    );
+            .AssertForbidden(async userService =>
+            {
+                var service = new FootnoteService(
+                    InMemoryStatisticsDbContext(),
+                    contentPersistenceHelper.Object,
+                    userService.Object,
+                    dataBlockService.Object,
+                    footnoteService.Object,
+                    releaseSubjectRepository.Object,
+                    statisticsPersistenceHelper.Object
+                );
 
-                    return await protectedAction.Invoke(service);
-                }
-            );
+                return await protectedAction.Invoke(service);
+            });
     }
 
     private static (
@@ -175,13 +154,15 @@ public class FootnoteServicePermissionTests
         Mock<IDataBlockService>,
         Mock<IFootnoteRepository>,
         Mock<IPersistenceHelper<StatisticsDbContext>>,
-        Mock<IReleaseSubjectRepository>) Mocks()
+        Mock<IReleaseSubjectRepository>
+    ) Mocks()
     {
         return (
             MockPersistenceHelper<ContentDbContext, ReleaseVersion>(ReleaseVersion.Id, ReleaseVersion),
             new Mock<IDataBlockService>(),
             new Mock<IFootnoteRepository>(),
             MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote),
-            new Mock<IReleaseSubjectRepository>());
+            new Mock<IReleaseSubjectRepository>()
+        );
     }
 }

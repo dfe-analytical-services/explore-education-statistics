@@ -6,7 +6,10 @@ public static class PublicationExtensions
 {
     public static bool IsArchived(this Publication publication) =>
         !publication.SupersededById.IsBlank()
-        && (publication.SupersededBy?.LatestPublishedReleaseVersionId.HasValue
+        && (
+            publication.SupersededBy?.LatestPublishedReleaseVersionId.HasValue
             ?? throw new ArgumentException(
-                $"{nameof(Publication)}.{nameof(publication.SupersededBy)} has not been populated. Ensure it is Included in the entity in the query."));
+                $"{nameof(Publication)}.{nameof(publication.SupersededBy)} has not been populated. Ensure it is Included in the entity in the query."
+            )
+        );
 }

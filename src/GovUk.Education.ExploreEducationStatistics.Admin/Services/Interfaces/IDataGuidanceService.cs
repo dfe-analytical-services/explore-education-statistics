@@ -8,13 +8,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IDataGuidanceService
 {
-    public Task<Either<ActionResult, DataGuidanceViewModel>> GetDataGuidance(Guid releaseVersionId,
-        CancellationToken cancellationToken = default);
+    public Task<Either<ActionResult, DataGuidanceViewModel>> GetDataGuidance(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default
+    );
 
-    public Task<Either<ActionResult, DataGuidanceViewModel>> UpdateDataGuidance(Guid releaseVersionId,
+    public Task<Either<ActionResult, DataGuidanceViewModel>> UpdateDataGuidance(
+        Guid releaseVersionId,
         DataGuidanceUpdateRequest request,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
-    public Task<Either<ActionResult, Unit>> ValidateForReleaseChecklist(Guid releaseVersionId,
-        CancellationToken cancellationToken = default);
+    public Task<Either<ActionResult, Unit>> ValidateForReleaseChecklist(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default
+    );
 }

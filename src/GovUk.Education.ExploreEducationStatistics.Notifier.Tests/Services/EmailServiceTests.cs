@@ -13,8 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Services;
 
 public class EmailServiceTests
 {
-    private const string TestApiKeyErrorMessage =
-        "Can't send to this recipient using a team-only API key";
+    private const string TestApiKeyErrorMessage = "Can't send to this recipient using a team-only API key";
 
     private static readonly AppOptions DefaultAppOptions = new() { SuppressExceptionsForTeamOnlyApiKeyErrors = false };
 
@@ -23,42 +22,19 @@ public class EmailServiceTests
     {
         var email = "test@test.com";
         var templateId = "test-template-id";
-        var values = new Dictionary<string, dynamic>
-        {
-            { "test-key", "test-value" },
-            { "test-key-2", 2 }
-        };
+        var values = new Dictionary<string, dynamic> { { "test-key", "test-value" }, { "test-key-2", 2 } };
 
         var notificationClient = new Mock<INotificationClient>(MockBehavior.Strict);
 
         notificationClient
-            .Setup(s =>
-                s.SendEmail(
-                    email,
-                    templateId,
-                    values,
-                    null,
-                    null,
-                    null))
+            .Setup(s => s.SendEmail(email, templateId, values, null, null, null))
             .Returns(new EmailNotificationResponse());
 
-        var service = BuildService(
-            notificationClient: notificationClient.Object);
+        var service = BuildService(notificationClient: notificationClient.Object);
 
-        service.SendEmail(
-            email: email,
-            templateId: templateId,
-            values: values);
+        service.SendEmail(email: email, templateId: templateId, values: values);
 
-        notificationClient.Verify(
-            s => s.SendEmail(
-                email,
-                templateId,
-                values,
-                null,
-                null,
-                null)
-            , Times.Once);
+        notificationClient.Verify(s => s.SendEmail(email, templateId, values, null, null, null), Times.Once);
     }
 
     [Fact]
@@ -66,45 +42,23 @@ public class EmailServiceTests
     {
         var email = "test@test.com";
         var templateId = "test-template-id";
-        var values = new Dictionary<string, dynamic>
-        {
-            { "test-key", "test-value" },
-            { "test-key-2", 2 }
-        };
+        var values = new Dictionary<string, dynamic> { { "test-key", "test-value" }, { "test-key-2", 2 } };
 
         var notificationClient = new Mock<INotificationClient>(MockBehavior.Strict);
 
         var originalException = new NotifyClientException("Generic error");
 
         notificationClient
-            .Setup(s =>
-                s.SendEmail(
-                    email,
-                    templateId,
-                    values,
-                    null,
-                    null,
-                    null))
+            .Setup(s => s.SendEmail(email, templateId, values, null, null, null))
             .Throws(originalException);
 
-        var service = BuildService(
-            notificationClient: notificationClient.Object);
+        var service = BuildService(notificationClient: notificationClient.Object);
 
         var exception = Assert.Throws<NotifyClientException>(() =>
-            service.SendEmail(
-                email: email,
-                templateId: templateId,
-                values: values));
+            service.SendEmail(email: email, templateId: templateId, values: values)
+        );
 
-        notificationClient.Verify(
-            s => s.SendEmail(
-                email,
-                templateId,
-                values,
-                null,
-                null,
-                null)
-            , Times.Once);
+        notificationClient.Verify(s => s.SendEmail(email, templateId, values, null, null, null), Times.Once);
 
         Assert.Equal(originalException, exception);
     }
@@ -114,45 +68,23 @@ public class EmailServiceTests
     {
         var email = "test@test.com";
         var templateId = "test-template-id";
-        var values = new Dictionary<string, dynamic>
-        {
-            { "test-key", "test-value" },
-            { "test-key-2", 2 }
-        };
+        var values = new Dictionary<string, dynamic> { { "test-key", "test-value" }, { "test-key-2", 2 } };
 
         var notificationClient = new Mock<INotificationClient>(MockBehavior.Strict);
 
         var originalException = new NotifyClientException(TestApiKeyErrorMessage);
 
         notificationClient
-            .Setup(s =>
-                s.SendEmail(
-                    email,
-                    templateId,
-                    values,
-                    null,
-                    null,
-                    null))
+            .Setup(s => s.SendEmail(email, templateId, values, null, null, null))
             .Throws(originalException);
 
-        var service = BuildService(
-            notificationClient: notificationClient.Object);
+        var service = BuildService(notificationClient: notificationClient.Object);
 
         var exception = Assert.Throws<NotifyClientException>(() =>
-            service.SendEmail(
-                email: email,
-                templateId: templateId,
-                values: values));
+            service.SendEmail(email: email, templateId: templateId, values: values)
+        );
 
-        notificationClient.Verify(
-            s => s.SendEmail(
-                email,
-                templateId,
-                values,
-                null,
-                null,
-                null)
-            , Times.Once);
+        notificationClient.Verify(s => s.SendEmail(email, templateId, values, null, null, null), Times.Once);
 
         Assert.Equal(originalException, exception);
     }
@@ -162,25 +94,14 @@ public class EmailServiceTests
     {
         var email = "test@test.com";
         var templateId = "test-template-id";
-        var values = new Dictionary<string, dynamic>
-        {
-            { "test-key", "test-value" },
-            { "test-key-2", 2 }
-        };
+        var values = new Dictionary<string, dynamic> { { "test-key", "test-value" }, { "test-key-2", 2 } };
 
         var notificationClient = new Mock<INotificationClient>(MockBehavior.Strict);
 
         var originalException = new NotifyClientException(TestApiKeyErrorMessage);
 
         notificationClient
-            .Setup(s =>
-                s.SendEmail(
-                    email,
-                    templateId,
-                    values,
-                    null,
-                    null,
-                    null))
+            .Setup(s => s.SendEmail(email, templateId, values, null, null, null))
             .Throws(originalException);
 
         var logger = new Mock<ILogger<EmailService>>(MockBehavior.Strict);
@@ -188,27 +109,18 @@ public class EmailServiceTests
         ExpectLogMessage(
             logger,
             LogLevel.Information,
-            """Email could not be sent to "test@test.com" as they are not a valid recipient for this team-only API key.""");
+            """Email could not be sent to "test@test.com" as they are not a valid recipient for this team-only API key."""
+        );
 
         var service = BuildService(
             notificationClient: notificationClient.Object,
             options: new AppOptions { SuppressExceptionsForTeamOnlyApiKeyErrors = true },
-            logger: logger.Object);
+            logger: logger.Object
+        );
 
-        service.SendEmail(
-            email: email,
-            templateId: templateId,
-            values: values);
+        service.SendEmail(email: email, templateId: templateId, values: values);
 
-        notificationClient.Verify(
-            s => s.SendEmail(
-                email,
-                templateId,
-                values,
-                null,
-                null,
-                null),
-            Times.Once);
+        notificationClient.Verify(s => s.SendEmail(email, templateId, values, null, null, null), Times.Once);
 
         VerifyAllMocks(logger);
     }
@@ -216,11 +128,13 @@ public class EmailServiceTests
     private static EmailService BuildService(
         INotificationClient? notificationClient = null,
         AppOptions? options = null,
-        ILogger<EmailService>? logger = null)
+        ILogger<EmailService>? logger = null
+    )
     {
         return new EmailService(
             notificationClient: notificationClient ?? Mock.Of<INotificationClient>(MockBehavior.Strict),
             appOptions: (options ?? DefaultAppOptions).ToOptionsWrapper(),
-            logger: logger ?? Mock.Of<ILogger<EmailService>>());
+            logger: logger ?? Mock.Of<ILogger<EmailService>>()
+        );
     }
 }

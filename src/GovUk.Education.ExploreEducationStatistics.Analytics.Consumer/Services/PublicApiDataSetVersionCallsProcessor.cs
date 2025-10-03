@@ -7,22 +7,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services
 
 public class PublicApiDataSetVersionCallsProcessor(
     IAnalyticsPathResolver pathResolver,
-    IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
+    IProcessRequestFilesWorkflow workflow
+) : IRequestFileProcessor
 {
     private static readonly string[] PublicApiDataSetVersionsSubPath = ["public-api", "data-set-versions"];
-    
+
     public string SourceDirectory => pathResolver.BuildSourceDirectory(PublicApiDataSetVersionsSubPath);
     public string ReportsDirectory => pathResolver.BuildReportsDirectory(PublicApiDataSetVersionsSubPath);
-    
+
     public Task Process()
     {
-        return workflow.Process(new WorkflowActor(
-            sourceDirectory: SourceDirectory,
-            reportsDirectory: ReportsDirectory));
+        return workflow.Process(
+            new WorkflowActor(sourceDirectory: SourceDirectory, reportsDirectory: ReportsDirectory)
+        );
     }
 
-    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
-        : IWorkflowActor
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory) : IWorkflowActor
     {
         public string GetSourceDirectory()
         {
@@ -33,10 +33,11 @@ public class PublicApiDataSetVersionCallsProcessor(
         {
             return reportsDirectory;
         }
-        
+
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync(@"
+            await connection.ExecuteNonQueryAsync(
+                @"
                 CREATE TABLE sourceTable (
                     dataSetId UUID,
                     dataSetTitle VARCHAR,
@@ -48,22 +49,24 @@ public class PublicApiDataSetVersionCallsProcessor(
                     startTime DATETIME,
                     type VARCHAR
                 );
-            ");
+            "
+            );
         }
 
         public async Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection)
         {
             await connection.DirectCopyJsonIntoDuckDbTable(
                 jsonFilePath: sourceFilesDirectory,
-                tableName: "sourceTable");
+                tableName: "sourceTable"
+            );
         }
 
         public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
-            var reportFilePath = 
-                $"{reportsFolderPathAndFilenamePrefix}_public-api-data-set-version-calls.parquet";
-        
-            await connection.ExecuteNonQueryAsync($@"
+            var reportFilePath = $"{reportsFolderPathAndFilenamePrefix}_public-api-data-set-version-calls.parquet";
+
+            await connection.ExecuteNonQueryAsync(
+                $@"
                 COPY (
                     SELECT * EXCLUDE previewToken,
                     previewToken->>'label' AS previewTokenLabel,
@@ -74,7 +77,8 @@ public class PublicApiDataSetVersionCallsProcessor(
                     ORDER BY startTime ASC
                 )
                 TO '{reportFilePath}' (FORMAT 'parquet', CODEC 'zstd')
-            ");
+            "
+            );
         }
     }
 }

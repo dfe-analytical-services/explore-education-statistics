@@ -8,14 +8,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public static class NamingUtils
 {
-    public static string CreateReleaseSlug(
-        int year,
-        TimeIdentifier timePeriodCoverage,
-        string? label = null)
+    public static string CreateReleaseSlug(int year, TimeIdentifier timePeriodCoverage, string? label = null)
     {
         var trimmedLowercaseLabel = label?.Trim().ToLower();
 
-        return SlugFromTitle($"{Format(year, timePeriodCoverage)}{(string.IsNullOrWhiteSpace(trimmedLowercaseLabel) ? "" : $"-{trimmedLowercaseLabel}")}");
+        return SlugFromTitle(
+            $"{Format(year, timePeriodCoverage)}{(string.IsNullOrWhiteSpace(trimmedLowercaseLabel) ? "" : $"-{trimmedLowercaseLabel}")}"
+        );
     }
 
     public static string SlugFromTitle(string title)

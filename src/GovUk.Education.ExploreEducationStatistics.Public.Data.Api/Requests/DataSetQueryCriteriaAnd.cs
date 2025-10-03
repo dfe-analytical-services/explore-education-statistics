@@ -36,12 +36,9 @@ public record DataSetQueryCriteriaAnd : IDataSetQueryCriteria
     {
         public Validator()
         {
-            RuleFor(q => q.And)
-                .NotEmpty();
+            RuleFor(q => q.And).NotEmpty();
 
-            RuleForEach(q => q.And)
-                .NotNull()
-                .SetInheritanceValidator(IDataSetQueryCriteria.InheritanceValidator);
+            RuleForEach(q => q.And).NotNull().SetInheritanceValidator(IDataSetQueryCriteria.InheritanceValidator);
         }
     }
 }

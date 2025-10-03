@@ -44,8 +44,8 @@ public class EducationInNumbersViewModels
                 Slug = page.Slug,
                 Description = page.Description,
                 Published = page.Published!.Value, // we only display published Ein pages publicly
-                Content = page.Content
-                    .Select(EinContentSectionViewModel.FromModel)
+                Content = page
+                    .Content.Select(EinContentSectionViewModel.FromModel)
                     .OrderBy(section => section.Order)
                     .ToList(),
             };

@@ -15,8 +15,8 @@ public class ConfigController(
     IOptions<AppInsightsOptions> appInsightsOptions,
     IOptions<PublicAppOptions> publicAppOptions,
     IOptions<PublicDataApiOptions> publicDataApiOptions,
-    IOptions<FeatureFlagsOptions> featureFlags)
-    : ControllerBase
+    IOptions<FeatureFlagsOptions> featureFlags
+) : ControllerBase
 {
     [AllowAnonymous]
     [HttpGet("api/config")]
@@ -30,7 +30,7 @@ public class ConfigController(
             PublicApiDocsUrl = publicDataApiOptions.Value.DocsUrl,
             PermittedEmbedUrlDomains = EmbedBlockService.PermittedDomains,
             Oidc = oidcOptions.Value,
-            EnableReplacementOfPublicApiDataSets = featureFlags.Value.EnableReplacementOfPublicApiDataSets
+            EnableReplacementOfPublicApiDataSets = featureFlags.Value.EnableReplacementOfPublicApiDataSets,
         };
     }
 }

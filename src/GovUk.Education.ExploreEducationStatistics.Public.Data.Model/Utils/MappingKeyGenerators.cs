@@ -11,12 +11,9 @@ public static class MappingKeyGenerators
     public static Func<LocationOptionMetaLink, string> LocationOptionMetaLink =>
         link => LocationOptionMeta(link.Option);
 
-    public static Func<FilterMeta, string> Filter =>
-        filter => filter.Column;
+    public static Func<FilterMeta, string> Filter => filter => filter.Column;
 
-    public static Func<FilterOptionMeta, string> FilterOptionMeta =>
-        option => option.Label;
+    public static Func<FilterOptionMeta, string> FilterOptionMeta => option => option.Label;
 
-    public static Func<FilterOptionMetaLink, string> FilterOptionMetaLink =>
-        link => FilterOptionMeta(link.Option);
+    public static Func<FilterOptionMetaLink, string> FilterOptionMetaLink => link => FilterOptionMeta(link.Option);
 }

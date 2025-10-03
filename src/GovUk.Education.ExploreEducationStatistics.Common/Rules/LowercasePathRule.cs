@@ -54,7 +54,7 @@ public class LowercasePathRule : IRule
     private static bool IsApplicable(PathString path)
     {
         return path.HasValue
-               && !Regex.IsMatch(path, ExcludedPathsRegex, RegexOptions.IgnoreCase)
-               && path.Value.Any(char.IsUpper);
+            && !Regex.IsMatch(path, ExcludedPathsRegex, RegexOptions.IgnoreCase)
+            && path.Value.Any(char.IsUpper);
     }
 }

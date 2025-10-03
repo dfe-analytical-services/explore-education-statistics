@@ -55,7 +55,8 @@ public static class ReflectionExtensions
                     break;
 
                 case "Task":
-                    var task = typeof(Task).GetMethod("FromResult")
+                    var task = typeof(Task)
+                        .GetMethod("FromResult")
                         ?.MakeGenericMethod(boxType.GenericTypeArguments)
                         .Invoke(null, new[] { boxedValue });
 
@@ -98,7 +99,9 @@ public static class ReflectionExtensions
             if (result is Task)
             {
                 // TODO: EES-4268 Create async variant of this method
-                throw new ArgumentException("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.");
+                throw new ArgumentException(
+                    "Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first."
+                );
             }
 
             var resultType = result.GetType();

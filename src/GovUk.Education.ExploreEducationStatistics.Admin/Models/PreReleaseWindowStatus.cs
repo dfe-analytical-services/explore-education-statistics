@@ -18,5 +18,5 @@ public enum PreReleaseAccess
     NoneSet,
     Before,
     Within,
-    After
+    After,
 }

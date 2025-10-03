@@ -16,21 +16,21 @@ public abstract class DeleteTestReleaseAuthorizationHandlerTests
         {
             ApprovalStatus = ReleaseApprovalStatus.Approved,
             Version = 1,
-            Publication = new Publication { Theme = new Theme { Title = "UI test theme" } }
+            Publication = new Publication { Theme = new Theme { Title = "UI test theme" } },
         };
-        
+
         private static readonly ReleaseVersion SeedReleaseVersion = new()
         {
             ApprovalStatus = ReleaseApprovalStatus.Approved,
             Version = 1,
-            Publication = new Publication { Theme = new Theme { Title = "Seed theme" } }
+            Publication = new Publication { Theme = new Theme { Title = "Seed theme" } },
         };
 
         private static readonly ReleaseVersion RealReleaseVersion = new()
         {
             ApprovalStatus = ReleaseApprovalStatus.Approved,
             Version = 1,
-            Publication = new Publication { Theme = new Theme { Title = "Normal theme" } }
+            Publication = new Publication { Theme = new Theme { Title = "Normal theme" } },
         };
 
         [Fact]
@@ -39,16 +39,18 @@ public abstract class DeleteTestReleaseAuthorizationHandlerTests
             await AssertHandlerSucceedsWithCorrectGlobalRoles<ReleaseVersion, DeleteTestReleaseRequirement>(
                 _ => CreateHandler(enableThemeDeletion: true),
                 TestReleaseVersion,
-                rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]);
+                rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]
+            );
         }
-        
+
         [Fact]
         public async Task Success_SeedRelease()
         {
             await AssertHandlerSucceedsWithCorrectGlobalRoles<ReleaseVersion, DeleteTestReleaseRequirement>(
                 _ => CreateHandler(enableThemeDeletion: true),
                 SeedReleaseVersion,
-                rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]);
+                rolesExpectedToSucceed: [GlobalRoles.Role.BauUser]
+            );
         }
 
         [Fact]
@@ -56,7 +58,8 @@ public abstract class DeleteTestReleaseAuthorizationHandlerTests
         {
             await AssertHandlerSucceedsWithCorrectGlobalRoles<ReleaseVersion, DeleteTestReleaseRequirement>(
                 _ => CreateHandler(enableThemeDeletion: true),
-                RealReleaseVersion);
+                RealReleaseVersion
+            );
         }
 
         [Fact]
@@ -64,14 +67,15 @@ public abstract class DeleteTestReleaseAuthorizationHandlerTests
         {
             await AssertHandlerSucceedsWithCorrectGlobalRoles<ReleaseVersion, DeleteTestReleaseRequirement>(
                 _ => CreateHandler(enableThemeDeletion: false),
-                TestReleaseVersion);
+                TestReleaseVersion
+            );
         }
     }
 
-    private static DeleteTestReleaseAuthorizationHandler CreateHandler(
-        bool enableThemeDeletion = false)
+    private static DeleteTestReleaseAuthorizationHandler CreateHandler(bool enableThemeDeletion = false)
     {
         return new DeleteTestReleaseAuthorizationHandler(
-            appOptions: new AppOptions { EnableThemeDeletion = enableThemeDeletion }.ToOptionsWrapper());
+            appOptions: new AppOptions { EnableThemeDeletion = enableThemeDeletion }.ToOptionsWrapper()
+        );
     }
 }

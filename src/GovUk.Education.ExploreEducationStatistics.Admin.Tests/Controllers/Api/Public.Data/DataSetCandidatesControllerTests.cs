@@ -23,22 +23,15 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
         [Fact]
         public async Task Success()
         {
-            Release release = DataFixture
-                .DefaultRelease(publishedVersions: 0, draftVersion: true);
+            Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true);
 
-            var dataImports = DataFixture
-                .DefaultDataImport()
-                .WithStatus(DataImportStatus.COMPLETE)
-                .GenerateList(3);
+            var dataImports = DataFixture.DefaultDataImport().WithStatus(DataImportStatus.COMPLETE).GenerateList(3);
 
             var releaseVersion = release.Versions.Single();
 
             var releaseFiles = dataImports
-                .Select(di => DataFixture
-                    .DefaultReleaseFile()
-                    .WithFile(di.File)
-                    .WithReleaseVersion(releaseVersion)
-                    .Generate()
+                .Select(di =>
+                    DataFixture.DefaultReleaseFile().WithFile(di.File).WithReleaseVersion(releaseVersion).Generate()
                 )
                 .ToList();
 
@@ -54,9 +47,13 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             Assert.NotNull(candidates);
             Assert.Equal(3, candidates.Count);
-            Assert.Contains(releaseFiles, releaseFile =>
-                candidates.Any(candidate => candidate.ReleaseFileId == releaseFile.Id
-                                            && candidate.Title == releaseFile.Name));
+            Assert.Contains(
+                releaseFiles,
+                releaseFile =>
+                    candidates.Any(candidate =>
+                        candidate.ReleaseFileId == releaseFile.Id && candidate.Title == releaseFile.Name
+                    )
+            );
         }
 
         [Theory]
@@ -65,19 +62,15 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
         [InlineData(null)]
         public async Task NoPermissionsToViewReleaseVersion_Returns403(SecurityClaimTypes? claimType)
         {
-            ReleaseVersion releaseVersion = DataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion();
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseVersions.Add(releaseVersion));
 
-            var authenticatedUser =
-                claimType.HasValue
-                    ? DataFixture.AuthenticatedUser().WithClaim(claimType.Value.ToString())
-                    : DataFixture.AuthenticatedUser();
+            var authenticatedUser = claimType.HasValue
+                ? DataFixture.AuthenticatedUser().WithClaim(claimType.Value.ToString())
+                : DataFixture.AuthenticatedUser();
 
-            var client = TestApp
-                .SetUser(authenticatedUser)
-                .CreateClient();
+            var client = TestApp.SetUser(authenticatedUser).CreateClient();
 
             var response = await GetDataSetCandidates(releaseVersion.Id, client);
 
@@ -87,8 +80,7 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
         [Fact]
         public async Task NoReleaseFileExists_ReturnsEmptyList()
         {
-            ReleaseVersion releaseVersion = DataFixture
-                .DefaultReleaseVersion();
+            ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion();
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseVersions.Add(releaseVersion));
 
@@ -99,19 +91,14 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
             Assert.Empty(candidates);
         }
 
-
         [Fact]
         public async Task ReleaseFileIsReplacement_NotReturned()
         {
-            Release release = DataFixture
-                .DefaultRelease(publishedVersions: 0, draftVersion: true);
+            Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true);
 
             DataImport dataImport = DataFixture
                 .DefaultDataImport()
-                .WithFile(DataFixture
-                    .DefaultFile(FileType.Data)
-                    .WithReplacingId(Guid.NewGuid())
-                );
+                .WithFile(DataFixture.DefaultFile(FileType.Data).WithReplacingId(Guid.NewGuid()));
 
             var releaseVersion = release.Versions.Single();
 
@@ -136,15 +123,11 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
         [Fact]
         public async Task ReleaseFileIsReplaced_NotReturned()
         {
-            Release release = DataFixture
-                .DefaultRelease(publishedVersions: 0, draftVersion: true);
+            Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true);
 
             DataImport dataImport = DataFixture
                 .DefaultDataImport()
-                .WithFile(DataFixture
-                    .DefaultFile(FileType.Data)
-                    .WithReplacedById(Guid.NewGuid())
-                );
+                .WithFile(DataFixture.DefaultFile(FileType.Data).WithReplacedById(Guid.NewGuid()));
 
             var releaseVersion = release.Versions.Single();
 
@@ -169,12 +152,9 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
         [Fact]
         public async Task ReleaseFileHasAssociatedDataSet_NotReturned()
         {
-            Release release = DataFixture
-                .DefaultRelease(publishedVersions: 0, draftVersion: true);
+            Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true);
 
-            DataImport dataImport = DataFixture
-                .DefaultDataImport()
-                .WithFile(DataFixture.DefaultFile(FileType.Data));
+            DataImport dataImport = DataFixture.DefaultDataImport().WithFile(DataFixture.DefaultFile(FileType.Data));
 
             var releaseVersion = release.Versions.Single();
 
@@ -208,8 +188,7 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
         [InlineData(DataImportStatus.CANCELLING)]
         public async Task ReleaseFileImportIsNotComplete_NotReturned(DataImportStatus status)
         {
-            Release release = DataFixture
-                .DefaultRelease(publishedVersions: 0, draftVersion: true);
+            Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true);
 
             DataImport dataImport = DataFixture
                 .DefaultDataImport()
@@ -244,22 +223,13 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
             response.AssertNotFound();
         }
 
-        private async Task<HttpResponseMessage> GetDataSetCandidates(
-            Guid releaseVersionId,
-            HttpClient? client = null)
+        private async Task<HttpResponseMessage> GetDataSetCandidates(Guid releaseVersionId, HttpClient? client = null)
         {
-            var user = DataFixture
-                .AuthenticatedUser()
-                .WithClaim(SecurityClaimTypes.AccessAllReleases.ToString());
+            var user = DataFixture.AuthenticatedUser().WithClaim(SecurityClaimTypes.AccessAllReleases.ToString());
 
-            client ??= TestApp
-                .SetUser(user)
-                .CreateClient();
+            client ??= TestApp.SetUser(user).CreateClient();
 
-            var query = new Dictionary<string, string?>
-            {
-                { "releaseVersionId", releaseVersionId.ToString() },
-            };
+            var query = new Dictionary<string, string?> { { "releaseVersionId", releaseVersionId.ToString() } };
 
             var uri = QueryHelpers.AddQueryString(BaseUrl, query);
 

@@ -21,12 +21,14 @@ public static class DataSetVersionStatusTheoryData
     public static readonly TheoryData<DataSetVersionStatus> AvailableStatuses = new(AvailableStatusesList);
 
     public static readonly TheoryData<DataSetVersionStatus> UnavailableStatuses = new(
-        EnumUtil.GetEnums<DataSetVersionStatus>().Except(AvailableStatusesList));
+        EnumUtil.GetEnums<DataSetVersionStatus>().Except(AvailableStatusesList)
+    );
 
     public static readonly TheoryData<DataSetVersionStatus> UpdateableStatuses = new(UpdateableStatusesList);
 
     public static readonly TheoryData<DataSetVersionStatus> ReadOnlyStatuses = new(
-        EnumUtil.GetEnums<DataSetVersionStatus>().Except(UpdateableStatusesList));
+        EnumUtil.GetEnums<DataSetVersionStatus>().Except(UpdateableStatusesList)
+    );
 
     public static readonly TheoryData<DataSetVersionStatus> StatusesExceptDraft = new(
         EnumUtil.GetEnums<DataSetVersionStatus>().Except([DataSetVersionStatus.Draft])

@@ -4,5 +4,6 @@ public interface ISearchableDocumentCreator
 {
     Task<CreatePublicationLatestReleaseSearchableDocumentResponse> CreatePublicationLatestReleaseSearchableDocument(
         CreatePublicationLatestReleaseSearchableDocumentRequest request,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

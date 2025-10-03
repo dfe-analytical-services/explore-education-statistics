@@ -17,15 +17,19 @@ public class TimeIdentifierCategoryJsonConverter : JsonConverter<TimeIdentifierC
         writer.WriteEndObject();
     }
 
-    public override TimeIdentifierCategory? ReadJson(JsonReader reader, Type objectType,
+    public override TimeIdentifierCategory? ReadJson(
+        JsonReader reader,
+        Type objectType,
         TimeIdentifierCategory? existingValue,
         bool hasExistingValue,
-        JsonSerializer serializer)
+        JsonSerializer serializer
+    )
     {
-        if (reader.TokenType == JsonToken.Null) return null;
-        
+        if (reader.TokenType == JsonToken.Null)
+            return null;
+
         var jsonValue = JObject.Load(reader).GetValue("value").Value<string>();
-        var categories = ((TimeIdentifierCategory[]) Enum.GetValues(typeof(TimeIdentifierCategory)));
+        var categories = ((TimeIdentifierCategory[])Enum.GetValues(typeof(TimeIdentifierCategory)));
         return categories.First(category => category.GetEnumValue() == jsonValue);
     }
 }

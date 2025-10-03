@@ -37,22 +37,26 @@ public class ReplacementPlanService(
     IUserService userService,
     IDataSetVersionMappingService dataSetVersionMappingService,
     IReleaseFileRepository releaseFileRepository,
-    IOptions<FeatureFlagsOptions> featureFlags)
-    : IReplacementPlanService
+    IOptions<FeatureFlagsOptions> featureFlags
+) : IReplacementPlanService
 {
     private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
     public async Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
         Guid releaseVersionId,
         Guid originalFileId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await contentDbContext.ReleaseVersions
-            .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
+        return await contentDbContext
+            .ReleaseVersions.FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
-            .OnSuccess(() => releaseFileRepository.CheckLinkedOriginalAndReplacementReleaseFilesExist(
-                releaseVersionId: releaseVersionId,
-                originalFileId: originalFileId))
+            .OnSuccess(() =>
+                releaseFileRepository.CheckLinkedOriginalAndReplacementReleaseFilesExist(
+                    releaseVersionId: releaseVersionId,
+                    originalFileId: originalFileId
+                )
+            )
             .OnSuccess(async releaseFiles =>
             {
                 var originalReleaseFile = releaseFiles.originalReleaseFile;
@@ -61,13 +65,15 @@ public class ReplacementPlanService(
                 return await GenerateReplacementPlan(
                     originalReleaseFile: originalReleaseFile,
                     replacementReleaseFile: replacementReleaseFile,
-                    cancellationToken: cancellationToken);
+                    cancellationToken: cancellationToken
+                );
             });
     }
 
     private async Task<ReplaceApiDataSetVersionPlanViewModel?> GetApiVersionPlanViewModel(
         DataSetVersion replacementApiDataSetVersion,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var apiDataSetVersionPlan = new ReplaceApiDataSetVersionPlanViewModel
         {
@@ -84,7 +90,10 @@ public class ReplacementPlanService(
             return apiDataSetVersionPlan;
         }
 
-        var mappingStatus =  await dataSetVersionMappingService.GetMappingStatus(replacementApiDataSetVersion.Id, cancellationToken);
+        var mappingStatus = await dataSetVersionMappingService.GetMappingStatus(
+            replacementApiDataSetVersion.Id,
+            cancellationToken
+        );
         var isPatch = DataSetVersionNumber.TryParse(apiDataSetVersionPlan.Version, out var number) && number.Patch > 0;
 
         // If no mapping is found and the api version status is DRAFT, this data set version was deleted and recreated (& no mapping was necessary)
@@ -95,103 +104,109 @@ public class ReplacementPlanService(
             FiltersHaveMajorChange = false,
             LocationsComplete = true,
             LocationsHaveMajorChange = false,
-            HasDeletionChanges = false
+            HasDeletionChanges = false,
         };
 
         return apiDataSetVersionPlan with
         {
-            MappingStatus = mappingStatus
-                            ?? (apiDataSetVersionPlan.ReadyToPublish
-                                ? completeStatusResult
-                                : null),// If no mapping is found, this data set version was deleted and recreated (& no mapping was necessary)
-            Valid = (isPatch
+            MappingStatus = mappingStatus ?? (apiDataSetVersionPlan.ReadyToPublish ? completeStatusResult : null), // If no mapping is found, this data set version was deleted and recreated (& no mapping was necessary)
+            Valid =
+                (
+                    isPatch
                         ? mappingStatus is { IsMajorVersionUpdate: false } && apiDataSetVersionPlan.ReadyToPublish
-                        : apiDataSetVersionPlan.ReadyToPublish)
-                    || (mappingStatus is null && apiDataSetVersionPlan.ReadyToPublish) // Data set version was deleted and recreated (as opposed to as a patch increment of a previous data set version)
+                        : apiDataSetVersionPlan.ReadyToPublish
+                ) || (mappingStatus is null && apiDataSetVersionPlan.ReadyToPublish), // Data set version was deleted and recreated (as opposed to as a patch increment of a previous data set version)
         };
     }
 
     public async Task<Either<ActionResult, DataReplacementPlanViewModel>> GenerateReplacementPlan(
         ReleaseFile originalReleaseFile,
         ReleaseFile replacementReleaseFile,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await
-            GetLinkedDataSetVersion(
-                    featureFlags.Value.EnableReplacementOfPublicApiDataSets
-                        ? replacementReleaseFile
-                        : originalReleaseFile,
-                    cancellationToken)
-                .OnSuccess(async replacementApiDataSetVersion =>
+        return await GetLinkedDataSetVersion(
+                featureFlags.Value.EnableReplacementOfPublicApiDataSets ? replacementReleaseFile : originalReleaseFile,
+                cancellationToken
+            )
+            .OnSuccess(async replacementApiDataSetVersion =>
+            {
+                var replacementSubjectId = replacementReleaseFile.File.SubjectId!.Value;
+                var originalSubjectId = originalReleaseFile.File.SubjectId!.Value;
+
+                var replacementSubjectMeta = await GetReplacementSubjectMeta(replacementSubjectId);
+
+                var releaseVersionId = replacementReleaseFile.ReleaseVersionId;
+
+                var dataBlocks = ValidateDataBlocks(
+                    releaseVersionId: releaseVersionId,
+                    subjectId: originalSubjectId,
+                    replacementSubjectMeta
+                );
+                var footnotes = await ValidateFootnotes(
+                    releaseVersionId: releaseVersionId,
+                    subjectId: originalSubjectId,
+                    replacementSubjectMeta
+                );
+
+                var apiDataSetVersionPlan = replacementApiDataSetVersion is null
+                    ? null
+                    : await GetApiVersionPlanViewModel(replacementApiDataSetVersion, cancellationToken);
+
+                return new DataReplacementPlanViewModel
                 {
-                    var replacementSubjectId = replacementReleaseFile.File.SubjectId!.Value;
-                    var originalSubjectId = originalReleaseFile.File.SubjectId!.Value;
-
-                    var replacementSubjectMeta = await GetReplacementSubjectMeta(replacementSubjectId);
-
-                    var releaseVersionId = replacementReleaseFile.ReleaseVersionId;
-
-                    var dataBlocks = ValidateDataBlocks(
-                        releaseVersionId: releaseVersionId,
-                        subjectId: originalSubjectId,
-                        replacementSubjectMeta);
-                    var footnotes = await ValidateFootnotes(
-                        releaseVersionId: releaseVersionId,
-                        subjectId: originalSubjectId,
-                        replacementSubjectMeta);
-
-                    var apiDataSetVersionPlan = replacementApiDataSetVersion is null
-                        ? null
-                        : await GetApiVersionPlanViewModel(replacementApiDataSetVersion, cancellationToken);
-
-                    return new DataReplacementPlanViewModel
-                    {
-                        DataBlocks = dataBlocks,
-                        Footnotes = footnotes,
-                        ApiDataSetVersionPlan = apiDataSetVersionPlan,
-                        OriginalSubjectId = originalSubjectId,
-                        ReplacementSubjectId = replacementSubjectId,
-                    };
-                });
+                    DataBlocks = dataBlocks,
+                    Footnotes = footnotes,
+                    ApiDataSetVersionPlan = apiDataSetVersionPlan,
+                    OriginalSubjectId = originalSubjectId,
+                    ReplacementSubjectId = replacementSubjectId,
+                };
+            });
     }
 
     public async Task<bool> HasValidReplacementPlan(
         ReleaseFile originalReleaseFile,
         ReleaseFile replacementReleaseFile,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        var result = await GenerateReplacementPlan(
-            originalReleaseFile, replacementReleaseFile, cancellationToken);
+        var result = await GenerateReplacementPlan(originalReleaseFile, replacementReleaseFile, cancellationToken);
 
         return result.IsRight && result.Right.Valid;
     }
 
     private async Task<Either<ActionResult, DataSetVersion?>> GetLinkedDataSetVersion(
         ReleaseFile releaseFile,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         if (releaseFile.PublicApiDataSetId is null)
         {
             return (DataSetVersion)null!;
         }
 
-        return await dataSetVersionService.GetDataSetVersion(
+        return await dataSetVersionService
+            .GetDataSetVersion(
                 releaseFile.PublicApiDataSetId.Value,
                 releaseFile.PublicApiDataSetVersion!,
-                cancellationToken)
+                cancellationToken
+            )
             .OnSuccess(dsv => (DataSetVersion?)dsv)
-            .OnFailureDo(_ => throw new InvalidOperationException(
-                $"API data set version could not be found. Data set ID: '{releaseFile.PublicApiDataSetId}', version: '{releaseFile.PublicApiDataSetVersion}'"));
+            .OnFailureDo(_ =>
+                throw new InvalidOperationException(
+                    $"API data set version could not be found. Data set ID: '{releaseFile.PublicApiDataSetId}', version: '{releaseFile.PublicApiDataSetVersion}'"
+                )
+            );
     }
 
     private async Task<ReplacementSubjectMeta> GetReplacementSubjectMeta(Guid subjectId)
     {
         var filtersIncludingItems = await filterRepository.GetFiltersIncludingItems(subjectId);
 
-        var filters = filtersIncludingItems
-            .ToDictionary(filter => filter.Name, filter => filter);
+        var filters = filtersIncludingItems.ToDictionary(filter => filter.Name, filter => filter);
 
-        var indicators = indicatorRepository.GetIndicators(subjectId)
+        var indicators = indicatorRepository
+            .GetIndicators(subjectId)
             .ToDictionary(indicator => indicator.Name, indicator => indicator);
 
         var locations = await locationRepository.GetDistinctForSubject(subjectId);
@@ -203,17 +218,18 @@ public class ReplacementPlanService(
             Filters = filters,
             Indicators = indicators,
             Locations = locations,
-            TimePeriods = timePeriods
+            TimePeriods = timePeriods,
         };
     }
 
-    private List<DataBlockReplacementPlanViewModel> ValidateDataBlocks(Guid releaseVersionId,
+    private List<DataBlockReplacementPlanViewModel> ValidateDataBlocks(
+        Guid releaseVersionId,
         Guid subjectId,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
         return contentDbContext
-            .ContentBlocks
-            .Where(block => block.ReleaseVersionId == releaseVersionId)
+            .ContentBlocks.Where(block => block.ReleaseVersionId == releaseVersionId)
             .OfType<DataBlock>()
             .ToList()
             .Where(dataBlock => dataBlock.Query.SubjectId == subjectId)
@@ -221,8 +237,10 @@ public class ReplacementPlanService(
             .ToList();
     }
 
-    private DataBlockReplacementPlanViewModel ValidateDataBlock(DataBlock dataBlock,
-        ReplacementSubjectMeta replacementSubjectMeta)
+    private DataBlockReplacementPlanViewModel ValidateDataBlock(
+        DataBlock dataBlock,
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
         var existingFilters = ValidateFiltersForDataBlock(dataBlock, replacementSubjectMeta);
         var newlyIntroducedFilters = FindNewlyIntroducedFiltersForDataBlock(dataBlock, replacementSubjectMeta);
@@ -230,29 +248,31 @@ public class ReplacementPlanService(
         var locations = ValidateLocationsForDataBlock(dataBlock, replacementSubjectMeta);
         var timePeriods = ValidateTimePeriodsForDataBlock(dataBlock, replacementSubjectMeta);
 
-        return new DataBlockReplacementPlanViewModel(dataBlock.Id,
+        return new DataBlockReplacementPlanViewModel(
+            dataBlock.Id,
             dataBlock.Name,
             existingFilters,
             newlyIntroducedFilters,
             indicatorGroups,
             locations,
-            timePeriods);
+            timePeriods
+        );
     }
 
-    private async Task<List<FootnoteReplacementPlanViewModel>> ValidateFootnotes(Guid releaseVersionId,
+    private async Task<List<FootnoteReplacementPlanViewModel>> ValidateFootnotes(
+        Guid releaseVersionId,
         Guid subjectId,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
-        var footnotes = await footnoteRepository.GetFootnotes(releaseVersionId: releaseVersionId,
-            subjectId: subjectId);
-        return footnotes
-            .Select(footnote => ValidateFootnote(footnote, replacementSubjectMeta))
-            .ToList();
+        var footnotes = await footnoteRepository.GetFootnotes(releaseVersionId: releaseVersionId, subjectId: subjectId);
+        return footnotes.Select(footnote => ValidateFootnote(footnote, replacementSubjectMeta)).ToList();
     }
 
     private static FootnoteReplacementPlanViewModel ValidateFootnote(
         Footnote footnote,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
         var filters = ValidateFiltersForFootnote(footnote, replacementSubjectMeta);
         var filterGroups = ValidateFilterGroupsForFootnote(footnote, replacementSubjectMeta);
@@ -265,15 +285,17 @@ public class ReplacementPlanService(
             filters,
             filterGroups,
             filterItems,
-            indicatorGroups);
+            indicatorGroups
+        );
     }
 
     private static List<FootnoteFilterReplacementViewModel> ValidateFiltersForFootnote(
         Footnote footnote,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
-        return footnote.Filters
-            .Select(filterFootnote => filterFootnote.Filter)
+        return footnote
+            .Filters.Select(filterFootnote => filterFootnote.Filter)
             .OrderBy(filter => filter.Label, LabelComparer)
             .Select(filter => new FootnoteFilterReplacementViewModel(
                 id: filter.Id,
@@ -283,11 +305,13 @@ public class ReplacementPlanService(
             .ToList();
     }
 
-    private static List<FootnoteFilterGroupReplacementViewModel> ValidateFilterGroupsForFootnote(Footnote footnote,
-        ReplacementSubjectMeta replacementSubjectMeta)
+    private static List<FootnoteFilterGroupReplacementViewModel> ValidateFilterGroupsForFootnote(
+        Footnote footnote,
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
-        return footnote.FilterGroups
-            .Select(filterGroupFootnote => filterGroupFootnote.FilterGroup)
+        return footnote
+            .FilterGroups.Select(filterGroupFootnote => filterGroupFootnote.FilterGroup)
             .OrderBy(filterGroup => filterGroup.Label, LabelComparer)
             .Select(filterGroup => new FootnoteFilterGroupReplacementViewModel(
                 id: filterGroup.Id,
@@ -303,11 +327,13 @@ public class ReplacementPlanService(
             .ToList();
     }
 
-    private static List<FootnoteFilterItemReplacementViewModel> ValidateFilterItemsForFootnote(Footnote footnote,
-        ReplacementSubjectMeta replacementSubjectMeta)
+    private static List<FootnoteFilterItemReplacementViewModel> ValidateFilterItemsForFootnote(
+        Footnote footnote,
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
-        return footnote.FilterItems
-            .Select(filterItemFootnote => filterItemFootnote.FilterItem)
+        return footnote
+            .FilterItems.Select(filterItemFootnote => filterItemFootnote.FilterItem)
             .OrderBy(filterItem => filterItem.Label, LabelComparer)
             .Select(filterItem => new FootnoteFilterItemReplacementViewModel(
                 id: filterItem.Id,
@@ -328,10 +354,11 @@ public class ReplacementPlanService(
 
     private static Dictionary<Guid, IndicatorGroupReplacementViewModel> ValidateIndicatorGroupsForFootnote(
         Footnote footnote,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
-        return footnote.Indicators
-            .Select(indicatorFootnote => indicatorFootnote.Indicator)
+        return footnote
+            .Indicators.Select(indicatorFootnote => indicatorFootnote.Indicator)
             .GroupBy(indicatorFootnote => indicatorFootnote.IndicatorGroup)
             .OrderBy(group => group.Key.Label, LabelComparer)
             .ToDictionary(
@@ -340,22 +367,21 @@ public class ReplacementPlanService(
                     id: group.Key.Id,
                     label: group.Key.Label,
                     indicators: group.Select(indicator =>
-                        ValidateIndicatorForReplacement(indicator, replacementSubjectMeta))
+                        ValidateIndicatorForReplacement(indicator, replacementSubjectMeta)
+                    )
                 )
             );
     }
 
     private List<FilterReplacementViewModel> FindNewlyIntroducedFiltersForDataBlock(
         DataBlock dataBlock,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
-        var existingFilterItemIds = dataBlock
-            .Query
-            .GetFilterItemIds();
+        var existingFilterItemIds = dataBlock.Query.GetFilterItemIds();
 
         var existingFilterNames = statisticsDbContext
-            .FilterItem
-            .AsQueryable()
+            .FilterItem.AsQueryable()
             .Where(fi => existingFilterItemIds.Contains(fi.Id))
             .Select(fi => fi.FilterGroup.Filter)
             .Select(f => f.Name)
@@ -363,8 +389,7 @@ public class ReplacementPlanService(
             .ToList();
 
         return replacementSubjectMeta
-            .Filters
-            .Select(d => d.Value)
+            .Filters.Select(d => d.Value)
             .ToList()
             .Where(f => !existingFilterNames.Contains(f.Name))
             .Select(CreateNewlyIntroducedFilterReplacementViewModel)
@@ -374,27 +399,29 @@ public class ReplacementPlanService(
     private static FilterReplacementViewModel CreateNewlyIntroducedFilterReplacementViewModel(Filter filter)
     {
         var filterGroupReplacementViewModels = filter
-            .FilterGroups
-            .Select(fg => new FilterGroupReplacementViewModel(fg.Id, fg.Label, fg
-                .FilterItems
-                .Select(fi => new FilterItemReplacementViewModel(fi.Id, fi.Label, null)))
-            )
+            .FilterGroups.Select(fg => new FilterGroupReplacementViewModel(
+                fg.Id,
+                fg.Label,
+                fg.FilterItems.Select(fi => new FilterItemReplacementViewModel(fi.Id, fi.Label, null))
+            ))
             .ToDictionary(f => f.Id);
 
         return new FilterReplacementViewModel(
             filter.Id,
-            target: null,  // null because this a new filter, therefore not replacing any existing filter
+            target: null, // null because this a new filter, therefore not replacing any existing filter
             filter.Label,
             filter.Name,
-            filterGroupReplacementViewModels);
+            filterGroupReplacementViewModels
+        );
     }
 
     private Dictionary<Guid, FilterReplacementViewModel> ValidateFiltersForDataBlock(
         DataBlock dataBlock,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
-        return statisticsDbContext.FilterItem
-            .AsQueryable()
+        return statisticsDbContext
+            .FilterItem.AsQueryable()
             .Where(filterItem => dataBlock.Query.GetFilterItemIds().Contains(filterItem.Id))
             .Include(filterItem => filterItem.FilterGroup)
             .ThenInclude(filterGroup => filterGroup.Filter)
@@ -415,14 +442,16 @@ public class ReplacementPlanService(
                             .OrderBy(group => group.Key.Label, LabelComparer)
                             .ToDictionary(
                                 group => group.Key.Id,
-                                group => ValidateFilterGroupForReplacement(
-                                    new FilterGroup
-                                    {
-                                        Id = group.Key.Id,
-                                        Label = group.Key.Label,
-                                        FilterItems = group.Key.FilterItems.Intersect(filter).ToList()
-                                    },
-                                    replacementSubjectMeta)
+                                group =>
+                                    ValidateFilterGroupForReplacement(
+                                        new FilterGroup
+                                        {
+                                            Id = group.Key.Id,
+                                            Label = group.Key.Label,
+                                            FilterItems = group.Key.FilterItems.Intersect(filter).ToList(),
+                                        },
+                                        replacementSubjectMeta
+                                    )
                             )
                     );
                 }
@@ -431,10 +460,11 @@ public class ReplacementPlanService(
 
     private Dictionary<Guid, IndicatorGroupReplacementViewModel> ValidateIndicatorGroupsForDataBlock(
         DataBlock dataBlock,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
-        return statisticsDbContext.Indicator
-            .Include(indicator => indicator.IndicatorGroup)
+        return statisticsDbContext
+            .Indicator.Include(indicator => indicator.IndicatorGroup)
             .Where(indicator => dataBlock.Query.Indicators.Contains(indicator.Id))
             .ToList()
             .GroupBy(indicator => indicator.IndicatorGroup)
@@ -453,31 +483,35 @@ public class ReplacementPlanService(
 
     private Dictionary<string, LocationReplacementViewModel> ValidateLocationsForDataBlock(
         DataBlock dataBlock,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
-        return statisticsDbContext.Location
-            .AsNoTracking()
+        return statisticsDbContext
+            .Location.AsNoTracking()
             .Where(location => dataBlock.Query.LocationIds.Contains(location.Id))
             .ToList()
             .GroupBy(location => location.GeographicLevel)
-            .ToDictionary(group => group.Key.ToString(),
-                group =>
-                    new LocationReplacementViewModel(
-                        label: group.Key.ToString(),
-                        locationAttributes: group
-                            .Select(location =>
-                                ValidateLocationForReplacement(
-                                    location: location,
-                                    level: group.Key,
-                                    replacementSubjectMeta: replacementSubjectMeta))
-                            .OrderBy(location => location.Label, LabelComparer)
-                    )
+            .ToDictionary(
+                group => group.Key.ToString(),
+                group => new LocationReplacementViewModel(
+                    label: group.Key.ToString(),
+                    locationAttributes: group
+                        .Select(location =>
+                            ValidateLocationForReplacement(
+                                location: location,
+                                level: group.Key,
+                                replacementSubjectMeta: replacementSubjectMeta
+                            )
+                        )
+                        .OrderBy(location => location.Label, LabelComparer)
+                )
             );
     }
 
     private static TimePeriodRangeReplacementViewModel ValidateTimePeriodsForDataBlock(
         DataBlock dataBlock,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
         return new TimePeriodRangeReplacementViewModel(
             start: ValidateTimePeriodForReplacement(
@@ -496,7 +530,8 @@ public class ReplacementPlanService(
     private static TimePeriodReplacementViewModel ValidateTimePeriodForReplacement(
         int year,
         TimeIdentifier code,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
         return new TimePeriodReplacementViewModel(
             year: year,
@@ -507,20 +542,22 @@ public class ReplacementPlanService(
 
     private static FilterGroupReplacementViewModel ValidateFilterGroupForReplacement(
         FilterGroup filterGroup,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
         return new FilterGroupReplacementViewModel(
             id: filterGroup.Id,
             label: filterGroup.Label,
-            filters: filterGroup.FilterItems
-                .Select(item => ValidateFilterItemForReplacement(item, replacementSubjectMeta))
+            filters: filterGroup
+                .FilterItems.Select(item => ValidateFilterItemForReplacement(item, replacementSubjectMeta))
                 .OrderBy(item => item.Label, LabelComparer)
         );
     }
 
     private static FilterItemReplacementViewModel ValidateFilterItemForReplacement(
         FilterItem filterItem,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
         return new FilterItemReplacementViewModel(
             id: filterItem.Id,
@@ -529,13 +566,15 @@ public class ReplacementPlanService(
                 replacementSubjectMeta,
                 filterItem.FilterGroup.Filter.Name,
                 filterItem.FilterGroup.Label,
-                filterItem.Label)?.Id
+                filterItem.Label
+            )?.Id
         );
     }
 
     private static IndicatorReplacementViewModel ValidateIndicatorForReplacement(
         Indicator indicator,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
         return new IndicatorReplacementViewModel(
             id: indicator.Id,
@@ -548,16 +587,20 @@ public class ReplacementPlanService(
     private static LocationAttributeReplacementViewModel ValidateLocationForReplacement(
         Location location,
         GeographicLevel level,
-        ReplacementSubjectMeta replacementSubjectMeta)
+        ReplacementSubjectMeta replacementSubjectMeta
+    )
     {
         var locationAttribute = location.ToLocationAttribute();
         var code = locationAttribute.GetCodeOrFallback();
 
         // If the replacement subject contains the same location by id then use it,
         // otherwise try to find a location with the same code
-        var target = replacementSubjectMeta.Locations
-                         .SingleOrDefault(l => l.Id == location.Id)?.Id ??
-                     FindReplacementLocation(replacementSubjectMeta, level, code);
+        var target =
+            replacementSubjectMeta.Locations.SingleOrDefault(l => l.Id == location.Id)?.Id ?? FindReplacementLocation(
+                replacementSubjectMeta,
+                level,
+                code
+            );
 
         return new LocationAttributeReplacementViewModel(
             id: location.Id,
@@ -567,48 +610,50 @@ public class ReplacementPlanService(
         );
     }
 
-    private static Filter? FindReplacementFilter(ReplacementSubjectMeta replacementSubjectMeta,
-        string filterName)
+    private static Filter? FindReplacementFilter(ReplacementSubjectMeta replacementSubjectMeta, string filterName)
     {
         return replacementSubjectMeta.Filters.GetValueOrDefault(filterName);
     }
 
-    private static FilterGroup? FindReplacementFilterGroup(ReplacementSubjectMeta replacementSubjectMeta,
+    private static FilterGroup? FindReplacementFilterGroup(
+        ReplacementSubjectMeta replacementSubjectMeta,
         string filterName,
-        string filterGroupLabel)
+        string filterGroupLabel
+    )
     {
         var replacementFilter = FindReplacementFilter(replacementSubjectMeta, filterName);
-        return replacementFilter?.FilterGroups.SingleOrDefault(filterGroup =>
-            filterGroup.Label == filterGroupLabel);
+        return replacementFilter?.FilterGroups.SingleOrDefault(filterGroup => filterGroup.Label == filterGroupLabel);
     }
 
-    private static FilterItem? FindReplacementFilterItem(ReplacementSubjectMeta replacementSubjectMeta,
+    private static FilterItem? FindReplacementFilterItem(
+        ReplacementSubjectMeta replacementSubjectMeta,
         string filterName,
         string filterGroupLabel,
-        string filterItemLabel)
+        string filterItemLabel
+    )
     {
-        var replacementFilterGroup =
-            FindReplacementFilterGroup(replacementSubjectMeta, filterName, filterGroupLabel);
-        return replacementFilterGroup?.FilterItems.SingleOrDefault(filterItem =>
-            filterItem.Label == filterItemLabel);
+        var replacementFilterGroup = FindReplacementFilterGroup(replacementSubjectMeta, filterName, filterGroupLabel);
+        return replacementFilterGroup?.FilterItems.SingleOrDefault(filterItem => filterItem.Label == filterItemLabel);
     }
 
-    private static Guid? FindReplacementIndicator(ReplacementSubjectMeta replacementSubjectMeta,
-        string indicatorName)
+    private static Guid? FindReplacementIndicator(ReplacementSubjectMeta replacementSubjectMeta, string indicatorName)
     {
         return replacementSubjectMeta.Indicators.GetValueOrDefault(indicatorName)?.Id;
     }
 
-    private static Guid? FindReplacementLocation(ReplacementSubjectMeta replacementSubjectMeta,
+    private static Guid? FindReplacementLocation(
+        ReplacementSubjectMeta replacementSubjectMeta,
         GeographicLevel level,
-        string locationCode)
+        string locationCode
+    )
     {
-        var candidateReplacements = replacementSubjectMeta.Locations
-            .Where(location =>
+        var candidateReplacements = replacementSubjectMeta
+            .Locations.Where(location =>
                 // Filter by level as the other locations are unlikely to have matching codes
                 // and even if they did we shouldn't target a replacement location with a different level
-                location.GeographicLevel == level &&
-                location.ToLocationAttribute().GetCodeOrFallback() == locationCode)
+                location.GeographicLevel == level
+                && location.ToLocationAttribute().GetCodeOrFallback() == locationCode
+            )
             .ToList();
 
         // Only return a location if there's exactly one.

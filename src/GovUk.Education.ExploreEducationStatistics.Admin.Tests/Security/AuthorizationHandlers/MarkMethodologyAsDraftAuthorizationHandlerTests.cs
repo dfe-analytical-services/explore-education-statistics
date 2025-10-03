@@ -7,8 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
-using static
-    GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -49,24 +48,18 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
         {
             await ForEachSecurityClaimAsync(async claim =>
             {
-                var (
-                    handler,
-                    _,
-                    methodologyVersionRepository,
-                    _,
-                    _) = CreateHandlerAndDependencies();
+                var (handler, _, methodologyVersionRepository, _, _) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock =>
-                        mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
+                methodologyVersionRepository
+                    .Setup(mock => mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                     .ReturnsAsync(true);
 
-                var user = DataFixture
-                    .AuthenticatedUser(userId: UserId)
-                    .WithClaim(claim.ToString());
+                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<MarkMethodologyAsDraftRequirement, MethodologyVersion>
-                        (user, HigherReviewMethodologyVersion);
+                var authContext = CreateAuthorizationHandlerContext<
+                    MarkMethodologyAsDraftRequirement,
+                    MethodologyVersion
+                >(user, HigherReviewMethodologyVersion);
 
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(methodologyVersionRepository);
@@ -87,10 +80,10 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
                     userPublicationRoleRepository
-                    ) = CreateHandlerAndDependencies();
+                ) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock =>
-                        mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
+                methodologyVersionRepository
+                    .Setup(mock => mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                     .ReturnsAsync(false);
 
                 // Only the MarkAllMethodologiesDraft claim should allow a non publicly accessible Methodology to
@@ -99,8 +92,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
 
                 if (!expectedToPassByClaimAlone)
                 {
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(HigherReviewMethodologyVersion.MethodologyId))
+                    methodologyRepository
+                        .Setup(s => s.GetOwningPublication(HigherReviewMethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
@@ -112,20 +105,20 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                         .ReturnsAsync(new List<ReleaseRole>());
                 }
 
-                var user = DataFixture
-                    .AuthenticatedUser(userId: UserId)
-                    .WithClaim(claim.ToString());
+                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<MarkMethodologyAsDraftRequirement, MethodologyVersion>
-                        (user, HigherReviewMethodologyVersion);
+                var authContext = CreateAuthorizationHandlerContext<
+                    MarkMethodologyAsDraftRequirement,
+                    MethodologyVersion
+                >(user, HigherReviewMethodologyVersion);
 
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(
                     methodologyRepository,
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository);
+                    userPublicationRoleRepository
+                );
 
                 Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
             });
@@ -139,8 +132,7 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
         {
             await ForEachPublicationRoleAsync(async publicationRole =>
             {
-                var expectedToPassByPublicationRole =
-                    publicationRole is Allower or Owner;
+                var expectedToPassByPublicationRole = publicationRole is Allower or Owner;
 
                 var (
                     handler,
@@ -148,35 +140,33 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
                     userPublicationRoleRepository
-                    ) = CreateHandlerAndDependencies();
+                ) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock =>
-                        mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
+                methodologyVersionRepository
+                    .Setup(mock => mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                     .ReturnsAsync(false);
 
-                methodologyRepository.Setup(mock =>
-                        mock.GetOwningPublication(HigherReviewMethodologyVersion.MethodologyId))
+                methodologyRepository
+                    .Setup(mock => mock.GetOwningPublication(HigherReviewMethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(mock =>
-                        mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(publicationRole));
 
                 if (!expectedToPassByPublicationRole)
                 {
                     userReleaseRoleRepository
-                        .Setup(mock =>
-                            mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<ReleaseRole>());
                 }
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<MarkMethodologyAsDraftRequirement,
-                        MethodologyVersion>(user,
-                        HigherReviewMethodologyVersion);
+                var authContext = CreateAuthorizationHandlerContext<
+                    MarkMethodologyAsDraftRequirement,
+                    MethodologyVersion
+                >(user, HigherReviewMethodologyVersion);
 
                 await handler.HandleAsync(authContext);
 
@@ -184,7 +174,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     methodologyRepository,
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository);
+                    userPublicationRoleRepository
+                );
 
                 Assert.Equal(expectedToPassByPublicationRole, authContext.HasSucceeded);
             });
@@ -195,8 +186,7 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
         {
             await ForEachPublicationRoleAsync(async publicationRole =>
             {
-                var expectedToPassByPublicationRole =
-                    publicationRole is Allower;
+                var expectedToPassByPublicationRole = publicationRole is Allower;
 
                 var (
                     handler,
@@ -204,35 +194,33 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
                     userPublicationRoleRepository
-                    ) = CreateHandlerAndDependencies();
+                ) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock =>
-                        mock.IsLatestPublishedVersion(ApprovedMethodologyVersion))
+                methodologyVersionRepository
+                    .Setup(mock => mock.IsLatestPublishedVersion(ApprovedMethodologyVersion))
                     .ReturnsAsync(false);
 
-                methodologyRepository.Setup(mock =>
-                        mock.GetOwningPublication(ApprovedMethodologyVersion.MethodologyId))
+                methodologyRepository
+                    .Setup(mock => mock.GetOwningPublication(ApprovedMethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(mock =>
-                        mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(publicationRole));
 
                 if (!expectedToPassByPublicationRole)
                 {
                     userReleaseRoleRepository
-                        .Setup(mock =>
-                            mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<ReleaseRole>());
                 }
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-                var authContext =
-                    CreateAuthorizationHandlerContext
-                        <MarkMethodologyAsDraftRequirement, MethodologyVersion>
-                        (user, ApprovedMethodologyVersion);
+                var authContext = CreateAuthorizationHandlerContext<
+                    MarkMethodologyAsDraftRequirement,
+                    MethodologyVersion
+                >(user, ApprovedMethodologyVersion);
 
                 await handler.HandleAsync(authContext);
 
@@ -240,7 +228,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     methodologyRepository,
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository);
+                    userPublicationRoleRepository
+                );
 
                 Assert.Equal(expectedToPassByPublicationRole, authContext.HasSucceeded);
             });
@@ -250,8 +239,7 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
     public class ReleaseRoleTests
     {
         [Fact]
-        public async Task
-            ReleaseEditorAndApproverRolesOnAnyOwningPublicationReleaseCanMarkHigherLevelMethodologyAsDraft()
+        public async Task ReleaseEditorAndApproverRolesOnAnyOwningPublicationReleaseCanMarkHigherLevelMethodologyAsDraft()
         {
             await ForEachReleaseRoleAsync(async releaseRole =>
             {
@@ -263,14 +251,14 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
                     userPublicationRoleRepository
-                    ) = CreateHandlerAndDependencies();
+                ) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock =>
-                        mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
+                methodologyVersionRepository
+                    .Setup(mock => mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                     .ReturnsAsync(false);
 
-                methodologyRepository.Setup(s =>
-                        s.GetOwningPublication(HigherReviewMethodologyVersion.MethodologyId))
+                methodologyRepository
+                    .Setup(s => s.GetOwningPublication(HigherReviewMethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
@@ -283,10 +271,10 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<MarkMethodologyAsDraftRequirement,
-                        MethodologyVersion>(user,
-                        HigherReviewMethodologyVersion);
+                var authContext = CreateAuthorizationHandlerContext<
+                    MarkMethodologyAsDraftRequirement,
+                    MethodologyVersion
+                >(user, HigherReviewMethodologyVersion);
 
                 await handler.HandleAsync(authContext);
 
@@ -294,7 +282,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     methodologyRepository,
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository);
+                    userPublicationRoleRepository
+                );
 
                 Assert.Equal(expectedToPassByReleaseRole, authContext.HasSucceeded);
             });
@@ -313,32 +302,30 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
                     userPublicationRoleRepository
-                    ) = CreateHandlerAndDependencies();
+                ) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock =>
-                        mock.IsLatestPublishedVersion(ApprovedMethodologyVersion))
+                methodologyVersionRepository
+                    .Setup(mock => mock.IsLatestPublishedVersion(ApprovedMethodologyVersion))
                     .ReturnsAsync(false);
 
-                methodologyRepository.Setup(mock =>
-                        mock.GetOwningPublication(ApprovedMethodologyVersion.MethodologyId))
+                methodologyRepository
+                    .Setup(mock => mock.GetOwningPublication(ApprovedMethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(mock =>
-                        mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
                 userReleaseRoleRepository
-                    .Setup(mock =>
-                        mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(releaseRole));
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<MarkMethodologyAsDraftRequirement,
-                        MethodologyVersion>(user,
-                        ApprovedMethodologyVersion);
+                var authContext = CreateAuthorizationHandlerContext<
+                    MarkMethodologyAsDraftRequirement,
+                    MethodologyVersion
+                >(user, ApprovedMethodologyVersion);
 
                 await handler.HandleAsync(authContext);
 
@@ -346,7 +333,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     methodologyRepository,
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository);
+                    userPublicationRoleRepository
+                );
 
                 Assert.Equal(expectedToPassByReleaseRole, authContext.HasSucceeded);
             });
@@ -361,14 +349,14 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                 methodologyVersionRepository,
                 userReleaseRoleRepository,
                 userPublicationRoleRepository
-                ) = CreateHandlerAndDependencies();
+            ) = CreateHandlerAndDependencies();
 
-            methodologyVersionRepository.Setup(mock =>
-                    mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
+            methodologyVersionRepository
+                .Setup(mock => mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                 .ReturnsAsync(false);
 
-            methodologyRepository.Setup(s =>
-                    s.GetOwningPublication(HigherReviewMethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetOwningPublication(HigherReviewMethodologyVersion.MethodologyId))
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
@@ -381,16 +369,18 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-            var authContext =
-                CreateAuthorizationHandlerContext<MarkMethodologyAsDraftRequirement, MethodologyVersion>
-                    (user, HigherReviewMethodologyVersion);
+            var authContext = CreateAuthorizationHandlerContext<MarkMethodologyAsDraftRequirement, MethodologyVersion>(
+                user,
+                HigherReviewMethodologyVersion
+            );
 
             await handler.HandleAsync(authContext);
             VerifyAllMocks(
                 methodologyRepository,
                 methodologyVersionRepository,
                 userReleaseRoleRepository,
-                userPublicationRoleRepository);
+                userPublicationRoleRepository
+            );
 
             // A user with no role on the owning Publication of this Methodology is not allowed to mark it as draft
             Assert.False(authContext.HasSucceeded);
@@ -403,8 +393,7 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
         Mock<IMethodologyVersionRepository>,
         Mock<IUserReleaseRoleRepository>,
         Mock<IUserPublicationRoleRepository>
-        )
-        CreateHandlerAndDependencies()
+    ) CreateHandlerAndDependencies()
     {
         var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
@@ -418,7 +407,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                 userReleaseRoleRepository.Object,
                 userPublicationRoleRepository.Object,
-                Mock.Of<IPreReleaseService>(Strict))
+                Mock.Of<IPreReleaseService>(Strict)
+            )
         );
 
         return (

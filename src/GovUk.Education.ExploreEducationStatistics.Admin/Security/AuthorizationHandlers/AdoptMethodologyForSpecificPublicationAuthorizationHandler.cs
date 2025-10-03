@@ -6,9 +6,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class AdoptMethodologyForSpecificPublicationRequirement : IAuthorizationRequirement
-{
-}
+public class AdoptMethodologyForSpecificPublicationRequirement : IAuthorizationRequirement { }
 
 public class AdoptMethodologyForSpecificPublicationAuthorizationHandler
     : AuthorizationHandler<AdoptMethodologyForSpecificPublicationRequirement, Publication>
@@ -16,7 +14,8 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandler
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
     public AdoptMethodologyForSpecificPublicationAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService)
+        AuthorizationHandlerService authorizationHandlerService
+    )
     {
         _authorizationHandlerService = authorizationHandlerService;
     }
@@ -24,19 +23,16 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandler
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         AdoptMethodologyForSpecificPublicationRequirement requirement,
-        Publication publication)
+        Publication publication
+    )
     {
         if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.AdoptAnyMethodology))
         {
             context.Succeed(requirement);
             return;
         }
-        
-        if (await _authorizationHandlerService
-                .HasRolesOnPublication(
-                    context.User.GetUserId(),
-                    publication.Id,
-                    Owner))
+
+        if (await _authorizationHandlerService.HasRolesOnPublication(context.User.GetUserId(), publication.Id, Owner))
         {
             context.Succeed(requirement);
         }

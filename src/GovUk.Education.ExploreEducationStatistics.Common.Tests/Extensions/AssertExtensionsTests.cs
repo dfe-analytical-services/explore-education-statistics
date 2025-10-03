@@ -35,13 +35,9 @@ public class AssertExtensionsTests
         [Fact]
         public void Nested()
         {
-            var company1 = new Company("Company", ListOf(
-                new Person("Name1", 30),
-                new Person("Name2", 31)));
+            var company1 = new Company("Company", ListOf(new Person("Name1", 30), new Person("Name2", 31)));
 
-            var company2 = new Company("Company", ListOf(
-                new Person("Name1", 30),
-                new Person("Name2", 31)));
+            var company2 = new Company("Company", ListOf(new Person("Name1", 30), new Person("Name2", 31)));
 
             company1.AssertDeepEqualTo(company2);
         }
@@ -49,13 +45,9 @@ public class AssertExtensionsTests
         [Fact]
         public void Nested_NotEqual()
         {
-            var company1 = new Company("Company", ListOf(
-                new Person("Name1", 30),
-                new Person("Name2", 31)));
+            var company1 = new Company("Company", ListOf(new Person("Name1", 30), new Person("Name2", 31)));
 
-            var company2 = new Company("Company", ListOf(
-                new Person("Name1", 30),
-                new Person("DifferentName", 31)));
+            var company2 = new Company("Company", ListOf(new Person("Name1", 30), new Person("DifferentName", 31)));
 
             Assert.Throws<TrueException>(() => company1.AssertDeepEqualTo(company2));
         }
@@ -98,7 +90,7 @@ public class AssertExtensionsTests
         [Fact]
         public void NullableDateTime_Null()
         {
-            Assert.Throws<NotNullException>(() => ((DateTime?) null).AssertUtcNow());
+            Assert.Throws<NotNullException>(() => ((DateTime?)null).AssertUtcNow());
         }
     }
 }

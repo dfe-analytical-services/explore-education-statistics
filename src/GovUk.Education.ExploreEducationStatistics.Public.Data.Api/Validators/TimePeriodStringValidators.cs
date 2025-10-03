@@ -10,41 +10,43 @@ public static partial class TimePeriodStringValidators
 {
     private const string ExpectedFormat = "{period}|{code}";
 
-    public static IRuleBuilderOptionsConditions<T, string> TimePeriodString<T>(
-        this IRuleBuilder<T, string> rule)
+    public static IRuleBuilderOptionsConditions<T, string> TimePeriodString<T>(this IRuleBuilder<T, string> rule)
     {
-        return rule.NotEmpty().Custom((value, context) =>
-        {
-            if (value.IsNullOrWhitespace())
-            {
-                return;
-            }
+        return rule.NotEmpty()
+            .Custom(
+                (value, context) =>
+                {
+                    if (value.IsNullOrWhitespace())
+                    {
+                        return;
+                    }
 
-            if (!HasValidFormat(value))
-            {
-                context.AddFailure(
-                    message: ValidationMessages.TimePeriodFormat,
-                    detail: new FormatErrorDetail(Value: value, ExpectedFormat: ExpectedFormat)
-                );
-                return;
-            }
+                    if (!HasValidFormat(value))
+                    {
+                        context.AddFailure(
+                            message: ValidationMessages.TimePeriodFormat,
+                            detail: new FormatErrorDetail(Value: value, ExpectedFormat: ExpectedFormat)
+                        );
+                        return;
+                    }
 
-            var validator = new DataSetQueryTimePeriod.Validator();
-            var result = validator.Validate(DataSetQueryTimePeriod.Parse(value));
+                    var validator = new DataSetQueryTimePeriod.Validator();
+                    var result = validator.Validate(DataSetQueryTimePeriod.Parse(value));
 
-            if (result.IsValid)
-            {
-                return;
-            }
+                    if (result.IsValid)
+                    {
+                        return;
+                    }
 
-            foreach (var error in result.Errors)
-            {
-                error.FormattedMessagePlaceholderValues["Property"] = error.PropertyName.ToLowerFirst();
-                error.PropertyName = context.PropertyPath;
-                
-                context.AddFailure(error);
-            }
-        });
+                    foreach (var error in result.Errors)
+                    {
+                        error.FormattedMessagePlaceholderValues["Property"] = error.PropertyName.ToLowerFirst();
+                        error.PropertyName = context.PropertyPath;
+
+                        context.AddFailure(error);
+                    }
+                }
+            );
     }
 
     // Note this regex only does basic checks on the delimiter to allow

@@ -23,30 +23,27 @@ public class RelatedInformationServiceTests
         {
             Id = Guid.NewGuid(),
             Description = "Related page 1",
-            Url = "related-page-1"
+            Url = "related-page-1",
         },
         new()
         {
             Id = Guid.NewGuid(),
             Description = "Related page 2",
-            Url = "related-page-2"
+            Url = "related-page-2",
         },
         new()
         {
             Id = Guid.NewGuid(),
             Description = "Related page 3",
-            Url = "related-page-3"
-        }
+            Url = "related-page-3",
+        },
     ];
 
     [Fact]
     public async Task GetRelatedInformationAsync()
     {
         // Arrange
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithRelatedInformation(Links)
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelatedInformation(Links).Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -80,10 +77,7 @@ public class RelatedInformationServiceTests
     public async Task UpdateRelatedInformation()
     {
         // Arrange
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithRelatedInformation(Links)
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelatedInformation(Links).Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -96,25 +90,15 @@ public class RelatedInformationServiceTests
         // Act
         var linkUpdateRequest = new List<CreateUpdateLinkRequest>
         {
-            new()
-            {
-                Description = "Related page 2",
-                Url = "related-page-2"
-            },
-            new()
-            {
-                Description = "Related page 1",
-                Url = "related-page-1"
-            }
+            new() { Description = "Related page 2", Url = "related-page-2" },
+            new() { Description = "Related page 1", Url = "related-page-1" },
         };
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = BuildRelatedInformationService(contentDbContext);
 
-            var result = await service.UpdateRelatedInformation(
-                releaseVersion.Id,
-                linkUpdateRequest);
+            var result = await service.UpdateRelatedInformation(releaseVersion.Id, linkUpdateRequest);
 
             // Assert
             var links = result.AssertRight();
@@ -128,9 +112,10 @@ public class RelatedInformationServiceTests
     }
 
     private static RelatedInformationService BuildRelatedInformationService(
-            ContentDbContext? contentDbContext = null,
-            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
-            IUserService? userService = null)
+        ContentDbContext? contentDbContext = null,
+        IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+        IUserService? userService = null
+    )
     {
         contentDbContext ??= InMemoryContentDbContext();
 

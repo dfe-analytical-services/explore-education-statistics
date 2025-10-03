@@ -4,16 +4,15 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 
-public class ViewPublicationRequirement : IAuthorizationRequirement
-{
-}
+public class ViewPublicationRequirement : IAuthorizationRequirement { }
 
 public class ViewPublicationAuthorizationHandler : AuthorizationHandler<ViewPublicationRequirement, Publication>
 {
     protected override Task HandleRequirementAsync(
         AuthorizationHandlerContext authContext,
         ViewPublicationRequirement requirement,
-        Publication publication)
+        Publication publication
+    )
     {
         if (publication.LatestPublishedReleaseVersionId != null)
         {

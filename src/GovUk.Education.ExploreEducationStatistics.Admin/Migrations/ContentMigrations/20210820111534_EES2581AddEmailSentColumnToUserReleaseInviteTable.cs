@@ -10,13 +10,12 @@ public partial class EES2581AddEmailSentColumnToUserReleaseInviteTable : Migrati
             name: "EmailSent",
             table: "UserReleaseInvites",
             nullable: false,
-            defaultValue: true);
+            defaultValue: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "EmailSent",
-            table: "UserReleaseInvites");
+        migrationBuilder.DropColumn(name: "EmailSent", table: "UserReleaseInvites");
     }
 }

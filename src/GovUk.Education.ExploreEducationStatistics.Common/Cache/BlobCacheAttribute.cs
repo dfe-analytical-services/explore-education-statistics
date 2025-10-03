@@ -17,14 +17,14 @@ public class BlobCacheAttribute : CacheAttribute
     /// </summary>
     public string? ServiceName { get; set; }
 
-    public BlobCacheAttribute(Type key, bool forceUpdate = false) : base(key, forceUpdate)
-    {
-    }
+    public BlobCacheAttribute(Type key, bool forceUpdate = false)
+        : base(key, forceUpdate) { }
 
     public static void AddService(string name, IBlobCacheService service)
     {
         Services[name] = service;
     }
+
     public static void RemoveService(string name)
     {
         Services.Remove(name);

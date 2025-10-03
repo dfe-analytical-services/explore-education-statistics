@@ -16,12 +16,11 @@ public class ReleaseSearchableDocumentsController(IReleaseSearchableDocumentsSer
     : ControllerBase
 {
     [HttpGet("publications/{publicationSlug}/releases/latest/searchable")]
-    public async Task<ActionResult<ReleaseSearchableDocumentDto>>
-        GetLatestReleaseAsSearchableDocument(
-            string publicationSlug,
-            CancellationToken cancellationToken = default) =>
-        await releaseSearchableDocumentsService.GetLatestReleaseAsSearchableDocument(
-                publicationSlug,
-                cancellationToken)
+    public async Task<ActionResult<ReleaseSearchableDocumentDto>> GetLatestReleaseAsSearchableDocument(
+        string publicationSlug,
+        CancellationToken cancellationToken = default
+    ) =>
+        await releaseSearchableDocumentsService
+            .GetLatestReleaseAsSearchableDocument(publicationSlug, cancellationToken)
             .HandleFailuresOrOk();
 }

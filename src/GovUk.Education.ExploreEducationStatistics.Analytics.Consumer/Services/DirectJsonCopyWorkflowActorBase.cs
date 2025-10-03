@@ -20,8 +20,7 @@ public abstract class DirectJsonCopyWorkflowActorBase(
     string sourceDirectory,
     string reportsDirectory,
     string reportFilenamePart
-    ) 
-    : IWorkflowActor
+) : IWorkflowActor
 {
     public string GetSourceDirectory()
     {
@@ -42,18 +41,16 @@ public abstract class DirectJsonCopyWorkflowActorBase(
 
     public async Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection)
     {
-        await connection.DirectCopyJsonIntoDuckDbTable(
-            jsonFilePath: sourceFilesDirectory,
-            tableName: "sourceTable");
+        await connection.DirectCopyJsonIntoDuckDbTable(jsonFilePath: sourceFilesDirectory, tableName: "sourceTable");
     }
 
     public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
     {
-        var reportFilePath = 
-            $"{reportsFolderPathAndFilenamePrefix}_public-api-{reportFilenamePart}-calls.parquet";
+        var reportFilePath = $"{reportsFolderPathAndFilenamePrefix}_public-api-{reportFilenamePart}-calls.parquet";
 
         await connection.DirectCopyDuckDbTableIntoParquetFile(
             tableName: "sourceTable",
-            parquetFilePath: reportFilePath);
+            parquetFilePath: reportFilePath
+        );
     }
 }

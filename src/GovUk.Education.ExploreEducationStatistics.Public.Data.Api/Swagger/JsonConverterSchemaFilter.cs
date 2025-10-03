@@ -21,9 +21,9 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
 {
     private readonly HashSet<Type> _typesToIgnore =
     [
-         typeof(GeographicLevel),
-         typeof(IndicatorUnit),
-         typeof(TimeIdentifier),
+        typeof(GeographicLevel),
+        typeof(IndicatorUnit),
+        typeof(TimeIdentifier),
     ];
 
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
@@ -33,17 +33,15 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
             return;
         }
 
-        var properties = context.Type
-            .GetProperties()
-            .Where(
-                property => property.CustomAttributes
-                    .Any(attr => attr.AttributeType == typeof(JsonConverterAttribute))
+        var properties = context
+            .Type.GetProperties()
+            .Where(property =>
+                property.CustomAttributes.Any(attr => attr.AttributeType == typeof(JsonConverterAttribute))
             );
 
         foreach (var property in properties)
         {
-            if (property.GetCustomAttribute(typeof(JsonConverterAttribute))
-                is not JsonConverterAttribute attribute)
+            if (property.GetCustomAttribute(typeof(JsonConverterAttribute)) is not JsonConverterAttribute attribute)
             {
                 continue;
             }
@@ -74,8 +72,10 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
                 continue;
             }
 
-            if (propertyType.GetGenericTypeDefinition().IsAssignableTo(typeof(IReadOnlyList<>))
-                && propertyType.GenericTypeArguments[0].IsEnum)
+            if (
+                propertyType.GetGenericTypeDefinition().IsAssignableTo(typeof(IReadOnlyList<>))
+                && propertyType.GenericTypeArguments[0].IsEnum
+            )
             {
                 ApplyReadOnlyListEnumConverter(propertySchema, converterType, context.SchemaRepository);
             }
@@ -86,23 +86,22 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
         Type enumType,
         OpenApiSchema propertySchema,
         Type converterType,
-        SchemaRepository schemaRepository)
+        SchemaRepository schemaRepository
+    )
     {
         var hasEnumConverter = false;
 
-        var converterBaseType = converterType.IsGenericType
-            ? converterType.GetGenericTypeDefinition()
-            : converterType;
+        var converterBaseType = converterType.IsGenericType ? converterType.GetGenericTypeDefinition() : converterType;
 
-        if (converterBaseType == typeof(JsonStringEnumConverter) ||
-            converterBaseType == typeof(JsonStringEnumConverter<>))
+        if (
+            converterBaseType == typeof(JsonStringEnumConverter)
+            || converterBaseType == typeof(JsonStringEnumConverter<>)
+        )
         {
             hasEnumConverter = true;
 
             propertySchema.Type = "string";
-            propertySchema.Enum = Enum.GetNames(enumType)
-                .Select(name => new OpenApiString(name))
-                .ToList<IOpenApiAny>();
+            propertySchema.Enum = Enum.GetNames(enumType).Select(name => new OpenApiString(name)).ToList<IOpenApiAny>();
         }
         else if (converterBaseType == typeof(EnumToEnumLabelJsonConverter<>))
         {
@@ -130,14 +129,13 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
             // Clear any references to the enum schema as this would get merged together
             // with the property in the final document and produce incorrect enum values.
 
-            if (propertySchema.Reference is not null &&
-                propertySchema.Reference.Id == enumSchema.Reference.Id)
+            if (propertySchema.Reference is not null && propertySchema.Reference.Id == enumSchema.Reference.Id)
             {
                 propertySchema.Reference = null;
             }
 
-            propertySchema.AllOf = propertySchema.AllOf
-                .Where(s => s.Reference is null || s.Reference.Id != enumSchema.Reference.Id)
+            propertySchema.AllOf = propertySchema
+                .AllOf.Where(s => s.Reference is null || s.Reference.Id != enumSchema.Reference.Id)
                 .ToList();
         }
     }
@@ -145,7 +143,8 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
     private void ApplyReadOnlyListEnumConverter(
         OpenApiSchema propertySchema,
         Type converterType,
-        SchemaRepository schemaRepository)
+        SchemaRepository schemaRepository
+    )
     {
         if (converterType.GetGenericTypeDefinition() != typeof(ReadOnlyListJsonConverter<,>))
         {

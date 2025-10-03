@@ -15,7 +15,8 @@ public partial class EES3321_AddDeletedAndDeletedByToUserPublicationRole : Migra
             type: "uniqueidentifier",
             nullable: true,
             oldClrType: typeof(Guid),
-            oldType: "uniqueidentifier");
+            oldType: "uniqueidentifier"
+        );
 
         migrationBuilder.AlterColumn<DateTime>(
             name: "Created",
@@ -23,50 +24,50 @@ public partial class EES3321_AddDeletedAndDeletedByToUserPublicationRole : Migra
             type: "datetime2",
             nullable: true,
             oldClrType: typeof(DateTime),
-            oldType: "datetime2");
+            oldType: "datetime2"
+        );
 
         migrationBuilder.AddColumn<DateTime>(
             name: "Deleted",
             table: "UserPublicationRoles",
             type: "datetime2",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<Guid>(
             name: "DeletedById",
             table: "UserPublicationRoles",
             type: "uniqueidentifier",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_UserPublicationRoles_DeletedById",
             table: "UserPublicationRoles",
-            column: "DeletedById");
+            column: "DeletedById"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_UserPublicationRoles_Users_DeletedById",
             table: "UserPublicationRoles",
             column: "DeletedById",
             principalTable: "Users",
-            principalColumn: "Id");
+            principalColumn: "Id"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropForeignKey(
             name: "FK_UserPublicationRoles_Users_DeletedById",
-            table: "UserPublicationRoles");
+            table: "UserPublicationRoles"
+        );
 
-        migrationBuilder.DropIndex(
-            name: "IX_UserPublicationRoles_DeletedById",
-            table: "UserPublicationRoles");
+        migrationBuilder.DropIndex(name: "IX_UserPublicationRoles_DeletedById", table: "UserPublicationRoles");
 
-        migrationBuilder.DropColumn(
-            name: "Deleted",
-            table: "UserPublicationRoles");
+        migrationBuilder.DropColumn(name: "Deleted", table: "UserPublicationRoles");
 
-        migrationBuilder.DropColumn(
-            name: "DeletedById",
-            table: "UserPublicationRoles");
+        migrationBuilder.DropColumn(name: "DeletedById", table: "UserPublicationRoles");
 
         migrationBuilder.AlterColumn<Guid>(
             name: "CreatedById",
@@ -76,7 +77,8 @@ public partial class EES3321_AddDeletedAndDeletedByToUserPublicationRole : Migra
             defaultValue: new Guid("00000000-0000-0000-0000-000000000000"),
             oldClrType: typeof(Guid),
             oldType: "uniqueidentifier",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.AlterColumn<DateTime>(
             name: "Created",
@@ -86,6 +88,7 @@ public partial class EES3321_AddDeletedAndDeletedByToUserPublicationRole : Migra
             defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
             oldClrType: typeof(DateTime),
             oldType: "datetime2",
-            oldNullable: true);
+            oldNullable: true
+        );
     }
 }

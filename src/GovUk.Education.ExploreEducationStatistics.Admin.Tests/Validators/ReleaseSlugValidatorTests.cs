@@ -19,7 +19,8 @@ public abstract class ReleaseSlugValidatorTests
             [Fact]
             public async Task TargetReleaseSlugUnchanged_Succeeds()
             {
-                Release targetRelease = _dataFixture.DefaultRelease()
+                Release targetRelease = _dataFixture
+                    .DefaultRelease()
                     .WithSlug("slug-1")
                     .WithPublication(_dataFixture.DefaultPublication());
 
@@ -32,7 +33,8 @@ public abstract class ReleaseSlugValidatorTests
                 var result = await sut.ValidateNewSlug(
                     newReleaseSlug: "slug-1",
                     publicationId: targetRelease.PublicationId,
-                    releaseId: targetRelease.Id);
+                    releaseId: targetRelease.Id
+                );
 
                 result.AssertRight();
             }
@@ -40,11 +42,13 @@ public abstract class ReleaseSlugValidatorTests
             [Fact]
             public async Task DifferentReleaseExistsWithSameSlugInDifferentPublication_Succeeds()
             {
-                Release targetRelease = _dataFixture.DefaultRelease()
+                Release targetRelease = _dataFixture
+                    .DefaultRelease()
                     .WithSlug("slug-1")
                     .WithPublication(_dataFixture.DefaultPublication());
 
-                Release otherRelease = _dataFixture.DefaultRelease()
+                Release otherRelease = _dataFixture
+                    .DefaultRelease()
                     .WithSlug("slug-2")
                     .WithPublication(_dataFixture.DefaultPublication());
 
@@ -57,7 +61,8 @@ public abstract class ReleaseSlugValidatorTests
                 var result = await sut.ValidateNewSlug(
                     newReleaseSlug: "slug-2",
                     publicationId: targetRelease.PublicationId,
-                    releaseId: targetRelease.Id);
+                    releaseId: targetRelease.Id
+                );
 
                 result.AssertRight();
             }
@@ -67,13 +72,9 @@ public abstract class ReleaseSlugValidatorTests
             {
                 Publication publication = _dataFixture.DefaultPublication();
 
-                Release targetRelease = _dataFixture.DefaultRelease()
-                    .WithSlug("slug-2")
-                    .WithPublication(publication);
+                Release targetRelease = _dataFixture.DefaultRelease().WithSlug("slug-2").WithPublication(publication);
 
-                Release otherRelease = _dataFixture.DefaultRelease()
-                    .WithSlug("slug-1")
-                    .WithPublication(publication);
+                Release otherRelease = _dataFixture.DefaultRelease().WithSlug("slug-1").WithPublication(publication);
 
                 using var context = DbUtils.InMemoryApplicationDbContext(Guid.NewGuid().ToString());
                 context.Releases.AddRange(targetRelease, otherRelease);
@@ -84,7 +85,8 @@ public abstract class ReleaseSlugValidatorTests
                 var result = await sut.ValidateNewSlug(
                     newReleaseSlug: "slug-1",
                     publicationId: publication.Id,
-                    releaseId: targetRelease.Id);
+                    releaseId: targetRelease.Id
+                );
 
                 var validationProblem = result.AssertBadRequestWithValidationProblem();
 
@@ -98,16 +100,12 @@ public abstract class ReleaseSlugValidatorTests
             {
                 Publication publication = _dataFixture.DefaultPublication();
 
-                Release targetRelease = _dataFixture.DefaultRelease()
-                    .WithSlug("slug-2")
-                    .WithPublication(publication);
+                Release targetRelease = _dataFixture.DefaultRelease().WithSlug("slug-2").WithPublication(publication);
 
-                Release otherRelease = _dataFixture.DefaultRelease()
+                Release otherRelease = _dataFixture
+                    .DefaultRelease()
                     .WithSlug("slug-2")
-                    .WithRedirects([
-                        _dataFixture.DefaultReleaseRedirect()
-                            .WithSlug("slug-1")
-                        ])
+                    .WithRedirects([_dataFixture.DefaultReleaseRedirect().WithSlug("slug-1")])
                     .WithPublication(publication);
 
                 using var context = DbUtils.InMemoryApplicationDbContext(Guid.NewGuid().ToString());
@@ -119,7 +117,8 @@ public abstract class ReleaseSlugValidatorTests
                 var result = await sut.ValidateNewSlug(
                     newReleaseSlug: "slug-1",
                     publicationId: publication.Id,
-                    releaseId: targetRelease.Id);
+                    releaseId: targetRelease.Id
+                );
 
                 var validationProblem = result.AssertBadRequestWithValidationProblem();
 
@@ -131,16 +130,15 @@ public abstract class ReleaseSlugValidatorTests
             [Fact]
             public async Task RedirectExistsForNewSlugForDifferentReleaseInDifferentPublication_Succeeds()
             {
-                Release targetRelease = _dataFixture.DefaultRelease()
+                Release targetRelease = _dataFixture
+                    .DefaultRelease()
                     .WithSlug("slug-2")
                     .WithPublication(_dataFixture.DefaultPublication());
 
-                Release otherRelease = _dataFixture.DefaultRelease()
+                Release otherRelease = _dataFixture
+                    .DefaultRelease()
                     .WithSlug("slug-2")
-                    .WithRedirects([
-                        _dataFixture.DefaultReleaseRedirect()
-                            .WithSlug("slug-1")
-                        ])
+                    .WithRedirects([_dataFixture.DefaultReleaseRedirect().WithSlug("slug-1")])
                     .WithPublication(_dataFixture.DefaultPublication());
 
                 using var context = DbUtils.InMemoryApplicationDbContext(Guid.NewGuid().ToString());
@@ -152,7 +150,8 @@ public abstract class ReleaseSlugValidatorTests
                 var result = await sut.ValidateNewSlug(
                     newReleaseSlug: "slug-1",
                     publicationId: targetRelease.PublicationId,
-                    releaseId: targetRelease.Id);
+                    releaseId: targetRelease.Id
+                );
 
                 result.AssertRight();
             }
@@ -160,12 +159,10 @@ public abstract class ReleaseSlugValidatorTests
             [Fact]
             public async Task RedirectExistsForNewSlugForSameRelease_BadRequest()
             {
-                Release targetRelease = _dataFixture.DefaultRelease()
+                Release targetRelease = _dataFixture
+                    .DefaultRelease()
                     .WithSlug("slug-2")
-                    .WithRedirects([
-                        _dataFixture.DefaultReleaseRedirect()
-                            .WithSlug("slug-1")
-                        ])
+                    .WithRedirects([_dataFixture.DefaultReleaseRedirect().WithSlug("slug-1")])
                     .WithPublication(_dataFixture.DefaultPublication());
 
                 using var context = DbUtils.InMemoryApplicationDbContext(Guid.NewGuid().ToString());
@@ -177,7 +174,8 @@ public abstract class ReleaseSlugValidatorTests
                 var result = await sut.ValidateNewSlug(
                     newReleaseSlug: "slug-1",
                     publicationId: targetRelease.PublicationId,
-                    releaseId: targetRelease.Id);
+                    releaseId: targetRelease.Id
+                );
 
                 var validationProblem = result.AssertBadRequestWithValidationProblem();
 
@@ -194,7 +192,8 @@ public abstract class ReleaseSlugValidatorTests
             {
                 Publication targetPublication = _dataFixture.DefaultPublication();
 
-                Release release = _dataFixture.DefaultRelease()
+                Release release = _dataFixture
+                    .DefaultRelease()
                     .WithSlug("slug-1")
                     .WithPublication(_dataFixture.DefaultPublication());
 
@@ -208,7 +207,8 @@ public abstract class ReleaseSlugValidatorTests
                 var result = await sut.ValidateNewSlug(
                     newReleaseSlug: "slug-1",
                     publicationId: targetPublication.Id,
-                    releaseId: null);
+                    releaseId: null
+                );
 
                 result.AssertRight();
             }
@@ -216,7 +216,8 @@ public abstract class ReleaseSlugValidatorTests
             [Fact]
             public async Task ReleaseExistsWithSameSlugInSamePublication_BadRequest()
             {
-                Release release = _dataFixture.DefaultRelease()
+                Release release = _dataFixture
+                    .DefaultRelease()
                     .WithSlug("slug-1")
                     .WithPublication(_dataFixture.DefaultPublication());
 
@@ -229,7 +230,8 @@ public abstract class ReleaseSlugValidatorTests
                 var result = await sut.ValidateNewSlug(
                     newReleaseSlug: "slug-1",
                     publicationId: release.PublicationId,
-                    releaseId: null);
+                    releaseId: null
+                );
 
                 var validationProblem = result.AssertBadRequestWithValidationProblem();
 
@@ -243,12 +245,10 @@ public abstract class ReleaseSlugValidatorTests
             {
                 Publication targetPublication = _dataFixture.DefaultPublication();
 
-                Release release = _dataFixture.DefaultRelease()
+                Release release = _dataFixture
+                    .DefaultRelease()
                     .WithSlug("slug-2")
-                    .WithRedirects([
-                        _dataFixture.DefaultReleaseRedirect()
-                            .WithSlug("slug-1")
-                        ])
+                    .WithRedirects([_dataFixture.DefaultReleaseRedirect().WithSlug("slug-1")])
                     .WithPublication(_dataFixture.DefaultPublication());
 
                 using var context = DbUtils.InMemoryApplicationDbContext(Guid.NewGuid().ToString());
@@ -261,7 +261,8 @@ public abstract class ReleaseSlugValidatorTests
                 var result = await sut.ValidateNewSlug(
                     newReleaseSlug: "slug-1",
                     publicationId: targetPublication.Id,
-                    releaseId: null);
+                    releaseId: null
+                );
 
                 result.AssertRight();
             }
@@ -269,12 +270,10 @@ public abstract class ReleaseSlugValidatorTests
             [Fact]
             public async Task RedirectExistsForNewSlugInSamePublication_BadRequest()
             {
-                Release release = _dataFixture.DefaultRelease()
+                Release release = _dataFixture
+                    .DefaultRelease()
                     .WithSlug("slug-2")
-                    .WithRedirects([
-                        _dataFixture.DefaultReleaseRedirect()
-                            .WithSlug("slug-1")
-                        ])
+                    .WithRedirects([_dataFixture.DefaultReleaseRedirect().WithSlug("slug-1")])
                     .WithPublication(_dataFixture.DefaultPublication());
 
                 using var context = DbUtils.InMemoryApplicationDbContext(Guid.NewGuid().ToString());
@@ -286,7 +285,8 @@ public abstract class ReleaseSlugValidatorTests
                 var result = await sut.ValidateNewSlug(
                     newReleaseSlug: "slug-1",
                     publicationId: release.PublicationId,
-                    releaseId: null);
+                    releaseId: null
+                );
 
                 var validationProblem = result.AssertBadRequestWithValidationProblem();
 

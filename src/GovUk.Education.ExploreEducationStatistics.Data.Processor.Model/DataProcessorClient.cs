@@ -8,15 +8,19 @@ public class DataProcessorClient(string connectionString) : IDataProcessorClient
 
     public async Task Import(Guid importId, CancellationToken cancellationToken = default)
     {
-        await _queueServiceClient.SendMessageAsJson(ProcessorQueues.ImportsPendingQueue,
+        await _queueServiceClient.SendMessageAsJson(
+            ProcessorQueues.ImportsPendingQueue,
             new ImportMessage(importId),
-            cancellationToken);
+            cancellationToken
+        );
     }
 
     public async Task CancelImport(Guid importId, CancellationToken cancellationToken = default)
     {
-        await _queueServiceClient.SendMessageAsJson(ProcessorQueues.ImportsCancellingQueue,
+        await _queueServiceClient.SendMessageAsJson(
+            ProcessorQueues.ImportsCancellingQueue,
             new CancelImportMessage(importId),
-            cancellationToken);
+            cancellationToken
+        );
     }
 }

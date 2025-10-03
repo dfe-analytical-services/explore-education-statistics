@@ -46,16 +46,14 @@ public record ErrorViewModel
     public static ErrorViewModel Create(ValidationFailure failure)
     {
         var detail = failure.GetErrorDetail();
-        var path = failure.PropertyName.Split('.')
-            .Select(part => part.ToLowerFirst())
-            .JoinToString('.');
+        var path = failure.PropertyName.Split('.').Select(part => part.ToLowerFirst()).JoinToString('.');
 
         return new ErrorViewModel
         {
             Path = path,
             Code = failure.ErrorCode.Replace("Validator", ""),
             Message = failure.ErrorMessage,
-            Detail = detail.Count > 0 ? detail : null
+            Detail = detail.Count > 0 ? detail : null,
         };
     }
 }

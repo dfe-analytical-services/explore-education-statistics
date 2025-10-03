@@ -19,41 +19,36 @@ internal class ContentApiClientMockBuilder
         Assert = new Asserter(_mock);
 
         _mock
-            .Setup(m => m.GetPublicationLatestReleaseSearchableDocument(
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>()))
+            .Setup(m =>
+                m.GetPublicationLatestReleaseSearchableDocument(It.IsAny<string>(), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync(() => _releaseSearchableDocument ?? _releaseSearchableDocumentBuilder.Build());
 
         _mock
-            .Setup(m => m.GetPublicationsForTheme(
-                It.IsAny<Guid>(),
-                It.IsAny<CancellationToken>()))
+            .Setup(m => m.GetPublicationsForTheme(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => _publicationsForTheme ?? []);
 
         _mock
-            .Setup(m => m.GetReleasesForPublication(
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>()))
+            .Setup(m => m.GetReleasesForPublication(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => _releasesForPublication ?? []);
 
         _mock
-            .Setup(m => m.GetAllLivePublicationInfos(
-                It.IsAny<CancellationToken>()))
+            .Setup(m => m.GetAllLivePublicationInfos(It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => _publications ?? []);
-        
+
         _mock
-            .Setup(m => m.GetReleaseSummary(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync((string publicationSlug, string releaseSlug, CancellationToken _) => new ReleaseSummary
-            {
-                Id = Guid.NewGuid().ToString(),
-                ReleaseId = Guid.NewGuid().ToString(),
-                Title = "Release title",
-                Slug = releaseSlug,
-                PublicationSlug = publicationSlug
-            });
+            .Setup(m => m.GetReleaseSummary(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(
+                (string publicationSlug, string releaseSlug, CancellationToken _) =>
+                    new ReleaseSummary
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        ReleaseId = Guid.NewGuid().ToString(),
+                        Title = "Release title",
+                        Slug = releaseSlug,
+                        PublicationSlug = publicationSlug,
+                    }
+            );
     }
 
     public IContentApiClient Build()
@@ -62,14 +57,16 @@ internal class ContentApiClientMockBuilder
     }
 
     public ContentApiClientMockBuilder WhereReleaseSearchViewModelIs(
-        ReleaseSearchableDocument releaseSearchableDocument)
+        ReleaseSearchableDocument releaseSearchableDocument
+    )
     {
         _releaseSearchableDocument = releaseSearchableDocument;
         return this;
     }
 
     public ContentApiClientMockBuilder WhereReleaseSearchViewModelIs(
-        Func<ReleaseSearchableDocumentBuilder, ReleaseSearchableDocumentBuilder> modifyReleaseSearchViewModel)
+        Func<ReleaseSearchableDocumentBuilder, ReleaseSearchableDocumentBuilder> modifyReleaseSearchViewModel
+    )
     {
         modifyReleaseSearchViewModel(_releaseSearchableDocumentBuilder);
         return this;
@@ -96,31 +93,32 @@ internal class ContentApiClientMockBuilder
     public ContentApiClientMockBuilder WhereGetReleaseSummaryReturns(
         string publicationSlug,
         string releaseSlug,
-        ReleaseSummary releaseSummary)
+        ReleaseSummary releaseSummary
+    )
     {
         _mock
-            .Setup(m => m.GetReleaseSummary(
-                publicationSlug,
-                releaseSlug,
-                It.IsAny<CancellationToken>()))
+            .Setup(m => m.GetReleaseSummary(publicationSlug, releaseSlug, It.IsAny<CancellationToken>()))
             .ReturnsAsync(releaseSummary);
         return this;
     }
-    
+
     public ContentApiClientMockBuilder WhereGetReleaseSummaryThrows(
         string publicationSlug,
         string releaseSlug,
-        Exception? exception = null)
+        Exception? exception = null
+    )
     {
         _mock
-            .Setup(m => m.GetReleaseSummary(
-                publicationSlug,
-                releaseSlug,
-                It.IsAny<CancellationToken>()))
-            .Throws((string ps, string rs, CancellationToken _) =>
-                new UnableToGetReleaseSummaryForPublicationException(
-                    ps, rs, "This is a test exception. GetReleaseSummary error."));
-        
+            .Setup(m => m.GetReleaseSummary(publicationSlug, releaseSlug, It.IsAny<CancellationToken>()))
+            .Throws(
+                (string ps, string rs, CancellationToken _) =>
+                    new UnableToGetReleaseSummaryForPublicationException(
+                        ps,
+                        rs,
+                        "This is a test exception. GetReleaseSummary error."
+                    )
+            );
+
         return this;
     }
 
@@ -130,9 +128,10 @@ internal class ContentApiClientMockBuilder
     {
         public void ContentWasLoadedFor(string publicationSlug)
         {
-            mock.Verify(m =>
-                    m.GetPublicationLatestReleaseSearchableDocument(publicationSlug, It.IsAny<CancellationToken>()),
-                Times.Once);
+            mock.Verify(
+                m => m.GetPublicationLatestReleaseSearchableDocument(publicationSlug, It.IsAny<CancellationToken>()),
+                Times.Once
+            );
         }
 
         public void PublicationsRequestedForThemeId(Guid expectedThemeId)
@@ -147,12 +146,10 @@ internal class ContentApiClientMockBuilder
 
         public void ReleaseSummaryRequestedForPublication(string publicationSlug, string releaseSlug)
         {
-            mock
-                .Verify(m => m.GetReleaseSummary(
-                    publicationSlug,
-                    releaseSlug,
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
+            mock.Verify(
+                m => m.GetReleaseSummary(publicationSlug, releaseSlug, It.IsAny<CancellationToken>()),
+                Times.Once
+            );
         }
     }
 }

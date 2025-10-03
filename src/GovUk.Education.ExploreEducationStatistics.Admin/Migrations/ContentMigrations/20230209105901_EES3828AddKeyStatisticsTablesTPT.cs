@@ -26,7 +26,7 @@ public partial class EES3828AddKeyStatisticsTablesTPT : Migration
                 Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
                 CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                 UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                ContentBlockIdTemp = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                ContentBlockIdTemp = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
             },
             constraints: table =>
             {
@@ -36,25 +36,29 @@ public partial class EES3828AddKeyStatisticsTablesTPT : Migration
                     column: x => x.ReleaseId,
                     principalTable: "Releases",
                     principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.Cascade
+                );
                 table.ForeignKey(
                     name: "FK_KeyStatistics_Users_CreatedById",
                     column: x => x.CreatedById,
                     principalTable: "Users",
-                    principalColumn: "Id");
+                    principalColumn: "Id"
+                );
                 table.ForeignKey(
                     name: "FK_KeyStatistics_Users_UpdatedById",
                     column: x => x.UpdatedById,
                     principalTable: "Users",
-                    principalColumn: "Id");
-            });
+                    principalColumn: "Id"
+                );
+            }
+        );
 
         migrationBuilder.CreateTable(
             name: "KeyStatisticsDataBlock",
             columns: table => new
             {
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                DataBlockId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                DataBlockId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
             },
             constraints: table =>
             {
@@ -64,13 +68,16 @@ public partial class EES3828AddKeyStatisticsTablesTPT : Migration
                     column: x => x.DataBlockId,
                     principalTable: "ContentBlock",
                     principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.Cascade
+                );
                 table.ForeignKey(
                     name: "FK_KeyStatisticsDataBlock_KeyStatistics_Id",
                     column: x => x.Id,
                     principalTable: "KeyStatistics",
-                    principalColumn: "Id");
-            });
+                    principalColumn: "Id"
+                );
+            }
+        );
 
         migrationBuilder.CreateTable(
             name: "KeyStatisticsText",
@@ -78,7 +85,7 @@ public partial class EES3828AddKeyStatisticsTablesTPT : Migration
             {
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                Statistic = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                Statistic = table.Column<string>(type: "nvarchar(max)", nullable: false),
             },
             constraints: table =>
             {
@@ -87,28 +94,30 @@ public partial class EES3828AddKeyStatisticsTablesTPT : Migration
                     name: "FK_KeyStatisticsText_KeyStatistics_Id",
                     column: x => x.Id,
                     principalTable: "KeyStatistics",
-                    principalColumn: "Id");
-            });
+                    principalColumn: "Id"
+                );
+            }
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_KeyStatistics_CreatedById",
             table: "KeyStatistics",
-            column: "CreatedById");
+            column: "CreatedById"
+        );
 
-        migrationBuilder.CreateIndex(
-            name: "IX_KeyStatistics_ReleaseId",
-            table: "KeyStatistics",
-            column: "ReleaseId");
+        migrationBuilder.CreateIndex(name: "IX_KeyStatistics_ReleaseId", table: "KeyStatistics", column: "ReleaseId");
 
         migrationBuilder.CreateIndex(
             name: "IX_KeyStatistics_UpdatedById",
             table: "KeyStatistics",
-            column: "UpdatedById");
+            column: "UpdatedById"
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_KeyStatisticsDataBlock_DataBlockId",
             table: "KeyStatisticsDataBlock",
-            column: "DataBlockId");
+            column: "DataBlockId"
+        );
 
         migrationBuilder.SqlFromFile(ContentMigrationsPath, $"{MigrationId}_GrantPermissionsForKeyStatTables.sql");
         migrationBuilder.SqlFromFile(ContentMigrationsPath, $"{MigrationId}_MigrateKeyStatDataBlockData.sql");
@@ -116,13 +125,10 @@ public partial class EES3828AddKeyStatisticsTablesTPT : Migration
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropTable(
-            name: "KeyStatisticsDataBlock");
+        migrationBuilder.DropTable(name: "KeyStatisticsDataBlock");
 
-        migrationBuilder.DropTable(
-            name: "KeyStatisticsText");
+        migrationBuilder.DropTable(name: "KeyStatisticsText");
 
-        migrationBuilder.DropTable(
-            name: "KeyStatistics");
+        migrationBuilder.DropTable(name: "KeyStatistics");
     }
 }

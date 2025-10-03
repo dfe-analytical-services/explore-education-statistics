@@ -5,5 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 
 public class MethodologyUpdateRequest : MethodologyApprovalUpdateRequest
 {
-    [Required] public string Title { get; set; } = string.Empty;
+    [Required]
+    public string Title { get; set; } = string.Empty;
 }

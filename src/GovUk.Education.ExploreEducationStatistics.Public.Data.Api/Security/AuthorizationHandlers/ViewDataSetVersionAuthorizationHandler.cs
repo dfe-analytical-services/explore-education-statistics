@@ -13,7 +13,8 @@ public class ViewDataSetVersionAuthorizationHandler(IAuthorizationHandlerService
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         ViewDataSetVersionRequirement requirement,
-        DataSetVersion dataSetVersion)
+        DataSetVersion dataSetVersion
+    )
     {
         if (authorizationHandlerService.CanAccessUnpublishedData())
         {

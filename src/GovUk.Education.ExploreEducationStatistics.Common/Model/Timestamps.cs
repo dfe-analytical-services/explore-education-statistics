@@ -18,9 +18,8 @@ public interface ISoftDeletedTimestamp<TDate> : ITimestampsInternal.ISoftDeleted
 }
 
 public interface ICreatedUpdatedTimestamps<TCreated, TUpdated>
-    : ICreatedTimestamp<TCreated>, IUpdatedTimestamp<TUpdated>
-{
-}
+    : ICreatedTimestamp<TCreated>,
+        IUpdatedTimestamp<TUpdated> { }
 
 /// <summary>
 /// Marker interfaces for type guards without needing reflection.
@@ -29,7 +28,9 @@ public interface ICreatedUpdatedTimestamps<TCreated, TUpdated>
 /// </summary>
 public interface ITimestampsInternal
 {
-    public interface ICreated {}
-    public interface IUpdated {}
-    public interface ISoftDeleted {}
+    public interface ICreated { }
+
+    public interface IUpdated { }
+
+    public interface ISoftDeleted { }
 }

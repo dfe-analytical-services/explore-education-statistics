@@ -33,9 +33,9 @@ public class PublicationsSearchServiceTests
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         PublicationId = Guid.NewGuid(),
                         Year = 2021,
-                        Slug = "latest-release-slug A"
-                    }
-                }
+                        Slug = "latest-release-slug A",
+                    },
+                },
             };
 
             var publicationB = new Publication
@@ -52,9 +52,9 @@ public class PublicationsSearchServiceTests
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         PublicationId = Guid.NewGuid(),
                         Year = 2021,
-                        Slug = "latest-release-slug B"
-                    }
-                }
+                        Slug = "latest-release-slug B",
+                    },
+                },
             };
 
             var publicationC = new Publication
@@ -71,30 +71,15 @@ public class PublicationsSearchServiceTests
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         PublicationId = Guid.NewGuid(),
                         Year = 2021,
-                        Slug = "latest-release-slug C"
-                    }
-                }
+                        Slug = "latest-release-slug C",
+                    },
+                },
             };
 
             var themes = new List<Theme>
             {
-                new()
-                {
-                    Title = "Theme 1 title",
-                    Publications =
-                    [
-                        publicationA,
-                        publicationB
-                    ]
-                },
-                new()
-                {
-                    Title = "Theme 2 title",
-                    Publications =
-                    [
-                        publicationC
-                    ]
-                }
+                new() { Title = "Theme 1 title", Publications = [publicationA, publicationB] },
+                new() { Title = "Theme 2 title", Publications = [publicationC] },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -154,28 +139,16 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             // Not published (no published release)
-            var publicationB = new Publication
-            {
-                Title = "Publication B",
-                LatestPublishedReleaseVersion = null
-            };
+            var publicationB = new Publication { Title = "Publication B", LatestPublishedReleaseVersion = null };
 
             var themes = new List<Theme>
             {
-                new()
-                {
-                    Title = "Theme 1 title",
-                    Publications =
-                    [
-                        publicationA,
-                        publicationB
-                    ]
-                }
+                new() { Title = "Theme 1 title", Publications = [publicationA, publicationB] },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -206,8 +179,8 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             // Published
@@ -217,16 +190,12 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             // Not published (no published release)
-            var publicationC = new Publication
-            {
-                Title = "Publication C",
-                LatestPublishedReleaseVersionId = null
-            };
+            var publicationC = new Publication { Title = "Publication C", LatestPublishedReleaseVersionId = null };
 
             // Not published (superseded by publicationB which is published)
             var publicationD = new Publication
@@ -235,9 +204,9 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
                 },
-                SupersededBy = publicationB
+                SupersededBy = publicationB,
             };
 
             // Published (superseded by publicationC but it's not published yet)
@@ -247,9 +216,9 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
                 },
-                SupersededBy = publicationC
+                SupersededBy = publicationC,
             };
 
             var themes = new List<Theme>
@@ -257,15 +226,8 @@ public class PublicationsSearchServiceTests
                 new()
                 {
                     Title = "Theme 1 title",
-                    Publications =
-                    [
-                        publicationA,
-                        publicationB,
-                        publicationC,
-                        publicationD,
-                        publicationE
-                    ]
-                }
+                    Publications = [publicationA, publicationB, publicationC, publicationD, publicationE],
+                },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -297,8 +259,8 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var publicationB = new Publication
@@ -307,21 +269,13 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var themes = new List<Theme>
             {
-                new()
-                {
-                    Title = "Theme 1 title",
-                    Publications =
-                    [
-                        publicationA,
-                        publicationB
-                    ],
-                },
+                new() { Title = "Theme 1 title", Publications = [publicationA, publicationB] },
                 new()
                 {
                     Title = "Theme 2 title",
@@ -333,11 +287,11 @@ public class PublicationsSearchServiceTests
                             LatestPublishedReleaseVersion = new ReleaseVersion
                             {
                                 Type = AdHocStatistics,
-                                Published = new DateTime(2022, 1, 1)
-                            }
-                        }
+                                Published = new DateTime(2022, 1, 1),
+                            },
+                        },
                     ],
-                }
+                },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -351,9 +305,7 @@ public class PublicationsSearchServiceTests
             {
                 var service = BuildService(contentDbContext);
 
-                var pagedResult = await service.GetPublications(
-                    themeId: themes[0].Id
-                );
+                var pagedResult = await service.GetPublications(themeId: themes[0].Id);
                 var results = pagedResult.Results;
 
                 Assert.Equal(2, results.Count);
@@ -375,8 +327,8 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var publicationB = new Publication
@@ -385,8 +337,8 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var publicationC = new Publication
@@ -395,8 +347,8 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var publicationD = new Publication
@@ -405,8 +357,8 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var themes = new List<Theme>
@@ -414,14 +366,8 @@ public class PublicationsSearchServiceTests
                 new()
                 {
                     Title = "Theme 1 title",
-                    Publications =
-                    [
-                        publicationA,
-                        publicationB,
-                        publicationC,
-                        publicationD
-                    ]
-                }
+                    Publications = [publicationA, publicationB, publicationC, publicationD],
+                },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -435,8 +381,7 @@ public class PublicationsSearchServiceTests
             {
                 var service = BuildService(contentDbContext);
 
-                var pagedResult = await service.GetPublications(
-                    publicationIds: [publicationA.Id, publicationB.Id]);
+                var pagedResult = await service.GetPublications(publicationIds: [publicationA.Id, publicationB.Id]);
                 var results = pagedResult.Results;
 
                 Assert.Equal(2, results.Count);
@@ -456,8 +401,8 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var publicationB = new Publication
@@ -466,8 +411,8 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = OfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var publicationC = new Publication
@@ -476,29 +421,14 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AdHocStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var themes = new List<Theme>
             {
-                new()
-                {
-                    Title = "Theme 1 title",
-                    Publications =
-                    [
-                        publicationA,
-                        publicationB
-                    ],
-                },
-                new()
-                {
-                    Title = "Theme 2 title",
-                    Publications =
-                    [
-                        publicationC
-                    ],
-                }
+                new() { Title = "Theme 1 title", Publications = [publicationA, publicationB] },
+                new() { Title = "Theme 2 title", Publications = [publicationC] },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -512,9 +442,7 @@ public class PublicationsSearchServiceTests
             {
                 var service = BuildService(contentDbContext);
 
-                var pagedResult = await service.GetPublications(
-                    releaseType: OfficialStatistics
-                );
+                var pagedResult = await service.GetPublications(releaseType: OfficialStatistics);
                 var results = pagedResult.Results;
 
                 Assert.Single(results);
@@ -537,8 +465,8 @@ public class PublicationsSearchServiceTests
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     PublicationId = Guid.NewGuid(),
                     Year = 2021,
-                    Slug = "latest-release-slug A"
-                }
+                    Slug = "latest-release-slug A",
+                },
             };
 
             var releaseVersionB = new ReleaseVersion
@@ -551,8 +479,8 @@ public class PublicationsSearchServiceTests
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     PublicationId = Guid.NewGuid(),
                     Year = 2021,
-                    Slug = "latest-release-slug B"
-                }
+                    Slug = "latest-release-slug B",
+                },
             };
 
             var releasedVersionC = new ReleaseVersion
@@ -565,8 +493,8 @@ public class PublicationsSearchServiceTests
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     PublicationId = Guid.NewGuid(),
                     Year = 2021,
-                    Slug = "latest-release-slug C"
-                }
+                    Slug = "latest-release-slug C",
+                },
             };
 
             var theme = new Theme { Title = "Theme title" };
@@ -579,7 +507,7 @@ public class PublicationsSearchServiceTests
                     Title = "Publication B",
                     LatestPublishedReleaseVersionId = releaseVersionB.Id,
                     LatestPublishedReleaseVersion = releaseVersionB,
-                    Theme = theme
+                    Theme = theme,
                 },
                 new()
                 {
@@ -587,7 +515,7 @@ public class PublicationsSearchServiceTests
                     Title = "Publication C",
                     LatestPublishedReleaseVersionId = releasedVersionC.Id,
                     LatestPublishedReleaseVersion = releasedVersionC,
-                    Theme = theme
+                    Theme = theme,
                 },
                 new()
                 {
@@ -595,7 +523,7 @@ public class PublicationsSearchServiceTests
                     Title = "Publication A",
                     LatestPublishedReleaseVersionId = releaseVersionA.Id,
                     LatestPublishedReleaseVersion = releaseVersionA,
-                    Theme = theme
+                    Theme = theme,
                 },
             };
 
@@ -603,13 +531,15 @@ public class PublicationsSearchServiceTests
             {
                 new(publications[1].Id, 100),
                 new(publications[2].Id, 300),
-                new(publications[0].Id, 200)
+                new(publications[0].Id, 200),
             };
 
             var contentDbContext = new Mock<ContentDbContext>();
-            contentDbContext.Setup(context => context.Publications)
+            contentDbContext
+                .Setup(context => context.Publications)
                 .Returns(publications.AsQueryable().BuildMockDbSet().Object);
-            contentDbContext.Setup(context => context.PublicationsFreeTextTable("term"))
+            contentDbContext
+                .Setup(context => context.PublicationsFreeTextTable("term"))
                 .Returns(freeTextRanks.AsQueryable().BuildMockDbSet().Object);
 
             var service = BuildService(contentDbContext.Object);
@@ -648,8 +578,8 @@ public class PublicationsSearchServiceTests
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     PublicationId = Guid.NewGuid(),
                     Year = 2021,
-                    Slug = "latest-release-slug A"
-                }
+                    Slug = "latest-release-slug A",
+                },
             };
 
             var releaseVersionB = new ReleaseVersion
@@ -662,8 +592,8 @@ public class PublicationsSearchServiceTests
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     PublicationId = Guid.NewGuid(),
                     Year = 2021,
-                    Slug = "latest-release-slug B"
-                }
+                    Slug = "latest-release-slug B",
+                },
             };
 
             var releaseVersionC = new ReleaseVersion
@@ -676,8 +606,8 @@ public class PublicationsSearchServiceTests
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     PublicationId = Guid.NewGuid(),
                     Year = 2021,
-                    Slug = "latest-release-slug C"
-                }
+                    Slug = "latest-release-slug C",
+                },
             };
 
             var theme = new Theme { Title = "Theme title" };
@@ -690,7 +620,7 @@ public class PublicationsSearchServiceTests
                     Title = "Publication B",
                     LatestPublishedReleaseVersionId = releaseVersionB.Id,
                     LatestPublishedReleaseVersion = releaseVersionB,
-                    Theme = theme
+                    Theme = theme,
                 },
                 new()
                 {
@@ -698,7 +628,7 @@ public class PublicationsSearchServiceTests
                     Title = "Publication C",
                     LatestPublishedReleaseVersionId = releaseVersionC.Id,
                     LatestPublishedReleaseVersion = releaseVersionC,
-                    Theme = theme
+                    Theme = theme,
                 },
                 new()
                 {
@@ -706,7 +636,7 @@ public class PublicationsSearchServiceTests
                     Title = "Publication A",
                     LatestPublishedReleaseVersionId = releaseVersionA.Id,
                     LatestPublishedReleaseVersion = releaseVersionA,
-                    Theme = theme
+                    Theme = theme,
                 },
             };
 
@@ -714,13 +644,15 @@ public class PublicationsSearchServiceTests
             {
                 new(publications[1].Id, 100),
                 new(publications[2].Id, 300),
-                new(publications[0].Id, 200)
+                new(publications[0].Id, 200),
             };
 
             var contentDbContext = new Mock<ContentDbContext>();
-            contentDbContext.Setup(context => context.Publications)
+            contentDbContext
+                .Setup(context => context.Publications)
                 .Returns(publications.AsQueryable().BuildMockDbSet().Object);
-            contentDbContext.Setup(context => context.PublicationsFreeTextTable("term"))
+            contentDbContext
+                .Setup(context => context.PublicationsFreeTextTable("term"))
                 .Returns(freeTextRanks.AsQueryable().BuildMockDbSet().Object);
 
             var service = BuildService(contentDbContext.Object);
@@ -752,62 +684,58 @@ public class PublicationsSearchServiceTests
             var releaseVersionA = new ReleaseVersion
             {
                 Type = AccreditedOfficialStatistics,
-                Published = new DateTime(2020, 1, 1)
+                Published = new DateTime(2020, 1, 1),
             };
 
             var releaseVersionB = new ReleaseVersion
             {
                 Type = AccreditedOfficialStatistics,
-                Published = new DateTime(2021, 1, 1)
+                Published = new DateTime(2021, 1, 1),
             };
 
             var releaseVersionC = new ReleaseVersion
             {
                 Type = AccreditedOfficialStatistics,
-                Published = new DateTime(2022, 1, 1)
+                Published = new DateTime(2022, 1, 1),
             };
 
             // Two releases with the same published date should be ordered by Type
-            var releaseVersionD = new ReleaseVersion
-            {
-                Type = AdHocStatistics,
-                Published = new DateTime(2023, 1, 1)
-            };
+            var releaseVersionD = new ReleaseVersion { Type = AdHocStatistics, Published = new DateTime(2023, 1, 1) };
 
             var releaseVersionE = new ReleaseVersion
             {
                 Type = OfficialStatistics,
-                Published = new DateTime(2023, 1, 1)
+                Published = new DateTime(2023, 1, 1),
             };
 
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseVersion = releaseVersionA
+                LatestPublishedReleaseVersion = releaseVersionA,
             };
 
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseVersion = releaseVersionB
+                LatestPublishedReleaseVersion = releaseVersionB,
             };
 
             var publicationC = new Publication
             {
                 Title = "Publication C",
-                LatestPublishedReleaseVersion = releaseVersionC
+                LatestPublishedReleaseVersion = releaseVersionC,
             };
 
             var publicationD = new Publication
             {
                 Title = "Publication D",
-                LatestPublishedReleaseVersion = releaseVersionD
+                LatestPublishedReleaseVersion = releaseVersionD,
             };
 
             var publicationE = new Publication
             {
                 Title = "Publication E",
-                LatestPublishedReleaseVersion = releaseVersionE
+                LatestPublishedReleaseVersion = releaseVersionE,
             };
 
             var themes = new List<Theme>
@@ -815,15 +743,8 @@ public class PublicationsSearchServiceTests
                 new()
                 {
                     Title = "Theme 1 title",
-                    Publications =
-                    [
-                        publicationB,
-                        publicationC,
-                        publicationA,
-                        publicationD,
-                        publicationE
-                    ]
-                }
+                    Publications = [publicationB, publicationC, publicationA, publicationD, publicationE],
+                },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -870,51 +791,42 @@ public class PublicationsSearchServiceTests
             var releaseVersionA = new ReleaseVersion
             {
                 Type = AccreditedOfficialStatistics,
-                Published = new DateTime(2020, 1, 1)
+                Published = new DateTime(2020, 1, 1),
             };
 
             var releaseVersionB = new ReleaseVersion
             {
                 Type = AccreditedOfficialStatistics,
-                Published = new DateTime(2021, 1, 1)
+                Published = new DateTime(2021, 1, 1),
             };
 
             var releaseVersionC = new ReleaseVersion
             {
                 Type = AccreditedOfficialStatistics,
-                Published = new DateTime(2022, 1, 1)
+                Published = new DateTime(2022, 1, 1),
             };
 
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseVersion = releaseVersionA
+                LatestPublishedReleaseVersion = releaseVersionA,
             };
 
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseVersion = releaseVersionB
+                LatestPublishedReleaseVersion = releaseVersionB,
             };
 
             var publicationC = new Publication
             {
                 Title = "Publication C",
-                LatestPublishedReleaseVersion = releaseVersionC
+                LatestPublishedReleaseVersion = releaseVersionC,
             };
 
             var themes = new List<Theme>
             {
-                new()
-                {
-                    Title = "Theme 1 title",
-                    Publications =
-                    [
-                        publicationB,
-                        publicationC,
-                        publicationA
-                    ]
-                }
+                new() { Title = "Theme 1 title", Publications = [publicationB, publicationC, publicationA] },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -928,10 +840,7 @@ public class PublicationsSearchServiceTests
             {
                 var service = BuildService(contentDbContext);
 
-                var pagedResult = await service.GetPublications(
-                    sort: Published,
-                    sortDirection: Asc
-                );
+                var pagedResult = await service.GetPublications(sort: Published, sortDirection: Asc);
                 var results = pagedResult.Results;
 
                 Assert.Equal(3, results.Count);
@@ -958,8 +867,8 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var publicationB = new Publication
@@ -968,8 +877,8 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = OfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var publicationC = new Publication
@@ -978,22 +887,13 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AdHocStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var themes = new List<Theme>
             {
-                new()
-                {
-                    Title = "Theme 1 title",
-                    Publications =
-                    [
-                        publicationB,
-                        publicationC,
-                        publicationA
-                    ]
-                }
+                new() { Title = "Theme 1 title", Publications = [publicationB, publicationC, publicationA] },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1037,8 +937,8 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AccreditedOfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var publicationB = new Publication
@@ -1047,8 +947,8 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = OfficialStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var publicationC = new Publication
@@ -1057,22 +957,13 @@ public class PublicationsSearchServiceTests
                 LatestPublishedReleaseVersion = new ReleaseVersion
                 {
                     Type = AdHocStatistics,
-                    Published = DateTime.UtcNow
-                }
+                    Published = DateTime.UtcNow,
+                },
             };
 
             var themes = new List<Theme>
             {
-                new()
-                {
-                    Title = "Theme 1 title",
-                    Publications =
-                    [
-                        publicationB,
-                        publicationC,
-                        publicationA
-                    ]
-                }
+                new() { Title = "Theme 1 title", Publications = [publicationB, publicationC, publicationA] },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();

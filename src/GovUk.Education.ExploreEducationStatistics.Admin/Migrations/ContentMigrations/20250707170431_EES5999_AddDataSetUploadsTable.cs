@@ -28,18 +28,18 @@ public partial class EES5999_AddDataSetUploadsTable : Migration
                 Status = table.Column<int>(type: "int", nullable: false),
                 ScreenerResult = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                UploadedBy = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                UploadedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
             },
             constraints: table =>
             {
                 table.PrimaryKey("PK_DataSetUploads", x => x.Id);
-            });
+            }
+        );
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropTable(
-            name: "DataSetUploads");
+        migrationBuilder.DropTable(name: "DataSetUploads");
     }
 }

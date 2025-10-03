@@ -12,34 +12,58 @@ public interface IMethodologyContentService
 {
     Task<Either<ActionResult, ManageMethodologyContentViewModel>> GetContent(Guid methodologyVersionId);
 
-    Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid methodologyVersionId) where T : ContentBlock;
+    Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid methodologyVersionId)
+        where T : ContentBlock;
 
     Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSections(
-        Guid methodologyVersionId, Dictionary<Guid, int> newSectionOrder);
+        Guid methodologyVersionId,
+        Dictionary<Guid, int> newSectionOrder
+    );
 
     Task<Either<ActionResult, ContentSectionViewModel>> AddContentSection(
-        Guid methodologyVersionId, ContentSectionAddRequest request,
-        MethodologyContentService.ContentListType contentType);
+        Guid methodologyVersionId,
+        ContentSectionAddRequest request,
+        MethodologyContentService.ContentListType contentType
+    );
 
     Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeading(
-        Guid methodologyVersionId, Guid contentSectionId, string newHeading);
+        Guid methodologyVersionId,
+        Guid contentSectionId,
+        string newHeading
+    );
 
     Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSection(
-        Guid methodologyVersionId, Guid contentSectionId);
+        Guid methodologyVersionId,
+        Guid contentSectionId
+    );
 
     Task<Either<ActionResult, ContentSectionViewModel>> GetContentSection(
-        Guid methodologyVersionId, Guid contentSectionId);
+        Guid methodologyVersionId,
+        Guid contentSectionId
+    );
 
     Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(
-        Guid methodologyVersionId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder);
+        Guid methodologyVersionId,
+        Guid contentSectionId,
+        Dictionary<Guid, int> newBlocksOrder
+    );
 
     Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlock(
-        Guid methodologyVersionId, Guid contentSectionId,
-        ContentBlockAddRequest request);
+        Guid methodologyVersionId,
+        Guid contentSectionId,
+        ContentBlockAddRequest request
+    );
 
     Task<Either<ActionResult, List<IContentBlockViewModel>>> RemoveContentBlock(
-        Guid methodologyVersionId, Guid contentSectionId, Guid contentBlockId);
+        Guid methodologyVersionId,
+        Guid contentSectionId,
+        Guid contentBlockId
+    );
 
     Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlock(
-        Guid methodologyVersionId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request);
+        Guid methodologyVersionId,
+        Guid contentSectionId,
+        Guid contentBlockId,
+        ContentBlockUpdateRequest request
+    );
 }

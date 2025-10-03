@@ -9,19 +9,23 @@ public interface IParquetFilterRepository
     Task<IList<ParquetFilterOption>> ListOptions(
         DataSetVersion dataSetVersion,
         IEnumerable<int> ids,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<IList<ParquetFilterOption>> ListOptions(
         DataSetVersion dataSetVersion,
         IEnumerable<string> publicIds,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<IList<IdPublicIdPair>> ListOptionPublicIds(
         DataSetVersion dataSetVersion,
         IEnumerable<int> ids,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Dictionary<string, string>> GetFilterColumnsById(
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

@@ -13,15 +13,17 @@ public record PublicationInfoDto
         IsValid
             ? new PublicationInfo
             {
-                PublicationSlug = PublicationSlug, 
-                LatestReleaseSlug = LatestPublishedRelease.ReleaseSlug!
+                PublicationSlug = PublicationSlug,
+                LatestReleaseSlug = LatestPublishedRelease.ReleaseSlug!,
             }
-            : throw new Exception($"Invalid PublicationInfo. Data is missing. Has the ContentAPI contract changed? Dto: {this}");
-    
-    [MemberNotNullWhen( returnValue: true , nameof(PublicationSlug))]
-    [MemberNotNullWhen( returnValue: true , nameof(LatestPublishedRelease))]
-    private bool IsValid => 
-        !string.IsNullOrEmpty(PublicationSlug) 
-        && LatestPublishedRelease != null 
+            : throw new Exception(
+                $"Invalid PublicationInfo. Data is missing. Has the ContentAPI contract changed? Dto: {this}"
+            );
+
+    [MemberNotNullWhen(returnValue: true, nameof(PublicationSlug))]
+    [MemberNotNullWhen(returnValue: true, nameof(LatestPublishedRelease))]
+    private bool IsValid =>
+        !string.IsNullOrEmpty(PublicationSlug)
+        && LatestPublishedRelease != null
         && !string.IsNullOrEmpty(LatestPublishedRelease.ReleaseSlug);
 }

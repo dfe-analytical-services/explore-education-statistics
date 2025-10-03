@@ -8,8 +8,9 @@ public class TestAnalyticsPathResolver : AnalyticsPathResolverBase, IDisposable
         Path.GetTempPath(),
         "ExploreEducationStatistics",
         "Analytics",
-        Guid.NewGuid().ToString());
-    
+        Guid.NewGuid().ToString()
+    );
+
     public void Dispose()
     {
         if (Directory.Exists(_basePath))

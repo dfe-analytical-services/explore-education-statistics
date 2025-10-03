@@ -10,7 +10,8 @@ public static class JsonSerializationUtils
         object obj,
         Formatting formatting = Formatting.None,
         bool camelCase = false,
-        bool orderedProperties = false)
+        bool orderedProperties = false
+    )
     {
         var contractResolver = GetContractResolver(camelCase, orderedProperties);
 
@@ -22,11 +23,8 @@ public static class JsonSerializationUtils
             DateFormatString = "yyyy-MM-ddTHH:mm:ss.fffZ",
         };
         settings.Converters.Add(new StringEnumConverter());
-        
-        return JsonConvert.SerializeObject(
-            value: obj,
-            formatting: formatting,
-            settings: settings);
+
+        return JsonConvert.SerializeObject(value: obj, formatting: formatting, settings: settings);
     }
 
     private static IContractResolver GetContractResolver(bool camelCase, bool orderedProperties)
@@ -60,7 +58,7 @@ public static class JsonSerializationUtils
                 .ToList();
         }
     }
-    
+
     private class OrderedFieldsContractResolver : DefaultContractResolver
     {
         protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)

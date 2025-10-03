@@ -10,12 +10,11 @@ public class ConfiguredEventGridClientFactoryTests
 {
     private readonly EventGridClientFactoryMockBuilder _eventGridClientFactory = new();
     private readonly EventGridOptionsBuilder _eventGridOptions = new();
-    private readonly ILogger<ConfiguredEventGridClientFactory> _logger = NullLogger<ConfiguredEventGridClientFactory>.Instance;
+    private readonly ILogger<ConfiguredEventGridClientFactory> _logger =
+        NullLogger<ConfiguredEventGridClientFactory>.Instance;
 
-    private ConfiguredEventGridClientFactory GetSut() => new(
-            _eventGridClientFactory.Build(),
-            _eventGridOptions.Build(),
-            _logger);
+    private ConfiguredEventGridClientFactory GetSut() =>
+        new(_eventGridClientFactory.Build(), _eventGridOptions.Build(), _logger);
 
     [Fact]
     public void Can_instantiate_SUT() => Assert.NotNull(GetSut());
@@ -29,12 +28,12 @@ public class ConfiguredEventGridClientFactoryTests
 
         // ACT
         var wasSuccessful = sut.TryCreateClient("MyTopicOptionsKey", out var client);
-            
+
         // ASSERT
         Assert.False(wasSuccessful);
         Assert.Null(client);
     }
-    
+
     [Fact]
     public void GivenConfigDefined_WhenClientRequested_ThenCreatesClientUsingEndpointAndAccessKey()
     {
@@ -48,14 +47,15 @@ public class ConfiguredEventGridClientFactoryTests
 
         // ACT
         var wasSuccessful = sut.TryCreateClient(topicConfigKey, out var client);
-            
+
         // ASSERT
         Assert.True(wasSuccessful);
         _eventGridClientFactory.Assert.ClientRequested(
             actualEndpoint => actualEndpoint == topicEndpoint,
-            actualAccessKey => actualAccessKey == accessKey);        
+            actualAccessKey => actualAccessKey == accessKey
+        );
     }
-    
+
     [Fact]
     public void GivenConfigDefinedButBlank_WhenClientRequested_ThenReturnsNull()
     {
@@ -69,12 +69,12 @@ public class ConfiguredEventGridClientFactoryTests
 
         // ACT
         var wasSuccessful = sut.TryCreateClient(topicConfigKey, out var client);
-            
+
         // ASSERT
         Assert.False(wasSuccessful);
-        Assert.Null(client);        
+        Assert.Null(client);
     }
-    
+
     [Fact]
     public void GivenConfigDefinedButInvalid_WhenClientRequested_ThenReturnsNull()
     {
@@ -84,14 +84,14 @@ public class ConfiguredEventGridClientFactoryTests
         var accessKey = "invalid access key";
         _eventGridOptions.AddTopicConfig(topicConfigKey, topicEndpoint, accessKey);
         _eventGridClientFactory.WhereCreatingClientFails();
-        
+
         var sut = GetSut();
 
         // ACT
         var wasSuccessful = sut.TryCreateClient(topicConfigKey, out var client);
-            
+
         // ASSERT
         Assert.False(wasSuccessful);
-        Assert.Null(client);        
+        Assert.Null(client);
     }
 }

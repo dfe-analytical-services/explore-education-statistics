@@ -15,60 +15,51 @@ public class FileAccessorMockBuilder
 
     public FileAccessorMockBuilder WhereDirectoryExists(string directory)
     {
-        _mock
-            .Setup(m => m.DirectoryExists(directory))
-            .Returns(true);
+        _mock.Setup(m => m.DirectoryExists(directory)).Returns(true);
         return this;
     }
 
     public FileAccessorMockBuilder WhereDirectoryDoesNotExist(string directory)
     {
-        _mock
-            .Setup(m => m.DirectoryExists(directory))
-            .Returns(false);
+        _mock.Setup(m => m.DirectoryExists(directory)).Returns(false);
         return this;
     }
 
     public FileAccessorMockBuilder WhereDirectoryIsCreated(string directory)
     {
-        _mock
-            .Setup(m => m.CreateDirectory(directory));
+        _mock.Setup(m => m.CreateDirectory(directory));
         return this;
     }
 
     public FileAccessorMockBuilder WhereDirectoryIsDeleted(string directory)
     {
-        _mock
-            .Setup(m => m.DeleteDirectory(directory));
+        _mock.Setup(m => m.DeleteDirectory(directory));
         return this;
     }
 
     public FileAccessorMockBuilder WhereFileListForDirectoryIs(string directory, IEnumerable<string> files)
     {
-        _mock
-            .Setup(m => m.ListFiles(directory))
-            .Returns(files.ToList);
+        _mock.Setup(m => m.ListFiles(directory)).Returns(files.ToList);
         return this;
     }
 
     public FileAccessorMockBuilder WhereFileIsMoved(string sourcePath, string destinationPath)
     {
-        _mock
-            .Setup(m => m.Move(sourcePath, destinationPath));
+        _mock.Setup(m => m.Move(sourcePath, destinationPath));
         return this;
     }
 
     public FileAccessorMockBuilder WhereFilesAreMovedBetweenFolders(
         IEnumerable<string> sourceFiles,
         string sourceDirectory,
-        string destinationDirectory)
+        string destinationDirectory
+    )
     {
         sourceFiles.ForEach(sourceFile =>
         {
-            _mock
-                .Setup(m => m.Move(
-                    Path.Combine(sourceDirectory, sourceFile),
-                    Path.Combine(destinationDirectory, sourceFile)));
+            _mock.Setup(m =>
+                m.Move(Path.Combine(sourceDirectory, sourceFile), Path.Combine(destinationDirectory, sourceFile))
+            );
         });
         return this;
     }
@@ -111,17 +102,18 @@ public class FileAccessorMockBuilder
             mock.Verify(m => m.Move(sourcePath, destinationPath));
             return this;
         }
-        
+
         public Asserter MoveBetweenFoldersCalledFor(
             IEnumerable<string> files,
             string sourceDirectory,
-            string destinationDirectory)
+            string destinationDirectory
+        )
         {
             files.ForEach(sourceFile =>
             {
-                mock.Verify(m => m.Move(
-                    Path.Combine(sourceDirectory, sourceFile),
-                    Path.Combine(destinationDirectory, sourceFile)));
+                mock.Verify(m =>
+                    m.Move(Path.Combine(sourceDirectory, sourceFile), Path.Combine(destinationDirectory, sourceFile))
+                );
             });
             return this;
         }

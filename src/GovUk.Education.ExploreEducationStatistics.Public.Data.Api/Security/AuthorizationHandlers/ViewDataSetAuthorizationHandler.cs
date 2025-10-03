@@ -12,7 +12,8 @@ public class ViewDataSetAuthorizationHandler(IAuthorizationHandlerService author
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         ViewDataSetRequirement requirement,
-        DataSet dataSet)
+        DataSet dataSet
+    )
     {
         if (dataSet.Status is DataSetStatus.Published or DataSetStatus.Deprecated)
         {

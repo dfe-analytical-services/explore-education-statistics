@@ -9,24 +9,22 @@ public static class PathUtils
 {
     private const string SolutionFilename = "GovUk.Education.ExploreEducationStatistics.sln";
 
-    private static readonly Lazy<string> ProjectRootPathLazy = new(
-        () =>
+    private static readonly Lazy<string> ProjectRootPathLazy = new(() =>
+    {
+        var directory = Assembly.GetExecutingAssembly().GetDirectory();
+
+        while (directory is not null && directory.GetFiles(SolutionFilename).Length == 0)
         {
-            var directory = Assembly.GetExecutingAssembly().GetDirectory();
-
-            while (directory is not null && directory.GetFiles(SolutionFilename).Length == 0)
-            {
-                directory = directory.Parent;
-            }
-
-            if (directory?.Parent is null)
-            {
-                throw new Exception("Could not detect project root");
-            }
-
-            return directory.Parent.FullName;
+            directory = directory.Parent;
         }
-    );
+
+        if (directory?.Parent is null)
+        {
+            throw new Exception("Could not detect project root");
+        }
+
+        return directory.Parent.FullName;
+    });
 
     public static string ProjectRootPath => ProjectRootPathLazy.Value;
 
@@ -38,8 +36,10 @@ public static class PathUtils
     /// <returns>A path compatible with the target OS</returns>
     public static string OsPath(string path, OSPlatform? osPlatform = null)
     {
-        if (osPlatform == OSPlatform.Windows
-            || (osPlatform == null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows)))
+        if (
+            osPlatform == OSPlatform.Windows
+            || (osPlatform == null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        )
         {
             return path.Replace('/', '\\');
         }

@@ -11,7 +11,7 @@ public class EnumLabelValueAttribute : Attribute
         Label = label;
         Value = value;
     }
-    
+
     public EnumLabelValueAttribute(string label)
     {
         Label = label;

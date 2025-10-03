@@ -9,10 +9,10 @@ public static class ArrayExtensions
     {
         var shuffledArray = new T[array.Length];
         array.CopyTo(shuffledArray, 0);
-        
+
         var rnd = seed.HasValue ? new Random(seed.Value) : new Random();
-        
-        for (var i = shuffledArray.Length-1; i > 0 ; i--)
+
+        for (var i = shuffledArray.Length - 1; i > 0; i--)
         {
             var swapIndex = rnd.NextInt64(i + 1);
             (shuffledArray[i], shuffledArray[swapIndex]) = (shuffledArray[swapIndex], shuffledArray[i]);
@@ -31,11 +31,12 @@ public static class ArrayExtensions
         var numberOfItems = array.Length;
         var itemsPerGroup = numberOfItems / numberOfGroups;
         var remainder = numberOfItems % numberOfGroups;
-        var arrays = Enumerable.Range(0, numberOfGroups)
+        var arrays = Enumerable
+            .Range(0, numberOfGroups)
             .Select(i => i < remainder ? itemsPerGroup + 1 : itemsPerGroup)
             .Select(sizeOfArray => new T[sizeOfArray])
             .ToArray();
-        
+
         for (var i = 0; i < numberOfItems; i++)
         {
             var arrayIndex = i % numberOfGroups;

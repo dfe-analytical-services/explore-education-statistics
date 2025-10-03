@@ -21,23 +21,17 @@ public record PageFeedbackCreateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Url)
-                .NotEmpty();
+            RuleFor(request => request.Url).NotEmpty();
 
-            RuleFor(request => request.UserAgent)
-                .MaximumLength(250);
+            RuleFor(request => request.UserAgent).MaximumLength(250);
 
-            RuleFor(request => request.Response)
-                .IsInEnum();
+            RuleFor(request => request.Response).IsInEnum();
 
-            RuleFor(request => request.Context)
-                .MaximumLength(2000);
+            RuleFor(request => request.Context).MaximumLength(2000);
 
-            RuleFor(request => request.Issue)
-                .MaximumLength(2000);
+            RuleFor(request => request.Issue).MaximumLength(2000);
 
-            RuleFor(request => request.Intent)
-                .MaximumLength(2000);
+            RuleFor(request => request.Intent).MaximumLength(2000);
         }
     }
 }

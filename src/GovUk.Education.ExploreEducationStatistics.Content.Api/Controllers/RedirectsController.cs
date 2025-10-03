@@ -11,8 +11,7 @@ public class RedirectsController : ControllerBase
 {
     private readonly IRedirectsCacheService _redirectsCacheService;
 
-    public RedirectsController(
-        IRedirectsCacheService redirectsCacheService)
+    public RedirectsController(IRedirectsCacheService redirectsCacheService)
     {
         _redirectsCacheService = redirectsCacheService;
     }
@@ -20,7 +19,6 @@ public class RedirectsController : ControllerBase
     [HttpGet("redirects")]
     public async Task<ActionResult<RedirectsViewModel>> List()
     {
-        return await _redirectsCacheService.List()
-            .HandleFailuresOrOk();
+        return await _redirectsCacheService.List().HandleFailuresOrOk();
     }
 }

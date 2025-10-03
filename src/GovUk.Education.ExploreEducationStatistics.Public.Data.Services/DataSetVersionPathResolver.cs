@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 public class DataSetVersionPathResolver : IDataSetVersionPathResolver
 {
     private const string DraftVersionFolderName = "draft";
-    
+
     private readonly IOptions<DataFilesOptions> _options;
     private readonly IWebHostEnvironment _environment;
     private readonly string _basePath;
@@ -39,22 +39,22 @@ public class DataSetVersionPathResolver : IDataSetVersionPathResolver
 
     public string DirectoryPath(DataSetVersion dataSetVersion)
     {
-        var folderName = dataSetVersion.IsPrivateStatus() 
-            ? DraftVersionFolderName
-            : $"v{dataSetVersion.SemVersion()}";
-        
+        var folderName = dataSetVersion.IsPrivateStatus() ? DraftVersionFolderName : $"v{dataSetVersion.SemVersion()}";
+
         return Path.Combine(
-            ((IDataSetVersionPathResolver) this).DataSetsPath(),
+            ((IDataSetVersionPathResolver)this).DataSetsPath(),
             dataSetVersion.DataSetId.ToString(),
-            folderName);
+            folderName
+        );
     }
-    
+
     public string DirectoryPath(DataSetVersion dataSetVersion, SemVersion versionNumber)
     {
         return Path.Combine(
-            ((IDataSetVersionPathResolver) this).DataSetsPath(),
+            ((IDataSetVersionPathResolver)this).DataSetsPath(),
             dataSetVersion.DataSetId.ToString(),
-            $"v{versionNumber}");
+            $"v{versionNumber}"
+        );
     }
 
     private string GetBasePath()

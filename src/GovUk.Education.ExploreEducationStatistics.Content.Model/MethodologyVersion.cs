@@ -9,18 +9,20 @@ public enum MethodologyApprovalStatus
 {
     Draft,
     HigherLevelReview,
-    Approved
+    Approved,
 }
 
 public enum MethodologyPublishingStrategy
 {
     Immediately,
-    WithRelease
+    WithRelease,
 }
 
 public class MethodologyVersion : ICreatedTimestamp<DateTime?>
 {
-    [Key] [Required] public Guid Id { get; set; }
+    [Key]
+    [Required]
+    public Guid Id { get; set; }
 
     public string Title => AlternativeTitle ?? Methodology.OwningPublicationTitle;
 

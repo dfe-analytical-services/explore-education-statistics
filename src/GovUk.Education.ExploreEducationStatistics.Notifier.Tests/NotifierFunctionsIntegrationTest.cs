@@ -17,8 +17,9 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests;
 
-public abstract class NotifierFunctionsIntegrationTest
-    (NotifierFunctionsIntegrationTestFixture fixture) : FunctionsIntegrationTest<NotifierFunctionsIntegrationTestFixture>(fixture), IAsyncLifetime
+public abstract class NotifierFunctionsIntegrationTest(NotifierFunctionsIntegrationTestFixture fixture)
+    : FunctionsIntegrationTest<NotifierFunctionsIntegrationTestFixture>(fixture),
+        IAsyncLifetime
 {
     public Task InitializeAsync()
     {
@@ -55,7 +56,8 @@ public abstract class NotifierFunctionsIntegrationTest
         await dataTableStorageService.BatchManipulateEntities(
             tableName: NotifierTableStorage.ApiSubscriptionsTable,
             entities: subscriptions,
-            tableTransactionActionType: TableTransactionActionType.Add);
+            tableTransactionActionType: TableTransactionActionType.Add
+        );
     }
 
     protected async Task CreateApiSubscription(ApiSubscription subscription)
@@ -64,13 +66,15 @@ public abstract class NotifierFunctionsIntegrationTest
 
         await dataTableStorageService.CreateEntity(
             tableName: NotifierTableStorage.ApiSubscriptionsTable,
-            entity: subscription);
+            entity: subscription
+        );
     }
 
     protected async Task<ApiSubscription?> GetApiSubscriptionIfExists(
         Guid dataSetId,
         string email,
-        IEnumerable<string>? select = null)
+        IEnumerable<string>? select = null
+    )
     {
         var dataTableStorageService = new DataTableStorageService(StorageConnectionString());
 
@@ -78,13 +82,15 @@ public abstract class NotifierFunctionsIntegrationTest
             tableName: NotifierTableStorage.ApiSubscriptionsTable,
             partitionKey: dataSetId.ToString(),
             rowKey: email,
-            select: select);
+            select: select
+        );
     }
 
     protected async Task<IReadOnlyList<ApiSubscription>> QueryApiSubscriptions(
         Expression<Func<ApiSubscription, bool>>? filter = null,
         int? maxPerPage = null,
-        IEnumerable<string>? select = null)
+        IEnumerable<string>? select = null
+    )
     {
         var dataTableStorageService = new DataTableStorageService(StorageConnectionString());
 
@@ -93,13 +99,12 @@ public abstract class NotifierFunctionsIntegrationTest
             filter: filter,
             maxPerPage: maxPerPage,
             select: select,
-            cancellationToken: CancellationToken.None);
+            cancellationToken: CancellationToken.None
+        );
 
         var allSubscriptions = new List<ApiSubscription>();
 
-        await pagedSubscriptions
-            .AsPages()
-            .ForEachAsync(page => allSubscriptions.AddRange(page.Values));
+        await pagedSubscriptions.AsPages().ForEachAsync(page => allSubscriptions.AddRange(page.Values));
 
         return allSubscriptions;
     }
@@ -132,35 +137,32 @@ public class NotifierFunctionsIntegrationTestFixture : FunctionsIntegrationTestF
 
     public override IHostBuilder ConfigureTestHostBuilder()
     {
-        return base
-            .ConfigureTestHostBuilder()
+        return base.ConfigureTestHostBuilder()
             .ConfigureNotifierHostBuilder()
             .ConfigureAppConfiguration(builder =>
             {
                 builder
                     .AddJsonFile("appsettings.IntegrationTest.json", optional: true, reloadOnChange: false)
-                    .AddInMemoryCollection(new Dictionary<string, string?>
-                    {
+                    .AddInMemoryCollection(
+                        new Dictionary<string, string?>
                         {
-                            $"{AppOptions.Section}:{nameof(AppOptions.NotifierStorageConnectionString)}",
-                            StorageConnectionString()
+                            {
+                                $"{AppOptions.Section}:{nameof(AppOptions.NotifierStorageConnectionString)}",
+                                StorageConnectionString()
+                            },
                         }
-                    });
+                    );
             })
-            .ConfigureServices((_, services) =>
-            {
-                services
-                    .ReplaceService(NotificationClient);
-            });
+            .ConfigureServices(
+                (_, services) =>
+                {
+                    services.ReplaceService(NotificationClient);
+                }
+            );
     }
 
     protected override IEnumerable<Type> GetFunctionTypes()
     {
-        return
-        [
-            typeof(PublicationSubscriptionFunctions),
-            typeof(ReleaseNotifier),
-            typeof(ApiSubscriptionFunctions)
-        ];
+        return [typeof(PublicationSubscriptionFunctions), typeof(ReleaseNotifier), typeof(ApiSubscriptionFunctions)];
     }
 }

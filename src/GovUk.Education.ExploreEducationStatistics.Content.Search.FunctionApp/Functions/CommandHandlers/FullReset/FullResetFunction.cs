@@ -9,25 +9,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class FullResetFunction(
     IFullSearchableDocumentResetter fullSearchableDocumentResetter,
-    ICommandHandler commandHandler)
+    ICommandHandler commandHandler
+)
 {
     [Function(nameof(FullSearchableDocumentsReset))]
     [QueueOutput("%RefreshSearchableDocumentQueueName%")]
     public async Task<RefreshSearchableDocumentMessageDto[]> FullSearchableDocumentsReset(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(FullSearchableDocumentsReset))]
-        HttpRequest ignored, //  The binding name _ is invalid
-        FunctionContext context) =>
-        await commandHandler.Handle(
-            ResetSearchableDocument,
-            context.CancellationToken);
+            HttpRequest ignored, //  The binding name _ is invalid
+        FunctionContext context
+    ) => await commandHandler.Handle(ResetSearchableDocument, context.CancellationToken);
 
-    private async Task<RefreshSearchableDocumentMessageDto[]> ResetSearchableDocument(CancellationToken cancellationToken)
+    private async Task<RefreshSearchableDocumentMessageDto[]> ResetSearchableDocument(
+        CancellationToken cancellationToken
+    )
     {
         var response = await fullSearchableDocumentResetter.PerformReset(cancellationToken);
 
-        return response.AllPublications
-            .Select(publication =>
-                    new RefreshSearchableDocumentMessageDto { PublicationSlug = publication.PublicationSlug })
+        return response
+            .AllPublications.Select(publication => new RefreshSearchableDocumentMessageDto
+            {
+                PublicationSlug = publication.PublicationSlug,
+            })
             .ToArray();
     }
 }

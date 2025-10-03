@@ -10,6 +10,5 @@ public interface IMethodologyCacheService
 
     Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> UpdateSummariesTree();
 
-    Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetSummariesByPublication(
-        Guid publicationId);
+    Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetSummariesByPublication(Guid publicationId);
 }

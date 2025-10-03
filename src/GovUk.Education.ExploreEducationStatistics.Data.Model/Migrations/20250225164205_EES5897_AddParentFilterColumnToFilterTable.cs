@@ -14,14 +14,13 @@ public partial class EES5897_AddParentFilterColumnToFilterTable : Migration
             name: "ParentFilter",
             table: "Filter",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "ParentFilter",
-            table: "Filter");
+        migrationBuilder.DropColumn(name: "ParentFilter", table: "Filter");
     }
 }

@@ -10,9 +10,7 @@ public record FreeTextRank(Guid Id, int Rank)
     {
         public void Configure(EntityTypeBuilder<FreeTextRank> builder)
         {
-            builder
-                .HasNoKey()
-                .ToTable((string?) null);
+            builder.HasNoKey().ToTable((string?)null);
         }
     }
 }

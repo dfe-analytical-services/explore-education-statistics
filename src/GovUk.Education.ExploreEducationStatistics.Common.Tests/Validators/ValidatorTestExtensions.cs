@@ -5,9 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Validators;
 
 public static class ValidatorTestExtensions
 {
-    public static ITestValidationWith WithAttemptedValue<T>(
-        this ITestValidationContinuation failures,
-        T value)
+    public static ITestValidationWith WithAttemptedValue<T>(this ITestValidationContinuation failures, T value)
     {
         return failures.When(
             failure => failure.AttemptedValue is T attemptedValue && attemptedValue.Equals(value),
@@ -17,7 +15,8 @@ public static class ValidatorTestExtensions
 
     public static ITestValidationWith WithCustomState<T>(
         this ITestValidationContinuation failures,
-        Func<T, bool> predicate)
+        Func<T, bool> predicate
+    )
     {
         return failures.When(
             failure => failure.CustomState is T customState && predicate(customState),

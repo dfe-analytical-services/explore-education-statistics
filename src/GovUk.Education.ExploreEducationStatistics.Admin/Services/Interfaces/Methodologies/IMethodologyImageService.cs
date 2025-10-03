@@ -12,7 +12,8 @@ public interface IMethodologyImageService
     Task<Either<ActionResult, Unit>> Delete(
         Guid methodologyVersionId,
         IEnumerable<Guid> fileIds,
-        bool forceDelete = false);
+        bool forceDelete = false
+    );
 
     Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyVersionId, Guid fileId);
 

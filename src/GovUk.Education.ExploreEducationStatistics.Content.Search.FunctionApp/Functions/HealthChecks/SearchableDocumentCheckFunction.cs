@@ -11,9 +11,9 @@ public class SearchableDocumentCheckFunction(SearchableDocumentChecker searchabl
     [Function(nameof(SearchableDocumentCheck))]
     [Produces("application/json")]
     public async Task<IActionResult> SearchableDocumentCheck(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get")]
-        HttpRequest ignored, //  The binding name _ is invalid
-        CancellationToken cancellationToken)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest ignored, //  The binding name _ is invalid
+        CancellationToken cancellationToken
+    )
     {
         var report = await searchableDocumentChecker.RunCheck(cancellationToken);
         return new OkObjectResult(report);

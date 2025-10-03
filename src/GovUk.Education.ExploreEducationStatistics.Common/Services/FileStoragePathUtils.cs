@@ -17,14 +17,12 @@ public static class FileStoragePathUtils
 
     private static string PublicContentPublicationParentPath(string publicationSlug, bool staging = false)
     {
-        return
-            $"{AppendPathSeparator(staging ? PublicContentStagingPath() : null)}publications/{publicationSlug.TrimToLower()}";
+        return $"{AppendPathSeparator(staging ? PublicContentStagingPath() : null)}publications/{publicationSlug.TrimToLower()}";
     }
 
     public static string PublicContentReleaseParentPath(string publicationSlug, string releaseSlug)
     {
-        return
-            $"{PublicContentPublicationParentPath(publicationSlug)}/{ReleasesDirectory}/{releaseSlug.TrimToLower()}";
+        return $"{PublicContentPublicationParentPath(publicationSlug)}/{ReleasesDirectory}/{releaseSlug.TrimToLower()}";
     }
 
     public static string PublicContentPublicationPath(string publicationSlug)
@@ -39,8 +37,7 @@ public static class FileStoragePathUtils
 
     public static string PublicContentReleasePath(string publicationSlug, string releaseSlug, bool staging = false)
     {
-        return
-            $"{PublicContentPublicationParentPath(publicationSlug, staging)}/{ReleasesDirectory}/{releaseSlug.TrimToLower()}.json";
+        return $"{PublicContentPublicationParentPath(publicationSlug, staging)}/{ReleasesDirectory}/{releaseSlug.TrimToLower()}.json";
     }
 
     public static string PublicContentDataBlockParentPath(string publicationSlug, string releaseSlug)
@@ -56,7 +53,8 @@ public static class FileStoragePathUtils
     public static string PrivateContentDataBlockLocationsPath(
         Guid releaseVersionId,
         Guid dataBlockId,
-        long boundaryLevelId)
+        long boundaryLevelId
+    )
     {
         return $"{ReleasesDirectory}/{releaseVersionId}/{DataBlocksDirectory}/{dataBlockId}-boundary-levels/{dataBlockId}-{boundaryLevelId}.json";
     }
@@ -66,10 +64,7 @@ public static class FileStoragePathUtils
         return $"{ReleasesDirectory}/{releaseVersionId}/{SubjectMetaDirectory}/{subjectId}.json";
     }
 
-    public static string PublicContentDataBlockPath(
-        string publicationSlug,
-        string releaseSlug,
-        Guid dataBlockId)
+    public static string PublicContentDataBlockPath(string publicationSlug, string releaseSlug, Guid dataBlockId)
     {
         return $"{PublicContentDataBlockParentPath(publicationSlug, releaseSlug)}/{dataBlockId}.json";
     }
@@ -78,7 +73,8 @@ public static class FileStoragePathUtils
         string publicationSlug,
         string releaseSlug,
         Guid dataBlockId,
-        long boundaryLevelId)
+        long boundaryLevelId
+    )
     {
         return $"{PublicContentDataBlockParentPath(publicationSlug, releaseSlug)}/{dataBlockId}-boundary-levels/{dataBlockId}-{boundaryLevelId}.json";
     }

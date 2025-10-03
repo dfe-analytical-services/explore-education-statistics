@@ -19,7 +19,7 @@ public class ReleaseNotifierTests
     private static readonly AppOptions AppOptions = new()
     {
         Url = "https://notifier.func/api",
-        PublicAppUrl = "https://public.app"
+        PublicAppUrl = "https://public.app",
     };
 
     private static readonly GovUkNotifyOptions.EmailTemplateOptions EmailTemplateOptions = new()
@@ -29,7 +29,7 @@ public class ReleaseNotifierTests
         ReleasePublishedId = "release-published-id",
         ReleasePublishedSupersededSubscribersId = "release-published-superseded-subscribers-id",
         SubscriptionConfirmationId = "subscription-confirmation-id",
-        SubscriptionVerificationId = "subscription-verification-id"
+        SubscriptionVerificationId = "subscription-verification-id",
     };
 
     [Fact]
@@ -38,39 +38,45 @@ public class ReleaseNotifierTests
         var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
 
         var publication1Id = Guid.NewGuid();
-        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publication1Id))
-            .ReturnsAsync([ "test@test.com" ]);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publication1Id)).ReturnsAsync(["test@test.com"]);
 
         var supersededPubId = Guid.NewGuid();
-        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPubId))
-            .ReturnsAsync([ "superseded@test.com" ]);
+        subscriptionRepository
+            .Setup(mock => mock.GetSubscriberEmails(supersededPubId))
+            .ReturnsAsync(["superseded@test.com"]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
-        tokenService.Setup(mock =>
-                mock.GenerateToken("test@test.com", It.IsAny<DateTime>()))
+        tokenService
+            .Setup(mock => mock.GenerateToken("test@test.com", It.IsAny<DateTime>()))
             .Returns("unsubscribe-token-1");
-        tokenService.Setup(mock =>
-                mock.GenerateToken("superseded@test.com", It.IsAny<DateTime>()))
+        tokenService
+            .Setup(mock => mock.GenerateToken("superseded@test.com", It.IsAny<DateTime>()))
             .Returns("unsubscribe-token-2");
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail("test@test.com", "release-published-id",
-                It.IsAny<Dictionary<string, dynamic>>()));
+            mock.SendEmail("test@test.com", "release-published-id", It.IsAny<Dictionary<string, dynamic>>())
+        );
         emailService.Setup(mock =>
-            mock.SendEmail("superseded@test.com", "release-published-superseded-subscribers-id",
-                It.IsAny<Dictionary<string, dynamic>>()));
+            mock.SendEmail(
+                "superseded@test.com",
+                "release-published-superseded-subscribers-id",
+                It.IsAny<Dictionary<string, dynamic>>()
+            )
+        );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
         {
-            context.Publications.Add(new Publication
-            {
-                Id = supersededPubId,
-                Title = "Superseded publication",
-                Slug = "superseded-publication",
-                SupersededById = publication1Id,
-            });
+            context.Publications.Add(
+                new Publication
+                {
+                    Id = supersededPubId,
+                    Title = "Superseded publication",
+                    Slug = "superseded-publication",
+                    SupersededById = publication1Id,
+                }
+            );
             await context.SaveChangesAsync();
         }
 
@@ -80,7 +86,8 @@ public class ReleaseNotifierTests
                 contentDbContext: context,
                 subscriptionRepository: subscriptionRepository.Object,
                 tokenService: tokenService.Object,
-                emailService: emailService.Object);
+                emailService: emailService.Object
+            );
 
             var releaseNotificationMessage = new ReleaseNotificationMessage
             {
@@ -93,29 +100,52 @@ public class ReleaseNotifierTests
                 UpdateNote = string.Empty,
             };
 
-            await function.NotifySubscribers(
-                releaseNotificationMessage,
-                new TestFunctionContext());
+            await function.NotifySubscribers(releaseNotificationMessage, new TestFunctionContext());
         }
 
-        emailService.Verify(mock =>
-            mock.SendEmail("test@test.com", "release-published-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "unsubscribe-token-1",
-                        "Publication 1", "publication-1",
-                        "2000", "2000", null,
-                        "publication-1", null)
-                )), Times.Once);
+        emailService.Verify(
+            mock =>
+                mock.SendEmail(
+                    "test@test.com",
+                    "release-published-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(
+                            d,
+                            "unsubscribe-token-1",
+                            "Publication 1",
+                            "publication-1",
+                            "2000",
+                            "2000",
+                            null,
+                            "publication-1",
+                            null
+                        )
+                    )
+                ),
+            Times.Once
+        );
 
-        emailService.Verify(mock =>
-            mock.SendEmail("superseded@test.com", "release-published-superseded-subscribers-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "unsubscribe-token-2",
-                        "Publication 1", "publication-1",
-                        "2000", "2000", null,
-                        "superseded-publication",
-                        "Superseded publication")
-                )), Times.Once);
+        emailService.Verify(
+            mock =>
+                mock.SendEmail(
+                    "superseded@test.com",
+                    "release-published-superseded-subscribers-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(
+                            d,
+                            "unsubscribe-token-2",
+                            "Publication 1",
+                            "publication-1",
+                            "2000",
+                            "2000",
+                            null,
+                            "superseded-publication",
+                            "Superseded publication"
+                        )
+                    )
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -124,30 +154,31 @@ public class ReleaseNotifierTests
         var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
 
         var publicationId = Guid.NewGuid();
-        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId))
-            .ReturnsAsync([ "test1@test.com", "test2@test.com", "test3@test.com" ]);
+        subscriptionRepository
+            .Setup(mock => mock.GetSubscriberEmails(publicationId))
+            .ReturnsAsync(["test1@test.com", "test2@test.com", "test3@test.com"]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
-        tokenService.Setup(mock =>
-                mock.GenerateToken("test1@test.com", It.IsAny<DateTime>()))
+        tokenService
+            .Setup(mock => mock.GenerateToken("test1@test.com", It.IsAny<DateTime>()))
             .Returns("unsubscribe-token-1");
-        tokenService.Setup(mock =>
-                mock.GenerateToken("test2@test.com", It.IsAny<DateTime>()))
+        tokenService
+            .Setup(mock => mock.GenerateToken("test2@test.com", It.IsAny<DateTime>()))
             .Returns("unsubscribe-token-2");
-        tokenService.Setup(mock =>
-                mock.GenerateToken("test3@test.com", It.IsAny<DateTime>()))
+        tokenService
+            .Setup(mock => mock.GenerateToken("test3@test.com", It.IsAny<DateTime>()))
             .Returns("unsubscribe-token-3");
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail("test1@test.com", "release-published-id",
-                It.IsAny<Dictionary<string, dynamic>>()));
+            mock.SendEmail("test1@test.com", "release-published-id", It.IsAny<Dictionary<string, dynamic>>())
+        );
         emailService.Setup(mock =>
-            mock.SendEmail("test2@test.com", "release-published-id",
-                It.IsAny<Dictionary<string, dynamic>>()));
+            mock.SendEmail("test2@test.com", "release-published-id", It.IsAny<Dictionary<string, dynamic>>())
+        );
         emailService.Setup(mock =>
-            mock.SendEmail("test3@test.com", "release-published-id",
-                It.IsAny<Dictionary<string, dynamic>>()));
+            mock.SendEmail("test3@test.com", "release-published-id", It.IsAny<Dictionary<string, dynamic>>())
+        );
 
         await using var context = ContentDbUtils.InMemoryContentDbContext(Guid.NewGuid().ToString());
 
@@ -155,7 +186,8 @@ public class ReleaseNotifierTests
             contentDbContext: context,
             subscriptionRepository: subscriptionRepository.Object,
             tokenService: tokenService.Object,
-            emailService: emailService.Object);
+            emailService: emailService.Object
+        );
 
         var releaseNotificationMessage = new ReleaseNotificationMessage
         {
@@ -168,34 +200,71 @@ public class ReleaseNotifierTests
             UpdateNote = string.Empty,
         };
 
-        await function.NotifySubscribers(
-            releaseNotificationMessage,
-            new TestFunctionContext());
+        await function.NotifySubscribers(releaseNotificationMessage, new TestFunctionContext());
 
-        emailService.Verify(mock =>
-            mock.SendEmail("test1@test.com", "release-published-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "unsubscribe-token-1",
-                        "Publication 1", "publication-1",
-                        "2000", "2000", null,
-                        "publication-1", null)
-                )), Times.Once);
-        emailService.Verify(mock =>
-            mock.SendEmail("test2@test.com", "release-published-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "unsubscribe-token-2",
-                        "Publication 1", "publication-1",
-                        "2000", "2000", null,
-                        "publication-1", null)
-                )), Times.Once);
-        emailService.Verify(mock =>
-            mock.SendEmail("test3@test.com", "release-published-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "unsubscribe-token-3",
-                        "Publication 1", "publication-1",
-                        "2000", "2000", null,
-                        "publication-1", null)
-                )), Times.Once);
+        emailService.Verify(
+            mock =>
+                mock.SendEmail(
+                    "test1@test.com",
+                    "release-published-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(
+                            d,
+                            "unsubscribe-token-1",
+                            "Publication 1",
+                            "publication-1",
+                            "2000",
+                            "2000",
+                            null,
+                            "publication-1",
+                            null
+                        )
+                    )
+                ),
+            Times.Once
+        );
+        emailService.Verify(
+            mock =>
+                mock.SendEmail(
+                    "test2@test.com",
+                    "release-published-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(
+                            d,
+                            "unsubscribe-token-2",
+                            "Publication 1",
+                            "publication-1",
+                            "2000",
+                            "2000",
+                            null,
+                            "publication-1",
+                            null
+                        )
+                    )
+                ),
+            Times.Once
+        );
+        emailService.Verify(
+            mock =>
+                mock.SendEmail(
+                    "test3@test.com",
+                    "release-published-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(
+                            d,
+                            "unsubscribe-token-3",
+                            "Publication 1",
+                            "publication-1",
+                            "2000",
+                            "2000",
+                            null,
+                            "publication-1",
+                            null
+                        )
+                    )
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -204,45 +273,59 @@ public class ReleaseNotifierTests
         var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
 
         var publicationId = Guid.NewGuid();
-        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId))
-            .ReturnsAsync([]);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId)).ReturnsAsync([]);
 
         var supersededPubId = Guid.NewGuid();
-        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPubId))
-            .ReturnsAsync([ "superseded1@test.com", "superseded2@test.com", "superseded3@test.com" ]);
+        subscriptionRepository
+            .Setup(mock => mock.GetSubscriberEmails(supersededPubId))
+            .ReturnsAsync(["superseded1@test.com", "superseded2@test.com", "superseded3@test.com"]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
-        tokenService.Setup(mock =>
-                mock.GenerateToken("superseded1@test.com", It.IsAny<DateTime>()))
+        tokenService
+            .Setup(mock => mock.GenerateToken("superseded1@test.com", It.IsAny<DateTime>()))
             .Returns("unsubscribe-token-1");
-        tokenService.Setup(mock =>
-                mock.GenerateToken("superseded2@test.com", It.IsAny<DateTime>()))
+        tokenService
+            .Setup(mock => mock.GenerateToken("superseded2@test.com", It.IsAny<DateTime>()))
             .Returns("unsubscribe-token-2");
-        tokenService.Setup(mock =>
-                mock.GenerateToken("superseded3@test.com", It.IsAny<DateTime>()))
+        tokenService
+            .Setup(mock => mock.GenerateToken("superseded3@test.com", It.IsAny<DateTime>()))
             .Returns("unsubscribe-token-3");
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail("superseded1@test.com", "release-published-superseded-subscribers-id",
-                It.IsAny<Dictionary<string, dynamic>>()));
+            mock.SendEmail(
+                "superseded1@test.com",
+                "release-published-superseded-subscribers-id",
+                It.IsAny<Dictionary<string, dynamic>>()
+            )
+        );
         emailService.Setup(mock =>
-            mock.SendEmail("superseded2@test.com", "release-published-superseded-subscribers-id",
-                It.IsAny<Dictionary<string, dynamic>>()));
+            mock.SendEmail(
+                "superseded2@test.com",
+                "release-published-superseded-subscribers-id",
+                It.IsAny<Dictionary<string, dynamic>>()
+            )
+        );
         emailService.Setup(mock =>
-            mock.SendEmail("superseded3@test.com", "release-published-superseded-subscribers-id",
-                It.IsAny<Dictionary<string, dynamic>>()));
+            mock.SendEmail(
+                "superseded3@test.com",
+                "release-published-superseded-subscribers-id",
+                It.IsAny<Dictionary<string, dynamic>>()
+            )
+        );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
         {
-            context.Publications.Add(new Publication
-            {
-                Id = supersededPubId,
-                Title = "Superseded publication",
-                Slug = "superseded-publication",
-                SupersededById = publicationId,
-            });
+            context.Publications.Add(
+                new Publication
+                {
+                    Id = supersededPubId,
+                    Title = "Superseded publication",
+                    Slug = "superseded-publication",
+                    SupersededById = publicationId,
+                }
+            );
             await context.SaveChangesAsync();
         }
 
@@ -263,40 +346,75 @@ public class ReleaseNotifierTests
                 contentDbContext: context,
                 subscriptionRepository: subscriptionRepository.Object,
                 tokenService: tokenService.Object,
-                emailService: emailService.Object);
+                emailService: emailService.Object
+            );
 
-            await function.NotifySubscribers(
-                releaseNotificationMessage,
-                new TestFunctionContext());
+            await function.NotifySubscribers(releaseNotificationMessage, new TestFunctionContext());
         }
 
-        emailService.Verify(mock =>
-            mock.SendEmail("superseded1@test.com", "release-published-superseded-subscribers-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "unsubscribe-token-1",
-                        "Publication 1", "publication-1",
-                        "2000", "2000", null,
-                        "superseded-publication",
-                        "Superseded publication")
-                )), Times.Once);
-        emailService.Verify(mock =>
-            mock.SendEmail("superseded2@test.com", "release-published-superseded-subscribers-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "unsubscribe-token-2",
-                        "Publication 1", "publication-1",
-                        "2000", "2000", null,
-                        "superseded-publication",
-                        "Superseded publication")
-                )), Times.Once);
-        emailService.Verify(mock =>
-            mock.SendEmail("superseded3@test.com", "release-published-superseded-subscribers-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "unsubscribe-token-3",
-                        "Publication 1", "publication-1",
-                        "2000", "2000", null,
-                        "superseded-publication",
-                        "Superseded publication")
-                )), Times.Once);
+        emailService.Verify(
+            mock =>
+                mock.SendEmail(
+                    "superseded1@test.com",
+                    "release-published-superseded-subscribers-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(
+                            d,
+                            "unsubscribe-token-1",
+                            "Publication 1",
+                            "publication-1",
+                            "2000",
+                            "2000",
+                            null,
+                            "superseded-publication",
+                            "Superseded publication"
+                        )
+                    )
+                ),
+            Times.Once
+        );
+        emailService.Verify(
+            mock =>
+                mock.SendEmail(
+                    "superseded2@test.com",
+                    "release-published-superseded-subscribers-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(
+                            d,
+                            "unsubscribe-token-2",
+                            "Publication 1",
+                            "publication-1",
+                            "2000",
+                            "2000",
+                            null,
+                            "superseded-publication",
+                            "Superseded publication"
+                        )
+                    )
+                ),
+            Times.Once
+        );
+        emailService.Verify(
+            mock =>
+                mock.SendEmail(
+                    "superseded3@test.com",
+                    "release-published-superseded-subscribers-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(
+                            d,
+                            "unsubscribe-token-3",
+                            "Publication 1",
+                            "publication-1",
+                            "2000",
+                            "2000",
+                            null,
+                            "superseded-publication",
+                            "Superseded publication"
+                        )
+                    )
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -305,32 +423,41 @@ public class ReleaseNotifierTests
         var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
 
         var publicationId = Guid.NewGuid();
-        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId))
-            .ReturnsAsync([]);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId)).ReturnsAsync([]);
 
         var supersededPub1Id = Guid.NewGuid();
-        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPub1Id))
-            .ReturnsAsync([ "superseded1@test.com" ]);
+        subscriptionRepository
+            .Setup(mock => mock.GetSubscriberEmails(supersededPub1Id))
+            .ReturnsAsync(["superseded1@test.com"]);
 
         var supersededPub2Id = Guid.NewGuid();
-        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPub2Id))
-            .ReturnsAsync([ "superseded2@test.com" ]);
+        subscriptionRepository
+            .Setup(mock => mock.GetSubscriberEmails(supersededPub2Id))
+            .ReturnsAsync(["superseded2@test.com"]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
-        tokenService.Setup(mock =>
-                mock.GenerateToken("superseded1@test.com", It.IsAny<DateTime>()))
+        tokenService
+            .Setup(mock => mock.GenerateToken("superseded1@test.com", It.IsAny<DateTime>()))
             .Returns("unsubscribe-token-1");
-        tokenService.Setup(mock =>
-                mock.GenerateToken("superseded2@test.com", It.IsAny<DateTime>()))
+        tokenService
+            .Setup(mock => mock.GenerateToken("superseded2@test.com", It.IsAny<DateTime>()))
             .Returns("unsubscribe-token-2");
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail("superseded1@test.com", "release-published-superseded-subscribers-id",
-                It.IsAny<Dictionary<string, dynamic>>()));
+            mock.SendEmail(
+                "superseded1@test.com",
+                "release-published-superseded-subscribers-id",
+                It.IsAny<Dictionary<string, dynamic>>()
+            )
+        );
         emailService.Setup(mock =>
-            mock.SendEmail("superseded2@test.com", "release-published-superseded-subscribers-id",
-                It.IsAny<Dictionary<string, dynamic>>()));
+            mock.SendEmail(
+                "superseded2@test.com",
+                "release-published-superseded-subscribers-id",
+                It.IsAny<Dictionary<string, dynamic>>()
+            )
+        );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
@@ -349,7 +476,8 @@ public class ReleaseNotifierTests
                     Title = "Superseded 2 publication",
                     Slug = "superseded-2-publication",
                     SupersededById = publicationId,
-                });
+                }
+            );
             await context.SaveChangesAsync();
         }
 
@@ -359,7 +487,8 @@ public class ReleaseNotifierTests
                 contentDbContext: context,
                 subscriptionRepository: subscriptionRepository.Object,
                 tokenService: tokenService.Object,
-                emailService: emailService.Object);
+                emailService: emailService.Object
+            );
 
             var releaseNotificationMessage = new ReleaseNotificationMessage
             {
@@ -372,29 +501,51 @@ public class ReleaseNotifierTests
                 UpdateNote = string.Empty,
             };
 
-            await function.NotifySubscribers(
-                releaseNotificationMessage,
-                new TestFunctionContext());
+            await function.NotifySubscribers(releaseNotificationMessage, new TestFunctionContext());
         }
 
-        emailService.Verify(mock =>
-            mock.SendEmail("superseded1@test.com", "release-published-superseded-subscribers-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "unsubscribe-token-1",
-                        "Publication 1", "publication-1",
-                        "2000", "2000", null,
-                        "superseded-1-publication",
-                        "Superseded 1 publication")
-                )), Times.Once);
-        emailService.Verify(mock =>
-            mock.SendEmail("superseded2@test.com", "release-published-superseded-subscribers-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "unsubscribe-token-2",
-                        "Publication 1", "publication-1",
-                        "2000", "2000", null,
-                        "superseded-2-publication",
-                        "Superseded 2 publication")
-                )), Times.Once);
+        emailService.Verify(
+            mock =>
+                mock.SendEmail(
+                    "superseded1@test.com",
+                    "release-published-superseded-subscribers-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(
+                            d,
+                            "unsubscribe-token-1",
+                            "Publication 1",
+                            "publication-1",
+                            "2000",
+                            "2000",
+                            null,
+                            "superseded-1-publication",
+                            "Superseded 1 publication"
+                        )
+                    )
+                ),
+            Times.Once
+        );
+        emailService.Verify(
+            mock =>
+                mock.SendEmail(
+                    "superseded2@test.com",
+                    "release-published-superseded-subscribers-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(
+                            d,
+                            "unsubscribe-token-2",
+                            "Publication 1",
+                            "publication-1",
+                            "2000",
+                            "2000",
+                            null,
+                            "superseded-2-publication",
+                            "Superseded 2 publication"
+                        )
+                    )
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -403,40 +554,45 @@ public class ReleaseNotifierTests
         var subscriptionRepository = new Mock<ISubscriptionRepository>(MockBehavior.Strict);
 
         var publicationId = Guid.NewGuid();
-        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId))
-            .ReturnsAsync([ "test@test.com" ]);
+        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(publicationId)).ReturnsAsync(["test@test.com"]);
 
         var supersededPubId = Guid.NewGuid();
-        subscriptionRepository.Setup(mock => mock.GetSubscriberEmails(supersededPubId))
-            .ReturnsAsync([ "superseded@test.com" ]);
+        subscriptionRepository
+            .Setup(mock => mock.GetSubscriberEmails(supersededPubId))
+            .ReturnsAsync(["superseded@test.com"]);
 
         var tokenService = new Mock<ITokenService>(MockBehavior.Strict);
-        tokenService.Setup(mock =>
-                mock.GenerateToken("test@test.com", It.IsAny<DateTime>()))
+        tokenService
+            .Setup(mock => mock.GenerateToken("test@test.com", It.IsAny<DateTime>()))
             .Returns("unsubscribe-token-1");
-        tokenService.Setup(mock =>
-                mock.GenerateToken("superseded@test.com", It.IsAny<DateTime>()))
+        tokenService
+            .Setup(mock => mock.GenerateToken("superseded@test.com", It.IsAny<DateTime>()))
             .Returns("unsubscribe-token-2");
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
         emailService.Setup(mock =>
-            mock.SendEmail("test@test.com", "release-amendment-published-id",
-                It.IsAny<Dictionary<string, dynamic>>()));
+            mock.SendEmail("test@test.com", "release-amendment-published-id", It.IsAny<Dictionary<string, dynamic>>())
+        );
         emailService.Setup(mock =>
-            mock.SendEmail("superseded@test.com",
+            mock.SendEmail(
+                "superseded@test.com",
                 "release-amendment-published-superseded-subscribers-id",
-                It.IsAny<Dictionary<string, dynamic>>()));
+                It.IsAny<Dictionary<string, dynamic>>()
+            )
+        );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
         {
-            context.Publications.Add(new Publication
-            {
-                Id = supersededPubId,
-                Title = "Superseded publication",
-                Slug = "superseded-publication",
-                SupersededById = publicationId,
-            });
+            context.Publications.Add(
+                new Publication
+                {
+                    Id = supersededPubId,
+                    Title = "Superseded publication",
+                    Slug = "superseded-publication",
+                    SupersededById = publicationId,
+                }
+            );
             await context.SaveChangesAsync();
         }
 
@@ -446,7 +602,8 @@ public class ReleaseNotifierTests
                 contentDbContext: context,
                 subscriptionRepository: subscriptionRepository.Object,
                 tokenService: tokenService.Object,
-                emailService: emailService.Object);
+                emailService: emailService.Object
+            );
 
             var releaseNotificationMessage = new ReleaseNotificationMessage
             {
@@ -459,44 +616,73 @@ public class ReleaseNotifierTests
                 UpdateNote = "Update note",
             };
 
-            await function.NotifySubscribers(
-                releaseNotificationMessage,
-                new TestFunctionContext());
+            await function.NotifySubscribers(releaseNotificationMessage, new TestFunctionContext());
         }
 
-        emailService.Verify(mock =>
-            mock.SendEmail("test@test.com", "release-amendment-published-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "unsubscribe-token-1",
-                        "Publication 1", "publication-1",
-                        "2000", "2000", "Update note",
-                        "publication-1", null)
-                )), Times.Once);
+        emailService.Verify(
+            mock =>
+                mock.SendEmail(
+                    "test@test.com",
+                    "release-amendment-published-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(
+                            d,
+                            "unsubscribe-token-1",
+                            "Publication 1",
+                            "publication-1",
+                            "2000",
+                            "2000",
+                            "Update note",
+                            "publication-1",
+                            null
+                        )
+                    )
+                ),
+            Times.Once
+        );
 
-        emailService.Verify(mock =>
-            mock.SendEmail("superseded@test.com",
-                "release-amendment-published-superseded-subscribers-id",
-                It.Is<Dictionary<string, dynamic>>(d =>
-                    AssertEmailTemplateValues(d, "unsubscribe-token-2",
-                        "Publication 1", "publication-1",
-                        "2000", "2000", "Update note",
-                        "superseded-publication",
-                        "Superseded publication")
-                )), Times.Once);
+        emailService.Verify(
+            mock =>
+                mock.SendEmail(
+                    "superseded@test.com",
+                    "release-amendment-published-superseded-subscribers-id",
+                    It.Is<Dictionary<string, dynamic>>(d =>
+                        AssertEmailTemplateValues(
+                            d,
+                            "unsubscribe-token-2",
+                            "Publication 1",
+                            "publication-1",
+                            "2000",
+                            "2000",
+                            "Update note",
+                            "superseded-publication",
+                            "Superseded publication"
+                        )
+                    )
+                ),
+            Times.Once
+        );
     }
 
-    private static bool AssertEmailTemplateValues(Dictionary<string, dynamic> values,
+    private static bool AssertEmailTemplateValues(
+        Dictionary<string, dynamic> values,
         string unsubToken,
-        string pubName, string pubSlug,
-        string releaseName, string releaseSlug, string? updateNote,
+        string pubName,
+        string pubSlug,
+        string releaseName,
+        string releaseSlug,
+        string? updateNote,
         string unsubPubSlug,
-        string? supersededPublicationTitle = null)
+        string? supersededPublicationTitle = null
+    )
     {
         Assert.Equal(pubName, values["publication_name"]);
         Assert.Equal(releaseName, values["release_name"]);
-        Assert.Equal($"{AppOptions.PublicAppUrl}/find-statistics/{pubSlug}/{releaseSlug}",
-            values["release_link"]);
-        Assert.Equal($"{AppOptions.PublicAppUrl}/subscriptions/{unsubPubSlug}/confirm-unsubscription/{unsubToken}", values["unsubscribe_link"]);
+        Assert.Equal($"{AppOptions.PublicAppUrl}/find-statistics/{pubSlug}/{releaseSlug}", values["release_link"]);
+        Assert.Equal(
+            $"{AppOptions.PublicAppUrl}/subscriptions/{unsubPubSlug}/confirm-unsubscription/{unsubToken}",
+            values["unsubscribe_link"]
+        );
 
         if (updateNote != null)
         {
@@ -523,19 +709,17 @@ public class ReleaseNotifierTests
         ContentDbContext? contentDbContext = null,
         ITokenService? tokenService = null,
         IEmailService? emailService = null,
-        ISubscriptionRepository? subscriptionRepository = null)
+        ISubscriptionRepository? subscriptionRepository = null
+    )
     {
         return new ReleaseNotifier(
             contentDbContext ?? Mock.Of<ContentDbContext>(),
             Mock.Of<ILogger<ReleaseNotifier>>(),
             AppOptions.ToOptionsWrapper(),
-            new GovUkNotifyOptions
-            {
-                ApiKey = "",
-                EmailTemplates = EmailTemplateOptions
-            }.ToOptionsWrapper(),
+            new GovUkNotifyOptions { ApiKey = "", EmailTemplates = EmailTemplateOptions }.ToOptionsWrapper(),
             tokenService ?? Mock.Of<ITokenService>(MockBehavior.Strict),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
-            subscriptionRepository ?? Mock.Of<ISubscriptionRepository>(MockBehavior.Strict));
+            subscriptionRepository ?? Mock.Of<ISubscriptionRepository>(MockBehavior.Strict)
+        );
     }
 }

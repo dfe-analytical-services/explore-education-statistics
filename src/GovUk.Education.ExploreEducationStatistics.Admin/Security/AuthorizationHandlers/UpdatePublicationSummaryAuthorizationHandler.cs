@@ -7,23 +7,23 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class UpdatePublicationSummaryRequirement : IAuthorizationRequirement
-{
-}
+public class UpdatePublicationSummaryRequirement : IAuthorizationRequirement { }
 
-public class UpdatePublicationSummaryAuthorizationHandler : AuthorizationHandler<UpdatePublicationSummaryRequirement, Publication>
+public class UpdatePublicationSummaryAuthorizationHandler
+    : AuthorizationHandler<UpdatePublicationSummaryRequirement, Publication>
 {
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
-    public UpdatePublicationSummaryAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService)
+    public UpdatePublicationSummaryAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
     {
         _authorizationHandlerService = authorizationHandlerService;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
         UpdatePublicationSummaryRequirement summaryRequirement,
-        Publication publication)
+        Publication publication
+    )
     {
         if (SecurityUtils.HasClaim(context.User, UpdateAllPublications))
         {
@@ -31,11 +31,7 @@ public class UpdatePublicationSummaryAuthorizationHandler : AuthorizationHandler
             return;
         }
 
-        if (await _authorizationHandlerService
-                .HasRolesOnPublication(
-                    context.User.GetUserId(),
-                    publication.Id,
-                    Owner))
+        if (await _authorizationHandlerService.HasRolesOnPublication(context.User.GetUserId(), publication.Id, Owner))
         {
             context.Succeed(summaryRequirement);
         }

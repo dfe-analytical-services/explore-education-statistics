@@ -12,12 +12,13 @@ public class ReleaseVersionExtensionTests
     [Fact]
     public void AllFilesZipPath()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         Assert.Equal(
             $"{releaseVersion.Id}/zip/{releaseVersion.Release.Publication.Slug}_{releaseVersion.Release.Slug}.zip",
-            releaseVersion.AllFilesZipPath());
+            releaseVersion.AllFilesZipPath()
+        );
     }
 }

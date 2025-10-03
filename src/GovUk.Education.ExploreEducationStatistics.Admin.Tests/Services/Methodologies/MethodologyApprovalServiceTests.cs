@@ -21,8 +21,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -44,12 +44,8 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
-            }
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
+            },
         };
 
         var imageFile1 = new MethodologyFile
@@ -59,8 +55,8 @@ public class MethodologyApprovalServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image1.png",
-                Type = FileType.Image
-            }
+                Type = FileType.Image,
+            },
         };
 
         var imageFile2 = new MethodologyFile
@@ -70,8 +66,8 @@ public class MethodologyApprovalServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image2.png",
-                Type = FileType.Image
-            }
+                Type = FileType.Image,
+            },
         };
 
         var request = new MethodologyApprovalUpdateRequest
@@ -93,31 +89,36 @@ public class MethodologyApprovalServiceTests
         var contentService = new Mock<IMethodologyContentService>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
-        contentService.Setup(mock =>
-                mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
-            .ReturnsAsync(new List<HtmlBlock>
-            {
-                new()
+        contentService
+            .Setup(mock => mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+            .ReturnsAsync(
+                new List<HtmlBlock>
                 {
-                    Body = $@"
+                    new()
+                    {
+                        Body =
+                            $@"
     <img src=""/api/methodologies/{{methodologyId}}/images/{imageFile1.File.Id}""/>
-    <img src=""/api/methodologies/{{methodologyId}}/images/{imageFile2.File.Id}""/>"
+    <img src=""/api/methodologies/{{methodologyId}}/images/{imageFile2.File.Id}""/>",
+                    },
                 }
-            });
+            );
 
-        methodologyVersionRepository.Setup(mock =>
-                mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
-                    mv.Id == methodologyVersion.Id)))
+        methodologyVersionRepository
+            .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupService(contentDbContext: context,
+            var service = SetupService(
+                contentDbContext: context,
                 methodologyContentService: contentService.Object,
-                methodologyVersionRepository: methodologyVersionRepository.Object);
+                methodologyVersionRepository: methodologyVersionRepository.Object
+            );
 
-            var updatedMethodologyVersion =
-                (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+            var updatedMethodologyVersion = (
+                await service.UpdateApprovalStatus(methodologyVersion.Id, request)
+            ).AssertRight();
 
             VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -131,8 +132,7 @@ public class MethodologyApprovalServiceTests
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
             var updatedMethodology = await context
-                .MethodologyVersions
-                .Include(m => m.Methodology)
+                .MethodologyVersions.Include(m => m.Methodology)
                 .SingleAsync(m => m.Id == methodologyVersion.Id);
 
             Assert.Null(updatedMethodology.Published);
@@ -153,12 +153,8 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
-            }
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
+            },
         };
 
         var imageFile1 = new MethodologyFile
@@ -168,8 +164,8 @@ public class MethodologyApprovalServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image1.png",
-                Type = FileType.Image
-            }
+                Type = FileType.Image,
+            },
         };
 
         var imageFile2 = new MethodologyFile
@@ -179,8 +175,8 @@ public class MethodologyApprovalServiceTests
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "image2.png",
-                Type = FileType.Image
-            }
+                Type = FileType.Image,
+            },
         };
 
         var request = new MethodologyApprovalUpdateRequest
@@ -203,39 +199,38 @@ public class MethodologyApprovalServiceTests
         var imageService = new Mock<IMethodologyImageService>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
-        contentService.Setup(mock =>
-                mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+        contentService
+            .Setup(mock => mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        imageService.Setup(mock => mock.Delete(
-                methodologyVersion.Id, new List<Guid>
-                {
-                    imageFile1.File.Id,
-                    imageFile2.File.Id
-                }, true))
+        imageService
+            .Setup(mock =>
+                mock.Delete(methodologyVersion.Id, new List<Guid> { imageFile1.File.Id, imageFile2.File.Id }, true)
+            )
             .ReturnsAsync(Unit.Instance);
 
-        methodologyVersionRepository.Setup(mock =>
-                mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
-                    mv.Id == methodologyVersion.Id)))
+        methodologyVersionRepository
+            .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupService(contentDbContext: context,
+            var service = SetupService(
+                contentDbContext: context,
                 methodologyContentService: contentService.Object,
                 methodologyImageService: imageService.Object,
-                methodologyVersionRepository: methodologyVersionRepository.Object);
+                methodologyVersionRepository: methodologyVersionRepository.Object
+            );
 
-            var updatedMethodologyVersion =
-                (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+            var updatedMethodologyVersion = (
+                await service.UpdateApprovalStatus(methodologyVersion.Id, request)
+            ).AssertRight();
 
-            imageService.Verify(mock =>
-                mock.Delete(methodologyVersion.Id, new List<Guid>
-                {
-                    imageFile1.File.Id,
-                    imageFile2.File.Id
-                }, true), Times.Once);
+            imageService.Verify(
+                mock =>
+                    mock.Delete(methodologyVersion.Id, new List<Guid> { imageFile1.File.Id, imageFile2.File.Id }, true),
+                Times.Once
+            );
 
             VerifyAllMocks(contentService, imageService, methodologyVersionRepository);
 
@@ -249,8 +244,7 @@ public class MethodologyApprovalServiceTests
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
             var updatedMethodology = await context
-                .MethodologyVersions
-                .Include(m => m.Methodology)
+                .MethodologyVersions.Include(m => m.Methodology)
                 .SingleAsync(m => m.Id == methodologyVersion.Id);
 
             Assert.Null(updatedMethodology.Published);
@@ -271,12 +265,8 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
-            }
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
+            },
         };
 
         var request = new MethodologyApprovalUpdateRequest
@@ -297,23 +287,25 @@ public class MethodologyApprovalServiceTests
         var contentService = new Mock<IMethodologyContentService>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
-        contentService.Setup(mock =>
-                mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+        contentService
+            .Setup(mock => mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        methodologyVersionRepository.Setup(mock =>
-                mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
-                    mv.Id == methodologyVersion.Id)))
+        methodologyVersionRepository
+            .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupService(contentDbContext: context,
+            var service = SetupService(
+                contentDbContext: context,
                 methodologyContentService: contentService.Object,
-                methodologyVersionRepository: methodologyVersionRepository.Object);
+                methodologyVersionRepository: methodologyVersionRepository.Object
+            );
 
-            var updatedMethodologyVersion =
-                (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+            var updatedMethodologyVersion = (
+                await service.UpdateApprovalStatus(methodologyVersion.Id, request)
+            ).AssertRight();
 
             VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -323,9 +315,9 @@ public class MethodologyApprovalServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var methodologyStatus = await context
-                .MethodologyStatus
-                .SingleAsync(ms => ms.MethodologyVersionId == methodologyVersion.Id);
+            var methodologyStatus = await context.MethodologyStatus.SingleAsync(ms =>
+                ms.MethodologyVersionId == methodologyVersion.Id
+            );
 
             Assert.Equal("Test approval", methodologyStatus.InternalReleaseNote);
             Assert.Equal(Approved, methodologyStatus.ApprovalStatus);
@@ -345,11 +337,7 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
             },
         };
 
@@ -371,25 +359,26 @@ public class MethodologyApprovalServiceTests
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
         var userReleaseRoleService = new Mock<IUserReleaseRoleService>(Strict);
 
-        contentService.Setup(mock =>
-                mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+        contentService
+            .Setup(mock => mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        methodologyVersionRepository.Setup(mock =>
-                mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
-                    mv.Id == methodologyVersion.Id)))
+        methodologyVersionRepository
+            .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
 
-        userReleaseRoleService.Setup(mock =>
-                mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
+        userReleaseRoleService
+            .Setup(mock => mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
             .ReturnsAsync(new List<UserReleaseRole>());
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupService(contentDbContext: context,
+            var service = SetupService(
+                contentDbContext: context,
                 methodologyContentService: contentService.Object,
                 methodologyVersionRepository: methodologyVersionRepository.Object,
-                userReleaseRoleService: userReleaseRoleService.Object);
+                userReleaseRoleService: userReleaseRoleService.Object
+            );
 
             var result = await service.UpdateApprovalStatus(methodologyVersion.Id, request);
             var updatedMethodologyVersion = result.AssertRight();
@@ -402,9 +391,9 @@ public class MethodologyApprovalServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var methodologyStatus = await context
-                .MethodologyStatus
-                .SingleAsync(ms => ms.MethodologyVersionId == methodologyVersion.Id);
+            var methodologyStatus = await context.MethodologyStatus.SingleAsync(ms =>
+                ms.MethodologyVersionId == methodologyVersion.Id
+            );
 
             Assert.Equal("Submitted for higher review", methodologyStatus.InternalReleaseNote);
             Assert.Equal(HigherLevelReview, methodologyStatus.ApprovalStatus);
@@ -424,11 +413,7 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
             },
         };
 
@@ -450,25 +435,26 @@ public class MethodologyApprovalServiceTests
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
         var userReleaseRoleService = new Mock<IUserReleaseRoleService>(Strict);
 
-        contentService.Setup(mock =>
-                mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+        contentService
+            .Setup(mock => mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        methodologyVersionRepository.Setup(mock =>
-                mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
-                    mv.Id == methodologyVersion.Id)))
+        methodologyVersionRepository
+            .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
 
-        userReleaseRoleService.Setup(mock =>
-                mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
+        userReleaseRoleService
+            .Setup(mock => mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
             .ReturnsAsync(new List<UserReleaseRole>());
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupService(contentDbContext: context,
+            var service = SetupService(
+                contentDbContext: context,
                 methodologyContentService: contentService.Object,
                 methodologyVersionRepository: methodologyVersionRepository.Object,
-                userReleaseRoleService: userReleaseRoleService.Object);
+                userReleaseRoleService: userReleaseRoleService.Object
+            );
 
             var result = await service.UpdateApprovalStatus(methodologyVersion.Id, request);
             var updatedMethodologyVersion = result.AssertRight();
@@ -481,9 +467,9 @@ public class MethodologyApprovalServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var methodologyStatus = await context
-                .MethodologyStatus
-                .SingleAsync(ms => ms.MethodologyVersionId == methodologyVersion.Id);
+            var methodologyStatus = await context.MethodologyStatus.SingleAsync(ms =>
+                ms.MethodologyVersionId == methodologyVersion.Id
+            );
 
             Assert.Equal("Moving to draft", methodologyStatus.InternalReleaseNote);
             Assert.Equal(Draft, methodologyStatus.ApprovalStatus);
@@ -503,12 +489,8 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
-            }
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
+            },
         };
 
         var request = new MethodologyApprovalUpdateRequest
@@ -529,8 +511,9 @@ public class MethodologyApprovalServiceTests
         {
             var service = SetupService(contentDbContext: context);
 
-            var updatedMethodologyVersion =
-                (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+            var updatedMethodologyVersion = (
+                await service.UpdateApprovalStatus(methodologyVersion.Id, request)
+            ).AssertRight();
 
             Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
             Assert.Equal(request.Status, updatedMethodologyVersion.Status);
@@ -539,8 +522,7 @@ public class MethodologyApprovalServiceTests
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
             var methodologyStatuses = await context
-                .MethodologyStatus
-                .Where(ms => ms.MethodologyVersionId == methodologyVersion.Id)
+                .MethodologyStatus.Where(ms => ms.MethodologyVersionId == methodologyVersion.Id)
                 .ToListAsync();
 
             Assert.Empty(methodologyStatuses);
@@ -559,19 +541,15 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
-            }
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
+            },
         };
 
         var request = new MethodologyApprovalUpdateRequest
         {
             LatestInternalReleaseNote = "Test approval",
             PublishingStrategy = Immediately,
-            Status = Approved
+            Status = Approved,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -585,23 +563,25 @@ public class MethodologyApprovalServiceTests
         var contentService = new Mock<IMethodologyContentService>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
-        contentService.Setup(mock =>
-                mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+        contentService
+            .Setup(mock => mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        methodologyVersionRepository.Setup(mock =>
-                mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
-                    mv.Id == methodologyVersion.Id)))
+        methodologyVersionRepository
+            .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupService(contentDbContext: context,
+            var service = SetupService(
+                contentDbContext: context,
                 methodologyContentService: contentService.Object,
-                methodologyVersionRepository: methodologyVersionRepository.Object);
+                methodologyVersionRepository: methodologyVersionRepository.Object
+            );
 
-            var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request))
-                .AssertRight();
+            var updatedMethodologyVersion = (
+                await service.UpdateApprovalStatus(methodologyVersion.Id, request)
+            ).AssertRight();
 
             VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -616,8 +596,7 @@ public class MethodologyApprovalServiceTests
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
             var updatedMethodologyVersion = await context
-                .MethodologyVersions
-                .Include(m => m.Methodology)
+                .MethodologyVersions.Include(m => m.Methodology)
                 .SingleAsync(m => m.Id == methodologyVersion.Id);
 
             Assert.False(updatedMethodologyVersion.Published.HasValue);
@@ -640,19 +619,15 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
-            }
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
+            },
         };
 
         var request = new MethodologyApprovalUpdateRequest
         {
             LatestInternalReleaseNote = "Test approval",
             PublishingStrategy = Immediately,
-            Status = Approved
+            Status = Approved,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -669,47 +644,58 @@ public class MethodologyApprovalServiceTests
         var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
         var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
 
-        contentService.Setup(mock =>
-                mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+        contentService
+            .Setup(mock => mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        methodologyVersionRepository.Setup(mock =>
-                mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
-                    mv.Id == methodologyVersion.Id)))
+        methodologyVersionRepository
+            .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(true);
 
-        publishingService.Setup(mock => mock.PublishMethodologyFiles(methodologyVersion.Id, CancellationToken.None))
+        publishingService
+            .Setup(mock => mock.PublishMethodologyFiles(methodologyVersion.Id, CancellationToken.None))
             .ReturnsAsync(Unit.Instance);
 
-        methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
+        methodologyCacheService
+            .Setup(mock => mock.UpdateSummariesTree())
             .ReturnsAsync(
                 new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
-                    new List<AllMethodologiesThemeViewModel>()));
+                    new List<AllMethodologiesThemeViewModel>()
+                )
+            );
 
-        redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-            .ReturnsAsync(new RedirectsViewModel(
-                PublicationRedirects: [],
-                MethodologyRedirects: [],
-                ReleaseRedirectsByPublicationSlug: []));
+        redirectsCacheService
+            .Setup(mock => mock.UpdateRedirects())
+            .ReturnsAsync(
+                new RedirectsViewModel(
+                    PublicationRedirects: [],
+                    MethodologyRedirects: [],
+                    ReleaseRedirectsByPublicationSlug: []
+                )
+            );
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupService(contentDbContext: context,
+            var service = SetupService(
+                contentDbContext: context,
                 methodologyContentService: contentService.Object,
                 methodologyVersionRepository: methodologyVersionRepository.Object,
                 publishingService: publishingService.Object,
                 methodologyCacheService: methodologyCacheService.Object,
-                redirectsCacheService: redirectsCacheService.Object);
+                redirectsCacheService: redirectsCacheService.Object
+            );
 
-            var updatedMethodologyVersion =
-                (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+            var updatedMethodologyVersion = (
+                await service.UpdateApprovalStatus(methodologyVersion.Id, request)
+            ).AssertRight();
 
             VerifyAllMocks(
                 contentService,
                 methodologyVersionRepository,
                 publishingService,
                 methodologyCacheService,
-                redirectsCacheService);
+                redirectsCacheService
+            );
 
             Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
             updatedMethodologyVersion.Published.AssertUtcNow();
@@ -722,8 +708,7 @@ public class MethodologyApprovalServiceTests
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
             var updatedMethodologyVersion = await context
-                .MethodologyVersions
-                .Include(m => m.Methodology)
+                .MethodologyVersions.Include(m => m.Methodology)
                 .SingleAsync(m => m.Id == methodologyVersion.Id);
 
             updatedMethodologyVersion.Published.AssertUtcNow();
@@ -739,9 +724,9 @@ public class MethodologyApprovalServiceTests
     {
         Publication publication = _dataFixture.DefaultPublication();
 
-        ReleaseVersion scheduledWithReleaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(publication));
+        ReleaseVersion scheduledWithReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication));
 
         var methodologyVersion = new MethodologyVersion
         {
@@ -750,14 +735,10 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
             },
             // Existing ScheduledWithReleaseVersion should be cleared
-            ScheduledWithReleaseVersion = scheduledWithReleaseVersion
+            ScheduledWithReleaseVersion = scheduledWithReleaseVersion,
         };
 
         var request = new MethodologyApprovalUpdateRequest
@@ -766,7 +747,7 @@ public class MethodologyApprovalServiceTests
             PublishingStrategy = Immediately,
             Status = Approved,
             // Requested id should be ignored
-            WithReleaseId = scheduledWithReleaseVersion.Id
+            WithReleaseId = scheduledWithReleaseVersion.Id,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -780,23 +761,25 @@ public class MethodologyApprovalServiceTests
         var contentService = new Mock<IMethodologyContentService>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
-        contentService.Setup(mock =>
-                mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+        contentService
+            .Setup(mock => mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        methodologyVersionRepository.Setup(mock =>
-                mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
-                    mv.Id == methodologyVersion.Id)))
+        methodologyVersionRepository
+            .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupService(contentDbContext: context,
+            var service = SetupService(
+                contentDbContext: context,
                 methodologyContentService: contentService.Object,
-                methodologyVersionRepository: methodologyVersionRepository.Object);
+                methodologyVersionRepository: methodologyVersionRepository.Object
+            );
 
-            var updatedMethodologyVersion =
-                (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+            var updatedMethodologyVersion = (
+                await service.UpdateApprovalStatus(methodologyVersion.Id, request)
+            ).AssertRight();
 
             VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -809,8 +792,7 @@ public class MethodologyApprovalServiceTests
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
             var updatedMethodologyVersion = await context
-                .MethodologyVersions
-                .Include(mv => mv.Methodology)
+                .MethodologyVersions.Include(mv => mv.Methodology)
                 .SingleAsync(m => m.Id == methodologyVersion.Id);
 
             Assert.Equal(Approved, updatedMethodologyVersion.Status);
@@ -825,9 +807,9 @@ public class MethodologyApprovalServiceTests
     {
         Publication publication = _dataFixture.DefaultPublication();
 
-        ReleaseVersion scheduledWithReleaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(publication));
+        ReleaseVersion scheduledWithReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication));
 
         var methodologyVersion = new MethodologyVersion
         {
@@ -836,12 +818,8 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
-            }
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
+            },
         };
 
         var request = new MethodologyApprovalUpdateRequest
@@ -864,23 +842,25 @@ public class MethodologyApprovalServiceTests
         var contentService = new Mock<IMethodologyContentService>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
-        contentService.Setup(mock =>
-                mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+        contentService
+            .Setup(mock => mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        methodologyVersionRepository.Setup(mock =>
-                mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
-                    mv.Id == methodologyVersion.Id)))
+        methodologyVersionRepository
+            .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupService(contentDbContext: context,
+            var service = SetupService(
+                contentDbContext: context,
                 methodologyContentService: contentService.Object,
-                methodologyVersionRepository: methodologyVersionRepository.Object);
+                methodologyVersionRepository: methodologyVersionRepository.Object
+            );
 
-            var updatedMethodologyVersion =
-                (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+            var updatedMethodologyVersion = (
+                await service.UpdateApprovalStatus(methodologyVersion.Id, request)
+            ).AssertRight();
 
             VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -897,8 +877,7 @@ public class MethodologyApprovalServiceTests
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
             var updatedMethodologyVersion = await context
-                .MethodologyVersions
-                .Include(m => m.Methodology)
+                .MethodologyVersions.Include(m => m.Methodology)
                 .SingleAsync(m => m.Id == methodologyVersion.Id);
 
             Assert.Null(updatedMethodologyVersion.Published);
@@ -922,12 +901,8 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
-            }
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
+            },
         };
 
         // Create a request with a release Id that is null
@@ -936,7 +911,7 @@ public class MethodologyApprovalServiceTests
             LatestInternalReleaseNote = "Test approval",
             PublishingStrategy = WithRelease,
             WithReleaseId = null,
-            Status = Approved
+            Status = Approved,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -969,12 +944,8 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
-            }
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
+            },
         };
 
         // Create a request with a random release version Id that won't exist
@@ -983,7 +954,7 @@ public class MethodologyApprovalServiceTests
             LatestInternalReleaseNote = "Test approval",
             PublishingStrategy = WithRelease,
             WithReleaseId = Guid.NewGuid(),
-            Status = Approved
+            Status = Approved,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -999,7 +970,6 @@ public class MethodologyApprovalServiceTests
         {
             var service = SetupService(contentDbContext: context);
 
-
             var result = await service.UpdateApprovalStatus(methodologyVersion.Id, request);
             result.AssertNotFound();
         }
@@ -1008,7 +978,8 @@ public class MethodologyApprovalServiceTests
     [Fact]
     public async Task UpdateApprovalStatus_ApprovingUsingWithReleaseStrategy_ReleaseAlreadyPublished()
     {
-        Publication publication = _dataFixture.DefaultPublication()
+        Publication publication = _dataFixture
+            .DefaultPublication()
             .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var methodologyVersion = new MethodologyVersion
@@ -1018,12 +989,8 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
-            }
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
+            },
         };
 
         // Include a published release version in the request which the methodology cannot be made dependant on
@@ -1058,13 +1025,12 @@ public class MethodologyApprovalServiceTests
     [Fact]
     public async Task UpdateApprovalStatus_ApprovingUsingWithReleaseStrategy_ReleaseNotRelated()
     {
-        var (publication1, publication2) = _dataFixture.DefaultPublication()
-            .GenerateTuple2();
+        var (publication1, publication2) = _dataFixture.DefaultPublication().GenerateTuple2();
 
         // Release version is not from the same publication as the one linked to the methodology
-        ReleaseVersion scheduledWithReleaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(publication1));
+        ReleaseVersion scheduledWithReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication1));
 
         var methodologyVersion = new MethodologyVersion
         {
@@ -1073,12 +1039,8 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = "Publication title",
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication2
-                })
-            }
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication2 }),
+            },
         };
 
         var request = new MethodologyApprovalUpdateRequest
@@ -1086,7 +1048,7 @@ public class MethodologyApprovalServiceTests
             LatestInternalReleaseNote = "Test approval",
             PublishingStrategy = WithRelease,
             WithReleaseId = scheduledWithReleaseVersion.Id,
-            Status = Approved
+            Status = Approved,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1120,19 +1082,15 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
-            }
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
+            },
         };
 
         var request = new MethodologyApprovalUpdateRequest
         {
             LatestInternalReleaseNote = "A release note",
             PublishingStrategy = Immediately,
-            Status = Draft
+            Status = Draft,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1146,25 +1104,27 @@ public class MethodologyApprovalServiceTests
         var contentService = new Mock<IMethodologyContentService>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
-        contentService.Setup(mock =>
-                mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+        contentService
+            .Setup(mock => mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        methodologyVersionRepository.Setup(mock =>
-                mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
-                    mv.Id == methodologyVersion.Id)))
+        methodologyVersionRepository
+            .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupService(contentDbContext: context,
+            var service = SetupService(
+                contentDbContext: context,
                 methodologyContentService: contentService.Object,
-                methodologyVersionRepository: methodologyVersionRepository.Object);
+                methodologyVersionRepository: methodologyVersionRepository.Object
+            );
 
             // Un-approving is allowed for users that can approve the methodology providing it's not publicly accessible
             // Test that un-approving alters the status
-            var updatedMethodologyVersion =
-                (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+            var updatedMethodologyVersion = (
+                await service.UpdateApprovalStatus(methodologyVersion.Id, request)
+            ).AssertRight();
 
             VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -1180,8 +1140,7 @@ public class MethodologyApprovalServiceTests
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
             var updatedMethodologyVersion = await context
-                .MethodologyVersions
-                .Include(m => m.Methodology)
+                .MethodologyVersions.Include(m => m.Methodology)
                 .SingleAsync(m => m.Id == methodologyVersion.Id);
 
             Assert.Null(updatedMethodologyVersion.Published);
@@ -1204,26 +1163,21 @@ public class MethodologyApprovalServiceTests
             Methodology = new Methodology
             {
                 OwningPublicationTitle = publication.Title,
-                Publications = ListOf(new PublicationMethodology
-                {
-                    Owner = true,
-                    Publication = publication
-                })
-            }
+                Publications = ListOf(new PublicationMethodology { Owner = true, Publication = publication }),
+            },
         };
 
         var request = new MethodologyApprovalUpdateRequest
         {
             LatestInternalReleaseNote = "A release note",
-            Status = HigherLevelReview
+            Status = HigherLevelReview,
         };
 
         var userPublicationRole = new UserPublicationRole
         {
             PublicationId = publication.Id,
             Role = PublicationRole.Allower,
-            User = _dataFixture.DefaultUser()
-                .WithEmail("publication-approver@email.com")
+            User = _dataFixture.DefaultUser().WithEmail("publication-approver@email.com"),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1240,49 +1194,60 @@ public class MethodologyApprovalServiceTests
         var userReleaseRoleService = new Mock<IUserReleaseRoleService>(Strict);
         var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
 
-        contentService.Setup(mock =>
-                mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+        contentService
+            .Setup(mock => mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        methodologyVersionRepository.Setup(mock =>
-                mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
-                    mv.Id == methodologyVersion.Id)))
+        methodologyVersionRepository
+            .Setup(mock => mock.IsToBePublished(It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id)))
             .ReturnsAsync(false);
 
-        userReleaseRoleService.Setup(mock =>
-                mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
-            .ReturnsAsync(new List<UserReleaseRole>
-            {
-                new()
+        userReleaseRoleService
+            .Setup(mock => mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
+            .ReturnsAsync(
+                new List<UserReleaseRole>
                 {
-                    Role = ReleaseRole.Approver,
-                    User = _dataFixture.DefaultUser()
-                        .WithEmail("release-approver@email.com")
-                },
-            });
+                    new()
+                    {
+                        Role = ReleaseRole.Approver,
+                        User = _dataFixture.DefaultUser().WithEmail("release-approver@email.com"),
+                    },
+                }
+            );
 
-        emailTemplateService.Setup(mock =>
-                mock.SendMethodologyHigherReviewEmail("release-approver@email.com",
+        emailTemplateService
+            .Setup(mock =>
+                mock.SendMethodologyHigherReviewEmail(
+                    "release-approver@email.com",
                     methodologyVersion.Id,
-                    methodologyVersion.Title))
+                    methodologyVersion.Title
+                )
+            )
             .Returns(Unit.Instance);
 
-        emailTemplateService.Setup(mock =>
-                mock.SendMethodologyHigherReviewEmail("publication-approver@email.com",
+        emailTemplateService
+            .Setup(mock =>
+                mock.SendMethodologyHigherReviewEmail(
+                    "publication-approver@email.com",
                     methodologyVersion.Id,
-                    methodologyVersion.Title))
+                    methodologyVersion.Title
+                )
+            )
             .Returns(Unit.Instance);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupService(contentDbContext: context,
+            var service = SetupService(
+                contentDbContext: context,
                 methodologyContentService: contentService.Object,
                 methodologyVersionRepository: methodologyVersionRepository.Object,
                 userReleaseRoleService: userReleaseRoleService.Object,
-                emailTemplateService: emailTemplateService.Object);
+                emailTemplateService: emailTemplateService.Object
+            );
 
-            var updatedMethodologyVersion =
-                (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+            var updatedMethodologyVersion = (
+                await service.UpdateApprovalStatus(methodologyVersion.Id, request)
+            ).AssertRight();
 
             VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -1298,8 +1263,7 @@ public class MethodologyApprovalServiceTests
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
             var updatedMethodologyVersion = await context
-                .MethodologyVersions
-                .Include(m => m.Methodology)
+                .MethodologyVersions.Include(m => m.Methodology)
                 .SingleAsync(m => m.Id == methodologyVersion.Id);
 
             Assert.Null(updatedMethodologyVersion.Published);
@@ -1321,8 +1285,8 @@ public class MethodologyApprovalServiceTests
         IUserReleaseRoleService? userReleaseRoleService = null,
         IMethodologyCacheService? methodologyCacheService = null,
         IEmailTemplateService? emailTemplateService = null,
-        IRedirectsCacheService? redirectsCacheService = null)
-
+        IRedirectsCacheService? redirectsCacheService = null
+    )
     {
         return new(
             persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
@@ -1336,6 +1300,7 @@ public class MethodologyApprovalServiceTests
             userReleaseRoleService ?? Mock.Of<IUserReleaseRoleService>(Strict),
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
-            redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict));
+            redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict)
+        );
     }
 }

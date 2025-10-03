@@ -14,9 +14,7 @@ public class FileValidatorService(IFileTypeService fileTypeService) : IFileValid
 {
     private const int MaxFileSize = int.MaxValue; // 2GB
 
-    public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(
-        IFormFile file,
-        FileType type)
+    public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type)
     {
         if (type is FileType.Data or Metadata)
         {

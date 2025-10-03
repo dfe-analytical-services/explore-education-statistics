@@ -21,9 +21,7 @@ public abstract class OrganisationServiceTests
         public async Task GetAllOrganisations_ReturnsExpectedOrganisationsInOrderByTitle(int numOrganisations)
         {
             // Arrange
-            var organisations = _dataFixture.DefaultOrganisation()
-                .GenerateArray(numOrganisations)
-                .Shuffle();
+            var organisations = _dataFixture.DefaultOrganisation().GenerateArray(numOrganisations).Shuffle();
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -47,8 +45,6 @@ public abstract class OrganisationServiceTests
 
     private static OrganisationService BuildService(ContentDbContext context = null)
     {
-        return new OrganisationService(
-            context ?? Mock.Of<ContentDbContext>(MockBehavior.Strict)
-        );
+        return new OrganisationService(context ?? Mock.Of<ContentDbContext>(MockBehavior.Strict));
     }
 }

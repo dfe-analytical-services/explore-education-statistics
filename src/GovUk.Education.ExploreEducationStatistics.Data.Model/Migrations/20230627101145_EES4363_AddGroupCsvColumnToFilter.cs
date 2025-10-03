@@ -12,13 +12,12 @@ public partial class EES4363_AddGroupCsvColumnToFilter : Migration
             name: "GroupCsvColumn",
             table: "Filter",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "GroupCsvColumn",
-            table: "Filter");
+        migrationBuilder.DropColumn(name: "GroupCsvColumn", table: "Filter");
     }
 }

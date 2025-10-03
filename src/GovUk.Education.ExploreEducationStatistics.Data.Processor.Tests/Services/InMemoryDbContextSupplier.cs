@@ -16,34 +16,40 @@ public class InMemoryDbContextSupplier : IDbContextSupplier
     private readonly string _contentDbContextId;
     private readonly string _statisticsDbContextId;
 
-    public InMemoryDbContextSupplier(
-        string? contentDbContextId = null, 
-        string? statisticsDbContextId = null)
+    public InMemoryDbContextSupplier(string? contentDbContextId = null, string? statisticsDbContextId = null)
     {
         _contentDbContextId = contentDbContextId ?? Guid.NewGuid().ToString();
         _statisticsDbContextId = statisticsDbContextId ?? Guid.NewGuid().ToString();
     }
 
-    public TDbContext CreateDbContext<TDbContext>() where TDbContext : DbContext
+    public TDbContext CreateDbContext<TDbContext>()
+        where TDbContext : DbContext
     {
-        return (typeof(TDbContext).Name switch
-        {
-            nameof(ContentDbContext) => CreateContentDbContext() as TDbContext,
-            nameof(StatisticsDbContext) => CreateStatisticsDbContext() as TDbContext,
-            _ => throw new ArgumentOutOfRangeException("Unable to provide DbContext of type " + 
-                                                       typeof(TDbContext).Name)
-        })!;
+        return (
+            typeof(TDbContext).Name switch
+            {
+                nameof(ContentDbContext) => CreateContentDbContext() as TDbContext,
+                nameof(StatisticsDbContext) => CreateStatisticsDbContext() as TDbContext,
+                _ => throw new ArgumentOutOfRangeException(
+                    "Unable to provide DbContext of type " + typeof(TDbContext).Name
+                ),
+            }
+        )!;
     }
 
-    public TDbContext CreateDbContextDelegate<TDbContext>() where TDbContext : DbContext
+    public TDbContext CreateDbContextDelegate<TDbContext>()
+        where TDbContext : DbContext
     {
-        return (typeof(TDbContext).Name switch
-        {
-            nameof(ContentDbContext) => CreateContentDbContext() as TDbContext,
-            nameof(StatisticsDbContext) => CreateStatisticsDbContext() as TDbContext,
-            _ => throw new ArgumentOutOfRangeException("Unable to provide DbContext delegate of type " +
-                                                       typeof(TDbContext).Name)
-        })!;
+        return (
+            typeof(TDbContext).Name switch
+            {
+                nameof(ContentDbContext) => CreateContentDbContext() as TDbContext,
+                nameof(StatisticsDbContext) => CreateStatisticsDbContext() as TDbContext,
+                _ => throw new ArgumentOutOfRangeException(
+                    "Unable to provide DbContext delegate of type " + typeof(TDbContext).Name
+                ),
+            }
+        )!;
     }
 
     private StatisticsDbContext CreateStatisticsDbContext()

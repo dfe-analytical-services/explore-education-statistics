@@ -9,5 +9,6 @@ public interface IManageContentPageService
 {
     Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModel(
         Guid releaseVersionId,
-        bool isPrerelease = false);
+        bool isPrerelease = false
+    );
 }

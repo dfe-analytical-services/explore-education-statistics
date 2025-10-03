@@ -15,10 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class DataGuidanceServicePermissionTests
 {
-    private readonly ReleaseVersion _releaseVersion = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
 
     [Fact]
     public async Task GetDataGuidance()
@@ -29,14 +26,11 @@ public class DataGuidanceServicePermissionTests
 
         await PolicyCheckBuilder<ContentSecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupService(contentDbContext: contentDbContext,
-                        userService: userService.Object);
-                    return service.GetDataGuidance(_releaseVersion.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupService(contentDbContext: contentDbContext, userService: userService.Object);
+                return service.GetDataGuidance(_releaseVersion.Id);
+            });
     }
 
     [Fact]
@@ -48,26 +42,25 @@ public class DataGuidanceServicePermissionTests
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, SecurityPolicies.CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupService(contentDbContext: contentDbContext,
-                        userService: userService.Object);
-                    return service.UpdateDataGuidance(_releaseVersion.Id, new DataGuidanceUpdateRequest());
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupService(contentDbContext: contentDbContext, userService: userService.Object);
+                return service.UpdateDataGuidance(_releaseVersion.Id, new DataGuidanceUpdateRequest());
+            });
     }
 
     private static DataGuidanceService SetupService(
         ContentDbContext? contentDbContext = null,
         IDataGuidanceDataSetService? dataGuidanceDataSetService = null,
         IUserService? userService = null,
-        IReleaseDataFileRepository? releaseDataFileRepository = null)
+        IReleaseDataFileRepository? releaseDataFileRepository = null
+    )
     {
         return new DataGuidanceService(
             contentDbContext ?? new Mock<ContentDbContext>().Object,
             dataGuidanceDataSetService ?? Mock.Of<IDataGuidanceDataSetService>(),
             userService ?? Mock.Of<IUserService>(),
-            releaseDataFileRepository ?? Mock.Of<IReleaseDataFileRepository>());
+            releaseDataFileRepository ?? Mock.Of<IReleaseDataFileRepository>()
+        );
     }
 }

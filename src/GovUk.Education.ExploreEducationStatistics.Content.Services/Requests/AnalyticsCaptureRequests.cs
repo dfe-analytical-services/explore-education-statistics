@@ -29,4 +29,5 @@ public record CaptureCsvDownloadRequest(
     string ReleaseName,
     string? ReleaseLabel,
     Guid SubjectId,
-    string DataSetTitle) : IAnalyticsCaptureRequest;
+    string DataSetTitle
+) : IAnalyticsCaptureRequest;

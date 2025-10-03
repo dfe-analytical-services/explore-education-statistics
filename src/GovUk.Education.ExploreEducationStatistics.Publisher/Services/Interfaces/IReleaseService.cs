@@ -14,7 +14,8 @@ public interface IReleaseService
 
     Task<ReleaseVersion> GetLatestPublishedReleaseVersion(
         Guid publicationId,
-        IReadOnlyList<Guid>? includeUnpublishedVersionIds = null);
+        IReadOnlyList<Guid>? includeUnpublishedVersionIds = null
+    );
 
     Task CompletePublishing(Guid releaseVersionId, DateTime actualPublishedDate);
 }

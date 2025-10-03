@@ -26,9 +26,7 @@ public record DataSetQueryCriteriaNot : IDataSetQueryCriteria
     {
         public Validator()
         {
-            RuleFor(q => q.Not)
-                .NotNull()
-                .SetInheritanceValidator(IDataSetQueryCriteria.InheritanceValidator);
+            RuleFor(q => q.Not).NotNull().SetInheritanceValidator(IDataSetQueryCriteria.InheritanceValidator);
         }
     }
 }

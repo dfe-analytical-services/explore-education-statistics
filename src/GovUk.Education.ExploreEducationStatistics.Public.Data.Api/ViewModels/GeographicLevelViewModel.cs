@@ -25,9 +25,6 @@ public record GeographicLevelViewModel
 
     public static GeographicLevelViewModel Create(GeographicLevel level)
     {
-        return new GeographicLevelViewModel
-        {
-            Code = level,
-        };
+        return new GeographicLevelViewModel { Code = level };
     }
 }

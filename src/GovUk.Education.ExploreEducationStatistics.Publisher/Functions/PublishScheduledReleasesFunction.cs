@@ -13,7 +13,8 @@ public class PublishScheduledReleasesFunction(
     ILogger<PublishScheduledReleasesFunction> logger,
     IReleasePublishingStatusService releasePublishingStatusService,
     IPublishingService publishingService,
-    IPublishingCompletionService publishingCompletionService)
+    IPublishingCompletionService publishingCompletionService
+)
 {
     /// <summary>
     /// Azure function which publishes the content for a release version at a scheduled time by moving it from a staging
@@ -28,25 +29,26 @@ public class PublishScheduledReleasesFunction(
     [Function(nameof(PublishScheduledReleases))]
     public async Task PublishScheduledReleases(
         [TimerTrigger("%App:PublishScheduledReleasesFunctionCronSchedule%")] TimerInfo timer,
-        FunctionContext context)
+        FunctionContext context
+    )
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        var releasesReadyForPublishing =
-            await releasePublishingStatusService.GetScheduledReleasesReadyForPublishing();
+        var releasesReadyForPublishing = await releasePublishingStatusService.GetScheduledReleasesReadyForPublishing();
 
         await PublishScheduledReleases(releasesReadyForPublishing);
 
         logger.LogInformation(
             "{FunctionName} completed. Published release versions [{ReleaseVersionIds}].",
             context.FunctionDefinition.Name,
-            releasesReadyForPublishing.ToReleaseVersionIdsString());
+            releasesReadyForPublishing.ToReleaseVersionIdsString()
+        );
     }
 
     /// <summary>
     /// Azure function which publishes the content for a release version immediately by moving it from a staging
     /// directory. This function is manually triggered by an HTTP POST, and is disabled by default in production
-    /// environments. 
+    /// environments.
     /// </summary>
     /// <remarks>
     /// It will then call PublishingCompletionService in order to complete the publishing process for that release version.
@@ -60,26 +62,27 @@ public class PublishScheduledReleasesFunction(
     [Function(nameof(PublishStagedReleaseVersionContentImmediately))]
     public async Task<ActionResult<ManualTriggerResponse>> PublishStagedReleaseVersionContentImmediately(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest request,
-        FunctionContext context)
+        FunctionContext context
+    )
     {
         logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
         var releaseVersionIds = (await request.GetJsonBody<ManualTriggerRequest>())?.ReleaseVersionIds;
 
-        var releasesReadyForPublishing =
-            await releasePublishingStatusService.GetScheduledReleasesReadyForPublishing();
+        var releasesReadyForPublishing = await releasePublishingStatusService.GetScheduledReleasesReadyForPublishing();
 
-        var selectedReleasesToPublish = releaseVersionIds?.Length > 0
-            ? releasesReadyForPublishing
-                .Where(key => releaseVersionIds.Contains(key.ReleaseVersionId))
-                .ToList()
-            : releasesReadyForPublishing;
+        var selectedReleasesToPublish =
+            releaseVersionIds?.Length > 0
+                ? releasesReadyForPublishing.Where(key => releaseVersionIds.Contains(key.ReleaseVersionId)).ToList()
+                : releasesReadyForPublishing;
 
         await PublishScheduledReleases(selectedReleasesToPublish);
 
-        logger.LogInformation("{FunctionName} completed. Published release versions [{ReleaseVersionIds}]",
+        logger.LogInformation(
+            "{FunctionName} completed. Published release versions [{ReleaseVersionIds}]",
             context.FunctionDefinition.Name,
-            selectedReleasesToPublish.ToReleaseVersionIdsString());
+            selectedReleasesToPublish.ToReleaseVersionIdsString()
+        );
 
         return new ManualTriggerResponse(selectedReleasesToPublish.ToReleaseVersionIds());
     }
@@ -97,8 +100,10 @@ public class PublishScheduledReleasesFunction(
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async key =>
             {
-                await releasePublishingStatusService.UpdateContentStage(key,
-                    ReleasePublishingStatusContentStage.Complete);
+                await releasePublishingStatusService.UpdateContentStage(
+                    key,
+                    ReleasePublishingStatusContentStage.Complete
+                );
             });
 
         // Finalise publishing of these releases

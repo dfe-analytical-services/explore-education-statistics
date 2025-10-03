@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class HealthCheckFunctionTests
 {
-    private HealthCheckFunction GetSut(IEnumerable<IHealthCheckStrategy> strategies) => 
+    private HealthCheckFunction GetSut(IEnumerable<IHealthCheckStrategy> strategies) =>
         new(strategies, new NullLogger<HealthCheckFunction>());
 
     [Fact]
@@ -24,20 +24,20 @@ public class HealthCheckFunctionTests
         [
             new HealthCheckStrategyMockBuilder().WhereResultIsHealthy().Build(),
             new HealthCheckStrategyMockBuilder().WhereResultIsHealthy().Build(),
-            new HealthCheckStrategyMockBuilder().WhereResultIsHealthy().Build()
+            new HealthCheckStrategyMockBuilder().WhereResultIsHealthy().Build(),
         ];
         var sut = GetSut(strategies);
-        
+
         // ACT
         var result = await sut.FullHealthCheck(null!, CancellationToken.None);
-        
+
         // ASSERT
         Assert.NotNull(result);
         var okResult = Assert.IsType<OkObjectResult>(result);
         var healthCheckResult = Assert.IsType<HealthCheckResponse>(okResult.Value);
         Assert.True(healthCheckResult.IsHealthy);
     }
-    
+
     [Theory]
     [InlineData(true, true, false)]
     [InlineData(false, true, true)]
@@ -47,7 +47,7 @@ public class HealthCheckFunctionTests
         bool isHealthy1,
         bool isHealthy2,
         bool isHealthy3
-        )
+    )
     {
         // ARRANGE
         IHealthCheckStrategy[] strategies =
@@ -57,10 +57,10 @@ public class HealthCheckFunctionTests
             new HealthCheckStrategyMockBuilder().WhereIsHealthyResultIs(isHealthy3).Build(),
         ];
         var sut = GetSut(strategies);
-        
+
         // ACT
         var result = await sut.FullHealthCheck(null!, CancellationToken.None);
-        
+
         // ASSERT
         Assert.NotNull(result);
         var httpResult = Assert.IsType<ObjectResult>(result);
@@ -68,7 +68,7 @@ public class HealthCheckFunctionTests
         var healthCheckResult = Assert.IsType<HealthCheckResponse>(httpResult.Value);
         Assert.False(healthCheckResult.IsHealthy);
     }
-    
+
     [Fact]
     public async Task WhenStrategiesReturnResults_ThenHealthCheckResponseContainsResults()
     {
@@ -77,13 +77,13 @@ public class HealthCheckFunctionTests
         [
             new HealthCheckStrategyMockBuilder().WhereResultIsHealthy("Result one").Build(),
             new HealthCheckStrategyMockBuilder().WhereResultIsUnhealthy("Result two").Build(),
-            new HealthCheckStrategyMockBuilder().WhereResultIsHealthy("Result three").Build()
+            new HealthCheckStrategyMockBuilder().WhereResultIsHealthy("Result three").Build(),
         ];
         var sut = GetSut(strategies);
-        
+
         // ACT
         var result = await sut.FullHealthCheck(null!, CancellationToken.None);
-        
+
         // ASSERT
         Assert.NotNull(result);
         var okResult = Assert.IsType<ObjectResult>(result);
@@ -92,9 +92,8 @@ public class HealthCheckFunctionTests
         {
             new HealthCheckResult(strategies[0], true, "Result one"),
             new HealthCheckResult(strategies[1], false, "Result two"),
-            new HealthCheckResult(strategies[2], true, "Result three")
+            new HealthCheckResult(strategies[2], true, "Result three"),
         };
         Assert.Equal(expectedResults, healthCheckResult.Results);
     }
-
 }

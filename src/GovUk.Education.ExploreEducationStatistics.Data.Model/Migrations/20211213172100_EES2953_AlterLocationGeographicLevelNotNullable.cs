@@ -14,7 +14,8 @@ public partial class EES2953_AlterLocationGeographicLevelNotNullable : Migration
             oldClrType: typeof(string),
             oldType: "nvarchar(6)",
             oldMaxLength: 6,
-            oldNullable: true);
+            oldNullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -26,6 +27,7 @@ public partial class EES2953_AlterLocationGeographicLevelNotNullable : Migration
             maxLength: 6,
             nullable: true,
             oldClrType: typeof(string),
-            oldMaxLength: 6);
+            oldMaxLength: 6
+        );
     }
 }

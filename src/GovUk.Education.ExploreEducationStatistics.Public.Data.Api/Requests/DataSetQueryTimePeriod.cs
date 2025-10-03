@@ -83,11 +83,7 @@ public record DataSetQueryTimePeriod
         var period = parts[0];
         var code = parts[1];
 
-        return new DataSetQueryTimePeriod
-        {
-            Period = period,
-            Code = code,
-        };
+        return new DataSetQueryTimePeriod { Period = period, Code = code };
     }
 
     private static string GetParsedPeriod(string period, TimeIdentifier identifier)
@@ -100,7 +96,8 @@ public record DataSetQueryTimePeriod
                 ? period
                 : throw new ArgumentOutOfRangeException(
                     paramName: nameof(period),
-                    message: "Period should be a single year and not a range.");
+                    message: "Period should be a single year and not a range."
+                );
         }
 
         if (period.Contains('/'))
@@ -112,11 +109,12 @@ public record DataSetQueryTimePeriod
             ? $"{year}/{year + 1}"
             : throw new ArgumentOutOfRangeException(
                 paramName: nameof(period),
-                message: "Period should be a numeric year");
+                message: "Period should be a numeric year"
+            );
     }
 
-    private static bool TryParseYear(string year, out int parsedYear)
-        => int.TryParse(year, style: NumberStyles.None, provider: null, result: out parsedYear);
+    private static bool TryParseYear(string year, out int parsedYear) =>
+        int.TryParse(year, style: NumberStyles.None, provider: null, result: out parsedYear);
 
     private static bool IsValidPeriodYear(string period) => TryParseYear(period, out _);
 
@@ -150,27 +148,22 @@ public record DataSetQueryTimePeriod
                 });
         }
 
-        private static readonly HashSet<TimeIdentifier> AllowedTimeIdentifiers =
-            TimeIdentifierUtils.Enums.ToHashSet();
+        private static readonly HashSet<TimeIdentifier> AllowedTimeIdentifiers = TimeIdentifierUtils.Enums.ToHashSet();
 
-        private static readonly HashSet<TimeIdentifier> AllowedRangeTimeIdentifiers =
-            AllowedTimeIdentifiers
-                .Where(
-                    identifier => identifier.GetEnumAttribute<TimeIdentifierMetaAttribute>().YearFormat
-                        is TimePeriodYearFormat.Academic or TimePeriodYearFormat.Fiscal
-                )
-                .ToHashSet();
+        private static readonly HashSet<TimeIdentifier> AllowedRangeTimeIdentifiers = AllowedTimeIdentifiers
+            .Where(identifier =>
+                identifier.GetEnumAttribute<TimeIdentifierMetaAttribute>().YearFormat
+                    is TimePeriodYearFormat.Academic
+                        or TimePeriodYearFormat.Fiscal
+            )
+            .ToHashSet();
 
-        private static readonly IReadOnlyList<string> AllowedCodes =
-            TimeIdentifierUtils.Codes
-                .Order()
-                .ToList();
+        private static readonly IReadOnlyList<string> AllowedCodes = TimeIdentifierUtils.Codes.Order().ToList();
 
-        private static readonly IReadOnlyList<string> AllowedRangeCodes =
-            AllowedRangeTimeIdentifiers
-                .Select(identifier => identifier.GetEnumValue())
-                .Order()
-                .ToList();
+        private static readonly IReadOnlyList<string> AllowedRangeCodes = AllowedRangeTimeIdentifiers
+            .Select(identifier => identifier.GetEnumValue())
+            .Order()
+            .ToList();
 
         private static bool IsValidPeriodYearRange(string period)
         {
@@ -179,8 +172,8 @@ public record DataSetQueryTimePeriod
             var end = rangeParts[1];
 
             return TryParseYear(start, out var startYear)
-                   && TryParseYear(end, out var endYear)
-                   && endYear == startYear + 1;
+                && TryParseYear(end, out var endYear)
+                && endYear == startYear + 1;
         }
 
         private static bool IsAllowedCode(DataSetQueryTimePeriod timePeriod)

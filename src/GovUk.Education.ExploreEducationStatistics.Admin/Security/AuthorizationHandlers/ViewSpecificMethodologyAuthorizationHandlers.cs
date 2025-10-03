@@ -7,26 +7,25 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using IReleaseVersionRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class ViewSpecificMethodologyRequirement : IAuthorizationRequirement
-{
-}
+public class ViewSpecificMethodologyRequirement : IAuthorizationRequirement { }
 
 public class ViewSpecificMethodologyAuthorizationHandler(
     IMethodologyRepository methodologyRepository,
     IUserReleaseRoleRepository userReleaseRoleRepository,
     IPreReleaseService preReleaseService,
     IReleaseVersionRepository releaseVersionRepository,
-    AuthorizationHandlerService authorizationHandlerService) :
-    AuthorizationHandler<ViewSpecificMethodologyRequirement, MethodologyVersion>
+    AuthorizationHandlerService authorizationHandlerService
+) : AuthorizationHandler<ViewSpecificMethodologyRequirement, MethodologyVersion>
 {
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
         ViewSpecificMethodologyRequirement requirement,
-        MethodologyVersion methodologyVersion)
+        MethodologyVersion methodologyVersion
+    )
     {
         // If the user has a global Claim that allows them to access any Methodology, allow it.
         if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.AccessAllMethodologies))
@@ -35,18 +34,19 @@ public class ViewSpecificMethodologyAuthorizationHandler(
             return;
         }
 
-        var owningPublication =
-        await methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
+        var owningPublication = await methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
         // If the user is a Publication Owner or Approver of the Publication that owns this Methodology, they can
         // view it.  Additionally, if the user is a Contributor or an Approver of any
         // (Live or non-Live) release version of the owning publication of this methodology, they can view it.
-        if (await authorizationHandlerService
-                .HasRolesOnPublicationOrAnyReleaseVersion(
-                    context.User.GetUserId(),
-                    owningPublication.Id,
-                    ListOf(PublicationRole.Owner, PublicationRole.Allower),
-                    ReleaseEditorAndApproverRoles))
+        if (
+            await authorizationHandlerService.HasRolesOnPublicationOrAnyReleaseVersion(
+                context.User.GetUserId(),
+                owningPublication.Id,
+                ListOf(PublicationRole.Owner, PublicationRole.Allower),
+                ReleaseEditorAndApproverRoles
+            )
+        )
         {
             context.Succeed(requirement);
             return;
@@ -58,8 +58,7 @@ public class ViewSpecificMethodologyAuthorizationHandler(
         // publication, approved but unpublished, and within the prerelease window.
         if (methodologyVersion.Approved)
         {
-            var publicationIds = await methodologyRepository
-                    .GetAllPublicationIds(methodologyVersion.MethodologyId);
+            var publicationIds = await methodologyRepository.GetAllPublicationIds(methodologyVersion.MethodologyId);
 
             foreach (var publicationId in publicationIds)
             {
@@ -83,14 +82,18 @@ public class ViewSpecificMethodologyAuthorizationHandler(
                     continue;
                 }
 
-                if (await userReleaseRoleRepository.HasUserReleaseRole(
+                if (
+                    await userReleaseRoleRepository.HasUserReleaseRole(
                         context.User.GetUserId(),
                         latestReleaseVersion.Id,
-                        ReleaseRole.PrereleaseViewer))
+                        ReleaseRole.PrereleaseViewer
+                    )
+                )
                 {
-                    if (preReleaseService
-                            .GetPreReleaseWindowStatus(latestReleaseVersion, DateTime.UtcNow)
-                            .Access == PreReleaseAccess.Within)
+                    if (
+                        preReleaseService.GetPreReleaseWindowStatus(latestReleaseVersion, DateTime.UtcNow).Access
+                        == PreReleaseAccess.Within
+                    )
                     {
                         context.Succeed(requirement);
                         return;

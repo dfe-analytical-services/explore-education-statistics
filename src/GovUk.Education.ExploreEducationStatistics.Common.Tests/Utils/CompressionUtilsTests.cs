@@ -20,7 +20,9 @@ public class CompressionUtilsTests
             await CompressionUtils.CompressToStream(
                 stream: Content.ToStream(),
                 targetStream: new MemoryStream(),
-                contentEncoding: "other"));
+                contentEncoding: "other"
+            )
+        );
     }
 
     [Fact]
@@ -31,7 +33,8 @@ public class CompressionUtilsTests
         await CompressionUtils.CompressToStream(
             stream: Content.ToStream(),
             targetStream: compressedStream,
-            contentEncoding: ContentEncodings.Gzip);
+            contentEncoding: ContentEncodings.Gzip
+        );
 
         Assert.Equal(0, compressedStream.Position);
         Assert.True(compressedStream.Length > 0);
@@ -56,7 +59,8 @@ public class CompressionUtilsTests
         await CompressionUtils.CompressToStream(
             stream: Content.ToStream(),
             targetStream: compressedStream,
-            contentEncoding: ContentEncodings.Zstd);
+            contentEncoding: ContentEncodings.Zstd
+        );
 
         Assert.Equal(0, compressedStream.Position);
         Assert.True(compressedStream.Length > 0);
@@ -80,7 +84,9 @@ public class CompressionUtilsTests
             await CompressionUtils.DecompressToStream(
                 stream: Content.ToStream(),
                 targetStream: new MemoryStream(),
-                contentEncoding: "other"));
+                contentEncoding: "other"
+            )
+        );
     }
 
     [Fact]
@@ -98,7 +104,8 @@ public class CompressionUtilsTests
         await CompressionUtils.DecompressToStream(
             stream: compressedStream,
             targetStream: decompressedStream,
-            contentEncoding: ContentEncodings.Gzip);
+            contentEncoding: ContentEncodings.Gzip
+        );
 
         Assert.Equal(0, decompressedStream.Position);
         Assert.Equal(Content, decompressedStream.ReadToEnd());
@@ -119,7 +126,8 @@ public class CompressionUtilsTests
         await CompressionUtils.DecompressToStream(
             stream: compressedStream,
             targetStream: decompressedStream,
-            contentEncoding: ContentEncodings.Zstd);
+            contentEncoding: ContentEncodings.Zstd
+        );
 
         Assert.Equal(0, decompressedStream.Position);
         Assert.Equal(Content, decompressedStream.ReadToEnd());
@@ -129,9 +137,8 @@ public class CompressionUtilsTests
     public async Task DecompressToString_UnsupportedContentEncoding()
     {
         await Assert.ThrowsAsync<NotSupportedException>(async () =>
-            await CompressionUtils.DecompressToString(
-                bytes: Encoding.UTF8.GetBytes(Content),
-                contentEncoding: "other"));
+            await CompressionUtils.DecompressToString(bytes: Encoding.UTF8.GetBytes(Content), contentEncoding: "other")
+        );
     }
 
     [Fact]
@@ -147,7 +154,8 @@ public class CompressionUtilsTests
         // Decompress the byte array using the method under test
         var result = await CompressionUtils.DecompressToString(
             bytes: compressedStream.ToArray(),
-            contentEncoding: ContentEncodings.Gzip);
+            contentEncoding: ContentEncodings.Gzip
+        );
 
         Assert.Equal(Content, result);
     }
@@ -165,7 +173,8 @@ public class CompressionUtilsTests
         // Decompress the byte array using the method under test
         var result = await CompressionUtils.DecompressToString(
             bytes: compressedStream.ToArray(),
-            contentEncoding: ContentEncodings.Zstd);
+            contentEncoding: ContentEncodings.Zstd
+        );
 
         Assert.Equal(Content, result);
     }

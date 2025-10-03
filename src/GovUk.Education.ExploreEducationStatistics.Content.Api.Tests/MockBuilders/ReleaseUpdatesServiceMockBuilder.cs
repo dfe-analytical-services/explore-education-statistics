@@ -14,25 +14,29 @@ public class ReleaseUpdatesServiceMockBuilder
 
     private PaginatedListViewModel<ReleaseUpdateDto>? _releaseUpdates;
 
-    private static readonly Expression<Func<IReleaseUpdatesService,
-        Task<Either<ActionResult, PaginatedListViewModel<ReleaseUpdateDto>>>>> GetReleaseUpdates =
-        m => m.GetReleaseUpdates(
+    private static readonly Expression<
+        Func<IReleaseUpdatesService, Task<Either<ActionResult, PaginatedListViewModel<ReleaseUpdateDto>>>>
+    > GetReleaseUpdates = m =>
+        m.GetReleaseUpdates(
             It.IsAny<string>(),
             It.IsAny<string>(),
             It.IsAny<int>(),
             It.IsAny<int>(),
-            It.IsAny<CancellationToken>());
+            It.IsAny<CancellationToken>()
+        );
 
     public ReleaseUpdatesServiceMockBuilder()
     {
-        _mock.Setup(GetReleaseUpdates)
+        _mock
+            .Setup(GetReleaseUpdates)
             .ReturnsAsync(() => _releaseUpdates ?? PaginatedListViewModel<ReleaseUpdateDto>.Paginate([], 1, 10));
     }
 
     public IReleaseUpdatesService Build() => _mock.Object;
 
     public ReleaseUpdatesServiceMockBuilder WhereHasReleaseUpdates(
-        PaginatedListViewModel<ReleaseUpdateDto> releaseUpdates)
+        PaginatedListViewModel<ReleaseUpdateDto> releaseUpdates
+    )
     {
         _releaseUpdates = releaseUpdates;
         return this;
@@ -40,12 +44,16 @@ public class ReleaseUpdatesServiceMockBuilder
 
     public ReleaseUpdatesServiceMockBuilder WhereGetReleaseUpdatesReturnsNotFound()
     {
-        _mock.Setup(m => m.GetReleaseUpdates(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<int>(),
-                It.IsAny<int>(),
-                It.IsAny<CancellationToken>()))
+        _mock
+            .Setup(m =>
+                m.GetReleaseUpdates(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ReturnsAsync(new NotFoundResult());
 
         return this;
@@ -59,15 +67,20 @@ public class ReleaseUpdatesServiceMockBuilder
             string? publicationSlug = null,
             string? releaseSlug = null,
             int? page = null,
-            int? pageSize = null)
+            int? pageSize = null
+        )
         {
-            mock.Verify(m => m.GetReleaseUpdates(
-                    It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
-                    It.Is<string>(actual => releaseSlug == null || actual == releaseSlug),
-                    It.Is<int>(actual => page == null || actual == page),
-                    It.Is<int>(actual => pageSize == null || actual == pageSize),
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
+            mock.Verify(
+                m =>
+                    m.GetReleaseUpdates(
+                        It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
+                        It.Is<string>(actual => releaseSlug == null || actual == releaseSlug),
+                        It.Is<int>(actual => page == null || actual == page),
+                        It.Is<int>(actual => pageSize == null || actual == pageSize),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
     }
 }

@@ -24,6 +24,6 @@ public class FullTableQueryRequestBuilder
             {
                 { Guid.NewGuid(), [new FilterHierarchyOption([Guid.NewGuid(), Guid.NewGuid()])] },
                 { Guid.NewGuid(), [new FilterHierarchyOption([Guid.NewGuid(), Guid.NewGuid()])] },
-            }
+            },
         };
 }

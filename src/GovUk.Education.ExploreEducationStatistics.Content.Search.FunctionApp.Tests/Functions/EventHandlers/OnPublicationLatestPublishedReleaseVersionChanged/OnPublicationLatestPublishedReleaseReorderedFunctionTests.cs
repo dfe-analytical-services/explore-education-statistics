@@ -10,99 +10,100 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
 {
-    private OnPublicationLatestPublishedReleaseReorderedFunction GetSut() => new(new EventGridEventHandler(new NullLogger<EventGridEventHandler>()));
+    private OnPublicationLatestPublishedReleaseReorderedFunction GetSut() =>
+        new(new EventGridEventHandler(new NullLogger<EventGridEventHandler>()));
 
     [Fact]
     public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
 
     [Theory]
     [MemberData(nameof(TheoryDatas.Blank.Bools), MemberType = typeof(TheoryDatas.Blank))]
-    public async Task GivenEvent_WhenPayloadContainsSlugAndPublicationIsNotArchived_ThenRefreshSearchableDocumentsReturned(bool? isPublicationArchived)
+    public async Task GivenEvent_WhenPayloadContainsSlugAndPublicationIsNotArchived_ThenRefreshSearchableDocumentsReturned(
+        bool? isPublicationArchived
+    )
     {
         // ARRANGE
         var payload = new PublicationLatestPublishedReleaseReorderedEventDto
         {
             Slug = "this-is-a-publication-slug",
-            IsPublicationArchived = isPublicationArchived
+            IsPublicationArchived = isPublicationArchived,
         };
 
-        var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(payload)
-            .Build();
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var sut = GetSut();
-        
+
         // ACT
         var response = await sut.OnPublicationLatestPublishedReleaseReordered(
-            eventGridEvent, 
-            new FunctionContextMockBuilder().Build());
-        
+            eventGridEvent,
+            new FunctionContextMockBuilder().Build()
+        );
+
         // ASSERT
         Assert.NotNull(response);
         var actual = Assert.Single(response.RefreshSearchableDocuments);
         Assert.NotNull(actual);
         Assert.Equal(payload.Slug, actual.PublicationSlug);
     }
-    
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task GivenEvent_OnlyWhenPayloadContainsPreviousReleaseId_ThenRemoveSearchableDocumentReturned(bool hasPreviousReleaseId)
+    public async Task GivenEvent_OnlyWhenPayloadContainsPreviousReleaseId_ThenRemoveSearchableDocumentReturned(
+        bool hasPreviousReleaseId
+    )
     {
         // ARRANGE
-        Guid? previousReleaseId = hasPreviousReleaseId 
-                                            ? Guid.NewGuid() 
-                                            : null;
+        Guid? previousReleaseId = hasPreviousReleaseId ? Guid.NewGuid() : null;
 
         var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(new PublicationLatestPublishedReleaseReorderedEventDto
-            {
-                Slug = "this-is-a-publication-slug",
-                PreviousReleaseId = previousReleaseId
-            })
+            .WithPayload(
+                new PublicationLatestPublishedReleaseReorderedEventDto
+                {
+                    Slug = "this-is-a-publication-slug",
+                    PreviousReleaseId = previousReleaseId,
+                }
+            )
             .Build();
 
         var sut = GetSut();
-        
+
         // ACT
         var response = await sut.OnPublicationLatestPublishedReleaseReordered(
-            eventGridEvent, 
-            new FunctionContextMockBuilder().Build());
-        
+            eventGridEvent,
+            new FunctionContextMockBuilder().Build()
+        );
+
         // ASSERT
         Assert.NotNull(response);
 
         RemoveSearchableDocumentDto[] expected = hasPreviousReleaseId
-            ? [new RemoveSearchableDocumentDto{ ReleaseId = previousReleaseId! }]
+            ? [new RemoveSearchableDocumentDto { ReleaseId = previousReleaseId! }]
             : [];
         Assert.Equal(expected, response.RemoveSearchableDocuments);
     }
-    
+
     [Theory]
     [MemberData(nameof(TheoryDatas.Blank.Strings), MemberType = typeof(TheoryDatas.Blank))]
     public async Task GivenEvent_WhenPayloadDoesNotContainSlug_ThenNothingIsReturned(string? blankSlug)
     {
         // ARRANGE
-        var payload = new PublicationLatestPublishedReleaseReorderedEventDto
-        {
-            Slug = blankSlug,
-        };
+        var payload = new PublicationLatestPublishedReleaseReorderedEventDto { Slug = blankSlug };
 
-        var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(payload)
-            .Build();
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var sut = GetSut();
-        
+
         // ACT
         var response = await sut.OnPublicationLatestPublishedReleaseReordered(
-            eventGridEvent, 
-            new FunctionContextMockBuilder().Build());
-        
+            eventGridEvent,
+            new FunctionContextMockBuilder().Build()
+        );
+
         // ASSERT
         Assert.Equal(OnPublicationLatestPublishedReleaseReorderedOutput.Empty, response);
     }
-    
+
     [Fact]
     public async Task GivenEvent_WhenPublicationIsArchived_ThenNothingIsReturned()
     {
@@ -110,20 +111,19 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
         var payload = new PublicationLatestPublishedReleaseReorderedEventDto
         {
             Slug = "this-is-a-publication-slug",
-            IsPublicationArchived = true
+            IsPublicationArchived = true,
         };
 
-        var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(payload)
-            .Build();
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var sut = GetSut();
-        
+
         // ACT
         var response = await sut.OnPublicationLatestPublishedReleaseReordered(
-            eventGridEvent, 
-            new FunctionContextMockBuilder().Build());
-        
+            eventGridEvent,
+            new FunctionContextMockBuilder().Build()
+        );
+
         // ASSERT
         Assert.Equal(OnPublicationLatestPublishedReleaseReorderedOutput.Empty, response);
     }

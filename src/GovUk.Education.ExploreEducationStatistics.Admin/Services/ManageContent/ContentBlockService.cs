@@ -16,39 +16,35 @@ public class ContentBlockService : IContentBlockService
 
     public async Task DeleteContentBlockAndReorder(Guid blockToRemoveId)
     {
-        var blockToRemove = await _context
-            .ContentBlocks
-            .SingleAsync(cb => cb.Id == blockToRemoveId);
+        var blockToRemove = await _context.ContentBlocks.SingleAsync(cb => cb.Id == blockToRemoveId);
 
         var originalBlockOrder = blockToRemove.Order;
         var originalContentSectionId = blockToRemove.ContentSectionId;
 
         await DeleteContentBlock(blockToRemove);
 
-        var contentSection = await _context.ContentSections
-            .Include(cs => cs.Content)
+        var contentSection = await _context
+            .ContentSections.Include(cs => cs.Content)
             .SingleAsync(cs => cs.Id == originalContentSectionId);
 
-        var contentBlocksRequiringOrderChange = contentSection.Content
-            .Where(cb => cb.Order > originalBlockOrder)
+        var contentBlocksRequiringOrderChange = contentSection
+            .Content.Where(cb => cb.Order > originalBlockOrder)
             .ToList();
 
         _context.ContentBlocks.UpdateRange(contentBlocksRequiringOrderChange);
-        contentBlocksRequiringOrderChange
-            .ForEach(contentBlock => contentBlock.Order--);
+        contentBlocksRequiringOrderChange.ForEach(contentBlock => contentBlock.Order--);
 
         await _context.SaveChangesAsync();
     }
 
     public async Task DeleteSectionContentBlocks(Guid contentSectionId)
     {
-        var contentSection = await _context.ContentSections
-            .Include(cs => cs.Content)
+        var contentSection = await _context
+            .ContentSections.Include(cs => cs.Content)
             .SingleAsync(cs => cs.Id == contentSectionId);
 
         await contentSection
-            .Content
-            .ToList()
+            .Content.ToList()
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async contentBlock =>
             {
@@ -70,9 +66,7 @@ public class ContentBlockService : IContentBlockService
                 _context.ContentBlocks.Update(dataBlock);
                 break;
             case EmbedBlockLink embedBlockLink:
-                await _context.Entry(embedBlockLink)
-                    .Reference(ebl => ebl.EmbedBlock)
-                    .LoadAsync();
+                await _context.Entry(embedBlockLink).Reference(ebl => ebl.EmbedBlock).LoadAsync();
                 _context.EmbedBlocks.Remove(embedBlockLink.EmbedBlock);
                 _context.EmbedBlockLinks.Remove(embedBlockLink);
                 break;

@@ -14,59 +14,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
 public class RelatedInformationServicePermissionTests
 {
-    private readonly ReleaseVersion _releaseVersion = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
 
     [Fact]
     public void AddRelatedInformationAsync()
     {
-        AssertSecurityPoliciesChecked(service =>
-                service.AddRelatedInformationAsync(
-                    _releaseVersion.Id,
-                    new CreateUpdateLinkRequest()),
-            SecurityPolicies.CanUpdateSpecificReleaseVersion);
+        AssertSecurityPoliciesChecked(
+            service => service.AddRelatedInformationAsync(_releaseVersion.Id, new CreateUpdateLinkRequest()),
+            SecurityPolicies.CanUpdateSpecificReleaseVersion
+        );
     }
 
     [Fact]
     public void DeleteRelatedInformationAsync()
     {
-        AssertSecurityPoliciesChecked(service =>
+        AssertSecurityPoliciesChecked(
+            service =>
                 service.DeleteRelatedInformationAsync(
                     releaseVersionId: _releaseVersion.Id,
-                    relatedInformationId: Guid.NewGuid()),
-            SecurityPolicies.CanUpdateSpecificReleaseVersion);
+                    relatedInformationId: Guid.NewGuid()
+                ),
+            SecurityPolicies.CanUpdateSpecificReleaseVersion
+        );
     }
 
     [Fact]
     public void UpdateRelatedInformationAsync()
     {
-        AssertSecurityPoliciesChecked(service =>
-                service.UpdateRelatedInformation(
-                    _releaseVersion.Id,
-                    []),
-            SecurityPolicies.CanUpdateSpecificReleaseVersion);
+        AssertSecurityPoliciesChecked(
+            service => service.UpdateRelatedInformation(_releaseVersion.Id, []),
+            SecurityPolicies.CanUpdateSpecificReleaseVersion
+        );
     }
 
     private void AssertSecurityPoliciesChecked<T>(
-        Func<RelatedInformationService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
+        Func<RelatedInformationService, Task<Either<ActionResult, T>>> protectedAction,
+        params SecurityPolicies[] policies
+    )
     {
         var (contentDbContext, releaseHelper, userService) = Mocks();
 
         var service = new RelatedInformationService(contentDbContext.Object, releaseHelper.Object, userService.Object);
 
-        PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _releaseVersion, userService, service, policies);
+        PermissionTestUtil.AssertSecurityPoliciesChecked(
+            protectedAction,
+            _releaseVersion,
+            userService,
+            service,
+            policies
+        );
     }
 
-    private (
-        Mock<ContentDbContext>,
-        Mock<IPersistenceHelper<ContentDbContext>>,
-        Mock<IUserService>) Mocks()
+    private (Mock<ContentDbContext>, Mock<IPersistenceHelper<ContentDbContext>>, Mock<IUserService>) Mocks()
     {
         return (
             new Mock<ContentDbContext>(),
             MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id, _releaseVersion),
-            new Mock<IUserService>());
+            new Mock<IUserService>()
+        );
     }
 }

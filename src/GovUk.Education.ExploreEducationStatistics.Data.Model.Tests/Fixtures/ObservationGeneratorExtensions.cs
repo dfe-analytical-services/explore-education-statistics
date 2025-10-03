@@ -6,51 +6,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 
 public static class ObservationGeneratorExtensions
 {
-    public static Generator<Observation> DefaultObservation(this DataFixture fixture)
-        => fixture.Generator<Observation>().WithDefaults();
+    public static Generator<Observation> DefaultObservation(this DataFixture fixture) =>
+        fixture.Generator<Observation>().WithDefaults();
 
-    public static Generator<Observation> WithDefaults(this Generator<Observation> generator)
-        => generator.ForInstance(s => s.SetDefaults());
+    public static Generator<Observation> WithDefaults(this Generator<Observation> generator) =>
+        generator.ForInstance(s => s.SetDefaults());
 
-    public static Generator<Observation> WithSubject(this Generator<Observation> generator, Subject subject)
-        => generator.ForInstance(s => s.SetSubject(subject));
+    public static Generator<Observation> WithSubject(this Generator<Observation> generator, Subject subject) =>
+        generator.ForInstance(s => s.SetSubject(subject));
 
-    public static Generator<Observation> WithLocation(this Generator<Observation> generator, Location location)
-        => generator.ForInstance(s => s.SetLocation(location));
+    public static Generator<Observation> WithLocation(this Generator<Observation> generator, Location location) =>
+        generator.ForInstance(s => s.SetLocation(location));
 
     public static Generator<Observation> WithFilterItems(
         this Generator<Observation> generator,
-        IEnumerable<FilterItem> filterItems)
-        => generator.ForInstance(s => s.SetFilterItems(filterItems));
+        IEnumerable<FilterItem> filterItems
+    ) => generator.ForInstance(s => s.SetFilterItems(filterItems));
 
     public static Generator<Observation> WithMeasures(
         this Generator<Observation> generator,
-        IEnumerable<Indicator> indicators)
-        => generator.ForInstance(s => s.SetMeasures(indicators));
+        IEnumerable<Indicator> indicators
+    ) => generator.ForInstance(s => s.SetMeasures(indicators));
 
     public static Generator<Observation> WithMeasures(
         this Generator<Observation> generator,
         IEnumerable<Indicator> indicators,
-        IEnumerable<string> measures)
-        => generator.ForInstance(s => s.SetMeasures(indicators, measures));
+        IEnumerable<string> measures
+    ) => generator.ForInstance(s => s.SetMeasures(indicators, measures));
 
     public static Generator<Observation> WithTimePeriod(
         this Generator<Observation> generator,
         int year,
-        TimeIdentifier identifier)
-        => generator.ForInstance(s => s.SetTimePeriod(year, identifier));
+        TimeIdentifier identifier
+    ) => generator.ForInstance(s => s.SetTimePeriod(year, identifier));
 
-    public static InstanceSetters<Observation> SetDefaults(this InstanceSetters<Observation> setters)
-        => setters
+    public static InstanceSetters<Observation> SetDefaults(this InstanceSetters<Observation> setters) =>
+        setters
             .SetDefault(o => o.Id)
             .Set(o => o.TimeIdentifier, TimeIdentifier.AcademicYear)
             .Set(o => o.Year, f => f.Random.Int(2016, 2022))
             .Set(o => o.CsvRow, f => f.IndexFaker + 2);
 
-    public static InstanceSetters<Observation> SetSubject(
-        this InstanceSetters<Observation> setters,
-        Subject subject)
-        => setters
+    public static InstanceSetters<Observation> SetSubject(this InstanceSetters<Observation> setters, Subject subject) =>
+        setters
             .Set(
                 o => o.Subject,
                 (_, observation) =>
@@ -63,24 +61,23 @@ public static class ObservationGeneratorExtensions
 
     public static InstanceSetters<Observation> SetLocation(
         this InstanceSetters<Observation> setters,
-        Location location)
-        => setters
-            .Set(o => o.Location, location)
-            .Set(o => o.LocationId, location.Id);
+        Location location
+    ) => setters.Set(o => o.Location, location).Set(o => o.LocationId, location.Id);
 
     public static InstanceSetters<Observation> SetFilterItems(
         this InstanceSetters<Observation> setters,
-        params FilterItem[] filterItems)
-        => setters.SetFilterItems(filterItems.ToList());
+        params FilterItem[] filterItems
+    ) => setters.SetFilterItems(filterItems.ToList());
 
     public static InstanceSetters<Observation> SetFilterItems(
         this InstanceSetters<Observation> setters,
-        IEnumerable<FilterItem> filterItems)
-        => setters.Set(
+        IEnumerable<FilterItem> filterItems
+    ) =>
+        setters.Set(
             o => o.FilterItems,
-            (_, observation) => filterItems
-                .Select(
-                    filterItem => new ObservationFilterItem
+            (_, observation) =>
+                filterItems
+                    .Select(filterItem => new ObservationFilterItem
                     {
                         FilterItem = filterItem,
                         FilterItemId = filterItem.Id,
@@ -88,33 +85,28 @@ public static class ObservationGeneratorExtensions
                         FilterId = filterItem.FilterGroup?.FilterId,
                         Observation = observation,
                         ObservationId = observation.Id,
-                    }
-                )
-                .ToList()
+                    })
+                    .ToList()
         );
 
     public static InstanceSetters<Observation> SetMeasures(
         this InstanceSetters<Observation> setters,
-        IEnumerable<Indicator> indicators)
-        => setters.Set(
-            o => o.Measures,
-            f => indicators.ToDictionary(i => i.Id, _ => f.Random.Short().ToString())
-        );
+        IEnumerable<Indicator> indicators
+    ) => setters.Set(o => o.Measures, f => indicators.ToDictionary(i => i.Id, _ => f.Random.Short().ToString()));
 
     public static InstanceSetters<Observation> SetMeasures(
         this InstanceSetters<Observation> setters,
         IEnumerable<Indicator> indicators,
-        IEnumerable<string> measures)
-        => setters.Set(o => o.Measures, indicators
-            .Select(i => i.Id)
-            .Zip(measures)
-            .ToDictionary(pair => pair.First, pair => pair.Second));
+        IEnumerable<string> measures
+    ) =>
+        setters.Set(
+            o => o.Measures,
+            indicators.Select(i => i.Id).Zip(measures).ToDictionary(pair => pair.First, pair => pair.Second)
+        );
 
     public static InstanceSetters<Observation> SetTimePeriod(
         this InstanceSetters<Observation> setters,
         int year,
-        TimeIdentifier identifier)
-        => setters
-            .Set(o => o.Year, year)
-            .Set(o => o.TimeIdentifier, identifier);
+        TimeIdentifier identifier
+    ) => setters.Set(o => o.Year, year).Set(o => o.TimeIdentifier, identifier);
 }

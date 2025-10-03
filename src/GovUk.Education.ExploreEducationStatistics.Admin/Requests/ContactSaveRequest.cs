@@ -7,13 +7,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
 public class ContactSaveRequest : IValidatableObject
 {
-    [Required] public string TeamName { get; set; } = string.Empty;
+    [Required]
+    public string TeamName { get; set; } = string.Empty;
 
-    [Required, EmailAddress] public string TeamEmail { get; set; } = string.Empty;
+    [Required, EmailAddress]
+    public string TeamEmail { get; set; } = string.Empty;
 
-    [Required] public string ContactName { get; set; } = string.Empty;
+    [Required]
+    public string ContactName { get; set; } = string.Empty;
 
-    [PhoneNumber] public string? ContactTelNo { get; set; }
+    [PhoneNumber]
+    public string? ContactTelNo { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
@@ -21,11 +25,9 @@ public class ContactSaveRequest : IValidatableObject
 
         if (ContactTelNo != null)
         {
-            if (Regex.IsMatch(ContactTelNo,
-                    @"^\s*0\s*3\s*7\s*0\s*0\s*0\s*0\s*2\s*2\s*8\s*8\s*$"))
+            if (Regex.IsMatch(ContactTelNo, @"^\s*0\s*3\s*7\s*0\s*0\s*0\s*0\s*2\s*2\s*8\s*8\s*$"))
             {
-                results.Add(new ValidationResult(
-                    "Contact telephone cannot be DfE Enquiries number"));
+                results.Add(new ValidationResult("Contact telephone cannot be DfE Enquiries number"));
             }
         }
 

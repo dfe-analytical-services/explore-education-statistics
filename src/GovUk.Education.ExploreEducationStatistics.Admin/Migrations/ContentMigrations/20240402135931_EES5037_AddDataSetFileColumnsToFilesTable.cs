@@ -15,30 +15,25 @@ public partial class EES5037_AddDataSetFileColumnsToFilesTable : Migration
             name: "DataSetFileId",
             table: "Files",
             type: "uniqueidentifier",
-            nullable: true);
+            nullable: true
+        );
 
-        migrationBuilder.AddColumn<int>(
-            name: "DataSetFileVersion",
-            table: "Files",
-            type: "int",
-            nullable: true);
+        migrationBuilder.AddColumn<int>(name: "DataSetFileVersion", table: "Files", type: "int", nullable: true);
 
-        migrationBuilder.Sql("""
-                             UPDATE Files
-                             SET DataSetFileId = NEWID(), DataSetFileVersion = 0
-                             WHERE Type = 'Data'
-                             """);
+        migrationBuilder.Sql(
+            """
+            UPDATE Files
+            SET DataSetFileId = NEWID(), DataSetFileVersion = 0
+            WHERE Type = 'Data'
+            """
+        );
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "DataSetFileId",
-            table: "Files");
+        migrationBuilder.DropColumn(name: "DataSetFileId", table: "Files");
 
-        migrationBuilder.DropColumn(
-            name: "DataSetFileVersion",
-            table: "Files");
+        migrationBuilder.DropColumn(name: "DataSetFileVersion", table: "Files");
     }
 }

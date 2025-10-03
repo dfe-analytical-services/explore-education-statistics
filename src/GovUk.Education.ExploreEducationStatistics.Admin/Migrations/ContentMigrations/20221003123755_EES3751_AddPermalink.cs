@@ -18,27 +18,21 @@ public partial class EES3751_AddPermalink : Migration
                 DataSetTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 ReleaseId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                 SubjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Created = table.Column<DateTime>(type: "datetime2", nullable: false)
+                Created = table.Column<DateTime>(type: "datetime2", nullable: false),
             },
             constraints: table =>
             {
                 table.PrimaryKey("PK_Permalinks", x => x.Id);
-            });
+            }
+        );
 
-        migrationBuilder.CreateIndex(
-            name: "IX_Permalinks_ReleaseId",
-            table: "Permalinks",
-            column: "ReleaseId");
+        migrationBuilder.CreateIndex(name: "IX_Permalinks_ReleaseId", table: "Permalinks", column: "ReleaseId");
 
-        migrationBuilder.CreateIndex(
-            name: "IX_Permalinks_SubjectId",
-            table: "Permalinks",
-            column: "SubjectId");
+        migrationBuilder.CreateIndex(name: "IX_Permalinks_SubjectId", table: "Permalinks", column: "SubjectId");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropTable(
-            name: "Permalinks");
+        migrationBuilder.DropTable(name: "Permalinks");
     }
 }

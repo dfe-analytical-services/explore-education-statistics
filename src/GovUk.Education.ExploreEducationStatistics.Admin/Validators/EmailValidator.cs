@@ -12,11 +12,7 @@ public static class EmailValidator
 {
     public static Either<ActionResult, List<string>> ValidateEmailAddresses(IEnumerable<string> input)
     {
-        var emails = input
-            .Where(email => !email.IsNullOrWhitespace())
-            .Select(line => line.Trim())
-            .Distinct()
-            .ToList();
+        var emails = input.Where(email => !email.IsNullOrWhitespace()).Select(line => line.Trim()).Distinct().ToList();
 
         var emailAddressAttribute = new EmailAddressAttribute();
         if (emails.Any(email => !emailAddressAttribute.IsValid(email)))

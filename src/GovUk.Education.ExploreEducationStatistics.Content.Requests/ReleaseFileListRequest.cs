@@ -10,8 +10,7 @@ public record ReleaseFileListRequest
     {
         public Validator()
         {
-            RuleFor(r => r.Ids)
-                .NotEmpty();
+            RuleFor(r => r.Ids).NotEmpty();
         }
     }
 }

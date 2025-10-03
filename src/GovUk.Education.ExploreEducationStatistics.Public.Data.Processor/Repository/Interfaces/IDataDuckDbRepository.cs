@@ -2,7 +2,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public interface IDataDuckDbRepository
 {
-    Task CreateDataTable(
-        Guid dataSetVersionId,
-        CancellationToken cancellationToken = default);
+    Task CreateDataTable(Guid dataSetVersionId, CancellationToken cancellationToken = default);
 }

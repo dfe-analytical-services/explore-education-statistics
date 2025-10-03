@@ -10,10 +10,7 @@ public static class DictionaryExtensionsTests
         [Fact]
         public void Exists()
         {
-            var dictionary = new Dictionary<string, int>
-            {
-                ["test"] = 20
-            };
+            var dictionary = new Dictionary<string, int> { ["test"] = 20 };
 
             var value = dictionary.GetOrSet("test", 10);
 
@@ -35,10 +32,7 @@ public static class DictionaryExtensionsTests
         [Fact]
         public void WithSupplier_Exists()
         {
-            var dictionary = new Dictionary<string, int>
-            {
-                ["test"] = 20
-            };
+            var dictionary = new Dictionary<string, int> { ["test"] = 20 };
 
             var value = dictionary.GetOrSet("test", () => 10);
 

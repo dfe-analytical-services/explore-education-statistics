@@ -33,7 +33,7 @@ public record DataSetGetQueryRequest
 
     /// <summary>
     /// The IDs of indicators to return values for.
-    /// 
+    ///
     /// Omitting this parameter will return values for all indicators.
     /// </summary>
     [FromQuery, QuerySeparator]
@@ -89,28 +89,27 @@ public record DataSetGetQueryRequest
                 .SetValidator(new DataSetGetQueryTimePeriods.Validator()!)
                 .When(q => q.TimePeriods is not null);
 
-            When(q => q.Indicators is not null, () =>
-            {
-                RuleFor(q => q.Indicators)
-                    .NotEmpty();
-                RuleForEach(q => q.Indicators)
-                    .NotEmpty()
-                    .MaximumLength(40);
-            });
+            When(
+                q => q.Indicators is not null,
+                () =>
+                {
+                    RuleFor(q => q.Indicators).NotEmpty();
+                    RuleForEach(q => q.Indicators).NotEmpty().MaximumLength(40);
+                }
+            );
 
-            When(q => q.Sorts is not null, () =>
-            {
-                RuleFor(q => q.Sorts)
-                    .NotEmpty();
-                RuleForEach(q => q.Sorts)
-                    .SortString();
-            });
+            When(
+                q => q.Sorts is not null,
+                () =>
+                {
+                    RuleFor(q => q.Sorts).NotEmpty();
+                    RuleForEach(q => q.Sorts).SortString();
+                }
+            );
 
-            RuleFor(request => request.Page)
-                .GreaterThanOrEqualTo(1);
-            
-            RuleFor(request => request.PageSize)
-                .InclusiveBetween(1, 10000);
+            RuleFor(request => request.Page).GreaterThanOrEqualTo(1);
+
+            RuleFor(request => request.PageSize).InclusiveBetween(1, 10000);
         }
     }
 }

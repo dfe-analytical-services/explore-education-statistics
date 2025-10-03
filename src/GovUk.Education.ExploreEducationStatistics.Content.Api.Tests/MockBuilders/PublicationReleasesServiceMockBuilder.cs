@@ -14,26 +14,28 @@ public class PublicationReleasesServiceMockBuilder
 
     private PaginatedListViewModel<IPublicationReleaseEntryDto>? _publicationReleases;
 
-    private static readonly Expression<Func<IPublicationReleasesService,
-            Task<Either<ActionResult, PaginatedListViewModel<IPublicationReleaseEntryDto>>>>>
-        GetPublicationReleases =
-            m => m.GetPublicationReleases(
-                It.IsAny<string>(),
-                It.IsAny<int>(),
-                It.IsAny<int>(),
-                It.IsAny<CancellationToken>());
+    private static readonly Expression<
+        Func<
+            IPublicationReleasesService,
+            Task<Either<ActionResult, PaginatedListViewModel<IPublicationReleaseEntryDto>>>
+        >
+    > GetPublicationReleases = m =>
+        m.GetPublicationReleases(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>());
 
     public PublicationReleasesServiceMockBuilder()
     {
-        _mock.Setup(GetPublicationReleases)
+        _mock
+            .Setup(GetPublicationReleases)
             .ReturnsAsync(() =>
-                _publicationReleases ?? PaginatedListViewModel<IPublicationReleaseEntryDto>.Paginate([], 1, 10));
+                _publicationReleases ?? PaginatedListViewModel<IPublicationReleaseEntryDto>.Paginate([], 1, 10)
+            );
     }
 
     public IPublicationReleasesService Build() => _mock.Object;
 
     public PublicationReleasesServiceMockBuilder WhereHasPublicationReleases(
-        PaginatedListViewModel<IPublicationReleaseEntryDto> publicationReleases)
+        PaginatedListViewModel<IPublicationReleaseEntryDto> publicationReleases
+    )
     {
         _publicationReleases = publicationReleases;
         return this;
@@ -41,11 +43,15 @@ public class PublicationReleasesServiceMockBuilder
 
     public PublicationReleasesServiceMockBuilder WhereGetPublicationReleasesReturnsNotFound()
     {
-        _mock.Setup(m => m.GetPublicationReleases(
-                It.IsAny<string>(),
-                It.IsAny<int>(),
-                It.IsAny<int>(),
-                It.IsAny<CancellationToken>()))
+        _mock
+            .Setup(m =>
+                m.GetPublicationReleases(
+                    It.IsAny<string>(),
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ReturnsAsync(new NotFoundResult());
 
         return this;
@@ -58,14 +64,19 @@ public class PublicationReleasesServiceMockBuilder
         public void GetPublicationReleasesWasCalled(
             string? publicationSlug = null,
             int? page = null,
-            int? pageSize = null)
+            int? pageSize = null
+        )
         {
-            mock.Verify(m => m.GetPublicationReleases(
-                    It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
-                    It.Is<int>(actual => page == null || actual == page),
-                    It.Is<int>(actual => pageSize == null || actual == pageSize),
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
+            mock.Verify(
+                m =>
+                    m.GetPublicationReleases(
+                        It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
+                        It.Is<int>(actual => page == null || actual == page),
+                        It.Is<int>(actual => pageSize == null || actual == pageSize),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
     }
 }

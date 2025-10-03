@@ -35,9 +35,7 @@ public class ReleasePublishingStatus : ITableEntity
     [IgnoreDataMember]
     private ReleasePublishingStatusState _state;
 
-    public ReleasePublishingStatus()
-    {
-    }
+    public ReleasePublishingStatus() { }
 
     public ReleasePublishingStatus(
         Guid releaseVersionId,
@@ -47,7 +45,8 @@ public class ReleasePublishingStatus : ITableEntity
         string releaseSlug,
         ReleasePublishingStatusState state,
         bool immediate,
-        IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null)
+        IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null
+    )
     {
         PartitionKey = releaseVersionId.ToString();
         RowKey = releaseStatusId.ToString();
@@ -80,19 +79,16 @@ public class ReleasePublishingStatus : ITableEntity
             PublishingStage = value.Publishing.ToString();
             OverallStage = value.Overall.ToString();
 
-            _state = new ReleasePublishingStatusState(
-                value.Content,
-                value.Files,
-                value.Publishing,
-                value.Overall);
+            _state = new ReleasePublishingStatusState(value.Content, value.Files, value.Publishing, value.Overall);
             _state.PropertyChanged += StateChangedCallback;
         }
     }
 
     [IgnoreDataMember]
-    public IEnumerable<ReleasePublishingStatusLogMessage> LogMessages => Messages == null
-        ? new List<ReleasePublishingStatusLogMessage>()
-        : JsonConvert.DeserializeObject<IEnumerable<ReleasePublishingStatusLogMessage>>(Messages);
+    public IEnumerable<ReleasePublishingStatusLogMessage> LogMessages =>
+        Messages == null
+            ? new List<ReleasePublishingStatusLogMessage>()
+            : JsonConvert.DeserializeObject<IEnumerable<ReleasePublishingStatusLogMessage>>(Messages);
 
     public void AppendLogMessage(ReleasePublishingStatusLogMessage logMessage)
     {
@@ -122,8 +118,8 @@ public class ReleasePublishingStatus : ITableEntity
 
     public bool AllStagesPriorToPublishingComplete()
     {
-        return State.Content == ReleasePublishingStatusContentStage.Complete &&
-               State.Files == ReleasePublishingStatusFilesStage.Complete;
+        return State.Content == ReleasePublishingStatusContentStage.Complete
+            && State.Files == ReleasePublishingStatusFilesStage.Complete;
     }
 
     public ReleasePublishingKey AsTableRowKey()

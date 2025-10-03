@@ -13,13 +13,9 @@ public record PendingApiSubscriptionCreateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Email)
-                .NotEmpty()
-                .EmailAddress();
-            RuleFor(request => request.DataSetId)
-                .NotEmpty();
-            RuleFor(request => request.DataSetTitle)
-                .NotEmpty();
+            RuleFor(request => request.Email).NotEmpty().EmailAddress();
+            RuleFor(request => request.DataSetId).NotEmpty();
+            RuleFor(request => request.DataSetTitle).NotEmpty();
         }
     }
 }

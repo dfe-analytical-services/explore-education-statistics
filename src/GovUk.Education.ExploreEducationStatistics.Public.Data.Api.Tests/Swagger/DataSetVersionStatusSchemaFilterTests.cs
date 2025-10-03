@@ -15,10 +15,9 @@ public class DataSetVersionStatusSchemaFilterTests
             UseAllOfToExtendReferenceSchemas = true,
             SchemaFilters = [new DataSetVersionStatusSchemaFilter()],
         },
-        new JsonSerializerDataContractResolver(new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        })
+        new JsonSerializerDataContractResolver(
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+        )
     );
 
     private readonly SchemaRepository _schemaRepository = new("Default");

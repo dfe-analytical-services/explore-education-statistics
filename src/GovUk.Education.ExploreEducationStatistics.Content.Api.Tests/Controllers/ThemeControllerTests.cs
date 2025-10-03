@@ -29,11 +29,12 @@ public class ThemeControllerTests
                         {
                             Id = Guid.NewGuid(),
                             Slug = "methodology-slug",
-                            Title = "Methodology title"
+                            Title = "Methodology title",
                         }
-                    )
-                })
-        }
+                    ),
+                }
+            ),
+        },
     };
 
     [Fact]
@@ -43,9 +44,7 @@ public class ThemeControllerTests
 
         var controller = BuildController(methodologyCacheService.Object);
 
-        methodologyCacheService
-            .Setup(mock => mock.GetSummariesTree())
-            .ReturnsAsync(MethodologyThemes);
+        methodologyCacheService.Setup(mock => mock.GetSummariesTree()).ReturnsAsync(MethodologyThemes);
 
         var result = await controller.GetMethodologyThemes();
 
@@ -56,10 +55,12 @@ public class ThemeControllerTests
 
     private static ThemeController BuildController(
         IMethodologyCacheService? methodologyCacheService = null,
-        IThemeService? themeService = null)
+        IThemeService? themeService = null
+    )
     {
         return new ThemeController(
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-            themeService ?? Mock.Of<IThemeService>(Strict));
+            themeService ?? Mock.Of<IThemeService>(Strict)
+        );
     }
 }
