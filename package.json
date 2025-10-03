@@ -90,7 +90,7 @@
       "python3 -m pipenv run black",
       "python3 -m pipenv run isort"
     ],
-    "*.cs": [
+    "*.{cs,csproj}": [
       "dotnet csharpier check"
     ]
   }
