@@ -16,7 +16,7 @@
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
-    <PackageReference Include="AspectInjector" Version="2.8.1" PrivateAssets="all" />
+    <PackageReference Include="AspectInjector" Version="2.9.0" PrivateAssets="all" />
     <!-- v2.8.1 is compatible with MacOS -->
     <PackageReference Include="Azure.Identity" Version="1.16.0" />
     <PackageReference Include="Dapper" Version="2.1.66" />
