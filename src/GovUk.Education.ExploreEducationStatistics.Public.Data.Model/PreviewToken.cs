@@ -26,11 +26,11 @@ public class PreviewToken : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
 
     public DateTimeOffset? Updated { get; set; }
 
-    public PreviewTokenStatus Status => GetPreviewTokenStatus();
+    public PreviewTokenStatus Status => GetPreviewTokenStatus(TimeProvider.System);
 
-    public PreviewTokenStatus GetPreviewTokenStatus(DateTimeOffset? now = null)
+    public PreviewTokenStatus GetPreviewTokenStatus(TimeProvider dateTimeProvider)
     {
-        now??= DateTimeOffset.UtcNow;
+        var now = dateTimeProvider.GetUtcNow();
         return now >= Expiry ? PreviewTokenStatus.Expired :
             now < Activates ? PreviewTokenStatus.Pending : PreviewTokenStatus.Active;
     }
