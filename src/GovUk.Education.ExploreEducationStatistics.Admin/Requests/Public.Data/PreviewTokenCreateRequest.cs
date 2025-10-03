@@ -47,18 +47,18 @@ public record PreviewTokenCreateRequest
                     {
                         RuleFor(r => r)
                             .Cascade(CascadeMode.Stop)
-                            .Must(r => r.Activates!.Value.UtcDateTime <= r.Expires!.Value.UtcDateTime)
-                            .WithMessage("Activates date must be before or equal to the expires date.")
-                            .Must(r => r.Expires!.Value.UtcDateTime <= r.Activates!.Value.UtcDateTime.AddDays(7))
+                            .Must(r => r.Activates!.Value < r.Expires!.Value)
+                            .WithMessage("Activates date must be before the expires date.")
+                            .Must(r => r.Expires!.Value <= r.Activates!.Value.AddDays(7))
                             .WithMessage("Expires date must be no more than 7 days after the activates date.");
                     })
                     .Otherwise(() =>
                     {
                         RuleFor(r => r.Expires)
                             .Cascade(CascadeMode.Stop)
-                            .Must(e => utcNow<= e!.Value.UtcDateTime)
+                            .Must(e => utcNow<= e!.Value)
                             .WithMessage("Expires date must not be in the past.")
-                            .Must(e => e!.Value.UtcDateTime <=  utcNow.AddDays(7))
+                            .Must(e => e!.Value <=  utcNow.AddDays(7))
                             .WithMessage("Expires date must be no more than 7 days from today.");
                     });
             });
@@ -69,10 +69,10 @@ public record PreviewTokenCreateRequest
             RuleFor(request => request.Label)
                 .NotEmpty()
                 .MaximumLength(100);
+            return;
+
             static bool IsNotInPastWithTolerance(DateTimeOffset now, DateTimeOffset value, TimeSpan tolerance)
-            {
-                return value.UtcDateTime >= now.UtcDateTime.Subtract(tolerance);
-            }
+                => value.UtcDateTime >= now.UtcDateTime.Subtract(tolerance);
 
         }
     }

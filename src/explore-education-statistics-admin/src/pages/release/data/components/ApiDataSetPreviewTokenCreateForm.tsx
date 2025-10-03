@@ -115,7 +115,6 @@ export default function ApiDataSetPreviewTokenCreateForm({
               value.setHours(23, 59, 59, 999); // Set 'Expires' to the end of the day as FE doesn't allow Time input
 
               const activatesMaxDate = new Date(activates);
-              value.setHours(23, 59, 59, 999);
               activatesMaxDate.setDate(activates.getDate() + 7);
 
               const laterThanActivates = endDateIsLaterThanOrEqualToStartDate(

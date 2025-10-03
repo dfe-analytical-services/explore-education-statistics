@@ -83,12 +83,7 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
 
     await waitFor(() => expect(handleSubmit).toHaveBeenCalledTimes(1));
 
-    expect(handleSubmit).toHaveBeenCalledWith(
-      'Test label',
-      undefined,
-      undefined,
-      undefined,
-    );
+    expect(handleSubmit).toHaveBeenCalledWith('Test label', null, null, null);
   });
 
   test('submitting form with validation error does not call `onSubmit` handler', async () => {

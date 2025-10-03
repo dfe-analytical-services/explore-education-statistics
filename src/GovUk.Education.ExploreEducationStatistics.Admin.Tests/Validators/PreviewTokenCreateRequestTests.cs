@@ -110,7 +110,7 @@ public class PreviewTokenCreateRequestTests
 
         var result = validator.TestValidate(request);
         result.ShouldHaveValidationErrorFor(r => r)
-            .WithErrorMessage("Activates date must be before or equal to the expires date.");
+            .WithErrorMessage("Activates date must be before the expires date.");
     }
 
     [Theory]
