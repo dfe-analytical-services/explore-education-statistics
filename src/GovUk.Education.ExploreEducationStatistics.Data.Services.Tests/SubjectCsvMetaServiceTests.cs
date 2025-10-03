@@ -1857,7 +1857,9 @@ public class SubjectCsvMetaServiceTests
             statisticsDbContext: statisticsDbContext,
             contentDbContext: contentDbContext,
             userService: AlwaysTrueUserService().Object,
-            filterItemRepository: new FilterItemRepository(statisticsDbContext),
+            filterItemRepository: new FilterItemRepository(
+                statisticsDbContext,
+                Mock.Of<ILogger<FilterItemRepository>>()),
             releaseFileBlobService: releaseFileBlobService ?? Mock.Of<IReleaseFileBlobService>(Strict)
         );
     }

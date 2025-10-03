@@ -11,7 +11,7 @@ public partial class EES3067_DropObservationGeographicLevel : Migration
 {
     private const string PreviousObservationTypeMigrationId = InitialCreate_Custom.MigrationId;
     private const string PreviousInsertObservationsMigrationId = InitialCreate_Custom.MigrationId;
-    private const string MigrationId = "20220325160924";
+    public const string MigrationId = "20220325160924";
 
     protected override void Up(MigrationBuilder migrationBuilder)
     {
