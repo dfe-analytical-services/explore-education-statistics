@@ -12,7 +12,6 @@ import {
   ApplicationInsightsContextProvider as BaseApplicationInsightsContextProvider,
   useApplicationInsights,
 } from '@common/contexts/ApplicationInsightsContext';
-import { NetworkActivityContextProvider } from '@common/contexts/NetworkActivityContext';
 import composeProviders from '@common/hocs/composeProviders';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import {
@@ -105,7 +104,6 @@ const Providers = composeProviders(
   ConfigContextProvider,
   ApplicationInsightsContextProvider,
   BrowserRouter,
-  NetworkActivityContextProvider,
   QueryClientProvider,
   ConfiguredMsalProvider,
   AuthContextProvider,
