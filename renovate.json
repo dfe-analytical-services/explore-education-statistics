@@ -37,24 +37,31 @@
     },
     {
       "matchDatasources": ["nuget"],
-      "groupName": "Minor backend dependencies",
+      "groupName": "Backend packages (minor)",
       "matchUpdateTypes": ["minor", "patch"],
       "schedule": ["every month"]
     },
     {
       "matchDatasources": ["nuget"],
-      "groupName": "Major backend dependencies",
+      "groupName": "Backend packages (major)",
       "matchUpdateTypes": ["major"],
       "schedule": ["every 3 months"]
     },
     {
-      "description": "Exclude AspectInjector to pin it to version 2.8.1 for macOS compatibility",
+      "description": "Disable MicroElements.Swashbuckle.FluentValidation which requires major update to Swashbuckle",
       "matchDatasources": ["nuget"],
-      "matchPackageNames": ["AspectInjector"],
+      "matchPackageNames": ["MicroElements.Swashbuckle.FluentValidation"],
+      "matchCurrentVersion": "6.1.0",
       "enabled": false
     },
     {
-      "description": "Exclude packages which need their major versions to be in sync with the .NET version or the EF Core version",
+      "description": "Disable DuckDB.NET.Data.Full and InterpolatedSql.Dapper related to issue EES-6079",
+      "matchDatasources": ["nuget"],
+      "matchPackageNames": ["DuckDB.NET.Data.Full", "InterpolatedSql.Dapper"],
+      "enabled": false
+    },
+    {
+      "description": "Disable packages which need their major versions to be in sync with the .NET version or the EF Core version",
       "matchDatasources": ["nuget"],
       "matchPackagePrefixes": [
         "Microsoft.AspNetCore",
