@@ -23,4 +23,6 @@ public interface IEducationInNumbersService
     Task<Either<ActionResult, List<EinSummaryViewModel>>> Reorder(List<Guid> newOrder);
 
     Task<Either<ActionResult, Unit>> Delete(Guid id);
+
+    Task<Either<ActionResult, Unit>> FullDelete(string slug);
 }

@@ -4,7 +4,7 @@ Resource            ../libs/admin-common.robot
 Resource            ../libs/admin/manage-content-common.robot
 Resource            ../libs/public-api-common.robot
 
-Force Tags          Admin    Local    Dev    AltersData
+Force Tags          Admin    PublicApi    Local    Dev    AltersData
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
