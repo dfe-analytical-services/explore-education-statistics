@@ -36,7 +36,20 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
     ...previewTokenQueries.list(dataSet?.draftVersion?.id ?? ''),
     enabled: !!dataSet?.draftVersion,
   });
-
+  const getPreviewTokenTagColour = (
+    status: string,
+  ): 'green' | 'yellow' | 'grey' => {
+    switch (status) {
+      case 'Active':
+        return 'green';
+      case 'Pending':
+        return 'yellow';
+      case 'Expired':
+        return 'grey';
+      default:
+        return 'grey';
+    }
+  };
   const handleRevoke = async (id: string) => {
     await previewTokenService.revokePreviewToken(id);
     refetchTokens();
@@ -79,7 +92,7 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
               <tr>
                 <th>Reference</th>
                 <th>User</th>
-                <th>Date generated</th>
+                <th>Activates</th>
                 <th>Status</th>
                 <th>Expiry</th>
                 <th className="govuk-!-text-align-right">Action</th>
@@ -93,13 +106,11 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                     <td>{token.createdByEmail}</td>
                     <td>
                       <FormattedDate format="d MMMM yyyy, HH:mm">
-                        {token.created}
+                        {token.activates}
                       </FormattedDate>
                     </td>
                     <td>
-                      <Tag
-                        colour={token.status === 'Active' ? 'green' : 'grey'}
-                      >
+                      <Tag colour={getPreviewTokenTagColour(token.status)}>
                         {token.status}
                       </Tag>
                     </td>
@@ -109,7 +120,8 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                       </FormattedDate>
                     </td>
                     <td className="govuk-!-text-align-right">
-                      {token.status === 'Active' && (
+                      {(token.status === 'Active' ||
+                        token.status === 'Pending') && (
                         <>
                           <Link
                             to={generatePath<ReleaseDataSetPreviewTokenRouteParams>(
