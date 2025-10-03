@@ -8,10 +8,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
 public abstract class ReleaseVersionsControllerTests
 {
+    private readonly ReleaseContentServiceMockBuilder _releaseContentService = new();
     private readonly ReleaseVersionsServiceMockBuilder _releaseVersionsService = new();
 
     private const string PublicationSlug = "test-publication";
     private const string ReleaseSlug = "test-release";
+
+    public class GetReleaseContentTests : ReleaseVersionsControllerTests
+    {
+        [Fact]
+        public async Task WhenServiceReturnsReleaseContent_ReturnsOk()
+        {
+            // Arrange
+            var releaseContent = new ReleaseContentDtoBuilder().Build();
+            _releaseContentService.WhereHasReleaseContent(releaseContent);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetReleaseContent(PublicationSlug, ReleaseSlug);
+
+            // Assert
+            _releaseContentService.Assert.GetReleaseContentWasCalled(PublicationSlug, ReleaseSlug);
+            result.AssertOkResult(releaseContent);
+        }
+
+        [Fact]
+        public async Task WhenServiceReturnsNotFound_ReturnsNotFound()
+        {
+            // Arrange
+            _releaseContentService.WhereGetReleaseContentReturnsNotFound(PublicationSlug, ReleaseSlug);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetReleaseContent(PublicationSlug, ReleaseSlug);
+
+            // Assert
+            _releaseContentService.Assert.GetReleaseContentWasCalled(PublicationSlug, ReleaseSlug);
+            result.AssertNotFoundResult();
+        }
+    }
 
     public class GetReleaseVersionSummaryTests : ReleaseVersionsControllerTests
     {
@@ -49,5 +86,6 @@ public abstract class ReleaseVersionsControllerTests
         }
     }
 
-    private ReleaseVersionsController BuildController() => new(_releaseVersionsService.Build());
+    private ReleaseVersionsController BuildController() =>
+        new(_releaseContentService.Build(), _releaseVersionsService.Build());
 }
