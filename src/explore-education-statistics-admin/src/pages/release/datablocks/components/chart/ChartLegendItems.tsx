@@ -57,8 +57,8 @@ interface Props {
 }
 
 export default function ChartLegendItems({
-  capabilities,
   allowColourSelection,
+  capabilities,
   position,
   onChange,
 }: Props) {

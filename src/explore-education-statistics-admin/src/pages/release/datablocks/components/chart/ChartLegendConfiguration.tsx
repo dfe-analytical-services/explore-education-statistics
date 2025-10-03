@@ -47,11 +47,11 @@ export type ChartLegendFormValues = LegendConfiguration;
 const formId = 'chartLegendConfigurationForm';
 
 interface Props {
+  allowColourSelection?: boolean;
   axisMajor: AxisConfiguration;
   buttons?: ReactNode;
   data: TableDataResult[];
   definition: ChartDefinition;
-  allowColourSelection?: boolean;
   legend: LegendConfiguration;
   meta: FullTableMeta;
   showDataLabels?: boolean;
@@ -122,6 +122,7 @@ const ChartLegendConfiguration = ({
   }, [
     axisMajor,
     definition.axes.major?.constants?.groupBy,
+    definition.type,
     data,
     meta,
     legend.position,
