@@ -157,6 +157,8 @@ public class Startup
         services.AddTransient<ISubjectMetaService, SubjectMetaService>();
         services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
         services.AddTransient<IFilterItemRepository, FilterItemRepository>();
+        services.AddTransient<SparseObservationsMatchedFilterItemsStrategy>();
+        services.AddTransient<DenseObservationsMatchedFilterItemsStrategy>();
         services.AddTransient<IFilterRepository, FilterRepository>();
         services.AddTransient<IFootnoteRepository, FootnoteRepository>();
         services.AddTransient<IFrontendService, FrontendService>();

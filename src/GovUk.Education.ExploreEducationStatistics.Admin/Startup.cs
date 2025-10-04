@@ -579,6 +579,8 @@ public class Startup(
         services.AddTransient<ITableBuilderService, TableBuilderService>();
         services.AddTransient<IFilterRepository, FilterRepository>();
         services.AddTransient<IFilterItemRepository, FilterItemRepository>();
+        services.AddTransient<SparseObservationsMatchedFilterItemsStrategy>();
+        services.AddTransient<DenseObservationsMatchedFilterItemsStrategy>();
         services.AddTransient<IFootnoteService, FootnoteService>();
         services.AddTransient<IFootnoteRepository, FootnoteRepository>();
         services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();
