@@ -137,6 +137,8 @@ public class Startup
         services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Section));
         services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.Section));
 
+        services.AddTransient<IRawSqlExecutor, RawSqlExecutor>();
+        services.AddTransient<ITemporaryTableCreator, TemporaryTableCreator>();
         services.AddSingleton<IBlobSasService, BlobSasService>();
         services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(provider =>
             new PublicBlobStorageService(
@@ -157,8 +159,12 @@ public class Startup
         services.AddTransient<ISubjectMetaService, SubjectMetaService>();
         services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
         services.AddTransient<IFilterItemRepository, FilterItemRepository>();
-        services.AddTransient<SparseObservationsMatchedFilterItemsStrategy>();
-        services.AddTransient<DenseObservationsMatchedFilterItemsStrategy>();
+        services
+            .AddTransient<ISparseObservationsMatchedFilterItemsStrategy,
+                SparseObservationsMatchedFilterItemsStrategy>();
+        services
+            .AddTransient<IDenseObservationsMatchedFilterItemsStrategy, DenseObservationsMatchedFilterItemsStrategy>();
+        services.AddTransient<IAllObservationsMatchedFilterItemsStrategy, AllObservationsMatchedFilterItemsStrategy>();
         services.AddTransient<IFilterRepository, FilterRepository>();
         services.AddTransient<IFootnoteRepository, FootnoteRepository>();
         services.AddTransient<IFrontendService, FrontendService>();

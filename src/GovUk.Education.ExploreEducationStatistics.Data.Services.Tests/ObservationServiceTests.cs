@@ -14,6 +14,7 @@ using Thinktecture.EntityFrameworkCore.TempTables;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.SqlTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.ObservationService;
 using static Moq.MockBehavior;
@@ -568,23 +569,6 @@ public class ObservationServiceTests
         }
     }
 
-    private static string FormatSql(string sql)
-    {
-        var removeNewLines = new Regex("\n", RegexOptions.Compiled);
-        var removeWhitespaceAfterOpeningBracket = new Regex("\\( *", RegexOptions.Compiled);
-        var removeWhitespaceBeforeClosingBracket = new Regex(" *\\)", RegexOptions.Compiled);
-        var removeExtraWhitespace = new Regex("[ ]{2,}", RegexOptions.Compiled);
-
-        var newLinesStripped = removeNewLines.Replace(sql, "");
-        var openingBracketWhitespaceStripped = removeWhitespaceAfterOpeningBracket
-            .Replace(newLinesStripped, "(");
-        var closingBracketWhitespaceStripped = removeWhitespaceBeforeClosingBracket
-            .Replace(openingBracketWhitespaceStripped, ")");
-        return removeExtraWhitespace
-            .Replace(closingBracketWhitespaceStripped, " ")
-            .Trim();
-    }
-
     private static ObservationService BuildService(
         StatisticsDbContext context,
         IMatchingObservationsQueryGenerator? queryGenerator = null,
@@ -620,14 +604,16 @@ public class ObservationServiceTests
     {
         // Check the expected query is present to insert matching Observation Ids into
         // the temp table.
-        var actualSql = FormatSql(sql);
-        Assert.StartsWith(FormatSql(expectedSql), actualSql);
+        var actualSql = NormaliseSqlFormatting(sql);
+        Assert.StartsWith(NormaliseSqlFormatting(expectedSql), actualSql);
 
         // Check the expected index is applied to the temp table after the insert.
-        var restOfSql = actualSql.Split(FormatSql(expectedSql))[1].TrimStart();
+        var restOfSql = actualSql.Split(NormaliseSqlFormatting(expectedSql))[1].TrimStart();
         var indexSqlPattern = new Regex(
             @"CREATE UNIQUE CLUSTERED INDEX \[IX_#MatchedObservation_Id_.{36}\].* " +
-            @"ON #MatchedObservation\(Id\) WITH \(MAXDOP = 4\);");
+            @"ON #MatchedObservation\(Id\) WITH \(MAXDOP = 4\);\s*" +
+            @"UPDATE STATISTICS #MatchedObservation WITH FULLSCAN;");
+        
         Assert.Matches(indexSqlPattern, restOfSql);
     }
 }

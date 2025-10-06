@@ -5,7 +5,7 @@
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations;
 
 /// <inheritdoc />
-public partial class AddObservationIdFilterItemIdIndexToObservationFilterItemTable : Migration
+public partial class AddFilterItemIdObservationIdIndexToObservationFilterItemTable : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
@@ -14,18 +14,16 @@ public partial class AddObservationIdFilterItemIdIndexToObservationFilterItemTab
             IF NOT EXISTS (
                 SELECT 1
                 FROM sys.indexes
-                WHERE name = 'IX_ObservationFilterItem_ObservationId_FilterItemId'
+                WHERE name = 'IX_ObservationFilterItem_FilterItemId_ObservationId'
                   AND object_id = OBJECT_ID('dbo.ObservationFilterItem')
             )
             BEGIN
-                CREATE INDEX IX_ObservationFilterItem_ObservationId_FilterItemId
-                ON dbo.ObservationFilterItem (ObservationId, FilterItemId)
+                CREATE INDEX IX_ObservationFilterItem_FilterItemId_ObservationId
+                ON dbo.ObservationFilterItem (FilterItemId, ObservationId)
                 WITH (
                     DATA_COMPRESSION = PAGE,
                     SORT_IN_TEMPDB = ON,
-                    ONLINE = ON,
-                    FILLFACTOR = 95,
-                    OPTIMIZE_FOR_SEQUENTIAL_KEY = ON
+                    ONLINE = ON
                 )
             END
         ");

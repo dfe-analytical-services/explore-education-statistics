@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    [Migration("20250926152334_AddObservationIdFilterItemIdIndexToObservationFilterItemTable")]
-    partial class AddObservationIdFilterItemIdIndexToObservationFilterItemTable
+    [Migration("20250926152334_AddFilterItemIdObservationIdIndexToObservationFilterItemTable")]
+    partial class AddFilterItemIdObservationIdIndexToObservationFilterItemTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

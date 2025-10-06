@@ -132,10 +132,15 @@ public class ObservationService : IObservationService
             // Add a unique clustered index *after* the heap insert for better performance,
             // as adding before the insert forces a more complex execution plan that orders
             // the inserts and disables parallelism.
+            //
+            // Update its statistics so that any future joins can make full use of its
+            // accurate stats.
             var indexSql = $@"
                 CREATE UNIQUE CLUSTERED INDEX [IX_{matchingObservationTable.Name}_{nameof(MatchedObservation.Id)}_{Guid.NewGuid()}]
                 ON {matchingObservationTable.Name}({nameof(MatchedObservation.Id)})
-                WITH (MAXDOP = 4);";
+                WITH (MAXDOP = 4);
+
+                UPDATE STATISTICS {matchingObservationTable.Name} WITH FULLSCAN;";
 
             var parameters = ListOf(new SqlParameter("subjectId", subjectId));
 

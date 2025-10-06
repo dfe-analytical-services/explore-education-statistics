@@ -8,7 +8,16 @@ public class RawSqlExecutor : IRawSqlExecutor
     public async Task ExecuteSqlRaw<TDbContext>(
         TDbContext context,
         string sql,
-        IList<SqlParameter> parameters,
+        CancellationToken cancellationToken)
+        where TDbContext : DbContext
+    {
+        await ExecuteSqlRaw(context, sql, [], cancellationToken);
+    }
+
+    public async Task ExecuteSqlRaw<TDbContext>(
+        TDbContext context,
+        string sql,
+        IEnumerable<SqlParameter> parameters,
         CancellationToken cancellationToken)
         where TDbContext : DbContext
     {
@@ -23,7 +32,13 @@ public interface IRawSqlExecutor
     Task ExecuteSqlRaw<TDbContext>(
         TDbContext context,
         string sql,
-        IList<SqlParameter> parameters,
+        CancellationToken cancellationToken)
+        where TDbContext : DbContext;
+    
+    Task ExecuteSqlRaw<TDbContext>(
+        TDbContext context,
+        string sql,
+        IEnumerable<SqlParameter> parameters,
         CancellationToken cancellationToken)
         where TDbContext : DbContext;
 }

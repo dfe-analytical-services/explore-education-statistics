@@ -1,19 +1,16 @@
 ﻿#nullable enable
-using System.Text.RegularExpressions;
-using GovUk.Education.ExploreEducationStatistics.Common.Database;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Thinktecture.EntityFrameworkCore.TempTables;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.FilterItemRepository;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 
@@ -21,162 +18,219 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
 public class FilterItemRepositoryTests
 {
-    private static DataFixture Fixture = new();
+    private static readonly DataFixture Fixture = new();
         
     [Fact]
-    public async Task GetMatchedFilterItems_QueryGeneratedAndExecuted()
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    public async Task GetMatchedFilterItems_AllObservationsMatched_AllObservationsStrategyChosen()
     {
         var subjectId = Guid.NewGuid();
         
-        await using var context = InMemoryStatisticsDbContext();
+        var allObservationsForSubject = Fixture
+            .DefaultObservation()
+            .WithSubject(new Subject
+            {
+                Id = subjectId
+            })
+            .GenerateList(10);
         
-        const string sql = "Some SQL here";
+        var observationsForAnotherSubject = Fixture
+            .DefaultObservation()
+            .WithSubject(new Subject
+            {
+                Id = Guid.NewGuid()
+            })
+            .GenerateList(10);
+        
+        // Fill the #MatchedObservation temp table with matches for every Observation for the Subject.
+        var matchedObservationIds = allObservationsForSubject
+            .Select(o => new MatchedObservation(o.Id))
+            .ToList();
 
-        var queryGenerator = new Mock<IMatchedFilterItemsQueryGenerator>(Strict);
+        var statisticsDbContextId = Guid.NewGuid().ToString();
 
-        var matchingObservationsTable = new Mock<ITempTableReference>(Strict);
-        matchingObservationsTable
-            .SetupGet(t => t.Name)
-            .Returns("#MatchedObservation");
-        
-        var matchedFilterItemsTable = new Mock<ITempTableReference>(Strict);
-        matchedFilterItemsTable
-            .SetupGet(t => t.Name)
-            .Returns("#MatchedFilterItem");
-
-        queryGenerator
-            .Setup(s => s
-                .GetMatchedFilterItemsQuery(
-                    context,
-                    matchingObservationsTable.Object,
-                    default))
-            .ReturnsAsync(sql);
-
-        var sqlExecutor = new Mock<IRawSqlExecutor>(Strict);
-
-        sqlExecutor
-            .Setup(s => s.ExecuteSqlRaw(context, sql, new List<SqlParameter>(), default))
-            .Returns(Task.CompletedTask);
-        
-        var service = BuildFilterItemRepository(
-            context: context,
-            sqlExecutor: sqlExecutor.Object,
-            queryGenerator: queryGenerator.Object);
-
-        await service.GetFilterItemsFromMatchedObservationIds(
-            subjectId,
-            matchingObservationsTable.Object,
-            default);
-        
-        VerifyAllMocks(queryGenerator, sqlExecutor);
-    }
-    
-    [Fact]
-    public async Task GetMatchedFilterItems_MatchedFilterItemsUsedToReturnFilterItems()
-    {
-        // Create 4 filters for this Subject.
-        var filters = Fixture
-            .DefaultFilter(filterGroupCount: 2, filterItemCount: 2)
-            .WithSubject(Fixture.DefaultSubject())
-            .GenerateList(4);
-
-        var subjectId = filters[0].SubjectId;
-        
-        // We have matched a FilterItem from Filter 1, Filter Group 2.
-        var matchedFilter1Group2Item2 = filters[0].FilterGroups[1].FilterItems[1];
-        
-        // We have matched 2 FilterItems from Filter 2, Filter Group 1.
-        var matchedFilter2Group1Item1 = filters[1].FilterGroups[0].FilterItems[0];
-        var matchedFilter2Group1Item2 = filters[1].FilterGroups[0].FilterItems[1];
-        
-        // We have matched 2 FilterItems from Filter 3, from different Filter Groups.
-        var matchedFilter3Group1Item1 = filters[2].FilterGroups[0].FilterItems[0];
-        var matchedFilter3Group2Item1 = filters[2].FilterGroups[1].FilterItems[0];
-        
-        await using var context = InMemoryStatisticsDbContext();
-        
-        context.Filter.AddRange(filters);
-        await context.SaveChangesAsync();
-
-        FilterItem[] expectedMatchedFilterItems =
-        [
-            matchedFilter1Group2Item2,
-            matchedFilter2Group1Item1,
-            matchedFilter2Group1Item2,
-            matchedFilter3Group1Item1,
-            matchedFilter3Group2Item1
-        ];
-        
-        // Fake populating the temporary table with results from executing the generated
-        // query from the MatchedFilterItemsQueryGenerator. 
-        context.MatchedFilterItems.AddRange(
-            expectedMatchedFilterItems.Select(fi => new MatchedFilterItem(fi.Id)));
-        await context.SaveChangesAsync();
-        
-        var matchingObservationsTable = new Mock<ITempTableReference>(Loose);
-        var sqlExecutor = new Mock<IRawSqlExecutor>(Loose);
-        var queryGenerator = new Mock<IMatchedFilterItemsQueryGenerator>(Loose);
-
-        var service = BuildFilterItemRepository(
-            context: context,
-            sqlExecutor: sqlExecutor.Object,
-            queryGenerator: queryGenerator.Object);
-
-        var matchedFilterItems = await service.GetFilterItemsFromMatchedObservationIds(
-            subjectId,
-            matchingObservationsTable.Object,
-            default);
-        
-        Assert.Equal(
-            expectedMatchedFilterItems.OrderBy(f => f.Id),
-            matchedFilterItems.OrderBy(f => f.Id));
-    }
-    
-    [Fact]
-    public async Task MatchedFilterItemsQueryGenerator()
-    {
-        await using var context = InMemoryStatisticsDbContext();
-        
-        var tempTableCreator = new Mock<ITemporaryTableCreator>();
-
-        var matchingObservationsTable = new Mock<ITempTableReference>(Strict);
-        matchingObservationsTable
-            .SetupGet(t => t.Name)
-            .Returns("#MatchedObservation");
-
-        var matchedFilterItemsTable = new Mock<ITempTableReference>(Strict);
-        matchedFilterItemsTable
-            .SetupGet(t => t.Name)
-            .Returns("#MatchedFilterItem");
-
-        tempTableCreator
-            .Setup(s =>
-                s.CreateTemporaryTable<MatchedFilterItem, StatisticsDbContext>(context, default))
-            .ReturnsAsync(matchedFilterItemsTable.Object);
-        
-        var queryGenerator = new MatchedFilterItemsQueryGenerator
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            TempTableCreator = tempTableCreator.Object
-        };
+            await statisticsDbContext.Observation.AddRangeAsync(
+                allObservationsForSubject.Concat(observationsForAnotherSubject));
+            await statisticsDbContext.MatchedObservations.AddRangeAsync(matchedObservationIds);
+            await statisticsDbContext.SaveChangesAsync();
+        }
 
-        var sql = 
-            await queryGenerator
-                .GetMatchedFilterItemsQuery(
-                    context,
-                    matchingObservationsTable.Object,
-                    default);
+        await using var context = InMemoryStatisticsDbContext(statisticsDbContextId);
 
-        VerifyAllMocks(tempTableCreator);
+        var allObservationsStrategy = new Mock<IAllObservationsMatchedFilterItemsStrategy>(Strict);
+        var sparseObservationsStrategy = new Mock<ISparseObservationsMatchedFilterItemsStrategy>(Strict);
+        var denseObservationsStrategy = new Mock<IDenseObservationsMatchedFilterItemsStrategy>(Strict);
+
+        var filterItemsToReturn = Fixture
+            .DefaultFilterItem()
+            .GenerateList(2);
+
+        allObservationsStrategy
+            .Setup(s => s.GetFilterItemsFromMatchedObservationIds(
+                subjectId,
+                default))
+            .ReturnsAsync(filterItemsToReturn);
         
-        var expectedSql = $@"
-            INSERT INTO {matchedFilterItemsTable.Object.Name} WITH (TABLOCK)
-            SELECT DISTINCT o.FilterItemId
-            FROM {matchingObservationsTable.Object.Name} AS mo
-            JOIN ObservationFilterItem AS o
-              ON o.ObservationId = mo.Id
-            OPTION(RECOMPILE, MAXDOP 4);";
+        var repository = BuildFilterItemRepository(
+            context: context,
+            allObservationsMatchedFilterItemsStrategy: allObservationsStrategy.Object,
+            sparseObservationsMatchedFilterItemsStrategy: sparseObservationsStrategy.Object,
+            denseObservationsMatchedFilterItemsStrategy: denseObservationsStrategy.Object);
 
-        AssertInsertIntoMatchedFilterItemsCorrect(sql, expectedSql);
+        var result = await repository.GetFilterItemsFromMatchedObservationIds(
+            subjectId: subjectId,
+            matchedObservationsTableReference: Mock.Of<ITempTableReference>(),
+            cancellationToken: default);
+        
+        VerifyAllMocks(allObservationsStrategy);
+        
+        Assert.Equal(filterItemsToReturn, result);
+    }
+    
+    [Fact]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    public async Task GetMatchedFilterItems_PercentThresholdObservationsMatched_DenseObservationsStrategyChosen()
+    {
+        var subjectId = Guid.NewGuid();
+        
+        var allObservationsForSubject = Fixture
+            .DefaultObservation()
+            .WithSubject(new Subject
+            {
+                Id = subjectId
+            })
+            .GenerateList(100);
+        
+        var observationsForAnotherSubject = Fixture
+            .DefaultObservation()
+            .WithSubject(new Subject
+            {
+                Id = Guid.NewGuid()
+            })
+            .GenerateList(100);
+        
+        // Fill the #MatchedObservation temp table with 80% of the Observations for the Subject.
+        var matchedObservationIds = allObservationsForSubject
+            .Take(75)
+            .Select(o => new MatchedObservation(o.Id))
+            .ToList();
+
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            await statisticsDbContext.Observation.AddRangeAsync(
+                allObservationsForSubject.Concat(observationsForAnotherSubject));
+            await statisticsDbContext.MatchedObservations.AddRangeAsync(matchedObservationIds);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using var context = InMemoryStatisticsDbContext(statisticsDbContextId);
+
+        var allObservationsStrategy = new Mock<IAllObservationsMatchedFilterItemsStrategy>(Strict);
+        var sparseObservationsStrategy = new Mock<ISparseObservationsMatchedFilterItemsStrategy>(Strict);
+        var denseObservationsStrategy = new Mock<IDenseObservationsMatchedFilterItemsStrategy>(Strict);
+        var matchedObservationTempTable = Mock.Of<ITempTableReference>();
+
+        var filterItemsToReturn = Fixture
+            .DefaultFilterItem()
+            .GenerateList(2);
+
+        denseObservationsStrategy
+            .Setup(s => s.GetFilterItemsFromMatchedObservationIds(
+                subjectId,
+                matchedObservationTempTable,
+                default))
+            .ReturnsAsync(filterItemsToReturn);
+        
+        var repository = BuildFilterItemRepository(
+            context: context,
+            allObservationsMatchedFilterItemsStrategy: allObservationsStrategy.Object,
+            sparseObservationsMatchedFilterItemsStrategy: sparseObservationsStrategy.Object,
+            denseObservationsMatchedFilterItemsStrategy: denseObservationsStrategy.Object);
+
+        var result = await repository.GetFilterItemsFromMatchedObservationIds(
+            subjectId: subjectId,
+            matchedObservationsTableReference: matchedObservationTempTable,
+            cancellationToken: default);
+        
+        VerifyAllMocks(denseObservationsStrategy);
+        
+        Assert.Equal(filterItemsToReturn, result);
+    }
+    
+    [Fact]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    public async Task GetMatchedFilterItems_LessThanPercentThresholdObservationsMatched_SparseObservationsStrategyChosen()
+    {
+        var subjectId = Guid.NewGuid();
+        
+        var allObservationsForSubject = Fixture
+            .DefaultObservation()
+            .WithSubject(new Subject
+            {
+                Id = subjectId
+            })
+            .GenerateList(100);
+        
+        var observationsForAnotherSubject = Fixture
+            .DefaultObservation()
+            .WithSubject(new Subject
+            {
+                Id = Guid.NewGuid()
+            })
+            .GenerateList(10);
+        
+        // Fill the #MatchedObservation temp table with less than 80% of the Observations for the Subject.
+        var matchedObservationIds = allObservationsForSubject
+            .Take(74)
+            .Select(o => new MatchedObservation(o.Id))
+            .ToList();
+
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            await statisticsDbContext.Observation.AddRangeAsync(
+                allObservationsForSubject.Concat(observationsForAnotherSubject));
+            await statisticsDbContext.MatchedObservations.AddRangeAsync(matchedObservationIds);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using var context = InMemoryStatisticsDbContext(statisticsDbContextId);
+
+        var allObservationsStrategy = new Mock<IAllObservationsMatchedFilterItemsStrategy>(Strict);
+        var sparseObservationsStrategy = new Mock<ISparseObservationsMatchedFilterItemsStrategy>(Strict);
+        var denseObservationsStrategy = new Mock<IDenseObservationsMatchedFilterItemsStrategy>(Strict);
+        var matchedObservationTempTable = Mock.Of<ITempTableReference>();
+
+        var filterItemsToReturn = Fixture
+            .DefaultFilterItem()
+            .GenerateList(2);
+
+        sparseObservationsStrategy
+            .Setup(s => s.GetFilterItemsFromMatchedObservationIds(
+                subjectId,
+                matchedObservationTempTable,
+                default))
+            .ReturnsAsync(filterItemsToReturn);
+        
+        var repository = BuildFilterItemRepository(
+            context: context,
+            allObservationsMatchedFilterItemsStrategy: allObservationsStrategy.Object,
+            sparseObservationsMatchedFilterItemsStrategy: sparseObservationsStrategy.Object,
+            denseObservationsMatchedFilterItemsStrategy: denseObservationsStrategy.Object);
+
+        var result = await repository.GetFilterItemsFromMatchedObservationIds(
+            subjectId: subjectId,
+            matchedObservationsTableReference: matchedObservationTempTable,
+            cancellationToken: default);
+        
+        VerifyAllMocks(sparseObservationsStrategy);
+        
+        Assert.Equal(filterItemsToReturn, result);
     }
     
     [Fact]
@@ -339,45 +393,15 @@ public class FilterItemRepositoryTests
 
     private static FilterItemRepository BuildFilterItemRepository(
         StatisticsDbContext context,
-        IRawSqlExecutor? sqlExecutor = null,
-        IMatchedFilterItemsQueryGenerator? queryGenerator = null)
+        IAllObservationsMatchedFilterItemsStrategy? allObservationsMatchedFilterItemsStrategy = null,
+        ISparseObservationsMatchedFilterItemsStrategy? sparseObservationsMatchedFilterItemsStrategy = null,
+        IDenseObservationsMatchedFilterItemsStrategy? denseObservationsMatchedFilterItemsStrategy = null)
     {
-        return new(context, Mock.Of<ILogger<FilterItemRepository>>())
-        {
-            SqlExecutor = sqlExecutor ?? Mock.Of<IRawSqlExecutor>(Strict),
-            QueryGenerator = queryGenerator ?? Mock.Of<IMatchedFilterItemsQueryGenerator>(Strict)
-        };
-    }
-    
-    private static void AssertInsertIntoMatchedFilterItemsCorrect(string sql, string expectedSql)
-    {
-        // Check the expected query is present to insert matching Observation Ids into
-        // the temp table.
-        var actualSql = FormatSql(sql);
-        Assert.StartsWith(FormatSql(expectedSql), actualSql);
-
-        // Check the expected index is applied to the temp table after the insert.
-        var restOfSql = actualSql.Split(FormatSql(expectedSql))[1].TrimStart();
-        var indexSqlPattern = new Regex(
-            @"CREATE UNIQUE CLUSTERED INDEX \[IX_#MatchedFilterItem_Id_.{36}\].* " +
-            @"ON #MatchedFilterItem\(Id\) WITH \(MAXDOP = 4\);");
-        Assert.Matches(indexSqlPattern, restOfSql);
-    }
-    
-    private static string FormatSql(string sql)
-    {
-        var removeNewLines = new Regex("\n", RegexOptions.Compiled);
-        var removeWhitespaceAfterOpeningBracket = new Regex("\\( *", RegexOptions.Compiled);
-        var removeWhitespaceBeforeClosingBracket = new Regex(" *\\)", RegexOptions.Compiled);
-        var removeExtraWhitespace = new Regex("[ ]{2,}", RegexOptions.Compiled);
-
-        var newLinesStripped = removeNewLines.Replace(sql, "");
-        var openingBracketWhitespaceStripped = removeWhitespaceAfterOpeningBracket
-            .Replace(newLinesStripped, "(");
-        var closingBracketWhitespaceStripped = removeWhitespaceBeforeClosingBracket
-            .Replace(openingBracketWhitespaceStripped, ")");
-        return removeExtraWhitespace
-            .Replace(closingBracketWhitespaceStripped, " ")
-            .Trim();
+        return new(
+            statisticsDbContext: context, 
+            allObservationsMatchedFilterItemsStrategy ?? Mock.Of<IAllObservationsMatchedFilterItemsStrategy>(),
+            sparseObservationsMatchedFilterItemsStrategy ?? Mock.Of<ISparseObservationsMatchedFilterItemsStrategy>(),
+            denseObservationsMatchedFilterItemsStrategy ?? Mock.Of<IDenseObservationsMatchedFilterItemsStrategy>(),
+            Mock.Of<ILogger<FilterItemRepository>>());
     }
 }
