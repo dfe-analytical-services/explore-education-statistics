@@ -548,9 +548,9 @@ public class ReleaseVersionService(
                         )
                     );
             })
+            .OnSuccess(releaseVersions => releaseVersions.Where(rv => !rv.Live))
             .OnSuccess(async releaseVersions =>
-            {
-                var approvedReleases = await releaseVersions
+                await releaseVersions
                     .ToAsyncEnumerable()
                     .SelectAwait(async releaseVersion =>
                     {
@@ -561,10 +561,8 @@ public class ReleaseVersionService(
                         );
                         return releaseViewModel;
                     })
-                    .ToListAsync();
-
-                return approvedReleases.Where(release => !release.Live).ToList();
-            });
+                    .ToListAsync()
+            );
     }
 
     public async Task<Either<ActionResult, DeleteDataFilePlanViewModel>> GetDeleteDataFilePlan(
