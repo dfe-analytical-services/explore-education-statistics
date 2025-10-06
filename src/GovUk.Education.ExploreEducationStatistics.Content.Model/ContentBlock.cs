@@ -80,7 +80,7 @@ public class DataBlock : ContentBlock
 
     public string Name { get; set; }
 
-    public string Source { get; set; }
+    public string? Source { get; set; }
 
     public FullTableQuery Query { get; set; }
 

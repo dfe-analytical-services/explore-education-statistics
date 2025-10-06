@@ -130,7 +130,7 @@ public class DataBlockVersionDtoBuilder
     private string _heading = "Heading";
     private string _name = "Name";
     private FullTableQuery _query = new();
-    private string _source = "Source";
+    private string? _source = "Source";
     private TableBuilderConfiguration _table = new();
 
     public DataBlockVersionDto Build() =>
@@ -182,7 +182,7 @@ public class DataBlockVersionDtoBuilder
         return this;
     }
 
-    public DataBlockVersionDtoBuilder WithSource(string source)
+    public DataBlockVersionDtoBuilder WithSource(string? source)
     {
         _source = source;
         return this;

@@ -1718,7 +1718,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnName("DataBlock_Query");
 
                     b.Property<string>("Source")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Table")

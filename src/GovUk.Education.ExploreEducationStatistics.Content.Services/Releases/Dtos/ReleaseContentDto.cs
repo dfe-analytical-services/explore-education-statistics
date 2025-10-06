@@ -104,7 +104,7 @@ public record DataBlockVersionDto
 
     public required FullTableQuery Query { get; init; }
 
-    public required string Source { get; init; }
+    public required string? Source { get; init; }
 
     public required TableBuilderConfiguration Table { get; init; }
 
