@@ -53,9 +53,18 @@ interface HomeProps extends BaseReleaseProps {
   page: 'home';
 }
 
+interface ExploreDataProps extends BaseReleaseProps {
+  page: 'explore';
+  methodologiesSummary: PublicationMethodologiesList;
+}
+
 interface MethodologyProps extends BaseReleaseProps {
   page: 'methodology';
   methodologiesSummary: PublicationMethodologiesList;
+}
+
+interface HelpProps extends BaseReleaseProps {
+  page: 'help';
 }
 
 interface CurrentReleaseProps {
@@ -63,7 +72,12 @@ interface CurrentReleaseProps {
   releaseVersion: ReleaseVersion;
 }
 
-type Props = HomeProps | MethodologyProps | CurrentReleaseProps;
+type Props =
+  | HomeProps
+  | ExploreDataProps
+  | MethodologyProps
+  | HelpProps
+  | CurrentReleaseProps;
 
 const PublicationReleasePage: NextPage<Props> = props => {
   const { page } = props;
@@ -80,12 +94,14 @@ const PublicationReleasePage: NextPage<Props> = props => {
           publicationSummary={props.publicationSummary}
         />
       )}
+      {page === 'explore' && <p>TODO EES-6444 Explore Data page</p>}
       {page === 'methodology' && (
         <ReleaseMethodologyPage
           publicationSummary={props.publicationSummary}
           methodologiesSummary={props.methodologiesSummary}
         />
       )}
+      {page === 'help' && <p>TODO EES-6446 Help and information page</p>}
     </ReleasePageShell>
   );
 };
@@ -129,6 +145,22 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
         };
 
         switch (tab) {
+          case undefined:
+            return {
+              props: {
+                ...baseProps,
+                page: 'home',
+              },
+            };
+
+          case 'explore':
+            return {
+              props: {
+                ...baseProps,
+                page: 'explore',
+              },
+            };
+
           case 'methodology':
             return {
               props: {
@@ -142,12 +174,17 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
               },
             };
 
-          default:
+          case 'help':
             return {
               props: {
                 ...baseProps,
-                page: 'home',
+                page: 'help',
               },
+            };
+
+          default:
+            return {
+              notFound: true,
             };
         }
       } catch (error) {
