@@ -40,7 +40,7 @@ describe('PageNavExpandable', () => {
     ).toHaveAttribute('href', '#item-3');
     expect(
       within(items[3]).getByRole('link', { name: 'Back to top' }),
-    ).toHaveAttribute('href', '#main-content');
+    ).toHaveAttribute('href', '#top');
   });
 
   test('renders correctly with sub nav', () => {

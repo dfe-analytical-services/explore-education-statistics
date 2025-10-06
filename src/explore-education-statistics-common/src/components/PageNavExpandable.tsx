@@ -73,7 +73,7 @@ export default function PageNavExpandable({
           ))}
           <NavItem
             className={items.length ? 'govuk-!-margin-top-8' : undefined}
-            id="main-content"
+            id="top"
             text="Back to top"
             onClick={() => onClickItem?.(items[0].id)}
           />
