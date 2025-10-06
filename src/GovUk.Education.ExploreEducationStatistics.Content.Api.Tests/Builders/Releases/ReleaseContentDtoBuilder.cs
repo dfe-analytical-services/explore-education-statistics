@@ -73,7 +73,7 @@ public class ContentSectionDtoBuilder
         new HtmlBlockDtoBuilder().Build(),
     ];
 
-    private string _heading = "Heading";
+    private string? _heading = "Heading";
 
     public ContentSectionDto Build() =>
         new()
@@ -95,7 +95,7 @@ public class ContentSectionDtoBuilder
         return this;
     }
 
-    public ContentSectionDtoBuilder WithHeading(string heading)
+    public ContentSectionDtoBuilder WithHeading(string? heading)
     {
         _heading = heading;
         return this;

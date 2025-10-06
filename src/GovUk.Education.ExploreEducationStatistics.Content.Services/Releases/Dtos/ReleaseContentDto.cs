@@ -45,7 +45,7 @@ public record ContentSectionDto
 {
     public required Guid Id { get; init; }
 
-    public required string Heading { get; init; }
+    public required string? Heading { get; init; }
 
     public required ContentBlockBaseDto[] Content { get; init; }
 
