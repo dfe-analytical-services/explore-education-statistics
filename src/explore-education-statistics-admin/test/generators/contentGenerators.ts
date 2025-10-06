@@ -77,7 +77,6 @@ const defaultDataBlockQuery: TableDataQuery = {
 };
 
 const defaultTable: Table = {
-  indicators: [],
   tableHeaders: {
     columnGroups: [],
     columns: [],

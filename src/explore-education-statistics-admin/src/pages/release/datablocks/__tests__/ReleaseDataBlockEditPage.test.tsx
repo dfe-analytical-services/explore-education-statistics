@@ -135,7 +135,6 @@ describe('ReleaseDataBlockEditPage', () => {
       indicators: ['authorised-absence-sessions'],
     },
     table: {
-      indicators: [],
       tableHeaders: {
         columnGroups: [[{ type: 'TimePeriod', value: '2020_AY' }]],
         columns: [{ type: 'Filter', value: 'gender-female' }],

@@ -5,6 +5,7 @@ import publicationService, {
   PublicationMethodologiesList,
   PublicationSummaryRedesign,
   ReleaseVersion,
+  ReleaseVersionHomeContent,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
@@ -49,6 +50,7 @@ interface BaseReleaseProps {
 
 interface HomeProps extends BaseReleaseProps {
   page: 'home';
+  homeContent: ReleaseVersionHomeContent;
 }
 
 interface ExploreDataProps extends BaseReleaseProps {
@@ -121,6 +123,7 @@ const PublicationReleasePage: NextPage<Props> = props => {
     >
       {page === 'home' && (
         <PublicationReleasePageHome
+          homeContent={props.homeContent}
           publicationSummary={props.publicationSummary}
         />
       )}
@@ -180,6 +183,12 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
               props: {
                 ...baseProps,
                 page: 'home',
+                homeContent: await queryClient.fetchQuery(
+                  publicationQueries.getReleaseVersionHomeContent(
+                    publicationSlug,
+                    releaseSlug,
+                  ),
+                ),
               },
             };
 

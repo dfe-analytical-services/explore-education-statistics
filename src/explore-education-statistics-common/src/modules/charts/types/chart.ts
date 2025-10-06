@@ -266,6 +266,7 @@ export interface LineChart {
   map?: MapConfig;
   subtitle?: string;
   dataLabelPosition?: LineChartDataLabelPosition;
+  dataLabelColour?: LegendLabelColour;
   legend: LegendConfiguration;
   axes: {
     major: AxisConfiguration;

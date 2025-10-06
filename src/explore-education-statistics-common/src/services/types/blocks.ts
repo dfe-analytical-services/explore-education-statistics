@@ -3,7 +3,6 @@ import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 
 export interface Table {
-  indicators: string[];
   tableHeaders: UnmappedTableHeadersConfig;
 }
 

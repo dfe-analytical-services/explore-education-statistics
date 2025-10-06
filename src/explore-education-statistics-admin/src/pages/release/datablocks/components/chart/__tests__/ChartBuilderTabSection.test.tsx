@@ -100,7 +100,6 @@ describe('ChartBuilderTabSection', () => {
         columns: [],
         rows: [],
       },
-      indicators: [],
     },
     charts: [testChart],
     query: {

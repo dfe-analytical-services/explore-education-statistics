@@ -5,6 +5,7 @@ import publicationService, {
   PublicationTreeOptions,
   ReleaseSummary,
   ReleaseVersion,
+  ReleaseVersionHomeContent,
   ReleaseVersionSummary,
   Theme,
 } from '@common/services/publicationService';
@@ -41,6 +42,19 @@ const publicationQueries = {
       queryKey: ['releaseVersionSummary', publicationSlug, releaseSlug],
       queryFn: () =>
         publicationService.getReleaseVersionSummary(
+          publicationSlug,
+          releaseSlug,
+        ),
+    };
+  },
+  getReleaseVersionHomeContent(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): UseQueryOptions<ReleaseVersionHomeContent> {
+    return {
+      queryKey: ['releaseVersionHomeContent', publicationSlug, releaseSlug],
+      queryFn: () =>
+        publicationService.getReleaseVersionHomeContent(
           publicationSlug,
           releaseSlug,
         ),
