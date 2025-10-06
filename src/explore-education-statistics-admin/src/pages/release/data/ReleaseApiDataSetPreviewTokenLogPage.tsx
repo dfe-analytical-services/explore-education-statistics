@@ -9,7 +9,9 @@ import {
 } from '@admin/routes/releaseRoutes';
 import previewTokenQueries from '@admin/queries/previewTokenQueries';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
-import previewTokenService from '@admin/services/previewTokenService';
+import previewTokenService, {
+  PreviewToken,
+} from '@admin/services/previewTokenService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import FormattedDate from '@common/components/FormattedDate';
@@ -37,7 +39,7 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
     enabled: !!dataSet?.draftVersion,
   });
   const getPreviewTokenTagColour = (
-    status: string,
+    status: PreviewToken['status'],
   ): 'green' | 'yellow' | 'grey' => {
     switch (status) {
       case 'Active':

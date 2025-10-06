@@ -28,7 +28,7 @@ public class PreviewTokenService(
         Guid dataSetVersionId,
         string label,
         DateTimeOffset? activates,
-        DateTimeOffset? expiry,
+        DateTimeOffset? expires,
         CancellationToken cancellationToken = default)
     {
         return await userService.CheckIsBauUser()
@@ -36,14 +36,15 @@ public class PreviewTokenService(
             .OnSuccessDo(ValidateDraftDataSetVersion)
             .OnSuccess(async () =>
             {
-                activates = activates?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
+                var activatesUtc = activates?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
+                var expiresUtc = expires?.ToUniversalTime() ?? activatesUtc.AddDays(7);
                 var previewToken = publicDataDbContext.PreviewTokens.Add(new PreviewToken
                 {
                     DataSetVersionId = dataSetVersionId,
                     Label = label,
                     Created = DateTimeOffset.UtcNow,
-                    Activates = activates.Value.ToUniversalTime(),
-                    Expiry = expiry?.ToUniversalTime() ?? activates.Value.AddDays(7),
+                    Activates = activatesUtc,
+                    Expiry = expiresUtc,
                     CreatedByUserId = userService.GetUserId()
                 });
                 await publicDataDbContext.SaveChangesAsync(cancellationToken);

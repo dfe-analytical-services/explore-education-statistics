@@ -11,7 +11,7 @@ public interface IPreviewTokenService
         Guid dataSetVersionId,
         string label,
         DateTimeOffset? activates,
-        DateTimeOffset? expiry,
+        DateTimeOffset? expires,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, PreviewTokenViewModel>> GetPreviewToken(

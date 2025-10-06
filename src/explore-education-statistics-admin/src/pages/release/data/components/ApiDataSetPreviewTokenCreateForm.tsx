@@ -17,7 +17,7 @@ import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import { PreviewTokenFormProps } from '@admin/pages/release/data/types/PreviewTokenFormProps';
+import { PreviewTokenCreateValues } from '@admin/pages/release/data/types/PreviewTokenCreateValues';
 
 interface FormValues {
   agreeTerms: boolean;
@@ -30,7 +30,7 @@ interface FormValues {
 
 interface Props {
   onCancel: () => void;
-  onSubmit: (values: PreviewTokenFormProps) => void;
+  onSubmit: (values: PreviewTokenCreateValues) => void;
 }
 
 const presetOptions: RadioOption[] = [

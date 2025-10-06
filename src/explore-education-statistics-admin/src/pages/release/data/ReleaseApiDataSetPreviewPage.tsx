@@ -16,7 +16,7 @@ import Modal from '@common/components/Modal';
 import { useQuery } from '@tanstack/react-query';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import React from 'react';
-import { PreviewTokenFormProps } from '@admin/pages/release/data/types/PreviewTokenFormProps';
+import { PreviewTokenCreateValues } from '@admin/pages/release/data/types/PreviewTokenCreateValues';
 import { isToday } from 'date-fns';
 
 export default function ReleaseApiDataSetPreviewPage() {
@@ -50,7 +50,7 @@ export default function ReleaseApiDataSetPreviewPage() {
     datePresetSpan,
     activates,
     expires,
-  }: PreviewTokenFormProps) => {
+  }: PreviewTokenCreateValues) => {
     let startDate: Date | null = null;
     let endDate: Date | null = null;
 

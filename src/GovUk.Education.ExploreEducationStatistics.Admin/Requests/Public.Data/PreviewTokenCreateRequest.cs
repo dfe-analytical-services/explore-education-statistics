@@ -49,7 +49,7 @@ public record PreviewTokenCreateRequest
                             .Cascade(CascadeMode.Stop)
                             .Must(r => r.Activates!.Value < r.Expires!.Value)
                             .WithMessage("Activates date must be before the expires date.")
-                            .Must(r => r.Expires!.Value <= r.Activates!.Value.AddDays(7))
+                            .Must(r => r.Expires!.Value.Date <= r.Activates!.Value.AddDays(7).Date) // ignore the time when comparing with the 'Activates'
                             .WithMessage("Expires date must be no more than 7 days after the activates date.");
                     })
                     .Otherwise(() =>
@@ -72,7 +72,7 @@ public record PreviewTokenCreateRequest
             return;
 
             static bool IsNotInPastWithTolerance(DateTimeOffset now, DateTimeOffset value, TimeSpan tolerance)
-                => value.UtcDateTime >= now.UtcDateTime.Subtract(tolerance);
+                => value >= now.Subtract(tolerance);
 
         }
     }
