@@ -1,5 +1,5 @@
-import { render, waitFor, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import render from '@common-test/render';
+import { waitFor, screen, within } from '@testing-library/react';
 import React from 'react';
 import Accordion from '../Accordion';
 import AccordionSection from '../AccordionSection';
@@ -44,7 +44,7 @@ describe('Accordion', () => {
   });
 
   test('clicking heading makes the section content expanded', async () => {
-    render(
+    const { user } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading">Test content</AccordionSection>
       </Accordion>,
@@ -54,7 +54,7 @@ describe('Accordion', () => {
 
     expect(heading).toHaveAttribute('aria-expanded', 'false');
 
-    await userEvent.click(heading);
+    await user.click(heading);
 
     expect(heading).toHaveAttribute('aria-expanded', 'true');
   });
@@ -185,7 +185,7 @@ describe('Accordion', () => {
   test('accordion sections that were opened when the location hash matches an element in the section content can be closed', async () => {
     window.location.hash = '#test-sections-1-content';
 
-    render(
+    const { user } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading 1">
           Test content 1
@@ -205,7 +205,7 @@ describe('Accordion', () => {
 
     expect(heading).toHaveAttribute('aria-expanded', 'true');
 
-    await userEvent.click(heading);
+    await user.click(heading);
 
     expect(
       await within(accordionSections[0]).findByText('Show'),
@@ -235,7 +235,7 @@ describe('Accordion', () => {
   });
 
   test('clicking on `Show all sections` reveals all sections', async () => {
-    render(
+    const { user } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading 1">
           Test content 1
@@ -255,7 +255,7 @@ describe('Accordion', () => {
     expect(sections[0]).toHaveAttribute('aria-expanded', 'false');
     expect(sections[1]).toHaveAttribute('aria-expanded', 'true');
 
-    await userEvent.click(button);
+    await user.click(button);
 
     expect(button).toHaveAttribute('aria-expanded', 'true');
     expect(sections[0]).toHaveAttribute('aria-expanded', 'true');
@@ -265,7 +265,7 @@ describe('Accordion', () => {
   test('clicking on `Show all sections` causes `onToggleAll` handler to be called with new state', async () => {
     const toggleAll = jest.fn();
 
-    render(
+    const { user } = render(
       <Accordion id="test-sections" onToggleAll={toggleAll}>
         <AccordionSection heading="Test heading">Test content</AccordionSection>
       </Accordion>,
@@ -273,15 +273,13 @@ describe('Accordion', () => {
 
     expect(toggleAll).not.toHaveBeenCalled();
 
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Show all sections' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Show all sections' }));
 
     expect(toggleAll).toHaveBeenCalledWith(true);
   });
 
   test('clicking on `Hide all sections` closes all sections', async () => {
-    render(
+    const { user } = render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading 1" open>
           Test content 1
@@ -301,7 +299,7 @@ describe('Accordion', () => {
     expect(sections[0]).toHaveAttribute('aria-expanded', 'true');
     expect(sections[1]).toHaveAttribute('aria-expanded', 'true');
 
-    await userEvent.click(closeAllButton);
+    await user.click(closeAllButton);
 
     expect(closeAllButton).toHaveAttribute('aria-expanded', 'false');
     expect(sections[0]).toHaveAttribute('aria-expanded', 'false');
@@ -311,7 +309,7 @@ describe('Accordion', () => {
   test('clicking on `Hide all sections` causes `onToggleAll` handler to be called with new state', async () => {
     const toggleAll = jest.fn();
 
-    render(
+    const { user } = render(
       <Accordion id="test-sections" onToggleAll={toggleAll}>
         <AccordionSection heading="Test heading" open>
           Test content
@@ -321,9 +319,7 @@ describe('Accordion', () => {
 
     expect(toggleAll).not.toHaveBeenCalled();
 
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Hide all sections' }),
-    );
+    await user.click(screen.getByRole('button', { name: 'Hide all sections' }));
 
     expect(toggleAll).toHaveBeenCalledWith(false);
   });
@@ -338,11 +334,31 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    expect(container.querySelectorAll('.govuk-visually-hidden')).toHaveLength(
-      1,
+    const hiddenText = container.querySelectorAll('.govuk-visually-hidden');
+
+    expect(hiddenText).toHaveLength(2);
+    expect(hiddenText[0]).toHaveTextContent('Academic year 2016/17 sections');
+    expect(hiddenText[1]).toHaveTextContent(',');
+  });
+
+  test('it renders the correct aria-label', async () => {
+    const { user } = render(
+      <Accordion
+        id="test-sections"
+        toggleAllHiddenText="Academic year 2016/17 sections"
+      >
+        <AccordionSection heading="Test heading">Test content</AccordionSection>
+      </Accordion>,
     );
-    expect(container.querySelector('.govuk-visually-hidden')).toHaveTextContent(
-      'Academic year 2016/17 sections',
-    );
+
+    expect(
+      screen.getByRole('button', { name: /Test heading/ }),
+    ).toHaveAttribute('aria-label', 'Test heading, show this section');
+
+    await user.click(screen.getByRole('button', { name: /Test heading/ }));
+
+    expect(
+      screen.getByRole('button', { name: /Test heading/ }),
+    ).toHaveAttribute('aria-label', 'Test heading, hide this section');
   });
 });
