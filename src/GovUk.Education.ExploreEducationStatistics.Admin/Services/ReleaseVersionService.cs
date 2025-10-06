@@ -548,6 +548,7 @@ public class ReleaseVersionService(
                         )
                     );
             })
+            .OnSuccess(releaseVersions => releaseVersions.Where(rv => !rv.Live))
             .OnSuccess(async releaseVersions =>
             {
                 var approvedReleases = await releaseVersions
@@ -563,7 +564,7 @@ public class ReleaseVersionService(
                     })
                     .ToListAsync();
 
-                return approvedReleases.Where(release => !release.Live).ToList();
+                return approvedReleases.ToList();
             });
     }
 
