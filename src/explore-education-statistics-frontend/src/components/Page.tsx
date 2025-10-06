@@ -48,6 +48,8 @@ const Page = ({
 }: Props) => {
   return (
     <>
+      {/* eslint-disable-next-line jsx-a11y/anchor-has-content */}
+      <a id="top" />
       <CookieBanner width={width} />
       <PageMeta
         includeDefaultMetaTitle={includeDefaultMetaTitle}
