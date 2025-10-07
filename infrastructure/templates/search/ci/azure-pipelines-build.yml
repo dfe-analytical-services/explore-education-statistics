@@ -39,6 +39,16 @@ jobs:
           version: $(dotNetVersion)
 
       - task: DotNetCoreCLI@2
+        displayName: Restore .NET tools
+        inputs:
+          command: custom
+          custom: tool
+          arguments: restore
+
+      - script: dotnet csharpier check $(System.DefaultWorkingDirectory)/src/GovUk.Education.ExploreEducationStatistics.Content.Search*
+        displayName: CSharpier check formatting
+
+      - task: DotNetCoreCLI@2
         displayName: 'Build the solution'
         inputs:
           command: 'build'
