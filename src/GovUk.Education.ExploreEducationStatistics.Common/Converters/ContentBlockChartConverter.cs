@@ -18,7 +18,8 @@ public class ContentBlockChartConverter : JsonConverter<IChart>
     )
     {
         var jsonObject = JObject.Load(reader);
-        var type = jsonObject["Type"] ?? jsonObject["type"] ?? throw new JsonSerializationException("Type not found");;
+        var type = jsonObject["Type"] ?? jsonObject["type"] ?? throw new JsonSerializationException("Type not found");
+        ;
         var chartType = EnumUtil.GetFromEnumValue<ChartType>(type.Value<string>() ?? string.Empty);
 
         IChart contentBlock = chartType switch

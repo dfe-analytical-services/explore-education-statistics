@@ -13,7 +13,7 @@ public static class EnumExtensions
     {
         return GetEnumLabelValueAttribute(enumValue)?.Value ?? enumValue.ToString();
     }
-    
+
     public static TAttribute? GetEnumAttribute<TAttribute>(this Enum enumValue)
         where TAttribute : Attribute
     {
@@ -26,8 +26,9 @@ public static class EnumExtensions
     {
         return enumValue.GetEnumAttribute<EnumLabelValueAttribute>();
     }
-    
-    public static List<EnumValue> GetValues<T>() where T: Enum
+
+    public static List<EnumValue> GetValues<T>()
+        where T : Enum
     {
         return (
             from object itemType in Enum.GetValues(typeof(T))

@@ -26,13 +26,15 @@ public class Either<TL, TR>
 
     public bool IsRight => !IsLeft;
 
-    public TL Left => IsLeft ? _left
-                               ?? throw new InvalidOperationException(UnexpectedLeftNullErrorMessage)
-        : throw new ArgumentException("Calling Left on a Right");
+    public TL Left =>
+        IsLeft
+            ? _left ?? throw new InvalidOperationException(UnexpectedLeftNullErrorMessage)
+            : throw new ArgumentException("Calling Left on a Right");
 
-    public TR Right => !IsLeft ? _right
-                                 ?? throw new InvalidOperationException(UnexpectedRightNullErrorMessage)
-        : throw new ArgumentException("Calling Right on a Left");
+    public TR Right =>
+        !IsLeft
+            ? _right ?? throw new InvalidOperationException(UnexpectedRightNullErrorMessage)
+            : throw new ArgumentException("Calling Right on a Left");
 
     private Either<TL, T> Map<T>(Func<TR, T> func) =>
         IsLeft ? new Either<TL, T>(Left) : new Either<TL, T>(func.Invoke(Right));
