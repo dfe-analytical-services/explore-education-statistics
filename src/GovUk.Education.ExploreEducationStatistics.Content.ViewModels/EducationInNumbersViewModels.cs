@@ -51,4 +51,19 @@ public class EducationInNumbersViewModels
             };
         }
     }
+
+    public class EinPageSitemapItemViewModel
+    {
+        public required string Slug { get; set; } = string.Empty;
+        public DateTimeOffset LastModified { get; set; }
+
+        public static EinPageSitemapItemViewModel FromModel(EducationInNumbersPage page)
+        {
+            return new EinPageSitemapItemViewModel
+            {
+                Slug = page.Slug ?? string.Empty, // ein root page has a null slug - we want an empty string in that case
+                LastModified = page.Updated ?? page.Created,
+            };
+        }
+    }
 }
