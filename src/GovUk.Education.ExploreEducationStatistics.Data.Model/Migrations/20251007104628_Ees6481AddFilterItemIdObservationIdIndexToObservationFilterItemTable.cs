@@ -5,17 +5,18 @@
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations;
 
 /// <inheritdoc />
-public partial class AddFilterItemIdObservationIdIndexToObservationFilterItemTable : Migration
+public partial class Ees6481AddFilterItemIdObservationIdIndexToObservationFilterItemTable
+    : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.Sql(@"
-            IF NOT EXISTS (
+        migrationBuilder.Sql(
+            @"
+            IF EXISTS (
                 SELECT 1
                 FROM sys.indexes
-                WHERE name = 'IX_ObservationFilterItem_FilterItemId_ObservationId'
-                  AND object_id = OBJECT_ID('dbo.ObservationFilterItem')
+                WHERE name = 'TakesTooLongToRunOnDeploy')
             )
             BEGIN
                 CREATE INDEX IX_ObservationFilterItem_FilterItemId_ObservationId
@@ -26,12 +27,10 @@ public partial class AddFilterItemIdObservationIdIndexToObservationFilterItemTab
                     ONLINE = ON
                 )
             END
-        ");
+        "
+        );
     }
 
     /// <inheritdoc />
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

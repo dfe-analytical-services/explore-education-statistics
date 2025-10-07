@@ -24,10 +24,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 /// a smaller set.
 /// 
 /// For each ObservationId, we join the ObservationFilterItem table and find all
-/// distinct FilterItemIds that appear for that ObservationId.  The query executor
-/// will generally pick a good strategy for applying this, making use of parallelism
-/// to break the job into batches of ObservationIds and eventually combining and
-/// de-duping the FilterItemIds found.
+/// distinct FilterItemIds that appear for that ObservationId, using the
+/// IX_ObservationFilterItem_FilterItemId_ObservationId index for extra speed.
+/// The query executor will generally pick a good strategy for applying this, making
+/// use of parallelism to break the job into batches of ObservationIds and eventually
+/// combining and de-duping the FilterItemIds found.
 ///
 /// The reason that this strategy works well is that the #MatchedObservation temp table
 /// (which is the driving set for this query) is a smaller set because we only use this
