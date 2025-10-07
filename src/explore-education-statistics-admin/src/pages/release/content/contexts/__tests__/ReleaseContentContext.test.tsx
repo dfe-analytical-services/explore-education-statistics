@@ -37,8 +37,7 @@ const emptyTable: Table = {
 
 const testCommentUser: CommentUser = {
   id: 'user-1',
-  firstName: 'Jane',
-  lastName: 'Doe',
+  displayName: 'Jane Doe',
   email: 'jane@test.com',
 };
 
@@ -350,8 +349,7 @@ describe('ReleaseContentContext', () => {
             content: 'A comment',
             createdBy: {
               id: 'user-1',
-              firstName: 'Bau1',
-              lastName: '',
+              displayName: 'Bau1',
               email: 'bau1@test.com',
             },
             created: '2020-03-09T09:39:53.736',
@@ -361,8 +359,7 @@ describe('ReleaseContentContext', () => {
             content: 'another comment',
             createdBy: {
               id: 'user-1',
-              firstName: 'Bau1',
-              lastName: '',
+              displayName: 'Bau1',
               email: 'bau1@test.com',
             },
             created: '2020-03-09T09:40:16.534',

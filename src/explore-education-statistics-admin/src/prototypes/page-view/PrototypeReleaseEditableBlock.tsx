@@ -148,7 +148,7 @@ const PrototypeReleaseEditableBlock = ({
           id: '1',
           content: '',
           created: '',
-          createdBy: { id: 'a', lastName: '', firstName: '', email: '' },
+          createdBy: { id: 'a', displayName: '', email: '' },
         })
       }
       onUpdate={() => Promise.resolve()}
