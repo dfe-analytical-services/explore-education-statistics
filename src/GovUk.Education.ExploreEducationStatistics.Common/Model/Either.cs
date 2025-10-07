@@ -4,8 +4,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 public class Either<TL, TR>
 {
-    private readonly TL _left;
-    private readonly TR _right;
+    private const string UnexpectedLeftNullErrorMessage = "Left is null when IsLeft is set to true";
+    private const string UnexpectedRightNullErrorMessage = "Right is null when IsRight is set to true";
+
+    private readonly TL? _left;
+    private readonly TR? _right;
 
     public Either(TL left)
     {
@@ -23,9 +26,13 @@ public class Either<TL, TR>
 
     public bool IsRight => !IsLeft;
 
-    public TL Left => IsLeft ? _left : throw new ArgumentException("Calling Left on a Right");
+    public TL Left => IsLeft ? _left
+                               ?? throw new InvalidOperationException(UnexpectedLeftNullErrorMessage)
+        : throw new ArgumentException("Calling Left on a Right");
 
-    public TR Right => !IsLeft ? _right : throw new ArgumentException("Calling Right on a Left");
+    public TR Right => !IsLeft ? _right
+                                 ?? throw new InvalidOperationException(UnexpectedRightNullErrorMessage)
+        : throw new ArgumentException("Calling Right on a Left");
 
     private Either<TL, T> Map<T>(Func<TR, T> func) =>
         IsLeft ? new Either<TL, T>(Left) : new Either<TL, T>(func.Invoke(Right));
@@ -36,7 +43,7 @@ public class Either<TL, TR>
     {
         if (IsLeft)
         {
-            return _left;
+            return _left ?? throw new InvalidOperationException(UnexpectedLeftNullErrorMessage);
         }
 
         return await func();
@@ -46,10 +53,10 @@ public class Either<TL, TR>
     {
         if (IsLeft)
         {
-            return _left;
+            return _left ?? throw new InvalidOperationException(UnexpectedLeftNullErrorMessage);
         }
 
-        return await func.Invoke(_right);
+        return await func.Invoke(_right ?? throw new InvalidOperationException(UnexpectedRightNullErrorMessage));
     }
 
     public Either<TL, T> OnSuccess<T>(Func<T> func) => Map(_ => func.Invoke());
@@ -116,7 +123,7 @@ public static class EitherExtensions
 
         if (result.IsLeft)
         {
-            return result.Left.FirstOrDefault();
+            return result.Left.FirstOrDefault() ?? throw new InvalidOperationException("Expected at least one success");
         }
 
         return result.Right;

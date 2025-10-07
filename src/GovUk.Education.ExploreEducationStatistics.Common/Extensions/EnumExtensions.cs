@@ -13,8 +13,8 @@ public static class EnumExtensions
     {
         return GetEnumLabelValueAttribute(enumValue)?.Value ?? enumValue.ToString();
     }
-
-    public static TAttribute GetEnumAttribute<TAttribute>(this Enum enumValue)
+    
+    public static TAttribute? GetEnumAttribute<TAttribute>(this Enum enumValue)
         where TAttribute : Attribute
     {
         var memberInfo = enumValue.GetType().GetMember(enumValue.ToString());
@@ -22,13 +22,12 @@ public static class EnumExtensions
         return memberInfo[0].GetCustomAttributes(typeof(TAttribute), false).OfType<TAttribute>().FirstOrDefault();
     }
 
-    private static EnumLabelValueAttribute GetEnumLabelValueAttribute(this Enum enumValue)
+    private static EnumLabelValueAttribute? GetEnumLabelValueAttribute(this Enum enumValue)
     {
         return enumValue.GetEnumAttribute<EnumLabelValueAttribute>();
     }
-
-    public static List<EnumValue> GetValues<T>()
-        where T : Enum
+    
+    public static List<EnumValue> GetValues<T>() where T: Enum
     {
         return (
             from object itemType in Enum.GetValues(typeof(T))
@@ -38,7 +37,7 @@ public static class EnumExtensions
 
     public class EnumValue
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public int Value { get; set; }
     }
 }

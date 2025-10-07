@@ -12,14 +12,14 @@ public class ContentBlockChartConverter : JsonConverter<IChart>
     public override IChart ReadJson(
         JsonReader reader,
         Type objectType,
-        IChart existingValue,
+        IChart? existingValue,
         bool hasExistingValue,
         JsonSerializer serializer
     )
     {
         var jsonObject = JObject.Load(reader);
-        var type = jsonObject["Type"] ?? jsonObject["type"];
-        var chartType = EnumUtil.GetFromEnumValue<ChartType>(type.Value<string>());
+        var type = jsonObject["Type"] ?? jsonObject["type"] ?? throw new JsonSerializationException("Type not found");;
+        var chartType = EnumUtil.GetFromEnumValue<ChartType>(type.Value<string>() ?? string.Empty);
 
         IChart contentBlock = chartType switch
         {
@@ -35,7 +35,7 @@ public class ContentBlockChartConverter : JsonConverter<IChart>
         return contentBlock;
     }
 
-    public override void WriteJson(JsonWriter writer, IChart value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, IChart? value, JsonSerializer serializer)
     {
         throw new InvalidOperationException("Use default serialization.");
     }

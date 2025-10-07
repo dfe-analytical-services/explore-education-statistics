@@ -7,7 +7,7 @@ public class TimeIdentifierMetaAttribute : EnumLabelValueAttribute
 {
     public TimePeriodYearFormat YearFormat { get; }
     public TimePeriodLabelFormat LabelFormat { get; }
-    public string ShortLabel { get; }
+    public string? ShortLabel { get; }
 
     public TimeIdentifierCategory Category { get; }
 
@@ -17,7 +17,7 @@ public class TimeIdentifierMetaAttribute : EnumLabelValueAttribute
         TimeIdentifierCategory category,
         TimePeriodYearFormat yearFormat = TimePeriodYearFormat.Default,
         TimePeriodLabelFormat labelFormat = TimePeriodLabelFormat.FullLabel,
-        string shortLabel = null
+        string? shortLabel = null
     )
         : base(label, value)
     {
