@@ -103,7 +103,6 @@ describe('PageNavExpandable', () => {
   test('renders current attribute correctly', () => {
     render(
       <PageNavExpandable
-        activeSection="item-2"
         items={[
           {
             id: 'item-1',
@@ -131,7 +130,7 @@ describe('PageNavExpandable', () => {
 
     expect(
       within(items[0]).getByRole('link', { name: 'Item 1' }),
-    ).not.toHaveAttribute('aria-current');
+    ).toHaveAttribute('aria-current');
 
     const item1SubItems = within(items[0]).getAllByRole('listitem');
     expect(
@@ -140,7 +139,7 @@ describe('PageNavExpandable', () => {
 
     expect(
       within(items[2]).getByRole('link', { name: 'Item 2' }),
-    ).toHaveAttribute('aria-current');
+    ).not.toHaveAttribute('aria-current');
     const item2SubItems = within(items[2]).getAllByRole('listitem');
     expect(
       within(item2SubItems[0]).getByRole('link', { name: 'Item 2a' }),
@@ -165,42 +164,5 @@ describe('PageNavExpandable', () => {
     );
 
     expect(screen.getByRole('heading', { name: 'A custom heading' }));
-  });
-
-  test('calls the `onClickItem` method with the top level item id when clicked', async () => {
-    const handleClick = jest.fn();
-    const { user } = render(
-      <PageNavExpandable
-        items={[
-          {
-            id: 'item-1',
-            text: 'Item 1',
-            subNavItems: [{ id: 'item-1-a', text: 'Item 1a' }],
-          },
-          {
-            id: 'item-2',
-            text: 'Item 2',
-          },
-        ]}
-        onClickItem={handleClick}
-      />,
-    );
-
-    expect(screen.getByRole('heading', { name: 'On this page' }));
-
-    const items = screen.getAllByRole('listitem');
-    expect(items).toHaveLength(4);
-
-    expect(handleClick).not.toHaveBeenCalled();
-
-    await user.click(screen.getByRole('link', { name: 'Item 2' }));
-
-    expect(handleClick).toHaveBeenCalledTimes(1);
-    expect(handleClick).toHaveBeenCalledWith('item-2');
-
-    await user.click(screen.getByRole('link', { name: 'Item 1a' }));
-
-    expect(handleClick).toHaveBeenCalledTimes(2);
-    expect(handleClick).toHaveBeenCalledWith('item-1');
   });
 });

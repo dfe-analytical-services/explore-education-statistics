@@ -1,15 +1,12 @@
 import SectionBreak from '@common/components/SectionBreak';
-import ContactUsSection, {
-  contactUsNavItem,
-} from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
-import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
+import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import {
   PublicationMethodologiesList,
   PublicationSummaryRedesign,
 } from '@common/services/publicationService';
 import getUrlAttributes from '@common/utils/url/getUrlAttributes';
 import Link from '@frontend/components/Link';
-import React, { useState } from 'react';
+import React from 'react';
 
 interface Props {
   methodologiesSummary: PublicationMethodologiesList;
@@ -24,30 +21,12 @@ const ReleaseMethodologyPage = ({
 
   const hasMethodologies = methodologies.length > 0 || externalMethodology;
 
-  const navItems = [
-    hasMethodologies && { id: 'methodology-section', text: 'Methodology' },
-    contactUsNavItem,
-  ].filter(item => !!item);
-
-  const [activeSection, setActiveSection] = useState(navItems[0].id);
-
   const externalMethodologyAttributes = getUrlAttributes(
     externalMethodology?.url || '',
   );
 
-  const setActiveSectionIfValid = (sectionId: string) => {
-    if (navItems.some(item => item.id === sectionId)) {
-      setActiveSection(sectionId);
-    }
-  };
-
   return (
-    <ReleasePageLayout
-      activeSection={activeSection}
-      navItems={navItems}
-      onClickNavItem={setActiveSectionIfValid}
-      onChangeSection={setActiveSectionIfValid}
-    >
+    <>
       {hasMethodologies && (
         <>
           <section id="methodology-section" data-page-section>
@@ -91,7 +70,7 @@ const ReleaseMethodologyPage = ({
         publicationContact={publicationSummary.contact}
         publicationTitle={publicationSummary.title}
       />
-    </ReleasePageLayout>
+    </>
   );
 };
 

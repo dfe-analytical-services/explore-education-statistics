@@ -6,32 +6,18 @@ import styles from '@common/modules/release/components/ReleasePageLayout.module.
 import React, { ReactNode } from 'react';
 
 interface Props {
-  activeSection?: string;
   children: ReactNode;
   navItems: NavItem[];
-  onChangeSection?: (id: string) => void;
-  onClickNavItem?: (id: string) => void;
 }
 
-const ReleasePageLayout = ({
-  activeSection,
-  children,
-  navItems,
-  onChangeSection,
-  onClickNavItem,
-}: Props) => {
+const ReleasePageLayout = ({ children, navItems }: Props) => {
   const { isMedia: isMobileMedia } = useMobileMedia();
 
   return (
     <div className={styles.wrapper}>
       {!isMobileMedia && (
         <div className={styles.sidebar}>
-          <PageNavExpandable
-            activeSection={activeSection}
-            items={navItems}
-            onChangeSection={onChangeSection}
-            onClickItem={onClickNavItem}
-          />
+          <PageNavExpandable items={navItems} />
         </div>
       )}
       <div className={styles.content}>{children}</div>

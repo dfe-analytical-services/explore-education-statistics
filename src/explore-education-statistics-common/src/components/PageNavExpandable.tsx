@@ -1,28 +1,30 @@
 import styles from '@common/components/PageNavExpandable.module.scss';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 
 interface Props {
-  activeSection?: string;
   heading?: string;
   items: NavItem[];
-  onChangeSection?: (id: string) => void;
-  onClickItem?: (id: string) => void;
 }
 
 export default function PageNavExpandable({
-  activeSection,
   heading = 'On this page',
   items,
-  onChangeSection,
-  onClickItem,
 }: Props) {
-  const [handleScroll] = useDebouncedCallback(() => {
-    if (!onChangeSection) {
-      return;
-    }
+  const [activeSection, setActiveSection] = useState(items[0].id);
 
+  useEffect(() => {
+    setActiveSection(items[0].id);
+  }, [items]);
+
+  const setActiveSectionIfValid = (sectionId: string) => {
+    if (items.some(item => item.id === sectionId)) {
+      setActiveSection(sectionId);
+    }
+  };
+
+  const [handleScroll] = useDebouncedCallback(() => {
     const sections = document.querySelectorAll('[data-page-section]');
 
     // Set a section as active when it's in the top third of the page.
@@ -30,7 +32,7 @@ export default function PageNavExpandable({
     const scrollPosition = window.scrollY + buffer;
 
     sections.forEach(section => {
-      if (!section || section.id === activeSection) {
+      if (section.id === activeSection) {
         return;
       }
 
@@ -41,7 +43,7 @@ export default function PageNavExpandable({
       const pageSectionId = section.id;
 
       if (scrollPosition > offsetTop && scrollPosition < offsetBottom) {
-        onChangeSection(pageSectionId);
+        setActiveSectionIfValid(pageSectionId);
       }
     });
   }, 10);
@@ -68,14 +70,14 @@ export default function PageNavExpandable({
               isActive={activeSection === item.id}
               text={item.text}
               subNavItems={item.subNavItems}
-              onClick={onClickItem}
+              onClick={setActiveSection}
             />
           ))}
           <NavItem
             className={items.length ? 'govuk-!-margin-top-8' : undefined}
             id="top"
             text="Back to top"
-            onClick={() => onClickItem?.(items[0].id)}
+            onClick={() => setActiveSection(items[0].id)}
           />
         </ul>
       </nav>

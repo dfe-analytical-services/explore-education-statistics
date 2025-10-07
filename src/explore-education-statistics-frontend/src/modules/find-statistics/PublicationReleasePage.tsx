@@ -1,4 +1,6 @@
 /* eslint-disable react/destructuring-assignment */
+import { NavItem } from '@common/components/PageNavExpandable';
+import { contactUsNavItem } from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import publicationService, {
   PublicationMethodologiesList,
   PublicationSummaryRedesign,
@@ -8,6 +10,7 @@ import publicationService, {
 import { Dictionary } from '@common/types';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import ReleasePageShell from '@frontend/modules/find-statistics/components/ReleasePageShell';
+import { TabRouteItem } from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
 import PublicationReleasePageCurrent from '@frontend/modules/find-statistics/PublicationReleasePageCurrent';
 import PublicationReleasePageHome from '@frontend/modules/find-statistics/PublicationReleasePageHome';
 import ReleaseMethodologyPage from '@frontend/modules/find-statistics/ReleaseMethodologyPage';
@@ -15,11 +18,6 @@ import publicationQueries from '@frontend/queries/publicationQueries';
 import { QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-
-type ReleasePageTabRouteItem = Dictionary<{
-  title: string;
-  slug: string;
-}>;
 
 export const releasePageTabRouteItems = {
   home: {
@@ -38,7 +36,7 @@ export const releasePageTabRouteItems = {
     title: 'Help and related information',
     slug: 'help',
   },
-} as const satisfies ReleasePageTabRouteItem;
+} as const satisfies TabRouteItem;
 
 export type ReleasePageTabRouteItems = typeof releasePageTabRouteItems;
 export type ReleasePageTabRouteKey = keyof ReleasePageTabRouteItems;
@@ -55,7 +53,6 @@ interface HomeProps extends BaseReleaseProps {
 
 interface ExploreDataProps extends BaseReleaseProps {
   page: 'explore';
-  methodologiesSummary: PublicationMethodologiesList;
 }
 
 interface MethodologyProps extends BaseReleaseProps {
@@ -81,13 +78,46 @@ type Props =
 
 const PublicationReleasePage: NextPage<Props> = props => {
   const { page } = props;
+
+  const generateNavItems = (): NavItem[] => {
+    switch (page) {
+      case 'home':
+        return [
+          {
+            id: 'headlines-section',
+            text: 'Headlines facts and figures',
+          },
+          contactUsNavItem,
+        ];
+
+      case 'methodology': {
+        const hasMethodologies =
+          props.methodologiesSummary.methodologies.length > 0 ||
+          props.methodologiesSummary.externalMethodology;
+
+        return [
+          hasMethodologies && {
+            id: 'methodology-section',
+            text: 'Methodology',
+          },
+          contactUsNavItem,
+        ].filter(item => !!item);
+      }
+
+      default:
+        return [contactUsNavItem];
+    }
+  };
+
   return page === 'old' ? (
     <PublicationReleasePageCurrent releaseVersion={props.releaseVersion} />
   ) : (
     <ReleasePageShell
+      activePage={page}
+      inPageNavItems={generateNavItems()}
       publicationSummary={props.publicationSummary}
       releaseVersionSummary={props.releaseVersionSummary}
-      activePage={page}
+      tabNavItems={releasePageTabRouteItems}
     >
       {page === 'home' && (
         <PublicationReleasePageHome
