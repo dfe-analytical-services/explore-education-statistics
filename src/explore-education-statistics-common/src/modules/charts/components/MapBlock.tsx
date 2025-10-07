@@ -28,7 +28,13 @@ import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { MapContainer } from 'react-leaflet';
 import useToggle from '@common/hooks/useToggle';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -119,6 +125,7 @@ export default function MapBlock({
   dataGroups: deprecatedDataGroups,
   dataClassification: deprecatedDataClassification,
   data,
+  alt,
   map,
   meta,
   legend,
@@ -230,6 +237,27 @@ export default function MapBlock({
     selectedDataSetKey,
   ]);
 
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    // Run after render and whenever `alt` changes
+    const root = wrapperRef.current;
+    if (!root) return;
+
+    const el = root.querySelector<HTMLElement>('.dfe-print-break-avoid');
+    if (el) {
+      if (alt) {
+        el.setAttribute('aria-label', alt);
+        el.setAttribute('role', 'group');
+      } else {
+        el.setAttribute(
+          'aria-label',
+          'Interactive map showing education statistics by area',
+        );
+        el.setAttribute('role', 'group');
+      }
+    }
+  }, [alt]);
+
   useEffect(() => {
     if (categoricalDataGroups?.length) {
       onChangeCategoricalDataConfig?.(categoricalDataGroups);
@@ -290,6 +318,7 @@ export default function MapBlock({
 
       <div className="govuk-grid-row govuk-!-margin-bottom-4">
         <div
+          ref={wrapperRef}
           className={classNames(
             'govuk-grid-column-two-thirds',
             styles.mapWrapper,
