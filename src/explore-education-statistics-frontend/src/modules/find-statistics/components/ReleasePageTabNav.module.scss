@@ -17,7 +17,11 @@
   list-style: none;
   padding: 0;
   margin-top: 0;
-  margin-bottom: govuk-spacing(8);
+  margin-bottom: govuk-spacing(4);
+
+  @include govuk-media-query($from: tablet) {
+    margin-bottom: govuk-spacing(8);
+  }
 
   > li {
     margin: 0;

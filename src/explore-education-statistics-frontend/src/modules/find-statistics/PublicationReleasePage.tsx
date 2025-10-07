@@ -125,6 +125,7 @@ const PublicationReleasePage: NextPage<Props> = props => {
         <PublicationReleasePageHome
           homeContent={props.homeContent}
           publicationSummary={props.publicationSummary}
+          releaseVersionSummary={props.releaseVersionSummary}
         />
       )}
       {page === 'explore' && <p>TODO EES-6444 Explore Data page</p>}
