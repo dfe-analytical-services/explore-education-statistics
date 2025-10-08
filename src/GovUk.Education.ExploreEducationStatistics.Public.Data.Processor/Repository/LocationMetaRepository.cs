@@ -192,7 +192,10 @@ public class LocationMetaRepository(
                 .SqlBuilder(
                     $"""
                     SELECT {cols.JoinToString(", "):raw}
-                    FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
+                    FROM read_csv(
+                        '{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}',
+                        {DuckDbConstants.ReadCsvOptions:raw}
+                    )
                     WHERE {cols.Select(col => $"{col} != ''").JoinToString(" AND "):raw}
                     GROUP BY {cols.JoinToString(", "):raw}
                     ORDER BY {cols.JoinToString(", "):raw}

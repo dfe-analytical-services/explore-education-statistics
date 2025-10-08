@@ -48,7 +48,10 @@ public class GeographicLevelMetaRepository(
                 .SqlBuilder(
                     $"""
                     SELECT DISTINCT geographic_level
-                    FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
+                    FROM read_csv(
+                        '{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}',
+                        {DuckDbConstants.ReadCsvOptions:raw}
+                    )
                     """
                 )
                 .QueryAsync<string>(cancellationToken: cancellationToken)

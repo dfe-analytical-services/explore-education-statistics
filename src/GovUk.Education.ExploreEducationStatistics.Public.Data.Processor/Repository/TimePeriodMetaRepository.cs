@@ -49,7 +49,10 @@ public class TimePeriodMetaRepository(
                 .SqlBuilder(
                     $"""
                     SELECT DISTINCT time_period, time_identifier
-                    FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
+                    FROM read_csv(
+                        '{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}',
+                        {DuckDbConstants.ReadCsvOptions:raw}
+                    )
                     ORDER BY time_period
                     """
                 )

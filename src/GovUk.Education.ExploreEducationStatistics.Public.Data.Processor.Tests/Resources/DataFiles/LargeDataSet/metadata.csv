@@ -1,0 +1,9 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+time_frame,Filter,Time frame,,,,,
+reference_date,Indicator,Reference date,,,,,
+education_phase,Filter,Education phase,,,,,
+attendance_status,Filter,Attendance status,,,,,
+attendance_type,Filter,Attendance type,,,,,attendance_status
+attendance_reason,Filter,Attendance reason,,,,,attendance_type
+session_count,Indicator,Number of sessions,,,0,,
+session_percent,Indicator,Percent of sessions,,%,2,,

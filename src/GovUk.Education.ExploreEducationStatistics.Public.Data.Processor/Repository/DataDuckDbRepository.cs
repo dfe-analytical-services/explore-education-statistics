@@ -113,7 +113,10 @@ public class DataDuckDbRepository(
                 INSERT INTO {DataTable.TableName:raw}
                 SELECT
                 {insertColumns.JoinToString(",\n"):raw}
-                FROM read_csv('{dataFilePath:raw}', ALL_VARCHAR = true) AS {DataSourceTable.TableName:raw}
+                FROM read_csv(
+                  '{dataFilePath:raw}',
+                  {DuckDbConstants.ReadCsvOptions:raw}
+                ) AS {DataSourceTable.TableName:raw}
                 {insertJoins.JoinToString('\n'):raw}
                 ORDER BY
                 {DataSourceTable.Ref.GeographicLevel:raw} ASC,
