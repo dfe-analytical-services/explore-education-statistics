@@ -17,7 +17,7 @@ public static class ErrorViewModelTests
                 ErrorCode = "TestCode",
                 ErrorMessage = "Test message",
                 PropertyName = "testProperty",
-                AttemptedValue = "Test value"
+                AttemptedValue = "Test value",
             };
 
             var error = ErrorViewModel.Create(failure);
@@ -39,7 +39,7 @@ public static class ErrorViewModelTests
             {
                 ErrorCode = "TestCodeValidator",
                 ErrorMessage = "Test message",
-                PropertyName = "testProperty"
+                PropertyName = "testProperty",
             };
 
             var error = ErrorViewModel.Create(failure);

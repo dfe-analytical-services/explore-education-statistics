@@ -19,38 +19,36 @@ public class UserReleaseRoleServiceTests
     {
         var (publication, publicationIgnored) = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture
-                .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                .Generate(2))
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(2))
             .GenerateTuple2();
 
         var userReleaseRole1 = new UserReleaseRole
         {
-            User = new User { Id = Guid.NewGuid() },
+            User = _dataFixture.DefaultUser(),
             ReleaseVersion = publication.ReleaseVersions[0],
             Role = Contributor,
         };
         var userReleaseRole2 = new UserReleaseRole
         {
-            User = new User { Id = Guid.NewGuid() },
+            User = _dataFixture.DefaultUser(),
             ReleaseVersion = publication.ReleaseVersions[0],
             Role = Contributor,
         };
         var userReleaseRole3 = new UserReleaseRole
         {
-            User = new User { Id = Guid.NewGuid() },
+            User = _dataFixture.DefaultUser(),
             ReleaseVersion = publication.ReleaseVersions[1],
             Role = Contributor,
         };
         var userReleaseRoleIgnored1 = new UserReleaseRole // Ignored because not Contributor role
         {
-            User = new User { Id = Guid.NewGuid() },
+            User = _dataFixture.DefaultUser(),
             ReleaseVersion = publication.ReleaseVersions[0],
             Role = Approver,
         };
         var userReleaseRoleIgnored2 = new UserReleaseRole // Ignored due to release under different publication
         {
-            User = new User { Id = Guid.NewGuid() },
+            User = _dataFixture.DefaultUser(),
             ReleaseVersion = publicationIgnored.ReleaseVersions[0],
             Role = Contributor,
         };
@@ -60,16 +58,19 @@ public class UserReleaseRoleServiceTests
         {
             contentDbContext.Publications.AddRange(publication, publicationIgnored);
             contentDbContext.UserReleaseRoles.AddRange(
-                userReleaseRole1, userReleaseRole2, userReleaseRole3,
-                userReleaseRoleIgnored1, userReleaseRoleIgnored2);
+                userReleaseRole1,
+                userReleaseRole2,
+                userReleaseRole3,
+                userReleaseRoleIgnored1,
+                userReleaseRoleIgnored2
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = BuildService(contentDbContext);
-            var userReleaseRoles = await service.ListUserReleaseRolesByPublication(Contributor,
-                publication.Id);
+            var userReleaseRoles = await service.ListUserReleaseRolesByPublication(Contributor, publication.Id);
 
             Assert.Equal(3, userReleaseRoles.Count);
 
@@ -90,11 +91,8 @@ public class UserReleaseRoleServiceTests
         }
     }
 
-    private static UserReleaseRoleService BuildService(
-        ContentDbContext contentDbContext)
+    private static UserReleaseRoleService BuildService(ContentDbContext contentDbContext)
     {
-        return new(
-            contentDbContext,
-            new ReleaseVersionRepository(contentDbContext));
+        return new(contentDbContext, new ReleaseVersionRepository(contentDbContext));
     }
 }

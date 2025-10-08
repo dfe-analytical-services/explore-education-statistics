@@ -21,13 +21,12 @@ public static class LocationOptionsTable
         public const string LaEstab = "laestab";
     }
 
-    public static string Alias(GeographicLevel geographicLevel)
-        => $"locations_{geographicLevel.GetEnumValue().ToLower()}";
+    public static string Alias(GeographicLevel geographicLevel) =>
+        $"locations_{geographicLevel.GetEnumValue().ToLower()}";
 
     private static TableRef DefaultRef => new(TableName);
 
-    public static TableRef Ref(GeographicLevel? level = null)
-        => level.HasValue ? new(Alias(level.Value)) : DefaultRef;
+    public static TableRef Ref(GeographicLevel? level = null) => level.HasValue ? new(Alias(level.Value)) : DefaultRef;
 
     public class TableRef(string table)
     {

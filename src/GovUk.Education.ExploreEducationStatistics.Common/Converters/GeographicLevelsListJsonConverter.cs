@@ -25,7 +25,8 @@ public class GeographicLevelsListJsonConverter : JsonConverter<IList<GeographicL
         Type objectType,
         IList<GeographicLevel>? existingValue,
         bool hasExistingValue,
-        JsonSerializer serializer)
+        JsonSerializer serializer
+    )
     {
         var geographicLevels = (GeographicLevel[])Enum.GetValues(typeof(GeographicLevel));
         var result = new List<GeographicLevel>();

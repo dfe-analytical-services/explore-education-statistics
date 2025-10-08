@@ -7,9 +7,7 @@ public record IdTitleViewModel
 
     public string Title { get; init; } = string.Empty;
 
-    public IdTitleViewModel()
-    {
-    }
+    public IdTitleViewModel() { }
 
     public IdTitleViewModel(Guid id, string title)
     {

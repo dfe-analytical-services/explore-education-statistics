@@ -19,10 +19,12 @@ public class MethodologyService : IMethodologyService
     private readonly IMapper _mapper;
     private readonly IMethodologyVersionRepository _methodologyVersionRepository;
 
-    public MethodologyService(ContentDbContext contentDbContext,
+    public MethodologyService(
+        ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IMapper mapper,
-        IMethodologyVersionRepository methodologyVersionRepository)
+        IMethodologyVersionRepository methodologyVersionRepository
+    )
     {
         _contentDbContext = contentDbContext;
         _persistenceHelper = persistenceHelper;
@@ -33,12 +35,14 @@ public class MethodologyService : IMethodologyService
     public async Task<Either<ActionResult, MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug)
     {
         return await _persistenceHelper
-            .CheckEntityExists<Methodology>(
-                query => query
+            .CheckEntityExists<Methodology>(query =>
+                query
                     .Include(m => m.LatestPublishedVersion)
                     .Where(m =>
                         m.LatestPublishedVersion != null
-                        && slug == (m.LatestPublishedVersion.AlternativeSlug ?? m.OwningPublicationSlug))) // slug == mv.Slug doesn't translate
+                        && slug == (m.LatestPublishedVersion.AlternativeSlug ?? m.OwningPublicationSlug)
+                    )
+            ) // slug == mv.Slug doesn't translate
             .OnSuccess<ActionResult, Methodology, MethodologyVersionViewModel>(async methodology =>
             {
                 var latestPublishedVersion = methodology.LatestPublishedVersion;
@@ -48,19 +52,15 @@ public class MethodologyService : IMethodologyService
                     return new NotFoundResult();
                 }
 
-                await _contentDbContext
-                    .Entry(latestPublishedVersion)
-                    .Collection(m => m.Notes)
-                    .LoadAsync();
+                await _contentDbContext.Entry(latestPublishedVersion).Collection(m => m.Notes).LoadAsync();
 
-                await _contentDbContext
-                    .Entry(latestPublishedVersion)
-                    .Reference(m => m.MethodologyContent)
-                    .LoadAsync();
+                await _contentDbContext.Entry(latestPublishedVersion).Reference(m => m.MethodologyContent).LoadAsync();
 
                 var viewModel = _mapper.Map<MethodologyVersionViewModel>(latestPublishedVersion);
 
-                viewModel.Publications = await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
+                viewModel.Publications = await GetPublishedPublicationsForMethodology(
+                    latestPublishedVersion.MethodologyId
+                );
 
                 return viewModel;
             });
@@ -68,41 +68,41 @@ public class MethodologyService : IMethodologyService
 
     public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetSummariesTree()
     {
-        var themes = await _contentDbContext.Themes
-            .Include(theme => theme.Publications)
+        var themes = await _contentDbContext
+            .Themes.Include(theme => theme.Publications)
             .AsNoTracking()
             .Select(theme => new AllMethodologiesThemeViewModel
             {
                 Id = theme.Id,
                 Title = theme.Title,
-                Publications = theme.Publications.Select(publication =>
-                        new AllMethodologiesPublicationViewModel
-                        {
-                            Id = publication.Id,
-                            Title = publication.Title
-                        }).ToList()
+                Publications = theme
+                    .Publications.Select(publication => new AllMethodologiesPublicationViewModel
+                    {
+                        Id = publication.Id,
+                        Title = publication.Title,
+                    })
+                    .ToList(),
             })
             .ToListAsync();
 
-        await themes.SelectMany(model => model.Publications)
+        await themes
+            .SelectMany(model => model.Publications)
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async publication =>
-                publication.Methodologies = await BuildMethodologiesForPublication(publication.Id));
+                publication.Methodologies = await BuildMethodologiesForPublication(publication.Id)
+            );
 
         themes.ForEach(theme => theme.RemovePublicationNodesWithoutMethodologiesAndSort());
 
-        return themes.Where(theme => theme.Publications.Any())
-            .OrderBy(theme => theme.Title)
-            .ToList();
+        return themes.Where(theme => theme.Publications.Any()).OrderBy(theme => theme.Title).ToList();
     }
 
     private async Task<List<PublicationSummaryViewModel>> GetPublishedPublicationsForMethodology(Guid methodologyId)
     {
-        return await _contentDbContext.PublicationMethodologies
-            .Include(pm => pm.Publication)
+        return await _contentDbContext
+            .PublicationMethodologies.Include(pm => pm.Publication)
             .ThenInclude(p => p.Contact)
-            .Where(pm => pm.MethodologyId == methodologyId
-                         && pm.Publication.LatestPublishedReleaseVersionId != null)
+            .Where(pm => pm.MethodologyId == methodologyId && pm.Publication.LatestPublishedReleaseVersionId != null)
             .Select(pm => new PublicationSummaryViewModel
             {
                 Id = pm.PublicationId,
@@ -110,7 +110,7 @@ public class MethodologyService : IMethodologyService
                 Slug = pm.Publication.Slug,
                 LatestReleaseSlug = pm.Publication.LatestPublishedReleaseVersion!.Release.Slug,
                 Owner = pm.Owner,
-                Contact = _mapper.Map<ContactViewModel>(pm.Publication.Contact)
+                Contact = _mapper.Map<ContactViewModel>(pm.Publication.Contact),
             })
             .OrderBy(pvm => pvm.Title)
             .ToListAsync();
@@ -118,26 +118,23 @@ public class MethodologyService : IMethodologyService
 
     private async Task<List<MethodologyVersionSummaryViewModel>> BuildMethodologiesForPublication(Guid publicationId)
     {
-        var latestPublishedMethodologies =
-            await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(publicationId);
+        var latestPublishedMethodologies = await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(
+            publicationId
+        );
         return _mapper.Map<List<MethodologyVersionSummaryViewModel>>(latestPublishedMethodologies);
     }
 
     public async Task<Either<ActionResult, List<MethodologySitemapItemViewModel>>> ListSitemapItems(
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await _contentDbContext.Methodologies
-            .Include(m => m.LatestPublishedVersion)
+        return await _contentDbContext
+            .Methodologies.Include(m => m.LatestPublishedVersion)
             .ThenInclude(mv => mv!.Methodology)
             .Where(m => m.LatestPublishedVersion != null)
             .Select(m => m.LatestPublishedVersion)
             .OfType<MethodologyVersion>()
-            .Select(mv =>
-                new MethodologySitemapItemViewModel
-                {
-                    Slug = mv.Slug,
-                    LastModified = mv.Published
-                })
+            .Select(mv => new MethodologySitemapItemViewModel { Slug = mv.Slug, LastModified = mv.Published })
             .ToListAsync(cancellationToken);
     }
 }

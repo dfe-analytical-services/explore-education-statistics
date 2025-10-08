@@ -11,7 +11,8 @@ public interface IReleaseService
     Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest request);
 
     Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(
-        Guid releaseId, 
+        Guid releaseId,
         ReleaseUpdateRequest request,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

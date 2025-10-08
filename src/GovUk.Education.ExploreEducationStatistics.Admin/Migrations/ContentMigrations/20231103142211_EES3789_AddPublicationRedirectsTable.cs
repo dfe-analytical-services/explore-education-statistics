@@ -15,7 +15,7 @@ public partial class EES3789_AddPublicationRedirectsTable : Migration
             {
                 Slug = table.Column<string>(type: "nvarchar(450)", nullable: false),
                 PublicationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Created = table.Column<DateTime>(type: "datetime2", nullable: false)
+                Created = table.Column<DateTime>(type: "datetime2", nullable: false),
             },
             constraints: table =>
             {
@@ -25,8 +25,10 @@ public partial class EES3789_AddPublicationRedirectsTable : Migration
                     column: x => x.PublicationId,
                     principalTable: "Publications",
                     principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
-            });
+                    onDelete: ReferentialAction.Cascade
+                );
+            }
+        );
 
         migrationBuilder.Sql("GRANT SELECT ON dbo.PublicationRedirects TO [content];");
         migrationBuilder.Sql("GRANT SELECT ON dbo.PublicationRedirects TO [publisher];");
@@ -34,7 +36,6 @@ public partial class EES3789_AddPublicationRedirectsTable : Migration
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropTable(
-            name: "PublicationRedirects");
+        migrationBuilder.DropTable(name: "PublicationRedirects");
     }
 }

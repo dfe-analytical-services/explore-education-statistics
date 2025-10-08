@@ -14,10 +14,9 @@ public class ReleaseVersionsController(IReleaseVersionsService releaseVersionsSe
     public async Task<ActionResult<ReleaseVersionSummaryDto>> GetReleaseVersionSummary(
         string publicationSlug,
         string releaseSlug,
-        CancellationToken cancellationToken = default) =>
-        await releaseVersionsService.GetReleaseVersionSummary(
-                publicationSlug: publicationSlug,
-                releaseSlug: releaseSlug,
-                cancellationToken)
+        CancellationToken cancellationToken = default
+    ) =>
+        await releaseVersionsService
+            .GetReleaseVersionSummary(publicationSlug: publicationSlug, releaseSlug: releaseSlug, cancellationToken)
             .HandleFailuresOrOk();
 }

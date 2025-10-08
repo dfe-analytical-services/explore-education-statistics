@@ -17,9 +17,7 @@ public class ReleaseController : ControllerBase
     private readonly IReleaseService _releaseService;
     private readonly ICacheKeyService _cacheKeyService;
 
-    public ReleaseController(
-        IReleaseService releaseService,
-        ICacheKeyService cacheKeyService)
+    public ReleaseController(IReleaseService releaseService, ICacheKeyService cacheKeyService)
     {
         _releaseService = releaseService;
         _cacheKeyService = cacheKeyService;
@@ -37,9 +35,7 @@ public class ReleaseController : ControllerBase
     [HttpGet("releases/{releaseVersionId:guid}/featured-tables")]
     public async Task<ActionResult<List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseVersionId)
     {
-        return await _releaseService
-            .ListFeaturedTables(releaseVersionId)
-            .HandleFailuresOrOk();
+        return await _releaseService.ListFeaturedTables(releaseVersionId).HandleFailuresOrOk();
     }
 
     [BlobCache(typeof(ReleaseSubjectsCacheKey))]

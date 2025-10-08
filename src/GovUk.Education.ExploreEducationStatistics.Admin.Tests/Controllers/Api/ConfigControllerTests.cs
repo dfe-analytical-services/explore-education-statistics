@@ -63,22 +63,16 @@ public class ConfigControllerTests
         Assert.Equal(string.Empty, viewModel.AppInsightsKey);
         Assert.Equal("http://localhost:3000", viewModel.PublicAppUrl);
         Assert.Equal("http://localhost:5050", viewModel.PublicApiUrl);
+        Assert.Equal("https://dev.statistics.api.education.gov.uk/docs", viewModel.PublicApiDocsUrl);
         Assert.Equal(
-            "https://dev.statistics.api.education.gov.uk/docs",
-            viewModel.PublicApiDocsUrl
+            new[] { "https://department-for-education.shinyapps.io", "https://dfe-analytical-services.github.io" },
+            viewModel.PermittedEmbedUrlDomains
         );
-        Assert.Equal(
-            new []
-            {
-                "https://department-for-education.shinyapps.io",
-                "https://dfe-analytical-services.github.io"
-            },
-            viewModel.PermittedEmbedUrlDomains);
 
         const string realm = "https://ees.local:5031/auth/realms/ees-realm";
         Assert.Equal("ees-admin-client", viewModel.Oidc.ClientId);
         Assert.Equal(realm, viewModel.Oidc.Authority);
-        Assert.Equal(new [] { realm, "ees.local:5031" }, viewModel.Oidc.KnownAuthorities);
+        Assert.Equal(new[] { realm, "ees.local:5031" }, viewModel.Oidc.KnownAuthorities);
         Assert.Equal(SecurityScopes.AccessAdminApiScope, viewModel.Oidc.AdminApiScope);
 
         var authorityMetadata = viewModel.Oidc.AuthorityMetadata!;

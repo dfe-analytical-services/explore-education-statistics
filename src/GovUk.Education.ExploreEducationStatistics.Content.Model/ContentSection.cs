@@ -19,13 +19,12 @@ public class ContentSection
 
     public string Heading { get; set; }
 
-    public string Caption { get; set; }
-
     public List<ContentBlock> Content { get; set; } = new();
 
     public ReleaseVersion ReleaseVersion { get; set; }
 
     public Guid ReleaseVersionId { get; set; }
 
-    [JsonIgnore] public ContentSectionType Type { get; set; }
+    [JsonIgnore]
+    public ContentSectionType Type { get; set; }
 }

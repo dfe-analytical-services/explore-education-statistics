@@ -20,10 +20,7 @@ public interface IBlobStorageService
         public Regex? IncludeRegex { get; set; }
     }
 
-    Task DeleteBlobs(
-        IBlobContainer containerName,
-        string? directoryPath = null,
-        DeleteBlobsOptions? options = null);
+    Task DeleteBlobs(IBlobContainer containerName, string? directoryPath = null, DeleteBlobsOptions? options = null);
 
     Task DeleteBlob(IBlobContainer containerName, string path);
 
@@ -31,12 +28,10 @@ public interface IBlobStorageService
         IBlobContainer sourceContainer,
         string sourcePath,
         string destinationPath,
-        IBlobContainer? destinationContainer = null);
+        IBlobContainer? destinationContainer = null
+    );
 
-    Task UploadFile(
-        IBlobContainer containerName,
-        string path,
-        IFormFile file);
+    Task UploadFile(IBlobContainer containerName, string path, IFormFile file);
 
     Task UploadStream(
         IBlobContainer containerName,
@@ -44,7 +39,8 @@ public interface IBlobStorageService
         Stream sourceStream,
         string contentType,
         string? contentEncoding = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task UploadAsJson<T>(
         IBlobContainer containerName,
@@ -52,7 +48,8 @@ public interface IBlobStorageService
         T content,
         string? contentEncoding = null,
         JsonSerializerSettings? settings = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Get a download Stream to fetch the entirety of a blob, with no intermediary Streams necessary.
@@ -66,8 +63,9 @@ public interface IBlobStorageService
         IBlobContainer containerName,
         string path,
         bool decompress = true,
-        CancellationToken cancellationToken = default);
-    
+        CancellationToken cancellationToken = default
+    );
+
     /// <summary>
     /// Obtain a secure,short-lived download token for use with <see cref="StreamWithToken"/>.
     /// Any relevant permission checks for the current business process situation should be
@@ -87,8 +85,9 @@ public interface IBlobStorageService
         IBlobContainer container,
         string filename,
         string path,
-        CancellationToken cancellationToken);
-    
+        CancellationToken cancellationToken
+    );
+
     /// <summary>
     /// Use a secure, short-lived <see cref="BlobDownloadToken"/> obtained from
     /// <see cref="GetBlobDownloadToken"/> to stream a Blob from storage.
@@ -100,25 +99,29 @@ public interface IBlobStorageService
     /// <returns></returns>
     Task<Either<ActionResult, FileStreamResult>> StreamWithToken(
         BlobDownloadToken token,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken
+    );
 
     Task<Either<ActionResult, string>> DownloadBlobText(
         IBlobContainer containerName,
         string path,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, object?>> GetDeserializedJson(
         IBlobContainer containerName,
         string path,
         Type type,
         JsonSerializerSettings? settings = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, T?>> GetDeserializedJson<T>(
         IBlobContainer containerName,
         string path,
         JsonSerializerSettings? settings = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where T : class;
 
     public class CopyDirectoryOptions
@@ -134,7 +137,8 @@ public interface IBlobStorageService
         string sourceDirectoryPath,
         IBlobContainer destinationContainerName,
         string destinationDirectoryPath,
-        CopyDirectoryOptions? options = null);
+        CopyDirectoryOptions? options = null
+    );
 
     public class MoveDirectoryOptions
     {
@@ -149,5 +153,6 @@ public interface IBlobStorageService
         string sourceDirectoryPath,
         IBlobContainer destinationContainerName,
         string destinationDirectoryPath,
-        MoveDirectoryOptions? options = null);
+        MoveDirectoryOptions? options = null
+    );
 }

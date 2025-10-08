@@ -6,9 +6,7 @@ public partial class EES2423RemoveInternalReleaseNoteFromReleasesTable : Migrati
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "InternalReleaseNote",
-            table: "Releases");
+        migrationBuilder.DropColumn(name: "InternalReleaseNote", table: "Releases");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -17,6 +15,7 @@ public partial class EES2423RemoveInternalReleaseNoteFromReleasesTable : Migrati
             name: "InternalReleaseNote",
             table: "Releases",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
     }
 }

@@ -14,9 +14,11 @@ public static class DuckDbConnectionExtensions
     public static async Task DirectCopyJsonIntoDuckDbTable(
         this DuckDbConnection connection,
         string jsonFilePath,
-        string tableName)
+        string tableName
+    )
     {
-        await connection.ExecuteNonQueryAsync($@"
+        await connection.ExecuteNonQueryAsync(
+            $@"
             INSERT INTO {tableName} BY NAME (
                 SELECT *
                 FROM read_json('{jsonFilePath}', 
@@ -24,9 +26,10 @@ public static class DuckDbConnectionExtensions
                     union_by_name='true'
                 )
              )
-        ");
+        "
+        );
     }
-    
+
     /// <summary>
     /// Copy the contents of a DuckDb table directly into a Parquet file with no
     /// additional transformations or logic.
@@ -37,15 +40,18 @@ public static class DuckDbConnectionExtensions
     public static async Task DirectCopyDuckDbTableIntoParquetFile(
         this DuckDbConnection connection,
         string tableName,
-        string parquetFilePath)
+        string parquetFilePath
+    )
     {
-        await connection.ExecuteNonQueryAsync($@"
+        await connection.ExecuteNonQueryAsync(
+            $@"
             COPY (
                 SELECT *
                 FROM {tableName}
                 ORDER BY startTime ASC
             )
             TO '{parquetFilePath}' (FORMAT 'parquet', CODEC 'zstd')
-        ");
+        "
+        );
     }
 }

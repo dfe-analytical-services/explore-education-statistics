@@ -49,7 +49,7 @@ public record IndicatorViewModel
             Column = meta.Column,
             Label = meta.Label,
             Unit = meta.Unit,
-            DecimalPlaces = meta.DecimalPlaces
+            DecimalPlaces = meta.DecimalPlaces,
         };
     }
 }

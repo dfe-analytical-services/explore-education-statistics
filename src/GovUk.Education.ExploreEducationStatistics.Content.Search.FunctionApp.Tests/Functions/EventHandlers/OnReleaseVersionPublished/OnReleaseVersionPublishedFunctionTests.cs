@@ -24,9 +24,7 @@ public class OnReleaseVersionPublishedFunctionTests
         // ARRANGE
         var payload = NewReleaseVersionPublishedEvents.WherePublicationSlugIs(blankString);
 
-        var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(payload)
-            .Build();
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var sut = GetSut();
 
@@ -43,9 +41,7 @@ public class OnReleaseVersionPublishedFunctionTests
         // ARRANGE
         var payload = NewReleaseVersionPublishedEvents.NewlyPublishedIsNotLatest;
 
-        var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(payload)
-            .Build();
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var sut = GetSut();
 
@@ -57,15 +53,12 @@ public class OnReleaseVersionPublishedFunctionTests
     }
 
     [Fact]
-    public async Task
-        GivenEvent_WhenPublishedReleaseVersionIsADifferentRelease_ThenPreviousReleaseSearchableDocumentIsRemoved()
+    public async Task GivenEvent_WhenPublishedReleaseVersionIsADifferentRelease_ThenPreviousReleaseSearchableDocumentIsRemoved()
     {
         // ARRANGE
         var payload = NewReleaseVersionPublishedEvents.NewlyPublishedIsForNewLatestRelease;
 
-        var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(payload)
-            .Build();
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var sut = GetSut();
 
@@ -78,29 +71,21 @@ public class OnReleaseVersionPublishedFunctionTests
         // document will be created using its new ReleaseId.
         // Therefore, the existing, previously latest searchable document needs to be removed.
         Assert.Equal(
-            [
-                new RemoveSearchableDocumentDto
-                {
-                    ReleaseId = payload.PreviousLatestPublishedReleaseId
-                }
-            ],
-            response.RemoveSearchableDocuments);
+            [new RemoveSearchableDocumentDto { ReleaseId = payload.PreviousLatestPublishedReleaseId }],
+            response.RemoveSearchableDocuments
+        );
     }
 
     [Fact]
-    public async Task
-        GivenPublicationIsArchived_WhenPublishedReleaseVersionIsADifferentRelease_ThenNoReleaseSearchableDocumentIsRemoved()
+    public async Task GivenPublicationIsArchived_WhenPublishedReleaseVersionIsADifferentRelease_ThenNoReleaseSearchableDocumentIsRemoved()
     {
         // ARRANGE
-        var payload = NewReleaseVersionPublishedEvents.NewlyPublishedIsForNewLatestRelease
-            with
-            {
-                IsPublicationArchived = true
-            };
+        var payload = NewReleaseVersionPublishedEvents.NewlyPublishedIsForNewLatestRelease with
+        {
+            IsPublicationArchived = true,
+        };
 
-        var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(payload)
-            .Build();
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var sut = GetSut();
 
@@ -117,9 +102,7 @@ public class OnReleaseVersionPublishedFunctionTests
         // ARRANGE
         var payload = NewReleaseVersionPublishedEvents.NewlyPublishedIsForSameRelease;
 
-        var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(payload)
-            .Build();
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var sut = GetSut();
 
@@ -136,9 +119,7 @@ public class OnReleaseVersionPublishedFunctionTests
         // ARRANGE
         var payload = NewReleaseVersionPublishedEvents.NewlyPublishedIsTheFirstRelease;
 
-        var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(payload)
-            .Build();
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
 
         var sut = GetSut();
 
@@ -151,53 +132,51 @@ public class OnReleaseVersionPublishedFunctionTests
 
     [Theory]
     [MemberData(nameof(EventsThatRefreshSearchableDocument))]
-    public async Task WhenReleaseVersionPublished_ThenSearchableDocumentIsRefreshed(ReleaseVersionPublishedEventDto payload)
+    public async Task WhenReleaseVersionPublished_ThenSearchableDocumentIsRefreshed(
+        ReleaseVersionPublishedEventDto payload
+    )
     {
         // ARRANGE
-        var eventGridEvent = new EventGridEventBuilder()
-            .WithPayload(payload)
-            .Build();
-        
+        var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
+
         var sut = GetSut();
-        
+
         // ACT
         var response = await sut.OnReleaseVersionPublished(eventGridEvent, new FunctionContextMockBuilder().Build());
-        
+
         // ASSERT
-        RefreshSearchableDocumentMessageDto[] expected = 
-            [
-                new() { PublicationSlug = payload.PublicationSlug }
-            ];
+        RefreshSearchableDocumentMessageDto[] expected = [new() { PublicationSlug = payload.PublicationSlug }];
         Assert.Equal(expected, response.RefreshSearchableDocumentMessages);
     }
-    
+
     [Theory]
     [MemberData(nameof(EventsThatRefreshSearchableDocument))]
-    public async Task GivenPublicationIsArchived_WhenReleaseVersionPublished_ThenNoSearchableDocumentIsRefreshed(ReleaseVersionPublishedEventDto payload)
+    public async Task GivenPublicationIsArchived_WhenReleaseVersionPublished_ThenNoSearchableDocumentIsRefreshed(
+        ReleaseVersionPublishedEventDto payload
+    )
     {
         // ARRANGE
         var eventGridEvent = new EventGridEventBuilder()
             .WithPayload(payload with { IsPublicationArchived = true })
             .Build();
-        
+
         var sut = GetSut();
-        
+
         // ACT
         var response = await sut.OnReleaseVersionPublished(eventGridEvent, new FunctionContextMockBuilder().Build());
-        
+
         // ASSERT
         Assert.Empty(response.RefreshSearchableDocumentMessages);
     }
-    
+
     public static TheoryData<ReleaseVersionPublishedEventDto> EventsThatRefreshSearchableDocument =>
-    [
-        NewReleaseVersionPublishedEvents.NewlyPublishedIsForNewLatestRelease,
-        NewReleaseVersionPublishedEvents.NewlyPublishedIsForSameRelease,
-        NewReleaseVersionPublishedEvents.NewlyPublishedIsTheFirstRelease
-    ];
+        [
+            NewReleaseVersionPublishedEvents.NewlyPublishedIsForNewLatestRelease,
+            NewReleaseVersionPublishedEvents.NewlyPublishedIsForSameRelease,
+            NewReleaseVersionPublishedEvents.NewlyPublishedIsTheFirstRelease,
+        ];
 
-
-private static class NewReleaseVersionPublishedEvents
+    private static class NewReleaseVersionPublishedEvents
     {
         private static ReleaseVersionPublishedEventDto Base
         {
@@ -216,7 +195,7 @@ private static class NewReleaseVersionPublishedEvents
                     PublicationId = Guid.NewGuid(),
                     PublicationSlug = "this-is-a-publication-slug",
                     LatestPublishedReleaseVersionId = newlyPublishedLatestReleaseVersionId,
-                    PreviousLatestPublishedReleaseId = newlyPublishedLatestReleaseId
+                    PreviousLatestPublishedReleaseId = newlyPublishedLatestReleaseId,
                 };
             }
         }
@@ -224,30 +203,30 @@ private static class NewReleaseVersionPublishedEvents
         public static ReleaseVersionPublishedEventDto WherePublicationSlugIs(string? publicationSlug) =>
             Base with
             {
-                PublicationSlug = publicationSlug
+                PublicationSlug = publicationSlug,
             };
 
-        public static ReleaseVersionPublishedEventDto NewlyPublishedIsNotLatest => 
+        public static ReleaseVersionPublishedEventDto NewlyPublishedIsNotLatest =>
             Base with
             {
                 // Latest release version id is something other than the release version just published
-                LatestPublishedReleaseVersionId = Guid.NewGuid()
+                LatestPublishedReleaseVersionId = Guid.NewGuid(),
             };
 
-        public static ReleaseVersionPublishedEventDto NewlyPublishedIsForNewLatestRelease => 
+        public static ReleaseVersionPublishedEventDto NewlyPublishedIsForNewLatestRelease =>
             Base with
             {
                 // The previous release id is a different release
-                PreviousLatestPublishedReleaseId = Guid.NewGuid()
+                PreviousLatestPublishedReleaseId = Guid.NewGuid(),
             };
 
         public static ReleaseVersionPublishedEventDto NewlyPublishedIsForSameRelease => Base;
-        
-        public static ReleaseVersionPublishedEventDto NewlyPublishedIsTheFirstRelease => 
+
+        public static ReleaseVersionPublishedEventDto NewlyPublishedIsTheFirstRelease =>
             Base with
             {
                 PreviousLatestPublishedReleaseId = null,
-                PreviousLatestPublishedReleaseVersionId = null
+                PreviousLatestPublishedReleaseVersionId = null,
             };
     }
 }

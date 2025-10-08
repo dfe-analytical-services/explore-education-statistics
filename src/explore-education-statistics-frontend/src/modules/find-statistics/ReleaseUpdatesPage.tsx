@@ -1,18 +1,19 @@
 import FormattedDate from '@common/components/FormattedDate';
-import publicationService, {
+import {
   PublicationSummaryRedesign,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
-import releaseUpdatesService, {
-  ReleaseUpdate,
-} from '@common/services/releaseUpdatesService';
+import { ReleaseUpdate } from '@common/services/releaseUpdatesService';
 import { PaginatedList } from '@common/services/types/pagination';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
 import styles from '@frontend/modules/find-statistics/ReleaseUpdatesPage.module.scss';
+import publicationQueries from '@frontend/queries/publicationQueries';
+import releaseUpdatesQueries from '@frontend/queries/releaseUpdatesQueries';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { Dictionary } from '@frontend/types';
+import { QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps } from 'next';
 import React from 'react';
 
@@ -115,28 +116,49 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
     pageSize,
   } = query as Dictionary<string>;
 
+  // TODO EES-6449 - remove
   if (process.env.APP_ENV === 'Production') {
     return {
       notFound: true,
     };
   }
 
-  const publicationSummary =
-    await publicationService.getPublicationSummaryRedesign(publicationSlug);
+  const queryClient = new QueryClient();
 
-  const [releaseVersionSummary, releaseUpdates] = await Promise.all([
-    publicationService.getReleaseVersionSummary(publicationSlug, releaseSlug),
-    releaseUpdatesService.getReleaseUpdates(publicationSlug, releaseSlug, {
-      page: page ? Number(page) : undefined,
-      pageSize: pageSize ? Number(pageSize) : undefined,
-    }),
-  ]);
+  try {
+    const [publicationSummary, releaseVersionSummary, releaseUpdates] =
+      await Promise.all([
+        queryClient.fetchQuery(
+          publicationQueries.getPublicationSummaryRedesign(publicationSlug),
+        ),
+        queryClient.fetchQuery(
+          publicationQueries.getReleaseVersionSummary(
+            publicationSlug,
+            releaseSlug,
+          ),
+        ),
+        queryClient.fetchQuery(
+          releaseUpdatesQueries.getReleaseUpdates(
+            publicationSlug,
+            releaseSlug,
+            {
+              page: page ? Number(page) : undefined,
+              pageSize: pageSize ? Number(pageSize) : undefined,
+            },
+          ),
+        ),
+      ]);
 
-  return {
-    props: {
-      publicationSummary,
-      releaseVersionSummary,
-      releaseUpdates,
-    },
-  };
+    return {
+      props: {
+        publicationSummary,
+        releaseVersionSummary,
+        releaseUpdates,
+      },
+    };
+  } catch (error) {
+    return {
+      notFound: true,
+    };
+  }
 };

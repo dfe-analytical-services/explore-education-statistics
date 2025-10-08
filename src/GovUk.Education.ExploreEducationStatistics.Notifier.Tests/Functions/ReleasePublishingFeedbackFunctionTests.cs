@@ -18,28 +18,21 @@ public class ReleasePublishingFeedbackFunctionTests
 {
     private static readonly DataFixture DataFixture = new();
 
-    private static readonly AppOptions AppOptions = new()
-    {
-        PublicAppUrl = "https://public.app"
-    };
+    private static readonly AppOptions AppOptions = new() { PublicAppUrl = "https://public.app" };
 
     private static readonly GovUkNotifyOptions.EmailTemplateOptions EmailTemplateOptions = new()
     {
-        ReleasePublishingFeedbackId = "release-publishing-feedback-id"
+        ReleasePublishingFeedbackId = "release-publishing-feedback-id",
     };
 
     [Theory]
     [InlineData(PublicationRole.Owner, "an owner")]
     [InlineData(PublicationRole.Allower, "an approver")]
-    public async Task SendReleasePublishingFeedbackEmail_Success(
-        PublicationRole role,
-        string expectedRoleDescription)
+    public async Task SendReleasePublishingFeedbackEmail_Success(PublicationRole role, string expectedRoleDescription)
     {
         ReleaseVersion releaseVersion = DataFixture
             .DefaultReleaseVersion()
-            .WithRelease(DataFixture
-                .DefaultRelease()
-                .WithPublication(DataFixture.DefaultPublication()));
+            .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()));
 
         var feedback = new ReleasePublishingFeedback
         {
@@ -48,7 +41,7 @@ public class ReleasePublishingFeedbackFunctionTests
             UserPublicationRole = role,
             ReleaseVersionId = releaseVersion.Id,
             ReleaseTitle = "Academic year 2022",
-            PublicationTitle = "Publication title"
+            PublicationTitle = "Publication title",
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -61,67 +54,8 @@ public class ReleasePublishingFeedbackFunctionTests
 
         var releasePublishingFeedbackMessage = new ReleasePublishingFeedbackMessage(
             ReleasePublishingFeedbackId: feedback.Id,
-            EmailAddress: "test@test.com");
-
-        var emailService = new Mock<IEmailService>(MockBehavior.Strict);
-
-        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
-        {
-            var function = BuildFunction(
-                contentDbContext: context,
-                emailService: emailService.Object);
-
-            await function.SendReleasePublishingFeedbackEmail(
-                releasePublishingFeedbackMessage,
-                cancellationToken: default);
-        }
-
-        emailService
-            .Verify(s => s.SendEmail(
-                releasePublishingFeedbackMessage.EmailAddress,
-                EmailTemplateOptions.ReleasePublishingFeedbackId,
-                It.Is<Dictionary<string, dynamic>>(values =>
-                    AssertEmailTemplateValues(values,
-                        releaseVersion.Release.Publication.Title,
-                        releaseVersion.Release.Title,
-                        expectedRoleDescription,
-                        feedback.EmailToken)
-                )), Times.Once);
-    }
-    
-    [Theory]
-    [InlineData(PublicationRole.Drafter)]
-    [InlineData(PublicationRole.Approver)]
-    public async Task SendReleasePublishingFeedbackEmail_UnsupportedRoleUsed_NoEmailSent(
-        PublicationRole role)
-    {
-        ReleaseVersion releaseVersion = DataFixture
-            .DefaultReleaseVersion()
-            .WithRelease(DataFixture
-                .DefaultRelease()
-                .WithPublication(DataFixture.DefaultPublication()));
-
-        var feedback = new ReleasePublishingFeedback
-        {
-            Id = Guid.NewGuid(),
-            EmailToken = Guid.NewGuid().ToString(),
-            UserPublicationRole = role,
-            ReleaseVersionId = releaseVersion.Id,
-            ReleaseTitle = "Academic year 2022",
-            PublicationTitle = "Publication title"
-        };
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
-        {
-            context.ReleaseVersions.Add(releaseVersion);
-            context.ReleasePublishingFeedback.Add(feedback);
-            await context.SaveChangesAsync();
-        }
-
-        var releasePublishingFeedbackMessage = new ReleasePublishingFeedbackMessage(
-            ReleasePublishingFeedbackId: feedback.Id,
-            EmailAddress: "test@test.com");
+            EmailAddress: "test@test.com"
+        );
 
         var emailService = new Mock<IEmailService>(MockBehavior.Strict);
 
@@ -131,15 +65,77 @@ public class ReleasePublishingFeedbackFunctionTests
 
             await function.SendReleasePublishingFeedbackEmail(
                 releasePublishingFeedbackMessage,
-                cancellationToken: default);
+                cancellationToken: default
+            );
         }
 
-        emailService
-            .Verify(s => s.SendEmail(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<Dictionary<string, dynamic>>()
-                ), Times.Never);
+        emailService.Verify(
+            s =>
+                s.SendEmail(
+                    releasePublishingFeedbackMessage.EmailAddress,
+                    EmailTemplateOptions.ReleasePublishingFeedbackId,
+                    It.Is<Dictionary<string, dynamic>>(values =>
+                        AssertEmailTemplateValues(
+                            values,
+                            releaseVersion.Release.Publication.Title,
+                            releaseVersion.Release.Title,
+                            expectedRoleDescription,
+                            feedback.EmailToken
+                        )
+                    )
+                ),
+            Times.Once
+        );
+    }
+
+    [Theory]
+    [InlineData(PublicationRole.Drafter)]
+    [InlineData(PublicationRole.Approver)]
+    public async Task SendReleasePublishingFeedbackEmail_UnsupportedRoleUsed_NoEmailSent(PublicationRole role)
+    {
+        ReleaseVersion releaseVersion = DataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()));
+
+        var feedback = new ReleasePublishingFeedback
+        {
+            Id = Guid.NewGuid(),
+            EmailToken = Guid.NewGuid().ToString(),
+            UserPublicationRole = role,
+            ReleaseVersionId = releaseVersion.Id,
+            ReleaseTitle = "Academic year 2022",
+            PublicationTitle = "Publication title",
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+        {
+            context.ReleaseVersions.Add(releaseVersion);
+            context.ReleasePublishingFeedback.Add(feedback);
+            await context.SaveChangesAsync();
+        }
+
+        var releasePublishingFeedbackMessage = new ReleasePublishingFeedbackMessage(
+            ReleasePublishingFeedbackId: feedback.Id,
+            EmailAddress: "test@test.com"
+        );
+
+        var emailService = new Mock<IEmailService>(MockBehavior.Strict);
+
+        await using (var context = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+        {
+            var function = BuildFunction(contentDbContext: context, emailService: emailService.Object);
+
+            await function.SendReleasePublishingFeedbackEmail(
+                releasePublishingFeedbackMessage,
+                cancellationToken: default
+            );
+        }
+
+        emailService.Verify(
+            s => s.SendEmail(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()),
+            Times.Never
+        );
     }
 
     private static bool AssertEmailTemplateValues(
@@ -147,29 +143,30 @@ public class ReleasePublishingFeedbackFunctionTests
         string publicationName,
         string releaseName,
         string roleDescription,
-        string emailToken)
+        string emailToken
+    )
     {
         Assert.Equal(publicationName, values["publication_name"]);
         Assert.Equal(releaseName, values["release_name"]);
         Assert.Equal(roleDescription, values["role_description"]);
-        Assert.Equal($"{AppOptions.PublicAppUrl}/release-publishing-feedback?token={emailToken}",
-            values["feedback_url"]);
+        Assert.Equal(
+            $"{AppOptions.PublicAppUrl}/release-publishing-feedback?token={emailToken}",
+            values["feedback_url"]
+        );
         return true;
     }
 
     private static ReleasePublishingFeedbackFunction BuildFunction(
         ContentDbContext? contentDbContext = null,
-        IEmailService? emailService = null)
+        IEmailService? emailService = null
+    )
     {
         return new ReleasePublishingFeedbackFunction(
             contentDbContext ?? Mock.Of<ContentDbContext>(),
             AppOptions.ToOptionsWrapper(),
-            new GovUkNotifyOptions
-            {
-                ApiKey = "",
-                EmailTemplates = EmailTemplateOptions
-            }.ToOptionsWrapper(),
+            new GovUkNotifyOptions { ApiKey = "", EmailTemplates = EmailTemplateOptions }.ToOptionsWrapper(),
             emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
-            Mock.Of<ILogger<ReleasePublishingFeedbackFunction>>());
+            Mock.Of<ILogger<ReleasePublishingFeedbackFunction>>()
+        );
     }
 }

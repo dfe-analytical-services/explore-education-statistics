@@ -16,7 +16,8 @@ public class DataSetQueryLocationJsonConverter : JsonConverter<IDataSetQueryLoca
     public override IDataSetQueryLocation? Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
-        JsonSerializerOptions options)
+        JsonSerializerOptions options
+    )
     {
         if (!JsonDocument.TryParseValue(ref reader, out var doc))
         {
@@ -25,10 +26,7 @@ public class DataSetQueryLocationJsonConverter : JsonConverter<IDataSetQueryLoca
 
         var rootElement = doc.RootElement.GetRawText();
 
-        var propertyNames = doc.RootElement
-            .EnumerateObject()
-            .Select(p => p.Name.ToUpperFirst())
-            .ToHashSet();
+        var propertyNames = doc.RootElement.EnumerateObject().Select(p => p.Name.ToUpperFirst()).ToHashSet();
 
         if (!doc.RootElement.TryGetProperty(nameof(IDataSetQueryLocation.Level).ToLowerFirst(), out var levelProperty))
         {
@@ -58,8 +56,7 @@ public class DataSetQueryLocationJsonConverter : JsonConverter<IDataSetQueryLoca
                         when propertyNames.Contains(nameof(DataSetQueryLocationSchoolLaEstab.LaEstab)):
                         return JsonSerializer.Deserialize<DataSetQueryLocationSchoolLaEstab>(rootElement, options);
 
-                    case GeographicLevel.School
-                        when propertyNames.Contains(nameof(DataSetQueryLocationSchoolUrn.Urn)):
+                    case GeographicLevel.School when propertyNames.Contains(nameof(DataSetQueryLocationSchoolUrn.Urn)):
                         return JsonSerializer.Deserialize<DataSetQueryLocationSchoolUrn>(rootElement, options);
 
                     case GeographicLevel.Provider

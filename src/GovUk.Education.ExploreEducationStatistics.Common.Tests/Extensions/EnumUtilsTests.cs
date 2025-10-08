@@ -19,23 +19,21 @@ public static class EnumUtilsTests
         [Fact]
         public void WithLabelValue_UsingLabel_Invalid()
         {
-            var exception = Assert.Throws<ArgumentOutOfRangeException>(
-                () => EnumUtil.GetFromEnumValue<TestEnum>("With label value"));
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+                EnumUtil.GetFromEnumValue<TestEnum>("With label value")
+            );
 
-            Assert.StartsWith(
-                $"The value 'With label value' is not a valid {nameof(TestEnum)}",
-                exception.Message);
+            Assert.StartsWith($"The value 'With label value' is not a valid {nameof(TestEnum)}", exception.Message);
         }
 
         [Fact]
         public void NoMatch_Invalid()
         {
-            var exception = Assert.Throws<ArgumentOutOfRangeException>(
-                () => EnumUtil.GetFromEnumValue<TestEnum>("Invalid label"));
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+                EnumUtil.GetFromEnumValue<TestEnum>("Invalid label")
+            );
 
-            Assert.StartsWith(
-                $"The value 'Invalid label' is not a valid {nameof(TestEnum)}",
-                exception.Message);
+            Assert.StartsWith($"The value 'Invalid label' is not a valid {nameof(TestEnum)}", exception.Message);
         }
     }
 
@@ -72,23 +70,21 @@ public static class EnumUtilsTests
         [Fact]
         public void WithLabelValue_UsingValue_Invalid()
         {
-            var exception = Assert.Throws<ArgumentOutOfRangeException>(
-                () => EnumUtil.GetFromEnumLabel<TestEnum>("with-label-value"));
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+                EnumUtil.GetFromEnumLabel<TestEnum>("with-label-value")
+            );
 
-            Assert.StartsWith(
-                $"The label 'with-label-value' is not a valid {nameof(TestEnum)}",
-                exception.Message);
+            Assert.StartsWith($"The label 'with-label-value' is not a valid {nameof(TestEnum)}", exception.Message);
         }
 
         [Fact]
         public void NoMatch_Invalid()
         {
-            var exception = Assert.Throws<ArgumentOutOfRangeException>(
-                () => EnumUtil.GetFromEnumLabel<TestEnum>("Invalid label"));
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+                EnumUtil.GetFromEnumLabel<TestEnum>("Invalid label")
+            );
 
-            Assert.StartsWith(
-                $"The label 'Invalid label' is not a valid {nameof(TestEnum)}",
-                exception.Message);
+            Assert.StartsWith($"The label 'Invalid label' is not a valid {nameof(TestEnum)}", exception.Message);
         }
     }
 
@@ -120,11 +116,7 @@ public static class EnumUtilsTests
         [Fact]
         public void Success()
         {
-            var expected = new List<TestEnum>
-            {
-                TestEnum.WithLabel,
-                TestEnum.WithLabelValue
-            };
+            var expected = new List<TestEnum> { TestEnum.WithLabel, TestEnum.WithLabelValue };
 
             Assert.Equal(expected, EnumUtil.GetEnums<TestEnum>());
         }
@@ -135,11 +127,7 @@ public static class EnumUtilsTests
         [Fact]
         public void Success()
         {
-            var expected = new []
-            {
-                TestEnum.WithLabel,
-                TestEnum.WithLabelValue
-            };
+            var expected = new[] { TestEnum.WithLabel, TestEnum.WithLabelValue };
 
             Assert.Equal(expected, EnumUtil.GetEnumsArray<TestEnum>());
         }
@@ -180,11 +168,7 @@ public static class EnumUtilsTests
         [Fact]
         public void Success()
         {
-            var expected = new List<string>
-            {
-                TestEnum.WithLabel.ToString(),
-                TestEnum.WithLabelValue.GetEnumValue(),
-            };
+            var expected = new List<string> { TestEnum.WithLabel.ToString(), TestEnum.WithLabelValue.GetEnumValue() };
 
             Assert.Equal(expected, EnumUtil.GetEnumValues<TestEnum>());
         }

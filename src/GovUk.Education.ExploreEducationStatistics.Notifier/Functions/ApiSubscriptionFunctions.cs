@@ -19,7 +19,8 @@ public class ApiSubscriptionFunctions(
     ILogger<ApiSubscriptionFunctions> logger,
     IApiSubscriptionService apiSubscriptionService,
     IValidator<PendingApiSubscriptionCreateRequest> newPendingApiSubscriptionRequestValidator,
-    IValidator<ApiNotificationMessage> apiNotificationMessageValidator)
+    IValidator<ApiNotificationMessage> apiNotificationMessageValidator
+)
 {
     private static class FunctionNames
     {
@@ -34,45 +35,62 @@ public class ApiSubscriptionFunctions(
     [Function(FunctionNames.RequestPendingSubscription)]
     public async Task<IActionResult> RequestPendingSubscription(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "public-api/request-pending-subscription")]
-        [FromBody] PendingApiSubscriptionCreateRequest request,
-        CancellationToken cancellationToken)
+        [FromBody]
+            PendingApiSubscriptionCreateRequest request,
+        CancellationToken cancellationToken
+    )
     {
         try
         {
-            return await newPendingApiSubscriptionRequestValidator.Validate(request, cancellationToken)
-                .OnSuccess(() => apiSubscriptionService.RequestPendingSubscription(
-                    dataSetId: request.DataSetId,
-                    dataSetTitle: request.DataSetTitle,
-                    email: request.Email,
-                    cancellationToken: cancellationToken))
+            return await newPendingApiSubscriptionRequestValidator
+                .Validate(request, cancellationToken)
+                .OnSuccess(() =>
+                    apiSubscriptionService.RequestPendingSubscription(
+                        dataSetId: request.DataSetId,
+                        dataSetTitle: request.DataSetTitle,
+                        email: request.Email,
+                        cancellationToken: cancellationToken
+                    )
+                )
                 .HandleFailuresOr(subscription => new OkObjectResult(subscription));
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Exception occured while executing '{FunctionName}'", nameof(RequestPendingSubscription));
+            logger.LogError(
+                ex,
+                "Exception occured while executing '{FunctionName}'",
+                nameof(RequestPendingSubscription)
+            );
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
 
     [Function(FunctionNames.VerifySubscription)]
     public async Task<IActionResult> VerifySubscription(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "public-api/{dataSetId:guid}/verify-subscription/{token}")]
-        HttpRequest request,
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "post",
+            Route = "public-api/{dataSetId:guid}/verify-subscription/{token}"
+        )]
+            HttpRequest request,
         Guid dataSetId,
         string token,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         try
         {
-            return await apiSubscriptionService.VerifySubscription(
-                    dataSetId: dataSetId,
-                    token: token,
-                    cancellationToken: cancellationToken)
+            return await apiSubscriptionService
+                .VerifySubscription(dataSetId: dataSetId, token: token, cancellationToken: cancellationToken)
                 .HandleFailuresOr(subscription => new OkObjectResult(subscription));
         }
         catch (Exception ex)
         {
-            logger.LogError(exception: ex, "Exception occured while executing '{FunctionName}'", nameof(VerifySubscription));
+            logger.LogError(
+                exception: ex,
+                "Exception occured while executing '{FunctionName}'",
+                nameof(VerifySubscription)
+            );
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
@@ -80,17 +98,16 @@ public class ApiSubscriptionFunctions(
     [Function(FunctionNames.Unsubscribe)]
     public async Task<IActionResult> Unsubscribe(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "public-api/{dataSetId:guid}/unsubscribe/{token}")]
-        HttpRequest request,
+            HttpRequest request,
         Guid dataSetId,
         string token,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         try
         {
-            return await apiSubscriptionService.Unsubscribe(
-                    dataSetId: dataSetId,
-                    token: token,
-                    cancellationToken: cancellationToken)
+            return await apiSubscriptionService
+                .Unsubscribe(dataSetId: dataSetId, token: token, cancellationToken: cancellationToken)
                 .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
         }
         catch (Exception ex)
@@ -103,7 +120,8 @@ public class ApiSubscriptionFunctions(
     [Function(FunctionNames.RemoveExpiredSubscriptions)]
     public async Task RemoveExpiredSubscriptions(
         [TimerTrigger("0 * * * * *")] TimerInfo timerInfo,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         await apiSubscriptionService.RemoveExpiredApiSubscriptions(cancellationToken);
     }
@@ -111,13 +129,15 @@ public class ApiSubscriptionFunctions(
     [Function(FunctionNames.NotifySubscribers)]
     public async Task NotifySubscribers(
         [QueueTrigger(NotifierQueueStorage.ApiNotificationQueue)] ApiNotificationMessage message,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         await apiNotificationMessageValidator.ValidateAndThrowAsync(message, cancellationToken);
         await apiSubscriptionService.NotifyApiSubscribers(
             dataSetId: message.DataSetId,
             dataSetFileId: message.DataSetFileId,
             version: message.Version,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
 }

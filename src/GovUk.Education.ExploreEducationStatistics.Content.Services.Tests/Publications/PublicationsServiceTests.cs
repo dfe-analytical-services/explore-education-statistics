@@ -21,7 +21,8 @@ public abstract class PublicationsServiceTests
         public async Task WhenPublicationExists_ReturnsExpectedPublication()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithTheme(_dataFixture.DefaultTheme())
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
@@ -57,7 +58,8 @@ public abstract class PublicationsServiceTests
                     Assert.Equal(publication.Releases[0].Title, result.LatestRelease.Title);
                     AssertPublicationNextReleaseDateEqual(
                         publication.Releases[0].Versions[0].NextReleaseDate,
-                        result.NextReleaseDate);
+                        result.NextReleaseDate
+                    );
                     Assert.Null(result.SupersededByPublication);
                     Assert.Equal(publication.Theme.Id, result.Theme.Id);
                     Assert.Equal(publication.Theme.Summary, result.Theme.Summary);
@@ -85,8 +87,7 @@ public abstract class PublicationsServiceTests
         public async Task WhenPublicationHasNoReleases_ReturnsNotFound()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithTheme(_dataFixture.DefaultTheme());
+            Publication publication = _dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme());
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -111,7 +112,8 @@ public abstract class PublicationsServiceTests
         public async Task WhenPublicationHasNoPublishedRelease_ReturnsNotFound()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithTheme(_dataFixture.DefaultTheme())
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
@@ -138,13 +140,15 @@ public abstract class PublicationsServiceTests
         public async Task WhenPublicationHasMultiplePublishedReleases_ReturnsPublicationWithExpectedLatestRelease()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithTheme(_dataFixture.DefaultTheme())
                 .WithReleases(_ =>
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1),
-                    _dataFixture.DefaultRelease(publishedVersions: 1)
-                ]);
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 1),
+                        _dataFixture.DefaultRelease(publishedVersions: 1),
+                    ]
+                );
             var latestPublishedRelease = publication.LatestPublishedReleaseVersion!.Release;
 
             var contextId = Guid.NewGuid().ToString();
@@ -176,12 +180,13 @@ public abstract class PublicationsServiceTests
         public async Task WhenSupersedingPublicationHasPublishedRelease_ReturnsPublicationWithExpectedSupersededByPublication()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithTheme(_dataFixture.DefaultTheme())
                 .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
-                .WithSupersededBy(_dataFixture
-                    .DefaultPublication()
-                    .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]));
+                .WithSupersededBy(
+                    _dataFixture.DefaultPublication().WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
+                );
             var supersedingPublication = publication.SupersededBy!;
 
             var contextId = Guid.NewGuid().ToString();
@@ -214,7 +219,8 @@ public abstract class PublicationsServiceTests
         public async Task WhenSupersedingPublicationHasNoPublishedRelease_ReturnsPublicationWithNoSupersededByPublication()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithTheme(_dataFixture.DefaultTheme())
                 .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
                 .WithSupersededBy(_dataFixture.DefaultPublication());
@@ -243,7 +249,8 @@ public abstract class PublicationsServiceTests
         public async Task WhenLatestReleaseVersionHasNoNextReleaseDate_ReturnsPublicationWithNoNextReleaseDate()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithTheme(_dataFixture.DefaultTheme())
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
             publication.Releases[0].Versions[0].NextReleaseDate = null;
@@ -273,19 +280,21 @@ public abstract class PublicationsServiceTests
         [InlineData("2025", "9", null)]
         [InlineData("2025", "9", "5")]
         public async Task WhenLatestReleaseVersionHasPartialNextReleaseDate_ReturnsPublicationWithExpectedNextReleaseDate(
-                string year,
-                string? month,
-                string? day)
+            string year,
+            string? month,
+            string? day
+        )
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithTheme(_dataFixture.DefaultTheme())
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
             publication.Releases[0].Versions[0].NextReleaseDate = new PartialDate
             {
                 Year = year,
                 Month = month ?? string.Empty,
-                Day = day ?? string.Empty
+                Day = day ?? string.Empty,
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -306,13 +315,15 @@ public abstract class PublicationsServiceTests
                 var result = outcome.AssertRight();
                 AssertPublicationNextReleaseDateEqual(
                     publication.Releases[0].Versions[0].NextReleaseDate,
-                    result.NextReleaseDate);
+                    result.NextReleaseDate
+                );
             }
         }
 
         private static void AssertPublicationNextReleaseDateEqual(
             PartialDate? expected,
-            PublicationNextReleaseDateDto? actual)
+            PublicationNextReleaseDateDto? actual
+        )
         {
             if (expected == null || actual == null)
             {

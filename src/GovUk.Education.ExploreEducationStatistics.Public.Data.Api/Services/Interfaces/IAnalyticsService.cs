@@ -9,7 +9,8 @@ public interface IAnalyticsService
     Task CaptureTopLevelCall(
         TopLevelCallType type,
         object? parameters = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Favour the CapturePublicationCall method that accepts a
@@ -21,27 +22,31 @@ public interface IAnalyticsService
         Guid publicationId,
         PublicationCallType type,
         object? parameters = null,
-        CancellationToken cancellationToken = default);
-    
+        CancellationToken cancellationToken = default
+    );
+
     Task CapturePublicationCall(
         Guid publicationId,
         string publicationTitle,
         PublicationCallType type,
         object? parameters = null,
-        CancellationToken cancellationToken = default);
-    
+        CancellationToken cancellationToken = default
+    );
+
     Task CaptureDataSetCall(
         Guid dataSetId,
         DataSetCallType type,
         object? parameters = null,
-        CancellationToken cancellationToken = default);
-    
+        CancellationToken cancellationToken = default
+    );
+
     Task CaptureDataSetVersionCall(
         Guid dataSetVersionId,
         DataSetVersionCallType type,
         string? requestedDataSetVersion,
         object? parameters = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task CaptureDataSetVersionQuery(
         DataSetVersion dataSetVersion,
@@ -49,5 +54,6 @@ public interface IAnalyticsService
         DataSetQueryRequest query,
         DataSetQueryPaginatedResultsViewModel results,
         DateTime startTime,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken
+    );
 }

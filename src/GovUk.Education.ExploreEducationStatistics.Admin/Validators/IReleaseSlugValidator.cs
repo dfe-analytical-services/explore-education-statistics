@@ -9,5 +9,6 @@ public interface IReleaseSlugValidator
         string newReleaseSlug,
         Guid publicationId,
         Guid? releaseId = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

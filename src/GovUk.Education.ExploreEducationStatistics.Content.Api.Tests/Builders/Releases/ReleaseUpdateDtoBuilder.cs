@@ -7,11 +7,7 @@ public class ReleaseUpdateDtoBuilder
     private string _summary = "Summary";
     private DateTime _date = new(2025, 09, 01);
 
-    public ReleaseUpdateDto Build() => new()
-    {
-        Summary = _summary,
-        Date = _date
-    };
+    public ReleaseUpdateDto Build() => new() { Summary = _summary, Date = _date };
 
     public ReleaseUpdateDtoBuilder WithSummary(string summary)
     {

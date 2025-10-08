@@ -6,24 +6,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services
 
 public class PermalinksTableDownloadsProcessor(
     IAnalyticsPathResolver pathResolver,
-    IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
+    IProcessRequestFilesWorkflow workflow
+) : IRequestFileProcessor
 {
     public const string ReportFileSuffix = "_public-permalink-table-downloads.parquet";
-    
+
     private static readonly string[] CapturedCallsSubPath = ["public", "table-tool-downloads", "permalinks"];
-    
+
     public string SourceDirectory => pathResolver.BuildSourceDirectory(CapturedCallsSubPath);
     public string ReportsDirectory => pathResolver.BuildReportsDirectory(CapturedCallsSubPath);
-    
+
     public async Task Process()
     {
-        await workflow.Process(new WorkflowActor(
-            sourceDirectory: SourceDirectory,
-            reportsDirectory: ReportsDirectory));
+        await workflow.Process(new WorkflowActor(sourceDirectory: SourceDirectory, reportsDirectory: ReportsDirectory));
     }
 
-    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
-        : IWorkflowActor
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory) : IWorkflowActor
     {
         public string GetSourceDirectory()
         {
@@ -34,21 +32,24 @@ public class PermalinksTableDownloadsProcessor(
         {
             return reportsDirectory;
         }
-        
+
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync(@"
+            await connection.ExecuteNonQueryAsync(
+                @"
                 CREATE TABLE sourceTable (
                     permalinkId UUID,
                     permalinkTitle VARCHAR,
                     downloadFormat VARCHAR
                 )
-            "); // TODO: add Query
+            "
+            ); // TODO: add Query
         }
 
         public async Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync($@"
+            await connection.ExecuteNonQueryAsync(
+                $@"
                 INSERT INTO sourceTable BY NAME (
                     SELECT
                         *
@@ -61,12 +62,14 @@ public class PermalinksTableDownloadsProcessor(
                         }}
                     )
                  )
-            ");
+            "
+            );
         }
 
         public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync(@"
+            await connection.ExecuteNonQueryAsync(
+                @"
                 CREATE TABLE permalinkTableDownloadsReport AS 
                 SELECT 
                     FIRST(permalinkId) AS permalinkId,
@@ -76,14 +79,16 @@ public class PermalinksTableDownloadsProcessor(
                 FROM sourceTable
                 GROUP BY permalinkId
                 ORDER BY permalinkId
-            ");
-            
-            var reportFilePath = 
-                $"{reportsFolderPathAndFilenamePrefix}{ReportFileSuffix}";
-            
-            await connection.ExecuteNonQueryAsync($@"
+            "
+            );
+
+            var reportFilePath = $"{reportsFolderPathAndFilenamePrefix}{ReportFileSuffix}";
+
+            await connection.ExecuteNonQueryAsync(
+                $@"
                 COPY (SELECT * FROM permalinkTableDownloadsReport)
-                TO '{reportFilePath}' (FORMAT 'parquet', CODEC 'zstd')");
+                TO '{reportFilePath}' (FORMAT 'parquet', CODEC 'zstd')"
+            );
         }
     }
 }

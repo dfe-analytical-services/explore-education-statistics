@@ -9,11 +9,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 public static class CopyDirectoryCallbacks
 {
 #pragma warning disable 1998
-    public static async Task<bool> TransferBlobIfFileExistsCallback(object source,
+    public static async Task<bool> TransferBlobIfFileExistsCallback(
+        object source,
 #pragma warning restore 1998
         List<File> files,
         IBlobContainer sourceContainerName,
-        ILogger logger)
+        ILogger logger
+    )
     {
         if (source is not CloudBlockBlob item)
         {

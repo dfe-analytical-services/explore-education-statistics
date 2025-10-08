@@ -20,10 +20,7 @@ public interface IDataSetFileStorage
     /// </list>
     /// </remarks>
     /// <returns>A summary of the data set details.</returns>
-    Task<DataFileInfo> UploadDataSet(
-        Guid releaseVersionId,
-        DataSet dataSet,
-        CancellationToken cancellationToken);
+    Task<DataFileInfo> UploadDataSet(Guid releaseVersionId, DataSet dataSet, CancellationToken cancellationToken);
 
     /// <summary>
     /// Persist a collection of physical data set files to temporary storage.
@@ -36,13 +33,15 @@ public interface IDataSetFileStorage
     Task<List<DataSetUpload>> UploadDataSetsToTemporaryStorage(
         Guid releaseVersionId,
         List<DataSet> dataSets,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken
+    );
 
     Task<Either<ActionResult, BlobDownloadToken>> GetTemporaryFileDownloadToken(
         Guid releaseVersionId,
         Guid dataSetUploadId,
         FileType fileType,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken
+    );
 
     /// <summary>
     /// Persist an existing temporary data set to permanent storage.
@@ -59,12 +58,14 @@ public interface IDataSetFileStorage
     Task<List<ReleaseFile>> MoveDataSetsToPermanentStorage(
         Guid releaseVersionId,
         List<DataSetUpload> dataSetUploads,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken
+    );
 
     Task AddScreenerResultToUpload(
         Guid dataSetUploadId,
         DataSetScreenerResponse screenerResult,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken
+    );
 
     /// <summary>
     /// Overwrite an existing data set record in the database with a new one.
@@ -74,5 +75,6 @@ public interface IDataSetFileStorage
     Task<DataSetUpload> CreateOrReplaceExistingDataSetUpload(
         Guid releaseVersionId,
         DataSetUpload dataSetUpload,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken
+    );
 }

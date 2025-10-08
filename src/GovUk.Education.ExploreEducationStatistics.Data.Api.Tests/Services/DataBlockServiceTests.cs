@@ -26,17 +26,17 @@ public class DataBlockServiceTests
     {
         var subjectId = Guid.NewGuid();
 
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .WithReleaseVersion(releaseVersion)
-                .WithSubjectId(subjectId)
-                .Generate())
+            .WithLatestPublishedVersion(
+                _fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithSubjectId(subjectId)
+                    .Generate()
+            )
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -51,10 +51,7 @@ public class DataBlockServiceTests
 
         var tableBuilderResults = new TableBuilderResultViewModel
         {
-            Results = new List<ObservationViewModel>
-            {
-                new()
-            }
+            Results = new List<ObservationViewModel> { new() },
         };
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -62,19 +59,21 @@ public class DataBlockServiceTests
             var (service, tableBuilderService) = BuildServiceAndDependencies(contentDbContext);
 
             tableBuilderService
-                .Setup(
-                    s =>
-                        s.Query(
-                            dataBlockVersion.ReleaseVersionId,
-                            It.Is<FullTableQuery>(q => q.SubjectId == subjectId),
-                            default
-                        )
+                .Setup(s =>
+                    s.Query(
+                        dataBlockVersion.ReleaseVersionId,
+                        It.Is<FullTableQuery>(q => q.SubjectId == subjectId),
+                        default
+                    )
                 )
                 .ReturnsAsync(tableBuilderResults);
 
-            var result = (await service.GetDataBlockTableResult(
-                releaseVersionId: dataBlockVersion.ReleaseVersionId,
-                dataBlockVersionId: dataBlockVersion.Id)).AssertRight();
+            var result = (
+                await service.GetDataBlockTableResult(
+                    releaseVersionId: dataBlockVersion.ReleaseVersionId,
+                    dataBlockVersionId: dataBlockVersion.Id
+                )
+            ).AssertRight();
 
             VerifyAllMocks(tableBuilderService);
 
@@ -86,10 +85,7 @@ public class DataBlockServiceTests
     public async Task GetDataBlockTableResult_NotDataBlockType()
     {
         var contentDbContextId = Guid.NewGuid().ToString();
-        var htmlBlock = new HtmlBlock
-        {
-            ReleaseVersion = new ReleaseVersion()
-        };
+        var htmlBlock = new HtmlBlock { ReleaseVersion = new ReleaseVersion() };
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -103,7 +99,8 @@ public class DataBlockServiceTests
 
             var result = await service.GetDataBlockTableResult(
                 releaseVersionId: htmlBlock.ReleaseVersionId,
-                dataBlockVersionId: htmlBlock.Id);
+                dataBlockVersionId: htmlBlock.Id
+            );
 
             result.AssertNotFound();
         }
@@ -111,8 +108,8 @@ public class DataBlockServiceTests
 
     private static (
         DataBlockService service,
-        Mock<ITableBuilderService> tableBuilderService)
-        BuildServiceAndDependencies(ContentDbContext contentDbContext)
+        Mock<ITableBuilderService> tableBuilderService
+    ) BuildServiceAndDependencies(ContentDbContext contentDbContext)
     {
         var tableBuilderService = new Mock<ITableBuilderService>(Strict);
         var userService = AlwaysTrueUserService();

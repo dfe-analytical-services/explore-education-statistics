@@ -13,7 +13,8 @@ public class StorageInstanceCreationUtil : IStorageInstanceCreationUtil
         string connectionString,
         AzureStorageType storageType,
         string instance,
-        Func<Task> createIfNotExists)
+        Func<Task> createIfNotExists
+    )
     {
         var identifyingString = $"{instance}{storageType}{connectionString}";
         if (!CreatedInstances.ContainsKey(identifyingString))
@@ -27,7 +28,8 @@ public class StorageInstanceCreationUtil : IStorageInstanceCreationUtil
         string connectionString,
         AzureStorageType storageType,
         string instance,
-        Action createIfNotExists)
+        Action createIfNotExists
+    )
     {
         var identifyingString = $"{instance}{storageType}{connectionString}";
         if (!CreatedInstances.ContainsKey(identifyingString))

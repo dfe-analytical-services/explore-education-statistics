@@ -18,14 +18,15 @@ public class Processor
     [
         DataImportStatus.QUEUED,
         DataImportStatus.STAGE_1,
-        DataImportStatus.STAGE_2
+        DataImportStatus.STAGE_2,
     ];
 
     public Processor(
         IDataImportService dataImportService,
         IProcessorService processorService,
         ILogger<Processor> logger,
-        bool rethrowExceptions = false)
+        bool rethrowExceptions = false
+    )
     {
         _dataImportService = dataImportService;
         _processorService = processorService;
@@ -37,7 +38,8 @@ public class Processor
     [QueueOutput(ImportsPendingQueue)]
     public async Task<ImportMessage[]> ProcessUploads(
         [QueueTrigger(ImportsPendingQueue)] ImportMessage message,
-        FunctionContext context)
+        FunctionContext context
+    )
     {
         try
         {
@@ -47,29 +49,32 @@ public class Processor
                 "{FunctionName} function processing import message for {Filename} at stage {ImportStatus}",
                 context.FunctionDefinition.Name,
                 import.File.Filename,
-                import.Status);
+                import.Status
+            );
 
             switch (import.Status)
             {
                 case DataImportStatus.CANCELLING:
                     _logger.LogInformation(
-                        "Import for {Filename} is in the process of being " +
-                        "cancelled, so not processing to the next import stage - marking as " +
-                        "CANCELLED",
-                        import.File.Filename);
+                        "Import for {Filename} is in the process of being "
+                            + "cancelled, so not processing to the next import stage - marking as "
+                            + "CANCELLED",
+                        import.File.Filename
+                    );
 
                     await _dataImportService.UpdateStatus(import.Id, DataImportStatus.CANCELLED, 100);
                     break;
                 case DataImportStatus.CANCELLED:
                     _logger.LogInformation(
                         "Import for {Filename} is cancelled, so not processing any further",
-                        import.File.Filename);
+                        import.File.Filename
+                    );
                     break;
                 case DataImportStatus.QUEUED:
-                    {
-                        await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 0);
-                        break;
-                    }
+                {
+                    await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 0);
+                    break;
+                }
                 case DataImportStatus.STAGE_1:
                     await _processorService.ProcessStage1(import.Id);
                     await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_2, 0);
@@ -95,7 +100,8 @@ public class Processor
                 "{FunctionName} function FAILED for Import {ImportId} : {Message}",
                 context.FunctionDefinition.Name,
                 message.Id,
-                mainException.Message);
+                mainException.Message
+            );
 
             await _dataImportService.FailImport(message.Id);
 

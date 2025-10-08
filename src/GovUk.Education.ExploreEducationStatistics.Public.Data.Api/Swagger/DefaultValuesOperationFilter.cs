@@ -15,9 +15,7 @@ internal class DefaultValuesOperationFilter : IOperationFilter
 
         foreach (var responseType in context.ApiDescription.SupportedResponseTypes)
         {
-            var responseKey = responseType.IsDefaultResponse
-                ? "default"
-                : responseType.StatusCode.ToString();
+            var responseKey = responseType.IsDefaultResponse ? "default" : responseType.StatusCode.ToString();
             var response = operation.Responses[responseKey];
 
             foreach (var contentType in response.Content.Keys)
@@ -36,17 +34,15 @@ internal class DefaultValuesOperationFilter : IOperationFilter
 
         foreach (var parameter in operation.Parameters)
         {
-            var description = apiDescription.ParameterDescriptions
-                .First(p => p.Name.Equals(parameter.Name, StringComparison.CurrentCultureIgnoreCase));
+            var description = apiDescription.ParameterDescriptions.First(p =>
+                p.Name.Equals(parameter.Name, StringComparison.CurrentCultureIgnoreCase)
+            );
 
             parameter.Description ??= description.ModelMetadata?.Description;
 
             if (parameter.Schema.Default == null && description.DefaultValue != null)
             {
-                var json = JsonSerializer.Serialize(
-                    description.DefaultValue,
-                    description.ModelMetadata!.ModelType
-                );
+                var json = JsonSerializer.Serialize(description.DefaultValue, description.ModelMetadata!.ModelType);
                 parameter.Schema.Default = OpenApiAnyFactory.CreateFromJson(json);
             }
 

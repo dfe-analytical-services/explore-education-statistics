@@ -28,12 +28,7 @@ internal class FilterFacetsParser : IFacetsParser
 
         if (facets.Filters?.Eq is not null)
         {
-            fragments.Add(
-                EqFragment(
-                    filterOptionId: facets.Filters.Eq,
-                    path: QueryUtils.Path(path, "filters.eq")
-                )
-            );
+            fragments.Add(EqFragment(filterOptionId: facets.Filters.Eq, path: QueryUtils.Path(path, "filters.eq")));
         }
 
         if (facets.Filters?.NotEq is not null)
@@ -50,10 +45,7 @@ internal class FilterFacetsParser : IFacetsParser
         if (facets.Filters?.In is not null && facets.Filters.In.Count != 0)
         {
             fragments.Add(
-                InFragment(
-                    filterOptionIds: [..facets.Filters.In],
-                    path: QueryUtils.Path(path, "filters.in")
-                )
+                InFragment(filterOptionIds: [.. facets.Filters.In], path: QueryUtils.Path(path, "filters.in"))
             );
         }
 
@@ -61,22 +53,17 @@ internal class FilterFacetsParser : IFacetsParser
         {
             fragments.Add(
                 InFragment(
-                    filterOptionIds: [..facets.Filters.NotIn],
+                    filterOptionIds: [.. facets.Filters.NotIn],
                     path: QueryUtils.Path(path, "filters.notIn"),
                     negate: true
                 )
             );
         }
 
-        return new DuckDbSqlBuilder()
-            .AppendRange(fragments, "\nAND ")
-            .Build();
+        return new DuckDbSqlBuilder().AppendRange(fragments, "\nAND ").Build();
     }
 
-    private IInterpolatedSql EqFragment(
-        string filterOptionId,
-        string path,
-        bool negate = false)
+    private IInterpolatedSql EqFragment(string filterOptionId, string path, bool negate = false)
     {
         var builder = new DuckDbSqlBuilder();
 
@@ -84,9 +71,7 @@ internal class FilterFacetsParser : IFacetsParser
         {
             _queryState.Warnings.Add(CreateNotFoundWarning([filterOptionId], path));
 
-            return builder
-                .AppendLiteral(negate ? "true" : "false")
-                .Build();
+            return builder.AppendLiteral(negate ? "true" : "false").Build();
         }
 
         builder += $"{DataTable.Ref().Col(option.FilterColumn):raw} {(negate ? "!=" : "="):raw} {option.Id}";
@@ -94,10 +79,7 @@ internal class FilterFacetsParser : IFacetsParser
         return builder.Build();
     }
 
-    private IInterpolatedSql InFragment(
-        HashSet<string> filterOptionIds,
-        string path,
-        bool negate = false)
+    private IInterpolatedSql InFragment(HashSet<string> filterOptionIds, string path, bool negate = false)
     {
         var builder = new DuckDbSqlBuilder();
 
@@ -113,9 +95,7 @@ internal class FilterFacetsParser : IFacetsParser
 
         if (options.Count == 0)
         {
-            return builder
-                .AppendLiteral(negate ? "true" : "false")
-                .Build();
+            return builder.AppendLiteral(negate ? "true" : "false").Build();
         }
 
         var fragments = options
@@ -130,9 +110,7 @@ internal class FilterFacetsParser : IFacetsParser
             .ToList();
 
         return fragments.Count == 1
-            ? builder
-                .AppendFormattableString(fragments[0])
-                .Build()
+            ? builder.AppendFormattableString(fragments[0]).Build()
             : builder
                 .AppendLiteral("(")
                 .AppendRange(fragments, joinString: negate ? "\n AND " : "\n OR ")
@@ -140,13 +118,14 @@ internal class FilterFacetsParser : IFacetsParser
                 .Build();
     }
 
-    private WarningViewModel CreateNotFoundWarning(HashSet<string> filterOptionIds, string path) => new()
-    {
-        Code = ValidationMessages.FiltersNotFound.Code,
-        Message = ValidationMessages.FiltersNotFound.Message,
-        Path = path,
-        Detail = new NotFoundItemsErrorDetail<string>(
-            filterOptionIds.Where(optionId => !_allowedFilterOptionsByPublicId.ContainsKey(optionId))
-        )
-    };
+    private WarningViewModel CreateNotFoundWarning(HashSet<string> filterOptionIds, string path) =>
+        new()
+        {
+            Code = ValidationMessages.FiltersNotFound.Code,
+            Message = ValidationMessages.FiltersNotFound.Message,
+            Path = path,
+            Detail = new NotFoundItemsErrorDetail<string>(
+                filterOptionIds.Where(optionId => !_allowedFilterOptionsByPublicId.ContainsKey(optionId))
+            ),
+        };
 }

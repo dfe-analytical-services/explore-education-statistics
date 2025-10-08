@@ -41,9 +41,7 @@ public abstract class DataSetQueryLocationTests
 
             Assert.IsType(expectedType, location);
 
-            var value = location.GetType()
-                .GetProperty(property.ToUpperFirst())!
-                .GetValue(location);
+            var value = location.GetType().GetProperty(property.ToUpperFirst())!.GetValue(location);
 
             Assert.Equal(expectedValue, value);
         }
@@ -58,8 +56,7 @@ public abstract class DataSetQueryLocationTests
         [InlineData("1")]
         public void InvalidLevel_Throws(string level)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
-                IDataSetQueryLocation.Parse($"{level}|id|12345"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => IDataSetQueryLocation.Parse($"{level}|id|12345"));
         }
 
         [Theory]
@@ -83,8 +80,7 @@ public abstract class DataSetQueryLocationTests
         [InlineData("SCH", "ukprn")]
         public void InvalidProperty_Throws(string level, string property)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
-                IDataSetQueryLocation.Parse($"{level}|{property}|12345"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => IDataSetQueryLocation.Parse($"{level}|{property}|12345"));
         }
 
         public static readonly TheoryData<Type> LocationTypes = new(
@@ -118,11 +114,13 @@ public abstract class DataSetQueryLocationTests
             Assert.True(
                 parsedLocationTypes.Contains(locationType),
                 $"""
-                  The location type could not be parsed. Ensure that:
-                  
-                  - There is a branch for this type in '{nameof(IDataSetQueryLocation)}.{nameof(IDataSetQueryLocation.Parse)}'
-                  - There is a corresponding string for this in the '{nameof(locationStrings)}' variable
-                  """
+                The location type could not be parsed. Ensure that:
+
+                - There is a branch for this type in '{nameof(IDataSetQueryLocation)}.{nameof(
+                    IDataSetQueryLocation.Parse
+                )}'
+                - There is a corresponding string for this in the '{nameof(locationStrings)}' variable
+                """
             );
         }
     }

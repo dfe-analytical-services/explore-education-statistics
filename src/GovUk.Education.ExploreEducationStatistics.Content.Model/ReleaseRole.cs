@@ -4,5 +4,5 @@ public enum ReleaseRole
 {
     Contributor,
     Approver,
-    PrereleaseViewer
+    PrereleaseViewer,
 }

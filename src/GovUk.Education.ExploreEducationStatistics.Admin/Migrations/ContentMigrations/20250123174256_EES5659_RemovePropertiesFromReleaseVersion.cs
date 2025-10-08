@@ -13,17 +13,11 @@ public partial class EES5659_RemovePropertiesFromReleaseVersion : Migration
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "ReleaseName",
-            table: "ReleaseVersions");
+        migrationBuilder.DropColumn(name: "ReleaseName", table: "ReleaseVersions");
 
-        migrationBuilder.DropColumn(
-            name: "Slug",
-            table: "ReleaseVersions");
+        migrationBuilder.DropColumn(name: "Slug", table: "ReleaseVersions");
 
-        migrationBuilder.DropColumn(
-            name: "TimePeriodCoverage",
-            table: "ReleaseVersions");
+        migrationBuilder.DropColumn(name: "TimePeriodCoverage", table: "ReleaseVersions");
     }
 
     /// <inheritdoc />
@@ -33,13 +27,15 @@ public partial class EES5659_RemovePropertiesFromReleaseVersion : Migration
             name: "ReleaseName",
             table: "ReleaseVersions",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<string>(
             name: "Slug",
             table: "ReleaseVersions",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.AddColumn<string>(
             name: "TimePeriodCoverage",
@@ -47,6 +43,7 @@ public partial class EES5659_RemovePropertiesFromReleaseVersion : Migration
             type: "nvarchar(6)",
             maxLength: 6,
             nullable: false,
-            defaultValue: "");
+            defaultValue: ""
+        );
     }
 }

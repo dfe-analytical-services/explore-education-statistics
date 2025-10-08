@@ -4,5 +4,5 @@ public enum PublicDataSecurityPolicies
 {
     CanViewDataSet,
     CanQueryDataSetVersion,
-    CanViewDataSetVersion
+    CanViewDataSetVersion,
 }

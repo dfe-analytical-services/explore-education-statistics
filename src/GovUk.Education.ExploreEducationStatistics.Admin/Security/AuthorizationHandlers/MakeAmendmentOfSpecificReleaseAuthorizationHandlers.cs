@@ -8,9 +8,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class MakeAmendmentOfSpecificReleaseRequirement : IAuthorizationRequirement
-{
-}
+public class MakeAmendmentOfSpecificReleaseRequirement : IAuthorizationRequirement { }
 
 public class MakeAmendmentOfSpecificReleaseAuthorizationHandler
     : AuthorizationHandler<MakeAmendmentOfSpecificReleaseRequirement, ReleaseVersion>
@@ -20,7 +18,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandler
 
     public MakeAmendmentOfSpecificReleaseAuthorizationHandler(
         AuthorizationHandlerService authorizationHandlerService,
-        IReleaseVersionRepository releaseVersionRepository)
+        IReleaseVersionRepository releaseVersionRepository
+    )
     {
         _authorizationHandlerService = authorizationHandlerService;
         _releaseVersionRepository = releaseVersionRepository;
@@ -29,7 +28,8 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandler
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         MakeAmendmentOfSpecificReleaseRequirement requirement,
-        ReleaseVersion releaseVersion)
+        ReleaseVersion releaseVersion
+    )
     {
         if (!releaseVersion.Live)
         {
@@ -47,11 +47,13 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandler
             return;
         }
 
-        if (await _authorizationHandlerService
-                .HasRolesOnPublication(
-                    context.User.GetUserId(),
-                    releaseVersion.PublicationId,
-                    Owner))
+        if (
+            await _authorizationHandlerService.HasRolesOnPublication(
+                context.User.GetUserId(),
+                releaseVersion.PublicationId,
+                Owner
+            )
+        )
         {
             context.Succeed(requirement);
         }

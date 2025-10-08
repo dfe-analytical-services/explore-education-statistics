@@ -9,11 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Se
 
 public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
 {
-    protected override string ResourcesPath => Path.Combine(
-        Assembly.GetExecutingAssembly().GetDirectoryPath(),
-        "Resources",
-        "PublicApi",
-        "Queries");
+    protected override string ResourcesPath =>
+        Path.Combine(Assembly.GetExecutingAssembly().GetDirectoryPath(), "Resources", "PublicApi", "Queries");
 
     public class ProcessTests : PublicApiQueriesProcessorTests
     {
@@ -27,12 +24,12 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             Assert.Equal(2, reports.Length);
 
@@ -77,9 +74,9 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.710Z"), queryAccessReportRow.StartTime);
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.850Z"), queryAccessReportRow.EndTime);
             Assert.Equal(140, queryAccessReportRow.DurationMillis);
-            
+
             Assert.Null(queryAccessReportRow.RequestedDataSetVersion);
-            
+
             Assert.Null(queryAccessReportRow.PreviewTokenLabel);
             Assert.Null(queryAccessReportRow.PreviewTokenCreated);
             Assert.Null(queryAccessReportRow.PreviewTokenExpiry);
@@ -144,10 +141,11 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
             // 2 separate lines in the query access report and the access times
             // match the times from the original JSON file, and the calculated
             // fields match the expected values.
-            var queryAccessReportRows = (await duckDbConnection
-                .SqlBuilder($"SELECT * FROM read_parquet('{queryAccessReportFile:raw}')")
-                .QueryAsync<QueryAccessReportLine>())
-                .ToList();
+            var queryAccessReportRows = (
+                await duckDbConnection
+                    .SqlBuilder($"SELECT * FROM read_parquet('{queryAccessReportFile:raw}')")
+                    .QueryAsync<QueryAccessReportLine>()
+            ).ToList();
 
             Assert.Equal(2, queryAccessReportRows.Count);
 
@@ -187,10 +185,11 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
             var duckDbConnection = new DuckDbConnection();
             duckDbConnection.Open();
 
-            var queryReportRows = (await duckDbConnection
-                .SqlBuilder($"SELECT * FROM read_parquet('{queryReportFile:raw}')")
-                .QueryAsync<QueryReportLine>())
-                    .ToList();
+            var queryReportRows = (
+                await duckDbConnection
+                    .SqlBuilder($"SELECT * FROM read_parquet('{queryReportFile:raw}')")
+                    .QueryAsync<QueryReportLine>()
+            ).ToList();
 
             // Check that the 3 different source files for the same query
             // have resulted in a single line in the query report, and the
@@ -214,10 +213,11 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
 
             var queryAccessReportFile = reports.Single(file => file.EndsWith("public-api-query-access.parquet"));
 
-            var queryAccessReportRows = (await duckDbConnection
-                .SqlBuilder($"SELECT * FROM read_parquet('{queryAccessReportFile:raw}')")
-                .QueryAsync<QueryAccessReportLine>())
-                .ToList();
+            var queryAccessReportRows = (
+                await duckDbConnection
+                    .SqlBuilder($"SELECT * FROM read_parquet('{queryAccessReportFile:raw}')")
+                    .QueryAsync<QueryAccessReportLine>()
+            ).ToList();
 
             // Check that the 3 different recorded query accesses have resulted in
             // 3 separate lines in the query access report and the access times
@@ -308,10 +308,11 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
 
             var queryAccessReportFile = reports.Single(file => file.EndsWith("public-api-query-access.parquet"));
 
-            var queryAccessReportRows = (await duckDbConnection
-                .SqlBuilder($"SELECT * FROM read_parquet('{queryAccessReportFile:raw}')")
-                .QueryAsync<QueryAccessReportLine>())
-                .ToList();
+            var queryAccessReportRows = (
+                await duckDbConnection
+                    .SqlBuilder($"SELECT * FROM read_parquet('{queryAccessReportFile:raw}')")
+                    .QueryAsync<QueryAccessReportLine>()
+            ).ToList();
 
             // Check that the 2 different recorded query accesses have resulted in
             // 2 separate lines in the query access report.
@@ -337,7 +338,7 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
             Assert.Equal(DateTime.Parse("2025-02-25T03:07:44.850Z"), queryAccessReportRow2.EndTime);
             Assert.Equal(140, queryAccessReportRow2.DurationMillis);
         }
-        
+
         [Fact]
         public async Task WithPreviewTokenAndRequestedDataSetVersion_CapturedInReport()
         {
@@ -349,7 +350,7 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             Assert.Equal(2, reports.Length);
 
@@ -394,78 +395,84 @@ public abstract class PublicApiQueriesProcessorTests : ProcessorTestsBase
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.710Z"), queryAccessReportRow.StartTime);
             Assert.Equal(DateTime.Parse("2025-02-24T03:07:44.850Z"), queryAccessReportRow.EndTime);
             Assert.Equal(140, queryAccessReportRow.DurationMillis);
-            
+
             Assert.Equal("1.*", queryAccessReportRow.RequestedDataSetVersion);
-            
+
             Assert.Equal("Preview token content", queryAccessReportRow.PreviewTokenLabel);
             Assert.Equal(DateTime.Parse("2025-02-23T11:02:44.850Z"), queryAccessReportRow.PreviewTokenCreated);
             Assert.Equal(DateTime.Parse("2025-02-24T11:02:44.850Z"), queryAccessReportRow.PreviewTokenExpiry);
-            Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryAccessReportRow.PreviewTokenDataSetVersionId);
+            Assert.Equal(
+                Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"),
+                queryAccessReportRow.PreviewTokenDataSetVersionId
+            );
         }
 
-        private static async Task<List<QueryReportLine>> ReadQueryReport(DuckDbConnection duckDbConnection, string queryReportFile)
+        private static async Task<List<QueryReportLine>> ReadQueryReport(
+            DuckDbConnection duckDbConnection,
+            string queryReportFile
+        )
         {
-            var queryReportRows = (await duckDbConnection
+            var queryReportRows = (
+                await duckDbConnection
                     .SqlBuilder($"SELECT * FROM read_parquet('{queryReportFile:raw}')")
-                    .QueryAsync<QueryReportLine>())
+                    .QueryAsync<QueryReportLine>()
+            )
                 .OrderBy(row => row.DataSetTitle)
                 .ToList();
             return queryReportRows;
         }
     }
-    
+
     private PublicApiQueriesProcessor BuildService()
     {
-        return new PublicApiQueriesProcessor(
-            pathResolver: PathResolver,
-            workflow: Workflow);
+        return new PublicApiQueriesProcessor(pathResolver: PathResolver, workflow: Workflow);
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local
     private record QueryReportLine
     {
         public string QueryVersionHash { get; init; } = string.Empty;
-        
+
         public string QueryHash { get; init; } = string.Empty;
-        
+
         public Guid DataSetId { get; init; }
-        
+
         public Guid DataSetVersionId { get; init; }
-        
+
         public string DataSetVersion { get; init; } = string.Empty;
-        
+
         public string DataSetTitle { get; init; } = string.Empty;
-        
+
         public int ResultsCount { get; init; }
-        
+
         public int TotalRowsCount { get; init; }
-        
+
         public string Query { get; init; } = string.Empty;
-        
+
         public int QueryExecutions { get; init; }
     }
-    
+
     // ReSharper disable once ClassNeverInstantiated.Local
     private record QueryAccessReportLine
     {
         public string QueryVersionHash { get; init; } = string.Empty;
 
         public Guid DataSetVersionId { get; init; }
-        
+
         public DateTime StartTime { get; init; }
-        
+
         public DateTime EndTime { get; init; }
-    
+
         public int DurationMillis { get; init; }
 
         public string? RequestedDataSetVersion { get; init; }
-        
+
         public string? PreviewTokenLabel { get; init; }
-        
+
         public Guid? PreviewTokenDataSetVersionId { get; init; }
-        
+
         public DateTime? PreviewTokenCreated { get; init; }
-        
+
         public DateTime? PreviewTokenExpiry { get; init; }
     }
 }

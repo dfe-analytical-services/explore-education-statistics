@@ -8,6 +8,6 @@ public class PublicationSaveRequestTests
     [Fact]
     public void ManualSlugOverride()
     {
-        Assert.Equal("slug", new PublicationSaveRequest {Title = "title", Slug = "slug"}.Slug);
+        Assert.Equal("slug", new PublicationSaveRequest { Title = "title", Slug = "slug" }.Slug);
     }
 }

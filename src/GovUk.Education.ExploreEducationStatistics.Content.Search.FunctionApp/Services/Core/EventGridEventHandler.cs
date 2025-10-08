@@ -9,17 +9,23 @@ public class EventGridEventHandler(ILogger<EventGridEventHandler> logger) : IEve
     public async Task<TResponse> Handle<TPayload, TResponse>(
         FunctionContext context,
         EventGridEvent eventGridEvent,
-        Func<TPayload, CancellationToken, Task<TResponse>> handler)
+        Func<TPayload, CancellationToken, Task<TResponse>> handler
+    )
     {
-        var payload = eventGridEvent.Data.ToObjectFromJson<TPayload>(); 
+        var payload = eventGridEvent.Data.ToObjectFromJson<TPayload>();
 
-        logger.LogDebug("{FunctionName} triggered: {@EventGridEvent} {@Payload}", context.FunctionDefinition.Name, eventGridEvent, payload);
+        logger.LogDebug(
+            "{FunctionName} triggered: {@EventGridEvent} {@Payload}",
+            context.FunctionDefinition.Name,
+            eventGridEvent,
+            payload
+        );
 
         if (payload is null)
         {
             throw new Exception($"Unable to deserialise the payload of event into type {typeof(TPayload).Name}");
         }
-        
+
         try
         {
             var response = await handler(payload, context.CancellationToken);
@@ -28,7 +34,12 @@ public class EventGridEventHandler(ILogger<EventGridEventHandler> logger) : IEve
         }
         catch (Exception e)
         {
-            logger.LogError(e, "{FunctionName} errored processing {@EventGridEvent}.", context.FunctionDefinition.Name, eventGridEvent);
+            logger.LogError(
+                e,
+                "{FunctionName} errored processing {@EventGridEvent}.",
+                context.FunctionDefinition.Name,
+                eventGridEvent
+            );
             throw;
         }
     }

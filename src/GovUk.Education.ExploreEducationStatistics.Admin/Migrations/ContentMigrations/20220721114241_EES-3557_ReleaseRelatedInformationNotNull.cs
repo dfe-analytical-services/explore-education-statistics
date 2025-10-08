@@ -22,7 +22,8 @@ public partial class EES3557_ReleaseRelatedInformationNotNull : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -33,6 +34,7 @@ public partial class EES3557_ReleaseRelatedInformationNotNull : Migration
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
     }
 }

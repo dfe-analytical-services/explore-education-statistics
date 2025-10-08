@@ -4,9 +4,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -20,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
 public class MethodologyAmendmentServiceTests
 {
+    private readonly DataFixture _dataFixture = new();
     private readonly Guid _userId = Guid.NewGuid();
 
     [Fact]
@@ -34,7 +37,7 @@ public class MethodologyAmendmentServiceTests
 
             // creation and update fields
             Created = DateTime.Today.AddDays(-2),
-            CreatedBy = new User(),
+            CreatedBy = _dataFixture.DefaultUser(),
             CreatedById = Guid.NewGuid(),
             Updated = DateTime.Today.AddDays(-10),
 
@@ -52,7 +55,7 @@ public class MethodologyAmendmentServiceTests
 
             // methodology field
             Methodology = new Methodology(),
-            MethodologyId = Guid.NewGuid()
+            MethodologyId = Guid.NewGuid(),
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -89,8 +92,8 @@ public class MethodologyAmendmentServiceTests
         // the MethodologyVersionTests class.
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var amendment = await context.MethodologyVersions
-                .Include(m => m.Notes)
+            var amendment = await context
+                .MethodologyVersions.Include(m => m.Notes)
                 .Include(m => m.MethodologyContent)
                 .Include(m => m.CreatedBy)
                 .Include(m => m.ScheduledWithReleaseVersion)
@@ -133,255 +136,42 @@ public class MethodologyAmendmentServiceTests
         var originalVersion = new MethodologyVersion
         {
             Id = Guid.NewGuid(),
-            MethodologyContent = new MethodologyVersionContent {
+            MethodologyContent = new MethodologyVersionContent
+            {
                 Annexes = new List<ContentSection>
                 {
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        Caption = "Annex caption",
                         Heading = "Annex heading",
                         Order = 2,
                         Type = ContentSectionType.Generic,
-                        Content = ListOf<ContentBlock>(new HtmlBlock
-                        {
-                            Id = Guid.NewGuid(),
-                            Body = "Annex body",
-                            Created = DateTime.Today.AddDays(-13),
-                            Order = 5,
-                            ContentSection = new ContentSection(),
-                            ContentSectionId = Guid.NewGuid(),
-                            Comments = new List<Comment>
+                        Content = ListOf<ContentBlock>(
+                            new HtmlBlock
                             {
-                                new()
+                                Id = Guid.NewGuid(),
+                                Body = "Annex body",
+                                Created = DateTime.Today.AddDays(-13),
+                                Order = 5,
+                                ContentSection = new ContentSection(),
+                                ContentSectionId = Guid.NewGuid(),
+                                Comments = new List<Comment>
                                 {
-                                    Id = Guid.NewGuid(),
-                                    Content = "Annex comment",
-                                    Created = DateTime.Today.AddDays(-4),
-                                    CreatedById = Guid.NewGuid(),
-                                    Updated = DateTime.Today.AddDays(-3),
-                                    CreatedBy = new User()
-                                }
+                                    new()
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Content = "Annex comment",
+                                        Created = DateTime.Today.AddDays(-4),
+                                        CreatedById = Guid.NewGuid(),
+                                        Updated = DateTime.Today.AddDays(-3),
+                                        CreatedBy = _dataFixture.DefaultUser(),
+                                    },
+                                },
                             }
-                        })
-                    }
-                }
-            }
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            await context.MethodologyVersions.AddAsync(originalVersion);
-            await context.SaveChangesAsync();
-        }
-
-        Guid amendmentId;
-
-        // Call the method under test
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var methodologyService = new Mock<IMethodologyService>(Strict);
-            var service = BuildService(context, methodologyService: methodologyService.Object);
-
-            var amendmentCapture = new List<MethodologyVersion>();
-            var viewModel = new MethodologyVersionViewModel();
-
-            methodologyService
-                .Setup(s => s.BuildMethodologyVersionViewModel(Capture.In(amendmentCapture)))
-                .ReturnsAsync(viewModel);
-
-            var result = await service.CreateMethodologyAmendment(originalVersion.Id);
-            VerifyAllMocks(methodologyService);
-
-            result.AssertRight(viewModel);
-            var amendment = Assert.Single(amendmentCapture);
-            amendmentId = amendment.Id;
-        }
-
-        // Check that the amendment was successfully saved.  More detailed field-by-field testing is available in
-        // the MethodologyVersionTests class.
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var amendment = await context.MethodologyVersions
-                .Include(m => m.MethodologyContent)
-                .SingleAsync(m => m.Id == amendmentId);
-
-            AssertContentSectionAmendedCorrectly(
-                amendment.MethodologyContent.Annexes[0],
-                originalVersion.MethodologyContent.Annexes[0]);
-        }
-    }
-
-    [Fact]
-    public async Task CreateMethodologyAmendment_ClonesContentSections()
-    {
-        var originalVersion = new MethodologyVersion
-        {
-            Id = Guid.NewGuid(),
-            MethodologyContent = new MethodologyVersionContent {
-                Content = new List<ContentSection>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Caption = "Content caption",
-                        Heading = "Content heading",
-                        Order = 2,
-                        Type = ContentSectionType.Generic,
-                        Content = ListOf<ContentBlock>(new HtmlBlock
-                        {
-                            Id = Guid.NewGuid(),
-                            Body = "Content body",
-                            Comments = new List<Comment>
-                            {
-                                new()
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Content = "Content comment",
-                                    Created = DateTime.Today.AddDays(-4),
-                                    CreatedById = Guid.NewGuid(),
-                                    Updated = DateTime.Today.AddDays(-3),
-                                    CreatedBy = new User()
-                                }
-                            }
-                        })
-                    }
-                }
-            }
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            await context.MethodologyVersions.AddAsync(originalVersion);
-            await context.SaveChangesAsync();
-        }
-
-        Guid amendmentId;
-
-        // Call the method under test
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var methodologyService = new Mock<IMethodologyService>(Strict);
-            var service = BuildService(context, methodologyService: methodologyService.Object);
-
-            var amendmentCapture = new List<MethodologyVersion>();
-            var viewModel = new MethodologyVersionViewModel();
-
-            methodologyService
-                .Setup(s => s.BuildMethodologyVersionViewModel(Capture.In(amendmentCapture)))
-                .ReturnsAsync(viewModel);
-
-            var result = await service.CreateMethodologyAmendment(originalVersion.Id);
-            VerifyAllMocks(methodologyService);
-
-            result.AssertRight(viewModel);
-            var amendment = Assert.Single(amendmentCapture);
-            amendmentId = amendment.Id;
-        }
-
-        // Check that the amendment was successfully saved.  More detailed field-by-field testing is available in
-        // the MethodologyVersionTests class.
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var amendment = await context.MethodologyVersions
-                .Include(m => m.MethodologyContent)
-                .SingleAsync(m => m.Id == amendmentId);
-
-            AssertContentSectionAmendedCorrectly(
-                amendment.MethodologyContent.Content[0],
-                originalVersion.MethodologyContent.Content[0]);
-        }
-    }
-
-    private static void AssertContentSectionAmendedCorrectly(
-        ContentSection amendmentContentSection,
-        ContentSection originalContentSection)
-    {
-        // Check the Content Section has a new id.
-        Assert.NotEqual(Guid.Empty, amendmentContentSection.Id);
-        Assert.NotEqual(originalContentSection.Id, amendmentContentSection.Id);
-
-        // Check the other basic Content Section fields are the same
-        Assert.Equal(originalContentSection.Caption, amendmentContentSection.Caption);
-        Assert.Equal(originalContentSection.Heading, amendmentContentSection.Heading);
-        Assert.Equal(originalContentSection.Order, amendmentContentSection.Order);
-        Assert.Equal(originalContentSection.Type, amendmentContentSection.Type);
-
-        var amendmentContentBlock = Assert.IsType<HtmlBlock>(Assert.Single(amendmentContentSection.Content));
-        var originalContentBlock = Assert.IsType<HtmlBlock>(originalContentSection.Content[0]);
-
-        // Check the Content Block has a new id.
-        Assert.NotEqual(Guid.Empty, amendmentContentBlock.Id);
-        Assert.NotEqual(originalContentBlock.Id, amendmentContentBlock.Id);
-
-        // Check the other Content Block basic fields.
-        Assert.Equal(originalContentBlock.Body, amendmentContentBlock.Body);
-        amendmentContentBlock.Created.AssertUtcNow();
-        Assert.Equal(originalContentBlock.Order, amendmentContentBlock.Order);
-
-        // Check the Content Section is null. Content Blocks within JSON do not need an owning
-        // Content Section back reference.
-        Assert.Null(amendmentContentBlock.ContentSection);
-        Assert.Null(amendmentContentBlock.ContentSectionId);
-
-        // Check the amendment's Content Block Comments are empty as we are starting with a clean slate.
-        Assert.Empty(amendmentContentBlock.Comments);
-    }
-
-    [Fact]
-    public async Task CreateMethodologyAmendment_ClonesNotes()
-    {
-        var originalVersion = new MethodologyVersion
-        {
-            Id = Guid.NewGuid()
-        };
-
-        originalVersion.Notes = new List<MethodologyNote>
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Content = "Note 1",
-                DisplayDate = DateTime.Today.ToUniversalTime(),
-                MethodologyVersion = originalVersion,
-                MethodologyVersionId = originalVersion.Id,
-                Created = DateTime.Today.AddDays(-6).ToUniversalTime(),
-                CreatedBy = new User(),
-                CreatedById = Guid.NewGuid(),
-                Updated = DateTime.Today.AddDays(-5).ToUniversalTime(),
-                UpdatedBy = new User(),
-                UpdatedById = Guid.NewGuid()
+                        ),
+                    },
+                },
             },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Content = "Note 2",
-                DisplayDate = DateTime.Today.ToUniversalTime(),
-                MethodologyVersion = originalVersion,
-                MethodologyVersionId = originalVersion.Id,
-                Created = DateTime.Today.AddDays(-4).ToUniversalTime(),
-                CreatedBy = new User(),
-                CreatedById = Guid.NewGuid(),
-                Updated = DateTime.Today.AddDays(-3).ToUniversalTime(),
-                UpdatedBy = new User(),
-                UpdatedById = Guid.NewGuid()
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Content = "Note 3",
-                DisplayDate = DateTime.Today.ToUniversalTime(),
-                MethodologyVersion = originalVersion,
-                MethodologyVersionId = originalVersion.Id,
-                Created = DateTime.Today.AddDays(-2).ToUniversalTime(),
-                CreatedBy = new User(),
-                CreatedById = Guid.NewGuid(),
-                Updated = DateTime.Today.AddDays(-1).ToUniversalTime(),
-                UpdatedBy = new User(),
-                UpdatedById = Guid.NewGuid()
-            }
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -419,8 +209,223 @@ public class MethodologyAmendmentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var amendment = await context
-                .MethodologyVersions
-                .Include(m => m.Notes)
+                .MethodologyVersions.Include(m => m.MethodologyContent)
+                .SingleAsync(m => m.Id == amendmentId);
+
+            AssertContentSectionAmendedCorrectly(
+                amendment.MethodologyContent.Annexes[0],
+                originalVersion.MethodologyContent.Annexes[0]
+            );
+        }
+    }
+
+    [Fact]
+    public async Task CreateMethodologyAmendment_ClonesContentSections()
+    {
+        var originalVersion = new MethodologyVersion
+        {
+            Id = Guid.NewGuid(),
+            MethodologyContent = new MethodologyVersionContent
+            {
+                Content = new List<ContentSection>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Heading = "Content heading",
+                        Order = 2,
+                        Type = ContentSectionType.Generic,
+                        Content = ListOf<ContentBlock>(
+                            new HtmlBlock
+                            {
+                                Id = Guid.NewGuid(),
+                                Body = "Content body",
+                                Comments = new List<Comment>
+                                {
+                                    new()
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Content = "Content comment",
+                                        Created = DateTime.Today.AddDays(-4),
+                                        CreatedById = Guid.NewGuid(),
+                                        Updated = DateTime.Today.AddDays(-3),
+                                        CreatedBy = _dataFixture.DefaultUser(),
+                                    },
+                                },
+                            }
+                        ),
+                    },
+                },
+            },
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.MethodologyVersions.AddAsync(originalVersion);
+            await context.SaveChangesAsync();
+        }
+
+        Guid amendmentId;
+
+        // Call the method under test
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var methodologyService = new Mock<IMethodologyService>(Strict);
+            var service = BuildService(context, methodologyService: methodologyService.Object);
+
+            var amendmentCapture = new List<MethodologyVersion>();
+            var viewModel = new MethodologyVersionViewModel();
+
+            methodologyService
+                .Setup(s => s.BuildMethodologyVersionViewModel(Capture.In(amendmentCapture)))
+                .ReturnsAsync(viewModel);
+
+            var result = await service.CreateMethodologyAmendment(originalVersion.Id);
+            VerifyAllMocks(methodologyService);
+
+            result.AssertRight(viewModel);
+            var amendment = Assert.Single(amendmentCapture);
+            amendmentId = amendment.Id;
+        }
+
+        // Check that the amendment was successfully saved.  More detailed field-by-field testing is available in
+        // the MethodologyVersionTests class.
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var amendment = await context
+                .MethodologyVersions.Include(m => m.MethodologyContent)
+                .SingleAsync(m => m.Id == amendmentId);
+
+            AssertContentSectionAmendedCorrectly(
+                amendment.MethodologyContent.Content[0],
+                originalVersion.MethodologyContent.Content[0]
+            );
+        }
+    }
+
+    private static void AssertContentSectionAmendedCorrectly(
+        ContentSection amendmentContentSection,
+        ContentSection originalContentSection
+    )
+    {
+        // Check the Content Section has a new id.
+        Assert.NotEqual(Guid.Empty, amendmentContentSection.Id);
+        Assert.NotEqual(originalContentSection.Id, amendmentContentSection.Id);
+
+        // Check the other basic Content Section fields are the same
+        Assert.Equal(originalContentSection.Heading, amendmentContentSection.Heading);
+        Assert.Equal(originalContentSection.Order, amendmentContentSection.Order);
+        Assert.Equal(originalContentSection.Type, amendmentContentSection.Type);
+
+        var amendmentContentBlock = Assert.IsType<HtmlBlock>(Assert.Single(amendmentContentSection.Content));
+        var originalContentBlock = Assert.IsType<HtmlBlock>(originalContentSection.Content[0]);
+
+        // Check the Content Block has a new id.
+        Assert.NotEqual(Guid.Empty, amendmentContentBlock.Id);
+        Assert.NotEqual(originalContentBlock.Id, amendmentContentBlock.Id);
+
+        // Check the other Content Block basic fields.
+        Assert.Equal(originalContentBlock.Body, amendmentContentBlock.Body);
+        amendmentContentBlock.Created.AssertUtcNow();
+        Assert.Equal(originalContentBlock.Order, amendmentContentBlock.Order);
+
+        // Check the Content Section is null. Content Blocks within JSON do not need an owning
+        // Content Section back reference.
+        Assert.Null(amendmentContentBlock.ContentSection);
+        Assert.Null(amendmentContentBlock.ContentSectionId);
+
+        // Check the amendment's Content Block Comments are empty as we are starting with a clean slate.
+        Assert.Empty(amendmentContentBlock.Comments);
+    }
+
+    [Fact]
+    public async Task CreateMethodologyAmendment_ClonesNotes()
+    {
+        var originalVersion = new MethodologyVersion { Id = Guid.NewGuid() };
+
+        originalVersion.Notes = new List<MethodologyNote>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Content = "Note 1",
+                DisplayDate = DateTime.Today.ToUniversalTime(),
+                MethodologyVersion = originalVersion,
+                MethodologyVersionId = originalVersion.Id,
+                Created = DateTime.Today.AddDays(-6).ToUniversalTime(),
+                CreatedBy = _dataFixture.DefaultUser(),
+                CreatedById = Guid.NewGuid(),
+                Updated = DateTime.Today.AddDays(-5).ToUniversalTime(),
+                UpdatedBy = _dataFixture.DefaultUser(),
+                UpdatedById = Guid.NewGuid(),
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Content = "Note 2",
+                DisplayDate = DateTime.Today.ToUniversalTime(),
+                MethodologyVersion = originalVersion,
+                MethodologyVersionId = originalVersion.Id,
+                Created = DateTime.Today.AddDays(-4).ToUniversalTime(),
+                CreatedBy = _dataFixture.DefaultUser(),
+                CreatedById = Guid.NewGuid(),
+                Updated = DateTime.Today.AddDays(-3).ToUniversalTime(),
+                UpdatedBy = _dataFixture.DefaultUser(),
+                UpdatedById = Guid.NewGuid(),
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Content = "Note 3",
+                DisplayDate = DateTime.Today.ToUniversalTime(),
+                MethodologyVersion = originalVersion,
+                MethodologyVersionId = originalVersion.Id,
+                Created = DateTime.Today.AddDays(-2).ToUniversalTime(),
+                CreatedBy = _dataFixture.DefaultUser(),
+                CreatedById = Guid.NewGuid(),
+                Updated = DateTime.Today.AddDays(-1).ToUniversalTime(),
+                UpdatedBy = _dataFixture.DefaultUser(),
+                UpdatedById = Guid.NewGuid(),
+            },
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.MethodologyVersions.AddAsync(originalVersion);
+            await context.SaveChangesAsync();
+        }
+
+        Guid amendmentId;
+
+        // Call the method under test
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var methodologyService = new Mock<IMethodologyService>(Strict);
+            var service = BuildService(context, methodologyService: methodologyService.Object);
+
+            var amendmentCapture = new List<MethodologyVersion>();
+            var viewModel = new MethodologyVersionViewModel();
+
+            methodologyService
+                .Setup(s => s.BuildMethodologyVersionViewModel(Capture.In(amendmentCapture)))
+                .ReturnsAsync(viewModel);
+
+            var result = await service.CreateMethodologyAmendment(originalVersion.Id);
+            VerifyAllMocks(methodologyService);
+
+            result.AssertRight(viewModel);
+            var amendment = Assert.Single(amendmentCapture);
+            amendmentId = amendment.Id;
+        }
+
+        // Check that the amendment was successfully saved.  More detailed field-by-field testing is available in
+        // the MethodologyVersionTests class.
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var amendment = await context
+                .MethodologyVersions.Include(m => m.Notes)
                 .SingleAsync(m => m.Id == amendmentId);
 
             Assert.Equal(3, amendment.Notes.Count);
@@ -434,7 +439,8 @@ public class MethodologyAmendmentServiceTests
     private void AssertMethodologyNoteAmendedCorrectly(
         MethodologyNote amendmentNote,
         MethodologyNote originalNote,
-        MethodologyVersion amendment)
+        MethodologyVersion amendment
+    )
     {
         // Check the note has a new id.
         Assert.NotEqual(Guid.Empty, amendmentNote.Id);
@@ -468,35 +474,26 @@ public class MethodologyAmendmentServiceTests
                 OwningPublicationTitle = "Owning Publication Title",
                 OwningPublicationSlug = "owning-publication-slug",
             },
-            MethodologyContent = new MethodologyVersionContent {
-                Content = AsList(new ContentSection
-                {
-                    Content = AsList<ContentBlock>(new HtmlBlock
-                    {
-                        Body = "Content!"
-                    })
-                })
-            }
+            MethodologyContent = new MethodologyVersionContent
+            {
+                Content = AsList(
+                    new ContentSection { Content = AsList<ContentBlock>(new HtmlBlock { Body = "Content!" }) }
+                ),
+            },
         };
 
         var originalMethodologyFile1 = new MethodologyFile
         {
             Id = Guid.NewGuid(),
             MethodologyVersionId = originalVersion.Id,
-            File = new File
-            {
-                Id = Guid.NewGuid()
-            }
+            File = new File { Id = Guid.NewGuid() },
         };
 
         var originalMethodologyFile2 = new MethodologyFile
         {
             Id = Guid.NewGuid(),
             MethodologyVersionId = originalVersion.Id,
-            File = new File
-            {
-                Id = Guid.NewGuid()
-            }
+            File = new File { Id = Guid.NewGuid() },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -534,20 +531,21 @@ public class MethodologyAmendmentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var amendmentMethodologyFiles = await context
-                .MethodologyFiles
-                .AsQueryable()
+                .MethodologyFiles.AsQueryable()
                 .Where(f => f.MethodologyVersionId == amendmentId)
                 .ToListAsync();
 
             Assert.Equal(2, amendmentMethodologyFiles.Count());
 
-            var methodologyFile1ForAmendment =
-                Assert.Single(amendmentMethodologyFiles, 
-                    f => f.FileId == originalMethodologyFile1.FileId);
+            var methodologyFile1ForAmendment = Assert.Single(
+                amendmentMethodologyFiles,
+                f => f.FileId == originalMethodologyFile1.FileId
+            );
 
-            var methodologyFile2ForAmendment =
-                Assert.Single(amendmentMethodologyFiles, 
-                    f => f.FileId == originalMethodologyFile2.FileId);
+            var methodologyFile2ForAmendment = Assert.Single(
+                amendmentMethodologyFiles,
+                f => f.FileId == originalMethodologyFile2.FileId
+            );
 
             Assert.NotEqual(originalMethodologyFile1.Id, methodologyFile1ForAmendment.Id);
             Assert.NotEqual(originalMethodologyFile2.Id, methodologyFile2ForAmendment.Id);
@@ -558,7 +556,8 @@ public class MethodologyAmendmentServiceTests
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
         IMethodologyService? methodologyService = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new(
             contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),

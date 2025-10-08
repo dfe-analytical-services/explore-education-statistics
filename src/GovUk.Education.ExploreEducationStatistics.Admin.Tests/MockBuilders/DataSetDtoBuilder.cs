@@ -27,7 +27,7 @@ public class DataSetDtoBuilder
             {
                 FileName = _dataFileName,
                 FileSize = dataMemoryStream.Length,
-                FileStreamProvider = () => dataMemoryStream
+                FileStreamProvider = () => dataMemoryStream,
             };
         }
 
@@ -39,18 +39,17 @@ public class DataSetDtoBuilder
             {
                 FileName = _metaFileName,
                 FileSize = metaMemoryStream.Length,
-                FileStreamProvider = () => metaMemoryStream
+                FileStreamProvider = () => metaMemoryStream,
             };
         }
 
-        return
-            new()
-            {
-                ReleaseVersionId = _releaseVersionId ?? Guid.NewGuid(),
-                Title = _title,
-                DataFile = _dataFile,
-                MetaFile = _metaFile,
-            };
+        return new()
+        {
+            ReleaseVersionId = _releaseVersionId ?? Guid.NewGuid(),
+            Title = _title,
+            DataFile = _dataFile,
+            MetaFile = _metaFile,
+        };
     }
 
     public DataSetDtoBuilder WhereReleaseVersionIdIsEmpty()

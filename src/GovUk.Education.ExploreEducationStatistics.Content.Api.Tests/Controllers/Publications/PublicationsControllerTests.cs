@@ -12,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
 public abstract class PublicationsControllerTests
 {
+    private readonly PublicationMethodologiesServiceMockBuilder _publicationMethodologiesService = new();
     private readonly PublicationReleasesServiceMockBuilder _publicationReleasesService = new();
     private readonly PublicationsServiceMockBuilder _publicationsService = new();
 
@@ -53,6 +54,46 @@ public abstract class PublicationsControllerTests
         }
     }
 
+    public class GetPublicationMethodologiesTests : PublicationsControllerTests
+    {
+        [Fact]
+        public async Task WhenServiceReturnsMethodologies_ReturnsOk()
+        {
+            // Arrange
+            var methodologies = new PublicationMethodologiesDtoBuilder()
+                .WithMethodologies([new PublicationMethodologyDtoBuilder().Build()])
+                .WithExternalMethodology(new PublicationExternalMethodologyDtoBuilder().Build())
+                .Build();
+
+            _publicationMethodologiesService.WhereHasMethodologies(methodologies);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetPublicationMethodologies(PublicationSlug);
+
+            // Assert
+            _publicationMethodologiesService.Assert.GetPublicationMethodologiesWasCalled(PublicationSlug);
+            result.AssertOkResult(methodologies);
+        }
+
+        [Fact]
+        public async Task WhenServiceReturnsNotFound_ReturnsNotFound()
+        {
+            // Arrange
+            _publicationMethodologiesService.WhereGetPublicationMethodologiesReturnsNotFound(PublicationSlug);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetPublicationMethodologies(PublicationSlug);
+
+            // Assert
+            _publicationMethodologiesService.Assert.GetPublicationMethodologiesWasCalled(PublicationSlug);
+            result.AssertNotFoundResult();
+        }
+    }
+
     public class GetPublicationReleasesTests : PublicationsControllerTests
     {
         private const int Page = 1;
@@ -65,16 +106,17 @@ public abstract class PublicationsControllerTests
             var publicationReleases = PaginatedListViewModel<IPublicationReleaseEntryDto>.Paginate(
                 [
                     new LegacyPublicationReleaseEntryDtoBuilder().Build(),
-                    new PublicationReleaseEntryDtoBuilder().Build()
+                    new PublicationReleaseEntryDtoBuilder().Build(),
                 ],
                 page: Page,
-                pageSize: PageSize);
+                pageSize: PageSize
+            );
 
             var request = new GetPublicationReleasesRequest
             {
                 PublicationSlug = PublicationSlug,
                 Page = Page,
-                PageSize = PageSize
+                PageSize = PageSize,
             };
 
             _publicationReleasesService.WhereHasPublicationReleases(publicationReleases);
@@ -88,7 +130,8 @@ public abstract class PublicationsControllerTests
             _publicationReleasesService.Assert.GetPublicationReleasesWasCalled(
                 request.PublicationSlug,
                 page: request.Page,
-                pageSize: request.PageSize);
+                pageSize: request.PageSize
+            );
             result.AssertOkResult(publicationReleases);
         }
 
@@ -101,10 +144,11 @@ public abstract class PublicationsControllerTests
             var publicationReleases = PaginatedListViewModel<IPublicationReleaseEntryDto>.Paginate(
                 [
                     new LegacyPublicationReleaseEntryDtoBuilder().Build(),
-                    new PublicationReleaseEntryDtoBuilder().Build()
+                    new PublicationReleaseEntryDtoBuilder().Build(),
                 ],
                 page: defaultPage,
-                pageSize: defaultPageSize);
+                pageSize: defaultPageSize
+            );
 
             // No page or pageSize query parameters set on request
             var request = new GetPublicationReleasesRequest { PublicationSlug = PublicationSlug };
@@ -120,7 +164,8 @@ public abstract class PublicationsControllerTests
             _publicationReleasesService.Assert.GetPublicationReleasesWasCalled(
                 request.PublicationSlug,
                 page: defaultPage,
-                pageSize: defaultPageSize);
+                pageSize: defaultPageSize
+            );
             result.AssertOkResult(publicationReleases);
         }
 
@@ -143,7 +188,10 @@ public abstract class PublicationsControllerTests
         }
     }
 
-    private PublicationsController BuildController() => new(
-        _publicationReleasesService.Build(),
-        _publicationsService.Build());
+    private PublicationsController BuildController() =>
+        new(
+            _publicationMethodologiesService.Build(),
+            _publicationReleasesService.Build(),
+            _publicationsService.Build()
+        );
 }

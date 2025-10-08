@@ -1,27 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <CompilerVisibleProperty Include="RootNamespace" />
-        <CompilerVisibleProperty Include="ProjectDir" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="AspectInjector" Version="2.8.1" PrivateAssets="all" /> <!-- v2.8.1 is compatible with MacOS -->
-        <PackageReference Include="System.Linq.Async.Queryable" Version="6.0.3" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Analytics.Common\GovUk.Education.ExploreEducationStatistics.Analytics.Common.csproj" />
-      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
-      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Requests\GovUk.Education.ExploreEducationStatistics.Content.Requests.csproj" />
-      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj" />
-      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Services\GovUk.Education.ExploreEducationStatistics.Data.Services.csproj" />
-    </ItemGroup>
-
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="RootNamespace" />
+    <CompilerVisibleProperty Include="ProjectDir" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
+    <!-- v2.8.1 is compatible with MacOS -->
+    <PackageReference Include="System.Linq.Async.Queryable" Version="6.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Analytics.Common\GovUk.Education.ExploreEducationStatistics.Analytics.Common.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Requests\GovUk.Education.ExploreEducationStatistics.Content.Requests.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Services\GovUk.Education.ExploreEducationStatistics.Data.Services.csproj" />
+  </ItemGroup>
 </Project>

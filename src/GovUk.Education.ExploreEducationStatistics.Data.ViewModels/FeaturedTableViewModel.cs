@@ -7,4 +7,5 @@ public record FeaturedTableViewModel(
     Guid SubjectId,
     Guid DataBlockId,
     Guid DataBlockParentId,
-    int Order);
+    int Order
+);

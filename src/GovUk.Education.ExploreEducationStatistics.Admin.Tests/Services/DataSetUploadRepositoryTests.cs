@@ -69,24 +69,19 @@ public class DataSetUploadRepositoryTests
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
             privateBlobStorageService
-                .Setup(mock => mock.DeleteBlob(
-                    PrivateReleaseTempFiles,
-                    It.IsAny<string>()))
+                .Setup(mock => mock.DeleteBlob(PrivateReleaseTempFiles, It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            var service = BuildService(
-                contentDbContext,
-                privateBlobStorageService.Object);
+            var service = BuildService(contentDbContext, privateBlobStorageService.Object);
 
             // Act
             var result = await service.Delete(releaseVersionId, upload2.Id, default);
 
             // Assert
-            privateBlobStorageService
-                .Verify(mock => mock.DeleteBlob(
-                    PrivateReleaseTempFiles,
-                    It.IsAny<string>()),
-                Times.Exactly(2));
+            privateBlobStorageService.Verify(
+                mock => mock.DeleteBlob(PrivateReleaseTempFiles, It.IsAny<string>()),
+                Times.Exactly(2)
+            );
 
             result.AssertRight();
             Assert.Equal(2, contentDbContext.DataSetUploads.Count());
@@ -117,24 +112,19 @@ public class DataSetUploadRepositoryTests
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
             privateBlobStorageService
-                .Setup(mock => mock.DeleteBlob(
-                    PrivateReleaseTempFiles,
-                    It.IsAny<string>()))
+                .Setup(mock => mock.DeleteBlob(PrivateReleaseTempFiles, It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            var service = BuildService(
-                contentDbContext,
-                privateBlobStorageService.Object);
+            var service = BuildService(contentDbContext, privateBlobStorageService.Object);
 
             // Act
             var result = await service.DeleteAll(releaseVersionId, default);
 
             // Assert
-            privateBlobStorageService
-                .Verify(mock => mock.DeleteBlob(
-                    PrivateReleaseTempFiles,
-                    It.IsAny<string>()),
-                Times.Exactly(6));
+            privateBlobStorageService.Verify(
+                mock => mock.DeleteBlob(PrivateReleaseTempFiles, It.IsAny<string>()),
+                Times.Exactly(6)
+            );
 
             result.AssertRight();
             Assert.Empty(contentDbContext.DataSetUploads);
@@ -144,11 +134,13 @@ public class DataSetUploadRepositoryTests
     private static DataSetUploadRepository BuildService(
         ContentDbContext context,
         IPrivateBlobStorageService? privateBlobStorageService = null,
-        IMapper? mapper = null)
+        IMapper? mapper = null
+    )
     {
         return new DataSetUploadRepository(
             context,
             privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
-            mapper ?? Mock.Of<IMapper>());
+            mapper ?? Mock.Of<IMapper>()
+        );
     }
 }

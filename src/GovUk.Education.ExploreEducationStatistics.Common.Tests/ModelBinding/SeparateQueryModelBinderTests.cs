@@ -10,17 +10,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.ModelBinding;
 
 public class SeparateQueryModelBinderTests : IntegrationTest<TestStartup>
 {
-    public SeparateQueryModelBinderTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-    {
-    }
+    public SeparateQueryModelBinderTests(TestApplicationFactory<TestStartup> testApp)
+        : base(testApp) { }
 
     [Fact]
     public async Task BindsToIntList()
     {
         var client = BuildApp().CreateClient();
 
-        var response = await client.GetAsync(
-            $"{nameof(TestController.IntList)}?items=1,2,3");
+        var response = await client.GetAsync($"{nameof(TestController.IntList)}?items=1,2,3");
 
         response.AssertOk(new List<int> { 1, 2, 3 });
     }
@@ -30,8 +28,7 @@ public class SeparateQueryModelBinderTests : IntegrationTest<TestStartup>
     {
         var client = BuildApp().CreateClient();
 
-        var response = await client.PostAsync(
-            $"{nameof(TestController.IntListPost)}?items=1,2,3", null);
+        var response = await client.PostAsync($"{nameof(TestController.IntListPost)}?items=1,2,3", null);
 
         response.AssertOk(new List<int> { 1, 2, 3 });
     }
@@ -41,22 +38,22 @@ public class SeparateQueryModelBinderTests : IntegrationTest<TestStartup>
     {
         var client = BuildApp().CreateClient();
 
-        var response = await client.GetAsync(
-            $"{nameof(TestController.IntListClass)}?items=1,2,3");
+        var response = await client.GetAsync($"{nameof(TestController.IntListClass)}?items=1,2,3");
 
-        response.AssertOk(new IntListRequest
-        {
-            Items = new List<int> { 1, 2, 3 }
-        });
+        response.AssertOk(
+            new IntListRequest
+            {
+                Items = new List<int> { 1, 2, 3 },
+            }
+        );
     }
-    
+
     [Fact]
     public async Task BindsToIntArray()
     {
         var client = BuildApp().CreateClient();
 
-        var response = await client.GetAsync(
-            $"{nameof(TestController.IntArray)}?items=1,2,3");
+        var response = await client.GetAsync($"{nameof(TestController.IntArray)}?items=1,2,3");
 
         response.AssertOk(new List<int> { 1, 2, 3 });
     }
@@ -70,8 +67,7 @@ public class SeparateQueryModelBinderTests : IntegrationTest<TestStartup>
 
         var client = BuildApp().CreateClient();
 
-        var response = await client.GetAsync(
-            $"{nameof(TestController.GuidList)}?items={guid1},{guid2},{guid3}");
+        var response = await client.GetAsync($"{nameof(TestController.GuidList)}?items={guid1},{guid2},{guid3}");
 
         response.AssertOk(new List<Guid> { guid1, guid2, guid3 });
     }
@@ -86,7 +82,8 @@ public class SeparateQueryModelBinderTests : IntegrationTest<TestStartup>
         var client = BuildApp().CreateClient();
 
         var response = await client.GetAsync(
-            $"{nameof(TestController.StringList)}?items={string1},{string2},{string3}");
+            $"{nameof(TestController.StringList)}?items={string1},{string2},{string3}"
+        );
 
         // Only a single item list is returned, meaning the model was not bound as expected.
         response.AssertOk(new List<string> { $"{string1},{string2},{string3}" });
@@ -102,13 +99,11 @@ public class SeparateQueryModelBinderTests : IntegrationTest<TestStartup>
         var client = BuildApp().CreateClient();
 
         var response = await client.GetAsync(
-            $"{nameof(TestController.StringListClass)}?items={string1},{string2},{string3}");
+            $"{nameof(TestController.StringListClass)}?items={string1},{string2},{string3}"
+        );
 
         // Only a single item list is returned, meaning the model was not bound as expected.
-        response.AssertOk(new StringListRequest
-        {
-            Items = new List<string> { $"{string1},{string2},{string3}" }
-        });
+        response.AssertOk(new StringListRequest { Items = new List<string> { $"{string1},{string2},{string3}" } });
     }
 
     [Fact]
@@ -121,7 +116,8 @@ public class SeparateQueryModelBinderTests : IntegrationTest<TestStartup>
         var client = BuildApp().CreateClient();
 
         var response = await client.GetAsync(
-            $"{nameof(TestController.StringListQuerySeparator)}?items={string1},{string2},{string3}");
+            $"{nameof(TestController.StringListQuerySeparator)}?items={string1},{string2},{string3}"
+        );
 
         response.AssertOk(new List<string> { string1, string2, string3 });
     }
@@ -136,12 +132,15 @@ public class SeparateQueryModelBinderTests : IntegrationTest<TestStartup>
         var client = BuildApp().CreateClient();
 
         var response = await client.GetAsync(
-            $"{nameof(TestController.StringListClassQuerySeparator)}?items={string1},{string2},{string3}");
+            $"{nameof(TestController.StringListClassQuerySeparator)}?items={string1},{string2},{string3}"
+        );
 
-        response.AssertOk(new StringListWithQuerySeparatorRequest
-        {
-            Items = new List<string> { string1, string2, string3 }
-        });
+        response.AssertOk(
+            new StringListWithQuerySeparatorRequest
+            {
+                Items = new List<string> { string1, string2, string3 },
+            }
+        );
     }
 
     [Fact]
@@ -154,7 +153,8 @@ public class SeparateQueryModelBinderTests : IntegrationTest<TestStartup>
         var client = BuildApp().CreateClient();
 
         var response = await client.GetAsync(
-            $"{nameof(TestController.StringListQuerySeparatorCustom)}?items={string1}:{string2}:{string3}");
+            $"{nameof(TestController.StringListQuerySeparatorCustom)}?items={string1}:{string2}:{string3}"
+        );
 
         response.AssertOk(new List<string> { string1, string2, string3 });
     }
@@ -202,21 +202,20 @@ public class SeparateQueryModelBinderTests : IntegrationTest<TestStartup>
         public StringListRequest StringListClass([FromQuery] StringListRequest request) => request;
 
         [HttpGet(nameof(StringListQuerySeparator))]
-        public IList<string> StringListQuerySeparator(
-            [FromQuery, QuerySeparator] IList<string> items) => items;
+        public IList<string> StringListQuerySeparator([FromQuery, QuerySeparator] IList<string> items) => items;
 
         [HttpGet(nameof(StringListClassQuerySeparator))]
         public StringListWithQuerySeparatorRequest StringListClassQuerySeparator(
-            [FromQuery] StringListWithQuerySeparatorRequest request) => request;
+            [FromQuery] StringListWithQuerySeparatorRequest request
+        ) => request;
 
         [HttpGet(nameof(StringListQuerySeparatorCustom))]
-        public IList<string> StringListQuerySeparatorCustom(
-            [FromQuery, QuerySeparator(":")] IList<string> items) => items;
+        public IList<string> StringListQuerySeparatorCustom([FromQuery, QuerySeparator(":")] IList<string> items) =>
+            items;
     }
 
     private WebApplicationFactory<TestStartup> BuildApp()
     {
-        return TestApp.WithWebHostBuilder(builder =>
-            builder.WithAdditionalControllers(typeof(TestController)));
+        return TestApp.WithWebHostBuilder(builder => builder.WithAdditionalControllers(typeof(TestController)));
     }
 }

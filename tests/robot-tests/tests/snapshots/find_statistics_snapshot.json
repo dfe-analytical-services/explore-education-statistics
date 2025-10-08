@@ -219,7 +219,7 @@
   {
     "publication_summary": "Initial outputs from DfE's Childcare Experiences Survey (aka \u201cYour Childcare\u201d), understanding working parents' experiences of the expanded childcare entitlement",
     "publication_title": "Expansion to early childcare entitlements: Childcare Experiences Survey",
-    "published": "12 May 2025",
+    "published": "25 Sep 2025",
     "release_type": "Management information",
     "theme": "Early years"
   },
@@ -261,7 +261,7 @@
   {
     "publication_summary": "Apprenticeship and adult 19+ Further Education and skills learning, including community learning, education and training, and basic skills (English and maths).",
     "publication_title": "Further education and skills",
-    "published": "18 Sep 2025",
+    "published": "26 Sep 2025",
     "release_type": "Accredited official statistics",
     "theme": "Further education"
   },
@@ -541,8 +541,8 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly statistics in development derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "7 Aug 2025",
-    "release_type": "Official statistics in development",
+    "published": "25 Sep 2025",
+    "release_type": "Official statistics",
     "theme": "Pupils and schools"
   },
   {
@@ -551,6 +551,13 @@
     "published": "9 Aug 2023",
     "release_type": "Management information",
     "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Retention rates and headcounts of senior leaders who are new to their leadership post in each census year, in state-funded primary and secondary schools.",
+    "publication_title": "School Leadership retention",
+    "published": "2 Oct 2025",
+    "release_type": "Ad hoc statistics",
+    "theme": "Teachers and school workforce"
   },
   {
     "publication_summary": "School places in primary and secondary state-funded schools including sixth form. Local authorities\u2019 pupil forecasts and planned changes to school places.",

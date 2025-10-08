@@ -7,18 +7,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 public static class TimeIdentifierUtils
 {
     private static readonly Lazy<IReadOnlyList<TimeIdentifier>> EnumsLazy = new(() =>
-        EnumUtil.GetEnums<TimeIdentifier>()
-            .ToList());
+        EnumUtil.GetEnums<TimeIdentifier>().ToList()
+    );
 
     private static readonly Lazy<IReadOnlyList<string>> CodesLazy = new(() =>
-        EnumsLazy.Value
-            .Select(ti => ti.GetEnumValue())
-            .ToList());
+        EnumsLazy.Value.Select(ti => ti.GetEnumValue()).ToList()
+    );
 
     private static readonly Lazy<IReadOnlyList<string>> LabelsLazy = new(() =>
-        EnumsLazy.Value
-            .Select(ti => ti.GetEnumLabel())
-            .ToList());
+        EnumsLazy.Value.Select(ti => ti.GetEnumLabel()).ToList()
+    );
 
     public static IReadOnlyList<TimeIdentifier> Enums => EnumsLazy.Value;
 

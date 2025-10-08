@@ -21,13 +21,11 @@ public class MethodologyController : ControllerBase
     [HttpGet("methodologies/{slug}")]
     public async Task<ActionResult<MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug)
     {
-        return await _methodologyService.GetLatestMethodologyBySlug(slug)
-            .HandleFailuresOrOk();
+        return await _methodologyService.GetLatestMethodologyBySlug(slug).HandleFailuresOrOk();
     }
 
     [HttpGet("methodologies/sitemap-items")]
     public async Task<ActionResult<List<MethodologySitemapItemViewModel>>> ListSitemapItems(
-        CancellationToken cancellationToken = default) =>
-        await _methodologyService.ListSitemapItems(cancellationToken)
-            .HandleFailuresOrOk();
+        CancellationToken cancellationToken = default
+    ) => await _methodologyService.ListSitemapItems(cancellationToken).HandleFailuresOrOk();
 }

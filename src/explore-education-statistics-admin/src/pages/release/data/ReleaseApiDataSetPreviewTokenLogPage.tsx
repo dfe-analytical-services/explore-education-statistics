@@ -81,7 +81,7 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                 <th>User</th>
                 <th>Date generated</th>
                 <th>Status</th>
-                <th>Expiry</th>
+                <th>Expires</th>
                 <th className="govuk-!-text-align-right">Action</th>
               </tr>
             </thead>
@@ -105,7 +105,7 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                     </td>
                     <td>
                       <FormattedDate format="d MMMM yyyy, HH:mm">
-                        {token.expiry}
+                        {token.expires}
                       </FormattedDate>
                     </td>
                     <td className="govuk-!-text-align-right">

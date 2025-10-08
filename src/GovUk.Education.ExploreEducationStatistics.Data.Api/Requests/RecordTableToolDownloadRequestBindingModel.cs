@@ -14,7 +14,7 @@ public record RecordTableToolDownloadRequestBindingModel
     public string? DataSetName { get; init; }
     public TableDownloadFormat? DownloadFormat { get; init; }
     public FullTableQueryRequest? Query { get; init; }
-    
+
     public class Validator : AbstractValidator<RecordTableToolDownloadRequestBindingModel>
     {
         public Validator()
@@ -39,7 +39,7 @@ public record RecordTableToolDownloadRequestBindingModel
             SubjectId = SubjectId!.Value,
             DataSetName = DataSetName,
             DownloadFormat = DownloadFormat!.Value,
-            Query = Query!.AsFullTableQuery()
+            Query = Query!.AsFullTableQuery(),
         };
     }
 }

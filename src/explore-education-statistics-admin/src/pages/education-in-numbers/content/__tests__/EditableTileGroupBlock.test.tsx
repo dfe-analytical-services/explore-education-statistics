@@ -1,4 +1,6 @@
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
+import EditableTileGroupBlock from '@admin/pages/education-in-numbers/content/components/EditableTileGroupBlock';
+import { EducationInNumbersPageContentProvider } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
@@ -6,8 +8,6 @@ import React from 'react';
 import testEinPageVersion, {
   testEinPageContent,
 } from '../../__tests__/__data__/testEducationInNumbersPageAndContent';
-import EditableTileGroupBlock from '../components/EditableTileGroupBlock';
-import { EducationInNumbersPageContentProvider } from '../context/EducationInNumbersPageContentContext';
 import testBlock from './__data__/testBlock';
 
 const renderWithContext = (component: React.ReactNode) =>
@@ -159,5 +159,28 @@ describe('EditableTileGroupBlock', () => {
         screen.queryByTestId('freeTextStatTile-editForm'),
       ).not.toBeInTheDocument(),
     );
+  });
+
+  test('when the remove tile button is clicked a confirm modal is shown', async () => {
+    const { user } = renderWithContext(
+      <EditableTileGroupBlock
+        block={testBlock}
+        editable
+        sectionId="test-section"
+        onDelete={noop}
+      />,
+    );
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Delete tile - Test Tile Group Block Title',
+      }),
+    );
+
+    const modal = within(screen.getByRole('dialog'));
+
+    await waitFor(() => {
+      expect(modal.getByText('Remove tile')).toBeInTheDocument();
+    });
   });
 });

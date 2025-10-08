@@ -16,11 +16,12 @@ public enum LoginResult
     LoginSuccess,
     RegistrationSuccess,
     NoInvite,
-    ExpiredInvite
+    ExpiredInvite,
 }
 
 public record UserProfile(Guid Id, string FirstName);
 
 public record SignInResponseViewModel(
     [property: JsonConverter(typeof(StringEnumConverter))] LoginResult LoginResult,
-    UserProfile? UserProfile = null);
+    UserProfile? UserProfile = null
+);

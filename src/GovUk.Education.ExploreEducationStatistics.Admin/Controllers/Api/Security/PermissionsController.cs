@@ -23,7 +23,8 @@ public class PermissionsController(
     IUserService userService,
     IPreReleaseService preReleaseService,
     IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository) : ControllerBase
+    IUserReleaseRoleRepository userReleaseRoleRepository
+) : ControllerBase
 {
     [HttpGet("permissions/access")]
     public async Task<ActionResult<GlobalPermissionsViewModel>> GetGlobalPermissions()
@@ -34,7 +35,7 @@ public class PermissionsController(
         // not expect a user with that role to be the target of specific Release or Publication
         // roles.  If they were to be given Approver permissions, we would therefore assume that they
         // should have Approver access to ALL Methodologies and Releases that are awaiting approval,
-        // which would potentially be overwhelming. 
+        // which would potentially be overwhelming.
         var isApprover = !isBauUser && (await IsReleaseApprover() || await IsPublicationApprover());
 
         return new GlobalPermissionsViewModel(
@@ -44,7 +45,8 @@ public class PermissionsController(
             CanAccessPrereleasePages: await userService.CheckCanAccessPrereleasePages().IsRight(),
             CanManageAllTaxonomy: await userService.CheckCanManageAllTaxonomy().IsRight(),
             IsBauUser: isBauUser,
-            IsApprover: isApprover);
+            IsApprover: isApprover
+        );
     }
 
     [HttpGet("permissions/theme/{themeId:guid}/publication/create")]
@@ -60,21 +62,23 @@ public class PermissionsController(
     }
 
     public record ReleaseStatusPermissionsViewModel(
-        bool CanMarkDraft, bool CanMarkHigherLevelReview, bool CanMarkApproved);
+        bool CanMarkDraft,
+        bool CanMarkHigherLevelReview,
+        bool CanMarkApproved
+    );
 
     [HttpGet("permissions/release/{releaseVersionId:guid}/status")]
     public async Task<ActionResult<ReleaseStatusPermissionsViewModel>> GetReleaseStatusPermissions(
-        Guid releaseVersionId)
+        Guid releaseVersionId
+    )
     {
-        return await persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        return await persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(async releaseVersion =>
             {
-                var canMarkDraft = await userService
-                    .CheckCanMarkReleaseVersionAsDraft(releaseVersion);
-                var canMarkHigherReview = await userService
-                    .CheckCanSubmitReleaseVersionForHigherReview(releaseVersion);
-                var canMarkApproved = await userService
-                    .CheckCanApproveReleaseVersion(releaseVersion);
+                var canMarkDraft = await userService.CheckCanMarkReleaseVersionAsDraft(releaseVersion);
+                var canMarkHigherReview = await userService.CheckCanSubmitReleaseVersionForHigherReview(releaseVersion);
+                var canMarkApproved = await userService.CheckCanApproveReleaseVersion(releaseVersion);
 
                 return new ReleaseStatusPermissionsViewModel(
                     CanMarkDraft: canMarkDraft.IsRight,
@@ -82,18 +86,14 @@ public class PermissionsController(
                     CanMarkApproved: canMarkApproved.IsRight
                 );
             })
-            .OrElse(() => new ReleaseStatusPermissionsViewModel(
-                false, false, false));
+            .OrElse(() => new ReleaseStatusPermissionsViewModel(false, false, false));
     }
 
     [HttpGet("permissions/release/{releaseVersionId:guid}/data/{fileId:guid}")]
     public async Task<ActionResult<DataFilePermissions>> GetDataFilePermissions(Guid releaseVersionId, Guid fileId)
     {
         return await releaseFileService
-            .CheckFileExists(
-                releaseVersionId: releaseVersionId,
-                fileId: fileId,
-                FileType.Data)
+            .CheckFileExists(releaseVersionId: releaseVersionId, fileId: fileId, FileType.Data)
             .OnSuccess(userService.GetDataFilePermissions)
             .HandleFailuresOrOk();
     }
@@ -101,7 +101,10 @@ public class PermissionsController(
     [HttpGet("permissions/release/{releaseVersionId:guid}/amend")]
     public Task<ActionResult<bool>> CanMakeAmendmentOfRelease(Guid releaseVersionId)
     {
-        return CheckPolicyAgainstEntity<ReleaseVersion>(releaseVersionId, userService.CheckCanMakeAmendmentOfReleaseVersion);
+        return CheckPolicyAgainstEntity<ReleaseVersion>(
+            releaseVersionId,
+            userService.CheckCanMakeAmendmentOfReleaseVersion
+        );
     }
 
     [HttpGet("permissions/release/{releaseVersionId:guid}/prerelease/status")]
@@ -117,41 +120,46 @@ public class PermissionsController(
     [HttpGet("permissions/methodology/{methodologyId:guid}/update")]
     public Task<ActionResult<bool>> CanUpdateMethodology(Guid methodologyId)
     {
-        return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId,
-        userService.CheckCanUpdateMethodologyVersion);
+        return CheckPolicyAgainstEntity<MethodologyVersion>(
+            methodologyId,
+            userService.CheckCanUpdateMethodologyVersion
+        );
     }
 
     public record MethodologyApprovalStatusPermissions(
-        bool CanMarkDraft, bool CanMarkHigherLevelReview, bool CanMarkApproved);
+        bool CanMarkDraft,
+        bool CanMarkHigherLevelReview,
+        bool CanMarkApproved
+    );
 
     [HttpGet("permissions/methodology/{methodologyVersionId:guid}/status")]
     public async Task<ActionResult<MethodologyApprovalStatusPermissions>> GetMethodologyApprovalPermissions(
-        Guid methodologyVersionId)
+        Guid methodologyVersionId
+    )
     {
-        return await persistenceHelper.CheckEntityExists<MethodologyVersion>(methodologyVersionId)
+        return await persistenceHelper
+            .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
             .OnSuccess(async methodologyVersion =>
             {
-                var canMarkDraft = await userService
-                    .CheckCanMarkMethodologyVersionAsDraft(methodologyVersion);
-                var canMarkHigherLevelReview = await userService
-                    .CheckCanSubmitMethodologyForHigherReview(methodologyVersion);
-                var canMarkApproved = await userService
-                    .CheckCanApproveMethodologyVersion(methodologyVersion);
+                var canMarkDraft = await userService.CheckCanMarkMethodologyVersionAsDraft(methodologyVersion);
+                var canMarkHigherLevelReview = await userService.CheckCanSubmitMethodologyForHigherReview(
+                    methodologyVersion
+                );
+                var canMarkApproved = await userService.CheckCanApproveMethodologyVersion(methodologyVersion);
 
-                return new MethodologyApprovalStatusPermissions
-                (
+                return new MethodologyApprovalStatusPermissions(
                     CanMarkDraft: canMarkDraft.IsRight,
                     CanMarkHigherLevelReview: canMarkHigherLevelReview.IsRight,
                     CanMarkApproved: canMarkApproved.IsRight
                 );
             })
-            .OrElse(() => new MethodologyApprovalStatusPermissions(
-                false, false, false));
+            .OrElse(() => new MethodologyApprovalStatusPermissions(false, false, false));
     }
 
     private async Task<ActionResult<bool>> CheckPolicyAgainstEntity<TEntity>(
         Guid entityId,
-        Func<TEntity, Task<Either<ActionResult, TEntity>>> policyCheck)
+        Func<TEntity, Task<Either<ActionResult, TEntity>>> policyCheck
+    )
         where TEntity : class
     {
         return await persistenceHelper
@@ -163,13 +171,15 @@ public class PermissionsController(
 
     private async Task<bool> IsReleaseApprover()
     {
-        return (await userReleaseRoleRepository.GetDistinctRolesByUser(userService.GetUserId()))
-            .Contains(ReleaseRole.Approver);
+        return (await userReleaseRoleRepository.GetDistinctRolesByUser(userService.GetUserId())).Contains(
+            ReleaseRole.Approver
+        );
     }
 
     private async Task<bool> IsPublicationApprover()
     {
-        return (await userPublicationRoleRepository.GetDistinctRolesByUser(userService.GetUserId()))
-            .Contains(PublicationRole.Allower);
+        return (await userPublicationRoleRepository.GetDistinctRolesByUser(userService.GetUserId())).Contains(
+            PublicationRole.Allower
+        );
     }
 }

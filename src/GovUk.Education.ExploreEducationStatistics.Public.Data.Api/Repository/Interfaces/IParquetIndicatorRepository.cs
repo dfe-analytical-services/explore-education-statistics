@@ -6,5 +6,6 @@ public interface IParquetIndicatorRepository
 {
     Task<Dictionary<string, string>> GetColumnsById(
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

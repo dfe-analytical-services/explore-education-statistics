@@ -8,13 +8,14 @@ public record PublicationDeletedEvent : IEvent
     public PublicationDeletedEvent(
         Guid publicationId,
         string publicationSlug,
-        LatestPublishedReleaseInfo? latestPublishedRelease)
+        LatestPublishedReleaseInfo? latestPublishedRelease
+    )
     {
         Subject = publicationId.ToString();
         Payload = new EventPayload
         {
             PublicationSlug = publicationSlug,
-            LatestPublishedRelease = latestPublishedRelease
+            LatestPublishedRelease = latestPublishedRelease,
         };
     }
 

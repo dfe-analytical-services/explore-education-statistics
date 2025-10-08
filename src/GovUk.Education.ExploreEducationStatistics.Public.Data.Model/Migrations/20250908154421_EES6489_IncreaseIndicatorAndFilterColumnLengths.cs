@@ -18,7 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(80)",
-                oldMaxLength: 80);
+                oldMaxLength: 80
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Label",
@@ -28,7 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(80)",
-                oldMaxLength: 80);
+                oldMaxLength: 80
+            );
         }
 
         /// <inheritdoc />
@@ -42,7 +44,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(100)",
-                oldMaxLength: 100);
+                oldMaxLength: 100
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Label",
@@ -52,7 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(100)",
-                oldMaxLength: 100);
+                oldMaxLength: 100
+            );
         }
     }
 }

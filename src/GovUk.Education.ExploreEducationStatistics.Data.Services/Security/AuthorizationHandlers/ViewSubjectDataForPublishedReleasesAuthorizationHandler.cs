@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
 
-public class ViewSubjectDataForPublishedReleasesAuthorizationHandler : AuthorizationHandler<
-    ViewSubjectDataRequirement, ReleaseSubject>
+public class ViewSubjectDataForPublishedReleasesAuthorizationHandler
+    : AuthorizationHandler<ViewSubjectDataRequirement, ReleaseSubject>
 {
     private readonly IReleaseVersionRepository _releaseVersionRepository;
 
@@ -15,9 +15,11 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandler : Authoriza
         _releaseVersionRepository = releaseVersionRepository;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext authContext,
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext authContext,
         ViewSubjectDataRequirement requirement,
-        ReleaseSubject releaseSubject)
+        ReleaseSubject releaseSubject
+    )
     {
         if (await _releaseVersionRepository.IsLatestPublishedReleaseVersion(releaseSubject.ReleaseVersionId))
         {

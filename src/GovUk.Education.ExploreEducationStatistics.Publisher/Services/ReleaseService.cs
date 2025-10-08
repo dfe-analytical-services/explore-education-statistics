@@ -10,22 +10,20 @@ using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
-public class ReleaseService(
-    ContentDbContext contentDbContext,
-    IReleaseVersionRepository releaseVersionRepository
-    ) : IReleaseService
+public class ReleaseService(ContentDbContext contentDbContext, IReleaseVersionRepository releaseVersionRepository)
+    : IReleaseService
 {
     public async Task<ReleaseVersion> Get(Guid releaseVersionId)
     {
-        return await contentDbContext.ReleaseVersions
-            .Include(rv => rv.Release)
+        return await contentDbContext
+            .ReleaseVersions.Include(rv => rv.Release)
             .SingleAsync(releaseVersion => releaseVersion.Id == releaseVersionId);
     }
 
     public async Task<IEnumerable<ReleaseVersion>> GetAmendedReleases(IEnumerable<Guid> releaseVersionIds)
     {
-        return await contentDbContext.ReleaseVersions
-            .Include(rv => rv.PreviousVersion)
+        return await contentDbContext
+            .ReleaseVersions.Include(rv => rv.PreviousVersion)
             .Include(rv => rv.Release)
             .ThenInclude(r => r.Publication)
             .Where(rv => releaseVersionIds.Contains(rv.Id) && rv.PreviousVersionId != null)
@@ -34,10 +32,10 @@ public class ReleaseService(
 
     public async Task<ReleaseVersion> GetLatestPublishedReleaseVersion(
         Guid publicationId,
-        IReadOnlyList<Guid>? includeUnpublishedVersionIds = null)
+        IReadOnlyList<Guid>? includeUnpublishedVersionIds = null
+    )
     {
-        var publication = await contentDbContext.Publications
-            .SingleAsync(p => p.Id == publicationId);
+        var publication = await contentDbContext.Publications.SingleAsync(p => p.Id == publicationId);
 
         // Get the publications release id's by the order they appear in the release series
         var releaseSeriesReleaseIds = publication.ReleaseSeries.ReleaseIds();
@@ -48,10 +46,12 @@ public class ReleaseService(
         ReleaseVersion? latestPublishedReleaseVersion = null;
         foreach (var releaseId in releaseSeriesReleaseIds)
         {
-            latestPublishedReleaseVersion = await contentDbContext.ReleaseVersions
-                .LatestReleaseVersion(releaseId: releaseId,
+            latestPublishedReleaseVersion = await contentDbContext
+                .ReleaseVersions.LatestReleaseVersion(
+                    releaseId: releaseId,
                     publishedOnly: true,
-                    includeUnpublishedVersionIds: includeUnpublishedVersionIds)
+                    includeUnpublishedVersionIds: includeUnpublishedVersionIds
+                )
                 .SingleOrDefaultAsync();
 
             if (latestPublishedReleaseVersion != null)
@@ -60,15 +60,16 @@ public class ReleaseService(
             }
         }
 
-        return latestPublishedReleaseVersion ?? throw new InvalidOperationException(
-            $"No latest published release version found for publication {publicationId}");
+        return latestPublishedReleaseVersion
+            ?? throw new InvalidOperationException(
+                $"No latest published release version found for publication {publicationId}"
+            );
     }
 
     public async Task<List<File>> GetFiles(Guid releaseVersionId, params FileType[] types)
     {
         return await contentDbContext
-            .ReleaseFiles
-            .Include(rf => rf.File)
+            .ReleaseFiles.Include(rf => rf.File)
             .Where(rf => rf.ReleaseVersionId == releaseVersionId)
             .Select(rf => rf.File)
             .Where(file => types.Contains(file.Type))
@@ -78,8 +79,7 @@ public class ReleaseService(
     public async Task CompletePublishing(Guid releaseVersionId, DateTime actualPublishedDate)
     {
         var releaseVersion = await contentDbContext
-            .ReleaseVersions
-            .Include(rv => rv.DataBlockVersions)
+            .ReleaseVersions.Include(rv => rv.DataBlockVersions)
             .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
             .SingleAsync(rv => rv.Id == releaseVersionId);
 
@@ -96,12 +96,10 @@ public class ReleaseService(
         await contentDbContext.SaveChangesAsync();
     }
 
-    private async Task UpdateReleaseFilePublishedDate(
-        ReleaseVersion releaseVersion,
-        DateTime publishedDate)
+    private async Task UpdateReleaseFilePublishedDate(ReleaseVersion releaseVersion, DateTime publishedDate)
     {
-        var dataReleaseFiles = contentDbContext.ReleaseFiles
-            .Where(releaseFile => releaseFile.ReleaseVersionId == releaseVersion.Id)
+        var dataReleaseFiles = contentDbContext
+            .ReleaseFiles.Where(releaseFile => releaseFile.ReleaseVersionId == releaseVersion.Id)
             .Include(rf => rf.File);
 
         if (releaseVersion.PreviousVersion is null)
@@ -121,8 +119,7 @@ public class ReleaseService(
         // Update all of the DataBlockParents to point their "LatestPublishedVersions" to the "latest" versions
         // on the Release. Mark the "latest" version as null until a Release Amendment is created.
         var latestDataBlockParents = releaseVersion
-            .DataBlockVersions
-            .Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
+            .DataBlockVersions.Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
             .ToList();
 
         latestDataBlockParents.ForEach(latestDataBlockParent =>
@@ -144,9 +141,10 @@ public class ReleaseService(
             var latestDataBlockParentIds = latestDataBlockParents.Select(dataBlockParent => dataBlockParent.Id);
 
             var removedDataBlockVersions = await contentDbContext
-                .DataBlockVersions
-                .Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersion.PreviousVersionId &&
-                                           !latestDataBlockParentIds.Contains(dataBlockVersion.DataBlockParentId))
+                .DataBlockVersions.Where(dataBlockVersion =>
+                    dataBlockVersion.ReleaseVersionId == releaseVersion.PreviousVersionId
+                    && !latestDataBlockParentIds.Contains(dataBlockVersion.DataBlockParentId)
+                )
                 .Include(dataBlockVersion => dataBlockVersion.DataBlockParent)
                 .ToListAsync();
 

@@ -47,7 +47,8 @@ public class MethodologyApprovalService : IMethodologyApprovalService
         IUserReleaseRoleService userReleaseRoleService,
         IMethodologyCacheService methodologyCacheService,
         IEmailTemplateService emailTemplateService,
-        IRedirectsCacheService redirectsCacheService)
+        IRedirectsCacheService redirectsCacheService
+    )
     {
         _persistenceHelper = persistenceHelper;
         _context = context;
@@ -65,121 +66,125 @@ public class MethodologyApprovalService : IMethodologyApprovalService
 
     public async Task<Either<ActionResult, MethodologyVersion>> UpdateApprovalStatus(
         Guid methodologyVersionId,
-        MethodologyApprovalUpdateRequest request)
+        MethodologyApprovalUpdateRequest request
+    )
     {
         return await _persistenceHelper
-            .CheckEntityExists<MethodologyVersion>(methodologyVersionId, q =>
-                q.Include(m => m.Methodology))
+            .CheckEntityExists<MethodologyVersion>(methodologyVersionId, q => q.Include(m => m.Methodology))
             .OnSuccess(methodology => UpdateStatus(methodology, request));
     }
 
     private async Task<Either<ActionResult, MethodologyVersion>> UpdateStatus(
         MethodologyVersion methodologyVersionToUpdate,
-        MethodologyApprovalUpdateRequest request)
+        MethodologyApprovalUpdateRequest request
+    )
     {
         if (!request.IsStatusUpdateRequired(methodologyVersionToUpdate))
         {
             return methodologyVersionToUpdate;
         }
 
-        return await
-            _userService.CheckCanUpdateMethodologyVersionStatus(methodologyVersionToUpdate, request.Status)
-                .OnSuccessDo(methodologyVersion => CheckMethodologyCanDependOnRelease(methodologyVersion, request))
-                .OnSuccessDo(RemoveUnusedImages)
-                .OnSuccess(async methodologyVersion =>
+        return await _userService
+            .CheckCanUpdateMethodologyVersionStatus(methodologyVersionToUpdate, request.Status)
+            .OnSuccessDo(methodologyVersion => CheckMethodologyCanDependOnRelease(methodologyVersion, request))
+            .OnSuccessDo(RemoveUnusedImages)
+            .OnSuccess(async methodologyVersion =>
+            {
+                _context.MethodologyVersions.Update(methodologyVersion);
+
+                methodologyVersion.Status = request.Status;
+                methodologyVersion.PublishingStrategy = request.PublishingStrategy;
+                methodologyVersion.ScheduledWithReleaseVersionId =
+                    WithRelease == request.PublishingStrategy ? request.WithReleaseId : null;
+
+                methodologyVersion.Updated = DateTime.UtcNow;
+
+                // We cannot rely on Methodology.LatestPublishedVersionId, as it may now be incorrect,
+                // if we are approving and publishing this methodology version.
+                var isToBePublished = await _methodologyVersionRepository.IsToBePublished(methodologyVersion);
+
+                if (isToBePublished)
                 {
-                    _context.MethodologyVersions.Update(methodologyVersion);
+                    methodologyVersion.Published = DateTime.UtcNow;
+                    methodologyVersion.Methodology.LatestPublishedVersionId = methodologyVersion.Id;
 
-                    methodologyVersion.Status = request.Status;
-                    methodologyVersion.PublishingStrategy = request.PublishingStrategy;
-                    methodologyVersion.ScheduledWithReleaseVersionId = WithRelease == request.PublishingStrategy
-                        ? request.WithReleaseId
-                        : null;
+                    await _publishingService.PublishMethodologyFiles(methodologyVersion.Id);
+                }
 
-                    methodologyVersion.Updated = DateTime.UtcNow;
+                var methodologyStatus = new MethodologyStatus
+                {
+                    MethodologyVersionId = methodologyVersion.Id,
+                    InternalReleaseNote = request.LatestInternalReleaseNote,
+                    ApprovalStatus = request.Status,
+                    CreatedById = _userService.GetUserId(),
+                };
+                await _context.MethodologyStatus.AddAsync(methodologyStatus);
 
-                    // We cannot rely on Methodology.LatestPublishedVersionId, as it may now be incorrect,
-                    // if we are approving and publishing this methodology version.
-                    var isToBePublished = await _methodologyVersionRepository.IsToBePublished(methodologyVersion);
+                await _context.SaveChangesAsync();
 
-                    if (isToBePublished)
-                    {
-                        methodologyVersion.Published = DateTime.UtcNow;
-                        methodologyVersion.Methodology.LatestPublishedVersionId = methodologyVersion.Id;
+                if (isToBePublished)
+                {
+                    await _methodologyCacheService.UpdateSummariesTree();
 
-                        await _publishingService.PublishMethodologyFiles(methodologyVersion.Id);
-                    }
+                    await _context.Entry(methodologyVersion).Reference(mv => mv.Methodology).LoadAsync();
 
-                    var methodologyStatus = new MethodologyStatus
-                    {
-                        MethodologyVersionId = methodologyVersion.Id,
-                        InternalReleaseNote = request.LatestInternalReleaseNote,
-                        ApprovalStatus = request.Status,
-                        CreatedById = _userService.GetUserId(),
-                    };
-                    await _context.MethodologyStatus.AddAsync(methodologyStatus);
-
+                    var redundantRedirects = await _context
+                        .MethodologyRedirects.Where(mr => mr.Slug == methodologyVersion.Slug)
+                        .ToListAsync();
+                    _context.MethodologyRedirects.RemoveRange(redundantRedirects);
                     await _context.SaveChangesAsync();
 
-                    if (isToBePublished)
-                    {
-                        await _methodologyCacheService.UpdateSummariesTree();
+                    await _redirectsCacheService.UpdateRedirects();
+                }
 
-                        await _context.Entry(methodologyVersion)
-                            .Reference(mv => mv.Methodology)
-                            .LoadAsync();
+                if (request.Status == MethodologyApprovalStatus.HigherLevelReview)
+                {
+                    await NotifyApprovers(methodologyVersion);
+                }
 
-                        var redundantRedirects = await _context.MethodologyRedirects
-                            .Where(mr => mr.Slug == methodologyVersion.Slug)
-                            .ToListAsync();
-                        _context.MethodologyRedirects.RemoveRange(redundantRedirects);
-                        await _context.SaveChangesAsync();
-
-                        await _redirectsCacheService.UpdateRedirects();
-                    }
-
-                    if (request.Status == MethodologyApprovalStatus.HigherLevelReview)
-                    {
-                        await NotifyApprovers(methodologyVersion);
-                    }
-
-                    return methodologyVersion;
-                });
+                return methodologyVersion;
+            });
     }
 
     private async Task NotifyApprovers(MethodologyVersion methodologyVersion)
     {
-        var owningPublicationId = await _context.PublicationMethodologies
-            .Where(pm => pm.MethodologyId == methodologyVersion.MethodologyId
-                         && pm.Owner)
+        var owningPublicationId = await _context
+            .PublicationMethodologies.Where(pm => pm.MethodologyId == methodologyVersion.MethodologyId && pm.Owner)
             .Select(pm => pm.PublicationId)
             .SingleAsync();
 
-        var userReleaseRoles = await _userReleaseRoleService
-            .ListUserReleaseRolesByPublication(ReleaseRole.Approver, owningPublicationId);
+        var userReleaseRoles = await _userReleaseRoleService.ListUserReleaseRolesByPublication(
+            ReleaseRole.Approver,
+            owningPublicationId
+        );
 
-        var userPublicationRoles = await _context.UserPublicationRoles
-            .Include(upr => upr.User)
-            .Where(upr => owningPublicationId == upr.PublicationId
-                          && upr.Role == PublicationRole.Allower)
+        var userPublicationRoles = await _context
+            .UserPublicationRoles.Include(upr => upr.User)
+            .Where(upr => owningPublicationId == upr.PublicationId && upr.Role == PublicationRole.Allower)
             .ToListAsync();
 
         var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();
         if (notifyHigherReviewers)
         {
-            userReleaseRoles.Select(urr => urr.User.Email)
+            userReleaseRoles
+                .Select(urr => urr.User.Email)
                 .Concat(userPublicationRoles.Select(upr => upr.User.Email))
                 .Distinct()
                 .ForEach(email =>
                 {
-                    _emailTemplateService.SendMethodologyHigherReviewEmail(email, methodologyVersion.Id, methodologyVersion.Title);
+                    _emailTemplateService.SendMethodologyHigherReviewEmail(
+                        email,
+                        methodologyVersion.Id,
+                        methodologyVersion.Title
+                    );
                 });
         }
     }
 
     private async Task<Either<ActionResult, Unit>> CheckMethodologyCanDependOnRelease(
         MethodologyVersion methodologyVersion,
-        MethodologyApprovalUpdateRequest request)
+        MethodologyApprovalUpdateRequest request
+    )
     {
         if (request.PublishingStrategy != WithRelease)
         {
@@ -201,16 +206,12 @@ public class MethodologyApprovalService : IMethodologyApprovalService
                     return ValidationActionResult(MethodologyCannotDependOnPublishedRelease);
                 }
 
-                await _context.Entry(methodologyVersion)
-                    .Reference(m => m.Methodology)
-                    .LoadAsync();
+                await _context.Entry(methodologyVersion).Reference(m => m.Methodology).LoadAsync();
 
-                await _context.Entry(methodologyVersion.Methodology)
-                    .Collection(mp => mp.Publications)
-                    .LoadAsync();
+                await _context.Entry(methodologyVersion.Methodology).Collection(mp => mp.Publications).LoadAsync();
 
-                var publicationIds = methodologyVersion.Methodology.Publications
-                    .Select(pm => pm.PublicationId)
+                var publicationIds = methodologyVersion
+                    .Methodology.Publications.Select(pm => pm.PublicationId)
                     .ToList();
 
                 if (!publicationIds.Contains(release.PublicationId))
@@ -224,11 +225,12 @@ public class MethodologyApprovalService : IMethodologyApprovalService
 
     private async Task<Either<ActionResult, Unit>> RemoveUnusedImages(MethodologyVersion methodologyVersion)
     {
-        return await _methodologyContentService.GetContentBlocks<HtmlBlock>(methodologyVersion.Id)
+        return await _methodologyContentService
+            .GetContentBlocks<HtmlBlock>(methodologyVersion.Id)
             .OnSuccess(async contentBlocks =>
             {
-                var contentImageIds = contentBlocks.SelectMany(contentBlock =>
-                        HtmlImageUtil.GetMethodologyImages(contentBlock.Body))
+                var contentImageIds = contentBlocks
+                    .SelectMany(contentBlock => HtmlImageUtil.GetMethodologyImages(contentBlock.Body))
                     .Distinct();
 
                 var imageFiles = await _methodologyFileRepository.GetByFileType(methodologyVersion.Id, Image);
@@ -243,7 +245,8 @@ public class MethodologyApprovalService : IMethodologyApprovalService
                     return await _methodologyImageService.Delete(
                         methodologyVersionId: methodologyVersion.Id,
                         fileIds: unusedImages,
-                        forceDelete: true);
+                        forceDelete: true
+                    );
                 }
 
                 return Unit.Instance;

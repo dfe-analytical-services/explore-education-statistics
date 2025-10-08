@@ -40,9 +40,7 @@ public class ReleasesControllerUnitTests
 
         var releaseService = new Mock<IReleaseService>(Strict);
 
-        releaseService
-            .Setup(s => s.CreateRelease(It.IsAny<ReleaseCreateRequest>()))
-            .ReturnsAsync(returnedViewModel);
+        releaseService.Setup(s => s.CreateRelease(It.IsAny<ReleaseCreateRequest>())).ReturnsAsync(returnedViewModel);
 
         var controller = BuildController(releaseService.Object);
 
@@ -52,15 +50,14 @@ public class ReleasesControllerUnitTests
         result.AssertOkResult(returnedViewModel);
     }
 
-    private static ReleasesController BuildController(
-        IReleaseService? releaseService = null)
+    private static ReleasesController BuildController(IReleaseService? releaseService = null)
     {
-        return new ReleasesController(
-            releaseService ?? Mock.Of<IReleaseService>(Strict));
+        return new ReleasesController(releaseService ?? Mock.Of<IReleaseService>(Strict));
     }
 }
 
-public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory testApp)
+    : IntegrationTestFixture(testApp)
 {
     public class CreateReleaseTests(TestApplicationFactory testApp) : ReleasesControllerIntegrationTests(testApp)
     {
@@ -80,25 +77,26 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             TimeIdentifier timePeriodCoverage,
             string? label,
             string? expectedLabel,
-            string expectedSlug)
+            string expectedSlug
+        )
         {
             Publication publication = DataFixture.DefaultPublication();
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             var response = await CreateRelease(
                 publicationId: publication.Id,
                 year: year,
                 timePeriodCoverage: timePeriodCoverage,
-                label: label);
+                label: label
+            );
 
             var viewModel = response.AssertOk<ReleaseVersionViewModel>();
 
             var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
-            var updatedPublication = contentDbContext.Publications
-                .Include(p => p.Releases)
+            var updatedPublication = contentDbContext
+                .Publications.Include(p => p.Releases)
                 .ThenInclude(r => r.Versions)
                 .Single(p => p.Id == publication.Id);
 
@@ -129,7 +127,8 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
                 publicationId: Guid.NewGuid(),
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
-                label: null);
+                label: null
+            );
 
             response.AssertNotFound();
         }
@@ -139,8 +138,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         {
             Publication publication = DataFixture.DefaultPublication();
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
 
@@ -149,7 +147,8 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
                 label: null,
-                client: client);
+                client: client
+            );
 
             response.AssertForbidden();
         }
@@ -159,15 +158,15 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         {
             Publication publication = DataFixture.DefaultPublication();
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             var response = await CreateRelease(
                 publicationId: publication.Id,
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
                 label: null,
-                type: ReleaseType.ExperimentalStatistics);
+                type: ReleaseType.ExperimentalStatistics
+            );
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -189,23 +188,21 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             int year,
             TimeIdentifier timePeriodCoverage,
             string? label,
-            string existingReleaseSlug)
+            string existingReleaseSlug
+        )
         {
-            Publication publication = DataFixture.DefaultPublication()
-                .WithReleases([
-                    DataFixture
-                        .DefaultRelease(publishedVersions: 1)
-                        .WithSlug(existingReleaseSlug)
-                    ]);
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1).WithSlug(existingReleaseSlug)]);
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             var response = await CreateRelease(
                 publicationId: publication.Id,
                 year: year,
                 timePeriodCoverage: timePeriodCoverage,
-                label: label);
+                label: label
+            );
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -217,25 +214,28 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         [Fact]
         public async Task ReleaseRedirectExistsForSlugForDifferentReleaseInSamePublication()
         {
-            Publication publication = DataFixture.DefaultPublication()
-                .WithReleases([
-                    DataFixture.DefaultRelease(publishedVersions: 1)
-                        .WithYear(2020)
-                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                        .WithLabel("intermediate")
-                        .WithSlug("2020-21-intermediate")
-                        .WithRedirects([DataFixture.DefaultReleaseRedirect()
-                            .WithSlug("2020-21-final")])
-                    ]);
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases(
+                    [
+                        DataFixture
+                            .DefaultRelease(publishedVersions: 1)
+                            .WithYear(2020)
+                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                            .WithLabel("intermediate")
+                            .WithSlug("2020-21-intermediate")
+                            .WithRedirects([DataFixture.DefaultReleaseRedirect().WithSlug("2020-21-final")]),
+                    ]
+                );
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
-                
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+
             var response = await CreateRelease(
                 publicationId: publication.Id,
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
-                label: "final");
+                label: "final"
+            );
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -247,27 +247,32 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         [Fact]
         public async Task ReleaseRedirectExistsForSlugForReleaseInDifferentPublication()
         {
-            Publication otherPublication = DataFixture.DefaultPublication()
-                .WithReleases([
-                    DataFixture.DefaultRelease(publishedVersions: 1)
-                        .WithYear(2020)
-                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                        .WithLabel("intermediate")
-                        .WithSlug("2020-21-intermediate")
-                        .WithRedirects([DataFixture.DefaultReleaseRedirect()
-                            .WithSlug("2020-21-final")])
-                    ]);
+            Publication otherPublication = DataFixture
+                .DefaultPublication()
+                .WithReleases(
+                    [
+                        DataFixture
+                            .DefaultRelease(publishedVersions: 1)
+                            .WithYear(2020)
+                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                            .WithLabel("intermediate")
+                            .WithSlug("2020-21-intermediate")
+                            .WithRedirects([DataFixture.DefaultReleaseRedirect().WithSlug("2020-21-final")]),
+                    ]
+                );
 
             Publication targetPublication = DataFixture.DefaultPublication();
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.AddRange(otherPublication, targetPublication));
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.Publications.AddRange(otherPublication, targetPublication)
+            );
 
             var response = await CreateRelease(
                 publicationId: targetPublication.Id,
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
-                label: "final");
+                label: "final"
+            );
 
             response.AssertOk();
         }
@@ -277,25 +282,27 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         {
             Publication publication = DataFixture.DefaultPublication();
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             var response = await CreateRelease(
                 publicationId: publication.Id,
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
-                label: new string('a', 21));
+                label: new string('a', 21)
+            );
 
             var validationProblem = response.AssertValidationProblem();
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal($"The field {nameof(ReleaseCreateRequest.Label)} must be a string or array type with a maximum length of '20'.", error.Message);
+            Assert.Equal(
+                $"The field {nameof(ReleaseCreateRequest.Label)} must be a string or array type with a maximum length of '20'.",
+                error.Message
+            );
             Assert.Equal(nameof(ReleaseCreateRequest.Label), error.Path);
         }
 
-        private WebApplicationFactory<TestStartup> BuildApp(
-            ClaimsPrincipal? user = null)
+        private WebApplicationFactory<TestStartup> BuildApp(ClaimsPrincipal? user = null)
         {
             return TestApp.SetUser(user ?? DataFixture.BauUser());
         }
@@ -306,7 +313,8 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             TimeIdentifier timePeriodCoverage,
             string? label = null,
             ReleaseType? type = ReleaseType.OfficialStatistics,
-            HttpClient? client = null)
+            HttpClient? client = null
+        )
         {
             client ??= BuildApp().CreateClient();
 
@@ -328,36 +336,84 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         public override async Task InitializeAsync() => await InitializeWithAzurite();
 
         [Theory]
-        [InlineData(2020, TimeIdentifier.AcademicYear, "initial", "initial", "2020-21-initial", "Academic year 2020/21 initial")]
-        [InlineData(2020, TimeIdentifier.AcademicYear, "Initial", "Initial", "2020-21-initial", "Academic year 2020/21 Initial")]
-        [InlineData(2020, TimeIdentifier.AcademicYear, " initial", "initial", "2020-21-initial", "Academic year 2020/21 initial")]
-        [InlineData(2020, TimeIdentifier.AcademicYear, "initial ", "initial", "2020-21-initial", "Academic year 2020/21 initial")]
-        [InlineData(2020, TimeIdentifier.AcademicYear, "initial 2", "initial 2", "2020-21-initial-2", "Academic year 2020/21 initial 2")]
-        [InlineData(2020, TimeIdentifier.AcademicYear, "initial  2", "initial 2", "2020-21-initial-2", "Academic year 2020/21 initial 2")]
+        [InlineData(
+            2020,
+            TimeIdentifier.AcademicYear,
+            "initial",
+            "initial",
+            "2020-21-initial",
+            "Academic year 2020/21 initial"
+        )]
+        [InlineData(
+            2020,
+            TimeIdentifier.AcademicYear,
+            "Initial",
+            "Initial",
+            "2020-21-initial",
+            "Academic year 2020/21 Initial"
+        )]
+        [InlineData(
+            2020,
+            TimeIdentifier.AcademicYear,
+            " initial",
+            "initial",
+            "2020-21-initial",
+            "Academic year 2020/21 initial"
+        )]
+        [InlineData(
+            2020,
+            TimeIdentifier.AcademicYear,
+            "initial ",
+            "initial",
+            "2020-21-initial",
+            "Academic year 2020/21 initial"
+        )]
+        [InlineData(
+            2020,
+            TimeIdentifier.AcademicYear,
+            "initial 2",
+            "initial 2",
+            "2020-21-initial-2",
+            "Academic year 2020/21 initial 2"
+        )]
+        [InlineData(
+            2020,
+            TimeIdentifier.AcademicYear,
+            "initial  2",
+            "initial 2",
+            "2020-21-initial-2",
+            "Academic year 2020/21 initial 2"
+        )]
         [InlineData(2020, TimeIdentifier.AcademicYear, "", null, "2020-21", "Academic year 2020/21")]
         [InlineData(2020, TimeIdentifier.AcademicYear, " ", null, "2020-21", "Academic year 2020/21")]
         [InlineData(2020, TimeIdentifier.AcademicYear, "  ", null, "2020-21", "Academic year 2020/21")]
         [InlineData(2020, TimeIdentifier.AcademicYear, null, null, "2020-21", "Academic year 2020/21")]
-        [InlineData(2020, TimeIdentifier.AcademicYearQ1, "initial", "initial", "2020-21-q1-initial", "Academic year Q1 2020/21 initial")]
+        [InlineData(
+            2020,
+            TimeIdentifier.AcademicYearQ1,
+            "initial",
+            "initial",
+            "2020-21-q1-initial",
+            "Academic year Q1 2020/21 initial"
+        )]
         public async Task Success(
             int year,
             TimeIdentifier timePeriodCoverage,
             string? label,
             string? expectedLabel,
             string expectedSlug,
-            string expectedTitle)
+            string expectedTitle
+        )
         {
-            Release release = DataFixture.DefaultRelease(publishedVersions: 1)
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 1)
                 .WithYear(year)
                 .WithTimePeriodCoverage(timePeriodCoverage)
                 .WithPublication(DataFixture.DefaultPublication());
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.Add(release));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Releases.Add(release));
 
-            var response = await UpdateRelease(
-                releaseId: release.Id,
-                label: label);
+            var response = await UpdateRelease(releaseId: release.Id, label: label);
 
             var viewModel = response.AssertOk<ReleaseViewModel>();
 
@@ -370,8 +426,8 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
 
             var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
-            var updatedRelease = await contentDbContext.Releases
-                .Include(r => r.Publication)
+            var updatedRelease = await contentDbContext
+                .Releases.Include(r => r.Publication)
                 .SingleAsync(r => r.Id == release.Id);
 
             Assert.Equal(expectedLabel, updatedRelease.Label);
@@ -383,18 +439,17 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         {
             var oldSlug = "2020-21-initial";
 
-            Publication publication = DataFixture.DefaultPublication()
-                .WithTheme(DataFixture.DefaultTheme());
+            Publication publication = DataFixture.DefaultPublication().WithTheme(DataFixture.DefaultTheme());
 
-            Release oldRelease = DataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true)
+            Release oldRelease = DataFixture
+                .DefaultRelease(publishedVersions: 2, draftVersion: true)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel("initial")
                 .WithSlug(oldSlug)
                 .WithPublication(publication);
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.Add(oldRelease));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Releases.Add(oldRelease));
 
             var app = BuildApp();
             var client = app.CreateClient();
@@ -406,11 +461,11 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var oldReleaseCachedViewModel = new ReleaseCacheViewModel(latestPublishedReleaseVersion.Id);
             var oldReleaseCacheKey = new ReleaseCacheKey(
                 publicationSlug: publication.Slug,
-                releaseSlug: oldRelease.Slug);
+                releaseSlug: oldRelease.Slug
+            );
 
             var oldLatestReleaseCachedViewModel = new ReleaseCacheViewModel(latestPublishedReleaseVersion.Id);
-            var oldLatestReleaseCacheKey = new ReleaseCacheKey(
-                publicationSlug: publication.Slug);
+            var oldLatestReleaseCacheKey = new ReleaseCacheKey(publicationSlug: publication.Slug);
 
             var oldPublicationCachedViewModel = new PublicationCacheViewModel();
             var oldPublicationCacheKey = new PublicationCacheKey(publication.Slug);
@@ -419,13 +474,15 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var oldReleaseParentPathTestDataCacheKey1 = new TestReleaseParentPathDataCacheKey(
                 PublicationSlug: publication.Slug,
                 ReleaseSlug: oldRelease.Slug,
-                FileParentPath: "test-folder-1");
+                FileParentPath: "test-folder-1"
+            );
 
             var oldReleaseParentPathTestDataCachedViewModel2 = new TestReleaseParentPathDataViewModel();
             var oldReleaseParentPathTestDataCacheKey2 = new TestReleaseParentPathDataCacheKey(
                 PublicationSlug: publication.Slug,
                 ReleaseSlug: oldRelease.Slug,
-                FileParentPath: "test-folder-2");
+                FileParentPath: "test-folder-2"
+            );
 
             // This represents the cache stored in the release-specific directory
             await publicBlobCacheService.SetItemAsync(oldReleaseCacheKey, oldReleaseCachedViewModel);
@@ -434,50 +491,78 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             // This represents the publication cache
             await publicBlobCacheService.SetItemAsync(oldPublicationCacheKey, oldPublicationCachedViewModel);
             // This represents the release parent path cache folder, and some test data cached within it (in nested folders)
-            await publicBlobCacheService.SetItemAsync(oldReleaseParentPathTestDataCacheKey1, oldReleaseParentPathTestDataCachedViewModel1);
-            await publicBlobCacheService.SetItemAsync(oldReleaseParentPathTestDataCacheKey2, oldReleaseParentPathTestDataCachedViewModel2);
+            await publicBlobCacheService.SetItemAsync(
+                oldReleaseParentPathTestDataCacheKey1,
+                oldReleaseParentPathTestDataCachedViewModel1
+            );
+            await publicBlobCacheService.SetItemAsync(
+                oldReleaseParentPathTestDataCacheKey2,
+                oldReleaseParentPathTestDataCachedViewModel2
+            );
 
             // Testing that these pieces of cache have actually been stored
-            Assert.NotNull(await publicBlobCacheService.GetItemAsync(oldReleaseCacheKey, typeof(ReleaseCacheViewModel)));
-            Assert.NotNull(await publicBlobCacheService.GetItemAsync(oldLatestReleaseCacheKey, typeof(ReleaseCacheViewModel)));
-            Assert.NotNull(await publicBlobCacheService.GetItemAsync(oldPublicationCacheKey, typeof(PublicationCacheViewModel)));
-            Assert.NotNull(await publicBlobCacheService.GetItemAsync(oldReleaseParentPathTestDataCacheKey1, typeof(TestReleaseParentPathDataViewModel)));
-            Assert.NotNull(await publicBlobCacheService.GetItemAsync(oldReleaseParentPathTestDataCacheKey2, typeof(TestReleaseParentPathDataViewModel)));
+            Assert.NotNull(
+                await publicBlobCacheService.GetItemAsync(oldReleaseCacheKey, typeof(ReleaseCacheViewModel))
+            );
+            Assert.NotNull(
+                await publicBlobCacheService.GetItemAsync(oldLatestReleaseCacheKey, typeof(ReleaseCacheViewModel))
+            );
+            Assert.NotNull(
+                await publicBlobCacheService.GetItemAsync(oldPublicationCacheKey, typeof(PublicationCacheViewModel))
+            );
+            Assert.NotNull(
+                await publicBlobCacheService.GetItemAsync(
+                    oldReleaseParentPathTestDataCacheKey1,
+                    typeof(TestReleaseParentPathDataViewModel)
+                )
+            );
+            Assert.NotNull(
+                await publicBlobCacheService.GetItemAsync(
+                    oldReleaseParentPathTestDataCacheKey2,
+                    typeof(TestReleaseParentPathDataViewModel)
+                )
+            );
 
             var newLabel = "final";
-            var response = await UpdateRelease(
-                releaseId: oldRelease.Id,
-                label: newLabel,
-                client: client);
+            var response = await UpdateRelease(releaseId: oldRelease.Id, label: newLabel, client: client);
 
             response.AssertOk<ReleaseViewModel>();
 
             var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
-            var updatedRelease = await contentDbContext.Releases
-                .Include(r => r.Publication)
+            var updatedRelease = await contentDbContext
+                .Releases.Include(r => r.Publication)
                 .SingleAsync(r => r.Id == oldRelease.Id);
 
-            var oldSlugCachedValue = await publicBlobCacheService.GetItemAsync(oldReleaseCacheKey, typeof(ReleaseCacheViewModel));
+            var oldSlugCachedValue = await publicBlobCacheService.GetItemAsync(
+                oldReleaseCacheKey,
+                typeof(ReleaseCacheViewModel)
+            );
 
             var newSlugReleaseCacheKey = new ReleaseCacheKey(
                 publicationSlug: publication.Slug,
-                releaseSlug: updatedRelease.Slug);
-            var newSlugCachedValue = await publicBlobCacheService.GetItemAsync(newSlugReleaseCacheKey, typeof(ReleaseCacheViewModel))
+                releaseSlug: updatedRelease.Slug
+            );
+            var newSlugCachedValue =
+                await publicBlobCacheService.GetItemAsync(newSlugReleaseCacheKey, typeof(ReleaseCacheViewModel))
                 as ReleaseCacheViewModel;
 
-            var newLatestReleaseCachedValue = await publicBlobCacheService.GetItemAsync(oldLatestReleaseCacheKey, typeof(ReleaseCacheViewModel))
+            var newLatestReleaseCachedValue =
+                await publicBlobCacheService.GetItemAsync(oldLatestReleaseCacheKey, typeof(ReleaseCacheViewModel))
                 as ReleaseCacheViewModel;
 
-            var newPublicationCachedValue = await publicBlobCacheService.GetItemAsync(oldPublicationCacheKey, typeof(PublicationCacheViewModel))
+            var newPublicationCachedValue =
+                await publicBlobCacheService.GetItemAsync(oldPublicationCacheKey, typeof(PublicationCacheViewModel))
                 as PublicationCacheViewModel;
 
             var oldReleaseParentPathTestDataCachedValue1 = await publicBlobCacheService.GetItemAsync(
-                oldReleaseParentPathTestDataCacheKey1, 
-                typeof(TestReleaseParentPathDataViewModel));
+                oldReleaseParentPathTestDataCacheKey1,
+                typeof(TestReleaseParentPathDataViewModel)
+            );
             var oldReleaseParentPathTestDataCachedValue2 = await publicBlobCacheService.GetItemAsync(
                 oldReleaseParentPathTestDataCacheKey2,
-                typeof(TestReleaseParentPathDataViewModel));
+                typeof(TestReleaseParentPathDataViewModel)
+            );
 
             // Checking that the Release Label and Slug are UPDATED
             Assert.Equal(newLabel, updatedRelease.Label);
@@ -504,7 +589,10 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             Assert.NotNull(newPublicationCachedValue);
             Assert.NotEqual(oldPublicationCachedViewModel, newPublicationCachedValue);
             Assert.All(newPublicationCachedValue.Releases, r => Assert.Equal(updatedRelease.Slug, r.Slug));
-            Assert.All(newPublicationCachedValue.ReleaseSeries, rs => Assert.Equal(updatedRelease.Slug, rs.ReleaseSlug));
+            Assert.All(
+                newPublicationCachedValue.ReleaseSeries,
+                rs => Assert.Equal(updatedRelease.Slug, rs.ReleaseSlug)
+            );
 
             // Checking that all of the cache within the release parent path has been deleted
             Assert.Null(oldReleaseParentPathTestDataCachedValue1);
@@ -517,18 +605,17 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var oldLabel = "initial";
             var oldSlug = $"2020-21-{oldLabel}";
 
-            Publication publication = DataFixture.DefaultPublication()
-                .WithTheme(DataFixture.DefaultTheme());
+            Publication publication = DataFixture.DefaultPublication().WithTheme(DataFixture.DefaultTheme());
 
-            Release oldRelease = DataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true)
+            Release oldRelease = DataFixture
+                .DefaultRelease(publishedVersions: 2, draftVersion: true)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel(oldLabel)
                 .WithSlug(oldSlug)
                 .WithPublication(publication);
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.Add(oldRelease));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Releases.Add(oldRelease));
 
             var app = BuildApp();
             var client = app.CreateClient();
@@ -540,11 +627,11 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var oldReleaseCachedViewModel = new ReleaseCacheViewModel(latestPublishedReleaseVersion.Id);
             var oldReleaseCacheKey = new ReleaseCacheKey(
                 publicationSlug: publication.Slug,
-                releaseSlug: oldRelease.Slug);
+                releaseSlug: oldRelease.Slug
+            );
 
             var oldLatestReleaseCachedViewModel = new ReleaseCacheViewModel(latestPublishedReleaseVersion.Id);
-            var oldLatestReleaseCacheKey = new ReleaseCacheKey(
-                publicationSlug: publication.Slug);
+            var oldLatestReleaseCacheKey = new ReleaseCacheKey(publicationSlug: publication.Slug);
 
             var oldPublicationCachedViewModel = new PublicationCacheViewModel();
             var oldPublicationCacheKey = new PublicationCacheKey(publication.Slug);
@@ -553,13 +640,15 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var oldReleaseParentPathTestDataCacheKey1 = new TestReleaseParentPathDataCacheKey(
                 PublicationSlug: publication.Slug,
                 ReleaseSlug: oldRelease.Slug,
-                FileParentPath: "test-folder-1");
+                FileParentPath: "test-folder-1"
+            );
 
             var oldReleaseParentPathTestDataCachedViewModel2 = new TestReleaseParentPathDataViewModel();
             var oldReleaseParentPathTestDataCacheKey2 = new TestReleaseParentPathDataCacheKey(
                 PublicationSlug: publication.Slug,
                 ReleaseSlug: oldRelease.Slug,
-                FileParentPath: "test-folder-2");
+                FileParentPath: "test-folder-2"
+            );
 
             // This represents the cache stored in the release-specific directory
             await publicBlobCacheService.SetItemAsync(oldReleaseCacheKey, oldReleaseCachedViewModel);
@@ -568,44 +657,68 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             // This represents the publication cache
             await publicBlobCacheService.SetItemAsync(oldPublicationCacheKey, oldPublicationCachedViewModel);
             // This represents the release parent path cache folder, and some test data cached within it (in nested folders)
-            await publicBlobCacheService.SetItemAsync(oldReleaseParentPathTestDataCacheKey1, oldReleaseParentPathTestDataCachedViewModel1);
-            await publicBlobCacheService.SetItemAsync(oldReleaseParentPathTestDataCacheKey2, oldReleaseParentPathTestDataCachedViewModel2);
+            await publicBlobCacheService.SetItemAsync(
+                oldReleaseParentPathTestDataCacheKey1,
+                oldReleaseParentPathTestDataCachedViewModel1
+            );
+            await publicBlobCacheService.SetItemAsync(
+                oldReleaseParentPathTestDataCacheKey2,
+                oldReleaseParentPathTestDataCachedViewModel2
+            );
 
             // Testing that these pieces of cache have actually been stored
-            Assert.NotNull(await publicBlobCacheService.GetItemAsync(oldReleaseCacheKey, typeof(ReleaseCacheViewModel)));
-            Assert.NotNull(await publicBlobCacheService.GetItemAsync(oldLatestReleaseCacheKey, typeof(ReleaseCacheViewModel)));
-            Assert.NotNull(await publicBlobCacheService.GetItemAsync(oldPublicationCacheKey, typeof(PublicationCacheViewModel)));
-            Assert.NotNull(await publicBlobCacheService.GetItemAsync(oldReleaseParentPathTestDataCacheKey1, typeof(TestReleaseParentPathDataViewModel)));
-            Assert.NotNull(await publicBlobCacheService.GetItemAsync(oldReleaseParentPathTestDataCacheKey2, typeof(TestReleaseParentPathDataViewModel)));
+            Assert.NotNull(
+                await publicBlobCacheService.GetItemAsync(oldReleaseCacheKey, typeof(ReleaseCacheViewModel))
+            );
+            Assert.NotNull(
+                await publicBlobCacheService.GetItemAsync(oldLatestReleaseCacheKey, typeof(ReleaseCacheViewModel))
+            );
+            Assert.NotNull(
+                await publicBlobCacheService.GetItemAsync(oldPublicationCacheKey, typeof(PublicationCacheViewModel))
+            );
+            Assert.NotNull(
+                await publicBlobCacheService.GetItemAsync(
+                    oldReleaseParentPathTestDataCacheKey1,
+                    typeof(TestReleaseParentPathDataViewModel)
+                )
+            );
+            Assert.NotNull(
+                await publicBlobCacheService.GetItemAsync(
+                    oldReleaseParentPathTestDataCacheKey2,
+                    typeof(TestReleaseParentPathDataViewModel)
+                )
+            );
 
-            var response = await UpdateRelease(
-                releaseId: oldRelease.Id,
-                label: oldLabel,
-                client: client);
+            var response = await UpdateRelease(releaseId: oldRelease.Id, label: oldLabel, client: client);
 
             response.AssertOk<ReleaseViewModel>();
 
             var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
-            var updatedRelease = await contentDbContext.Releases
-                .Include(r => r.Publication)
+            var updatedRelease = await contentDbContext
+                .Releases.Include(r => r.Publication)
                 .SingleAsync(r => r.Id == oldRelease.Id);
 
-            var newSlugCachedValue = await publicBlobCacheService.GetItemAsync(oldReleaseCacheKey, typeof(ReleaseCacheViewModel))
+            var newSlugCachedValue =
+                await publicBlobCacheService.GetItemAsync(oldReleaseCacheKey, typeof(ReleaseCacheViewModel))
                 as ReleaseCacheViewModel;
 
-            var newLatestReleaseCachedValue = await publicBlobCacheService.GetItemAsync(oldLatestReleaseCacheKey, typeof(ReleaseCacheViewModel))
+            var newLatestReleaseCachedValue =
+                await publicBlobCacheService.GetItemAsync(oldLatestReleaseCacheKey, typeof(ReleaseCacheViewModel))
                 as ReleaseCacheViewModel;
 
-            var newPublicationCachedValue = await publicBlobCacheService.GetItemAsync(oldPublicationCacheKey, typeof(PublicationCacheViewModel))
+            var newPublicationCachedValue =
+                await publicBlobCacheService.GetItemAsync(oldPublicationCacheKey, typeof(PublicationCacheViewModel))
                 as PublicationCacheViewModel;
 
             var oldReleaseParentPathTestDataCachedValue1 = await publicBlobCacheService.GetItemAsync(
                 oldReleaseParentPathTestDataCacheKey1,
-                typeof(TestReleaseParentPathDataViewModel));
+                typeof(TestReleaseParentPathDataViewModel)
+            );
             var oldReleaseParentPathTestDataCachedValue2 = await publicBlobCacheService.GetItemAsync(
                 oldReleaseParentPathTestDataCacheKey2,
-                typeof(TestReleaseParentPathDataViewModel));
+                typeof(TestReleaseParentPathDataViewModel)
+            );
 
             // Checking that the Release Label and Slug are UNCHANGED
             Assert.Equal(oldLabel, updatedRelease.Label);
@@ -643,23 +756,20 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
 
             Publication publication = DataFixture.DefaultPublication();
 
-            Release oldRelease = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+            Release oldRelease = DataFixture
+                .DefaultRelease(publishedVersions: 0, draftVersion: true)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel("initial")
                 .WithSlug(oldSlug)
                 .WithPublication(publication);
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.Add(oldRelease));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Releases.Add(oldRelease));
 
             var app = BuildApp();
             var client = app.CreateClient();
 
-            var response = await UpdateRelease(
-                releaseId: oldRelease.Id,
-                label: "final",
-                client: client);
+            var response = await UpdateRelease(releaseId: oldRelease.Id, label: "final", client: client);
 
             response.AssertOk<ReleaseViewModel>();
 
@@ -667,22 +777,33 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
 
             var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
-            var updatedRelease = await contentDbContext.Releases
-                .Include(r => r.Publication)
+            var updatedRelease = await contentDbContext
+                .Releases.Include(r => r.Publication)
                 .SingleAsync(r => r.Id == oldRelease.Id);
 
             var oldSlugReleaseCacheKey = new ReleaseCacheKey(
                 publicationSlug: publication.Slug,
-                releaseSlug: oldRelease.Slug);
-            var oldSlugReleaseCachedValue = await publicBlobCacheService.GetItemAsync(oldSlugReleaseCacheKey, typeof(ReleaseCacheViewModel));
+                releaseSlug: oldRelease.Slug
+            );
+            var oldSlugReleaseCachedValue = await publicBlobCacheService.GetItemAsync(
+                oldSlugReleaseCacheKey,
+                typeof(ReleaseCacheViewModel)
+            );
 
             var newSlugReleaseCacheKey = new ReleaseCacheKey(
                 publicationSlug: publication.Slug,
-                releaseSlug: updatedRelease.Slug);
-            var newSlugReleaseCachedValue = await publicBlobCacheService.GetItemAsync(newSlugReleaseCacheKey, typeof(ReleaseCacheViewModel));
+                releaseSlug: updatedRelease.Slug
+            );
+            var newSlugReleaseCachedValue = await publicBlobCacheService.GetItemAsync(
+                newSlugReleaseCacheKey,
+                typeof(ReleaseCacheViewModel)
+            );
 
             var publicationCacheKey = new PublicationCacheKey(publication.Slug);
-            var publicationCacheValue = await publicBlobCacheService.GetItemAsync(publicationCacheKey, typeof(ReleaseCacheViewModel));
+            var publicationCacheValue = await publicBlobCacheService.GetItemAsync(
+                publicationCacheKey,
+                typeof(ReleaseCacheViewModel)
+            );
 
             // Checking that there isn't any cache for the old release view-model
             Assert.Null(oldSlugReleaseCachedValue);
@@ -699,15 +820,15 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         {
             var oldSlug = "2020-21-initial";
 
-            Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 0, draftVersion: true)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel("initial")
                 .WithSlug(oldSlug)
                 .WithPublication(DataFixture.DefaultPublication());
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.Add(release));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Releases.Add(release));
 
             var app = BuildApp();
             var client = app.CreateClient();
@@ -717,7 +838,8 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var oldRedirectsCachedViewModel = new RedirectsViewModel(
                 PublicationRedirects: [],
                 MethodologyRedirects: [],
-                ReleaseRedirectsByPublicationSlug: []);
+                ReleaseRedirectsByPublicationSlug: []
+            );
             var redirectsCacheKey = new RedirectsCacheKey();
 
             await publicBlobCacheService.SetItemAsync(redirectsCacheKey, oldRedirectsCachedViewModel);
@@ -725,23 +847,21 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             // Testing that the redirects cache has actually been stored
             Assert.NotNull(await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel)));
 
-            var response = await UpdateRelease(
-                releaseId: release.Id,
-                label: "final",
-                client: client);
+            var response = await UpdateRelease(releaseId: release.Id, label: "final", client: client);
 
             response.AssertOk<ReleaseViewModel>();
 
             var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
-            var releaseRedirectsExist = await contentDbContext.ReleaseRedirects
-                .AnyAsync();
+            var releaseRedirectsExist = await contentDbContext.ReleaseRedirects.AnyAsync();
 
             Assert.False(releaseRedirectsExist);
 
             // Check that the redirects cache is untouched
-            var newRedirectsCachedValue= Assert.IsType<RedirectsViewModel>(await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel)));
-            
+            var newRedirectsCachedValue = Assert.IsType<RedirectsViewModel>(
+                await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel))
+            );
+
             Assert.Empty(newRedirectsCachedValue.PublicationRedirects);
             Assert.Empty(newRedirectsCachedValue.MethodologyRedirects);
             Assert.Empty(newRedirectsCachedValue.ReleaseRedirectsByPublicationSlug);
@@ -753,15 +873,15 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var oldLabel = "initial";
             var oldSlug = $"2020-21-{oldLabel}";
 
-            Release release = DataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true)
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 1, draftVersion: true)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel(oldLabel)
                 .WithSlug(oldSlug)
                 .WithPublication(DataFixture.DefaultPublication());
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.Add(release));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Releases.Add(release));
 
             var app = BuildApp();
             var client = app.CreateClient();
@@ -771,7 +891,8 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var oldRedirectsCachedViewModel = new RedirectsViewModel(
                 PublicationRedirects: [],
                 MethodologyRedirects: [],
-                ReleaseRedirectsByPublicationSlug: []);
+                ReleaseRedirectsByPublicationSlug: []
+            );
             var redirectsCacheKey = new RedirectsCacheKey();
 
             await publicBlobCacheService.SetItemAsync(redirectsCacheKey, oldRedirectsCachedViewModel);
@@ -780,28 +901,27 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             Assert.NotNull(await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel)));
 
             var newLabel = "final";
-            var response = await UpdateRelease(
-                releaseId: release.Id,
-                label: newLabel,
-                client: client);
+            var response = await UpdateRelease(releaseId: release.Id, label: newLabel, client: client);
 
             response.AssertOk<ReleaseViewModel>();
 
             var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
             // Check that a release redirect was created
-            var releaseRedirect = await contentDbContext.ReleaseRedirects
-                .SingleAsync(r => r.ReleaseId == release.Id);
+            var releaseRedirect = await contentDbContext.ReleaseRedirects.SingleAsync(r => r.ReleaseId == release.Id);
 
             Assert.Equal(oldSlug, releaseRedirect.Slug);
 
             // Check that the redirects cache has been updated
-            var newRedirectsCachedValue = await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel))
+            var newRedirectsCachedValue =
+                await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel))
                 as RedirectsViewModel;
 
             Assert.Empty(newRedirectsCachedValue!.PublicationRedirects);
             Assert.Empty(newRedirectsCachedValue.MethodologyRedirects);
-            var releaseRedirectsViewModel = Assert.Single(newRedirectsCachedValue.ReleaseRedirectsByPublicationSlug).Value;
+            var releaseRedirectsViewModel = Assert
+                .Single(newRedirectsCachedValue.ReleaseRedirectsByPublicationSlug)
+                .Value;
             var releaseRedirectViewModel = Assert.Single(releaseRedirectsViewModel);
             Assert.Equal(oldSlug, releaseRedirectViewModel.FromSlug);
             Assert.Equal($"2020-21-{newLabel}", releaseRedirectViewModel.ToSlug);
@@ -813,15 +933,15 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var oldLabel = "initial";
             var oldSlug = $"2020-21-{oldLabel}";
 
-            Release release = DataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true)
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 1, draftVersion: true)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel(oldLabel)
                 .WithSlug(oldSlug)
                 .WithPublication(DataFixture.DefaultPublication());
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.Add(release));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Releases.Add(release));
 
             var app = BuildApp();
             var client = app.CreateClient();
@@ -831,7 +951,8 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             var oldRedirectsCachedViewModel = new RedirectsViewModel(
                 PublicationRedirects: [],
                 MethodologyRedirects: [],
-                ReleaseRedirectsByPublicationSlug: []);
+                ReleaseRedirectsByPublicationSlug: []
+            );
             var redirectsCacheKey = new RedirectsCacheKey();
 
             await publicBlobCacheService.SetItemAsync(redirectsCacheKey, oldRedirectsCachedViewModel);
@@ -839,23 +960,23 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             // Testing that the redirects cache has actually been stored
             Assert.NotNull(await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel)));
 
-            var response = await UpdateRelease(
-                releaseId: release.Id,
-                label: oldLabel,
-                client: client);
+            var response = await UpdateRelease(releaseId: release.Id, label: oldLabel, client: client);
 
             response.AssertOk<ReleaseViewModel>();
 
             var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
             // Check that a release redirect was NOT created
-            var releaseRedirectExists = await contentDbContext.ReleaseRedirects
-                .AnyAsync(r => r.ReleaseId == release.Id);
+            var releaseRedirectExists = await contentDbContext.ReleaseRedirects.AnyAsync(r =>
+                r.ReleaseId == release.Id
+            );
 
             Assert.False(releaseRedirectExists);
 
             // Check that the redirects cache is untouched
-            var newRedirectsCachedViewModel = Assert.IsType<RedirectsViewModel>(await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel)));
+            var newRedirectsCachedViewModel = Assert.IsType<RedirectsViewModel>(
+                await publicBlobCacheService.GetItemAsync(redirectsCacheKey, typeof(RedirectsViewModel))
+            );
 
             Assert.Empty(newRedirectsCachedViewModel.PublicationRedirects);
             Assert.Empty(newRedirectsCachedViewModel.MethodologyRedirects);
@@ -865,9 +986,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         [Fact]
         public async Task ReleaseNotFound()
         {
-            var response = await UpdateRelease(
-                releaseId: Guid.NewGuid(),
-                label: null);
+            var response = await UpdateRelease(releaseId: Guid.NewGuid(), label: null);
 
             response.AssertNotFound();
         }
@@ -875,18 +994,15 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         [Fact]
         public async Task UserDoesNotHavePermission()
         {
-            Release release = DataFixture.DefaultRelease(publishedVersions: 1)
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 1)
                 .WithPublication(DataFixture.DefaultPublication());
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.Add(release));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Releases.Add(release));
 
             var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
 
-            var response = await UpdateRelease(
-                releaseId: release.Id,
-                label: null,
-                client: client);
+            var response = await UpdateRelease(releaseId: release.Id, label: null, client: client);
 
             response.AssertForbidden();
         }
@@ -904,23 +1020,25 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
             int year,
             TimeIdentifier timePeriodCoverage,
             string? label,
-            string existingReleaseSlug)
+            string existingReleaseSlug
+        )
         {
-            Publication publication = DataFixture.DefaultPublication()
-                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1)
-                    .WithYear(year)
-                    .WithTimePeriodCoverage(timePeriodCoverage)
-                    .ForIndex(0, s => s.SetSlug(existingReleaseSlug))
-                    .GenerateList(2));
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases(
+                    DataFixture
+                        .DefaultRelease(publishedVersions: 1)
+                        .WithYear(year)
+                        .WithTimePeriodCoverage(timePeriodCoverage)
+                        .ForIndex(0, s => s.SetSlug(existingReleaseSlug))
+                        .GenerateList(2)
+                );
 
             var releaseBeingUpdated = publication.Releases[1];
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
-            var response = await UpdateRelease(
-                releaseId: releaseBeingUpdated.Id,
-                label: label);
+            var response = await UpdateRelease(releaseId: releaseBeingUpdated.Id, label: label);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -932,13 +1050,13 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         [Fact]
         public async Task ReleaseIsUndergoingPublishing()
         {
-            Release release = DataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true)
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 2, draftVersion: true)
                 .WithPublication(DataFixture.DefaultPublication());
 
             var latestReleaseVersion = release.Versions[2];
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.Add(release));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Releases.Add(release));
 
             var app = BuildApp();
             var client = app.CreateClient();
@@ -953,22 +1071,24 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
                 publish: null,
                 releaseSlug: release.Slug,
                 state: ReleasePublishingStatusStates.ImmediateReleaseStartedState,
-                immediate: true);
+                immediate: true
+            );
 
             await publisherTableStorageService.CreateEntity(
                 tableName: TableStorageTableNames.PublisherReleaseStatusTableName,
-                entity: releasePublishingStatus);
+                entity: releasePublishingStatus
+            );
 
             // Testing that the release publishing status has actually been stored
-            Assert.NotNull(await publisherTableStorageService.GetEntityIfExists<ReleasePublishingStatus>(
-                tableName: TableStorageTableNames.PublisherReleaseStatusTableName,
-                partitionKey: latestReleaseVersion.Id.ToString(),
-                rowKey: releaseStatusId.ToString()));
+            Assert.NotNull(
+                await publisherTableStorageService.GetEntityIfExists<ReleasePublishingStatus>(
+                    tableName: TableStorageTableNames.PublisherReleaseStatusTableName,
+                    partitionKey: latestReleaseVersion.Id.ToString(),
+                    rowKey: releaseStatusId.ToString()
+                )
+            );
 
-            var response = await UpdateRelease(
-                releaseId: release.Id,
-                label: "new label",
-                client: client);
+            var response = await UpdateRelease(releaseId: release.Id, label: "new label", client: client);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -980,21 +1100,18 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         [Fact]
         public async Task ReleaseRedirectExistsForNewSlugForSameRelease()
         {
-            Release release = DataFixture.DefaultRelease(publishedVersions: 1)
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 1)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel("initial")
                 .WithSlug("2020-21-initial")
-                .WithRedirects([DataFixture.DefaultReleaseRedirect()
-                    .WithSlug("2020-21-final")])
+                .WithRedirects([DataFixture.DefaultReleaseRedirect().WithSlug("2020-21-final")])
                 .WithPublication(DataFixture.DefaultPublication());
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.Add(release));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Releases.Add(release));
 
-            var response = await UpdateRelease(
-                releaseId: release.Id,
-                label: "final");
+            var response = await UpdateRelease(releaseId: release.Id, label: "final");
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -1008,28 +1125,28 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         {
             Publication publication = DataFixture.DefaultPublication();
 
-            Release targetRelease = DataFixture.DefaultRelease(publishedVersions: 1)
+            Release targetRelease = DataFixture
+                .DefaultRelease(publishedVersions: 1)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel("initial")
                 .WithSlug("2020-21-initial")
                 .WithPublication(publication);
 
-            Release otherRelease = DataFixture.DefaultRelease(publishedVersions: 1)
+            Release otherRelease = DataFixture
+                .DefaultRelease(publishedVersions: 1)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel("intermediate")
                 .WithSlug("2020-21-intermediate")
-                .WithRedirects([DataFixture.DefaultReleaseRedirect()
-                    .WithSlug("2020-21-final")])
+                .WithRedirects([DataFixture.DefaultReleaseRedirect().WithSlug("2020-21-final")])
                 .WithPublication(publication);
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.AddRange(targetRelease, otherRelease));
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.Releases.AddRange(targetRelease, otherRelease)
+            );
 
-            var response = await UpdateRelease(
-                releaseId: targetRelease.Id,
-                label: "final");
+            var response = await UpdateRelease(releaseId: targetRelease.Id, label: "final");
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -1041,28 +1158,28 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         [Fact]
         public async Task ReleaseRedirectExistsForNewSlugForReleaseInDifferentPublication()
         {
-            Release targetRelease = DataFixture.DefaultRelease(publishedVersions: 1)
+            Release targetRelease = DataFixture
+                .DefaultRelease(publishedVersions: 1)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel("initial")
                 .WithSlug("2020-21-initial")
                 .WithPublication(DataFixture.DefaultPublication());
 
-            Release otherRelease = DataFixture.DefaultRelease(publishedVersions: 1)
+            Release otherRelease = DataFixture
+                .DefaultRelease(publishedVersions: 1)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel("intermediate")
                 .WithSlug("2020-21-intermediate")
-                .WithRedirects([DataFixture.DefaultReleaseRedirect()
-                    .WithSlug("2020-21-final")])
+                .WithRedirects([DataFixture.DefaultReleaseRedirect().WithSlug("2020-21-final")])
                 .WithPublication(DataFixture.DefaultPublication());
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.AddRange(targetRelease, otherRelease));
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.Releases.AddRange(targetRelease, otherRelease)
+            );
 
-            var response = await UpdateRelease(
-                releaseId: targetRelease.Id,
-                label: "final");
+            var response = await UpdateRelease(releaseId: targetRelease.Id, label: "final");
 
             response.AssertOk();
         }
@@ -1070,43 +1187,39 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         [Fact]
         public async Task LabelOver20Characters()
         {
-            Release release = DataFixture.DefaultRelease(publishedVersions: 1)
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 1)
                 .WithPublication(DataFixture.DefaultPublication());
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.Add(release));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Releases.Add(release));
 
-            var response = await UpdateRelease(
-                releaseId: release.Id,
-                label: new string('a', 21));
+            var response = await UpdateRelease(releaseId: release.Id, label: new string('a', 21));
 
             var validationProblem = response.AssertValidationProblem();
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal($"The field {nameof(ReleaseUpdateRequest.Label)} must be a string or array type with a maximum length of '20'.", error.Message);
+            Assert.Equal(
+                $"The field {nameof(ReleaseUpdateRequest.Label)} must be a string or array type with a maximum length of '20'.",
+                error.Message
+            );
             Assert.Equal(nameof(ReleaseUpdateRequest.Label), error.Path);
         }
 
-        private WebApplicationFactory<TestStartup> BuildApp(
-            ClaimsPrincipal? user = null)
+        private WebApplicationFactory<TestStartup> BuildApp(ClaimsPrincipal? user = null)
         {
-            return WithAzurite(
-                testApp: TestApp.SetUser(user ?? DataFixture.BauUser()), 
-                enabled: true);
+            return WithAzurite(testApp: TestApp.SetUser(user ?? DataFixture.BauUser()), enabled: true);
         }
 
         private async Task<HttpResponseMessage> UpdateRelease(
             Guid releaseId,
             string? label = null,
-            HttpClient? client = null)
+            HttpClient? client = null
+        )
         {
             client ??= BuildApp().CreateClient();
 
-            var request = new ReleaseUpdateRequest
-            {
-                Label = label,
-            };
+            var request = new ReleaseUpdateRequest { Label = label };
 
             return await client.PatchAsJsonAsync($"api/releases/{releaseId}", request);
         }
@@ -1114,11 +1227,13 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         private record TestReleaseParentPathDataCacheKey(
             string PublicationSlug,
             string ReleaseSlug,
-            string FileParentPath) : IBlobCacheKey
+            string FileParentPath
+        ) : IBlobCacheKey
         {
             public IBlobContainer Container => BlobContainers.PublicContent;
 
-            public string Key => $"{FileStoragePathUtils.PublicContentReleaseParentPath(
+            public string Key =>
+                $"{FileStoragePathUtils.PublicContentReleaseParentPath(
                 publicationSlug: PublicationSlug, 
                 releaseSlug: ReleaseSlug)}/{FileParentPath}/test-data.json";
         }

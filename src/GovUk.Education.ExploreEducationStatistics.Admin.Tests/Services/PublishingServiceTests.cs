@@ -21,7 +21,8 @@ public class PublishingServiceTests
     [Fact]
     public async Task RetryReleasePublishing()
     {
-        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
             .WithApprovalStatus(ReleaseApprovalStatus.Approved);
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -34,20 +35,23 @@ public class PublishingServiceTests
 
         var publisherClient = new Mock<IPublisherClient>(MockBehavior.Strict);
 
-        publisherClient.Setup(
-                s => s.RetryReleasePublishing(releaseVersion.Id, CancellationToken.None))
+        publisherClient
+            .Setup(s => s.RetryReleasePublishing(releaseVersion.Id, CancellationToken.None))
             .Returns(Task.CompletedTask);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publishingService = BuildPublishingService(contentDbContext: context,
-                publisherClient: publisherClient.Object);
+            var publishingService = BuildPublishingService(
+                contentDbContext: context,
+                publisherClient: publisherClient.Object
+            );
 
             var result = await publishingService.RetryReleasePublishing(releaseVersion.Id);
 
             publisherClient.Verify(
                 s => s.RetryReleasePublishing(releaseVersion.Id, CancellationToken.None),
-                Times.Once());
+                Times.Once()
+            );
 
             result.AssertRight();
         }
@@ -71,7 +75,8 @@ public class PublishingServiceTests
     public async Task ReleaseChanged()
     {
         ReleaseStatus releaseStatus = _fixture.DefaultReleaseStatus();
-        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion()
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
             .WithApprovalStatus(ReleaseApprovalStatus.Approved)
             .WithReleaseStatuses(new[] { releaseStatus });
 
@@ -87,18 +92,23 @@ public class PublishingServiceTests
 
         var releasePublishingKey = new ReleasePublishingKey(releaseVersion.Id, releaseStatus.Id);
 
-        publisherClient.Setup(s => s.HandleReleaseChanged(releasePublishingKey, true, CancellationToken.None))
+        publisherClient
+            .Setup(s => s.HandleReleaseChanged(releasePublishingKey, true, CancellationToken.None))
             .Returns(Task.CompletedTask);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publishingService = BuildPublishingService(contentDbContext: context,
-                publisherClient: publisherClient.Object);
+            var publishingService = BuildPublishingService(
+                contentDbContext: context,
+                publisherClient: publisherClient.Object
+            );
 
             var result = await publishingService.ReleaseChanged(releasePublishingKey, immediate: true);
 
-            publisherClient.Verify(s => s.HandleReleaseChanged(releasePublishingKey, true, CancellationToken.None),
-                Times.Once());
+            publisherClient.Verify(
+                s => s.HandleReleaseChanged(releasePublishingKey, true, CancellationToken.None),
+                Times.Once()
+            );
 
             result.AssertRight();
         }
@@ -113,9 +123,10 @@ public class PublishingServiceTests
 
         var publishingService = BuildPublishingService(contentDbContext: context);
 
-        var result =
-            await publishingService.ReleaseChanged(new ReleasePublishingKey(Guid.NewGuid(), Guid.NewGuid()),
-                immediate: true);
+        var result = await publishingService.ReleaseChanged(
+            new ReleasePublishingKey(Guid.NewGuid(), Guid.NewGuid()),
+            immediate: true
+        );
 
         result.AssertNotFound();
     }
@@ -135,20 +146,23 @@ public class PublishingServiceTests
 
         var publisherClient = new Mock<IPublisherClient>(MockBehavior.Strict);
 
-        publisherClient.Setup(
-                s => s.PublishMethodologyFiles(methodologyVersion.Id, CancellationToken.None))
+        publisherClient
+            .Setup(s => s.PublishMethodologyFiles(methodologyVersion.Id, CancellationToken.None))
             .Returns(Task.CompletedTask);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publishingService = BuildPublishingService(contentDbContext: context,
-                publisherClient: publisherClient.Object);
+            var publishingService = BuildPublishingService(
+                contentDbContext: context,
+                publisherClient: publisherClient.Object
+            );
 
-            var result = await publishingService
-                .PublishMethodologyFiles(methodologyVersion.Id);
+            var result = await publishingService.PublishMethodologyFiles(methodologyVersion.Id);
 
-            publisherClient.Verify(s => s.PublishMethodologyFiles(methodologyVersion.Id, CancellationToken.None),
-                Times.Once());
+            publisherClient.Verify(
+                s => s.PublishMethodologyFiles(methodologyVersion.Id, CancellationToken.None),
+                Times.Once()
+            );
 
             result.AssertRight();
         }
@@ -163,8 +177,7 @@ public class PublishingServiceTests
 
         var publishingService = BuildPublishingService(contentDbContext: context);
 
-        var result = await publishingService
-            .PublishMethodologyFiles(Guid.NewGuid());
+        var result = await publishingService.PublishMethodologyFiles(Guid.NewGuid());
 
         result.AssertNotFound();
     }
@@ -172,12 +185,14 @@ public class PublishingServiceTests
     private static PublishingService BuildPublishingService(
         ContentDbContext contentDbContext,
         IPublisherClient? publisherClient = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new PublishingService(
             contentDbContext,
             publisherClient ?? Mock.Of<IPublisherClient>(MockBehavior.Strict),
             userService ?? AlwaysTrueUserService().Object,
-            new Mock<ILogger<PublishingService>>().Object);
+            new Mock<ILogger<PublishingService>>().Object
+        );
     }
 }

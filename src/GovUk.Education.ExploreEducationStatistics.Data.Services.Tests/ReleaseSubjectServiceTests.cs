@@ -14,11 +14,7 @@ public class ReleaseSubjectServiceTests
     [Fact]
     public async Task Find_ReleaseId()
     {
-        var releaseSubject = new ReleaseSubject
-        {
-            Subject = new Subject(),
-            ReleaseVersion = new ReleaseVersion()
-        };
+        var releaseSubject = new ReleaseSubject { Subject = new Subject(), ReleaseVersion = new ReleaseVersion() };
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -35,7 +31,8 @@ public class ReleaseSubjectServiceTests
 
             var result = await service.Find(
                 subjectId: releaseSubject.SubjectId,
-                releaseVersionId: releaseSubject.ReleaseVersionId);
+                releaseVersionId: releaseSubject.ReleaseVersionId
+            );
 
             var actualReleaseSubject = result.AssertRight();
             Assert.Equal(releaseSubject.ReleaseVersionId, actualReleaseSubject.ReleaseVersionId);
@@ -52,39 +49,33 @@ public class ReleaseSubjectServiceTests
         {
             Id = Guid.NewGuid(),
             Published = DateTime.UtcNow.AddDays(-2),
-            Version = 0
+            Version = 0,
         };
 
         var latestReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTime.UtcNow.AddDays(-1),
-            Version = 1
+            Version = 1,
         };
 
         var futureReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTime.UtcNow.AddDays(1),
-            Version = 2
+            Version = 2,
         };
 
         var releaseSubjectPreviousRelease = new ReleaseSubject
         {
             Subject = subject,
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = previousReleaseVersion.Id,
-            }
+            ReleaseVersion = new ReleaseVersion { Id = previousReleaseVersion.Id },
         };
 
         var releaseSubjectLatestRelease = new ReleaseSubject
         {
             Subject = subject,
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = latestReleaseVersion.Id
-            }
+            ReleaseVersion = new ReleaseVersion { Id = latestReleaseVersion.Id },
         };
 
         // Link the Subject to the next version of the Release with a future Published date/time
@@ -92,10 +83,7 @@ public class ReleaseSubjectServiceTests
         var releaseSubjectFutureRelease = new ReleaseSubject
         {
             Subject = subject,
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = futureReleaseVersion.Id
-            }
+            ReleaseVersion = new ReleaseVersion { Id = futureReleaseVersion.Id },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -107,13 +95,15 @@ public class ReleaseSubjectServiceTests
             statisticsDbContext.ReleaseSubject.AddRange(
                 releaseSubjectLatestRelease,
                 releaseSubjectFutureRelease,
-                releaseSubjectPreviousRelease);
+                releaseSubjectPreviousRelease
+            );
             await statisticsDbContext.SaveChangesAsync();
 
             contentDbContext.ReleaseVersions.AddRange(
                 latestReleaseVersion,
                 futureReleaseVersion,
-                previousReleaseVersion);
+                previousReleaseVersion
+            );
 
             await contentDbContext.SaveChangesAsync();
         }
@@ -140,39 +130,33 @@ public class ReleaseSubjectServiceTests
         {
             Id = Guid.NewGuid(),
             Published = DateTime.UtcNow.AddDays(-2),
-            Version = 0
+            Version = 0,
         };
 
         var latestReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTime.UtcNow.AddDays(-1),
-            Version = 1
+            Version = 1,
         };
 
         var futureReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTime.UtcNow.AddDays(1),
-            Version = 2
+            Version = 2,
         };
 
         var releaseSubjectPreviousRelease = new ReleaseSubject
         {
             Subject = subject,
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = previousReleaseVersion.Id,
-            }
+            ReleaseVersion = new ReleaseVersion { Id = previousReleaseVersion.Id },
         };
 
         var releaseSubjectLatestRelease = new ReleaseSubject
         {
             Subject = subject,
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = latestReleaseVersion.Id
-            }
+            ReleaseVersion = new ReleaseVersion { Id = latestReleaseVersion.Id },
         };
 
         // Link the Subject to the next version of the Release with a future Published date/time
@@ -180,10 +164,7 @@ public class ReleaseSubjectServiceTests
         var releaseSubjectFutureRelease = new ReleaseSubject
         {
             Subject = subject,
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = futureReleaseVersion.Id
-            }
+            ReleaseVersion = new ReleaseVersion { Id = futureReleaseVersion.Id },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -195,13 +176,15 @@ public class ReleaseSubjectServiceTests
             statisticsDbContext.ReleaseSubject.AddRange(
                 releaseSubjectLatestRelease,
                 releaseSubjectFutureRelease,
-                releaseSubjectPreviousRelease);
+                releaseSubjectPreviousRelease
+            );
             await statisticsDbContext.SaveChangesAsync();
 
             contentDbContext.ReleaseVersions.AddRange(
                 latestReleaseVersion,
                 futureReleaseVersion,
-                previousReleaseVersion);
+                previousReleaseVersion
+            );
 
             await contentDbContext.SaveChangesAsync();
         }
@@ -246,17 +229,14 @@ public class ReleaseSubjectServiceTests
         var futureReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow.AddDays(1)
+            Published = DateTime.UtcNow.AddDays(1),
         };
 
         // Link the Subject to a Release with a future Published date/time that should not be considered Live
         var releaseSubjectFutureRelease = new ReleaseSubject
         {
             Subject = new Subject(),
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = futureReleaseVersion.Id
-            }
+            ReleaseVersion = new ReleaseVersion { Id = futureReleaseVersion.Id },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -275,18 +255,15 @@ public class ReleaseSubjectServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
             var service = BuildService(statisticsDbContext, contentDbContext);
-            Assert.Null(
-                await service.FindForLatestPublishedVersion(releaseSubjectFutureRelease.SubjectId));
+            Assert.Null(await service.FindForLatestPublishedVersion(releaseSubjectFutureRelease.SubjectId));
         }
     }
 
     private static ReleaseSubjectService BuildService(
         StatisticsDbContext statisticsDbContext,
-        ContentDbContext contentDbContext)
+        ContentDbContext contentDbContext
+    )
     {
-        return new ReleaseSubjectService(
-            statisticsDbContext: statisticsDbContext,
-            contentDbContext: contentDbContext
-        );
+        return new ReleaseSubjectService(statisticsDbContext: statisticsDbContext, contentDbContext: contentDbContext);
     }
 }

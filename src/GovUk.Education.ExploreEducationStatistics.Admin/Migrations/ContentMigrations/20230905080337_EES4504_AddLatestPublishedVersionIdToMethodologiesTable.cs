@@ -13,35 +13,35 @@ public partial class EES4504_AddLatestPublishedVersionIdToMethodologiesTable : M
             name: "LatestPublishedVersionId",
             table: "Methodologies",
             type: "uniqueidentifier",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_Methodologies_LatestPublishedVersionId",
             table: "Methodologies",
             column: "LatestPublishedVersionId",
             unique: true,
-            filter: "[LatestPublishedVersionId] IS NOT NULL");
+            filter: "[LatestPublishedVersionId] IS NOT NULL"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_Methodologies_MethodologyVersions_LatestPublishedVersionId",
             table: "Methodologies",
             column: "LatestPublishedVersionId",
             principalTable: "MethodologyVersions",
-            principalColumn: "Id");
+            principalColumn: "Id"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropForeignKey(
             name: "FK_Methodologies_MethodologyVersions_LatestPublishedVersionId",
-            table: "Methodologies");
+            table: "Methodologies"
+        );
 
-        migrationBuilder.DropIndex(
-            name: "IX_Methodologies_LatestPublishedVersionId",
-            table: "Methodologies");
+        migrationBuilder.DropIndex(name: "IX_Methodologies_LatestPublishedVersionId", table: "Methodologies");
 
-        migrationBuilder.DropColumn(
-            name: "LatestPublishedVersionId",
-            table: "Methodologies");
+        migrationBuilder.DropColumn(name: "LatestPublishedVersionId", table: "Methodologies");
     }
 }

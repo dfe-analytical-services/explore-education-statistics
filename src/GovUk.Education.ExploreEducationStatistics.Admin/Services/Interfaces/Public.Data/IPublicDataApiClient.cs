@@ -9,5 +9,6 @@ public interface IPublicDataApiClient
     Task<Either<ActionResult, HttpResponseMessage>> GetDataSetVersionChanges(
         Guid dataSetId,
         string dataSetVersion,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

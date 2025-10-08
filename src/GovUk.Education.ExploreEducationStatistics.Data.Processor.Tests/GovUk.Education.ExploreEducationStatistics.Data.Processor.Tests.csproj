@@ -1,36 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <RootNamespace>GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests</RootNamespace>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
-
   <ItemGroup>
-    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute"/>
+    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
   </ItemGroup>
-
   <ItemGroup>
-    <CompilerVisibleProperty Include="RootNamespace"/>
-    <CompilerVisibleProperty Include="ProjectDir"/>
+    <CompilerVisibleProperty Include="RootNamespace" />
+    <CompilerVisibleProperty Include="ProjectDir" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1"/> <!-- Required to execute unit tests in IDE -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <!-- Required to execute unit tests in IDE -->
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Admin.Tests\GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj"/>
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj"/>
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Processor\GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj"/>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Admin.Tests\GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Processor\GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj" />
   </ItemGroup>
-
   <ItemGroup>
-    <None Remove="Resources\**"/>
+    <None Remove="Resources\**" />
     <Content Include="Resources\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
 </Project>

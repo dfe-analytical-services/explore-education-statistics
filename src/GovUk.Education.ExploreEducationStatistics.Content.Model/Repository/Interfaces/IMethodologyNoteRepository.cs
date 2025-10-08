@@ -7,7 +7,8 @@ public interface IMethodologyNoteRepository
         Guid methodologyVersionId,
         Guid createdByUserId,
         string content,
-        DateTime displayDate);
+        DateTime displayDate
+    );
 
     Task DeleteNote(Guid methodologyNoteId);
 
@@ -15,5 +16,6 @@ public interface IMethodologyNoteRepository
         Guid methodologyNoteId,
         Guid updatedByUserId,
         string content,
-        DateTime displayDate);
+        DateTime displayDate
+    );
 }

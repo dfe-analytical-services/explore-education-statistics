@@ -14,28 +14,29 @@ public class TimePeriodsDuckDbRepository(PublicDataDbContext publicDataDbContext
     public async Task CreateTimePeriodsTable(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await publicDataDbContext
             .Entry(dataSetVersion)
             .Collection(dsv => dsv.TimePeriodMetas)
             .LoadAsync(cancellationToken);
 
-        await duckDbConnection.SqlBuilder(
-            $"""
-             CREATE TABLE {TimePeriodsTable.TableName:raw}(
-                 {TimePeriodsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
-                 {TimePeriodsTable.Cols.Period:raw} VARCHAR,
-                 {TimePeriodsTable.Cols.Identifier:raw} VARCHAR
-             )
-             """
-        ).ExecuteAsync(cancellationToken: cancellationToken);
+        await duckDbConnection
+            .SqlBuilder(
+                $"""
+                CREATE TABLE {TimePeriodsTable.TableName:raw}(
+                    {TimePeriodsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
+                    {TimePeriodsTable.Cols.Period:raw} VARCHAR,
+                    {TimePeriodsTable.Cols.Identifier:raw} VARCHAR
+                )
+                """
+            )
+            .ExecuteAsync(cancellationToken: cancellationToken);
 
         using var appender = duckDbConnection.CreateAppender(table: TimePeriodsTable.TableName);
 
-        var timePeriods = dataSetVersion.TimePeriodMetas
-            .OrderBy(tp => tp.Period)
-            .ThenBy(tp => tp.Code);
+        var timePeriods = dataSetVersion.TimePeriodMetas.OrderBy(tp => tp.Period).ThenBy(tp => tp.Code);
 
         var id = 1;
 

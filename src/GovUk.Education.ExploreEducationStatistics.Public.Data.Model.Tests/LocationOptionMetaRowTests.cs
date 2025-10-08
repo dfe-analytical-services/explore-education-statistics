@@ -9,10 +9,7 @@ public abstract class LocationOptionMetaRowTests
         [Fact]
         public void ContainsKeyProperties()
         {
-            HashSet<string> excludedProperties =
-            [
-                $"{nameof(LocationOptionMetaRow.Id)} value",
-            ];
+            HashSet<string> excludedProperties = [$"{nameof(LocationOptionMetaRow.Id)} value"];
 
             var expectedProperties = typeof(LocationOptionMetaRow)
                 .GetProperties()
@@ -29,7 +26,7 @@ public abstract class LocationOptionMetaRowTests
                 OldCode = nameof(LocationOptionMetaRow.OldCode) + " value",
                 Urn = nameof(LocationOptionMetaRow.Urn) + " value",
                 LaEstab = nameof(LocationOptionMetaRow.LaEstab) + " value",
-                Ukprn = nameof(LocationOptionMetaRow.Ukprn) + " value"
+                Ukprn = nameof(LocationOptionMetaRow.Ukprn) + " value",
             };
 
             var rowKey = optionRow.GetRowKey();
@@ -38,7 +35,7 @@ public abstract class LocationOptionMetaRowTests
             Assert.Equal(expectedProperties, properties);
         }
     }
-    
+
     public class GetRowKeyPrettyTests
     {
         [Fact]
@@ -64,7 +61,7 @@ public abstract class LocationOptionMetaRowTests
                 OldCode = nameof(LocationOptionMetaRow.OldCode) + " value",
                 Urn = nameof(LocationOptionMetaRow.Urn) + " value",
                 LaEstab = nameof(LocationOptionMetaRow.LaEstab) + " value",
-                Ukprn = nameof(LocationOptionMetaRow.Ukprn) + " value"
+                Ukprn = nameof(LocationOptionMetaRow.Ukprn) + " value",
             };
 
             var rowKey = optionRow.GetRowKeyPretty();
@@ -73,7 +70,7 @@ public abstract class LocationOptionMetaRowTests
             Assert.Equal(expectedProperties, properties);
         }
     }
-    
+
     [Fact]
     public void OmitsNullProperties()
     {
@@ -99,7 +96,7 @@ public abstract class LocationOptionMetaRowTests
             OldCode = null,
             Urn = nameof(LocationOptionMetaRow.Urn) + " value",
             LaEstab = nameof(LocationOptionMetaRow.LaEstab) + " value",
-            Ukprn = null
+            Ukprn = null,
         };
 
         var rowKey = optionRow.GetRowKeyPretty();

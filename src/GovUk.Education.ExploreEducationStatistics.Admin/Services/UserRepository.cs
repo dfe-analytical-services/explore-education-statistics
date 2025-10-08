@@ -8,20 +8,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
 {
-    public async Task<User?> FindById(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<User?> FindByEmail(string email, CancellationToken cancellationToken = default)
     {
-        return await contentDbContext.Users
-            .SingleOrDefaultAsync(u =>
-                u.Id == userId
-                && u.SoftDeleted == null,
-                cancellationToken);
+        return await contentDbContext.Users.SingleOrDefaultAsync(
+            u => u.Email.ToLower().Equals(email.ToLower()) && u.SoftDeleted == null,
+            cancellationToken
+        );
     }
 
-    public async Task<User?> FindByEmail(string email)
+    public async Task<User> FindDeletedUserPlaceholder(CancellationToken cancellationToken = default)
     {
-        return await contentDbContext.Users
-                .SingleOrDefaultAsync(u =>
-                    u.Email.ToLower().Equals(email.ToLower())
-                    && u.SoftDeleted == null);
+        // This user should be seeded in the ContentDbContext as part of the migrations, so should always exist.
+        return await contentDbContext.Users.SingleAsync(
+            u => u.Email.Equals(User.DeletedUserPlaceholderEmail),
+            cancellationToken
+        );
     }
 }

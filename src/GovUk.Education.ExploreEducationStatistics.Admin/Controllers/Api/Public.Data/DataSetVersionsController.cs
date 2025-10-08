@@ -19,14 +19,16 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
     [Produces("application/json")]
     public async Task<ActionResult<PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>> ListVersions(
         [FromQuery] DataSetVersionListRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetVersionService
             .ListLiveVersions(
                 dataSetId: request.DataSetId,
                 page: request.Page,
                 pageSize: request.PageSize,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
@@ -34,12 +36,11 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
     [Produces("application/json")]
     public async Task<ActionResult<DataSetVersionInfoViewModel>> GetDataSetVersion(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetVersionService
-            .GetDataSetVersion(
-                dataSetVersionId: dataSetVersionId,
-                cancellationToken: cancellationToken)
+            .GetDataSetVersion(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -47,13 +48,15 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
     [Produces("application/json")]
     public async Task<ActionResult<DataSetVersionSummaryViewModel>> CreateNextVersion(
         [FromBody] NextDataSetVersionCreateRequest nextDataSetVersionCreateRequest,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetVersionService
             .CreateNextVersion(
                 releaseFileId: nextDataSetVersionCreateRequest.ReleaseFileId,
                 dataSetId: nextDataSetVersionCreateRequest.DataSetId,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
@@ -62,41 +65,35 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
     [Route("complete")]
     public async Task<ActionResult<DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
         [FromBody] NextDataSetVersionCompleteImportRequest nextDataSetVersionCompleteImportRequest,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetVersionService
             .CompleteNextVersionImport(
                 dataSetVersionId: nextDataSetVersionCompleteImportRequest.DataSetVersionId,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
     [HttpDelete("{dataSetVersionId:guid}")]
     [Produces("application/json")]
-    public async Task<ActionResult> DeleteVersion(
-        Guid dataSetVersionId,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteVersion(Guid dataSetVersionId, CancellationToken cancellationToken)
     {
         return await dataSetVersionService
-            .DeleteVersion(
-                dataSetVersionId: dataSetVersionId,
-                cancellationToken: cancellationToken)
+            .DeleteVersion(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
             .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
     }
 
     [HttpGet("{dataSetVersionId:guid}/changes")]
     [Produces("application/json")]
-    public async Task<ActionResult> GetVersionChanges(
-        Guid dataSetVersionId,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult> GetVersionChanges(Guid dataSetVersionId, CancellationToken cancellationToken)
     {
         // We use a streaming approach as we don't have to share the public API view models
         // with the admin. This means we can avoid inefficiently re-serializing a second JSON
         // response and don't need to load the original response into memory.
         return await dataSetVersionService
-            .GetVersionChanges(
-                dataSetVersionId: dataSetVersionId,
-                cancellationToken: cancellationToken)
+            .GetVersionChanges(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
             .OnSuccessVoid(async response =>
             {
                 Response.ContentType = response.Content.Headers.ContentType?.ToString();
@@ -110,13 +107,15 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
     public async Task<ActionResult<DataSetDraftVersionViewModel>> UpdateVersion(
         Guid dataSetVersionId,
         [FromBody] DataSetVersionUpdateRequest dataSetVersionUpdateRequest,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await dataSetVersionService
             .UpdateVersion(
                 dataSetVersionId: dataSetVersionId,
                 updateRequest: dataSetVersionUpdateRequest,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 }

@@ -9,11 +9,13 @@ public interface IIndicatorMetaRepository
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task CreateIndicatorMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
         IReadOnlySet<string> allowedColumns,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

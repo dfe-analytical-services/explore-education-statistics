@@ -10,8 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model;
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class Location
 {
-    private static readonly Lazy<List<PropertyInfo>> _locationAttributeProperties = new(
-        () => typeof(Location).GetProperties()
+    private static readonly Lazy<List<PropertyInfo>> _locationAttributeProperties = new(() =>
+        typeof(Location)
+            .GetProperties()
             .Where(member => member.PropertyType.IsAssignableTo(typeof(LocationAttribute)))
             .ToList()
     );
@@ -26,9 +27,7 @@ public class Location
     [NotMapped]
     public Country? Country
     {
-        get => Country_Code == null && Country_Name == null
-            ? null
-            : new Country(Country_Code, Country_Name);
+        get => Country_Code == null && Country_Name == null ? null : new Country(Country_Code, Country_Name);
         init
         {
             Country_Code = value?.Code;
@@ -42,9 +41,10 @@ public class Location
     [NotMapped]
     public EnglishDevolvedArea? EnglishDevolvedArea
     {
-        get => EnglishDevolvedArea_Code == null && EnglishDevolvedArea_Name == null
-            ? null
-            : new EnglishDevolvedArea(EnglishDevolvedArea_Code, EnglishDevolvedArea_Name);
+        get =>
+            EnglishDevolvedArea_Code == null && EnglishDevolvedArea_Name == null
+                ? null
+                : new EnglishDevolvedArea(EnglishDevolvedArea_Code, EnglishDevolvedArea_Name);
         init
         {
             EnglishDevolvedArea_Code = value?.Code;
@@ -58,9 +58,10 @@ public class Location
     [NotMapped]
     public Institution? Institution
     {
-        get => Institution_Code == null && Institution_Name == null
-            ? null
-            : new Institution(Institution_Code, Institution_Name);
+        get =>
+            Institution_Code == null && Institution_Name == null
+                ? null
+                : new Institution(Institution_Code, Institution_Name);
         init
         {
             Institution_Code = value?.Code;
@@ -75,9 +76,10 @@ public class Location
     [NotMapped]
     public LocalAuthority? LocalAuthority
     {
-        get => LocalAuthority_Code == null && LocalAuthority_OldCode == null && LocalAuthority_Name == null
-            ? null
-            : new LocalAuthority(LocalAuthority_Code, LocalAuthority_OldCode, LocalAuthority_Name);
+        get =>
+            LocalAuthority_Code == null && LocalAuthority_OldCode == null && LocalAuthority_Name == null
+                ? null
+                : new LocalAuthority(LocalAuthority_Code, LocalAuthority_OldCode, LocalAuthority_Name);
         init
         {
             LocalAuthority_Code = value?.Code;
@@ -92,9 +94,10 @@ public class Location
     [NotMapped]
     public LocalAuthorityDistrict? LocalAuthorityDistrict
     {
-        get => LocalAuthorityDistrict_Code == null && LocalAuthorityDistrict_Name == null
-            ? null
-            : new LocalAuthorityDistrict(LocalAuthorityDistrict_Code, LocalAuthorityDistrict_Name);
+        get =>
+            LocalAuthorityDistrict_Code == null && LocalAuthorityDistrict_Name == null
+                ? null
+                : new LocalAuthorityDistrict(LocalAuthorityDistrict_Code, LocalAuthorityDistrict_Name);
         init
         {
             LocalAuthorityDistrict_Code = value?.Code;
@@ -108,9 +111,10 @@ public class Location
     [NotMapped]
     public LocalEnterprisePartnership? LocalEnterprisePartnership
     {
-        get => LocalEnterprisePartnership_Code == null && LocalEnterprisePartnership_Name == null
-            ? null
-            : new LocalEnterprisePartnership(LocalEnterprisePartnership_Code, LocalEnterprisePartnership_Name);
+        get =>
+            LocalEnterprisePartnership_Code == null && LocalEnterprisePartnership_Name == null
+                ? null
+                : new LocalEnterprisePartnership(LocalEnterprisePartnership_Code, LocalEnterprisePartnership_Name);
         init
         {
             LocalEnterprisePartnership_Code = value?.Code;
@@ -124,10 +128,13 @@ public class Location
     [NotMapped]
     public LocalSkillsImprovementPlanArea? LocalSkillsImprovementPlanArea
     {
-        get => LocalSkillsImprovementPlanArea_Code == null && LocalSkillsImprovementPlanArea_Name == null
-            ? null
-            : new LocalSkillsImprovementPlanArea(LocalSkillsImprovementPlanArea_Code,
-                LocalSkillsImprovementPlanArea_Name);
+        get =>
+            LocalSkillsImprovementPlanArea_Code == null && LocalSkillsImprovementPlanArea_Name == null
+                ? null
+                : new LocalSkillsImprovementPlanArea(
+                    LocalSkillsImprovementPlanArea_Code,
+                    LocalSkillsImprovementPlanArea_Name
+                );
         init
         {
             LocalSkillsImprovementPlanArea_Code = value?.Code;
@@ -141,9 +148,10 @@ public class Location
     [NotMapped]
     public MayoralCombinedAuthority? MayoralCombinedAuthority
     {
-        get => MayoralCombinedAuthority_Code == null && MayoralCombinedAuthority_Name == null
-            ? null
-            : new MayoralCombinedAuthority(MayoralCombinedAuthority_Code, MayoralCombinedAuthority_Name);
+        get =>
+            MayoralCombinedAuthority_Code == null && MayoralCombinedAuthority_Name == null
+                ? null
+                : new MayoralCombinedAuthority(MayoralCombinedAuthority_Code, MayoralCombinedAuthority_Name);
         init
         {
             MayoralCombinedAuthority_Code = value?.Code;
@@ -157,9 +165,10 @@ public class Location
     [NotMapped]
     public MultiAcademyTrust? MultiAcademyTrust
     {
-        get => MultiAcademyTrust_Code == null && MultiAcademyTrust_Name == null
-            ? null
-            : new MultiAcademyTrust(MultiAcademyTrust_Code, MultiAcademyTrust_Name);
+        get =>
+            MultiAcademyTrust_Code == null && MultiAcademyTrust_Name == null
+                ? null
+                : new MultiAcademyTrust(MultiAcademyTrust_Code, MultiAcademyTrust_Name);
         init
         {
             MultiAcademyTrust_Code = value?.Code;
@@ -173,9 +182,10 @@ public class Location
     [NotMapped]
     public OpportunityArea? OpportunityArea
     {
-        get => OpportunityArea_Code == null && OpportunityArea_Name == null
-            ? null
-            : new OpportunityArea(OpportunityArea_Code, OpportunityArea_Name);
+        get =>
+            OpportunityArea_Code == null && OpportunityArea_Name == null
+                ? null
+                : new OpportunityArea(OpportunityArea_Code, OpportunityArea_Name);
         init
         {
             OpportunityArea_Code = value?.Code;
@@ -189,9 +199,10 @@ public class Location
     [NotMapped]
     public ParliamentaryConstituency? ParliamentaryConstituency
     {
-        get => ParliamentaryConstituency_Code == null && ParliamentaryConstituency_Name == null
-            ? null
-            : new ParliamentaryConstituency(ParliamentaryConstituency_Code, ParliamentaryConstituency_Name);
+        get =>
+            ParliamentaryConstituency_Code == null && ParliamentaryConstituency_Name == null
+                ? null
+                : new ParliamentaryConstituency(ParliamentaryConstituency_Code, ParliamentaryConstituency_Name);
         init
         {
             ParliamentaryConstituency_Code = value?.Code;
@@ -205,9 +216,10 @@ public class Location
     [NotMapped]
     public PlanningArea? PlanningArea
     {
-        get => PlanningArea_Code == null && PlanningArea_Name == null
-            ? null
-            : new PlanningArea(PlanningArea_Code, PlanningArea_Name);
+        get =>
+            PlanningArea_Code == null && PlanningArea_Name == null
+                ? null
+                : new PlanningArea(PlanningArea_Code, PlanningArea_Name);
         init
         {
             PlanningArea_Code = value?.Code;
@@ -221,9 +233,7 @@ public class Location
     [NotMapped]
     public Provider? Provider
     {
-        get => Provider_Code == null && Provider_Name == null
-            ? null
-            : new Provider(Provider_Code, Provider_Name);
+        get => Provider_Code == null && Provider_Name == null ? null : new Provider(Provider_Code, Provider_Name);
         init
         {
             Provider_Code = value?.Code;
@@ -237,9 +247,7 @@ public class Location
     [NotMapped]
     public Region? Region
     {
-        get => Region_Code == null && Region_Name == null
-            ? null
-            : new Region(Region_Code, Region_Name);
+        get => Region_Code == null && Region_Name == null ? null : new Region(Region_Code, Region_Name);
         init
         {
             Region_Code = value?.Code;
@@ -252,9 +260,7 @@ public class Location
     [NotMapped]
     public RscRegion? RscRegion
     {
-        get => RscRegion_Code == null
-            ? null
-            : new RscRegion(RscRegion_Code);
+        get => RscRegion_Code == null ? null : new RscRegion(RscRegion_Code);
         init => RscRegion_Code = value?.Code;
     }
 
@@ -264,9 +270,7 @@ public class Location
     [NotMapped]
     public School? School
     {
-        get => School_Code == null && School_Name == null
-            ? null
-            : new School(School_Code, School_Name);
+        get => School_Code == null && School_Name == null ? null : new School(School_Code, School_Name);
         init
         {
             School_Code = value?.Code;
@@ -280,9 +284,7 @@ public class Location
     [NotMapped]
     public Sponsor? Sponsor
     {
-        get => Sponsor_Code == null && Sponsor_Name == null
-            ? null
-            : new Sponsor(Sponsor_Code, Sponsor_Name);
+        get => Sponsor_Code == null && Sponsor_Name == null ? null : new Sponsor(Sponsor_Code, Sponsor_Name);
         init
         {
             Sponsor_Code = value?.Code;
@@ -296,9 +298,7 @@ public class Location
     [NotMapped]
     public Ward? Ward
     {
-        get => Ward_Code == null && Ward_Name == null
-            ? null
-            : new Ward(Ward_Code, Ward_Name);
+        get => Ward_Code == null && Ward_Name == null ? null : new Ward(Ward_Code, Ward_Name);
         init
         {
             Ward_Code = value?.Code;
@@ -309,58 +309,61 @@ public class Location
     protected bool Equals(Location other)
     {
         return Id.Equals(other.Id)
-               && GeographicLevel == other.GeographicLevel
-               && Country_Code == other.Country_Code
-               && Country_Name == other.Country_Name
-               && EnglishDevolvedArea_Code == other.EnglishDevolvedArea_Code
-               && EnglishDevolvedArea_Name == other.EnglishDevolvedArea_Name
-               && Institution_Code == other.Institution_Code
-               && Institution_Name == other.Institution_Name
-               && LocalAuthority_Code == other.LocalAuthority_Code
-               && LocalAuthority_OldCode == other.LocalAuthority_OldCode
-               && LocalAuthority_Name == other.LocalAuthority_Name
-               && LocalAuthorityDistrict_Code == other.LocalAuthorityDistrict_Code
-               && LocalAuthorityDistrict_Name == other.LocalAuthorityDistrict_Name
-               && LocalEnterprisePartnership_Code == other.LocalEnterprisePartnership_Code
-               && LocalEnterprisePartnership_Name == other.LocalEnterprisePartnership_Name
-               && LocalSkillsImprovementPlanArea_Code == other.LocalSkillsImprovementPlanArea_Code
-               && LocalSkillsImprovementPlanArea_Name == other.LocalSkillsImprovementPlanArea_Name
-               && MayoralCombinedAuthority_Code == other.MayoralCombinedAuthority_Code
-               && MayoralCombinedAuthority_Name == other.MayoralCombinedAuthority_Name
-               && MultiAcademyTrust_Code == other.MultiAcademyTrust_Code
-               && MultiAcademyTrust_Name == other.MultiAcademyTrust_Name
-               && OpportunityArea_Code == other.OpportunityArea_Code
-               && OpportunityArea_Name == other.OpportunityArea_Name
-               && ParliamentaryConstituency_Code == other.ParliamentaryConstituency_Code
-               && ParliamentaryConstituency_Name == other.ParliamentaryConstituency_Name
-               && PlanningArea_Code == other.PlanningArea_Code
-               && PlanningArea_Name == other.PlanningArea_Name
-               && Provider_Code == other.Provider_Code
-               && Provider_Name == other.Provider_Name
-               && Region_Code == other.Region_Code
-               && Region_Name == other.Region_Name
-               && RscRegion_Code == other.RscRegion_Code
-               && School_Code == other.School_Code
-               && School_Name == other.School_Name
-               && Sponsor_Code == other.Sponsor_Code
-               && Sponsor_Name == other.Sponsor_Name
-               && Ward_Code == other.Ward_Code
-               && Ward_Name == other.Ward_Name;
+            && GeographicLevel == other.GeographicLevel
+            && Country_Code == other.Country_Code
+            && Country_Name == other.Country_Name
+            && EnglishDevolvedArea_Code == other.EnglishDevolvedArea_Code
+            && EnglishDevolvedArea_Name == other.EnglishDevolvedArea_Name
+            && Institution_Code == other.Institution_Code
+            && Institution_Name == other.Institution_Name
+            && LocalAuthority_Code == other.LocalAuthority_Code
+            && LocalAuthority_OldCode == other.LocalAuthority_OldCode
+            && LocalAuthority_Name == other.LocalAuthority_Name
+            && LocalAuthorityDistrict_Code == other.LocalAuthorityDistrict_Code
+            && LocalAuthorityDistrict_Name == other.LocalAuthorityDistrict_Name
+            && LocalEnterprisePartnership_Code == other.LocalEnterprisePartnership_Code
+            && LocalEnterprisePartnership_Name == other.LocalEnterprisePartnership_Name
+            && LocalSkillsImprovementPlanArea_Code == other.LocalSkillsImprovementPlanArea_Code
+            && LocalSkillsImprovementPlanArea_Name == other.LocalSkillsImprovementPlanArea_Name
+            && MayoralCombinedAuthority_Code == other.MayoralCombinedAuthority_Code
+            && MayoralCombinedAuthority_Name == other.MayoralCombinedAuthority_Name
+            && MultiAcademyTrust_Code == other.MultiAcademyTrust_Code
+            && MultiAcademyTrust_Name == other.MultiAcademyTrust_Name
+            && OpportunityArea_Code == other.OpportunityArea_Code
+            && OpportunityArea_Name == other.OpportunityArea_Name
+            && ParliamentaryConstituency_Code == other.ParliamentaryConstituency_Code
+            && ParliamentaryConstituency_Name == other.ParliamentaryConstituency_Name
+            && PlanningArea_Code == other.PlanningArea_Code
+            && PlanningArea_Name == other.PlanningArea_Name
+            && Provider_Code == other.Provider_Code
+            && Provider_Name == other.Provider_Name
+            && Region_Code == other.Region_Code
+            && Region_Name == other.Region_Name
+            && RscRegion_Code == other.RscRegion_Code
+            && School_Code == other.School_Code
+            && School_Name == other.School_Name
+            && Sponsor_Code == other.Sponsor_Code
+            && Sponsor_Name == other.Sponsor_Name
+            && Ward_Code == other.Ward_Code
+            && Ward_Name == other.Ward_Name;
     }
 
     public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
-        return Equals((Location) obj);
+        if (ReferenceEquals(null, obj))
+            return false;
+        if (ReferenceEquals(this, obj))
+            return true;
+        if (obj.GetType() != this.GetType())
+            return false;
+        return Equals((Location)obj);
     }
 
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
         hashCode.Add(Id);
-        hashCode.Add((int) GeographicLevel);
+        hashCode.Add((int)GeographicLevel);
         hashCode.Add(Country_Code);
         hashCode.Add(Country_Name);
         hashCode.Add(EnglishDevolvedArea_Code);
@@ -402,8 +405,8 @@ public class Location
 
     public IEnumerable<LocationAttribute> GetAttributes()
     {
-        return _locationAttributeProperties.Value
-            .Select(property => property.GetValue(this))
+        return _locationAttributeProperties
+            .Value.Select(property => property.GetValue(this))
             .OfType<LocationAttribute?>()
             .WhereNotNull();
     }
@@ -430,12 +433,13 @@ public class Location
             GeographicLevel.School => School,
             GeographicLevel.Sponsor => Sponsor,
             GeographicLevel.Ward => Ward,
-            _ => throw new ArgumentOutOfRangeException(nameof(GeographicLevel), GeographicLevel, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(GeographicLevel), GeographicLevel, null),
         };
 
-        return principalAttribute ??
-               throw new InvalidOperationException(
-                   $"{nameof(Location)} attribute corresponding with {nameof(GeographicLevel)} '{GeographicLevel}' is null");
+        return principalAttribute
+            ?? throw new InvalidOperationException(
+                $"{nameof(Location)} attribute corresponding with {nameof(GeographicLevel)} '{GeographicLevel}' is null"
+            );
     }
 }
 
@@ -443,11 +447,13 @@ public static class LocationListExtensions
 {
     public static Dictionary<GeographicLevel, List<LocationAttributeNode>> GetLocationAttributesHierarchical(
         this IList<Location> distinctLocations,
-        Dictionary<GeographicLevel, List<string>>? hierarchies = null)
+        Dictionary<GeographicLevel, List<string>>? hierarchies = null
+    )
     {
-        var hierarchyWithLocationSelectors = hierarchies == null
-            ? new Dictionary<GeographicLevel, List<Func<Location, LocationAttribute>>>()
-            : MapLocationAttributeSelectors(hierarchies);
+        var hierarchyWithLocationSelectors =
+            hierarchies == null
+                ? new Dictionary<GeographicLevel, List<Func<Location, LocationAttribute>>>()
+                : MapLocationAttributeSelectors(hierarchies);
 
         return distinctLocations
             .Distinct()
@@ -461,69 +467,79 @@ public static class LocationListExtensions
 
                     if (hierarchyWithLocationSelectors.ContainsKey(geographicLevel))
                     {
-                        return GroupLocationAttributes(locationsForLevel,
-                            hierarchyWithLocationSelectors[geographicLevel]);
+                        return GroupLocationAttributes(
+                            locationsForLevel,
+                            hierarchyWithLocationSelectors[geographicLevel]
+                        );
                     }
 
                     // No hierarchy configured for level so return flat list
-                    return locationsForLevel
-                        .Select(CreateLocationLeafNode)
-                        .ToList();
-                });
+                    return locationsForLevel.Select(CreateLocationLeafNode).ToList();
+                }
+            );
     }
 
-    private static Dictionary<GeographicLevel, List<Func<Location, LocationAttribute>>>
-        MapLocationAttributeSelectors(Dictionary<GeographicLevel, List<string>> hierarchies)
+    private static Dictionary<GeographicLevel, List<Func<Location, LocationAttribute>>> MapLocationAttributeSelectors(
+        Dictionary<GeographicLevel, List<string>> hierarchies
+    )
     {
         return hierarchies.ToDictionary(
             pair => pair.Key,
-            pair => pair.Value.Select(propertyName =>
-            {
-                // Function which resolves an ILocationAttribute from a Location by property name e.g. 'Region'.
-                // This gets used when grouping the attributes of a location by a property name configured in a hierarchy.
-                return (Func<Location, LocationAttribute>) (location =>
-                {
-                    var propertyInfo = typeof(Location).GetProperty(propertyName);
-
-                    if (propertyInfo == null)
+            pair =>
+                pair.Value.Select(propertyName =>
                     {
-                        throw new ArgumentException($"{nameof(Location)} does not have a property {propertyName}");
-                    }
+                        // Function which resolves an ILocationAttribute from a Location by property name e.g. 'Region'.
+                        // This gets used when grouping the attributes of a location by a property name configured in a hierarchy.
+                        return (Func<Location, LocationAttribute>)(
+                            location =>
+                            {
+                                var propertyInfo = typeof(Location).GetProperty(propertyName);
 
-                    // Only allow properties of Location that derive from LocationAttribute to be used in a hierarchy 
-                    if (!typeof(LocationAttribute).IsAssignableFrom(propertyInfo.PropertyType))
-                    {
-                        throw new ArgumentException(
-                            $"{nameof(Location)} property {propertyName} is not a {nameof(LocationAttribute)}");
-                    }
+                                if (propertyInfo == null)
+                                {
+                                    throw new ArgumentException(
+                                        $"{nameof(Location)} does not have a property {propertyName}"
+                                    );
+                                }
 
-                    var value = propertyInfo.GetValue(location);
+                                // Only allow properties of Location that derive from LocationAttribute to be used in a hierarchy
+                                if (!typeof(LocationAttribute).IsAssignableFrom(propertyInfo.PropertyType))
+                                {
+                                    throw new ArgumentException(
+                                        $"{nameof(Location)} property {propertyName} is not a {nameof(LocationAttribute)}"
+                                    );
+                                }
 
-                    // A `null` value is possible here as a property configured in a hierarchy
-                    // may not be included by all of the data, or might not even be present at all. 
-                    // E.g. a Country-Region-LA hierarchy could be defined for LA level but Country and/or Region
-                    // can be missing from the location data.
+                                var value = propertyInfo.GetValue(location);
 
-                    // Rather than returning null here, create an ILocationAttribute instance corresponding with
-                    // the property type. When building the view model for the hierarchy it's useful to know the
-                    // 'level' from the type of ILocationAttribute. This couldn't be determined if the value was null.
-                    if (value == null)
-                    {
-                        var propertyType = propertyInfo.PropertyType;
-                        var constructorParams = propertyType.GetConstructors().Single().GetParameters();
-                        var nullParams = new object[constructorParams.Length];
-                        value = Activator.CreateInstance(propertyType, nullParams);
-                    }
+                                // A `null` value is possible here as a property configured in a hierarchy
+                                // may not be included by all of the data, or might not even be present at all.
+                                // E.g. a Country-Region-LA hierarchy could be defined for LA level but Country and/or Region
+                                // can be missing from the location data.
 
-                    return (value as LocationAttribute)!;
-                });
-            }).ToList()
+                                // Rather than returning null here, create an ILocationAttribute instance corresponding with
+                                // the property type. When building the view model for the hierarchy it's useful to know the
+                                // 'level' from the type of ILocationAttribute. This couldn't be determined if the value was null.
+                                if (value == null)
+                                {
+                                    var propertyType = propertyInfo.PropertyType;
+                                    var constructorParams = propertyType.GetConstructors().Single().GetParameters();
+                                    var nullParams = new object[constructorParams.Length];
+                                    value = Activator.CreateInstance(propertyType, nullParams);
+                                }
+
+                                return (value as LocationAttribute)!;
+                            }
+                        );
+                    })
+                    .ToList()
         );
     }
 
     private static List<LocationAttributeNode> GroupLocationAttributes(
         IEnumerable<Location> locations,
-        IReadOnlyList<Func<Location, LocationAttribute>> attributeSelectors)
+        IReadOnlyList<Func<Location, LocationAttribute>> attributeSelectors
+    )
     {
         if (attributeSelectors.IsNullOrEmpty())
         {
@@ -533,19 +549,15 @@ public static class LocationListExtensions
         // Recursively GroupBy the Location attributes
         return locations
             .GroupBy(attributeSelectors[0])
-            .Select(
-                grouping => new LocationAttributeNode(grouping.Key)
-                {
-                    Children = GroupLocationAttributes(grouping, attributeSelectors.Skip(1).ToList())
-                })
+            .Select(grouping => new LocationAttributeNode(grouping.Key)
+            {
+                Children = GroupLocationAttributes(grouping, attributeSelectors.Skip(1).ToList()),
+            })
             .ToList();
     }
 
     private static LocationAttributeNode CreateLocationLeafNode(Location location)
     {
-        return new(location.ToLocationAttribute())
-        {
-            LocationId = location.Id
-        };
+        return new(location.ToLocationAttribute()) { LocationId = location.Id };
     }
 }

@@ -7,12 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 public class RedirectsCacheServiceMockBuilder
 {
     private readonly Mock<IRedirectsCacheService> _mock = new(MockBehavior.Strict);
+
     public IRedirectsCacheService Build()
     {
-        _mock
-            .Setup(m => m.UpdateRedirects())
-            .ReturnsAsync(() => new RedirectsViewModel([], [], []));
-        
+        _mock.Setup(m => m.UpdateRedirects()).ReturnsAsync(() => new RedirectsViewModel([], [], []));
+
         return _mock.Object;
     }
 }

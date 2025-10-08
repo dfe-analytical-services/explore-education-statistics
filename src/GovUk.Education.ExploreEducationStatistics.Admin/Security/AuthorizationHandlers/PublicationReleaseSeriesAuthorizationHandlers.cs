@@ -7,23 +7,23 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class ManagePublicationReleaseSeriesRequirement : IAuthorizationRequirement
-{}
+public class ManagePublicationReleaseSeriesRequirement : IAuthorizationRequirement { }
 
 public class ManagePublicationReleaseSeriesAuthorizationHandler
     : AuthorizationHandler<ManagePublicationReleaseSeriesRequirement, Publication>
 {
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
-    public ManagePublicationReleaseSeriesAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService)
+    public ManagePublicationReleaseSeriesAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
     {
         _authorizationHandlerService = authorizationHandlerService;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
         ManagePublicationReleaseSeriesRequirement requirement,
-        Publication publication)
+        Publication publication
+    )
     {
         if (SecurityUtils.HasClaim(context.User, UpdateAllPublications))
         {
@@ -31,11 +31,7 @@ public class ManagePublicationReleaseSeriesAuthorizationHandler
             return;
         }
 
-        if (await _authorizationHandlerService
-                .HasRolesOnPublication(
-                    context.User.GetUserId(),
-                    publication.Id,
-                    Owner))
+        if (await _authorizationHandlerService.HasRolesOnPublication(context.User.GetUserId(), publication.Id, Owner))
         {
             context.Succeed(requirement);
         }

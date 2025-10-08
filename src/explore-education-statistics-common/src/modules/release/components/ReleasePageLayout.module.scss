@@ -1,0 +1,22 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.wrapper {
+  display: flex;
+  gap: govuk-spacing(6);
+  --tab-nav-height: 55px;
+  --sidebar-y-offset: calc(var(--tab-nav-height) + #{govuk-spacing(4)});
+}
+
+.sidebar {
+  position: sticky;
+  top: var(--sidebar-y-offset);
+  flex: 0 0 280px;
+  align-self: flex-start;
+  max-height: calc(100vh - (var(--sidebar-y-offset)));
+  overflow-y: auto;
+}
+
+.content {
+  flex: 1 1 auto;
+  padding-bottom: govuk-spacing(8);
+}

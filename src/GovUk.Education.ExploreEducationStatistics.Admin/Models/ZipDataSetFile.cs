@@ -9,4 +9,5 @@ public record ZipDataSetFile(
     string MetaFilename,
     long DataFileSize = 1048576,
     long MetaFileSize = 1024,
-    File? ReplacingFile = null);
+    File? ReplacingFile = null
+);

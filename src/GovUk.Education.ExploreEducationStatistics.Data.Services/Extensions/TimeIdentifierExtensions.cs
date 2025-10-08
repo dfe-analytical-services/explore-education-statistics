@@ -12,14 +12,14 @@ public static class TimeIdentifierExtensions
             return true;
         }
 
-        return IsAcademicQuarter(timeIdentifier) && IsAcademicQuarter(compare) ||
-               IsCalendarQuarter(timeIdentifier) && IsCalendarQuarter(compare) ||
-               IsFinancialQuarter(timeIdentifier) && IsFinancialQuarter(compare) ||
-               IsTaxQuarter(timeIdentifier) && IsTaxQuarter(compare) ||
-               IsMonth(timeIdentifier) && IsMonth(compare) ||
-               IsWeek(timeIdentifier) && IsWeek(compare) ||
-               IsTerm(timeIdentifier) && IsTerm(compare) ||
-               IsFinancialYearPart(timeIdentifier) && IsFinancialYearPart(compare);
+        return IsAcademicQuarter(timeIdentifier) && IsAcademicQuarter(compare)
+            || IsCalendarQuarter(timeIdentifier) && IsCalendarQuarter(compare)
+            || IsFinancialQuarter(timeIdentifier) && IsFinancialQuarter(compare)
+            || IsTaxQuarter(timeIdentifier) && IsTaxQuarter(compare)
+            || IsMonth(timeIdentifier) && IsMonth(compare)
+            || IsWeek(timeIdentifier) && IsWeek(compare)
+            || IsTerm(timeIdentifier) && IsTerm(compare)
+            || IsFinancialYearPart(timeIdentifier) && IsFinancialYearPart(compare);
     }
 
     public static bool IsYear(this TimeIdentifier timeIdentifier)
@@ -114,7 +114,6 @@ public static class TimeIdentifierExtensions
             return GetFinancialYearParts();
         }
 
-        throw new ArgumentOutOfRangeException(nameof(timeIdentifier),
-            "The time identifier has no associated range");
+        throw new ArgumentOutOfRangeException(nameof(timeIdentifier), "The time identifier has no associated range");
     }
 }

@@ -5,16 +5,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Events;
 
 public record PublicationArchivedEvent : IEvent
 {
-    public PublicationArchivedEvent(
-        Guid publicationId,
-        string publicationSlug,
-        Guid supersededByPublicationId)
+    public PublicationArchivedEvent(Guid publicationId, string publicationSlug, Guid supersededByPublicationId)
     {
         Subject = publicationId.ToString();
         Payload = new EventPayload
         {
             PublicationSlug = publicationSlug,
-            SupersededByPublicationId = supersededByPublicationId
+            SupersededByPublicationId = supersededByPublicationId,
         };
     }
 

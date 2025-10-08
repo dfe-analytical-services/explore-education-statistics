@@ -21,7 +21,8 @@ public static class ReleaseVersionExtensions
         if (releaseVersion.Release?.Publication == null)
         {
             throw new ArgumentException(
-                "ReleaseVersion must be hydrated with Publication to create All Files zip file name");
+                "ReleaseVersion must be hydrated with Publication to create All Files zip file name"
+            );
         }
 
         return $"{releaseVersion.Release.Publication.Slug}_{releaseVersion.Release.Slug}.zip";

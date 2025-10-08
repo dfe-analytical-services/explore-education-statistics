@@ -5,15 +5,12 @@
     <RootNamespace>GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests</RootNamespace>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
-
   <ItemGroup>
     <CompilerVisibleProperty Include="RootNamespace" />
     <CompilerVisibleProperty Include="ProjectDir" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.csproj" />
   </ItemGroup>
-
 </Project>

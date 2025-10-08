@@ -4,17 +4,18 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Test
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.CommandHandlers.
-    RemovePublicationSearchableDocuments;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.CommandHandlers.RemovePublicationSearchableDocuments;
 
 public class RemovePublicationSearchableDocumentsTests
 {
     private readonly SearchableDocumentRemoverMockBuilder _searchableDocumentRemoverMockBuilder = new();
 
-    private RemovePublicationSearchableDocumentsFunction GetSut() => new(
-        new NullLogger<RemovePublicationSearchableDocumentsFunction>(),
-        _searchableDocumentRemoverMockBuilder.Build(),
-        new TestableCommandHandler());
+    private RemovePublicationSearchableDocumentsFunction GetSut() =>
+        new(
+            new NullLogger<RemovePublicationSearchableDocumentsFunction>(),
+            _searchableDocumentRemoverMockBuilder.Build(),
+            new TestableCommandHandler()
+        );
 
     [Fact]
     public void CanInstantiateSut() => Assert.NotNull(GetSut());
@@ -27,7 +28,8 @@ public class RemovePublicationSearchableDocumentsTests
         await GetSut().RemovePublicationSearchableDocuments(command, new FunctionContextMockBuilder().Build());
 
         _searchableDocumentRemoverMockBuilder.Assert.RemovePublicationSearchableDocumentsCalledFor(
-            command.PublicationSlug);
+            command.PublicationSlug
+        );
     }
 
     [Theory]

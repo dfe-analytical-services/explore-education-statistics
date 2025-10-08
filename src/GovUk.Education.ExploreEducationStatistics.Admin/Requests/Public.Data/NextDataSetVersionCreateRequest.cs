@@ -13,11 +13,9 @@ public record NextDataSetVersionCreateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.DataSetId)
-                .NotEmpty();
+            RuleFor(request => request.DataSetId).NotEmpty();
 
-            RuleFor(request => request.ReleaseFileId)
-                .NotEmpty();
+            RuleFor(request => request.ReleaseFileId).NotEmpty();
         }
     }
 }

@@ -6,7 +6,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IFileValidatorService
 {
-    Task<Either<ActionResult, Unit>> ValidateFileForUpload(
-        IFormFile file,
-        FileType type);
+    Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type);
 }

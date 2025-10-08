@@ -8,13 +8,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IEmbedBlockService
 {
-    Task<Either<ActionResult, EmbedBlockLinkViewModel>> Create(Guid releaseVersionId,
-        EmbedBlockCreateRequest request);
+    Task<Either<ActionResult, EmbedBlockLinkViewModel>> Create(Guid releaseVersionId, EmbedBlockCreateRequest request);
 
-    Task<Either<ActionResult, EmbedBlockLinkViewModel>> Update(Guid releaseVersionId,
+    Task<Either<ActionResult, EmbedBlockLinkViewModel>> Update(
+        Guid releaseVersionId,
         Guid contentBlockId,
-        EmbedBlockUpdateRequest request);
+        EmbedBlockUpdateRequest request
+    );
 
-    Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
-        Guid contentBlockId);
+    Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId, Guid contentBlockId);
 }

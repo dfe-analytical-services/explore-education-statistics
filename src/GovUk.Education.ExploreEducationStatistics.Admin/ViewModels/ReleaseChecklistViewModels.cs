@@ -33,7 +33,8 @@ public class MethodologyNotApprovedWarning : ReleaseChecklistIssue
 {
     public Guid MethodologyId { get; }
 
-    public MethodologyNotApprovedWarning(Guid methodologyId) : base(ValidationErrorMessages.MethodologyNotApproved)
+    public MethodologyNotApprovedWarning(Guid methodologyId)
+        : base(ValidationErrorMessages.MethodologyNotApproved)
     {
         MethodologyId = methodologyId;
     }
@@ -43,7 +44,8 @@ public class NoFootnotesOnSubjectsWarning : ReleaseChecklistIssue
 {
     public int TotalSubjects { get; }
 
-    public NoFootnotesOnSubjectsWarning(int totalSubjects) : base(ValidationErrorMessages.NoFootnotesOnSubjects)
+    public NoFootnotesOnSubjectsWarning(int totalSubjects)
+        : base(ValidationErrorMessages.NoFootnotesOnSubjects)
     {
         TotalSubjects = totalSubjects;
     }

@@ -14,9 +14,7 @@ public class FilterGroup
 
     public const string NotSpecifiedFilterGroupLabel = "Default";
 
-    public FilterGroup()
-    {
-    }
+    public FilterGroup() { }
 
     public FilterGroup(Guid filterId, string label)
     {
@@ -28,17 +26,21 @@ public class FilterGroup
 
     public FilterGroup Clone()
     {
-        return (FilterGroup) MemberwiseClone();
+        return (FilterGroup)MemberwiseClone();
     }
 
     private sealed class IdEqualityComparer : IEqualityComparer<FilterGroup>
     {
         public bool Equals(FilterGroup x, FilterGroup y)
         {
-            if (ReferenceEquals(x, y)) return true;
-            if (ReferenceEquals(x, null)) return false;
-            if (ReferenceEquals(y, null)) return false;
-            if (x.GetType() != y.GetType()) return false;
+            if (ReferenceEquals(x, y))
+                return true;
+            if (ReferenceEquals(x, null))
+                return false;
+            if (ReferenceEquals(y, null))
+                return false;
+            if (x.GetType() != y.GetType())
+                return false;
             return x.Id.Equals(y.Id);
         }
 

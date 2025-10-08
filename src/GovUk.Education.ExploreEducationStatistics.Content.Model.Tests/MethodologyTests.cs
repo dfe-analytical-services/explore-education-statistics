@@ -10,10 +10,7 @@ public class MethodologyTests
     [Fact]
     public void IsLatestVersionOfMethodology_FalseWithEmptyVersions()
     {
-        var methodology = new Methodology
-        {
-            Versions = new List<MethodologyVersion>()
-        };
+        var methodology = new Methodology { Versions = new List<MethodologyVersion>() };
 
         Assert.False(methodology.IsLatestVersionOfMethodology(Guid.NewGuid()));
     }
@@ -27,13 +24,10 @@ public class MethodologyTests
             PreviousVersionId = null,
             PublishingStrategy = Immediately,
             Status = Draft,
-            Version = 0
+            Version = 0,
         };
 
-        var methodology = new Methodology
-        {
-            Versions = AsList(version)
-        };
+        var methodology = new Methodology { Versions = AsList(version) };
 
         Assert.True(methodology.IsLatestVersionOfMethodology(version.Id));
     }
@@ -47,7 +41,7 @@ public class MethodologyTests
             PreviousVersionId = null,
             PublishingStrategy = Immediately,
             Status = Approved,
-            Version = 0
+            Version = 0,
         };
 
         var latestVersion = new MethodologyVersion
@@ -56,13 +50,10 @@ public class MethodologyTests
             PreviousVersionId = previousVersion.Id,
             PublishingStrategy = Immediately,
             Status = Draft,
-            Version = 1
+            Version = 1,
         };
 
-        var methodology = new Methodology
-        {
-            Versions = AsList(previousVersion, latestVersion)
-        };
+        var methodology = new Methodology { Versions = AsList(previousVersion, latestVersion) };
 
         Assert.False(methodology.IsLatestVersionOfMethodology(previousVersion.Id));
     }
@@ -76,7 +67,7 @@ public class MethodologyTests
             PreviousVersionId = null,
             PublishingStrategy = Immediately,
             Status = Approved,
-            Version = 0
+            Version = 0,
         };
 
         var latestVersion = new MethodologyVersion
@@ -85,13 +76,10 @@ public class MethodologyTests
             PreviousVersionId = previousVersion.Id,
             PublishingStrategy = Immediately,
             Status = Draft,
-            Version = 1
+            Version = 1,
         };
 
-        var methodology = new Methodology
-        {
-            Versions = AsList(previousVersion, latestVersion)
-        };
+        var methodology = new Methodology { Versions = AsList(previousVersion, latestVersion) };
 
         Assert.True(methodology.IsLatestVersionOfMethodology(latestVersion.Id));
     }
@@ -99,10 +87,7 @@ public class MethodologyTests
     [Fact]
     public void LatestVersion_ArgumentExceptionWithEmptyVersions()
     {
-        var methodology = new Methodology
-        {
-            Versions = new List<MethodologyVersion>()
-        };
+        var methodology = new Methodology { Versions = new List<MethodologyVersion>() };
 
         Assert.Throws<ArgumentException>(() => methodology.LatestVersion());
     }
@@ -116,13 +101,10 @@ public class MethodologyTests
             PreviousVersionId = null,
             PublishingStrategy = Immediately,
             Status = Draft,
-            Version = 0
+            Version = 0,
         };
 
-        var methodology = new Methodology
-        {
-            Versions = AsList(version)
-        };
+        var methodology = new Methodology { Versions = AsList(version) };
 
         Assert.Equal(version, methodology.LatestVersion());
     }
@@ -136,7 +118,7 @@ public class MethodologyTests
             PreviousVersionId = null,
             PublishingStrategy = Immediately,
             Status = Approved,
-            Version = 0
+            Version = 0,
         };
 
         var latestVersion = new MethodologyVersion
@@ -145,13 +127,10 @@ public class MethodologyTests
             PreviousVersionId = previousVersion.Id,
             PublishingStrategy = Immediately,
             Status = Draft,
-            Version = 1
+            Version = 1,
         };
 
-        var methodology = new Methodology
-        {
-            Versions = AsList(previousVersion, latestVersion)
-        };
+        var methodology = new Methodology { Versions = AsList(previousVersion, latestVersion) };
 
         Assert.Equal(latestVersion, methodology.LatestVersion());
     }

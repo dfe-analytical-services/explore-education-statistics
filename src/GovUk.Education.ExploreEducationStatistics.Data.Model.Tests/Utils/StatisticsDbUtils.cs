@@ -8,8 +8,7 @@ public static class StatisticsDbUtils
     public static StatisticsDbContext InMemoryStatisticsDbContext(string databaseName, bool updateTimestamps = true)
     {
         var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
-        builder.UseInMemoryDatabase(databaseName,
-            b => b.EnableNullChecks(false));
+        builder.UseInMemoryDatabase(databaseName, b => b.EnableNullChecks(false));
         return new StatisticsDbContext(builder.Options, null, updateTimestamps);
     }
 

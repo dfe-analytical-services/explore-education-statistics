@@ -17,8 +17,7 @@ public record PermalinkCreateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Query)
-                .SetValidator(new FullTableQueryRequest.Validator());
+            RuleFor(request => request.Query).SetValidator(new FullTableQueryRequest.Validator());
         }
     }
 }

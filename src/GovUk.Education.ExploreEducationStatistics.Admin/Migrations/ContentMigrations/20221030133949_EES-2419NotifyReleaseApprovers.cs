@@ -13,13 +13,12 @@ public partial class EES2419NotifyReleaseApprovers : Migration
             table: "ReleaseStatus",
             type: "bit",
             nullable: false,
-            defaultValue: false);
+            defaultValue: false
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "NotifyReleaseApprovers",
-            table: "ReleaseStatus");
+        migrationBuilder.DropColumn(name: "NotifyReleaseApprovers", table: "ReleaseStatus");
     }
 }

@@ -22,7 +22,7 @@ public record TimePeriodOptionViewModel : TimePeriodViewModel
         {
             Code = meta.Code,
             Period = meta.Period,
-            Label = TimePeriodFormatter.FormatLabel(meta.Period, meta.Code)
+            Label = TimePeriodFormatter.FormatLabel(meta.Period, meta.Code),
         };
     }
 }

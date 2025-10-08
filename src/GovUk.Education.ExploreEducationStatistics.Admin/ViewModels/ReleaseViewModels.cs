@@ -31,12 +31,12 @@ public record ReleaseVersionViewModel
     public Guid Id { get; set; }
 
     public Guid ReleaseId { get; set; }
-    
+
     public string Title { get; set; } = string.Empty;
 
     public string Slug { get; set; } = string.Empty;
 
-    public string? Label { get; set;}
+    public string? Label { get; set; }
 
     public int Version { get; set; }
 

@@ -7,10 +7,9 @@ public class EinContentSection
 {
     public Guid Id { get; set; }
     public int Order { get; set; }
+
     [MaxLength(255)]
     public string Heading { get; set; } = string.Empty;
-    [MaxLength(2048)]
-    public string? Caption { get; set; } // NOTE: This column is currently unused, but keeping it to be aligned with releases/methodologies ContentSections
     public Guid EducationInNumbersPageId { get; set; }
     public EducationInNumbersPage EducationInNumbersPage { get; set; } = null!;
     public List<EinContentBlock> Content { get; set; } = [];

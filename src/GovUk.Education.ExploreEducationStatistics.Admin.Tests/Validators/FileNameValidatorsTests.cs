@@ -8,8 +8,12 @@ public class FileNameValidatorsTests
     [InlineData("short.csv")]
     [InlineData("file-with-no-extension")]
     [InlineData("meeeeeeeeeee_eeeeeeeeeeeeeeeeeeeeeeeeee-eeeeeeeeeeeeeeeeeeeeedium.csv")] // 65 chars without extension
-    [InlineData("looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong.csv")] // 150 chars without extension
-    [InlineData("loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong.with.periods.csv")] // 150 chars without extension
+    [InlineData(
+        "looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong.csv"
+    )] // 150 chars without extension
+    [InlineData(
+        "loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong.with.periods.csv"
+    )] // 150 chars without extension
     public void MeetsLengthRequirements_Valid_ReturnsTrue(string fileName)
     {
         // Arrange

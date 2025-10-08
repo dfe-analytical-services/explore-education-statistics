@@ -3,20 +3,18 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class MarkMethodologyAsHigherLevelReviewRequirement : IAuthorizationRequirement
-{
-}
+public class MarkMethodologyAsHigherLevelReviewRequirement : IAuthorizationRequirement { }
 
-public class MarkMethodologyAsHigherLevelReviewAuthorizationHandler : AuthorizationHandler<
-    MarkMethodologyAsHigherLevelReviewRequirement, MethodologyVersion>
+public class MarkMethodologyAsHigherLevelReviewAuthorizationHandler
+    : AuthorizationHandler<MarkMethodologyAsHigherLevelReviewRequirement, MethodologyVersion>
 {
     private readonly IMethodologyVersionRepository _methodologyVersionRepository;
     private readonly IMethodologyRepository _methodologyRepository;
@@ -25,16 +23,19 @@ public class MarkMethodologyAsHigherLevelReviewAuthorizationHandler : Authorizat
     public MarkMethodologyAsHigherLevelReviewAuthorizationHandler(
         IMethodologyVersionRepository methodologyVersionRepository,
         IMethodologyRepository methodologyRepository,
-        AuthorizationHandlerService authorizationHandlerService)
+        AuthorizationHandlerService authorizationHandlerService
+    )
     {
         _methodologyVersionRepository = methodologyVersionRepository;
         _methodologyRepository = methodologyRepository;
         _authorizationHandlerService = authorizationHandlerService;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
         MarkMethodologyAsHigherLevelReviewRequirement requirement,
-        MethodologyVersion methodologyVersion)
+        MethodologyVersion methodologyVersion
+    )
     {
         if (await _methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
         {
@@ -47,23 +48,24 @@ public class MarkMethodologyAsHigherLevelReviewAuthorizationHandler : Authorizat
             return;
         }
 
-        var allowedPublicationRoles = methodologyVersion.Status == Approved
-            ? ListOf(PublicationRole.Allower)
-            : ListOf(PublicationRole.Owner, PublicationRole.Allower);
+        var allowedPublicationRoles =
+            methodologyVersion.Status == Approved
+                ? ListOf(PublicationRole.Allower)
+                : ListOf(PublicationRole.Owner, PublicationRole.Allower);
 
-        var allowedReleaseRoles = methodologyVersion.Status == Approved
-            ? ListOf(ReleaseRole.Approver)
-            : ReleaseEditorAndApproverRoles;
+        var allowedReleaseRoles =
+            methodologyVersion.Status == Approved ? ListOf(ReleaseRole.Approver) : ReleaseEditorAndApproverRoles;
 
-        var owningPublication =
-            await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
+        var owningPublication = await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
-        if (await _authorizationHandlerService
-                .HasRolesOnPublicationOrAnyReleaseVersion(
-                    context.User.GetUserId(),
-                    owningPublication.Id,
-                    allowedPublicationRoles,
-                    allowedReleaseRoles))
+        if (
+            await _authorizationHandlerService.HasRolesOnPublicationOrAnyReleaseVersion(
+                context.User.GetUserId(),
+                owningPublication.Id,
+                allowedPublicationRoles,
+                allowedReleaseRoles
+            )
+        )
         {
             context.Succeed(requirement);
         }

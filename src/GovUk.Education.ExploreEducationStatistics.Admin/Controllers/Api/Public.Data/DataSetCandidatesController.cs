@@ -16,10 +16,9 @@ public class DataSetCandidatesController(IDataSetCandidateService dataSetCandida
     [Produces("application/json")]
     public async Task<ActionResult<IReadOnlyList<DataSetCandidateViewModel>>> ListDataSetCandidates(
         [FromQuery] Guid releaseVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await dataSetCandidateService
-            .ListCandidates(releaseVersionId, cancellationToken)
-            .HandleFailuresOrOk();
+        return await dataSetCandidateService.ListCandidates(releaseVersionId, cancellationToken).HandleFailuresOrOk();
     }
 }

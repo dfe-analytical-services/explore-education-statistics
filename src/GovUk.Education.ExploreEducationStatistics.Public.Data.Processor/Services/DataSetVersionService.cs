@@ -18,8 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Semver;
 using Release = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Release;
-using ValidationMessages =
-    GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
+using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 
@@ -29,21 +28,26 @@ internal class DataSetVersionService(
     IReleaseFileRepository releaseFileRepository,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
     IOptions<FeatureFlagsOptions> featureFlags,
-    IOptions<AppOptions> options) : IDataSetVersionService
+    IOptions<AppOptions> options
+) : IDataSetVersionService
 {
     public async Task<Either<ActionResult, Guid>> CreateInitialVersion(
         Guid dataSetId,
         Guid releaseFileId,
         Guid instanceId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await GetDataSet(dataSetId, cancellationToken)
             .OnSuccess(ValidateInitialDataSet)
-            .OnSuccess(dataSet => CreateDataSetVersion(
-                releaseFileId: releaseFileId,
-                instanceId: instanceId,
-                dataSet: dataSet,
-                cancellationToken: cancellationToken))
+            .OnSuccess(dataSet =>
+                CreateDataSetVersion(
+                    releaseFileId: releaseFileId,
+                    instanceId: instanceId,
+                    dataSet: dataSet,
+                    cancellationToken: cancellationToken
+                )
+            )
             .OnSuccess(dataSetVersion => dataSetVersion.Id);
     }
 
@@ -52,72 +56,93 @@ internal class DataSetVersionService(
         Guid releaseFileId,
         Guid instanceId,
         Guid? dataSetVersionToReplaceId = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await GetDataSet(dataSetId, cancellationToken)
             .OnSuccess(ds => ValidateCanCreateNextDataSetVersion(ds, dataSetVersionToReplaceId))
-            .OnSuccess(dataSet => (featureFlags.Value.EnableReplacementOfPublicApiDataSets 
-                                   && dataSetVersionToReplaceId is not null
-                    ? ValidateDataSetVersionToReplace(dataSet, dataSetVersionToReplaceId.Value)
-                    : (DataSetVersion?)null)
-                .OnSuccess(previousDataSetVersionToReplace => (dataSet, previousDataSetVersionToReplace)))
-            .OnSuccess(dataSetAndDataSetVersion => CreateDataSetVersion(
-                releaseFileId: releaseFileId,
-                instanceId: instanceId,
-                dataSet: dataSetAndDataSetVersion.dataSet,
-                previousDataSetVersionToReplace: dataSetAndDataSetVersion.previousDataSetVersionToReplace,
-                cancellationToken: cancellationToken))
+            .OnSuccess(dataSet =>
+                (
+                    featureFlags.Value.EnableReplacementOfPublicApiDataSets && dataSetVersionToReplaceId is not null
+                        ? ValidateDataSetVersionToReplace(dataSet, dataSetVersionToReplaceId.Value)
+                        : (DataSetVersion?)null
+                ).OnSuccess(previousDataSetVersionToReplace => (dataSet, previousDataSetVersionToReplace))
+            )
+            .OnSuccess(dataSetAndDataSetVersion =>
+                CreateDataSetVersion(
+                    releaseFileId: releaseFileId,
+                    instanceId: instanceId,
+                    dataSet: dataSetAndDataSetVersion.dataSet,
+                    previousDataSetVersionToReplace: dataSetAndDataSetVersion.previousDataSetVersionToReplace,
+                    cancellationToken: cancellationToken
+                )
+            )
             .OnSuccess(dataSetVersion => dataSetVersion.Id);
     }
 
     public async Task<Either<ActionResult, Unit>> BulkDeleteVersions(
         Guid releaseVersionId,
         bool forceDeleteAll = false,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await publicDataDbContext.RequireTransaction(() =>
             GetReleaseFiles(releaseVersionId, cancellationToken)
-                .OnSuccess(async releaseFiles => await GetDataSetVersions(releaseFiles, cancellationToken)
-                    .OnSuccess(dataSetVersions => (releaseFiles, dataSetVersions))
-                    .OnSuccess(releaseFilesAndDataSetVersions =>
-                        (releaseFilesAndDataSetVersions.releaseFiles, releaseFilesAndDataSetVersions.dataSetVersions)))
+                .OnSuccess(async releaseFiles =>
+                    await GetDataSetVersions(releaseFiles, cancellationToken)
+                        .OnSuccess(dataSetVersions => (releaseFiles, dataSetVersions))
+                        .OnSuccess(releaseFilesAndDataSetVersions =>
+                            (
+                                releaseFilesAndDataSetVersions.releaseFiles,
+                                releaseFilesAndDataSetVersions.dataSetVersions
+                            )
+                        )
+                )
                 .OnSuccessDo(releaseFilesAndDataSetVersions =>
-                    CheckCanDeleteDataSetVersions(releaseFilesAndDataSetVersions.dataSetVersions, forceDeleteAll))
+                    CheckCanDeleteDataSetVersions(releaseFilesAndDataSetVersions.dataSetVersions, forceDeleteAll)
+                )
                 .OnSuccessDo(async releaseFilesAndDataSetVersions =>
-                    await UnlinkReleaseFilesFromApiDataSets(releaseFilesAndDataSetVersions.releaseFiles,
-                        cancellationToken))
+                    await UnlinkReleaseFilesFromApiDataSets(
+                        releaseFilesAndDataSetVersions.releaseFiles,
+                        cancellationToken
+                    )
+                )
                 .OnSuccessDo(async releaseFilesAndDataSetVersions =>
-                    await DeleteDataSetVersions(releaseFilesAndDataSetVersions.dataSetVersions, cancellationToken))
+                    await DeleteDataSetVersions(releaseFilesAndDataSetVersions.dataSetVersions, cancellationToken)
+                )
                 .OnSuccessDo(releaseFilesAndDataSetVersions =>
-                    DeleteDuckDbFiles(releaseFilesAndDataSetVersions.dataSetVersions))
-                .OnSuccessVoid());
+                    DeleteDuckDbFiles(releaseFilesAndDataSetVersions.dataSetVersions)
+                )
+                .OnSuccessVoid()
+        );
     }
 
     public async Task<Either<ActionResult, Unit>> DeleteVersion(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await publicDataDbContext.RequireTransaction(() =>
             GetDataSetVersion(dataSetVersionId, cancellationToken)
-                .OnSuccessDo(dataSetVersion => CheckCanDeleteDataSetVersion(
-                    dataSetVersion: dataSetVersion,
-                    forceDeleteAll: false))
+                .OnSuccessDo(dataSetVersion =>
+                    CheckCanDeleteDataSetVersion(dataSetVersion: dataSetVersion, forceDeleteAll: false)
+                )
                 .OnSuccessDo(async dataSetVersion => await UpdateReleaseFiles(dataSetVersion, cancellationToken))
                 .OnSuccessDo(async dataSetVersion => await DeleteDataSetVersion(dataSetVersion, cancellationToken))
                 .OnSuccessDo(DeleteDuckDbFiles)
-                .OnSuccessVoid());
+                .OnSuccessVoid()
+        );
     }
 
     private async Task<Either<ActionResult, IReadOnlyList<DataSetVersion>>> GetDataSetVersions(
         IReadOnlyList<ReleaseFile> releaseFiles,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var releaseFileIds = releaseFiles
-            .Select(rf => rf.Id)
-            .ToList();
+        var releaseFileIds = releaseFiles.Select(rf => rf.Id).ToList();
 
-        return await publicDataDbContext.DataSetVersions
-            .AsNoTracking()
+        return await publicDataDbContext
+            .DataSetVersions.AsNoTracking()
             .Include(dsv => dsv.DataSet)
             .Where(dsv => releaseFileIds.Contains(dsv.Release.ReleaseFileId))
             .ToListAsync(cancellationToken);
@@ -125,10 +150,11 @@ internal class DataSetVersionService(
 
     private async Task<Either<ActionResult, DataSetVersion>> GetDataSetVersion(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await publicDataDbContext.DataSetVersions
-            .AsNoTracking()
+        return await publicDataDbContext
+            .DataSetVersions.AsNoTracking()
             .Include(dsv => dsv.DataSet)
             .Where(dsv => dsv.Id == dataSetVersionId)
             .SingleOrNotFoundAsync(cancellationToken);
@@ -136,13 +162,14 @@ internal class DataSetVersionService(
 
     private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataSetVersions(
         IReadOnlyList<DataSetVersion> dataSetVersions,
-        bool forceDeleteAll = false)
+        bool forceDeleteAll = false
+    )
     {
         var versionsWhichCanNotBeDeleted = await dataSetVersions
             .ToAsyncEnumerable()
-            .WhereAwait(async dsv => !await CanDeleteDataSetVersion(
-                dataSetVersion: dsv, 
-                forceDeleteAll: forceDeleteAll))
+            .WhereAwait(async dsv =>
+                !await CanDeleteDataSetVersion(dataSetVersion: dsv, forceDeleteAll: forceDeleteAll)
+            )
             .Select(dsv => dsv.Id)
             .ToListAsync();
 
@@ -151,18 +178,18 @@ internal class DataSetVersionService(
             return Unit.Instance;
         }
 
-        return ValidationUtils.ValidationResult(new ErrorViewModel
-        {
-            Code = ValidationMessages.OneOrMoreDataSetVersionsCanNotBeDeleted.Code,
-            Message = ValidationMessages.OneOrMoreDataSetVersionsCanNotBeDeleted.Message,
-            Detail = new InvalidErrorDetail<IReadOnlyList<Guid>>(versionsWhichCanNotBeDeleted),
-            Path = "releaseVersionId"
-        });
+        return ValidationUtils.ValidationResult(
+            new ErrorViewModel
+            {
+                Code = ValidationMessages.OneOrMoreDataSetVersionsCanNotBeDeleted.Code,
+                Message = ValidationMessages.OneOrMoreDataSetVersionsCanNotBeDeleted.Message,
+                Detail = new InvalidErrorDetail<IReadOnlyList<Guid>>(versionsWhichCanNotBeDeleted),
+                Path = "releaseVersionId",
+            }
+        );
     }
 
-    private async Task<bool> CanDeleteDataSetVersion(
-        DataSetVersion dataSetVersion,
-        bool forceDeleteAll = false)
+    private async Task<bool> CanDeleteDataSetVersion(DataSetVersion dataSetVersion, bool forceDeleteAll = false)
     {
         if (dataSetVersion.CanBeDeleted)
         {
@@ -173,10 +200,9 @@ internal class DataSetVersionService(
         {
             return false;
         }
-        
+
         var releaseFile = await contentDbContext
-            .ReleaseFiles
-            .AsNoTracking()
+            .ReleaseFiles.AsNoTracking()
             .Include(releaseFile => releaseFile.ReleaseVersion.Publication.Theme)
             .SingleAsync(releaseFile => releaseFile.Id == dataSetVersion.Release.ReleaseFileId);
 
@@ -185,32 +211,31 @@ internal class DataSetVersionService(
 
     private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataSetVersion(
         DataSetVersion dataSetVersion,
-        bool forceDeleteAll = false)
+        bool forceDeleteAll = false
+    )
     {
-        var canDelete = await CanDeleteDataSetVersion(
-            dataSetVersion: dataSetVersion,
-            forceDeleteAll);
+        var canDelete = await CanDeleteDataSetVersion(dataSetVersion: dataSetVersion, forceDeleteAll);
 
         if (canDelete)
         {
             return Unit.Instance;
         }
 
-        return ValidationUtils.ValidationResult(new ErrorViewModel
-        {
-            Code = ValidationMessages.DataSetVersionCanNotBeDeleted.Code,
-            Message = ValidationMessages.DataSetVersionCanNotBeDeleted.Message,
-            Detail = new InvalidErrorDetail<Guid>(dataSetVersion.Id),
-            Path = "dataSetVersionId"
-        });
+        return ValidationUtils.ValidationResult(
+            new ErrorViewModel
+            {
+                Code = ValidationMessages.DataSetVersionCanNotBeDeleted.Code,
+                Message = ValidationMessages.DataSetVersionCanNotBeDeleted.Message,
+                Detail = new InvalidErrorDetail<Guid>(dataSetVersion.Id),
+                Path = "dataSetVersionId",
+            }
+        );
     }
 
-    private async Task UpdateReleaseFiles(
-        DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken)
+    private async Task UpdateReleaseFiles(DataSetVersion dataSetVersion, CancellationToken cancellationToken)
     {
-        var releaseFiles = await contentDbContext.ReleaseFiles
-            .Where(rf => rf.PublicApiDataSetId == dataSetVersion.DataSetId)
+        var releaseFiles = await contentDbContext
+            .ReleaseFiles.Where(rf => rf.PublicApiDataSetId == dataSetVersion.DataSetId)
             .Where(rf => rf.PublicApiDataSetVersion == dataSetVersion.SemVersion())
             .ToListAsync(cancellationToken);
 
@@ -219,11 +244,10 @@ internal class DataSetVersionService(
 
     private async Task DeleteDataSetVersions(
         IReadOnlyList<DataSetVersion> dataSetVersions,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var dataSetsWithNoOtherVersions = dataSetVersions
-            .Where(dsv => dsv.IsFirstVersion)
-            .Select(dsv => dsv.DataSet);
+        var dataSetsWithNoOtherVersions = dataSetVersions.Where(dsv => dsv.IsFirstVersion).Select(dsv => dsv.DataSet);
 
         publicDataDbContext.DataSetVersions.RemoveRange(dataSetVersions);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
@@ -246,17 +270,20 @@ internal class DataSetVersionService(
 
     private async Task<Either<ActionResult, IReadOnlyList<ReleaseFile>>> GetReleaseFiles(
         Guid releaseVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await releaseFileRepository.GetByFileType(
             releaseVersionId: releaseVersionId,
             cancellationToken: cancellationToken,
-            types: FileType.Data);
+            types: FileType.Data
+        );
     }
 
     private async Task UnlinkReleaseFilesFromApiDataSets(
         IReadOnlyList<ReleaseFile> releaseFiles,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         foreach (var releaseFile in releaseFiles)
         {
@@ -324,18 +351,19 @@ internal class DataSetVersionService(
 
     private async Task<Either<ActionResult, DataSet>> GetDataSet(
         Guid dataSetId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var dataSet = await publicDataDbContext
-            .DataSets
-            .Include(dataSet => dataSet.LatestLiveVersion)
+            .DataSets.Include(dataSet => dataSet.LatestLiveVersion)
             .Include(dataSet => dataSet.Versions)
             .FirstOrDefaultAsync(dataSet => dataSet.Id == dataSetId, cancellationToken);
 
         return dataSet is null
             ? ValidationUtils.NotFoundResult<DataSet, Guid>(
                 id: dataSetId,
-                path: nameof(NextDataSetVersionMappingsCreateRequest.DataSetId).ToLowerFirst())
+                path: nameof(NextDataSetVersionMappingsCreateRequest.DataSetId).ToLowerFirst()
+            )
             : dataSet;
     }
 
@@ -343,36 +371,44 @@ internal class DataSetVersionService(
     {
         if (dataSet.Versions.Count > 0)
         {
-            return ValidationUtils.ValidationResult(CreateDataSetIdError(
-                message: ValidationMessages.DataSetMustHaveNoExistingVersions,
-                dataSetId: dataSet.Id));
+            return ValidationUtils.ValidationResult(
+                CreateDataSetIdError(
+                    message: ValidationMessages.DataSetMustHaveNoExistingVersions,
+                    dataSetId: dataSet.Id
+                )
+            );
         }
 
         return dataSet;
     }
 
-    private static Either<ActionResult, DataSet> ValidateCanCreateNextDataSetVersion(DataSet dataSet, Guid? dataSetVersionToReplaceId)
+    private static Either<ActionResult, DataSet> ValidateCanCreateNextDataSetVersion(
+        DataSet dataSet,
+        Guid? dataSetVersionToReplaceId
+    )
     {
         var isNotReplacingAndIsMissingLiveVersion =
             dataSetVersionToReplaceId is null && dataSet.LatestLiveVersionId is null;
 
         //TODO: Action for EES-5996: Reword the validation error message to be more appropriate when EES-5779 is LIVE.
-        return isNotReplacingAndIsMissingLiveVersion 
-            ? ValidationUtils.ValidationResult(CreateDataSetIdError(
-                message: ValidationMessages.DataSetNoLiveVersion,
-                dataSetId: dataSet.Id))
+        return isNotReplacingAndIsMissingLiveVersion
+            ? ValidationUtils.ValidationResult(
+                CreateDataSetIdError(message: ValidationMessages.DataSetNoLiveVersion, dataSetId: dataSet.Id)
+            )
             : dataSet;
     }
 
-    private Either<ActionResult, DataSetVersion?> ValidateDataSetVersionToReplace(DataSet dataSet, Guid dataSetVersionToReplaceId)
+    private Either<ActionResult, DataSetVersion?> ValidateDataSetVersionToReplace(
+        DataSet dataSet,
+        Guid dataSetVersionToReplaceId
+    )
     {
-        var previousVersion = dataSet.Versions
-            .FirstOrDefault(dv => dataSetVersionToReplaceId == dv.Id);
+        var previousVersion = dataSet.Versions.FirstOrDefault(dv => dataSetVersionToReplaceId == dv.Id);
 
         return previousVersion is null
-            ? ValidationUtils.ValidationResult(CreateDataSetIdError(
-                message: ValidationMessages.NextDataSetVersionNotFound,
-                dataSetId: dataSet.Id))
+            ? ValidationUtils.ValidationResult(
+                CreateDataSetIdError(message: ValidationMessages.NextDataSetVersionNotFound, dataSetId: dataSet.Id)
+            )
             : previousVersion;
     }
 
@@ -381,7 +417,8 @@ internal class DataSetVersionService(
         Guid instanceId,
         DataSet dataSet,
         DataSetVersion? previousDataSetVersionToReplace = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await publicDataDbContext.RequireTransaction(async () =>
             await GetReleaseFile(releaseFileId, cancellationToken)
@@ -390,32 +427,42 @@ internal class DataSetVersionService(
                             releaseFile,
                             dataSet,
                             previousDataSetVersionToReplace?.PublicVersion,
-                            cancellationToken)
+                            cancellationToken
+                        )
                         .OnSuccess(async () =>
                             await CreateDataSetVersion(
                                 dataSet,
                                 releaseFile,
                                 previousDataSetVersionToReplace,
-                                cancellationToken))
+                                cancellationToken
+                            )
+                        )
                         .OnSuccessDo(async dataSetVersion =>
                             await CreateDataSetVersionImport(
                                 dataSetVersion,
                                 instanceId,
                                 previousDataSetVersionToReplace,
-                                cancellationToken))
+                                cancellationToken
+                            )
+                        )
                         .OnSuccessDo(async dataSetVersion =>
                             await UpdateReleaseFilePublicDataSetVersionId(
                                 releaseFile,
                                 dataSetVersion,
-                                cancellationToken))));
+                                cancellationToken
+                            )
+                        )
+                )
+        );
     }
 
     private async Task<Either<ActionResult, ReleaseFile>> GetReleaseFile(
         Guid releaseFileId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var releaseFile = await contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
+        var releaseFile = await contentDbContext
+            .ReleaseFiles.Include(rf => rf.File)
             .Include(rf => rf.ReleaseVersion)
             .ThenInclude(r => r.Release)
             .FirstOrDefaultAsync(rf => rf.Id == releaseFileId, cancellationToken);
@@ -423,7 +470,8 @@ internal class DataSetVersionService(
         return releaseFile is null
             ? ValidationUtils.NotFoundResult<ReleaseFile, Guid>(
                 id: releaseFileId,
-                path: nameof(NextDataSetVersionMappingsCreateRequest.ReleaseFileId).ToLowerFirst())
+                path: nameof(NextDataSetVersionMappingsCreateRequest.ReleaseFileId).ToLowerFirst()
+            )
             : releaseFile;
     }
 
@@ -431,30 +479,38 @@ internal class DataSetVersionService(
         ReleaseFile releaseFile,
         DataSet dataSet,
         string? dataSetVersionToReplace = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         // ReleaseFile must not already have a DataSetVersion
-        if (await publicDataDbContext.DataSetVersions.AnyAsync(
+        if (
+            await publicDataDbContext.DataSetVersions.AnyAsync(
                 dsv => dsv.Release.ReleaseFileId == releaseFile.Id,
-                cancellationToken: cancellationToken))
+                cancellationToken: cancellationToken
+            )
+        )
         {
             return ValidationUtils.ValidationResult(
-            [
-                CreateReleaseFileIdError(
-                    message: ValidationMessages.FileHasApiDataSetVersion,
-                    releaseFileId: releaseFile.Id)
-            ]);
+                [
+                    CreateReleaseFileIdError(
+                        message: ValidationMessages.FileHasApiDataSetVersion,
+                        releaseFileId: releaseFile.Id
+                    ),
+                ]
+            );
         }
 
         // ReleaseFile must relate to a ReleaseVersion in Draft approval status
         if (releaseFile.ReleaseVersion.ApprovalStatus != ReleaseApprovalStatus.Draft)
         {
             return ValidationUtils.ValidationResult(
-            [
-                CreateReleaseFileIdError(
-                    message: ValidationMessages.FileReleaseVersionNotDraft,
-                    releaseFileId: releaseFile.Id)
-            ]);
+                [
+                    CreateReleaseFileIdError(
+                        message: ValidationMessages.FileReleaseVersionNotDraft,
+                        releaseFileId: releaseFile.Id
+                    ),
+                ]
+            );
         }
 
         List<ErrorViewModel> errors = [];
@@ -462,65 +518,69 @@ internal class DataSetVersionService(
         // ReleaseFile must relate to a File of type Data
         if (releaseFile.File.Type != FileType.Data)
         {
-            errors.Add(CreateReleaseFileIdError(
-                message: ValidationMessages.FileTypeNotData,
-                releaseFileId: releaseFile.Id));
+            errors.Add(
+                CreateReleaseFileIdError(message: ValidationMessages.FileTypeNotData, releaseFileId: releaseFile.Id)
+            );
         }
 
         // There must be a ReleaseFile related to the same ReleaseVersion and Subject with File of type Metadata
-        if (!await contentDbContext.ReleaseFiles
-                .Where(rf => rf.ReleaseVersionId == releaseFile.ReleaseVersionId)
+        if (
+            !await contentDbContext
+                .ReleaseFiles.Where(rf => rf.ReleaseVersionId == releaseFile.ReleaseVersionId)
                 .Where(rf => rf.File.SubjectId == releaseFile.File.SubjectId)
                 .Where(rf => rf.File.Type == FileType.Metadata)
-                .AnyAsync(cancellationToken: cancellationToken))
+                .AnyAsync(cancellationToken: cancellationToken)
+        )
         {
-            errors.Add(CreateReleaseFileIdError(
-                message: ValidationMessages.NoMetadataFile,
-                releaseFileId: releaseFile.Id));
+            errors.Add(
+                CreateReleaseFileIdError(message: ValidationMessages.NoMetadataFile, releaseFileId: releaseFile.Id)
+            );
         }
 
         if (releaseFile.ReleaseVersion.PublicationId != dataSet.PublicationId)
         {
-            errors.Add(CreateReleaseFileIdError(
-                message: ValidationMessages.FileNotInDataSetPublication,
-                releaseFileId: releaseFile.Id));
+            errors.Add(
+                CreateReleaseFileIdError(
+                    message: ValidationMessages.FileNotInDataSetPublication,
+                    releaseFileId: releaseFile.Id
+                )
+            );
         }
 
-        var previousReleaseFileIds = dataSet
-            .Versions
-            .Select(version => version.Release.ReleaseFileId)
-            .ToList();
+        var previousReleaseFileIds = dataSet.Versions.Select(version => version.Release.ReleaseFileId).ToList();
 
         if (featureFlags.Value.EnableReplacementOfPublicApiDataSets && dataSetVersionToReplace is not null)
         {
             //`dataSetVersionToReplace` gets initiated when in an amendment.
             //When in an amendment, we are modifying one of the previous release ID and so the
             //selected release ID will be found because it will attempt to 'patch/replace' existing data.
-            //Therefore, we can skip validation that ensures data file is in a different release to current release.  
+            //Therefore, we can skip validation that ensures data file is in a different release to current release.
             return ValidationResult();
         }
-        
+
         var previousReleaseIds = await GetReleaseIdsForReleaseFiles(
             contentDbContext,
             previousReleaseFileIds,
-            cancellationToken);
+            cancellationToken
+        );
 
-        var selectedReleaseFileReleaseId = (await GetReleaseIdsForReleaseFiles(
-                contentDbContext,
-                [releaseFile.Id],
-                cancellationToken))
-            .Single();
+        var selectedReleaseFileReleaseId = (
+            await GetReleaseIdsForReleaseFiles(contentDbContext, [releaseFile.Id], cancellationToken)
+        ).Single();
 
         if (previousReleaseIds.Contains(selectedReleaseFileReleaseId))
         {
-            errors.Add(CreateReleaseFileIdError(
-                message: ValidationMessages.FileMustBeInDifferentRelease,
-                releaseFileId: releaseFile.Id));
+            errors.Add(
+                CreateReleaseFileIdError(
+                    message: ValidationMessages.FileMustBeInDifferentRelease,
+                    releaseFileId: releaseFile.Id
+                )
+            );
         }
 
         return ValidationResult();
 
-        Either<ActionResult, Unit> ValidationResult() => 
+        Either<ActionResult, Unit> ValidationResult() =>
             errors.Count == 0 ? Unit.Instance : ValidationUtils.ValidationResult(errors);
     }
 
@@ -528,12 +588,13 @@ internal class DataSetVersionService(
         DataSet dataSet,
         ReleaseFile releaseFile,
         DataSetVersion? previousVersionToPatch,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var nextVersion = featureFlags.Value.EnableReplacementOfPublicApiDataSets && previousVersionToPatch is not null
-            ? previousVersionToPatch.NextPatchVersion()
-            : dataSet.LatestLiveVersion?.DefaultNextVersion()
-              ?? new SemVersion(major: 1, minor: 0, patch: 0);
+        var nextVersion =
+            featureFlags.Value.EnableReplacementOfPublicApiDataSets && previousVersionToPatch is not null
+                ? previousVersionToPatch.NextPatchVersion()
+                : dataSet.LatestLiveVersion?.DefaultNextVersion() ?? new SemVersion(major: 1, minor: 0, patch: 0);
 
         var dataSetVersion = new DataSetVersion
         {
@@ -545,12 +606,12 @@ internal class DataSetVersionService(
                     releaseFile.File.DataSetFileId ?? throw new NullReferenceException("DataSetFileId cannot be null"),
                 ReleaseFileId = releaseFile.Id,
                 Slug = releaseFile.ReleaseVersion.Release.Slug,
-                Title = releaseFile.ReleaseVersion.Release.Title
+                Title = releaseFile.ReleaseVersion.Release.Title,
             },
             Notes = "",
             VersionMajor = nextVersion.Major,
             VersionMinor = nextVersion.Minor,
-            VersionPatch = nextVersion.Patch
+            VersionPatch = nextVersion.Patch,
         };
 
         dataSet.Versions.Add(dataSetVersion);
@@ -566,14 +627,15 @@ internal class DataSetVersionService(
         DataSetVersion dataSetVersion,
         Guid instanceId,
         DataSetVersion? dataSetVersionToReplace = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var dataSetVersionImport = new DataSetVersionImport
         {
             DataSetVersionId = dataSetVersion.Id,
             InstanceId = instanceId,
             Stage = DataSetVersionImportStage.Pending,
-            DataSetVersionToReplaceId = dataSetVersionToReplace?.Id
+            DataSetVersionToReplaceId = dataSetVersionToReplace?.Id,
         };
 
         publicDataDbContext.DataSetVersionImports.Add(dataSetVersionImport);
@@ -583,7 +645,8 @@ internal class DataSetVersionService(
     private async Task UpdateReleaseFilePublicDataSetVersionId(
         ReleaseFile releaseFile,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         releaseFile.PublicApiDataSetId = dataSetVersion.DataSetId;
         releaseFile.PublicApiDataSetVersion = dataSetVersion.SemVersion();
@@ -593,39 +656,35 @@ internal class DataSetVersionService(
     private static async Task<List<Guid>> GetReleaseIdsForReleaseFiles(
         ContentDbContext contentDbContext,
         List<Guid> releaseFileIds,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await contentDbContext
-            .ReleaseFiles
-            .Include(releaseFile => releaseFile.ReleaseVersion)
+            .ReleaseFiles.Include(releaseFile => releaseFile.ReleaseVersion)
             .Where(releaseFile => releaseFileIds.Contains(releaseFile.Id))
             .Select(releaseFile => releaseFile.ReleaseVersion.ReleaseId)
             .ToListAsync(cancellationToken);
     }
 
-    private static ErrorViewModel CreateReleaseFileIdError(
-        LocalizableMessage message,
-        Guid releaseFileId)
+    private static ErrorViewModel CreateReleaseFileIdError(LocalizableMessage message, Guid releaseFileId)
     {
         return new ErrorViewModel
         {
             Code = message.Code,
             Message = message.Message,
             Path = nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst(),
-            Detail = new InvalidErrorDetail<Guid>(releaseFileId)
+            Detail = new InvalidErrorDetail<Guid>(releaseFileId),
         };
     }
 
-    private static ErrorViewModel CreateDataSetIdError(
-        LocalizableMessage message,
-        Guid dataSetId)
+    private static ErrorViewModel CreateDataSetIdError(LocalizableMessage message, Guid dataSetId)
     {
         return new ErrorViewModel
         {
             Code = message.Code,
             Message = message.Message,
             Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetId).ToLowerFirst(),
-            Detail = new InvalidErrorDetail<Guid>(dataSetId)
+            Detail = new InvalidErrorDetail<Guid>(dataSetId),
         };
     }
 }

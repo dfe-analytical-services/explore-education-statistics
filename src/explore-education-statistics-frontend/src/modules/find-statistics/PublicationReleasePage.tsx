@@ -5,10 +5,12 @@ import publicationService, {
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
+import publicationQueries from '@frontend/queries/publicationQueries';
+import { QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import PublicationReleasePageHome from './PublicationReleasePageHome';
 import PublicationReleasePageCurrent from './PublicationReleasePageCurrent';
+import PublicationReleasePageHome from './PublicationReleasePageHome';
 
 interface PreviewRedesignProps {
   previewRedesign: true;
@@ -50,32 +52,41 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
       redesign,
     } = query as Dictionary<string>;
 
+    const queryClient = new QueryClient();
+
     if (redesign === 'true' && process.env.APP_ENV !== 'Production') {
-      const publicationSummary =
-        await publicationService.getPublicationSummaryRedesign(publicationSlug);
-
-      if (!releaseSlug) {
-        return {
-          redirect: {
-            destination: `/find-statistics/${publicationSlug}/${publicationSummary.latestRelease.slug}?redesign=true`, // TODO EES-6449 remove redesign query param
-            permanent: true,
-          },
-        };
-      }
-
-      const releaseVersionSummary =
-        await publicationService.getReleaseVersionSummary(
-          publicationSlug,
-          releaseSlug,
+      try {
+        const publicationSummary = await queryClient.fetchQuery(
+          publicationQueries.getPublicationSummaryRedesign(publicationSlug),
         );
 
-      return {
-        props: {
-          publicationSummary,
-          releaseVersionSummary,
-          previewRedesign: true,
-        },
-      };
+        if (!releaseSlug) {
+          return {
+            redirect: {
+              destination: `/find-statistics/${publicationSlug}/${publicationSummary.latestRelease.slug}?redesign=true`, // TODO EES-6449 remove redesign query param
+              permanent: true,
+            },
+          };
+        }
+        const releaseVersionSummary = await queryClient.fetchQuery(
+          publicationQueries.getReleaseVersionSummary(
+            publicationSlug,
+            releaseSlug,
+          ),
+        );
+
+        return {
+          props: {
+            publicationSummary,
+            releaseVersionSummary,
+            previewRedesign: true,
+          },
+        };
+      } catch (error) {
+        return {
+          notFound: true,
+        };
+      }
     }
 
     const releaseVersion = await (releaseSlug

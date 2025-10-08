@@ -40,42 +40,20 @@ public record DataSetQueryCriteriaLocations
 
     public HashSet<IDataSetQueryLocation> GetOptions()
     {
-        List<IDataSetQueryLocation?> locations =
-        [
-            Eq,
-            NotEq,
-            ..In ?? [],
-            ..NotIn ?? []
-        ];
+        List<IDataSetQueryLocation?> locations = [Eq, NotEq, .. In ?? [], .. NotIn ?? []];
 
-        return locations
-            .OfType<IDataSetQueryLocation>()
-            .ToHashSet();
+        return locations.OfType<IDataSetQueryLocation>().ToHashSet();
     }
 
-    public static DataSetQueryCriteriaLocations Create(
-        string comparator,
-        IList<IDataSetQueryLocation> locations)
+    public static DataSetQueryCriteriaLocations Create(string comparator, IList<IDataSetQueryLocation> locations)
     {
         return comparator switch
         {
-            nameof(Eq) => new DataSetQueryCriteriaLocations
-            {
-                Eq = locations.Count > 0 ? locations[0] : null
-            },
-            nameof(NotEq) => new DataSetQueryCriteriaLocations
-            {
-                NotEq = locations.Count > 0 ? locations[0] : null
-            },
-            nameof(In) => new DataSetQueryCriteriaLocations
-            {
-                In = locations.ToList()
-            },
-            nameof(NotIn) => new DataSetQueryCriteriaLocations
-            {
-                NotIn = locations.ToList()
-            },
-            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null)
+            nameof(Eq) => new DataSetQueryCriteriaLocations { Eq = locations.Count > 0 ? locations[0] : null },
+            nameof(NotEq) => new DataSetQueryCriteriaLocations { NotEq = locations.Count > 0 ? locations[0] : null },
+            nameof(In) => new DataSetQueryCriteriaLocations { In = locations.ToList() },
+            nameof(NotIn) => new DataSetQueryCriteriaLocations { NotIn = locations.ToList() },
+            _ => throw new ArgumentOutOfRangeException(nameof(comparator), comparator, null),
         };
     }
 
@@ -91,25 +69,28 @@ public record DataSetQueryCriteriaLocations
                 .SetInheritanceValidator(InheritanceValidator!)
                 .When(request => request.NotEq is not null);
 
-            When(q => q.In is not null, () =>
-            {
-                RuleFor(request => request.In)
-                    .NotEmpty();
-                RuleForEach(request => request.In)
-                    .SetInheritanceValidator(InheritanceValidator);
-            });
+            When(
+                q => q.In is not null,
+                () =>
+                {
+                    RuleFor(request => request.In).NotEmpty();
+                    RuleForEach(request => request.In).SetInheritanceValidator(InheritanceValidator);
+                }
+            );
 
-            When(q => q.NotIn is not null, () =>
-            {
-                RuleFor(request => request.NotIn)
-                    .NotEmpty();
-                RuleForEach(request => request.NotIn)
-                    .SetInheritanceValidator(InheritanceValidator);
-            });
+            When(
+                q => q.NotIn is not null,
+                () =>
+                {
+                    RuleFor(request => request.NotIn).NotEmpty();
+                    RuleForEach(request => request.NotIn).SetInheritanceValidator(InheritanceValidator);
+                }
+            );
         }
 
         private static void InheritanceValidator(
-            PolymorphicValidator<DataSetQueryCriteriaLocations, IDataSetQueryLocation> validator)
+            PolymorphicValidator<DataSetQueryCriteriaLocations, IDataSetQueryLocation> validator
+        )
         {
             validator.Add(new DataSetQueryLocationId.Validator());
             validator.Add(new DataSetQueryLocationCode.Validator());

@@ -21,8 +21,7 @@ public abstract class ProcessInitialDataSetVersionOrchestrationTests
             // Expect an entity lock to be acquired for calling the ImportMetadata activity
             var mockEntityFeature = new Mock<TaskOrchestrationEntityFeature>(MockBehavior.Strict);
             mockEntityFeature.SetupLockForActivity(ActivityNames.ImportMetadata);
-            mockOrchestrationContext.SetupGet(context => context.Entities)
-                .Returns(mockEntityFeature.Object);
+            mockOrchestrationContext.SetupGet(context => context.Entities).Returns(mockEntityFeature.Object);
 
             var activitySequence = new MockSequence();
 
@@ -32,16 +31,16 @@ public abstract class ProcessInitialDataSetVersionOrchestrationTests
                 ActivityNames.ImportMetadata,
                 ActivityNames.ImportData,
                 ActivityNames.WriteDataFiles,
-                ActivityNames.CompleteInitialDataSetVersionProcessing
+                ActivityNames.CompleteInitialDataSetVersionProcessing,
             ];
 
             foreach (var activityName in expectedActivitySequence)
             {
                 mockOrchestrationContext
                     .InSequence(activitySequence)
-                    .Setup(context => context.CallActivityAsync(activityName,
-                        mockOrchestrationContext.Object.InstanceId,
-                        null))
+                    .Setup(context =>
+                        context.CallActivityAsync(activityName, mockOrchestrationContext.Object.InstanceId, null)
+                    )
                     .Returns(Task.CompletedTask);
             }
 
@@ -60,17 +59,23 @@ public abstract class ProcessInitialDataSetVersionOrchestrationTests
             mockOrchestrationContext
                 .InSequence(activitySequence)
                 .Setup(context =>
-                    context.CallActivityAsync(ActivityNames.CopyCsvFiles,
+                    context.CallActivityAsync(
+                        ActivityNames.CopyCsvFiles,
                         mockOrchestrationContext.Object.InstanceId,
-                        null))
+                        null
+                    )
+                )
                 .Throws<Exception>();
 
             mockOrchestrationContext
                 .InSequence(activitySequence)
                 .Setup(context =>
-                    context.CallActivityAsync(ActivityNames.HandleProcessingFailure,
+                    context.CallActivityAsync(
+                        ActivityNames.HandleProcessingFailure,
                         mockOrchestrationContext.Object.InstanceId,
-                        null))
+                        null
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
             await ProcessInitialDataSetVersion(mockOrchestrationContext.Object);
@@ -82,7 +87,8 @@ public abstract class ProcessInitialDataSetVersionOrchestrationTests
         {
             await ProcessInitialDataSetVersionOrchestration.ProcessInitialDataSetVersion(
                 orchestrationContext,
-                new ProcessDataSetVersionContext { DataSetVersionId = Guid.NewGuid() });
+                new ProcessDataSetVersionContext { DataSetVersionId = Guid.NewGuid() }
+            );
         }
 
         private static Mock<TaskOrchestrationContext> DefaultMockOrchestrationContext(Guid? instanceId = null)
@@ -91,11 +97,12 @@ public abstract class ProcessInitialDataSetVersionOrchestrationTests
 
             mock.Setup(context =>
                     context.CreateReplaySafeLogger(
-                        nameof(ProcessInitialDataSetVersionOrchestration.ProcessInitialDataSetVersion)))
+                        nameof(ProcessInitialDataSetVersionOrchestration.ProcessInitialDataSetVersion)
+                    )
+                )
                 .Returns(NullLogger.Instance);
 
-            mock.SetupGet(context => context.InstanceId)
-                .Returns(instanceId?.ToString() ?? Guid.NewGuid().ToString());
+            mock.SetupGet(context => context.InstanceId).Returns(instanceId?.ToString() ?? Guid.NewGuid().ToString());
 
             return mock;
         }

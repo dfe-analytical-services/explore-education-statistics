@@ -53,12 +53,24 @@ public enum TimeIdentifier
     [TimeIdentifierMeta("Calendar year Q4", "CYQ4", Category.CalendarYear, Default, ShortLabel, "Q4")]
     CalendarYearQ4,
 
-    [TimeIdentifierMeta("Part 1 (April to September)", "P1", FinancialYearPart, Fiscal, ShortLabel,
-        "Part 1 (Apr to Sep)")]
+    [TimeIdentifierMeta(
+        "Part 1 (April to September)",
+        "P1",
+        FinancialYearPart,
+        Fiscal,
+        ShortLabel,
+        "Part 1 (Apr to Sep)"
+    )]
     FinancialYearPart1,
 
-    [TimeIdentifierMeta("Part 2 (October to March)", "P2", FinancialYearPart, Fiscal, ShortLabel,
-        "Part 2 (Oct to Mar)")]
+    [TimeIdentifierMeta(
+        "Part 2 (October to March)",
+        "P2",
+        FinancialYearPart,
+        Fiscal,
+        ShortLabel,
+        "Part 2 (Oct to Mar)"
+    )]
     FinancialYearPart2,
 
     [TimeIdentifierMeta("Financial year", "FY", Category.FinancialYear, Fiscal, NoLabel)]

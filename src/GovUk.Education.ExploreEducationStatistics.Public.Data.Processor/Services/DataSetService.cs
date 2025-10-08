@@ -21,30 +21,33 @@ public class DataSetService(
     public async Task<Either<ActionResult, (Guid dataSetId, Guid dataSetVersionId)>> CreateDataSet(
         DataSetCreateRequest request,
         Guid instanceId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await publicDataDbContext.RequireTransaction(async () =>
             await GetReleaseFile(request.ReleaseFileId, cancellationToken)
                 .OnSuccess(releaseFile => CreateDataSet(releaseFile, cancellationToken))
-                .OnSuccess(dataSet => dataSetVersionService
-                    .CreateInitialVersion(
-                        dataSetId: dataSet.Id,
-                        releaseFileId: request.ReleaseFileId,
-                        instanceId: instanceId,
-                        cancellationToken)
-                    .OnSuccess(dataSetVersionId => (dataSet.Id, dataSetVersionId))));
+                .OnSuccess(dataSet =>
+                    dataSetVersionService
+                        .CreateInitialVersion(
+                            dataSetId: dataSet.Id,
+                            releaseFileId: request.ReleaseFileId,
+                            instanceId: instanceId,
+                            cancellationToken
+                        )
+                        .OnSuccess(dataSetVersionId => (dataSet.Id, dataSetVersionId))
+                )
+        );
     }
 
-    private async Task<DataSet> CreateDataSet(
-        ReleaseFile releaseFile,
-        CancellationToken cancellationToken)
+    private async Task<DataSet> CreateDataSet(ReleaseFile releaseFile, CancellationToken cancellationToken)
     {
         var dataSet = new DataSet
         {
             Status = DataSetStatus.Draft,
             Title = releaseFile.Name!,
             Summary = releaseFile.Summary ?? "",
-            PublicationId = releaseFile.ReleaseVersion.PublicationId
+            PublicationId = releaseFile.ReleaseVersion.PublicationId,
         };
 
         publicDataDbContext.Add(dataSet);
@@ -55,17 +58,19 @@ public class DataSetService(
 
     private async Task<Either<ActionResult, ReleaseFile>> GetReleaseFile(
         Guid releaseFileId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var releaseFile = await contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
+        var releaseFile = await contentDbContext
+            .ReleaseFiles.Include(rf => rf.File)
             .Include(rf => rf.ReleaseVersion)
             .FirstOrDefaultAsync(rf => rf.Id == releaseFileId, cancellationToken);
 
         return releaseFile is null
             ? ValidationUtils.NotFoundResult<ReleaseFile, Guid>(
-                releaseFileId, 
-                nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst())
+                releaseFileId,
+                nameof(DataSetCreateRequest.ReleaseFileId).ToLowerFirst()
+            )
             : releaseFile;
     }
 }

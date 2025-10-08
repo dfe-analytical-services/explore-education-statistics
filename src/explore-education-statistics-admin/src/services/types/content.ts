@@ -7,8 +7,7 @@ import {
 
 export interface CommentUser {
   id: string;
-  firstName: string;
-  lastName: string;
+  displayName: string;
   email: string;
 }
 

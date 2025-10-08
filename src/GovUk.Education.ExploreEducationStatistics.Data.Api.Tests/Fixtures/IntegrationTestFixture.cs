@@ -7,10 +7,10 @@ using Xunit;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures;
 
 [Collection(CacheTestFixture.CollectionName)]
-public abstract class IntegrationTestFixture :
-    CacheServiceTestFixture,
-    IClassFixture<TestApplicationFactory>,
-    IAsyncLifetime
+public abstract class IntegrationTestFixture
+    : CacheServiceTestFixture,
+        IClassFixture<TestApplicationFactory>,
+        IAsyncLifetime
 {
     protected readonly DataFixture DataFixture = new();
 

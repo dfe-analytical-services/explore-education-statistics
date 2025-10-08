@@ -4,5 +4,5 @@ public enum ChartDataClassification
 {
     EqualIntervals,
     Quantiles,
-    Custom
+    Custom,
 }

@@ -12,9 +12,7 @@ public record GlossaryCategoryViewModel(char Heading, List<GlossaryEntryViewMode
     {
         return AzCharArray.ToDictionary(
             c => c,
-            c => new GlossaryCategoryViewModel(
-                Heading: c,
-                Entries: new List<GlossaryEntryViewModel>()
-            ));
+            c => new GlossaryCategoryViewModel(Heading: c, Entries: new List<GlossaryEntryViewModel>())
+        );
     }
 }

@@ -6,9 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Validators;
 
-[AttributeUsage(
-    AttributeTargets.Property | AttributeTargets.Field| AttributeTargets.Parameter,
-    AllowMultiple = true)]
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = true)]
 public class ContainsOnlyAttribute(params object[] allowedValues) : ValidationAttribute
 {
     private IEnumerable<object> AllowedValues { get; } = allowedValues;
@@ -36,7 +34,8 @@ public class ContainsOnlyAttribute(params object[] allowedValues) : ValidationAt
         if (!values.Cast<object>().All(allowedValues.Contains))
         {
             return new ValidationResult(
-                ErrorMessage ?? $"Field must contain only values from: {allowedValues.JoinToString(", ")}");
+                ErrorMessage ?? $"Field must contain only values from: {allowedValues.JoinToString(", ")}"
+            );
         }
 
         return ValidationResult.Success;
@@ -51,16 +50,17 @@ public class ContainsOnlyAttribute(params object[] allowedValues) : ValidationAt
 
         var instance = validationContext.ObjectInstance;
         var type = instance.GetType();
-        var member = type.GetMember(
-                AllowedValuesProvider,
-                MemberTypes.Field | MemberTypes.Property | MemberTypes.Method,
-                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static
-            )
-            .FirstOrDefault()
-                ?? throw new ArgumentException(
-                    $"{nameof(AllowedValuesProvider)} must reference a field or method in {type.FullName}",
-                    AllowedValuesProvider
-                );
+        var member =
+            type.GetMember(
+                    AllowedValuesProvider,
+                    MemberTypes.Field | MemberTypes.Property | MemberTypes.Method,
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static
+                )
+                .FirstOrDefault()
+            ?? throw new ArgumentException(
+                $"{nameof(AllowedValuesProvider)} must reference a field or method in {type.FullName}",
+                AllowedValuesProvider
+            );
 
         var providedValues = member.MemberType switch
         {
@@ -70,7 +70,7 @@ public class ContainsOnlyAttribute(params object[] allowedValues) : ValidationAt
             _ => throw new ArgumentOutOfRangeException(
                 $"{nameof(AllowedValuesProvider)} is not a valid member on {type.FullName}",
                 AllowedValuesProvider
-            )
+            ),
         };
 
         if (providedValues is not IEnumerable<object> providedAllowedValues)
@@ -81,8 +81,6 @@ public class ContainsOnlyAttribute(params object[] allowedValues) : ValidationAt
             );
         }
 
-        return AllowedValues
-            .Concat(providedAllowedValues)
-            .ToHashSet();
+        return AllowedValues.Concat(providedAllowedValues).ToHashSet();
     }
 }

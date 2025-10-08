@@ -8,21 +8,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 internal class AzureSearchHealthCheckStrategy(
     Func<ISearchIndexerClient> searchIndexerClientFactory,
     ILogger<AzureBlobStorageHealthCheckStrategy> logger,
-    IOptions<AzureSearchOptions> azureSearchOptions) : IHealthCheckStrategy
+    IOptions<AzureSearchOptions> azureSearchOptions
+) : IHealthCheckStrategy
 {
     public string Description => "Azure Search Indexer check";
+
     public async Task<HealthCheckResult> Run(CancellationToken cancellationToken)
     {
         logger.LogInformation("Running Azure Search health check");
         if (!azureSearchOptions.Value.IsValid(out var errorMessage))
         {
-            logger.LogWarning("Azure Search health check failed: Provider options are not valid. {@Options}", azureSearchOptions.Value);
+            logger.LogWarning(
+                "Azure Search health check failed: Provider options are not valid. {@Options}",
+                azureSearchOptions.Value
+            );
             return new HealthCheckResult(this, false, errorMessage);
         }
 
         try
         {
-            logger.LogInformation("Attempting to connect to Azure Search Indexer. {@Options}...", azureSearchOptions.Value);
+            logger.LogInformation(
+                "Attempting to connect to Azure Search Indexer. {@Options}...",
+                azureSearchOptions.Value
+            );
             var client = searchIndexerClientFactory();
             if (!await client.IndexerExists(cancellationToken))
             {
@@ -33,7 +41,11 @@ internal class AzureSearchHealthCheckStrategy(
         catch (Exception e)
         {
             logger.LogWarning(e, "Could not connect to Azure Search Indexer: {Message}", e.Message);
-            return new HealthCheckResult(this, false, $"Error occurred whilst trying to run health check for Azure Search Indexer: {e.Message}");
+            return new HealthCheckResult(
+                this,
+                false,
+                $"Error occurred whilst trying to run health check for Azure Search Indexer: {e.Message}"
+            );
         }
 
         logger.LogInformation("Health check was successful: Azure Search Indexer is found.");

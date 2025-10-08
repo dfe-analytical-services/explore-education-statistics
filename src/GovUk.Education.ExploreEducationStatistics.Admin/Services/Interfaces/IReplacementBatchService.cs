@@ -6,7 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IReplacementBatchService
 {
-    Task<Either<ActionResult, Unit>> Replace(Guid releaseVersionId,
+    Task<Either<ActionResult, Unit>> Replace(
+        Guid releaseVersionId,
         IEnumerable<Guid> originalFileIds,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

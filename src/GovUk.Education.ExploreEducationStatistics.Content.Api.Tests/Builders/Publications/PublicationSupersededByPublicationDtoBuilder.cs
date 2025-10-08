@@ -8,12 +8,13 @@ public class PublicationSupersededByPublicationDtoBuilder
     private string _slug = "Slug";
     private string _title = "Title";
 
-    public PublicationSupersededByPublicationDto Build() => new()
-    {
-        Id = _id,
-        Slug = _slug,
-        Title = _title
-    };
+    public PublicationSupersededByPublicationDto Build() =>
+        new()
+        {
+            Id = _id,
+            Slug = _slug,
+            Title = _title,
+        };
 
     public PublicationSupersededByPublicationDtoBuilder WithId(Guid id)
     {

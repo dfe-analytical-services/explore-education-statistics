@@ -11,12 +11,15 @@ public class TimeIdentifierMetaAttribute : EnumLabelValueAttribute
 
     public TimeIdentifierCategory Category { get; }
 
-    public TimeIdentifierMetaAttribute(string label,
+    public TimeIdentifierMetaAttribute(
+        string label,
         string value,
         TimeIdentifierCategory category,
         TimePeriodYearFormat yearFormat = TimePeriodYearFormat.Default,
         TimePeriodLabelFormat labelFormat = TimePeriodLabelFormat.FullLabel,
-        string shortLabel = null) : base(label, value)
+        string shortLabel = null
+    )
+        : base(label, value)
     {
         YearFormat = yearFormat;
         LabelFormat = labelFormat;

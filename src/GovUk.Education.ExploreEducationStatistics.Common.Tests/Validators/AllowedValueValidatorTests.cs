@@ -34,14 +34,10 @@ public abstract class AllowedValueValidatorTests
         [InlineData("value-3")]
         public void Success(string value)
         {
-            var query = new TestClass
-            {
-                Value = value
-            };
+            var query = new TestClass { Value = value };
 
             _validator.TestValidate(query).ShouldNotHaveAnyValidationErrors();
         }
-
 
         [Theory]
         [InlineData("Invalid")]
@@ -50,10 +46,7 @@ public abstract class AllowedValueValidatorTests
         [InlineData("")]
         public void Failure_Invalid(string value)
         {
-            var query = new TestClass
-            {
-                Value = value
-            };
+            var query = new TestClass { Value = value };
 
             var result = _validator.Validate(query);
 

@@ -142,6 +142,8 @@ Save datablock
     user enters text into element    id:dataBlockDetailsForm-heading    UI Test datablock_title
     user clicks button    Save data block
 
+    user waits until h2 is visible    UI Test datablock_name
+
 Reload created datablock
     user reloads page
     user clicks link    Data blocks

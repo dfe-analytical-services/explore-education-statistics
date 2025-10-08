@@ -21,24 +21,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class PreReleaseUserServicePermissionTests
 {
-    private readonly ReleaseVersion _releaseVersion = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
 
     [Fact]
     public async Task GetPreReleaseUsers()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupPreReleaseUserService(
-                        userService: userService.Object);
-                    return service.GetPreReleaseUsers(_releaseVersion.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupPreReleaseUserService(userService: userService.Object);
+                return service.GetPreReleaseUsers(_releaseVersion.Id);
+            });
     }
 
     [Fact]
@@ -46,17 +40,11 @@ public class PreReleaseUserServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupPreReleaseUserService(
-                        userService: userService.Object);
-                    return service.GetPreReleaseUsersInvitePlan(
-                        _releaseVersion.Id,
-                        ListOf("test@test.com")
-                    );
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupPreReleaseUserService(userService: userService.Object);
+                return service.GetPreReleaseUsersInvitePlan(_releaseVersion.Id, ListOf("test@test.com"));
+            });
     }
 
     [Fact]
@@ -64,17 +52,11 @@ public class PreReleaseUserServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupPreReleaseUserService(
-                        userService: userService.Object);
-                    return service.InvitePreReleaseUsers(
-                        _releaseVersion.Id,
-                        ListOf("test@test.com")
-                    );
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupPreReleaseUserService(userService: userService.Object);
+                return service.InvitePreReleaseUsers(_releaseVersion.Id, ListOf("test@test.com"));
+            });
     }
 
     [Fact]
@@ -82,14 +64,11 @@ public class PreReleaseUserServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupPreReleaseUserService(
-                        userService: userService.Object);
-                    return service.RemovePreReleaseUser(_releaseVersion.Id, "test@test.com");
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupPreReleaseUserService(userService: userService.Object);
+                return service.RemovePreReleaseUser(_releaseVersion.Id, "test@test.com");
+            });
     }
 
     private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
@@ -109,7 +88,8 @@ public class PreReleaseUserServicePermissionTests
         IUserRepository? userRepository = null,
         IUserInviteRepository? userInviteRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
-        IUserReleaseInviteRepository? userReleaseInviteRepository = null)
+        IUserReleaseInviteRepository? userReleaseInviteRepository = null
+    )
     {
         return new(
             context ?? Mock.Of<ContentDbContext>(),

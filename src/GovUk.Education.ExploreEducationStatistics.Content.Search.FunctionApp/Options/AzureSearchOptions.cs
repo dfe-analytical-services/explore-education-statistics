@@ -20,7 +20,8 @@ public class AzureSearchOptions
     {
         if (string.IsNullOrWhiteSpace(SearchServiceEndpoint))
         {
-            errorMessage = $"Azure Search Endpoint is not configured. Ensure the {Section}:{nameof(SearchServiceEndpoint)} is set.";
+            errorMessage =
+                $"Azure Search Endpoint is not configured. Ensure the {Section}:{nameof(SearchServiceEndpoint)} is set.";
             return false;
         }
 

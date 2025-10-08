@@ -11,13 +11,11 @@ export interface Methodology {
   content: {
     order: number;
     heading: string;
-    caption: string;
     content: ContentBlock[];
   }[];
   annexes: {
     order: number;
     heading: string;
-    caption: string;
     content: ContentBlock[];
   }[];
   notes: {

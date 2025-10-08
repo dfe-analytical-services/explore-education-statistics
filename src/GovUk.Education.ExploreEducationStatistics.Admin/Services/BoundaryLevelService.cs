@@ -12,18 +12,20 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class BoundaryLevelService(
-    IBoundaryLevelRepository boundaryLevelRepository,
-    StatisticsDbContext context) : IBoundaryLevelService
+public class BoundaryLevelService(IBoundaryLevelRepository boundaryLevelRepository, StatisticsDbContext context)
+    : IBoundaryLevelService
 {
     public async Task<Either<ActionResult, List<BoundaryLevel>>> ListBoundaryLevels(
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await context.BoundaryLevel.ToListAsync(cancellationToken);
     }
 
     public async Task<Either<ActionResult, BoundaryLevel>> GetBoundaryLevel(
-        long id, CancellationToken cancellationToken = default)
+        long id,
+        CancellationToken cancellationToken = default
+    )
     {
         return await context.BoundaryLevel.FirstOrNotFoundAsync(level => level.Id == id, cancellationToken);
     }
@@ -33,7 +35,8 @@ public class BoundaryLevelService(
         string label,
         DateTime published,
         IFormFile file,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         string fileContents;
         using (var stream = file.OpenReadStream())
@@ -46,24 +49,36 @@ public class BoundaryLevelService(
 
         try
         {
-            featureCollection = JsonConvert.DeserializeObject<FeatureCollection>(fileContents, new JsonSerializerSettings { CheckAdditionalContent = false });
+            featureCollection = JsonConvert.DeserializeObject<FeatureCollection>(
+                fileContents,
+                new JsonSerializerSettings { CheckAdditionalContent = false }
+            );
         }
         catch (Exception ex)
         {
-            throw new JsonSerializationException("Failed to create boundary level: deserialisation failed due to malformed GeoJSON", ex);
+            throw new JsonSerializationException(
+                "Failed to create boundary level: deserialisation failed due to malformed GeoJSON",
+                ex
+            );
         }
 
-        return await boundaryLevelRepository.CreateBoundaryLevel(level, label, published, featureCollection!, cancellationToken);
-
+        return await boundaryLevelRepository.CreateBoundaryLevel(
+            level,
+            label,
+            published,
+            featureCollection!,
+            cancellationToken
+        );
     }
 
     public async Task<Either<ActionResult, BoundaryLevel>> UpdateBoundaryLevel(
         long id,
         string label,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await context.BoundaryLevel
-            .FirstOrNotFoundAsync(level => level.Id == id, cancellationToken)
+        return await context
+            .BoundaryLevel.FirstOrNotFoundAsync(level => level.Id == id, cancellationToken)
             .OnSuccess(async level =>
             {
                 level.Label = label;

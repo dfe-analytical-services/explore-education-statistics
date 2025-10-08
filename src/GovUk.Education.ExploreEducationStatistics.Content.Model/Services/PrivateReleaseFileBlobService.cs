@@ -8,16 +8,18 @@ using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
 
-public class PrivateReleaseFileBlobService(
-    IPrivateBlobStorageService privateBlobStorageService) : IReleaseFileBlobService
+public class PrivateReleaseFileBlobService(IPrivateBlobStorageService privateBlobStorageService)
+    : IReleaseFileBlobService
 {
     public Task<Either<ActionResult, Stream>> GetDownloadStream(
         ReleaseFile releaseFile,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return privateBlobStorageService.GetDownloadStream(
             containerName: PrivateReleaseFiles,
             path: releaseFile.Path(),
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
 }

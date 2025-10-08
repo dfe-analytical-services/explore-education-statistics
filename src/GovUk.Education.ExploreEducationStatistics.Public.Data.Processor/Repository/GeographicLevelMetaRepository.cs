@@ -11,12 +11,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public class GeographicLevelMetaRepository(
     PublicDataDbContext publicDataDbContext,
-    IDataSetVersionPathResolver dataSetVersionPathResolver) : IGeographicLevelMetaRepository
+    IDataSetVersionPathResolver dataSetVersionPathResolver
+) : IGeographicLevelMetaRepository
 {
     public Task<GeographicLevelMeta> ReadGeographicLevelMeta(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return GetGeographicLevelMeta(duckDbConnection, dataSetVersion, cancellationToken);
     }
@@ -24,7 +26,8 @@ public class GeographicLevelMetaRepository(
     public async Task<GeographicLevelMeta> CreateGeographicLevelMeta(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var meta = await GetGeographicLevelMeta(duckDbConnection, dataSetVersion, cancellationToken);
 
@@ -37,23 +40,20 @@ public class GeographicLevelMetaRepository(
     private async Task<GeographicLevelMeta> GetGeographicLevelMeta(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        var geographicLevels =
-            (await duckDbConnection.SqlBuilder(
-                $"""
-                 SELECT DISTINCT geographic_level
-                 FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
-                 """
-            ).QueryAsync<string>(cancellationToken: cancellationToken))
-            .Select(EnumToEnumLabelConverter<GeographicLevel>.FromProvider)
-            .OrderBy(EnumToEnumLabelConverter<GeographicLevel>.ToProvider)
-            .ToList();
+        var geographicLevels = (
+            await duckDbConnection
+                .SqlBuilder(
+                    $"""
+                    SELECT DISTINCT geographic_level
+                    FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
+                    """
+                )
+                .QueryAsync<string>(cancellationToken: cancellationToken)
+        ).Select(EnumToEnumLabelConverter<GeographicLevel>.FromProvider).OrderBy(EnumToEnumLabelConverter<GeographicLevel>.ToProvider).ToList();
 
-        return new GeographicLevelMeta
-        {
-            DataSetVersionId = dataSetVersion.Id,
-            Levels = geographicLevels
-        };
+        return new GeographicLevelMeta { DataSetVersionId = dataSetVersion.Id, Levels = geographicLevels };
     }
 }

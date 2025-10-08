@@ -21,8 +21,8 @@ public class PublicDataDbContext : DbContext
         // scenarios.
     }
 
-    public PublicDataDbContext(
-        DbContextOptions<PublicDataDbContext> options, bool updateTimestamps = true) : base(options)
+    public PublicDataDbContext(DbContextOptions<PublicDataDbContext> options, bool updateTimestamps = true)
+        : base(options)
     {
         Configure(updateTimestamps: updateTimestamps);
     }
@@ -45,16 +45,22 @@ public class PublicDataDbContext : DbContext
 
     [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
     public Task<int> NextSequenceValue(string sequenceName, CancellationToken cancellationToken = default) =>
-        Database.SqlQueryRaw<int>($"""
-                                   SELECT nextval('public."{sequenceName}"') AS "Value"
-                                   """)
+        Database
+            .SqlQueryRaw<int>(
+                $"""
+                SELECT nextval('public."{sequenceName}"') AS "Value"
+                """
+            )
             .FirstAsync(cancellationToken);
 
     [SuppressMessage("Security", "EF1002:Risk of vulnerability to SQL injection.")]
     public Task<int> SetSequenceValue(string sequenceName, long value, CancellationToken cancellationToken = default) =>
-        Database.SqlQueryRaw<int>($"""
-                                   SELECT setval('public."{sequenceName}"', {value}) AS "Value"
-                                   """)
+        Database
+            .SqlQueryRaw<int>(
+                $"""
+                SELECT setval('public."{sequenceName}"', {value}) AS "Value"
+                """
+            )
             .FirstAsync(cancellationToken);
 
     public virtual DbSet<DataSet> DataSets { get; init; } = null!;

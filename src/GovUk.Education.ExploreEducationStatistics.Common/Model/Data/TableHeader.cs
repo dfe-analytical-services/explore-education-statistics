@@ -13,9 +13,7 @@ public class TableHeader
     [JsonConverter(typeof(StringEnumConverter))]
     public TableHeaderType Type { get; set; }
 
-    private TableHeader()
-    {
-    }
+    private TableHeader() { }
 
     public TableHeader(string value, TableHeaderType type)
     {
@@ -29,7 +27,7 @@ public class TableHeader
         {
             Level = level.ToString().CamelCase(),
             Value = value,
-            Type = TableHeaderType.Location
+            Type = TableHeaderType.Location,
         };
     }
 }
@@ -39,5 +37,5 @@ public enum TableHeaderType
     Filter,
     Indicator,
     Location,
-    TimePeriod
+    TimePeriod,
 }

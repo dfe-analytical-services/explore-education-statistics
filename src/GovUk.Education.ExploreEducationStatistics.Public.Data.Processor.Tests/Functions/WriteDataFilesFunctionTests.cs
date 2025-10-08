@@ -6,8 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class WriteDataFilesFunctionTests(
-    ProcessorFunctionsIntegrationTestFixture fixture)
+public abstract class WriteDataFilesFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
     private static readonly string[] AllDataSetVersionFiles =
@@ -21,19 +20,14 @@ public abstract class WriteDataFilesFunctionTests(
         FilterOptionsTable.ParquetFile,
         IndicatorsTable.ParquetFile,
         LocationOptionsTable.ParquetFile,
-        TimePeriodsTable.ParquetFile
+        TimePeriodsTable.ParquetFile,
     ];
 
     private const DataSetVersionImportStage Stage = DataSetVersionImportStage.WritingDataFiles;
 
-    public static readonly TheoryData<ProcessorTestData> Data = new()
-    {
-        ProcessorTestData.AbsenceSchool,
-    };
+    public static readonly TheoryData<ProcessorTestData> Data = new() { ProcessorTestData.AbsenceSchool };
 
-    public class WriteDataTests(
-        ProcessorFunctionsIntegrationTestFixture fixture)
-        : WriteDataFilesFunctionTests(fixture)
+    public class WriteDataTests(ProcessorFunctionsIntegrationTestFixture fixture) : WriteDataFilesFunctionTests(fixture)
     {
         [Theory]
         [MemberData(nameof(Data))]
@@ -45,8 +39,8 @@ public abstract class WriteDataFilesFunctionTests(
 
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
-            var savedImport = await publicDataDbContext.DataSetVersionImports
-                .Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
+            var savedImport = await publicDataDbContext
+                .DataSetVersionImports.Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
 
             Assert.Equal(Stage, savedImport.Stage);
@@ -55,10 +49,7 @@ public abstract class WriteDataFilesFunctionTests(
             AssertDataSetVersionDirectoryContainsOnlyFiles(dataSetVersion, AllDataSetVersionFiles);
         }
 
-        private async Task WriteData(
-            ProcessorTestData testData,
-            DataSetVersion dataSetVersion,
-            Guid instanceId)
+        private async Task WriteData(ProcessorTestData testData, DataSetVersion dataSetVersion, Guid instanceId)
         {
             SetupCsvDataFilesForDataSetVersion(testData, dataSetVersion);
 

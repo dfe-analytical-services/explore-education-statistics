@@ -31,7 +31,7 @@ public class MultiWriteStreamTests
 
         var multiWriteStream = new MultiWriteStream(stream1, stream2);
 
-        var buffer = new byte[] {};
+        var buffer = new byte[] { };
 
         Assert.Throws<NotSupportedException>(() => multiWriteStream.Read(buffer, 0, 0));
     }
@@ -55,6 +55,9 @@ public class MultiWriteStreamTests
 
         var multiWriteStream = new MultiWriteStream(stream1, stream2);
 
-        Assert.Throws<NotSupportedException>(() => { multiWriteStream.Position = 0; });
+        Assert.Throws<NotSupportedException>(() =>
+        {
+            multiWriteStream.Position = 0;
+        });
     }
 }

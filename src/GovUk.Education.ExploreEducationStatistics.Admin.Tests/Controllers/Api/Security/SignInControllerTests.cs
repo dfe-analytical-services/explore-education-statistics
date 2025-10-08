@@ -6,29 +6,57 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Identity;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Security;
 
 public class SignInControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
+    private readonly DataFixture _dataFixture = new();
+
     public class RegistrationTests(TestApplicationFactory testApp) : SignInControllerTests(testApp)
     {
         [Theory]
         [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 2", null, null)]
         [InlineData(null, "VALID-USER@education.gov.uk", "FirstName", "LastName", null, "Role 1", null, null)]
         [InlineData(null, "VALID-USER@education.gov.uk", null, null, "FirstName LastName", "Role 1", null, null)]
-        [InlineData(null, "VALID-USER@education.gov.uk", null, null, "FirstName MiddleName LastName", "Role 1", null,
-            null)]
+        [InlineData(
+            null,
+            "VALID-USER@education.gov.uk",
+            null,
+            null,
+            "FirstName MiddleName LastName",
+            "Role 1",
+            null,
+            null
+        )]
         [InlineData(null, "VALID-USER@education.gov.uk", null, null, "FirstName", "Role 1", null, null)]
-        [InlineData("VALID-USER@education.gov.uk", "VALID-USER@education.gov.uk", "FirstName", "LastName",
-            "FirstName LastName", "Role 1", null, null)]
+        [InlineData(
+            "VALID-USER@education.gov.uk",
+            "VALID-USER@education.gov.uk",
+            "FirstName",
+            "LastName",
+            "FirstName LastName",
+            "Role 1",
+            null,
+            null
+        )]
         [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", "Approver", null)]
         [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", null, "Allower")]
-        [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 1", "Contributor",
-            "Allower")]
+        [InlineData(
+            "VALID-USER@education.gov.uk",
+            null,
+            "FirstName",
+            "LastName",
+            null,
+            "Role 1",
+            "Contributor",
+            "Allower"
+        )]
         public async Task Success(
             string? emailClaimValue,
             string? nameClaimValue,
@@ -37,13 +65,16 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             string? combinedNameClaimValue,
             string globalRoleNameInInvite,
             string? releaseRoleInInvite,
-            string? publicationRoleInInvite)
+            string? publicationRoleInInvite
+        )
         {
             const string unrelatedUserEmail = "unrelated-user@education.gov.uk";
 
             var email = "";
             var firstName = "";
             var lastName = "";
+
+            var placeholderDeletedUser = CreatePlaceHolderDeletedUser();
 
             var claimsPrincipal = DataFixture.VerifiedByIdentityProviderUser().Generate();
             var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
@@ -91,79 +122,91 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 context.Roles.AddRange(globalRoles);
 
                 // Add a global role invite for an unrelated user.
-                context.UserInvites.Add(new UserInvite
-                {
-                    Email = unrelatedUserEmail,
-                    Role = globalRoles.Single(r => r.Name == globalRoleNameInInvite),
-                    Created = DateTime.UtcNow.AddDays(-1)
-                });
+                context.UserInvites.Add(
+                    new UserInvite
+                    {
+                        Email = unrelatedUserEmail,
+                        Role = globalRoles.Single(r => r.Name == globalRoleNameInInvite),
+                        Created = DateTime.UtcNow.AddDays(-1),
+                    }
+                );
 
                 // Add a global role invite for the user.
-                context.UserInvites.Add(new UserInvite
-                {
-                    // Change the case of the email address in the invite to test this scenario.
-                    Email = email.ToLower(),
-                    Role = globalRoles.Single(r => r.Name == globalRoleNameInInvite),
-                    Created = DateTime.UtcNow.AddDays(-1)
-                });
+                context.UserInvites.Add(
+                    new UserInvite
+                    {
+                        // Change the case of the email address in the invite to test this scenario.
+                        Email = email.ToLower(),
+                        Role = globalRoles.Single(r => r.Name == globalRoleNameInInvite),
+                        Created = DateTime.UtcNow.AddDays(-1),
+                    }
+                );
             });
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
+                context.Users.Add(placeholderDeletedUser);
+
                 var releaseVersion = new ReleaseVersion
                 {
                     Id = releaseVersionId,
-                    Publication = new Publication { Id = publicationId }
+                    Publication = new Publication { Id = publicationId },
                 };
 
                 context.ReleaseVersions.Add(releaseVersion);
 
                 // Add a release role invite for an unrelated user.
-                context.UserReleaseInvites.Add(new UserReleaseInvite
-                {
-                    ReleaseVersionId = releaseVersionId,
-                    Email = unrelatedUserEmail,
-                    Role = ReleaseRole.Approver,
-                    Created = DateTime.UtcNow.AddDays(-1),
-                });
+                context.UserReleaseInvites.Add(
+                    new UserReleaseInvite
+                    {
+                        ReleaseVersionId = releaseVersionId,
+                        Email = unrelatedUserEmail,
+                        Role = ReleaseRole.Approver,
+                        Created = DateTime.UtcNow.AddDays(-1),
+                    }
+                );
 
                 if (releaseRoleInInvite != null)
                 {
                     // Add a release role invite for this user.
-                    context.UserReleaseInvites.Add(new UserReleaseInvite
-                    {
-                        ReleaseVersionId = releaseVersionId,
-                        Email = email.ToLower(),
-                        Role = Enum.Parse<ReleaseRole>(releaseRoleInInvite),
-                        Created = DateTime.UtcNow.AddDays(-1),
-                    });
+                    context.UserReleaseInvites.Add(
+                        new UserReleaseInvite
+                        {
+                            ReleaseVersionId = releaseVersionId,
+                            Email = email.ToLower(),
+                            Role = Enum.Parse<ReleaseRole>(releaseRoleInInvite),
+                            Created = DateTime.UtcNow.AddDays(-1),
+                        }
+                    );
                 }
 
                 // Add a publication role invite for an unrelated user.
-                context.UserPublicationInvites.Add(new UserPublicationInvite
-                {
-                    PublicationId = publicationId,
-                    Email = unrelatedUserEmail,
-                    Role = PublicationRole.Allower,
-                    Created = DateTime.UtcNow.AddDays(-1),
-                });
+                context.UserPublicationInvites.Add(
+                    new UserPublicationInvite
+                    {
+                        PublicationId = publicationId,
+                        Email = unrelatedUserEmail,
+                        Role = PublicationRole.Allower,
+                        Created = DateTime.UtcNow.AddDays(-1),
+                    }
+                );
 
                 if (publicationRoleInInvite != null)
                 {
                     // Add a publication role invite for this user.
-                    context.UserPublicationInvites.Add(new UserPublicationInvite
-                    {
-                        PublicationId = releaseVersion.Publication.Id,
-                        Email = email.ToLower(),
-                        Role = Enum.Parse<PublicationRole>(publicationRoleInInvite),
-                        Created = DateTime.UtcNow.AddDays(-1),
-                    });
+                    context.UserPublicationInvites.Add(
+                        new UserPublicationInvite
+                        {
+                            PublicationId = releaseVersion.Publication.Id,
+                            Email = email.ToLower(),
+                            Role = Enum.Parse<PublicationRole>(publicationRoleInInvite),
+                            Created = DateTime.UtcNow.AddDays(-1),
+                        }
+                    );
                 }
             });
 
             // Set up scenario and test data.
-            var client = TestApp
-                .SetUser(claimsPrincipal)
-                .CreateClient();
+            var client = TestApp.SetUser(claimsPrincipal).CreateClient();
 
             var response = await client.PostAsync("/api/sign-in", null);
 
@@ -203,12 +246,12 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
             await using (var context = TestApp.GetDbContext<ContentDbContext>())
             {
                 // Verify that the new internal user is created.
-                var newInternalUser = Assert.Single(context.Users);
+                var newInternalUser = Assert.Single(context.Users, u => u.Email == email);
                 Assert.Equal(firstName, newInternalUser.FirstName);
                 Assert.Equal(lastName, newInternalUser.LastName);
-                Assert.Equal(email, newInternalUser.Email);
                 Assert.Equal($"{firstName} {lastName}", newInternalUser.DisplayName);
                 Assert.Equal(userProfile.Id, newInternalUser.Id);
+                Assert.Equal(placeholderDeletedUser.Id, newInternalUser.CreatedById);
 
                 if (releaseRoleInInvite != null)
                 {
@@ -238,6 +281,8 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
         {
             const string email = "user@education.gov.uk";
 
+            var placeholderDeletedUser = CreatePlaceHolderDeletedUser();
+
             var claimsPrincipal = DataFixture.VerifiedByIdentityProviderUser().Generate();
             var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
@@ -248,31 +293,37 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
+                context.Users.Add(placeholderDeletedUser);
+
                 var releaseVersion = new ReleaseVersion
                 {
                     Id = releaseVersionId,
-                    Publication = new Publication { Id = publicationId }
+                    Publication = new Publication { Id = publicationId },
                 };
 
                 context.ReleaseVersions.Add(releaseVersion);
 
                 // Add a release role invite for this user.
-                context.UserReleaseInvites.Add(new UserReleaseInvite
-                {
-                    ReleaseVersionId = releaseVersionId,
-                    Email = email.ToLower(),
-                    Role = ReleaseRole.Approver,
-                    Created = DateTime.UtcNow.AddDays(-1),
-                });
+                context.UserReleaseInvites.Add(
+                    new UserReleaseInvite
+                    {
+                        ReleaseVersionId = releaseVersionId,
+                        Email = email.ToLower(),
+                        Role = ReleaseRole.Approver,
+                        Created = DateTime.UtcNow.AddDays(-1),
+                    }
+                );
 
                 // Add a publication role invite for this user.
-                context.UserPublicationInvites.Add(new UserPublicationInvite
-                {
-                    PublicationId = releaseVersion.Publication.Id,
-                    Email = email.ToLower(),
-                    Role = PublicationRole.Allower,
-                    Created = DateTime.UtcNow.AddDays(-1),
-                });
+                context.UserPublicationInvites.Add(
+                    new UserPublicationInvite
+                    {
+                        PublicationId = releaseVersion.Publication.Id,
+                        Email = email.ToLower(),
+                        Role = PublicationRole.Allower,
+                        Created = DateTime.UtcNow.AddDays(-1),
+                    }
+                );
             });
 
             await TestApp.AddTestData<UsersAndRolesDbContext>(context =>
@@ -281,19 +332,19 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 context.Roles.AddRange(globalRoles);
 
                 // Add a global role invite for the user and back-date its created date.
-                context.UserInvites.Add(new UserInvite
-                {
-                    // Change the case of the email address in the invite to test this scenario.
-                    Email = email.ToLower(),
-                    Role = globalRoles.First(),
-                    Created = DateTime.UtcNow.AddDays(-daysOld),
-                });
+                context.UserInvites.Add(
+                    new UserInvite
+                    {
+                        // Change the case of the email address in the invite to test this scenario.
+                        Email = email.ToLower(),
+                        Role = globalRoles.First(),
+                        Created = DateTime.UtcNow.AddDays(-daysOld),
+                    }
+                );
             });
 
             // Set up scenario and test data.
-            var client = TestApp
-                .SetUser(claimsPrincipal)
-                .CreateClient();
+            var client = TestApp.SetUser(claimsPrincipal).CreateClient();
 
             var response = await client.PostAsync("/api/sign-in", null);
 
@@ -317,7 +368,8 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 await using (var context = TestApp.GetDbContext<ContentDbContext>())
                 {
                     // Assert that no internal user got created.
-                    Assert.Empty(context.Users);
+                    // Should just be the placeholder deleted user.
+                    Assert.Single(context.Users, u => u.Email == User.DeletedUserPlaceholderEmail);
 
                     // Assert that the release and publication invites were deleted.
                     Assert.Empty(context.UserReleaseInvites);
@@ -350,47 +402,51 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 context.Roles.AddRange(globalRoles);
 
                 // Add a global role invite for an unrelated user.
-                context.UserInvites.Add(new UserInvite
-                {
-                    // Change the case of the email address in the invite to test this scenario.
-                    Email = "unrelated-user@education.gov.uk",
-                    Role = globalRoles.First(),
-                    Created = DateTime.UtcNow.AddDays(-1),
-                });
+                context.UserInvites.Add(
+                    new UserInvite
+                    {
+                        // Change the case of the email address in the invite to test this scenario.
+                        Email = "unrelated-user@education.gov.uk",
+                        Role = globalRoles.First(),
+                        Created = DateTime.UtcNow.AddDays(-1),
+                    }
+                );
             });
             await TestApp.AddTestData<ContentDbContext>(context =>
             {
                 var releaseVersion = new ReleaseVersion
                 {
                     Id = releaseVersionId,
-                    Publication = new Publication { Id = publicationId }
+                    Publication = new Publication { Id = publicationId },
                 };
 
                 context.ReleaseVersions.Add(releaseVersion);
 
                 // Add a release role invite for this user, but without a global invite, this should have no effect.
-                context.UserReleaseInvites.Add(new UserReleaseInvite
-                {
-                    ReleaseVersionId = releaseVersionId,
-                    Email = email.ToLower(),
-                    Role = ReleaseRole.Approver,
-                    Created = DateTime.UtcNow.AddDays(-1),
-                });
+                context.UserReleaseInvites.Add(
+                    new UserReleaseInvite
+                    {
+                        ReleaseVersionId = releaseVersionId,
+                        Email = email.ToLower(),
+                        Role = ReleaseRole.Approver,
+                        Created = DateTime.UtcNow.AddDays(-1),
+                    }
+                );
 
                 // Add a publication role invite for this user.
-                context.UserPublicationInvites.Add(new UserPublicationInvite
-                {
-                    PublicationId = releaseVersion.Publication.Id,
-                    Email = email.ToLower(),
-                    Role = PublicationRole.Allower,
-                    Created = DateTime.UtcNow.AddDays(-1),
-                });
+                context.UserPublicationInvites.Add(
+                    new UserPublicationInvite
+                    {
+                        PublicationId = releaseVersion.Publication.Id,
+                        Email = email.ToLower(),
+                        Role = PublicationRole.Allower,
+                        Created = DateTime.UtcNow.AddDays(-1),
+                    }
+                );
             });
 
             // Set up scenario and test data.
-            var client = TestApp
-                .SetUser(claimsPrincipal)
-                .CreateClient();
+            var client = TestApp.SetUser(claimsPrincipal).CreateClient();
 
             var response = await client.PostAsync("/api/sign-in", null);
 
@@ -437,30 +493,32 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
                 context.Roles.AddRange(globalRoles);
 
                 // Add an Identity user for an unrelated user.
-                context.Users.Add(new ApplicationUser
-                {
-                    Id = userId.ToString(),
-                    Email = email,
-                    NormalizedEmail = email.ToUpper(),
-                    FirstName = "FirstName",
-                    LastName = "LastName"
-                });
+                context.Users.Add(
+                    new ApplicationUser
+                    {
+                        Id = userId.ToString(),
+                        Email = email,
+                        NormalizedEmail = email.ToUpper(),
+                        FirstName = "FirstName",
+                        LastName = "LastName",
+                    }
+                );
 
                 // Add an Identity user for the user.
-                context.Users.Add(new ApplicationUser
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Email = unrelatedUserEmail.ToLower(),
-                    NormalizedEmail = unrelatedUserEmail.ToUpper(),
-                    FirstName = "AnotherFirstName",
-                    LastName = "AnotherLastName"
-                });
+                context.Users.Add(
+                    new ApplicationUser
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Email = unrelatedUserEmail.ToLower(),
+                        NormalizedEmail = unrelatedUserEmail.ToUpper(),
+                        FirstName = "AnotherFirstName",
+                        LastName = "AnotherLastName",
+                    }
+                );
             });
 
             // Set up scenario and test data.
-            var client = TestApp
-                .SetUser(claimsPrincipal)
-                .CreateClient();
+            var client = TestApp.SetUser(claimsPrincipal).CreateClient();
 
             var response = await client.PostAsync("/api/sign-in", null);
 
@@ -481,17 +539,13 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
         public async Task NoAccessAdminApiScope()
         {
             // Set up a user with a valid JWT but which holds no scope by which the user can access the Admin API.
-            var claimsPrincipal = DataFixture
-                .VerifiedButNotAuthorizedByIdentityProviderUser()
-                .Generate();
+            var claimsPrincipal = DataFixture.VerifiedButNotAuthorizedByIdentityProviderUser().Generate();
 
             var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, "email"));
 
             // Set up scenario and test data.
-            var client = TestApp
-                .SetUser(claimsPrincipal)
-                .CreateClient();
+            var client = TestApp.SetUser(claimsPrincipal).CreateClient();
 
             var response = await client.PostAsync("/api/sign-in", null);
 
@@ -500,9 +554,22 @@ public class SignInControllerTests(TestApplicationFactory testApp) : Integration
         }
     }
 
+    private User CreatePlaceHolderDeletedUser() =>
+        _dataFixture.DefaultUser().WithEmail(User.DeletedUserPlaceholderEmail);
+
     private static List<IdentityRole> GetGlobalRoles() =>
-    [
-        new() { Id = "role-1", Name = "Role 1", NormalizedName = "ROLE 1" },
-        new() { Id = "role-2", Name = "Role 2", NormalizedName = "ROLE 2" }
-    ];
+        [
+            new()
+            {
+                Id = "role-1",
+                Name = "Role 1",
+                NormalizedName = "ROLE 1",
+            },
+            new()
+            {
+                Id = "role-2",
+                Name = "Role 2",
+                NormalizedName = "ROLE 2",
+            },
+        ];
 }

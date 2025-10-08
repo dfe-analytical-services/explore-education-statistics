@@ -8,5 +8,6 @@ public interface IReleaseSearchableDocumentsService
 {
     Task<Either<ActionResult, ReleaseSearchableDocumentDto>> GetLatestReleaseAsSearchableDocument(
         string publicationSlug,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

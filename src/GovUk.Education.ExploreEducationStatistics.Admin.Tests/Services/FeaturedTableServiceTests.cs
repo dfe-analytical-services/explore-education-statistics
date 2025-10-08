@@ -24,14 +24,9 @@ public class FeaturedTableServiceTests
     [Fact]
     public async Task Get()
     {
-        var dataBlockVersion = _fixture
-            .DefaultDataBlockVersion()
-            .Generate();
+        var dataBlockVersion = _fixture.DefaultDataBlockVersion().Generate();
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
-            .WithLatestDraftVersion(dataBlockVersion)
-            .Generate();
+        var dataBlockParent = _fixture.DefaultDataBlockParent().WithLatestDraftVersion(dataBlockVersion).Generate();
 
         var releaseVersion = _fixture
             .DefaultReleaseVersion()
@@ -61,7 +56,8 @@ public class FeaturedTableServiceTests
 
             var result = await featuredTableService.Get(
                 releaseVersionId: releaseVersion.Id,
-                dataBlockId: dataBlockVersion.Id);
+                dataBlockId: dataBlockVersion.Id
+            );
 
             var viewModel = result.AssertRight();
 
@@ -77,9 +73,7 @@ public class FeaturedTableServiceTests
     [Fact]
     public async Task Get_NoFeaturedTable()
     {
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
@@ -94,7 +88,8 @@ public class FeaturedTableServiceTests
 
             var result = await featuredTableService.Get(
                 releaseVersionId: releaseVersion.Id,
-                dataBlockId: Guid.NewGuid());
+                dataBlockId: Guid.NewGuid()
+            );
 
             result.AssertNotFound();
         }
@@ -108,9 +103,7 @@ public class FeaturedTableServiceTests
         {
             var featuredTableService = SetupService(context);
 
-            var result = await featuredTableService.Get(
-                Guid.NewGuid(),
-                Guid.NewGuid());
+            var result = await featuredTableService.Get(Guid.NewGuid(), Guid.NewGuid());
 
             result.AssertNotFound();
         }
@@ -119,16 +112,11 @@ public class FeaturedTableServiceTests
     [Fact]
     public async Task Get_ReleaseAndFeaturedTableNotAssociated()
     {
-        var releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .Generate();
+        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
         var featuredTable = new FeaturedTable
         {
-            DataBlock = _fixture
-                .DefaultDataBlockVersion()
-                .Generate()
-                .ContentBlock
+            DataBlock = _fixture.DefaultDataBlockVersion().Generate().ContentBlock,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -145,7 +133,8 @@ public class FeaturedTableServiceTests
 
             var result = await featuredTableService.Get(
                 releaseVersionId: releaseVersion.Id,
-                dataBlockId: featuredTable.DataBlock.Id);
+                dataBlockId: featuredTable.DataBlock.Id
+            );
 
             result.AssertNotFound();
         }
@@ -156,15 +145,12 @@ public class FeaturedTableServiceTests
     {
         var dataBlockParents = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(() => _fixture
-                .DefaultDataBlockVersion()
-                .Generate())
+            .WithLatestPublishedVersion(() => _fixture.DefaultDataBlockVersion().Generate())
             .GenerateList(2);
 
         var releaseVersion = _fixture
             .DefaultReleaseVersion()
-            .WithDataBlockVersions(dataBlockParents
-                .Select(p => p.LatestPublishedVersion!))
+            .WithDataBlockVersions(dataBlockParents.Select(p => p.LatestPublishedVersion!))
             .Generate();
 
         var featuredTable1 = _fixture
@@ -183,9 +169,7 @@ public class FeaturedTableServiceTests
 
         var unassociatedDataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .Generate())
+            .WithLatestPublishedVersion(_fixture.DefaultDataBlockVersion().Generate())
             .Generate();
 
         var unassociatedReleaseVersion = _fixture
@@ -197,15 +181,14 @@ public class FeaturedTableServiceTests
         {
             Name = "Unassociated featured table",
             DataBlock = unassociatedDataBlockParent.LatestPublishedVersion!.ContentBlock,
-            ReleaseVersion = unassociatedReleaseVersion
+            ReleaseVersion = unassociatedReleaseVersion,
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             context.ReleaseVersions.AddRange(releaseVersion, unassociatedReleaseVersion);
-            context.FeaturedTables.AddRange(
-                featuredTable1, featuredTable2, unassociatedFeaturedTable);
+            context.FeaturedTables.AddRange(featuredTable1, featuredTable2, unassociatedFeaturedTable);
             await context.SaveChangesAsync();
         }
 
@@ -238,30 +221,21 @@ public class FeaturedTableServiceTests
         var featuredTable1 = new FeaturedTable
         {
             Name = "Featured table name 1",
-            DataBlock = new DataBlock
-            {
-                ReleaseVersion = releaseVersion
-            },
+            DataBlock = new DataBlock { ReleaseVersion = releaseVersion },
             ReleaseVersion = releaseVersion,
             Order = 1,
         };
         var featuredTable2 = new FeaturedTable
         {
             Name = "Featured table name 2",
-            DataBlock = new DataBlock
-            {
-                ReleaseVersion = releaseVersion
-            },
+            DataBlock = new DataBlock { ReleaseVersion = releaseVersion },
             ReleaseVersion = releaseVersion,
             Order = 2,
         };
         var featuredTable3 = new FeaturedTable
         {
             Name = "Featured table name 3",
-            DataBlock = new DataBlock
-            {
-                ReleaseVersion = releaseVersion
-            },
+            DataBlock = new DataBlock { ReleaseVersion = releaseVersion },
             ReleaseVersion = releaseVersion,
             Order = 0,
         };
@@ -312,9 +286,7 @@ public class FeaturedTableServiceTests
     {
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestDraftVersion(_fixture
-                .DefaultDataBlockVersion()
-                .Generate())
+            .WithLatestDraftVersion(_fixture.DefaultDataBlockVersion().Generate())
             .Generate();
 
         var releaseVersion = _fixture
@@ -340,7 +312,8 @@ public class FeaturedTableServiceTests
                     Name = "New featured table",
                     Description = "New featured table description",
                     DataBlockId = releaseVersion.DataBlockVersions[0].Id,
-                });
+                }
+            );
 
             var viewModel = result.AssertRight();
 
@@ -373,8 +346,7 @@ public class FeaturedTableServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var featuredTableService = SetupService(
-                context);
+            var featuredTableService = SetupService(context);
 
             var result = await featuredTableService.Create(
                 Guid.NewGuid(),
@@ -383,7 +355,8 @@ public class FeaturedTableServiceTests
                     Name = "New featured table",
                     Description = "New featured table description",
                     DataBlockId = Guid.NewGuid(),
-                });
+                }
+            );
 
             result.AssertNotFound();
         }
@@ -412,7 +385,8 @@ public class FeaturedTableServiceTests
                     Name = "New featured table",
                     Description = "New featured table description",
                     DataBlockId = Guid.NewGuid(),
-                });
+                }
+            );
 
             result.AssertNotFound();
         }
@@ -422,10 +396,7 @@ public class FeaturedTableServiceTests
     public async Task Create_DataBlockAlreadyHasFeaturedTable()
     {
         var releaseVersion = new ReleaseVersion();
-        var dataBlock = new DataBlock
-        {
-            ReleaseVersion = releaseVersion
-        };
+        var dataBlock = new DataBlock { ReleaseVersion = releaseVersion };
         var featuredTable = new FeaturedTable
         {
             Name = "Featured table name",
@@ -453,7 +424,8 @@ public class FeaturedTableServiceTests
                     Name = "New featured table",
                     Description = "New featured table description",
                     DataBlockId = dataBlock.Id,
-                });
+                }
+            );
 
             result.AssertBadRequest(DataBlockAlreadyHasFeaturedTable);
         }
@@ -474,9 +446,7 @@ public class FeaturedTableServiceTests
     {
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(() => _fixture
-                .DefaultDataBlockVersion()
-                .Generate())
+            .WithLatestPublishedVersion(() => _fixture.DefaultDataBlockVersion().Generate())
             .Generate();
 
         var releaseVersion = _fixture
@@ -511,7 +481,8 @@ public class FeaturedTableServiceTests
                 {
                     Name = "Updated featured table name",
                     Description = "Updated featured table description",
-                });
+                }
+            );
 
             var viewModel = result.AssertRight();
 
@@ -540,8 +511,7 @@ public class FeaturedTableServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var featuredTableService = SetupService(
-                context);
+            var featuredTableService = SetupService(context);
 
             var result = await featuredTableService.Update(
                 Guid.NewGuid(),
@@ -550,7 +520,8 @@ public class FeaturedTableServiceTests
                 {
                     Name = "Updated featured table name",
                     Description = "Updated featured table description",
-                });
+                }
+            );
 
             result.AssertNotFound();
         }
@@ -579,7 +550,8 @@ public class FeaturedTableServiceTests
                 {
                     Name = "Updated featured table name",
                     Description = "Updated featured table description",
-                });
+                }
+            );
 
             result.AssertNotFound();
         }
@@ -589,10 +561,7 @@ public class FeaturedTableServiceTests
     public async Task Update_FeaturedTableNotAssociatedWithRelease()
     {
         var releaseVersion = new ReleaseVersion();
-        var dataBlock = new DataBlock
-        {
-            ReleaseVersion = releaseVersion
-        };
+        var dataBlock = new DataBlock { ReleaseVersion = releaseVersion };
         var featuredTable = new FeaturedTable
         {
             Name = "Featured table name",
@@ -621,7 +590,8 @@ public class FeaturedTableServiceTests
                 {
                     Name = "Updated featured table name",
                     Description = "Updated featured table description",
-                });
+                }
+            );
 
             result.AssertNotFound();
         }
@@ -631,10 +601,7 @@ public class FeaturedTableServiceTests
     public async Task Delete()
     {
         var releaseVersion = new ReleaseVersion();
-        var dataBlock = new DataBlock
-        {
-            ReleaseVersion = releaseVersion
-        };
+        var dataBlock = new DataBlock { ReleaseVersion = releaseVersion };
         var featuredTable = new FeaturedTable
         {
             Name = "Featured table name",
@@ -658,7 +625,8 @@ public class FeaturedTableServiceTests
 
             var result = await featuredTableService.Delete(
                 releaseVersionId: releaseVersion.Id,
-                dataBlockId: dataBlock.Id);
+                dataBlockId: dataBlock.Id
+            );
 
             result.AssertRight();
         }
@@ -676,12 +644,9 @@ public class FeaturedTableServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var featuredTableService = SetupService(
-                context);
+            var featuredTableService = SetupService(context);
 
-            var result = await featuredTableService.Delete(
-                Guid.NewGuid(),
-                Guid.NewGuid());
+            var result = await featuredTableService.Delete(Guid.NewGuid(), Guid.NewGuid());
 
             result.AssertNotFound();
         }
@@ -691,10 +656,7 @@ public class FeaturedTableServiceTests
     public async Task Delete_NoFeaturedTable()
     {
         var releaseVersion = new ReleaseVersion();
-        var dataBlock = new DataBlock
-        {
-            ReleaseVersion = releaseVersion
-        };
+        var dataBlock = new DataBlock { ReleaseVersion = releaseVersion };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
@@ -710,7 +672,8 @@ public class FeaturedTableServiceTests
 
             var result = await featuredTableService.Delete(
                 releaseVersionId: releaseVersion.Id,
-                dataBlockId: Guid.NewGuid());
+                dataBlockId: Guid.NewGuid()
+            );
 
             result.AssertNotFound();
         }
@@ -720,10 +683,7 @@ public class FeaturedTableServiceTests
     public async Task Delete_FeaturedTableNotAssociatedWithRelease()
     {
         var releaseVersion = new ReleaseVersion();
-        var dataBlock = new DataBlock
-        {
-            ReleaseVersion = releaseVersion
-        };
+        var dataBlock = new DataBlock { ReleaseVersion = releaseVersion };
         var featuredTable = new FeaturedTable
         {
             Name = "Featured table name",
@@ -748,7 +708,8 @@ public class FeaturedTableServiceTests
 
             var result = await featuredTableService.Delete(
                 releaseVersionId: releaseVersion.Id,
-                dataBlockId: featuredTable.DataBlock.Id);
+                dataBlockId: featuredTable.DataBlock.Id
+            );
 
             result.AssertNotFound();
         }
@@ -771,39 +732,43 @@ public class FeaturedTableServiceTests
     {
         var dataBlockParents = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(() => _fixture
-                .DefaultDataBlockVersion()
-                .Generate())
+            .WithLatestPublishedVersion(() => _fixture.DefaultDataBlockVersion().Generate())
             .GenerateList(3);
 
         var releaseVersion = _fixture
             .DefaultReleaseVersion()
-            .WithDataBlockVersions(dataBlockParents
-                .Select(p => p.LatestPublishedVersion!))
+            .WithDataBlockVersions(dataBlockParents.Select(p => p.LatestPublishedVersion!))
             .Generate();
 
         var featuredTables = _fixture
             .DefaultFeaturedTable()
             .WithReleaseVersion(releaseVersion)
-            .ForIndex(0, s => s
-                .SetDataBlock(dataBlockParents[0].LatestPublishedVersion!.ContentBlock)
-                .SetDataBlockParent(dataBlockParents[0])
-                .SetOrder(3))
-            .ForIndex(1, s => s
-                .SetDataBlock(dataBlockParents[1].LatestPublishedVersion!.ContentBlock)
-                .SetDataBlockParent(dataBlockParents[1])
-                .SetOrder(1))
-            .ForIndex(2, s => s
-                .SetDataBlock(dataBlockParents[2].LatestPublishedVersion!.ContentBlock)
-                .SetDataBlockParent(dataBlockParents[2])
-                .SetOrder(2))
+            .ForIndex(
+                0,
+                s =>
+                    s.SetDataBlock(dataBlockParents[0].LatestPublishedVersion!.ContentBlock)
+                        .SetDataBlockParent(dataBlockParents[0])
+                        .SetOrder(3)
+            )
+            .ForIndex(
+                1,
+                s =>
+                    s.SetDataBlock(dataBlockParents[1].LatestPublishedVersion!.ContentBlock)
+                        .SetDataBlockParent(dataBlockParents[1])
+                        .SetOrder(1)
+            )
+            .ForIndex(
+                2,
+                s =>
+                    s.SetDataBlock(dataBlockParents[2].LatestPublishedVersion!.ContentBlock)
+                        .SetDataBlockParent(dataBlockParents[2])
+                        .SetOrder(2)
+            )
             .GenerateList(3);
 
         var unassociatedDataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(() => _fixture
-                .DefaultDataBlockVersion()
-                .Generate())
+            .WithLatestPublishedVersion(() => _fixture.DefaultDataBlockVersion().Generate())
             .Generate();
 
         var unassociatedReleaseVersion = _fixture
@@ -832,10 +797,8 @@ public class FeaturedTableServiceTests
 
             var result = await featuredTableService.Reorder(
                 releaseVersion.Id,
-                new List<Guid>
-                {
-                    featuredTables[0].Id, featuredTables[1].Id, featuredTables[2].Id,
-                });
+                new List<Guid> { featuredTables[0].Id, featuredTables[1].Id, featuredTables[2].Id }
+            );
 
             var featuredTableList = result.AssertRight();
 
@@ -885,15 +848,12 @@ public class FeaturedTableServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var featuredTableService = SetupService(
-                context);
+            var featuredTableService = SetupService(context);
 
             var result = await featuredTableService.Reorder(
                 Guid.NewGuid(),
-                new List<Guid>
-                {
-                    Guid.NewGuid(), Guid.NewGuid(),
-                });
+                new List<Guid> { Guid.NewGuid(), Guid.NewGuid() }
+            );
 
             result.AssertNotFound();
         }
@@ -937,8 +897,7 @@ public class FeaturedTableServiceTests
         await using (var context = InMemoryContentDbContext(contextId))
         {
             context.ReleaseVersions.AddRange(releaseVersion);
-            context.FeaturedTables.AddRange(
-                featuredTable1, featuredTable2, featuredTable3, unassociatedFeaturedTable);
+            context.FeaturedTables.AddRange(featuredTable1, featuredTable2, featuredTable3, unassociatedFeaturedTable);
             await context.SaveChangesAsync();
         }
 
@@ -948,19 +907,14 @@ public class FeaturedTableServiceTests
 
             var result = await featuredTableService.Reorder(
                 releaseVersion.Id,
-                new List<Guid>
-                {
-                    featuredTable1.Id, featuredTable2.Id, unassociatedFeaturedTable.Id,
-                });
+                new List<Guid> { featuredTable1.Id, featuredTable2.Id, unassociatedFeaturedTable.Id }
+            );
 
-            result.AssertBadRequest(
-                ProvidedFeaturedTableIdsDifferFromReleaseFeaturedTableIds);
+            result.AssertBadRequest(ProvidedFeaturedTableIdsDifferFromReleaseFeaturedTableIds);
         }
     }
 
-    private FeaturedTableService SetupService(
-        ContentDbContext contentDbContext,
-        IUserService? userService = null)
+    private FeaturedTableService SetupService(ContentDbContext contentDbContext, IUserService? userService = null)
     {
         return new FeaturedTableService(
             contentDbContext,

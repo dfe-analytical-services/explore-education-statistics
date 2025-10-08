@@ -192,8 +192,7 @@ internal class HtmlToTextConverter
         }
 
         var hasPreviousInlineSibling =
-            prev is IText ||
-            (prev is not IHtmlBreakRowElement and IElement prevElement && prevElement.IsInlineType());
+            prev is IText || (prev is not IHtmlBreakRowElement and IElement prevElement && prevElement.IsInlineType());
 
         // We currently only add extra spacing if the text content starts with an
         // alphanumeric character as we can safely assume this isn't a
@@ -229,8 +228,7 @@ internal class HtmlToTextConverter
     private void ParseListElement(IElement element)
     {
         var isOrdered = element.LocalName == "ol";
-        var listItems = element.ChildNodes
-            .Where(node => node is IElement { LocalName: "li" });
+        var listItems = element.ChildNodes.Where(node => node is IElement { LocalName: "li" });
 
         ParseNodes(
             listItems,
@@ -260,8 +258,9 @@ internal class HtmlToTextConverter
     {
         const string indentation = "  ";
 
-        var listItems = element.ChildNodes
-            .Where(node => node is IElement { LocalName: "dt" } or IElement { LocalName: "dd" });
+        var listItems = element.ChildNodes.Where(node =>
+            node is IElement { LocalName: "dt" } or IElement { LocalName: "dd" }
+        );
 
         ParseNodes(
             listItems,
@@ -277,8 +276,7 @@ internal class HtmlToTextConverter
                         var converter = new HtmlToTextConverter();
                         var text = converter.Convert(item);
 
-                        text.ToLines()
-                            .ForEach(line => _builder.AppendLine(indentation + line));
+                        text.ToLines().ForEach(line => _builder.AppendLine(indentation + line));
 
                         break;
                 }

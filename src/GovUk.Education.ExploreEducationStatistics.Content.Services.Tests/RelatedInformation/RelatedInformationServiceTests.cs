@@ -22,11 +22,11 @@ public abstract class RelatedInformationServiceTests
         public async Task WhenPublicationAndReleaseExist_ReturnsRelatedInformation(int numRelatedInformation)
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
             var release = publication.Releases[0];
-            var relatedInformation = _dataFixture.DefaultLink()
-                .GenerateArray(numRelatedInformation);
+            var relatedInformation = _dataFixture.DefaultLink().GenerateArray(numRelatedInformation);
             release.Versions[0].RelatedInformation = [.. relatedInformation];
 
             var contextId = Guid.NewGuid().ToString();
@@ -43,19 +43,22 @@ public abstract class RelatedInformationServiceTests
                 // Act
                 var outcome = await sut.GetRelatedInformationForRelease(
                     publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug);
+                    releaseSlug: release.Slug
+                );
 
                 // Assert
                 var result = outcome.AssertRight();
                 Assert.Equal(relatedInformation.Length, result.Length);
-                Assert.All(relatedInformation,
+                Assert.All(
+                    relatedInformation,
                     (expected, index) =>
                     {
                         var actual = result[index];
                         Assert.Equal(expected.Id, actual.Id);
                         Assert.Equal(expected.Description, actual.Title);
                         Assert.Equal(expected.Url, actual.Url);
-                    });
+                    }
+                );
             }
         }
 
@@ -70,7 +73,8 @@ public abstract class RelatedInformationServiceTests
             // Act
             var outcome = await sut.GetRelatedInformationForRelease(
                 publicationSlug: publicationSlug,
-                releaseSlug: "test-release");
+                releaseSlug: "test-release"
+            );
 
             // Assert
             outcome.AssertNotFound();
@@ -97,7 +101,8 @@ public abstract class RelatedInformationServiceTests
                 // Act
                 var outcome = await sut.GetRelatedInformationForRelease(
                     publicationSlug: publication.Slug,
-                    releaseSlug: releaseSlug);
+                    releaseSlug: releaseSlug
+                );
 
                 // Assert
                 outcome.AssertNotFound();
@@ -108,7 +113,8 @@ public abstract class RelatedInformationServiceTests
         public async Task WhenReleaseHasNoPublishedVersion_ReturnsNotFound()
         {
             // Arrange
-            Publication publication = _dataFixture.DefaultPublication()
+            Publication publication = _dataFixture
+                .DefaultPublication()
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
 
@@ -126,7 +132,8 @@ public abstract class RelatedInformationServiceTests
                 // Act
                 var outcome = await sut.GetRelatedInformationForRelease(
                     publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug);
+                    releaseSlug: release.Slug
+                );
 
                 // Assert
                 outcome.AssertNotFound();

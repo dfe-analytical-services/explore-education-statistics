@@ -9,10 +9,7 @@ public class ContactSaveRequestTests
     [Fact]
     public void ContactSaveRequest_ContactTelNo()
     {
-        var request = new ContactSaveRequest
-        {
-            ContactTelNo = "01234567",
-        };
+        var request = new ContactSaveRequest { ContactTelNo = "01234567" };
 
         var validationContext = new ValidationContext(request);
 
@@ -24,10 +21,7 @@ public class ContactSaveRequestTests
     [Fact]
     public void ContactSaveRequest_ContactTelNo_Null()
     {
-        var request = new ContactSaveRequest
-        {
-            ContactTelNo = null,
-        };
+        var request = new ContactSaveRequest { ContactTelNo = null };
 
         var validationContext = new ValidationContext(request);
 
@@ -43,10 +37,7 @@ public class ContactSaveRequestTests
     [InlineData("037 0000 2288    ")]
     public void ContactSaveRequest_ContactTelNo_NotDfEEnquiriesNum(string contactTelNo)
     {
-        var request = new ContactSaveRequest
-        {
-            ContactTelNo = contactTelNo,
-        };
+        var request = new ContactSaveRequest { ContactTelNo = contactTelNo };
 
         var validationContext = new ValidationContext(request);
 

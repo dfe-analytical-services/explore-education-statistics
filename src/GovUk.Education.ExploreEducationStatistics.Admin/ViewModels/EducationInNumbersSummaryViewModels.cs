@@ -21,7 +21,7 @@ public class EinSummaryViewModel
     public int Order { get; set; }
 }
 
-public class EinSummaryWithPrevVersionViewModel :  EinSummaryViewModel
+public class EinSummaryWithPrevVersionViewModel : EinSummaryViewModel
 {
     public Guid? PreviousVersionId { get; set; }
 }

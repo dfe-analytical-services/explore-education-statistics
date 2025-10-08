@@ -25,8 +25,8 @@ public class EinContentViewModel
             Title = page.Title,
             Slug = page.Slug,
             Published = page.Published,
-            Content = page.Content
-                .Select(EinContentSectionViewModel.FromModel)
+            Content = page
+                .Content.Select(EinContentSectionViewModel.FromModel)
                 .OrderBy(section => section.Order)
                 .ToList(),
         };
@@ -41,23 +41,17 @@ public class EinContentSectionViewModel
 
     public string Heading { get; set; } = string.Empty;
 
-    public string? Caption { get; set; }
-
     public List<EinContentBlockViewModel> Content { get; set; } = new();
 
     public static EinContentSectionViewModel FromModel(EinContentSection section)
     {
-            return new EinContentSectionViewModel
-            {
-                Id = section.Id,
-                Order = section.Order,
-                Heading = section.Heading,
-                Caption = section.Caption,
-                Content = section.Content
-                    .Select(EinContentBlockViewModel.FromModel)
-                    .OrderBy(block => block.Order)
-                    .ToList(),
-            };
+        return new EinContentSectionViewModel
+        {
+            Id = section.Id,
+            Order = section.Order,
+            Heading = section.Heading,
+            Content = section.Content.Select(EinContentBlockViewModel.FromModel).OrderBy(block => block.Order).ToList(),
+        };
     }
 }
 
@@ -76,7 +70,7 @@ public class EinContentBlockViewModel
         {
             EinHtmlBlock htmlBlock => EinHtmlBlockViewModel.FromModel(htmlBlock),
             EinTileGroupBlock groupBlock => EinTileGroupBlockViewModel.FromModel(groupBlock),
-            _ => throw new Exception($"{nameof(EinContentBlock)} type {block.GetType()} not found")
+            _ => throw new Exception($"{nameof(EinContentBlock)} type {block.GetType()} not found"),
         };
     }
 }
@@ -110,10 +104,7 @@ public class EinTileGroupBlockViewModel : EinContentBlockViewModel
             Order = groupBlock.Order,
             Type = EinBlockType.TileGroupBlock,
             Title = groupBlock.Title,
-            Tiles = groupBlock.Tiles
-                .Select(EinTileViewModel.FromModel)
-                .OrderBy(tile => tile.Order)
-                .ToList(),
+            Tiles = groupBlock.Tiles.Select(EinTileViewModel.FromModel).OrderBy(tile => tile.Order).ToList(),
         };
     }
 }
@@ -126,13 +117,13 @@ public class EinTileViewModel
 
     [JsonConverter(typeof(StringEnumConverter))]
     public EinTileType Type { get; set; }
-    
+
     public static EinTileViewModel FromModel(EinTile tile)
     {
         return tile switch
         {
             EinFreeTextStatTile statTile => EinFreeTextStatTileViewModel.FromModel(statTile),
-            _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found")
+            _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found"),
         };
     }
 }
@@ -149,15 +140,14 @@ public class EinFreeTextStatTileViewModel : EinTileViewModel
     {
         return new EinFreeTextStatTileViewModel
         {
-                Id = statTile.Id,
-                Order = statTile.Order,
-                Type = EinTileType.FreeTextStatTile,
-                Title = statTile.Title,
-                Statistic = statTile.Statistic,
-                Trend = statTile.Trend,
-                LinkUrl = statTile.LinkUrl,
-                LinkText = statTile.LinkText,
+            Id = statTile.Id,
+            Order = statTile.Order,
+            Type = EinTileType.FreeTextStatTile,
+            Title = statTile.Title,
+            Statistic = statTile.Statistic,
+            Trend = statTile.Trend,
+            LinkUrl = statTile.LinkUrl,
+            LinkText = statTile.LinkText,
         };
     }
 }
-

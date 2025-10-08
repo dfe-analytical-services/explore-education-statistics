@@ -15,18 +15,14 @@ public class UserManagementControllerTests(TestApplicationFactory testApp) : Int
         [InlineData("BAU User", false)]
         [InlineData("Analyst", false)]
         [InlineData("Prerelease User", false)]
-        public async Task PermissionCheck(
-            string globalRoleName,
-            bool successExpected)
+        public async Task PermissionCheck(string globalRoleName, bool successExpected)
         {
             var claimsPrincipal = _fixture
                 .AuthenticatedUser()
                 .WithRole(globalRoleName)
                 .WithEmail("user@education.gov.uk");
 
-            var client = TestApp
-                .SetUser(claimsPrincipal)
-                .CreateClient();
+            var client = TestApp.SetUser(claimsPrincipal).CreateClient();
 
             var response = await client.DeleteAsync("/api/user-management/user/ees-test.delete@education.gov.uk");
 

@@ -6,23 +6,22 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class UpdateContactRequirement : IAuthorizationRequirement
-{
-}
+public class UpdateContactRequirement : IAuthorizationRequirement { }
 
 public class UpdateContactAuthorizationHandler : AuthorizationHandler<UpdateContactRequirement, Publication>
 {
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
-    public UpdateContactAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService)
+    public UpdateContactAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
     {
         _authorizationHandlerService = authorizationHandlerService;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
         UpdateContactRequirement contactRequirement,
-        Publication publication)
+        Publication publication
+    )
     {
         if (SecurityUtils.HasClaim(context.User, UpdateAllPublications))
         {
@@ -30,11 +29,7 @@ public class UpdateContactAuthorizationHandler : AuthorizationHandler<UpdateCont
             return;
         }
 
-        if (await _authorizationHandlerService
-                .HasRolesOnPublication(
-                    context.User.GetUserId(),
-                    publication.Id,
-                    Owner))
+        if (await _authorizationHandlerService.HasRolesOnPublication(context.User.GetUserId(), publication.Id, Owner))
         {
             context.Succeed(contactRequirement);
         }

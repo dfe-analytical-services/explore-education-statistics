@@ -19,7 +19,8 @@ public partial class EES4481_AlterCommentContentNotNull : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -30,6 +31,7 @@ public partial class EES4481_AlterCommentContentNotNull : Migration
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
     }
 }

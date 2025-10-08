@@ -13,8 +13,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
@@ -30,7 +30,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
     {
         Id = Guid.NewGuid(),
         PublishingStrategy = Immediately,
-        MethodologyId = Guid.NewGuid()
+        MethodologyId = Guid.NewGuid(),
     };
 
     private static readonly Publication OwningPublication = new() { Id = Guid.NewGuid() };
@@ -44,15 +44,11 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
         {
             await ForEachSecurityClaimAsync(async claim =>
             {
-                var (
-                    handler,
-                    methodologyRepository,
-                    methodologyVersionRepository,
-                    userPublicationRoleRepository
-                    ) = CreateHandlerAndDependencies();
+                var (handler, methodologyRepository, methodologyVersionRepository, userPublicationRoleRepository) =
+                    CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock =>
-                        mock.IsLatestPublishedVersion(MethodologyVersion))
+                methodologyVersionRepository
+                    .Setup(mock => mock.IsLatestPublishedVersion(MethodologyVersion))
                     .ReturnsAsync(true);
 
                 // Only the MakeAmendmentsOfAllMethodologies claim alongside the publicly-accessible Methodology
@@ -61,8 +57,8 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
 
                 if (!expectedToPassByClaimAlone)
                 {
-                    methodologyRepository.Setup(mock =>
-                            mock.GetOwningPublication(MethodologyVersion.MethodologyId))
+                    methodologyRepository
+                        .Setup(mock => mock.GetOwningPublication(MethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
@@ -70,15 +66,12 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(new List<PublicationRole>());
                 }
 
-                var user = DataFixture
-                    .AuthenticatedUser(userId: UserId)
-                    .WithClaim(claim.ToString());
+                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
                 var authContext = CreateAuthContext(user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
-                VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
-                    userPublicationRoleRepository);
+                VerifyAllMocks(methodologyRepository, methodologyVersionRepository, userPublicationRoleRepository);
 
                 Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
             });
@@ -89,20 +82,14 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
         {
             await ForEachSecurityClaimAsync(async claim =>
             {
-                var (
-                    handler,
-                    _,
-                    methodologyVersionRepository,
-                    userPublicationRoleRepository
-                    ) = CreateHandlerAndDependencies();
+                var (handler, _, methodologyVersionRepository, userPublicationRoleRepository) =
+                    CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock =>
-                        mock.IsLatestPublishedVersion(MethodologyVersion))
+                methodologyVersionRepository
+                    .Setup(mock => mock.IsLatestPublishedVersion(MethodologyVersion))
                     .ReturnsAsync(false);
 
-                var user = DataFixture
-                    .AuthenticatedUser(userId: UserId)
-                    .WithClaim(claim.ToString());
+                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
                 var authContext = CreateAuthContext(user, MethodologyVersion);
 
@@ -119,26 +106,21 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
     public class PublicationRoleTests
     {
         [Fact]
-        public async Task
-            UserWithLinkedPublicationOwnerRoleCanCreateAmendmentOfLatestPublishedMethodologyVersionOwnedByPublication()
+        public async Task UserWithLinkedPublicationOwnerRoleCanCreateAmendmentOfLatestPublishedMethodologyVersionOwnedByPublication()
         {
             await GetEnums<PublicationRole>()
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async role =>
                 {
-                    var (
-                        handler,
-                        methodologyRepository,
-                        methodologyVersionRepository,
-                        userPublicationRoleRepository
-                        ) = CreateHandlerAndDependencies();
+                    var (handler, methodologyRepository, methodologyVersionRepository, userPublicationRoleRepository) =
+                        CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository.Setup(mock =>
-                            mock.IsLatestPublishedVersion(MethodologyVersion))
+                    methodologyVersionRepository
+                        .Setup(mock => mock.IsLatestPublishedVersion(MethodologyVersion))
                         .ReturnsAsync(true);
 
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                    methodologyRepository
+                        .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
@@ -149,8 +131,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                     var authContext = CreateAuthContext(user, MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
-                        userPublicationRoleRepository);
+                    VerifyAllMocks(methodologyRepository, methodologyVersionRepository, userPublicationRoleRepository);
 
                     // Verify that the user can create an Amendment, as they have a Publication Owner role on a Publication
                     // that uses this Methodology.
@@ -159,22 +140,17 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
         }
 
         [Fact]
-        public async Task
-            UserWithoutLinkedPublicationOwnerRoleCannotCreateAmendmentOfLatestPublishedMethodologyVersion()
+        public async Task UserWithoutLinkedPublicationOwnerRoleCannotCreateAmendmentOfLatestPublishedMethodologyVersion()
         {
-            var (
-                handler,
-                methodologyRepository,
-                methodologyVersionRepository,
-                userPublicationRoleRepository
-                ) = CreateHandlerAndDependencies();
+            var (handler, methodologyRepository, methodologyVersionRepository, userPublicationRoleRepository) =
+                CreateHandlerAndDependencies();
 
-            methodologyVersionRepository.Setup(mock =>
-                    mock.IsLatestPublishedVersion(MethodologyVersion))
+            methodologyVersionRepository
+                .Setup(mock => mock.IsLatestPublishedVersion(MethodologyVersion))
                 .ReturnsAsync(true);
 
-            methodologyRepository.Setup(s =>
-                    s.GetOwningPublication(MethodologyVersion.MethodologyId))
+            methodologyRepository
+                .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
@@ -193,17 +169,13 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
         }
 
         [Fact]
-        public async Task
-            UserWithLinkedPublicationOwnerRoleCannotCreateAmendmentIfNotLatestPublishedMethodologyVersion()
+        public async Task UserWithLinkedPublicationOwnerRoleCannotCreateAmendmentIfNotLatestPublishedMethodologyVersion()
         {
-            var (
-                handler,
-                _,
-                methodologyVersionRepository,
-                userPublicationRoleRepository) = CreateHandlerAndDependencies();
+            var (handler, _, methodologyVersionRepository, userPublicationRoleRepository) =
+                CreateHandlerAndDependencies();
 
-            methodologyVersionRepository.Setup(mock =>
-                    mock.IsLatestPublishedVersion(MethodologyVersion))
+            methodologyVersionRepository
+                .Setup(mock => mock.IsLatestPublishedVersion(MethodologyVersion))
                 .ReturnsAsync(false);
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
@@ -219,18 +191,23 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
         }
     }
 
-    private static AuthorizationHandlerContext CreateAuthContext(ClaimsPrincipal user,
-        MethodologyVersion methodologyVersion)
+    private static AuthorizationHandlerContext CreateAuthContext(
+        ClaimsPrincipal user,
+        MethodologyVersion methodologyVersion
+    )
     {
-        return CreateAuthorizationHandlerContext<MakeAmendmentOfSpecificMethodologyRequirement, MethodologyVersion>
-            (user, methodologyVersion);
+        return CreateAuthorizationHandlerContext<MakeAmendmentOfSpecificMethodologyRequirement, MethodologyVersion>(
+            user,
+            methodologyVersion
+        );
     }
 
-    private static (MakeAmendmentOfSpecificMethodologyAuthorizationHandler,
+    private static (
+        MakeAmendmentOfSpecificMethodologyAuthorizationHandler,
         Mock<IMethodologyRepository>,
         Mock<IMethodologyVersionRepository>,
-        Mock<IUserPublicationRoleRepository>)
-        CreateHandlerAndDependencies()
+        Mock<IUserPublicationRoleRepository>
+    ) CreateHandlerAndDependencies()
     {
         var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
@@ -243,7 +220,9 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                 Mock.Of<IUserReleaseRoleRepository>(Strict),
                 userPublicationRoleRepository.Object,
-                Mock.Of<IPreReleaseService>(Strict)));
+                Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
 
         return (handler, methodologyRepository, methodologyVersionRepository, userPublicationRoleRepository);
     }

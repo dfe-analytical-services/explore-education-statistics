@@ -5,7 +5,7 @@ Resource            ../libs/admin/manage-content-common.robot
 Resource            ../libs/public-api-common.robot
 Resource            ../libs/public-common.robot
 
-Force Tags          Admin    Local    Dev    AltersData
+Force Tags          Admin    PublicApi    Local    Dev    AltersData
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
@@ -204,7 +204,7 @@ Verify the 'Active tokens' and 'Expired tokens' on preview token log page
     user checks table column heading contains    1    2    User
     user checks table column heading contains    1    3    Date generated
     user checks table column heading contains    1    4    Status
-    user checks table column heading contains    1    5    Expiry
+    user checks table column heading contains    1    5    Expires
     user checks table column heading contains    1    6    Action
 
     user checks table cell contains    1    4    Active

@@ -16,7 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cach
 
 public class MethodologyCacheServiceTests : CacheServiceTestFixture
 {
-    private readonly List<AllMethodologiesThemeViewModel> _methodologyTree = [
+    private readonly List<AllMethodologiesThemeViewModel> _methodologyTree =
+    [
         new AllMethodologiesThemeViewModel
         {
             Title = "Theme 1",
@@ -26,15 +27,9 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
                 {
                     Id = Guid.NewGuid(),
                     Title = "Theme 1 Publication 1",
-                    Methodologies =
-                    [
-                        new()
-                        {
-                            Title = "Theme 1 Publication 1 Methodology 1",
-                        }
-                    ]
-                }
-            ]
+                    Methodologies = [new() { Title = "Theme 1 Publication 1 Methodology 1" }],
+                },
+            ],
         },
         new AllMethodologiesThemeViewModel
         {
@@ -45,16 +40,11 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
                 {
                     Id = Guid.NewGuid(),
                     Title = "Theme 2 Publication 1",
-                    Methodologies =
-                    [
-                        new()
-                        {
-                            Title = "Theme 2 Publication 1 Methodology 1",
-                        }
-                    ]
-                }
-            ]
-        }];
+                    Methodologies = [new() { Title = "Theme 2 Publication 1 Methodology 1" }],
+                },
+            ],
+        },
+    ];
 
     [Fact]
     public async Task GetSummariesTree_NoCachedTreeExists()
@@ -123,8 +113,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
 
         VerifyAllMocks(methodologyService, PublicBlobCacheService);
 
-        var expectedMethodologiesByPublication =
-            _methodologyTree[1].Publications[0].Methodologies;
+        var expectedMethodologiesByPublication = _methodologyTree[1].Publications[0].Methodologies;
 
         result.AssertRight(expectedMethodologiesByPublication);
     }
@@ -168,8 +157,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
 
         VerifyAllMocks(PublicBlobCacheService);
 
-        var expectedMethodologiesByPublication =
-            _methodologyTree[1].Publications[0].Methodologies;
+        var expectedMethodologiesByPublication = _methodologyTree[1].Publications[0].Methodologies;
 
         result.AssertRight(expectedMethodologiesByPublication);
     }
@@ -213,18 +201,17 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
                             Id = Guid.NewGuid(),
                             Slug = "methodology-slug",
                             Title = "Methodology title",
-                        }
-                    }
-                }
-            ]
+                        },
+                    },
+                },
+            ],
         };
 
         var converted = DeserializeObject<AllMethodologiesThemeViewModel>(SerializeObject(viewModel));
         converted.AssertDeepEqualTo(viewModel);
     }
 
-    private static MethodologyCacheService SetupService(
-        IMethodologyService? methodologyService = null)
+    private static MethodologyCacheService SetupService(IMethodologyService? methodologyService = null)
     {
         return new(
             methodologyService: methodologyService ?? Mock.Of<IMethodologyService>(Strict),

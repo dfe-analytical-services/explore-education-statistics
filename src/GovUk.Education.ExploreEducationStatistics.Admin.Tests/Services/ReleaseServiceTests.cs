@@ -31,17 +31,14 @@ public abstract class ReleaseServiceTests
 {
     private readonly DataFixture _dataFixture = new();
     private readonly OrganisationsValidatorMockBuilder _organisationsValidator = new();
-    private static readonly User User = new() { Id = Guid.NewGuid() };
+    private static readonly Guid UserId = Guid.NewGuid();
 
     public class CreateReleaseTests : ReleaseServiceTests
     {
         [Fact]
         public async Task ReleaseTypeExperimentalStatistics_ReturnsValidationActionResult()
         {
-            var releaseCreateRequest = new ReleaseCreateRequest
-            {
-                Type = ReleaseType.ExperimentalStatistics,
-            };
+            var releaseCreateRequest = new ReleaseCreateRequest { Type = ReleaseType.ExperimentalStatistics };
 
             var releaseService = BuildService(Mock.Of<ContentDbContext>());
 
@@ -75,8 +72,9 @@ public abstract class ReleaseServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(
-                    contentDbContext: context, 
-                    releaseVersionService: releaseVersionServiceMock.Object);
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
 
                 var result = await releaseService.CreateRelease(
                     new ReleaseCreateRequest
@@ -86,8 +84,9 @@ public abstract class ReleaseServiceTests
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         Type = ReleaseType.OfficialStatistics,
                         Label = "initial",
-                        PublishingOrganisations = null
-                    });
+                        PublishingOrganisations = null,
+                    }
+                );
 
                 var viewModel = result.AssertRight();
                 Assert.Equal(releaseVersionViewModel, viewModel);
@@ -95,8 +94,8 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var actualReleaseVersion = await context.ReleaseVersions
-                    .Include(rv => rv.Release)
+                var actualReleaseVersion = await context
+                    .ReleaseVersions.Include(rv => rv.Release)
                     .Include(rv => rv.PublishingOrganisations)
                     .SingleAsync(rv => rv.Id == newReleaseVersionId);
 
@@ -132,65 +131,45 @@ public abstract class ReleaseServiceTests
                 Order = 2,
                 Comments =
                 [
-                    new Comment
-                    {
-                        Id = Guid.NewGuid(),
-                        Content = "Comment 1 Text"
-                    },
-                    new Comment
-                    {
-                        Id = Guid.NewGuid(),
-                        Content = "Comment 2 Text"
-                    }
-                ]
+                    new Comment { Id = Guid.NewGuid(), Content = "Comment 1 Text" },
+                    new Comment { Id = Guid.NewGuid(), Content = "Comment 2 Text" },
+                ],
             };
 
-            var dataBlock2 = new DataBlock
-            {
-                Id = Guid.NewGuid(),
-                Name = "Data Block 2"
-            };
+            var dataBlock2 = new DataBlock { Id = Guid.NewGuid(), Name = "Data Block 2" };
 
             var templateReleaseVersion = new ReleaseVersion
             {
-                Content = ListOf(new ContentSection
-                {
-                    Id = Guid.NewGuid(),
-                    Caption = "Template caption index 0",
-                    Heading = "Template heading index 0",
-                    Type = ContentSectionType.Generic,
-                    Order = 1,
-                    Content =
-                    [
-                        new HtmlBlock
-                        {
-                            Id = Guid.NewGuid(),
-                            Body = "<div></div>",
-                            Order = 1,
-                            Comments =
-                            [
-                                new Comment
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Content = "Comment 1 Text"
-                                },
-                                new Comment
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Content = "Comment 2 Text"
-                                }
-                            ]
-                        },
-                        dataBlock1,
-                        dataBlock2
-                    ]
-                })
+                Content = ListOf(
+                    new ContentSection
+                    {
+                        Id = Guid.NewGuid(),
+                        Heading = "Template heading index 0",
+                        Type = ContentSectionType.Generic,
+                        Order = 1,
+                        Content =
+                        [
+                            new HtmlBlock
+                            {
+                                Id = Guid.NewGuid(),
+                                Body = "<div></div>",
+                                Order = 1,
+                                Comments =
+                                [
+                                    new Comment { Id = Guid.NewGuid(), Content = "Comment 1 Text" },
+                                    new Comment { Id = Guid.NewGuid(), Content = "Comment 2 Text" },
+                                ],
+                            },
+                            dataBlock1,
+                            dataBlock2,
+                        ],
+                    }
+                ),
             };
 
-            Publication publication = _dataFixture.DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease()
-                    .WithVersions([templateReleaseVersion])
-                    .Generate(1));
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_dataFixture.DefaultRelease().WithVersions([templateReleaseVersion]).Generate(1));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -212,8 +191,9 @@ public abstract class ReleaseServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(
-                    contentDbContext: context, 
-                    releaseVersionService: releaseVersionServiceMock.Object);
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
 
                 var result = await releaseService.CreateRelease(
                     new ReleaseCreateRequest
@@ -222,7 +202,7 @@ public abstract class ReleaseServiceTests
                         TemplateReleaseId = templateReleaseVersion.Id,
                         Year = 2018,
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        Type = ReleaseType.OfficialStatistics
+                        Type = ReleaseType.OfficialStatistics,
                     }
                 );
 
@@ -234,14 +214,12 @@ public abstract class ReleaseServiceTests
             {
                 // Do an in depth check of the saved release version
                 var newReleaseVersion = await context
-                    .ReleaseVersions
-                    .Include(releaseVersion => releaseVersion.Content)
+                    .ReleaseVersions.Include(releaseVersion => releaseVersion.Content)
                     .ThenInclude(section => section.Content)
                     .SingleAsync(rv => rv.Id == newReleaseVersionId);
 
                 var contentSections = newReleaseVersion.GenericContent.ToList();
                 Assert.Single(contentSections);
-                Assert.Equal("Template caption index 0", contentSections[0].Caption);
                 Assert.Equal("Template heading index 0", contentSections[0].Heading);
                 Assert.Single(contentSections);
                 Assert.Equal(1, contentSections[0].Order);
@@ -251,14 +229,14 @@ public abstract class ReleaseServiceTests
                 Assert.Empty(contentSections[0].Content.AsReadOnly());
                 Assert.Equal(ContentSectionType.ReleaseSummary, newReleaseVersion.SummarySection.Type);
                 Assert.Equal(ContentSectionType.Headlines, newReleaseVersion.HeadlinesSection.Type);
-                Assert.Equal(ContentSectionType.KeyStatisticsSecondary,
-                    newReleaseVersion.KeyStatisticsSecondarySection.Type);
+                Assert.Equal(
+                    ContentSectionType.KeyStatisticsSecondary,
+                    newReleaseVersion.KeyStatisticsSecondarySection.Type
+                );
 
                 // Data Blocks should not be copied when created from a template.
                 Assert.Equal(2, context.DataBlocks.Count());
-                Assert.Empty(context
-                    .DataBlocks
-                    .Where(dataBlock => dataBlock.ReleaseVersionId == newReleaseVersionId));
+                Assert.Empty(context.DataBlocks.Where(dataBlock => dataBlock.ReleaseVersionId == newReleaseVersionId));
             }
         }
 
@@ -271,15 +249,15 @@ public abstract class ReleaseServiceTests
             context.Publications.Add(publication);
             await context.SaveChangesAsync();
 
-            var releaseVersionService = new ReleaseVersionServiceMockBuilder()
-                .WhereGetReleaseVersionReturns();
+            var releaseVersionService = new ReleaseVersionServiceMockBuilder().WhereGetReleaseVersionReturns();
 
             var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder();
 
             var sut = BuildService(
                 contentDbContext: context,
                 releaseVersionService: releaseVersionService.Build(),
-                releaseSlugValidator: releaseSlugValidator.Build());
+                releaseSlugValidator: releaseSlugValidator.Build()
+            );
 
             var year = 2020;
             var timePeriodCoverage = TimeIdentifier.AcademicYear;
@@ -300,12 +278,14 @@ public abstract class ReleaseServiceTests
             var expectedReleaseSlug = NamingUtils.CreateReleaseSlug(
                 year: year,
                 timePeriodCoverage: timePeriodCoverage,
-                label: label);
+                label: label
+            );
 
             releaseSlugValidator.Assert.ValidateNewSlugWasCalled(
                 expectedNewReleaseSlug: expectedReleaseSlug,
                 expectedPublicationId: publication.Id,
-                expectedReleaseId: null);
+                expectedReleaseId: null
+            );
         }
 
         [Fact]
@@ -316,7 +296,7 @@ public abstract class ReleaseServiceTests
             ErrorViewModel[] expectedValidationErrors =
             [
                 new() { Message = "Validation error 1" },
-                new() { Message = "Validation error 2" }
+                new() { Message = "Validation error 2" },
             ];
 
             _organisationsValidator.WhereHasValidationErrors(expectedValidationErrors);
@@ -330,8 +310,7 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseService = BuildService(
-                    contentDbContext: context);
+                var releaseService = BuildService(contentDbContext: context);
 
                 var result = await releaseService.CreateRelease(
                     new ReleaseCreateRequest
@@ -340,12 +319,13 @@ public abstract class ReleaseServiceTests
                         Type = ReleaseType.OfficialStatistics,
                         Year = 2020,
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishingOrganisations = [Guid.NewGuid(), Guid.NewGuid()]
+                        PublishingOrganisations = [Guid.NewGuid(), Guid.NewGuid()],
                     }
                 );
 
                 _organisationsValidator.Assert.ValidateOrganisationsWasCalled(
-                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst());
+                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst()
+                );
 
                 var validationProblem = result.AssertBadRequestWithValidationProblem();
                 validationProblem.AssertHasErrors(expectedValidationErrors.ToList());
@@ -355,8 +335,7 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task WhenRequestHasPublishingOrganisations_SetsOrganisations()
         {
-            var organisations = _dataFixture.DefaultOrganisation()
-                .GenerateArray(2);
+            var organisations = _dataFixture.DefaultOrganisation().GenerateArray(2);
             var organisationIds = organisations.Select(o => o.Id).ToArray();
 
             Publication publication = _dataFixture.DefaultPublication();
@@ -386,7 +365,8 @@ public abstract class ReleaseServiceTests
 
                 var releaseService = BuildService(
                     contentDbContext: context,
-                    releaseVersionService: releaseVersionServiceMock.Object);
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
 
                 var result = await releaseService.CreateRelease(
                     new ReleaseCreateRequest
@@ -395,13 +375,14 @@ public abstract class ReleaseServiceTests
                         Type = ReleaseType.OfficialStatistics,
                         Year = 2020,
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishingOrganisations = organisationIds
+                        PublishingOrganisations = organisationIds,
                     }
                 );
 
                 _organisationsValidator.Assert.ValidateOrganisationsWasCalled(
                     expectedOrganisationIds: organisationIds,
-                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst());
+                    expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst()
+                );
 
                 var viewModel = result.AssertRight();
                 Assert.Equal(viewModel, releaseVersionViewModel);
@@ -409,14 +390,19 @@ public abstract class ReleaseServiceTests
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var actualReleaseVersion = await context.ReleaseVersions
-                    .Include(rv => rv.PublishingOrganisations)
+                var actualReleaseVersion = await context
+                    .ReleaseVersions.Include(rv => rv.PublishingOrganisations)
                     .FirstAsync(rv => rv.Id == newReleaseVersionId);
 
                 Assert.Equal(organisations.Length, actualReleaseVersion.PublishingOrganisations.Count);
-                Assert.All(organisations,
-                    expectedOrganisation => Assert.Contains(actualReleaseVersion.PublishingOrganisations,
-                        o => expectedOrganisation.Id == o.Id));
+                Assert.All(
+                    organisations,
+                    expectedOrganisation =>
+                        Assert.Contains(
+                            actualReleaseVersion.PublishingOrganisations,
+                            o => expectedOrganisation.Id == o.Id
+                        )
+                );
             }
         }
     }
@@ -442,21 +428,24 @@ public abstract class ReleaseServiceTests
                 .DefaultPublication()
                 .WithLatestPublishedReleaseVersion(_dataFixture.DefaultReleaseVersion());
 
-            var publication = _dataFixture.DefaultPublication()
+            var publication = _dataFixture
+                .DefaultPublication()
                 .WithId(expectedPublicationId)
                 .WithSlug(expectedPublicationSlug)
                 .If(isPublicationArchived)
                 .Then(p => p.WithSupersededBy(supersedingPublication))
                 .Generate();
 
-            var release = _dataFixture.DefaultRelease()
+            var release = _dataFixture
+                .DefaultRelease()
                 .WithId(expectedReleaseId)
                 .WithPublication(publication)
                 .WithYear(year)
                 .WithTimePeriodCoverage(timePeriod)
                 .Generate();
 
-            var releaseVersion = _dataFixture.DefaultReleaseVersion()
+            var releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
                 .WithRelease(release)
                 .WithPublished(new DateTime(2025, 04, 01, 09, 16, 00)) // Release Version is live (ie has been published)
                 .Generate();
@@ -471,11 +460,12 @@ public abstract class ReleaseServiceTests
                 await context.SaveChangesAsync();
             }
 
-            var releaseVersionService = new ReleaseVersionServiceMockBuilder()
-                .WhereGetReleaseVersionReturns(releaseVersion.Id);
+            var releaseVersionService = new ReleaseVersionServiceMockBuilder().WhereGetReleaseVersionReturns(
+                releaseVersion.Id
+            );
 
-            var releasePublishingStatusRepository = new ReleasePublishingStatusRepositoryMockBuilder()
-                .SetNoReleaseVersionStatus(releaseVersion.Id);
+            var releasePublishingStatusRepository =
+                new ReleasePublishingStatusRepositoryMockBuilder().SetNoReleaseVersionStatus(releaseVersion.Id);
 
             var adminEventRaiser = new AdminEventRaiserMockBuilder();
 
@@ -488,7 +478,8 @@ public abstract class ReleaseServiceTests
                     publicationCacheService: new PublicationCacheServiceMockBuilder().Build(),
                     redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
                     releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
-                    adminEventRaiser: adminEventRaiser.Build());
+                    adminEventRaiser: adminEventRaiser.Build()
+                );
 
                 var request = new ReleaseUpdateRequest { Label = label };
 
@@ -523,13 +514,15 @@ public abstract class ReleaseServiceTests
             var label = "this is the new label";
             var year = 2025;
             var timePeriod = TimeIdentifier.April;
-            
-            var publication = _dataFixture.DefaultPublication()
+
+            var publication = _dataFixture
+                .DefaultPublication()
                 .WithId(expectedPublicationId)
                 .WithSlug(expectedPublicationSlug)
                 .Generate();
 
-            var release = _dataFixture.DefaultRelease()
+            var release = _dataFixture
+                .DefaultRelease()
                 .WithId(expectedReleaseId)
                 .WithPublication(publication)
                 .WithYear(year)
@@ -537,11 +530,9 @@ public abstract class ReleaseServiceTests
                 .Generate();
 
             var currentReleaseSlug = release.Slug;
-            
+
             // Release Version is not published
-            var releaseVersion = _dataFixture.DefaultReleaseVersion()
-                .WithRelease(release)
-                .Generate();
+            var releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(release).Generate();
 
             await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
             context.Publications.Add(publication);
@@ -549,40 +540,39 @@ public abstract class ReleaseServiceTests
             context.ReleaseVersions.Add(releaseVersion);
             await context.SaveChangesAsync();
 
-            var releaseVersionService = new ReleaseVersionServiceMockBuilder()
-                                            .WhereGetReleaseVersionReturns(releaseVersion.Id);
+            var releaseVersionService = new ReleaseVersionServiceMockBuilder().WhereGetReleaseVersionReturns(
+                releaseVersion.Id
+            );
 
-            var releasePublishingStatusRepository = new ReleasePublishingStatusRepositoryMockBuilder()
-                .SetNoReleaseVersionStatus(releaseVersion.Id);
+            var releasePublishingStatusRepository =
+                new ReleasePublishingStatusRepositoryMockBuilder().SetNoReleaseVersionStatus(releaseVersion.Id);
 
             var adminEventRaiser = new AdminEventRaiserMockBuilder();
-            
+
             var sut = BuildService(
-                                    context,
-                                    releaseVersionService: releaseVersionService.Build(),
-                                    releaseCacheService: new ReleaseCacheServiceMockBuilder().Build(),
-                                    publicationCacheService: new PublicationCacheServiceMockBuilder().Build(),
-                                    redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
-                                    releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
-                                    adminEventRaiser: adminEventRaiser.Build());
-            
-            var request = new ReleaseUpdateRequest
-            {
-                Label = label
-            };
+                context,
+                releaseVersionService: releaseVersionService.Build(),
+                releaseCacheService: new ReleaseCacheServiceMockBuilder().Build(),
+                publicationCacheService: new PublicationCacheServiceMockBuilder().Build(),
+                redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
+                releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
+                adminEventRaiser: adminEventRaiser.Build()
+            );
+
+            var request = new ReleaseUpdateRequest { Label = label };
 
             // ACT
             var result = await sut.UpdateRelease(release.Id, request);
-            
+
             // ASSERT
             result.AssertRight();
 
             var newReleaseSlug = NamingUtils.CreateReleaseSlug(year, timePeriod, label);
             Assert.NotEqual(currentReleaseSlug, newReleaseSlug);
-            
+
             adminEventRaiser.Assert.OnReleaseSlugChangedWasNotRaised();
         }
-        
+
         [Fact]
         public async Task GivenLiveRelease_WhenReleaseUpdatedButSlugUnchanged_ThenNoEventRaised()
         {
@@ -594,13 +584,15 @@ public abstract class ReleaseServiceTests
             var year = 2025;
             var timePeriod = TimeIdentifier.April;
             var currentReleaseSlug = NamingUtils.CreateReleaseSlug(year, timePeriod, currentLabel);
-            
-            var publication = _dataFixture.DefaultPublication()
+
+            var publication = _dataFixture
+                .DefaultPublication()
                 .WithId(expectedPublicationId)
                 .WithSlug(expectedPublicationSlug)
                 .Generate();
 
-            var release = _dataFixture.DefaultRelease()
+            var release = _dataFixture
+                .DefaultRelease()
                 .WithId(expectedReleaseId)
                 .WithPublication(publication)
                 .WithYear(year)
@@ -608,8 +600,9 @@ public abstract class ReleaseServiceTests
                 .WithLabel(currentLabel)
                 .WithSlug(currentReleaseSlug)
                 .Generate();
-            
-            var releaseVersion = _dataFixture.DefaultReleaseVersion()
+
+            var releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
                 .WithRelease(release)
                 .WithPublished(new DateTime(2025, 04, 01, 09, 16, 00)) // Release Version is live (ie has been published)
                 .Generate();
@@ -620,31 +613,30 @@ public abstract class ReleaseServiceTests
             context.ReleaseVersions.Add(releaseVersion);
             await context.SaveChangesAsync();
 
-            var releaseVersionService = new ReleaseVersionServiceMockBuilder()
-                                            .WhereGetReleaseVersionReturns(releaseVersion.Id);
+            var releaseVersionService = new ReleaseVersionServiceMockBuilder().WhereGetReleaseVersionReturns(
+                releaseVersion.Id
+            );
 
-            var releasePublishingStatusRepository = new ReleasePublishingStatusRepositoryMockBuilder()
-                .SetNoReleaseVersionStatus(releaseVersion.Id);
+            var releasePublishingStatusRepository =
+                new ReleasePublishingStatusRepositoryMockBuilder().SetNoReleaseVersionStatus(releaseVersion.Id);
 
             var adminEventRaiser = new AdminEventRaiserMockBuilder();
 
             var sut = BuildService(
-                                    context,
-                                    releaseVersionService: releaseVersionService.Build(),
-                                    releaseCacheService: new ReleaseCacheServiceMockBuilder().Build(),
-                                    publicationCacheService: new PublicationCacheServiceMockBuilder().Build(),
-                                    redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
-                                    releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
-                                    adminEventRaiser: adminEventRaiser.Build());
-            
-            var request = new ReleaseUpdateRequest
-            {
-                Label = currentLabel
-            };
+                context,
+                releaseVersionService: releaseVersionService.Build(),
+                releaseCacheService: new ReleaseCacheServiceMockBuilder().Build(),
+                publicationCacheService: new PublicationCacheServiceMockBuilder().Build(),
+                redirectsCacheService: new RedirectsCacheServiceMockBuilder().Build(),
+                releasePublishingStatusRepository: releasePublishingStatusRepository.Build(),
+                adminEventRaiser: adminEventRaiser.Build()
+            );
+
+            var request = new ReleaseUpdateRequest { Label = currentLabel };
 
             // ACT
             var result = await sut.UpdateRelease(release.Id, request);
-            
+
             // ASSERT
             result.AssertRight();
             adminEventRaiser.Assert.OnReleaseSlugChangedWasNotRaised();
@@ -653,8 +645,7 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task GivenReleaseExists_NewReleaseSlugIsValidated()
         {
-            Release release = _dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication());
+            Release release = _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication());
 
             await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
             context.Releases.Add(release);
@@ -662,16 +653,11 @@ public abstract class ReleaseServiceTests
 
             var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder();
 
-            var sut = BuildService(
-                context,
-                releaseSlugValidator: releaseSlugValidator.Build());
+            var sut = BuildService(context, releaseSlugValidator: releaseSlugValidator.Build());
 
             var newLabel = "initial";
 
-            var request = new ReleaseUpdateRequest
-            {
-                Label = newLabel
-            };
+            var request = new ReleaseUpdateRequest { Label = newLabel };
 
             // ACT
             await sut.UpdateRelease(release.Id, request);
@@ -680,12 +666,14 @@ public abstract class ReleaseServiceTests
             var expectedNewReleaseSlug = NamingUtils.CreateReleaseSlug(
                 year: release.Year,
                 timePeriodCoverage: release.TimePeriodCoverage,
-                label: newLabel);
+                label: newLabel
+            );
 
             releaseSlugValidator.Assert.ValidateNewSlugWasCalled(
                 expectedNewReleaseSlug: expectedNewReleaseSlug,
                 expectedPublicationId: release.PublicationId,
-                expectedReleaseId: release.Id);
+                expectedReleaseId: release.Id
+            );
         }
     }
 
@@ -697,13 +685,12 @@ public abstract class ReleaseServiceTests
         IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
         IRedirectsCacheService? redirectsCacheService = null,
         IAdminEventRaiser? adminEventRaiser = null,
-        IReleaseSlugValidator? releaseSlugValidator = null)
+        IReleaseSlugValidator? releaseSlugValidator = null
+    )
     {
         var userService = AlwaysTrueUserService();
 
-        userService
-            .Setup(s => s.GetUserId())
-            .Returns(User.Id);
+        userService.Setup(s => s.GetUserId()).Returns(UserId);
 
         return new ReleaseService(
             context: contentDbContext,
@@ -711,7 +698,8 @@ public abstract class ReleaseServiceTests
             releaseVersionService: releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             releaseCacheService: releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
             publicationCacheService: publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
-            releasePublishingStatusRepository: releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(Strict),
+            releasePublishingStatusRepository: releasePublishingStatusRepository
+                ?? Mock.Of<IReleasePublishingStatusRepository>(Strict),
             redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
             adminEventRaiser: adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
             guidGenerator: new SequentialGuidGenerator(),

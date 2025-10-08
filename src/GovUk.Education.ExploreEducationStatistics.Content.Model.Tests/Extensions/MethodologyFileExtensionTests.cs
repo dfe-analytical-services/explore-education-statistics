@@ -16,8 +16,8 @@ public class MethodologyFileExtensionTests
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 Filename = "ancillary.pdf",
-                Type = Ancillary
-            }
+                Type = Ancillary,
+            },
         };
 
         Assert.Equal(methodologyFile.File.Path(), methodologyFile.Path());
@@ -35,8 +35,8 @@ public class MethodologyFileExtensionTests
                 RootPath = Guid.NewGuid(),
                 Filename = "image.png",
                 ContentLength = 10240,
-                Type = Image
-            }
+                Type = Image,
+            },
         };
 
         var result = methodologyFile.ToFileInfo();

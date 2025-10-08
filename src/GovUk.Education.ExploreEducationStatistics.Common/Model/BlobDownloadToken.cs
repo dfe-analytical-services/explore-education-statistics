@@ -3,12 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
-public record BlobDownloadToken(
-    string Token,
-    string ContainerName,
-    string Path,
-    string Filename,
-    string ContentType)
+public record BlobDownloadToken(string Token, string ContainerName, string Path, string Filename, string ContentType)
 {
     public string ToBase64JsonString()
     {

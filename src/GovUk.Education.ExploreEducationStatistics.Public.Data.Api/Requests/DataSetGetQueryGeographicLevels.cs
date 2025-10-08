@@ -35,7 +35,7 @@ public record DataSetGetQueryGeographicLevels : DataSetQueryCriteriaGeographicLe
             Eq = Eq,
             NotEq = NotEq,
             In = In,
-            NotIn = NotIn
+            NotIn = NotIn,
         };
     }
 

@@ -23,5 +23,6 @@ public class ThemeSaveViewModel
 
     public string Summary { get; set; }
 
-    [Required] public string Title { get; set; }
+    [Required]
+    public string Title { get; set; }
 }

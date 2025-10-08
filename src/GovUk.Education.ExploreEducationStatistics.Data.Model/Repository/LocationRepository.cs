@@ -17,8 +17,7 @@ public class LocationRepository : ILocationRepository
     public async Task<IList<Location>> GetDistinctForSubject(Guid subjectId)
     {
         return await _context
-            .Observation
-            .AsNoTracking()
+            .Observation.AsNoTracking()
             .Where(o => o.SubjectId == subjectId)
             .Select(observation => observation.Location)
             .Distinct()

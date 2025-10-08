@@ -11,11 +11,13 @@ public interface IDataSetQueryService
         Guid dataSetId,
         DataSetGetQueryRequest request,
         string? dataSetVersion = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> Query(
         Guid dataSetId,
         DataSetQueryRequest request,
         string? dataSetVersion,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

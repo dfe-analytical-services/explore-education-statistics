@@ -26,7 +26,8 @@ public abstract class LocationOptionMetaTests
             // Use reflection to set all protected properties for the purpose of
             // this test. Otherwise, we would have to write boilerplate tests for
             // each LocationOptionMeta subtype (which is easy to forget to update).
-            option.GetType()
+            option
+                .GetType()
                 .GetProperties(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty)
                 .Where(p => !excludedOptionProperties.Contains(p.Name))
                 .ForEach(p => p.SetValue(option, p.Name));
@@ -36,9 +37,7 @@ public abstract class LocationOptionMetaTests
                 .Where(kv => !excludedOptionProperties.Contains(kv.Key))
                 .ToDictionary();
 
-            var rowProperties = option
-                .ToRow()
-                .ToDictionary();
+            var rowProperties = option.ToRow().ToDictionary();
 
             Assert.Equal(optionProperties, rowProperties);
         }

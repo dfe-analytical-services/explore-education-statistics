@@ -31,23 +31,23 @@ public class DataSetPublishingService(
     /// </summary>
     private async Task<IReadOnlyList<DataSetVersion>> PromoteDraftDataSetVersions(IEnumerable<Guid> releaseVersionIds)
     {
-        var releaseFileIds = (await GetReleaseFiles(releaseVersionIds))
-            .Select(releaseFile => releaseFile.Id);
+        var releaseFileIds = (await GetReleaseFiles(releaseVersionIds)).Select(releaseFile => releaseFile.Id);
 
         var dataSets = await publicDataDbContext
-            .DataSets
-            .Include(dataSet => dataSet.LatestLiveVersion)
+            .DataSets.Include(dataSet => dataSet.LatestLiveVersion)
             .Include(dataSet => dataSet.LatestDraftVersion)
-            .Where(dataSet => dataSet.LatestDraftVersion != null
-                              && releaseFileIds.Contains(dataSet.LatestDraftVersion.Release.ReleaseFileId))
+            .Where(dataSet =>
+                dataSet.LatestDraftVersion != null
+                && releaseFileIds.Contains(dataSet.LatestDraftVersion.Release.ReleaseFileId)
+            )
             .ToListAsync();
 
         foreach (var dataSet in dataSets)
         {
             var currentDraftVersion = dataSet.LatestDraftVersion!;
-            
+
             var originalFilePath = dataSetVersionPathResolver.DirectoryPath(currentDraftVersion);
-            
+
             currentDraftVersion.Status = DataSetVersionStatus.Published;
             currentDraftVersion.Published = DateTimeOffset.UtcNow;
 
@@ -59,16 +59,14 @@ public class DataSetPublishingService(
 
             dataSet.LatestDraftVersion = null;
             dataSet.LatestDraftVersionId = null;
-            
+
             var newFilePath = dataSetVersionPathResolver.DirectoryPath(currentDraftVersion);
             Directory.Move(sourceDirName: originalFilePath, destDirName: newFilePath);
 
             await publicDataDbContext.SaveChangesAsync();
         }
 
-        return dataSets
-            .Select(ds => ds.LatestLiveVersion!)
-            .ToList();
+        return dataSets.Select(ds => ds.LatestLiveVersion!).ToList();
     }
 
     /// <summary>
@@ -81,12 +79,10 @@ public class DataSetPublishingService(
             return;
         }
 
-        var releaseFileIds = publishedDataSetVersions
-            .Select(version => version.Release.ReleaseFileId)
-            .ToList();
+        var releaseFileIds = publishedDataSetVersions.Select(version => version.Release.ReleaseFileId).ToList();
 
-        var dataSetFileIds = await contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
+        var dataSetFileIds = await contentDbContext
+            .ReleaseFiles.Include(rf => rf.File)
             .Where(rf => releaseFileIds.Contains(rf.Id))
             .ToDictionaryAsync(rf => rf.Id, rf => rf.File.DataSetFileId!.Value);
 
@@ -95,7 +91,7 @@ public class DataSetPublishingService(
             {
                 DataSetId = version.DataSetId,
                 DataSetFileId = dataSetFileIds[version.Release.ReleaseFileId],
-                Version = version.PublicVersion
+                Version = version.PublicVersion,
             })
             .ToList();
 
@@ -109,8 +105,7 @@ public class DataSetPublishingService(
     private async Task UpdateDataSetVersionFileIdsForAmendments(IEnumerable<Guid> releaseVersionIds)
     {
         var previousReleaseVersionIds = await contentDbContext
-            .ReleaseVersions
-            .Where(releaseVersion => releaseVersionIds.Contains(releaseVersion.Id))
+            .ReleaseVersions.Where(releaseVersion => releaseVersionIds.Contains(releaseVersion.Id))
             .Where(releaseVersion => releaseVersion.PreviousVersionId != null)
             .Select(releaseVersion => releaseVersion.PreviousVersionId)
             .Distinct()
@@ -122,12 +117,12 @@ public class DataSetPublishingService(
             return;
         }
 
-        var previousReleaseFilesById = (await GetReleaseFiles(previousReleaseVersionIds))
-            .ToDictionary(rf => rf.Id);
+        var previousReleaseFilesById = (await GetReleaseFiles(previousReleaseVersionIds)).ToDictionary(rf => rf.Id);
 
         var dataSetVersions = await publicDataDbContext
-            .DataSetVersions
-            .Where(dataSetVersion => previousReleaseFilesById.Keys.Contains(dataSetVersion.Release.ReleaseFileId))
+            .DataSetVersions.Where(dataSetVersion =>
+                previousReleaseFilesById.Keys.Contains(dataSetVersion.Release.ReleaseFileId)
+            )
             .ToListAsync();
 
         if (dataSetVersions.Count == 0)
@@ -140,8 +135,7 @@ public class DataSetPublishingService(
             var previousReleaseFile = previousReleaseFilesById[dataSetVersion.Release.ReleaseFileId];
 
             var nextReleaseFileId = await contentDbContext
-                .ReleaseFiles
-                .Where(rf => rf.FileId == previousReleaseFile.FileId)
+                .ReleaseFiles.Where(rf => rf.FileId == previousReleaseFile.FileId)
                 .Where(rf => rf.ReleaseVersion.PreviousVersionId == previousReleaseFile.ReleaseVersionId)
                 .Select(rf => rf.Id)
                 .SingleOrDefaultAsync();
@@ -158,8 +152,7 @@ public class DataSetPublishingService(
     private async Task<List<ReleaseFile>> GetReleaseFiles(IEnumerable<Guid> releaseVersionIds)
     {
         return await contentDbContext
-            .ReleaseFiles
-            .AsNoTracking()
+            .ReleaseFiles.AsNoTracking()
             .Where(rf => releaseVersionIds.Contains(rf.ReleaseVersionId) && rf.File.Type == FileType.Data)
             .ToListAsync();
     }

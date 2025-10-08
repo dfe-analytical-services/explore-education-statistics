@@ -16,9 +16,8 @@ public class DuckDbSqlBuilder : InterpolatedSqlBuilderBase<DuckDbSqlBuilder, IIn
         CalculateAutoParameterName = (_, _) => string.Empty,
     };
 
-    public DuckDbSqlBuilder() : this(options: null, format: null, arguments: null)
-    {
-    }
+    public DuckDbSqlBuilder()
+        : this(options: null, format: null, arguments: null) { }
 
     public DuckDbSqlBuilder(FormattableString value, InterpolatedSqlBuilderOptions? options = null)
         : this(options: options, format: null, arguments: null)
@@ -44,10 +43,9 @@ public class DuckDbSqlBuilder : InterpolatedSqlBuilderBase<DuckDbSqlBuilder, IIn
     protected DuckDbSqlBuilder(
         InterpolatedSqlBuilderOptions? options = null,
         StringBuilder? format = null,
-        List<InterpolatedSqlParameter>? arguments = null)
-        : base(options: options ?? DefaultOptions, format: format, arguments: arguments)
-    {
-    }
+        List<InterpolatedSqlParameter>? arguments = null
+    )
+        : base(options: options ?? DefaultOptions, format: format, arguments: arguments) { }
 
     public override void AppendArgument(object? argument, int alignment = 0, string? format = null)
     {

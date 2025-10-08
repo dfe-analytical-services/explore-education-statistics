@@ -14,7 +14,8 @@ public class LocationsDuckDbRepository(PublicDataDbContext publicDataDbContext) 
     public async Task CreateLocationsTable(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await publicDataDbContext
             .Entry(dataSetVersion)
@@ -23,21 +24,23 @@ public class LocationsDuckDbRepository(PublicDataDbContext publicDataDbContext) 
             .Include(m => m.Options)
             .LoadAsync(cancellationToken);
 
-        await duckDbConnection.SqlBuilder(
-            $"""
-             CREATE TABLE {LocationOptionsTable.TableName:raw}(
-                 {LocationOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
-                 {LocationOptionsTable.Cols.Label:raw} VARCHAR,
-                 {LocationOptionsTable.Cols.Level:raw} VARCHAR,
-                 {LocationOptionsTable.Cols.PublicId:raw} VARCHAR,
-                 {LocationOptionsTable.Cols.Code:raw} VARCHAR,
-                 {LocationOptionsTable.Cols.OldCode:raw} VARCHAR,
-                 {LocationOptionsTable.Cols.Urn:raw} VARCHAR,
-                 {LocationOptionsTable.Cols.LaEstab:raw} VARCHAR,
-                 {LocationOptionsTable.Cols.Ukprn:raw} VARCHAR
-             )
-             """
-        ).ExecuteAsync(cancellationToken: cancellationToken);
+        await duckDbConnection
+            .SqlBuilder(
+                $"""
+                CREATE TABLE {LocationOptionsTable.TableName:raw}(
+                    {LocationOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
+                    {LocationOptionsTable.Cols.Label:raw} VARCHAR,
+                    {LocationOptionsTable.Cols.Level:raw} VARCHAR,
+                    {LocationOptionsTable.Cols.PublicId:raw} VARCHAR,
+                    {LocationOptionsTable.Cols.Code:raw} VARCHAR,
+                    {LocationOptionsTable.Cols.OldCode:raw} VARCHAR,
+                    {LocationOptionsTable.Cols.Urn:raw} VARCHAR,
+                    {LocationOptionsTable.Cols.LaEstab:raw} VARCHAR,
+                    {LocationOptionsTable.Cols.Ukprn:raw} VARCHAR
+                )
+                """
+            )
+            .ExecuteAsync(cancellationToken: cancellationToken);
 
         var id = 1;
 

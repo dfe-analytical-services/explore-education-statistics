@@ -39,254 +39,228 @@ public class ReleaseVersionServicePermissionTests
     [Fact]
     public async Task GetRelease()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         await PolicyCheckBuilder<ContentSecurityPolicies>()
             .SetupResourceCheckToFail(releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
-            .AssertForbidden(
-                async userService =>
-                {
-                    await using var contextDbContext = InMemoryApplicationDbContext();
-                    contextDbContext.ReleaseVersions.Add(releaseVersion);
-                    await contextDbContext.SaveChangesAsync();
+            .AssertForbidden(async userService =>
+            {
+                await using var contextDbContext = InMemoryApplicationDbContext();
+                contextDbContext.ReleaseVersions.Add(releaseVersion);
+                await contextDbContext.SaveChangesAsync();
 
-                    var service = BuildService(
-                        contentDbContext: contextDbContext,
-                        userService: userService.Object);
+                var service = BuildService(contentDbContext: contextDbContext, userService: userService.Object);
 
-                    return await service.GetRelease(releaseVersion.Id);
-                }
-            );
+                return await service.GetRelease(releaseVersion.Id);
+            });
     }
 
     [Fact]
     public async Task GetLatestPublishedRelease()
     {
-        Publication publication = _dataFixture.DefaultPublication()
+        Publication publication = _dataFixture
+            .DefaultPublication()
             .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFailWithMatcher<Publication>(p => p.Id == publication.Id,
-                CanViewSpecificPublication)
-            .AssertForbidden(
-                async userService =>
-                {
-                    await using var contextDbContext = InMemoryApplicationDbContext();
-                    contextDbContext.Publications.Add(publication);
-                    await contextDbContext.SaveChangesAsync();
+            .SetupResourceCheckToFailWithMatcher<Publication>(p => p.Id == publication.Id, CanViewSpecificPublication)
+            .AssertForbidden(async userService =>
+            {
+                await using var contextDbContext = InMemoryApplicationDbContext();
+                contextDbContext.Publications.Add(publication);
+                await contextDbContext.SaveChangesAsync();
 
-                    var service = BuildService(
-                        contentDbContext: contextDbContext,
-                        userService: userService.Object);
+                var service = BuildService(contentDbContext: contextDbContext, userService: userService.Object);
 
-                    return await service.GetLatestPublishedRelease(publication.Id);
-                }
-            );
+                return await service.GetLatestPublishedRelease(publication.Id);
+            });
     }
 
     [Fact]
     public async Task GetDeleteReleaseVersionPlan()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
-                CanDeleteSpecificReleaseVersion)
-            .AssertForbidden(
-                async userService =>
-                {
-                    await using var contextDbContext = InMemoryApplicationDbContext();
-                    contextDbContext.ReleaseVersions.Add(releaseVersion);
-                    await contextDbContext.SaveChangesAsync();
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == releaseVersion.Id,
+                CanDeleteSpecificReleaseVersion
+            )
+            .AssertForbidden(async userService =>
+            {
+                await using var contextDbContext = InMemoryApplicationDbContext();
+                contextDbContext.ReleaseVersions.Add(releaseVersion);
+                await contextDbContext.SaveChangesAsync();
 
-                    var service = BuildService(
-                        contentDbContext: contextDbContext,
-                        userService: userService.Object);
+                var service = BuildService(contentDbContext: contextDbContext, userService: userService.Object);
 
-                    return await service.GetDeleteReleaseVersionPlan(releaseVersion.Id);
-                }
-            );
+                return await service.GetDeleteReleaseVersionPlan(releaseVersion.Id);
+            });
     }
 
     [Fact]
     public async Task DeleteRelease()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
-                CanDeleteSpecificReleaseVersion)
-            .AssertForbidden(
-                async userService =>
-                {
-                    await using var contextDbContext = InMemoryApplicationDbContext();
-                    contextDbContext.ReleaseVersions.Add(releaseVersion);
-                    await contextDbContext.SaveChangesAsync();
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == releaseVersion.Id,
+                CanDeleteSpecificReleaseVersion
+            )
+            .AssertForbidden(async userService =>
+            {
+                await using var contextDbContext = InMemoryApplicationDbContext();
+                contextDbContext.ReleaseVersions.Add(releaseVersion);
+                await contextDbContext.SaveChangesAsync();
 
-                    var service = BuildService(
-                        contentDbContext: contextDbContext,
-                        userService: userService.Object);
+                var service = BuildService(contentDbContext: contextDbContext, userService: userService.Object);
 
-                    return await service.DeleteReleaseVersion(releaseVersion.Id);
-                }
-            );
+                return await service.DeleteReleaseVersion(releaseVersion.Id);
+            });
     }
 
     [Fact]
     public async Task DeleteTestRelease()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
-                CanDeleteTestRelease)
-            .AssertForbidden(
-                async userService =>
-                {
-                    await using var contextDbContext = InMemoryApplicationDbContext();
-                    contextDbContext.ReleaseVersions.Add(releaseVersion);
-                    await contextDbContext.SaveChangesAsync();
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id, CanDeleteTestRelease)
+            .AssertForbidden(async userService =>
+            {
+                await using var contextDbContext = InMemoryApplicationDbContext();
+                contextDbContext.ReleaseVersions.Add(releaseVersion);
+                await contextDbContext.SaveChangesAsync();
 
-                    var service = BuildService(
-                        contentDbContext: contextDbContext,
-                        userService: userService.Object);
+                var service = BuildService(contentDbContext: contextDbContext, userService: userService.Object);
 
-                    return await service.DeleteTestReleaseVersion(releaseVersion.Id);
-                }
-            );
+                return await service.DeleteTestReleaseVersion(releaseVersion.Id);
+            });
     }
 
     [Fact]
     public async Task ListReleasesWithStatuses_CanViewAllReleases()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
             .WithApprovalStatus(ReleaseApprovalStatus.Approved);
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupCheck(RegisteredUser)
             .SetupCheck(CanViewAllReleases)
-            .AssertSuccess(
-                async userService =>
-                {
-                    userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, CanAssignPreReleaseUsersToSpecificRelease))
-                        .ReturnsAsync(true);
+            .AssertSuccess(async userService =>
+            {
+                userService
+                    .Setup(s => s.MatchesPolicy(releaseVersion, CanAssignPreReleaseUsersToSpecificRelease))
+                    .ReturnsAsync(true);
 
-                    userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion))
-                        .ReturnsAsync(true);
+                userService
+                    .Setup(s => s.MatchesPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion))
+                    .ReturnsAsync(true);
 
-                    userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, CanUpdateSpecificReleaseVersion))
-                        .ReturnsAsync(true);
+                userService
+                    .Setup(s => s.MatchesPolicy(releaseVersion, CanUpdateSpecificReleaseVersion))
+                    .ReturnsAsync(true);
 
-                    userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, CanDeleteSpecificReleaseVersion))
-                        .ReturnsAsync(true);
+                userService
+                    .Setup(s => s.MatchesPolicy(releaseVersion, CanDeleteSpecificReleaseVersion))
+                    .ReturnsAsync(true);
 
-                    userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, CanMakeAmendmentOfSpecificReleaseVersion))
-                        .ReturnsAsync(true);
+                userService
+                    .Setup(s => s.MatchesPolicy(releaseVersion, CanMakeAmendmentOfSpecificReleaseVersion))
+                    .ReturnsAsync(true);
 
-                    userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion.Release, CanUpdateSpecificRelease))
-                        .ReturnsAsync(true);
+                userService
+                    .Setup(s => s.MatchesPolicy(releaseVersion.Release, CanUpdateSpecificRelease))
+                    .ReturnsAsync(true);
 
-                    await using var contextDbContext = InMemoryApplicationDbContext();
-                    contextDbContext.ReleaseVersions.Add(releaseVersion);
-                    await contextDbContext.SaveChangesAsync();
+                await using var contextDbContext = InMemoryApplicationDbContext();
+                contextDbContext.ReleaseVersions.Add(releaseVersion);
+                await contextDbContext.SaveChangesAsync();
 
-                    var service = BuildService(
-                        contentDbContext: contextDbContext,
-                        userService: userService.Object);
+                var service = BuildService(contentDbContext: contextDbContext, userService: userService.Object);
 
-                    var result = await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
+                var result = await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
 
-                    var viewModel = result.AssertRight();
-                    Assert.Single(viewModel);
-                    Assert.Equal(releaseVersion.Id, viewModel[0].Id);
+                var viewModel = result.AssertRight();
+                Assert.Single(viewModel);
+                Assert.Equal(releaseVersion.Id, viewModel[0].Id);
 
-                    return result;
-                }
-            );
+                return result;
+            });
     }
 
     [Fact]
     public async Task ListReleasesWithStatuses_CanViewRelatedReleases()
     {
-        var (releaseVersion, otherReleaseVersion) = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()))
+        var (releaseVersion, otherReleaseVersion) = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
             .WithApprovalStatus(ReleaseApprovalStatus.Approved)
             .GenerateTuple2();
 
-        UserReleaseRole userReleaseRole = _dataFixture.DefaultUserReleaseRole()
+        UserReleaseRole userReleaseRole = _dataFixture
+            .DefaultUserReleaseRole()
             .WithReleaseVersion(releaseVersion)
-            .WithUser(new User { Id = _userId })
+            .WithUser(_dataFixture.DefaultUser().WithId(_userId))
             .WithRole(ReleaseRole.Contributor);
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupCheck(RegisteredUser)
             .ExpectCheckToFail(CanViewAllReleases)
-            .AssertSuccess(
-                async userService =>
-                {
-                    userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, CanAssignPreReleaseUsersToSpecificRelease))
-                        .ReturnsAsync(true);
+            .AssertSuccess(async userService =>
+            {
+                userService
+                    .Setup(s => s.MatchesPolicy(releaseVersion, CanAssignPreReleaseUsersToSpecificRelease))
+                    .ReturnsAsync(true);
 
-                    userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion))
-                        .ReturnsAsync(true);
+                userService
+                    .Setup(s => s.MatchesPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion))
+                    .ReturnsAsync(true);
 
-                    userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, CanUpdateSpecificReleaseVersion))
-                        .ReturnsAsync(true);
+                userService
+                    .Setup(s => s.MatchesPolicy(releaseVersion, CanUpdateSpecificReleaseVersion))
+                    .ReturnsAsync(true);
 
-                    userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, CanDeleteSpecificReleaseVersion))
-                        .ReturnsAsync(true);
+                userService
+                    .Setup(s => s.MatchesPolicy(releaseVersion, CanDeleteSpecificReleaseVersion))
+                    .ReturnsAsync(true);
 
-                    userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion, CanMakeAmendmentOfSpecificReleaseVersion))
-                        .ReturnsAsync(true);
+                userService
+                    .Setup(s => s.MatchesPolicy(releaseVersion, CanMakeAmendmentOfSpecificReleaseVersion))
+                    .ReturnsAsync(true);
 
-                    userService
-                        .Setup(s => s.MatchesPolicy(releaseVersion.Release, CanUpdateSpecificRelease))
-                        .ReturnsAsync(true);
+                userService
+                    .Setup(s => s.MatchesPolicy(releaseVersion.Release, CanUpdateSpecificRelease))
+                    .ReturnsAsync(true);
 
-                    userService
-                        .Setup(s => s.GetUserId())
-                        .Returns(_userId);
+                userService.Setup(s => s.GetUserId()).Returns(_userId);
 
-                    await using var contextDbContext = InMemoryApplicationDbContext();
-                    contextDbContext.ReleaseVersions.AddRange(releaseVersion, otherReleaseVersion);
-                    contextDbContext.UserReleaseRoles.AddRange(userReleaseRole);
-                    await contextDbContext.SaveChangesAsync();
+                await using var contextDbContext = InMemoryApplicationDbContext();
+                contextDbContext.ReleaseVersions.AddRange(releaseVersion, otherReleaseVersion);
+                contextDbContext.UserReleaseRoles.AddRange(userReleaseRole);
+                await contextDbContext.SaveChangesAsync();
 
-                    var service = BuildService(
-                        contentDbContext: contextDbContext,
-                        userService: userService.Object);
+                var service = BuildService(contentDbContext: contextDbContext, userService: userService.Object);
 
-                    var result = await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
+                var result = await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
 
-                    var viewModel = result.AssertRight();
-                    Assert.Single(viewModel);
-                    Assert.Equal(releaseVersion.Id, viewModel[0].Id);
+                var viewModel = result.AssertRight();
+                Assert.Single(viewModel);
+                Assert.Equal(releaseVersion.Id, viewModel[0].Id);
 
-                    return result;
-                }
-            );
+                return result;
+            });
     }
 
     [Fact]
@@ -294,65 +268,56 @@ public class ReleaseVersionServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .ExpectCheckToFail(RegisteredUser)
-            .AssertForbidden(
-                async userService =>
-                {
-                    var service = BuildService(userService: userService.Object);
-                    return await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
-                }
-            );
+            .AssertForbidden(async userService =>
+            {
+                var service = BuildService(userService: userService.Object);
+                return await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
+            });
     }
 
     [Fact]
     public async Task RemoveDataFiles()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id,
-                CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(
-                async userService =>
-                {
-                    await using var contextDbContext = InMemoryApplicationDbContext();
-                    contextDbContext.ReleaseVersions.Add(releaseVersion);
-                    await contextDbContext.SaveChangesAsync();
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == releaseVersion.Id,
+                CanUpdateSpecificReleaseVersion
+            )
+            .AssertForbidden(async userService =>
+            {
+                await using var contextDbContext = InMemoryApplicationDbContext();
+                contextDbContext.ReleaseVersions.Add(releaseVersion);
+                await contextDbContext.SaveChangesAsync();
 
-                    var service = BuildService(
-                        contentDbContext: contextDbContext,
-                        userService: userService.Object);
+                var service = BuildService(contentDbContext: contextDbContext, userService: userService.Object);
 
-                    return await service.RemoveDataFiles(releaseVersion.Id, Guid.NewGuid());
-                }
-            );
+                return await service.RemoveDataFiles(releaseVersion.Id, Guid.NewGuid());
+            });
     }
 
     [Fact]
     public async Task UpdateReleasePublished()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .ExpectCheckToFail(IsBauUser)
-            .AssertForbidden(
-                async userService =>
-                {
-                    await using var contextDbContext = InMemoryApplicationDbContext();
-                    contextDbContext.ReleaseVersions.Add(releaseVersion);
-                    await contextDbContext.SaveChangesAsync();
+            .AssertForbidden(async userService =>
+            {
+                await using var contextDbContext = InMemoryApplicationDbContext();
+                contextDbContext.ReleaseVersions.Add(releaseVersion);
+                await contextDbContext.SaveChangesAsync();
 
-                    var service = BuildService(
-                        contentDbContext: contextDbContext,
-                        userService: userService.Object);
+                var service = BuildService(contentDbContext: contextDbContext, userService: userService.Object);
 
-                    return await service.UpdateReleasePublished(releaseVersion.Id,
-                        new ReleasePublishedUpdateRequest());
-                }
-            );
+                return await service.UpdateReleasePublished(releaseVersion.Id, new ReleasePublishedUpdateRequest());
+            });
     }
 
     private static ReleaseVersionService BuildService(
@@ -360,7 +325,8 @@ public class ReleaseVersionServicePermissionTests
         ContentDbContext? contentDbContext = null,
         StatisticsDbContext? statisticsDbContext = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
-        bool enableReplacementOfPublicApiDataSets = false)
+        bool enableReplacementOfPublicApiDataSets = false
+    )
     {
         contentDbContext ??= Mock.Of<ContentDbContext>();
         statisticsDbContext ??= Mock.Of<StatisticsDbContext>();
@@ -389,10 +355,12 @@ public class ReleaseVersionServicePermissionTests
             Mock.Of<IUserReleaseInviteRepository>(),
             Mock.Of<IUserReleaseRoleRepository>(),
             Mock.Of<IReleaseSlugValidator>(),
-             featureFlags: Microsoft.Extensions.Options.Options.Create(new FeatureFlagsOptions()
-             {
-                 EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets
-             }),
+            featureFlags: Microsoft.Extensions.Options.Options.Create(
+                new FeatureFlagsOptions()
+                {
+                    EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets,
+                }
+            ),
             Mock.Of<ILogger<ReleaseVersionService>>()
         );
     }

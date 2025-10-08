@@ -22,7 +22,8 @@ public class DataSetValidator(
     ContentDbContext contentDbContext,
     IUserService userService,
     IDataSetService dataSetService,
-    IOptions<FeatureFlagsOptions> featureFlags) : IDataSetValidator
+    IOptions<FeatureFlagsOptions> featureFlags
+) : IDataSetValidator
 {
     public async Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(DataSetDto dataSet)
     {
@@ -43,11 +44,9 @@ public class DataSetValidator(
 
         if (!result.IsValid)
         {
-            errors.AddRange(result.Errors.Select(e => new ErrorViewModel
-            {
-                Code = e.ErrorCode,
-                Message = e.ErrorMessage,
-            }));
+            errors.AddRange(
+                result.Errors.Select(e => new ErrorViewModel { Code = e.ErrorCode, Message = e.ErrorMessage })
+            );
         }
 
         var fileToBeReplaced = (File?)null;
@@ -58,7 +57,10 @@ public class DataSetValidator(
 
         if (fileToBeReplaced is not null)
         {
-            var releaseFileWithApiDataSet = await GetReplacingFileWithApiDataSetIfExists(dataSet.ReleaseVersionId, dataSet.Title);
+            var releaseFileWithApiDataSet = await GetReplacingFileWithApiDataSetIfExists(
+                dataSet.ReleaseVersionId,
+                dataSet.Title
+            );
 
             if (releaseFileWithApiDataSet != null)
             {
@@ -81,14 +83,16 @@ public class DataSetValidator(
                     errors.Add(ValidationMessages.GenerateErrorCannotReplaceDraftApiDataSet(dataSet.Title));
                     return errors;
                 }
-                
+
                 await dataSetService
                     .HasDraftVersion(releaseFileWithApiDataSet.PublicApiDataSetId!.Value)
                     .OnSuccessDo(hasDraftVersion =>
                     {
                         if (hasDraftVersion)
                         {
-                            errors.Add(ValidationMessages.GenerateErrorCannotCreateMultipleDraftApiDataSet(dataSet.Title));
+                            errors.Add(
+                                ValidationMessages.GenerateErrorCannotCreateMultipleDraftApiDataSet(dataSet.Title)
+                            );
                         }
                     });
             }
@@ -108,7 +112,8 @@ public class DataSetValidator(
     public async Task<Either<List<ErrorViewModel>, DataSetIndex>> ValidateBulkDataZipIndexFile(
         Guid releaseVersionId,
         FileDto indexFile,
-        List<FileDto> dataSetFiles)
+        List<FileDto> dataSetFiles
+    )
     {
         var errors = new List<ErrorViewModel>();
         var validator = new FileDto.Validator();
@@ -117,11 +122,9 @@ public class DataSetValidator(
 
         if (!result.IsValid)
         {
-            errors.AddRange(result.Errors.Select(e => new ErrorViewModel
-            {
-                Code = e.ErrorCode,
-                Message = e.ErrorMessage,
-            }));
+            errors.AddRange(
+                result.Errors.Select(e => new ErrorViewModel { Code = e.ErrorCode, Message = e.ErrorMessage })
+            );
         }
 
         var headers = await CsvUtils.GetCsvHeaders(indexFile.FileStreamProvider(), leaveOpen: true);
@@ -149,16 +152,18 @@ public class DataSetValidator(
                 .OnFailureDo(errors.AddRange)
                 .OnSuccessDo(_ =>
                 {
-                    dataSetIndex.DataSetIndexItems.Add(new()
-                    {
-                        DataSetTitle = dataSetName,
-                        DataFileName = $"{dataFileName}{Constants.DataSet.DataFileExtension}",
-                        MetaFileName = $"{dataFileName}{Constants.DataSet.MetaFileExtension}",
-                    });
+                    dataSetIndex.DataSetIndexItems.Add(
+                        new()
+                        {
+                            DataSetTitle = dataSetName,
+                            DataFileName = $"{dataFileName}{Constants.DataSet.DataFileExtension}",
+                            MetaFileName = $"{dataFileName}{Constants.DataSet.MetaFileExtension}",
+                        }
+                    );
 
                     indexFileEntries.Add((BaseFilename: dataFileName, Title: dataSetName));
                 })
-            .OnSuccessVoid();
+                .OnSuccessVoid();
         }
 
         if (errors.Count != 0)
@@ -170,14 +175,13 @@ public class DataSetValidator(
         errors.AddRange(CheckBulkDataZipForMissingFiles(dataSetIndex.DataSetIndexItems, dataSetFiles));
         errors.AddRange(CheckBulkDataZipForUnusedFiles(dataSetIndex.DataSetIndexItems, dataSetFiles));
 
-        return errors.Count > 0
-            ? errors
-            : dataSetIndex;
+        return errors.Count > 0 ? errors : dataSetIndex;
     }
 
     private static List<ErrorViewModel> CheckBulkDataZipForMissingFiles(
         List<DataSetIndexItem> indexItems,
-        List<FileDto> dataSetFiles)
+        List<FileDto> dataSetFiles
+    )
     {
         var errors = new List<ErrorViewModel>();
 
@@ -186,13 +190,17 @@ public class DataSetValidator(
 
         var dataSetFileNames = dataSetFiles.Select(item => item.FileName);
 
-        errors.AddRange(indexItemDataFileNames
-            .Where(fileName => !dataSetFileNames.Contains(fileName))
-            .Select(fileName => ValidationMessages.GenerateErrorFileNotFoundInZip(fileName, FileType.Data)));
+        errors.AddRange(
+            indexItemDataFileNames
+                .Where(fileName => !dataSetFileNames.Contains(fileName))
+                .Select(fileName => ValidationMessages.GenerateErrorFileNotFoundInZip(fileName, FileType.Data))
+        );
 
-        errors.AddRange(indexItemMetaFileNames
-            .Where(fileName => !dataSetFileNames.Contains(fileName))
-            .Select(fileName => ValidationMessages.GenerateErrorFileNotFoundInZip(fileName, FileType.Metadata)));
+        errors.AddRange(
+            indexItemMetaFileNames
+                .Where(fileName => !dataSetFileNames.Contains(fileName))
+                .Select(fileName => ValidationMessages.GenerateErrorFileNotFoundInZip(fileName, FileType.Metadata))
+        );
 
         return errors;
     }
@@ -205,15 +213,15 @@ public class DataSetValidator(
     private async Task<Either<List<ErrorViewModel>, File?>> GetFileToBeReplacedIfExists(
         Guid releaseVersionId,
         string dataSetName,
-        string replacementDataFileName)
+        string replacementDataFileName
+    )
     {
         // We replace files with the same title. If there is no ReleaseFile with the same title, it's a new data set.
-        var releaseFilesToBeReplaced = await contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
+        var releaseFilesToBeReplaced = await contentDbContext
+            .ReleaseFiles.Include(rf => rf.File)
             .Where(rf =>
-                rf.ReleaseVersionId == releaseVersionId &&
-                rf.File.Type == FileType.Data &&
-                rf.Name == dataSetName)
+                rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data && rf.Name == dataSetName
+            )
             .ToListAsync();
 
         if (releaseFilesToBeReplaced.Count == 0)
@@ -234,24 +242,24 @@ public class DataSetValidator(
         if (isReplacement)
         {
             errors.AddRange(await ToBeReplacedFileHasNoIncompleteImports(fileToBeReplaced!));
-            errors.AddRange(ValidateDataFileNames(releaseVersionId, dataSetName, replacementDataFileName, isReplacement));
+            errors.AddRange(
+                ValidateDataFileNames(releaseVersionId, dataSetName, replacementDataFileName, isReplacement)
+            );
         }
 
         return errors.Count != 0 ? errors : fileToBeReplaced;
     }
 
-    private async Task<ReleaseFile?> GetReplacingFileWithApiDataSetIfExists(
-        Guid releaseVersionId,
-        string dataSetName)
+    private async Task<ReleaseFile?> GetReplacingFileWithApiDataSetIfExists(Guid releaseVersionId, string dataSetName)
     {
-        return await contentDbContext.ReleaseFiles
-            .SingleOrDefaultAsync(rf =>
-                rf.ReleaseVersionId == releaseVersionId &&
-                rf.Name == dataSetName &&
-                rf.PublicApiDataSetId != null);
+        return await contentDbContext.ReleaseFiles.SingleOrDefaultAsync(rf =>
+            rf.ReleaseVersionId == releaseVersionId && rf.Name == dataSetName && rf.PublicApiDataSetId != null
+        );
     }
 
-    private static List<ErrorViewModel> CheckIndexFileForDuplicationErrors(List<(string BaseFilename, string Title)> dataSetNamesCsvEntries)
+    private static List<ErrorViewModel> CheckIndexFileForDuplicationErrors(
+        List<(string BaseFilename, string Title)> dataSetNamesCsvEntries
+    )
     {
         var errors = new List<ErrorViewModel>();
 
@@ -260,36 +268,39 @@ public class DataSetValidator(
             .Where(group => group.Count() > 1)
             .Select(group => group.Key)
             .ToList()
-            .ForEach(duplicateTitle => errors.Add(ValidationMessages.GenerateErrorDataSetTitleShouldBeUnique(duplicateTitle)));
+            .ForEach(duplicateTitle =>
+                errors.Add(ValidationMessages.GenerateErrorDataSetTitleShouldBeUnique(duplicateTitle))
+            );
 
         dataSetNamesCsvEntries
             .GroupBy(entry => entry.BaseFilename)
             .Where(group => group.Count() > 1)
             .Select(group => group.Key)
             .ToList()
-            .ForEach(duplicateFilename => errors.Add(ValidationMessages.GenerateErrorDataSetNamesCsvFilenamesShouldBeUnique(duplicateFilename)));
+            .ForEach(duplicateFilename =>
+                errors.Add(ValidationMessages.GenerateErrorDataSetNamesCsvFilenamesShouldBeUnique(duplicateFilename))
+            );
 
         return errors;
     }
 
     private static List<ErrorViewModel> CheckBulkDataZipForUnusedFiles(
         List<DataSetIndexItem> indexItems,
-        List<FileDto> dataSetFiles)
+        List<FileDto> dataSetFiles
+    )
     {
         var indexItemDataFileNames = indexItems.Select(item => item.DataFileName);
         var indexItemMetaFileNames = indexItems.Select(item => item.MetaFileName);
 
         var remainingFiles = dataSetFiles
             .Where(file =>
-                !indexItemDataFileNames.Contains(file.FileName) &&
-                !indexItemMetaFileNames.Contains(file.FileName))
+                !indexItemDataFileNames.Contains(file.FileName) && !indexItemMetaFileNames.Contains(file.FileName)
+            )
             .ToList();
 
         if (remainingFiles.Count > 0)
         {
-            var remainingFileNames = remainingFiles
-                .Select(file => file.FileName)
-                .ToList();
+            var remainingFileNames = remainingFiles.Select(file => file.FileName).ToList();
 
             return [ValidationMessages.GenerateErrorZipContainsUnusedFiles(remainingFileNames)];
         }
@@ -307,7 +318,7 @@ public class DataSetValidator(
     /// we only care if the pre-existing duplicate <see cref="ReleaseFile"/> name isn't the file being replaced.
     /// </para>
     /// <para>
-    /// We allow duplicate meta file names - meta files aren't included in publicly downloadable zip archives, 
+    /// We allow duplicate meta file names - meta files aren't included in publicly downloadable zip archives,
     /// so meta files won't be included in the same directory by file name and therefore cannot clash.
     /// </para>
     /// </remarks>
@@ -315,20 +326,17 @@ public class DataSetValidator(
         Guid releaseVersionId,
         string dataSetTitle,
         string dataFileName,
-        bool isReplacement)
+        bool isReplacement
+    )
     {
-        var dataReleaseFiles = contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
-            .Where(rf =>
-                rf.ReleaseVersionId == releaseVersionId &&
-                rf.File.Type == FileType.Data)
+        var dataReleaseFiles = contentDbContext
+            .ReleaseFiles.Include(rf => rf.File)
+            .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data)
             .ToList();
 
         if (isReplacement)
         {
-            var originalFile = dataReleaseFiles.Single(rf =>
-                rf.Name == dataSetTitle &&
-                rf.File.ReplacedBy is null);
+            var originalFile = dataReleaseFiles.Single(rf => rf.Name == dataSetTitle && rf.File.ReplacedBy is null);
 
             // It's ok to have the same data file name as the file we're replacing,
             // so this can be removed before performing the duplicate check.
@@ -345,8 +353,8 @@ public class DataSetValidator(
     private async Task<List<ErrorViewModel>> ToBeReplacedFileHasNoIncompleteImports(File file)
     {
         var releaseFileHasIncompleteImport = await contentDbContext.DataImports.AnyAsync(di =>
-            di.FileId == file.Id &&
-            DataImportStatusExtensions.IncompleteStatuses.Contains(di.Status));
+            di.FileId == file.Id && DataImportStatusExtensions.IncompleteStatuses.Contains(di.Status)
+        );
 
         return releaseFileHasIncompleteImport
             ? [ValidationMessages.GenerateErrorDataSetImportInProgress(file.Filename)]

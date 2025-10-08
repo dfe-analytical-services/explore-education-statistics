@@ -66,7 +66,7 @@ public class LocationCsvUtilsTests
             Country = _england,
             Region = _northWest,
             LocalAuthority = _nottingham,
-            GeographicLevel = GeographicLevel.LocalAuthority
+            GeographicLevel = GeographicLevel.LocalAuthority,
         };
 
         var csvValues = location.GetCsvValues();

@@ -9,26 +9,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 
 public class DeleteDataSetVersionFunction(
     IDataSetVersionService dataSetVersionService,
-    ILogger<DeleteDataSetVersionFunction> logger)
+    ILogger<DeleteDataSetVersionFunction> logger
+)
 {
     [Function(nameof(DeleteDataSetVersion))]
     public async Task<IActionResult> DeleteDataSetVersion(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete",
-            Route = $"{nameof(DeleteDataSetVersion)}/{{dataSetVersionId:guid}}")]
-        HttpRequest request,
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "delete",
+            Route = $"{nameof(DeleteDataSetVersion)}/{{dataSetVersionId:guid}}"
+        )]
+            HttpRequest request,
         Guid dataSetVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         try
         {
-            return await dataSetVersionService.DeleteVersion(
-                    dataSetVersionId,
-                    cancellationToken: cancellationToken)
+            return await dataSetVersionService
+                .DeleteVersion(dataSetVersionId, cancellationToken: cancellationToken)
                 .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
         }
         catch (Exception ex)
         {
-            logger.LogError(exception: ex, "Exception occured while executing '{FunctionName}'", nameof(DeleteDataSetVersion));
+            logger.LogError(
+                exception: ex,
+                "Exception occured while executing '{FunctionName}'",
+                nameof(DeleteDataSetVersion)
+            );
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }

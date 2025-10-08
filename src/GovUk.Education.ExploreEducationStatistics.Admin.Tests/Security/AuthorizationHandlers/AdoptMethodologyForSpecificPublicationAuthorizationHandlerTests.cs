@@ -8,8 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
@@ -47,13 +46,12 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
                         .ReturnsAsync(new List<PublicationRole>());
                 }
 
-                var user = DataFixture
-                    .AuthenticatedUser(userId: UserId)
-                    .WithClaim(claim.ToString());
+                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<AdoptMethodologyForSpecificPublicationRequirement,
-                    Publication>(user, Publication);
+                var authContext = CreateAuthorizationHandlerContext<
+                    AdoptMethodologyForSpecificPublicationRequirement,
+                    Publication
+                >(user, Publication);
 
                 await handler.HandleAsync(authContext);
 
@@ -81,9 +79,10 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
-                var authContext =
-                    CreateAuthorizationHandlerContext<AdoptMethodologyForSpecificPublicationRequirement,
-                        Publication>(user, Publication);
+                var authContext = CreateAuthorizationHandlerContext<
+                    AdoptMethodologyForSpecificPublicationRequirement,
+                    Publication
+                >(user, Publication);
 
                 await handler.HandleAsync(authContext);
 
@@ -104,6 +103,8 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                 Mock.Of<IUserReleaseRoleRepository>(Strict),
                 userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
-                Mock.Of<IPreReleaseService>(Strict)));
+                Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
     }
 }

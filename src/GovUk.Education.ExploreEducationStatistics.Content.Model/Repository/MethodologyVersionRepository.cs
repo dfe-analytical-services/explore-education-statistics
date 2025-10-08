@@ -12,8 +12,7 @@ public class MethodologyVersionRepository : IMethodologyVersionRepository
     private readonly ContentDbContext _contentDbContext;
     private readonly IMethodologyRepository _methodologyRepository;
 
-    public MethodologyVersionRepository(ContentDbContext contentDbContext,
-        IMethodologyRepository methodologyRepository)
+    public MethodologyVersionRepository(ContentDbContext contentDbContext, IMethodologyRepository methodologyRepository)
     {
         _contentDbContext = contentDbContext;
         _methodologyRepository = methodologyRepository;
@@ -21,30 +20,27 @@ public class MethodologyVersionRepository : IMethodologyVersionRepository
 
     public async Task<MethodologyVersion> CreateMethodologyForPublication(Guid publicationId, Guid createdByUserId)
     {
-        var publication = await _contentDbContext
-            .Publications
-            .AsQueryable()
-            .SingleAsync(p => p.Id == publicationId);
+        var publication = await _contentDbContext.Publications.AsQueryable().SingleAsync(p => p.Id == publicationId);
 
-        var methodologyVersion = (await _contentDbContext.MethodologyVersions.AddAsync(new MethodologyVersion
-        {
-            PublishingStrategy = Immediately,
-            Methodology = new Methodology
-            {
-                OwningPublicationTitle = publication.Title,
-                OwningPublicationSlug = publication.Slug,
-                Publications = new List<PublicationMethodology>
+        var methodologyVersion = (
+            await _contentDbContext.MethodologyVersions.AddAsync(
+                new MethodologyVersion
                 {
-                    new()
+                    PublishingStrategy = Immediately,
+                    Methodology = new Methodology
                     {
-                        Owner = true,
-                        PublicationId = publicationId
-                    }
+                        OwningPublicationTitle = publication.Title,
+                        OwningPublicationSlug = publication.Slug,
+                        Publications = new List<PublicationMethodology>
+                        {
+                            new() { Owner = true, PublicationId = publicationId },
+                        },
+                    },
+                    Created = DateTime.UtcNow,
+                    CreatedById = createdByUserId,
                 }
-            },
-            Created = DateTime.UtcNow,
-            CreatedById = createdByUserId
-        })).Entity;
+            )
+        ).Entity;
 
         await _contentDbContext.SaveChangesAsync();
         return methodologyVersion;
@@ -52,8 +48,8 @@ public class MethodologyVersionRepository : IMethodologyVersionRepository
 
     public async Task<MethodologyVersion> GetLatestVersion(Guid methodologyId)
     {
-        var methodology = await _contentDbContext.Methodologies
-            .Include(m => m.Versions)
+        var methodology = await _contentDbContext
+            .Methodologies.Include(m => m.Versions)
             .SingleAsync(mp => mp.Id == methodologyId);
 
         return methodology.LatestVersion();
@@ -61,21 +57,17 @@ public class MethodologyVersionRepository : IMethodologyVersionRepository
 
     public async Task<List<MethodologyVersion>> GetLatestVersionByPublication(Guid publicationId)
     {
-        var publication = await _contentDbContext.Publications
-            .AsQueryable()
-            .SingleAsync(p => p.Id == publicationId);
+        var publication = await _contentDbContext.Publications.AsQueryable().SingleAsync(p => p.Id == publicationId);
 
         var methodologies = await _methodologyRepository.GetByPublication(publication.Id);
-        return (await methodologies.SelectAsync(async methodology =>
+        return (
+            await methodologies.SelectAsync(async methodology =>
             {
-                await _contentDbContext.Entry(methodology)
-                    .Collection(m => m.Versions)
-                    .LoadAsync();
+                await _contentDbContext.Entry(methodology).Collection(m => m.Versions).LoadAsync();
 
                 return methodology.LatestVersion();
-            }))
-            .Where(version => version != null)
-            .ToList();
+            })
+        ).Where(version => version != null).ToList();
     }
 
     public async Task<MethodologyVersion?> GetLatestPublishedVersionBySlug(string slug)
@@ -87,14 +79,15 @@ public class MethodologyVersionRepository : IMethodologyVersionRepository
             .Where(mv =>
                 mv.Methodology.LatestPublishedVersionId == mv.Id
                 // EF cannot translate mv.Slug into a Queryable, so we have to do this...
-                && slug == (mv.AlternativeSlug ?? mv.Methodology.OwningPublicationSlug))
+                && slug == (mv.AlternativeSlug ?? mv.Methodology.OwningPublicationSlug)
+            )
             .SingleOrDefaultAsync();
     }
 
     public async Task<MethodologyVersion?> GetLatestPublishedVersion(Guid methodologyId)
     {
-        return await _contentDbContext.Methodologies
-            .Include(m => m.LatestPublishedVersion)
+        return await _contentDbContext
+            .Methodologies.Include(m => m.LatestPublishedVersion)
             .AsQueryable()
             .Where(mp => mp.Id == methodologyId)
             .Select(m => m.LatestPublishedVersion)
@@ -105,26 +98,19 @@ public class MethodologyVersionRepository : IMethodologyVersionRepository
     {
         var methodologies = await _methodologyRepository.GetByPublication(publicationId);
 
-        var methodologyVersions = await methodologies
-            .SelectAsync(async methodology =>
-            {
-                await _contentDbContext.Entry(methodology)
-                    .Reference(m => m.LatestPublishedVersion)
-                    .LoadAsync();
+        var methodologyVersions = await methodologies.SelectAsync(async methodology =>
+        {
+            await _contentDbContext.Entry(methodology).Reference(m => m.LatestPublishedVersion).LoadAsync();
 
-                return methodology.LatestPublishedVersion;
-            });
+            return methodology.LatestPublishedVersion;
+        });
 
-        return methodologyVersions
-            .WhereNotNull()
-            .ToList();
+        return methodologyVersions.WhereNotNull().ToList();
     }
 
     public async Task<bool> IsLatestPublishedVersion(MethodologyVersion methodologyVersion)
     {
-        await _contentDbContext.Entry(methodologyVersion)
-            .Reference(mv => mv.Methodology)
-            .LoadAsync();
+        await _contentDbContext.Entry(methodologyVersion).Reference(mv => mv.Methodology).LoadAsync();
 
         return methodologyVersion.Id == methodologyVersion.Methodology.LatestPublishedVersionId;
     }
@@ -144,8 +130,10 @@ public class MethodologyVersionRepository : IMethodologyVersionRepository
         {
             // If the next version is scheduled for immediate publishing, we don't need to check if the
             // associated publication is published: the previous version won't be published in either case.
-            if (nextVersion.ScheduledForPublishingImmediately ||
-                await IsVersionScheduledForPublishingWithPublishedRelease(nextVersion))
+            if (
+                nextVersion.ScheduledForPublishingImmediately
+                || await IsVersionScheduledForPublishingWithPublishedRelease(nextVersion)
+            )
             {
                 return false;
             }
@@ -164,49 +152,37 @@ public class MethodologyVersionRepository : IMethodologyVersionRepository
 
     private async Task<bool> PublicationsHaveAtLeastOnePublishedRelease(MethodologyVersion methodologyVersion)
     {
-        await _contentDbContext.Entry(methodologyVersion)
-            .Reference(m => m.Methodology)
-            .LoadAsync();
+        await _contentDbContext.Entry(methodologyVersion).Reference(m => m.Methodology).LoadAsync();
 
-        await _contentDbContext.Entry(methodologyVersion.Methodology)
-            .Collection(mp => mp.Publications)
-            .LoadAsync();
+        await _contentDbContext.Entry(methodologyVersion.Methodology).Collection(mp => mp.Publications).LoadAsync();
 
         return methodologyVersion.Methodology.Publications.Any(publicationMethodology =>
         {
-            _contentDbContext.Entry(publicationMethodology)
-                .Reference(pm => pm.Publication)
-                .Load();
+            _contentDbContext.Entry(publicationMethodology).Reference(pm => pm.Publication).Load();
 
             return publicationMethodology.Publication.Live;
         });
     }
 
-    private async Task<bool> IsVersionScheduledForPublishingWithPublishedRelease(
-        MethodologyVersion methodologyVersion)
+    private async Task<bool> IsVersionScheduledForPublishingWithPublishedRelease(MethodologyVersion methodologyVersion)
     {
         if (!methodologyVersion.ScheduledForPublishingWithRelease)
         {
             return false;
         }
 
-        await _contentDbContext.Entry(methodologyVersion)
-            .Reference(m => m.ScheduledWithReleaseVersion)
-            .LoadAsync();
+        await _contentDbContext.Entry(methodologyVersion).Reference(m => m.ScheduledWithReleaseVersion).LoadAsync();
         return methodologyVersion.ScheduledForPublishingWithPublishedRelease;
     }
 
     private async Task<MethodologyVersion?> GetNextVersion(MethodologyVersion methodologyVersion)
     {
-        await _contentDbContext.Entry(methodologyVersion)
-            .Reference(m => m.Methodology)
-            .LoadAsync();
+        await _contentDbContext.Entry(methodologyVersion).Reference(m => m.Methodology).LoadAsync();
 
-        await _contentDbContext.Entry(methodologyVersion.Methodology)
-            .Collection(mp => mp.Versions)
-            .LoadAsync();
+        await _contentDbContext.Entry(methodologyVersion.Methodology).Collection(mp => mp.Versions).LoadAsync();
 
         return methodologyVersion.Methodology.Versions.SingleOrDefault(mv =>
-            mv.PreviousVersionId == methodologyVersion.Id);
+            mv.PreviousVersionId == methodologyVersion.Id
+        );
     }
 }

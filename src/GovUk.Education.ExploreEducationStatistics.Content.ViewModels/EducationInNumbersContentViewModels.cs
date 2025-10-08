@@ -14,8 +14,6 @@ public class EducationInNumbersContentViewModels
 
         public string Heading { get; set; } = string.Empty;
 
-        public string? Caption { get; set; }
-
         public List<EinContentBlockViewModel> Content { get; set; } = new();
 
         public static EinContentSectionViewModel FromModel(EinContentSection section)
@@ -25,9 +23,8 @@ public class EducationInNumbersContentViewModels
                 Id = section.Id,
                 Order = section.Order,
                 Heading = section.Heading,
-                Caption = section.Caption,
-                Content = section.Content
-                    .Select(EinContentBlockViewModel.FromModel)
+                Content = section
+                    .Content.Select(EinContentBlockViewModel.FromModel)
                     .OrderBy(block => block.Order)
                     .ToList(),
             };
@@ -49,7 +46,7 @@ public class EducationInNumbersContentViewModels
             {
                 EinHtmlBlock htmlBlock => EinHtmlBlockViewModel.FromModel(htmlBlock),
                 EinTileGroupBlock groupBlock => EinTileGroupBlockViewModel.FromModel(groupBlock),
-                _ => throw new Exception($"{nameof(EinContentBlock)} type {block.GetType()} not found")
+                _ => throw new Exception($"{nameof(EinContentBlock)} type {block.GetType()} not found"),
             };
         }
     }
@@ -83,10 +80,7 @@ public class EducationInNumbersContentViewModels
                 Order = groupBlock.Order,
                 Type = EinBlockType.TileGroupBlock,
                 Title = groupBlock.Title,
-                Tiles = groupBlock.Tiles
-                    .Select(EinTileViewModel.FromModel)
-                    .OrderBy(tile => tile.Order)
-                    .ToList(),
+                Tiles = groupBlock.Tiles.Select(EinTileViewModel.FromModel).OrderBy(tile => tile.Order).ToList(),
             };
         }
     }
@@ -105,7 +99,7 @@ public class EducationInNumbersContentViewModels
             return tile switch
             {
                 EinFreeTextStatTile statTile => EinFreeTextStatTileViewModel.FromModel(statTile),
-                _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found")
+                _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found"),
             };
         }
     }

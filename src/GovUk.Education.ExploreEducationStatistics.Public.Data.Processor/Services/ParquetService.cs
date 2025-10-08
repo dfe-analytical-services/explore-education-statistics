@@ -14,22 +14,23 @@ public class ParquetService(
     IDataSetVersionPathResolver dataSetVersionPathResolver
 ) : IParquetService
 {
-    public async Task WriteDataFiles(
-        Guid dataSetVersionId,
-        CancellationToken cancellationToken = default)
+    public async Task WriteDataFiles(Guid dataSetVersionId, CancellationToken cancellationToken = default)
     {
-        var dataSetVersion = await publicDataDbContext.DataSetVersions
-            .SingleAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken: cancellationToken);
+        var dataSetVersion = await publicDataDbContext.DataSetVersions.SingleAsync(
+            dsv => dsv.Id == dataSetVersionId,
+            cancellationToken: cancellationToken
+        );
 
         var versionDir = dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
 
         logger.LogDebug("Writing data files to data set version directory '{VersionDir}'", versionDir);
 
-        await using var duckDbConnection =
-            DuckDbConnection.CreateFileConnectionReadOnly(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
+        await using var duckDbConnection = DuckDbConnection.CreateFileConnectionReadOnly(
+            dataSetVersionPathResolver.DuckDbPath(dataSetVersion)
+        );
 
-        await duckDbConnection.SqlBuilder(
-                $"EXPORT DATABASE '{versionDir:raw}' (FORMAT PARQUET, CODEC ZSTD)")
+        await duckDbConnection
+            .SqlBuilder($"EXPORT DATABASE '{versionDir:raw}' (FORMAT PARQUET, CODEC ZSTD)")
             .ExecuteAsync(cancellationToken: cancellationToken);
 
         // Convert absolute paths in load.sql to relative paths otherwise
@@ -39,8 +40,9 @@ public class ParquetService(
 
         var absolutePathToReplace = $"{versionDir.Replace('\\', '/')}/";
 
-        var newLines = (await File.ReadAllLinesAsync(loadSqlFilePath, cancellationToken))
-            .Select(line => line.Replace(absolutePathToReplace, ""));
+        var newLines = (await File.ReadAllLinesAsync(loadSqlFilePath, cancellationToken)).Select(line =>
+            line.Replace(absolutePathToReplace, "")
+        );
 
         await File.WriteAllLinesAsync(loadSqlFilePath, newLines, cancellationToken);
     }

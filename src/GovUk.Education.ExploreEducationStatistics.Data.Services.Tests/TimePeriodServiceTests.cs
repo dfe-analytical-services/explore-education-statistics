@@ -15,12 +15,12 @@ public class TimePeriodServiceTests
         {
             Observations = new List<Observation>
             {
-                new() {Year = 2001, TimeIdentifier = Week1},
-                new() {Year = 2000, TimeIdentifier = Week20},
-                new() {Year = 2000, TimeIdentifier = Week2},
-                new() {Year = 2000, TimeIdentifier = Week1},
-                new() {Year = 2000, TimeIdentifier = Week10},
-            }
+                new() { Year = 2001, TimeIdentifier = Week1 },
+                new() { Year = 2000, TimeIdentifier = Week20 },
+                new() { Year = 2000, TimeIdentifier = Week2 },
+                new() { Year = 2000, TimeIdentifier = Week1 },
+                new() { Year = 2000, TimeIdentifier = Week10 },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -51,12 +51,12 @@ public class TimePeriodServiceTests
         {
             Observations = new List<Observation>
             {
-                new() {Year = 2001, TimeIdentifier = January},
-                new() {Year = 2000, TimeIdentifier = February},
-                new() {Year = 2000, TimeIdentifier = December},
-                new() {Year = 2000, TimeIdentifier = October},
-                new() {Year = 2000, TimeIdentifier = March},
-            }
+                new() { Year = 2001, TimeIdentifier = January },
+                new() { Year = 2000, TimeIdentifier = February },
+                new() { Year = 2000, TimeIdentifier = December },
+                new() { Year = 2000, TimeIdentifier = October },
+                new() { Year = 2000, TimeIdentifier = March },
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -83,11 +83,11 @@ public class TimePeriodServiceTests
     [Fact]
     public async Task GetTimePeriods_Observations_CorrectlyOrderWeeklyTimeIdentifiers()
     {
-        var obs1 = new Observation {Year = 2001, TimeIdentifier = Week1};
-        var obs2 = new Observation {Year = 2000, TimeIdentifier = Week20};
-        var obs3 = new Observation {Year = 2000, TimeIdentifier = Week2};
-        var obs4 = new Observation {Year = 2000, TimeIdentifier = Week1};
-        var obs5 = new Observation {Year = 2000, TimeIdentifier = Week10};
+        var obs1 = new Observation { Year = 2001, TimeIdentifier = Week1 };
+        var obs2 = new Observation { Year = 2000, TimeIdentifier = Week20 };
+        var obs3 = new Observation { Year = 2000, TimeIdentifier = Week2 };
+        var obs4 = new Observation { Year = 2000, TimeIdentifier = Week1 };
+        var obs5 = new Observation { Year = 2000, TimeIdentifier = Week10 };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -118,31 +118,27 @@ public class TimePeriodServiceTests
 
         var subject = new Subject();
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = releaseVersion,
-            Subject = subject
-        };
+        var releaseSubject = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = subject };
 
         var subjectObservation1 = new Observation
         {
             Subject = subject,
             Year = 2030,
-            TimeIdentifier = AcademicYearQ3
+            TimeIdentifier = AcademicYearQ3,
         };
 
         var subjectObservation2 = new Observation
         {
             Subject = subject,
             Year = 2020,
-            TimeIdentifier = AcademicYearQ4
+            TimeIdentifier = AcademicYearQ4,
         };
 
         var subjectObservation3 = new Observation
         {
             Subject = subject,
             Year = 2021,
-            TimeIdentifier = AcademicYearQ1
+            TimeIdentifier = AcademicYearQ1,
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -152,10 +148,7 @@ public class TimePeriodServiceTests
             statisticsDbContext.ReleaseVersion.Add(releaseVersion);
             statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.ReleaseSubject.Add(releaseSubject);
-            statisticsDbContext.Observation.AddRange(
-                subjectObservation1,
-                subjectObservation2,
-                subjectObservation3);
+            statisticsDbContext.Observation.AddRange(subjectObservation1, subjectObservation2, subjectObservation3);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -177,11 +170,7 @@ public class TimePeriodServiceTests
 
         var subject = new Subject();
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = releaseVersion,
-            Subject = subject
-        };
+        var releaseSubject = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = subject };
 
         var subjectObservation1 = new Observation
         {
@@ -210,10 +199,7 @@ public class TimePeriodServiceTests
             statisticsDbContext.ReleaseVersion.Add(releaseVersion);
             statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.ReleaseSubject.Add(releaseSubject);
-            statisticsDbContext.Observation.AddRange(
-                subjectObservation1,
-                subjectObservation2,
-                subjectObservation3);
+            statisticsDbContext.Observation.AddRange(subjectObservation1, subjectObservation2, subjectObservation3);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -235,11 +221,7 @@ public class TimePeriodServiceTests
 
         var subject = new Subject();
 
-        var releaseSubject1 = new ReleaseSubject
-        {
-            ReleaseVersion = releaseVersion,
-            Subject = subject
-        };
+        var releaseSubject1 = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = subject };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
 

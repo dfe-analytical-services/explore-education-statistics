@@ -21,13 +21,9 @@ public abstract class Change<TEntity>
     {
         public virtual void Configure(EntityTypeBuilder<TChange> builder)
         {
-            builder
-                .HasOne(c => c.CurrentState)
-                .WithMany();
+            builder.HasOne(c => c.CurrentState).WithMany();
 
-            builder
-                .HasOne(c => c.PreviousState)
-                .WithMany();
+            builder.HasOne(c => c.PreviousState).WithMany();
 
             builder.Navigation(c => c.PreviousState).AutoInclude();
             builder.Navigation(c => c.CurrentState).AutoInclude();
@@ -50,29 +46,31 @@ public class FilterOptionMetaChange : Change<FilterOptionMetaChange.State>
     {
         public void Configure(EntityTypeBuilder<FilterOptionMetaChange> builder)
         {
-            builder.OwnsOne(c => c.PreviousState, b =>
-            {
-                b.HasOne(s => s.Meta)
-                    .WithMany();
+            builder.OwnsOne(
+                c => c.PreviousState,
+                b =>
+                {
+                    b.HasOne(s => s.Meta).WithMany();
 
-                b.HasOne(s => s.Option)
-                    .WithMany();
+                    b.HasOne(s => s.Option).WithMany();
 
-                b.Navigation(s => s.Meta).AutoInclude();
-                b.Navigation(s => s.Option).AutoInclude();
-            });
+                    b.Navigation(s => s.Meta).AutoInclude();
+                    b.Navigation(s => s.Option).AutoInclude();
+                }
+            );
 
-            builder.OwnsOne(c => c.CurrentState, b =>
-            {
-                b.HasOne(s => s.Meta)
-                    .WithMany();
+            builder.OwnsOne(
+                c => c.CurrentState,
+                b =>
+                {
+                    b.HasOne(s => s.Meta).WithMany();
 
-                b.HasOne(s => s.Option)
-                    .WithMany();
+                    b.HasOne(s => s.Option).WithMany();
 
-                b.Navigation(s => s.Meta).AutoInclude();
-                b.Navigation(s => s.Option).AutoInclude();
-            });
+                    b.Navigation(s => s.Meta).AutoInclude();
+                    b.Navigation(s => s.Option).AutoInclude();
+                }
+            );
         }
     }
 
@@ -96,7 +94,7 @@ public class FilterOptionMetaChange : Change<FilterOptionMetaChange.State>
                 MetaId = link.MetaId,
                 Option = link.Option,
                 OptionId = link.OptionId,
-                PublicId = link.PublicId
+                PublicId = link.PublicId,
             };
         }
     }
@@ -121,7 +119,6 @@ public class IndicatorMetaChange : Change<IndicatorMeta>
 }
 
 public class LocationMetaChange : Change<LocationMeta>
-
 {
     public int? CurrentStateId { get; set; }
 
@@ -136,29 +133,31 @@ public class LocationOptionMetaChange : Change<LocationOptionMetaChange.State>
     {
         public void Configure(EntityTypeBuilder<LocationOptionMetaChange> builder)
         {
-            builder.OwnsOne(c => c.PreviousState, b =>
-            {
-                b.HasOne(s => s.Meta)
-                    .WithMany();
+            builder.OwnsOne(
+                c => c.PreviousState,
+                b =>
+                {
+                    b.HasOne(s => s.Meta).WithMany();
 
-                b.HasOne(s => s.Option)
-                    .WithMany();
+                    b.HasOne(s => s.Option).WithMany();
 
-                b.Navigation(s => s.Meta).AutoInclude();
-                b.Navigation(s => s.Option).AutoInclude();
-            });
+                    b.Navigation(s => s.Meta).AutoInclude();
+                    b.Navigation(s => s.Option).AutoInclude();
+                }
+            );
 
-            builder.OwnsOne(c => c.CurrentState, b =>
-            {
-                b.HasOne(s => s.Meta)
-                    .WithMany();
+            builder.OwnsOne(
+                c => c.CurrentState,
+                b =>
+                {
+                    b.HasOne(s => s.Meta).WithMany();
 
-                b.HasOne(s => s.Option)
-                    .WithMany();
+                    b.HasOne(s => s.Option).WithMany();
 
-                b.Navigation(s => s.Meta).AutoInclude();
-                b.Navigation(s => s.Option).AutoInclude();
-            });
+                    b.Navigation(s => s.Meta).AutoInclude();
+                    b.Navigation(s => s.Option).AutoInclude();
+                }
+            );
         }
     }
 
@@ -182,7 +181,7 @@ public class LocationOptionMetaChange : Change<LocationOptionMetaChange.State>
                 MetaId = link.MetaId,
                 Option = link.Option,
                 OptionId = link.OptionId,
-                PublicId = link.PublicId
+                PublicId = link.PublicId,
             };
         }
     }

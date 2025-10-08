@@ -12,5 +12,6 @@ public interface IDataSetValidator
     Task<Either<List<ErrorViewModel>, DataSetIndex>> ValidateBulkDataZipIndexFile(
         Guid releaseVersionId,
         FileDto indexFile,
-        List<FileDto> dataSetFiles);
+        List<FileDto> dataSetFiles
+    );
 }

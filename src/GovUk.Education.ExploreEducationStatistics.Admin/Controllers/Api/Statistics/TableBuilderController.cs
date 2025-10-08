@@ -29,7 +29,8 @@ public class TableBuilderController : ControllerBase
     public TableBuilderController(
         ITableBuilderService tableBuilderService,
         IUserService userService,
-        IDataBlockService dataBlockService)
+        IDataBlockService dataBlockService
+    )
     {
         _tableBuilderService = tableBuilderService;
         _userService = userService;
@@ -42,21 +43,21 @@ public class TableBuilderController : ControllerBase
     public async Task<ActionResult> Query(
         Guid releaseVersionId,
         [FromBody] FullTableQueryRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         if (Request.AcceptsCsv(exact: true))
         {
-            Response.ContentDispositionAttachment(
-                contentType: ContentTypes.Csv,
-                filename: $"{releaseVersionId}.csv");
+            Response.ContentDispositionAttachment(contentType: ContentTypes.Csv, filename: $"{releaseVersionId}.csv");
 
-            return await _tableBuilderService.QueryToCsvStream(
-                releaseVersionId: releaseVersionId,
-                query: request.AsFullTableQuery(),
-                stream: Response.BodyWriter.AsStream(),
-                cancellationToken: cancellationToken
-            )
-            .HandleFailuresOrNoOp();
+            return await _tableBuilderService
+                .QueryToCsvStream(
+                    releaseVersionId: releaseVersionId,
+                    query: request.AsFullTableQuery(),
+                    stream: Response.BodyWriter.AsStream(),
+                    cancellationToken: cancellationToken
+                )
+                .HandleFailuresOrNoOp();
         }
 
         return await _tableBuilderService
@@ -68,7 +69,8 @@ public class TableBuilderController : ControllerBase
     public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
         Guid releaseVersionId,
         Guid dataBlockParentId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await _dataBlockService
             .GetDataBlockVersionForRelease(releaseVersionId: releaseVersionId, dataBlockParentId: dataBlockParentId)
@@ -81,24 +83,32 @@ public class TableBuilderController : ControllerBase
         Guid releaseVersionId,
         Guid dataBlockParentId,
         [FromQuery] long boundaryLevelId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await _dataBlockService
             .GetDataBlockVersionForRelease(releaseVersionId, dataBlockParentId)
-            .OnSuccess(dataBlockVersion => GetLocations(releaseVersionId, dataBlockVersion, boundaryLevelId, cancellationToken))
+            .OnSuccess(dataBlockVersion =>
+                GetLocations(releaseVersionId, dataBlockVersion, boundaryLevelId, cancellationToken)
+            )
             .HandleFailuresOrOk();
     }
 
     [BlobCache(typeof(DataBlockTableResultCacheKey))]
     private async Task<Either<ActionResult, TableBuilderResultViewModel>> GetReleaseDataBlockResults(
         DataBlockVersion dataBlockVersion,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await _userService
             .CheckCanViewReleaseVersion(dataBlockVersion.ReleaseVersion)
-            .OnSuccess(_ => _tableBuilderService.Query(releaseVersionId: dataBlockVersion.ReleaseVersionId,
-                dataBlockVersion.Query,
-                cancellationToken));
+            .OnSuccess(_ =>
+                _tableBuilderService.Query(
+                    releaseVersionId: dataBlockVersion.ReleaseVersionId,
+                    dataBlockVersion.Query,
+                    cancellationToken
+                )
+            );
     }
 
     [BlobCache(typeof(LocationsForDataBlockCacheKey))]
@@ -106,10 +116,18 @@ public class TableBuilderController : ControllerBase
         Guid releaseVersionId,
         DataBlockVersion dataBlockVersion,
         long boundaryLevelId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await _userService
             .CheckCanViewReleaseVersion(dataBlockVersion.ReleaseVersion)
-            .OnSuccess(_ => _tableBuilderService.QueryForBoundaryLevel(releaseVersionId, dataBlockVersion.Query, boundaryLevelId, cancellationToken));
+            .OnSuccess(_ =>
+                _tableBuilderService.QueryForBoundaryLevel(
+                    releaseVersionId,
+                    dataBlockVersion.Query,
+                    boundaryLevelId,
+                    cancellationToken
+                )
+            );
     }
 }

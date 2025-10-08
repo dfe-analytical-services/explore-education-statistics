@@ -15,16 +15,17 @@ internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient htt
         int pageSize,
         string? search = null,
         IEnumerable<Guid>? publicationIds = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var request = new PublicationsListPostRequest(
             Search: search,
             Page: page,
             PageSize: pageSize,
-            PublicationIds: publicationIds);
+            PublicationIds: publicationIds
+        );
 
-        var response = await httpClient
-            .PostAsJsonAsync("api/publications", request, cancellationToken);
+        var response = await httpClient.PostAsJsonAsync("api/publications", request, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -52,19 +53,19 @@ internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient htt
             }
         }
 
-        var publications = await response.Content
-            .ReadFromJsonAsync<PaginatedListViewModel<PublicationSearchResultViewModel>>(cancellationToken);
+        var publications = await response.Content.ReadFromJsonAsync<
+            PaginatedListViewModel<PublicationSearchResultViewModel>
+        >(cancellationToken);
 
-        return publications
-               ?? throw new NullReferenceException("Could not deserialize content API response.");
+        return publications ?? throw new NullReferenceException("Could not deserialize content API response.");
     }
 
     public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetPublication(
         Guid publicationId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        var response = await httpClient
-            .GetAsync($"api/publications/{publicationId}/summary", cancellationToken);
+        var response = await httpClient.GetAsync($"api/publications/{publicationId}/summary", cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -96,10 +97,10 @@ internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient htt
             }
         }
 
-        var publication = await response.Content
-            .ReadFromJsonAsync<PublishedPublicationSummaryViewModel>(cancellationToken);
+        var publication = await response.Content.ReadFromJsonAsync<PublishedPublicationSummaryViewModel>(
+            cancellationToken
+        );
 
-        return publication
-               ?? throw new NullReferenceException("Could not deserialize from content API response.");
+        return publication ?? throw new NullReferenceException("Could not deserialize from content API response.");
     }
 }

@@ -5,9 +5,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -20,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
 public class ContentBlockLockServiceTests
 {
+    private readonly DataFixture _dataFixture = new();
     private readonly Guid _defaultUserId = Guid.NewGuid();
 
     [Fact]
@@ -27,21 +30,18 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var user = new User
-        {
-            Id = _defaultUserId,
-            FirstName = "Jane",
-            LastName = "Doe",
-            Email = "jane@test.com"
-        };
+        var user = _dataFixture
+            .DefaultUser()
+            .WithId(_defaultUserId)
+            .WithFirstName("Jane")
+            .WithLastName("Doe")
+            .WithEmail("jane@test.com")
+            .Generate();
 
         var contentBlock = new HtmlBlock
         {
-            ContentSection = new ContentSection
-            {
-                ReleaseVersion = releaseVersion
-            },
-            ReleaseVersion = releaseVersion
+            ContentSection = new ContentSection { ReleaseVersion = releaseVersion },
+            ReleaseVersion = releaseVersion,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -60,9 +60,7 @@ public class ContentBlockLockServiceTests
             var client = new Mock<IReleaseContentHubClient>();
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
-            hubContext
-                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
-                .Returns(client.Object);
+            hubContext.Setup(s => s.Clients.Group(releaseVersion.Id.ToString())).Returns(client.Object);
 
             var service = BuildService(contentDbContext, hubContext: hubContext.Object);
             var result = await service.LockContentBlock(contentBlock.Id);
@@ -99,13 +97,13 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var user = new User
-        {
-            Id = _defaultUserId,
-            FirstName = "Jane",
-            LastName = "Doe",
-            Email = "jane@test.com"
-        };
+        var user = _dataFixture
+            .DefaultUser()
+            .WithId(_defaultUserId)
+            .WithFirstName("Jane")
+            .WithLastName("Doe")
+            .WithEmail("jane@test.com")
+            .Generate();
 
         var previousLocked = DateTime.UtcNow.AddMinutes(-9);
 
@@ -113,11 +111,8 @@ public class ContentBlockLockServiceTests
         {
             Locked = previousLocked,
             LockedBy = user,
-            ContentSection = new ContentSection
-            {
-                ReleaseVersion = releaseVersion
-            },
-            ReleaseVersion = releaseVersion
+            ContentSection = new ContentSection { ReleaseVersion = releaseVersion },
+            ReleaseVersion = releaseVersion,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -136,9 +131,7 @@ public class ContentBlockLockServiceTests
             var client = new Mock<IReleaseContentHubClient>();
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
-            hubContext
-                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
-                .Returns(client.Object);
+            hubContext.Setup(s => s.Clients.Group(releaseVersion.Id.ToString())).Returns(client.Object);
 
             var service = BuildService(contentDbContext, hubContext: hubContext.Object);
             var result = await service.LockContentBlock(contentBlock.Id);
@@ -182,20 +175,20 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var previousUser = new User
-        {
-            FirstName = "Rob",
-            LastName = "Rowe",
-            Email = "rob@test.com"
-        };
+        var previousUser = _dataFixture
+            .DefaultUser()
+            .WithFirstName("Rob")
+            .WithLastName("Rowe")
+            .WithEmail("rob@test.com")
+            .Generate();
 
-        var nextUser = new User
-        {
-            Id = _defaultUserId,
-            FirstName = "Jane",
-            LastName = "Doe",
-            Email = "jane@test.com"
-        };
+        var nextUser = _dataFixture
+            .DefaultUser()
+            .WithId(_defaultUserId)
+            .WithFirstName("Jane")
+            .WithLastName("Doe")
+            .WithEmail("jane@test.com")
+            .Generate();
 
         var contentBlock = new HtmlBlock
         {
@@ -206,11 +199,8 @@ public class ContentBlockLockServiceTests
             // allow another user to obtain the lock.
             Locked = DateTime.UtcNow.AddMinutes(-11),
             LockedBy = previousUser,
-            ContentSection = new ContentSection
-            {
-                ReleaseVersion = releaseVersion
-            },
-            ReleaseVersion = releaseVersion
+            ContentSection = new ContentSection { ReleaseVersion = releaseVersion },
+            ReleaseVersion = releaseVersion,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -229,9 +219,7 @@ public class ContentBlockLockServiceTests
             var client = new Mock<IReleaseContentHubClient>();
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
-            hubContext
-                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
-                .Returns(client.Object);
+            hubContext.Setup(s => s.Clients.Group(releaseVersion.Id.ToString())).Returns(client.Object);
 
             var service = BuildService(contentDbContext, hubContext: hubContext.Object);
             var result = await service.LockContentBlock(contentBlock.Id);
@@ -270,30 +258,27 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var user = new User
-        {
-            Id = _defaultUserId,
-            FirstName = "Jane",
-            LastName = "Doe",
-            Email = "jane@test.com"
-        };
+        var user = _dataFixture
+            .DefaultUser()
+            .WithId(_defaultUserId)
+            .WithFirstName("Jane")
+            .WithLastName("Doe")
+            .WithEmail("jane@test.com")
+            .Generate();
 
         var contentBlock = new HtmlBlock
         {
             // Lock is still valid, but we're using the
             // force flag to lock the block anyway.
             Locked = DateTime.UtcNow.AddMinutes(-9),
-            LockedBy = new User
-            {
-                FirstName = "Rob",
-                LastName = "Rowe",
-                Email = "rob@test.com"
-            },
-            ContentSection = new ContentSection
-            {
-                ReleaseVersion = releaseVersion
-            },
-            ReleaseVersion = releaseVersion
+            LockedBy = _dataFixture
+                .DefaultUser()
+                .WithFirstName("Rob")
+                .WithLastName("Rowe")
+                .WithEmail("rob@test.com")
+                .Generate(),
+            ContentSection = new ContentSection { ReleaseVersion = releaseVersion },
+            ReleaseVersion = releaseVersion,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -312,9 +297,7 @@ public class ContentBlockLockServiceTests
             var client = new Mock<IReleaseContentHubClient>();
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
-            hubContext
-                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
-                .Returns(client.Object);
+            hubContext.Setup(s => s.Clients.Group(releaseVersion.Id.ToString())).Returns(client.Object);
 
             var service = BuildService(contentDbContext, hubContext: hubContext.Object);
             var result = await service.LockContentBlock(contentBlock.Id, force: true);
@@ -352,19 +335,20 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var previousUser = new User
-        {
-            FirstName = "Rob",
-            LastName = "Rowe",
-            Email = "rob@test.com"
-        };
-        var nextUser = new User
-        {
-            Id = _defaultUserId,
-            FirstName = "Jane",
-            LastName = "Doe",
-            Email = "jane@test.com"
-        };
+        var previousUser = _dataFixture
+            .DefaultUser()
+            .WithFirstName("Rob")
+            .WithLastName("Rowe")
+            .WithEmail("rob@test.com")
+            .Generate();
+
+        var nextUser = _dataFixture
+            .DefaultUser()
+            .WithId(_defaultUserId)
+            .WithFirstName("Jane")
+            .WithLastName("Doe")
+            .WithEmail("jane@test.com")
+            .Generate();
 
         var locked = DateTime.UtcNow.AddMinutes(-9);
 
@@ -374,11 +358,8 @@ public class ContentBlockLockServiceTests
             // should not be able to acquire the lock.
             Locked = locked,
             LockedBy = previousUser,
-            ContentSection = new ContentSection
-            {
-                ReleaseVersion = releaseVersion
-            },
-            ReleaseVersion = releaseVersion
+            ContentSection = new ContentSection { ReleaseVersion = releaseVersion },
+            ReleaseVersion = releaseVersion,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -418,27 +399,25 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var user1 = new User
-        {
-            Id = _defaultUserId,
-            FirstName = "Jane",
-            LastName = "Doe",
-            Email = "jane@test.com"
-        };
-        var user2 = new User
-        {
-            FirstName = "Rob",
-            LastName = "Rowe",
-            Email = "rob@test.com"
-        };
+        var user1 = _dataFixture
+            .DefaultUser()
+            .WithId(_defaultUserId)
+            .WithFirstName("Jane")
+            .WithLastName("Doe")
+            .WithEmail("jane@test.com")
+            .Generate();
+
+        var user2 = _dataFixture
+            .DefaultUser()
+            .WithFirstName("Rob")
+            .WithLastName("Rowe")
+            .WithEmail("rob@test.com")
+            .Generate();
 
         var contentBlock = new HtmlBlock
         {
-            ContentSection = new ContentSection
-            {
-                ReleaseVersion = releaseVersion
-            },
-            ReleaseVersion = releaseVersion
+            ContentSection = new ContentSection { ReleaseVersion = releaseVersion },
+            ReleaseVersion = releaseVersion,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -457,9 +436,7 @@ public class ContentBlockLockServiceTests
             var client = new Mock<IReleaseContentHubClient>();
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
-            hubContext
-                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
-                .Returns(client.Object);
+            hubContext.Setup(s => s.Clients.Group(releaseVersion.Id.ToString())).Returns(client.Object);
 
             var userService = new Mock<IUserService>(Strict);
 
@@ -467,15 +444,13 @@ public class ContentBlockLockServiceTests
                 .Setup(s => s.MatchesPolicy(It.IsAny<ReleaseVersion>(), CanUpdateSpecificReleaseVersion))
                 .ReturnsAsync(true);
 
-            userService
-                .SetupSequence(s => s.GetUserId())
-                .Returns(user1.Id)
-                .Returns(user2.Id);
+            userService.SetupSequence(s => s.GetUserId()).Returns(user1.Id).Returns(user2.Id);
 
             var service = BuildService(
                 contentDbContext,
                 hubContext: hubContext.Object,
-                userService: userService.Object);
+                userService: userService.Object
+            );
 
             // Simulate simultaneous calls
             var task1 = service.LockContentBlock(contentBlock.Id);
@@ -529,10 +504,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task LockContentBlock_NoRelease()
     {
-        var contentBlock = new HtmlBlock
-        {
-            ContentSection = new ContentSection()
-        };
+        var contentBlock = new HtmlBlock { ContentSection = new ContentSection() };
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -556,23 +528,20 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var user = new User
-        {
-            Id = _defaultUserId,
-            FirstName = "Jane",
-            LastName = "Doe",
-            Email = "test@test.com"
-        };
+        var user = _dataFixture
+            .DefaultUser()
+            .WithId(_defaultUserId)
+            .WithFirstName("Jane")
+            .WithLastName("Doe")
+            .WithEmail("jane@test.com")
+            .Generate();
 
         var contentBlock = new HtmlBlock
         {
             Locked = DateTime.UtcNow.AddMinutes(-9),
             LockedBy = user,
-            ContentSection = new ContentSection
-            {
-                ReleaseVersion = releaseVersion
-            },
-            ReleaseVersion = releaseVersion
+            ContentSection = new ContentSection { ReleaseVersion = releaseVersion },
+            ReleaseVersion = releaseVersion,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -588,22 +557,19 @@ public class ContentBlockLockServiceTests
         {
             ContentBlockUnlockViewModel? viewModel = null;
 
-            var match = new CaptureMatch<ContentBlockUnlockViewModel>(
-                value => { viewModel = value; }
-            );
+            var match = new CaptureMatch<ContentBlockUnlockViewModel>(value =>
+            {
+                viewModel = value;
+            });
 
             var client = new Mock<IReleaseContentHubClient>(Strict);
 
             // Clients in the release group are notified that the content block is unlocked
-            client
-                .Setup(s => s.ContentBlockUnlocked(Capture.With(match)))
-                .Returns(Task.CompletedTask);
+            client.Setup(s => s.ContentBlockUnlocked(Capture.With(match))).Returns(Task.CompletedTask);
 
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
-            hubContext
-                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
-                .Returns(client.Object);
+            hubContext.Setup(s => s.Clients.Group(releaseVersion.Id.ToString())).Returns(client.Object);
 
             var service = BuildService(contentDbContext, hubContext: hubContext.Object);
             var result = await service.UnlockContentBlock(contentBlock.Id);
@@ -620,10 +586,10 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            var savedContentBlock = await contentDbContext.ContentBlocks
-                .Include(cb => cb.LockedBy)
+            var savedContentBlock = await contentDbContext
+                .ContentBlocks.Include(cb => cb.LockedBy)
                 .FirstAsync(cb => cb.Id == contentBlock.Id);
-            
+
             Assert.Null(savedContentBlock.Locked);
             Assert.Null(savedContentBlock.LockedBy);
             Assert.Null(savedContentBlock.LockedById);
@@ -635,19 +601,20 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var nextUser = new User
-        {
-            Id = _defaultUserId,
-            FirstName = "Jane",
-            LastName = "Doe",
-            Email = "test@test.com"
-        };
-        var previousUser = new User
-        {
-            FirstName = "Rob",
-            LastName = "Rowe",
-            Email = "rob@test.com"
-        };
+        var nextUser = _dataFixture
+            .DefaultUser()
+            .WithId(_defaultUserId)
+            .WithFirstName("Jane")
+            .WithLastName("Doe")
+            .WithEmail("jane@test.com")
+            .Generate();
+
+        var previousUser = _dataFixture
+            .DefaultUser()
+            .WithFirstName("Rob")
+            .WithLastName("Rowe")
+            .WithEmail("rob@test.com")
+            .Generate();
 
         var contentBlock = new HtmlBlock
         {
@@ -656,11 +623,8 @@ public class ContentBlockLockServiceTests
             // user is now idle or has disconnected.
             Locked = DateTime.UtcNow.AddMinutes(-20),
             LockedBy = previousUser,
-            ContentSection = new ContentSection
-            {
-                ReleaseVersion = releaseVersion
-            },
-            ReleaseVersion = releaseVersion
+            ContentSection = new ContentSection { ReleaseVersion = releaseVersion },
+            ReleaseVersion = releaseVersion,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -676,22 +640,19 @@ public class ContentBlockLockServiceTests
         {
             ContentBlockUnlockViewModel? viewModel = null;
 
-            var match = new CaptureMatch<ContentBlockUnlockViewModel>(
-                value => { viewModel = value; }
-            );
+            var match = new CaptureMatch<ContentBlockUnlockViewModel>(value =>
+            {
+                viewModel = value;
+            });
 
             var client = new Mock<IReleaseContentHubClient>(Strict);
 
             // Clients in the release group are notified that the content block is unlocked
-            client
-                .Setup(s => s.ContentBlockUnlocked(Capture.With(match)))
-                .Returns(Task.CompletedTask);
+            client.Setup(s => s.ContentBlockUnlocked(Capture.With(match))).Returns(Task.CompletedTask);
 
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
-            hubContext
-                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
-                .Returns(client.Object);
+            hubContext.Setup(s => s.Clients.Group(releaseVersion.Id.ToString())).Returns(client.Object);
 
             var service = BuildService(contentDbContext, hubContext: hubContext.Object);
             var result = await service.UnlockContentBlock(contentBlock.Id);
@@ -708,8 +669,8 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            var savedContentBlock = await contentDbContext.ContentBlocks
-                .Include(cb => cb.LockedBy)
+            var savedContentBlock = await contentDbContext
+                .ContentBlocks.Include(cb => cb.LockedBy)
                 .FirstAsync(cb => cb.Id == contentBlock.Id);
 
             Assert.Null(savedContentBlock.Locked);
@@ -723,19 +684,20 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var nextUser = new User
-        {
-            Id = _defaultUserId,
-            FirstName = "Jane",
-            LastName = "Doe",
-            Email = "test@test.com"
-        };
-        var previousUser = new User
-        {
-            FirstName = "Rob",
-            LastName = "Rowe",
-            Email = "rob@test.com"
-        };
+        var nextUser = _dataFixture
+            .DefaultUser()
+            .WithId(_defaultUserId)
+            .WithFirstName("Jane")
+            .WithLastName("Doe")
+            .WithEmail("jane@test.com")
+            .Generate();
+
+        var previousUser = _dataFixture
+            .DefaultUser()
+            .WithFirstName("Rob")
+            .WithLastName("Rowe")
+            .WithEmail("rob@test.com")
+            .Generate();
 
         var locked = DateTime.UtcNow.AddMinutes(-5);
 
@@ -746,11 +708,8 @@ public class ContentBlockLockServiceTests
             // user should not be able to unlock it.
             Locked = locked,
             LockedBy = previousUser,
-            ContentSection = new ContentSection
-            {
-                ReleaseVersion = releaseVersion
-            },
-            ReleaseVersion = releaseVersion
+            ContentSection = new ContentSection { ReleaseVersion = releaseVersion },
+            ReleaseVersion = releaseVersion,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -785,19 +744,20 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var nextUser = new User
-        {
-            Id = _defaultUserId,
-            FirstName = "Jane",
-            LastName = "Doe",
-            Email = "test@test.com"
-        };
-        var previousUser = new User
-        {
-            FirstName = "Rob",
-            LastName = "Rowe",
-            Email = "rob@test.com"
-        };
+        var nextUser = _dataFixture
+            .DefaultUser()
+            .WithId(_defaultUserId)
+            .WithFirstName("Jane")
+            .WithLastName("Doe")
+            .WithEmail("jane@test.com")
+            .Generate();
+
+        var previousUser = _dataFixture
+            .DefaultUser()
+            .WithFirstName("Rob")
+            .WithLastName("Rowe")
+            .WithEmail("rob@test.com")
+            .Generate();
 
         var locked = DateTime.UtcNow.AddMinutes(-5);
 
@@ -807,11 +767,8 @@ public class ContentBlockLockServiceTests
             // so need to use force flag to unlock it.
             Locked = locked,
             LockedBy = previousUser,
-            ContentSection = new ContentSection
-            {
-                ReleaseVersion = releaseVersion
-            },
-            ReleaseVersion = releaseVersion
+            ContentSection = new ContentSection { ReleaseVersion = releaseVersion },
+            ReleaseVersion = releaseVersion,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -827,22 +784,19 @@ public class ContentBlockLockServiceTests
         {
             ContentBlockUnlockViewModel? viewModel = null;
 
-            var match = new CaptureMatch<ContentBlockUnlockViewModel>(
-                value => { viewModel = value; }
-            );
+            var match = new CaptureMatch<ContentBlockUnlockViewModel>(value =>
+            {
+                viewModel = value;
+            });
 
             var client = new Mock<IReleaseContentHubClient>(Strict);
 
             // Clients in the release group are notified that the content block is unlocked
-            client
-                .Setup(s => s.ContentBlockUnlocked(Capture.With(match)))
-                .Returns(Task.CompletedTask);
+            client.Setup(s => s.ContentBlockUnlocked(Capture.With(match))).Returns(Task.CompletedTask);
 
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
-            hubContext
-                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
-                .Returns(client.Object);
+            hubContext.Setup(s => s.Clients.Group(releaseVersion.Id.ToString())).Returns(client.Object);
 
             var service = BuildService(contentDbContext, hubContext: hubContext.Object);
             var result = await service.UnlockContentBlock(contentBlock.Id, force: true);
@@ -859,8 +813,8 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            var savedContentBlock = await contentDbContext.ContentBlocks
-                .Include(cb => cb.LockedBy)
+            var savedContentBlock = await contentDbContext
+                .ContentBlocks.Include(cb => cb.LockedBy)
                 .FirstAsync(cb => cb.Id == contentBlock.Id);
 
             Assert.Null(savedContentBlock.Locked);
@@ -885,10 +839,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task UnlockContentBlock_NoRelease()
     {
-        var contentBlock = new HtmlBlock
-        {
-            ContentSection = new ContentSection()
-        };
+        var contentBlock = new HtmlBlock { ContentSection = new ContentSection() };
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -911,7 +862,8 @@ public class ContentBlockLockServiceTests
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IUserService? userService = null,
-        IHubContext<ReleaseContentHub, IReleaseContentHubClient>? hubContext = null)
+        IHubContext<ReleaseContentHub, IReleaseContentHubClient>? hubContext = null
+    )
     {
         return new ContentBlockLockService(
             contentDbContext: contentDbContext,

@@ -8,13 +8,15 @@ public interface IImporterMetaService
 {
     Task<SubjectMeta> Import(
         List<string> metaFileCsvHeaders,
-        List<List<string>> metaFileRows, 
-        Subject subject, 
-        StatisticsDbContext context);
+        List<List<string>> metaFileRows,
+        Subject subject,
+        StatisticsDbContext context
+    );
 
     Task<SubjectMeta> GetSubjectMeta(
         List<string> metaFileCsvHeaders,
-        List<List<string>> metaFileRows, 
+        List<List<string>> metaFileRows,
         Subject subject,
-        StatisticsDbContext context);
+        StatisticsDbContext context
+    );
 }

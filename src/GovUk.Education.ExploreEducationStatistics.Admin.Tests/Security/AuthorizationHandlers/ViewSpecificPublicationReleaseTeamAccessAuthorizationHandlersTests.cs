@@ -43,13 +43,12 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
 
             var handler = CreateHandler(userPublicationRoleRepository.Object);
 
-            var user = _fixture
-                .AuthenticatedUser(userId: UserId)
-                .WithClaim(claim.ToString());
+            var user = _fixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
-            var authContext =
-                CreateAuthorizationHandlerContext<ViewSpecificPublicationReleaseTeamAccessRequirement, Publication>
-                    (user, Publication);
+            var authContext = CreateAuthorizationHandlerContext<
+                ViewSpecificPublicationReleaseTeamAccessRequirement,
+                Publication
+            >(user, Publication);
 
             await handler.HandleAsync(authContext);
 
@@ -74,9 +73,10 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
 
             var user = _fixture.AuthenticatedUser(userId: UserId);
 
-            var authContext =
-                CreateAuthorizationHandlerContext<ViewSpecificPublicationReleaseTeamAccessRequirement, Publication>
-                    (user, Publication);
+            var authContext = CreateAuthorizationHandlerContext<
+                ViewSpecificPublicationReleaseTeamAccessRequirement,
+                Publication
+            >(user, Publication);
 
             await handler.HandleAsync(authContext);
 
@@ -84,18 +84,22 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
 
             Assert.Equal(
                 ListOf(PublicationRole.Owner, PublicationRole.Allower).Contains(role),
-                authContext.HasSucceeded);
+                authContext.HasSucceeded
+            );
         });
     }
 
     private static ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler CreateHandler(
-        IUserPublicationRoleRepository? userPublicationRoleRepository = null)
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null
+    )
     {
         return new ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler(
             new AuthorizationHandlerService(
                 new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                 Mock.Of<IUserReleaseRoleRepository>(Strict),
                 userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
-                Mock.Of<IPreReleaseService>(Strict)));
+                Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
     }
 }

@@ -20,14 +20,15 @@ public class SwaggerEnumSchemaFilter : ISchemaFilter
 
         if (!enumAttribute.Type.IsEnum)
         {
-            throw new InvalidOperationException(
-                $"Must use an enum type for '{nameof(SwaggerEnumAttribute)}'");
+            throw new InvalidOperationException($"Must use an enum type for '{nameof(SwaggerEnumAttribute)}'");
         }
 
         var schemaType = schema.Type == "array" ? schema.Items.Type : schema.Type;
 
-        if (enumAttribute.Serializer is SwaggerEnumSerializer.Ref
-            && TryGetEnumSchema(context, enumAttribute, out var enumSchema))
+        if (
+            enumAttribute.Serializer is SwaggerEnumSerializer.Ref
+            && TryGetEnumSchema(context, enumAttribute, out var enumSchema)
+        )
         {
             if (enumSchema.Type != schemaType)
             {
@@ -38,11 +39,7 @@ public class SwaggerEnumSchemaFilter : ISchemaFilter
 
             var enumSchemaId = GetEnumSchemaId(context, enumAttribute);
 
-            var enumRef = new OpenApiReference
-            {
-                Type = ReferenceType.Schema,
-                Id = enumSchemaId
-            };
+            var enumRef = new OpenApiReference { Type = ReferenceType.Schema, Id = enumSchemaId };
 
             if (schema.Type == "array")
             {
@@ -59,7 +56,8 @@ public class SwaggerEnumSchemaFilter : ISchemaFilter
         if (!IsValidEnumSerializerType(enumAttribute, schemaType))
         {
             throw new InvalidOperationException(
-                $"Schema type {schemaType} is not compatible with {enumAttribute.Serializer} serialized enum");
+                $"Schema type {schemaType} is not compatible with {enumAttribute.Serializer} serialized enum"
+            );
         }
 
         var enums = GetOpenApiEnums(context, enumAttribute);
@@ -79,14 +77,16 @@ public class SwaggerEnumSchemaFilter : ISchemaFilter
         return enumAttribute.Serializer switch
         {
             SwaggerEnumSerializer.Int => schemaType == "integer",
-            _ => schemaType == "string"
+            _ => schemaType == "string",
         };
     }
 
     private static IList<IOpenApiAny> GetOpenApiEnums(SchemaFilterContext context, SwaggerEnumAttribute enumAttribute)
     {
-        if (enumAttribute.Serializer is SwaggerEnumSerializer.Schema
-            && TryGetEnumSchema(context, enumAttribute, out var enumSchema))
+        if (
+            enumAttribute.Serializer is SwaggerEnumSerializer.Schema
+            && TryGetEnumSchema(context, enumAttribute, out var enumSchema)
+        )
         {
             return enumSchema.Enum;
         }
@@ -100,8 +100,8 @@ public class SwaggerEnumSchemaFilter : ISchemaFilter
     private static bool TryGetEnumSchema(
         SchemaFilterContext context,
         SwaggerEnumAttribute enumAttribute,
-        [NotNullWhen(true)]
-        out OpenApiSchema? enumSchema)
+        [NotNullWhen(true)] out OpenApiSchema? enumSchema
+    )
     {
         if (!context.SchemaRepository.TryLookupByType(enumAttribute.Type, out var refSchema))
         {
@@ -112,9 +112,7 @@ public class SwaggerEnumSchemaFilter : ISchemaFilter
         return context.SchemaRepository.Schemas.TryGetValue(refSchema.Reference.Id, out enumSchema);
     }
 
-    private static string GetEnumSchemaId(
-        SchemaFilterContext context,
-        SwaggerEnumAttribute enumAttribute)
+    private static string GetEnumSchemaId(SchemaFilterContext context, SwaggerEnumAttribute enumAttribute)
     {
         if (!context.SchemaRepository.TryLookupByType(enumAttribute.Type, out var refSchema))
         {
@@ -132,7 +130,7 @@ public class SwaggerEnumSchemaFilter : ISchemaFilter
             SwaggerEnumSerializer.String => new OpenApiString(@enum.ToString()),
             SwaggerEnumSerializer.Value => new OpenApiString(@enum.GetEnumValue()),
             SwaggerEnumSerializer.Label => new OpenApiString(@enum.GetEnumLabel()),
-            _ => new OpenApiInteger(Convert.ToInt32(@enum))
+            _ => new OpenApiInteger(Convert.ToInt32(@enum)),
         };
     }
 }

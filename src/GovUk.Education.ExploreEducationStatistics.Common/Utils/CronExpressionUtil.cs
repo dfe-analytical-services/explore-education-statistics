@@ -17,13 +17,12 @@ public static class CronExpressionUtil
     /// <returns>
     /// The next occurrence of the Cron expression as a <see cref="DateTimeOffset"/>, or <c>null</c> if no future occurrence exists.
     /// </returns>
-    public static DateTimeOffset? GetNextOccurrence(
-        string cronExpression,
-        DateTimeOffset from,
-        TimeZoneInfo timeZone)
+    public static DateTimeOffset? GetNextOccurrence(string cronExpression, DateTimeOffset from, TimeZoneInfo timeZone)
     {
-        var expression = CronExpression.Parse(cronExpression,
-            CronExpressionHasSecondPrecision(cronExpression) ? CronFormat.IncludeSeconds : CronFormat.Standard);
+        var expression = CronExpression.Parse(
+            cronExpression,
+            CronExpressionHasSecondPrecision(cronExpression) ? CronFormat.IncludeSeconds : CronFormat.Standard
+        );
 
         return expression.GetNextOccurrence(from, timeZone);
     }

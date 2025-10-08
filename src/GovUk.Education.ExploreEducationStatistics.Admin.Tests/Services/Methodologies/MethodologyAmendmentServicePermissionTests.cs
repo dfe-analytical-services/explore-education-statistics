@@ -15,29 +15,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
 public class MethodologyAmendmentServicePermissionTests
 {
-    private readonly MethodologyVersion _methodologyVersion = new MethodologyVersion
-    {
-        Id = Guid.NewGuid()
-    };
+    private readonly MethodologyVersion _methodologyVersion = new MethodologyVersion { Id = Guid.NewGuid() };
 
     [Fact]
     public async Task CreateMethodologyAmendment()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_methodologyVersion, CanMakeAmendmentOfSpecificMethodology)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupMethodologyAmendmentService(userService: userService.Object);
-                    return service.CreateMethodologyAmendment(_methodologyVersion.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupMethodologyAmendmentService(userService: userService.Object);
+                return service.CreateMethodologyAmendment(_methodologyVersion.Id);
+            });
     }
 
     private MethodologyAmendmentService SetupMethodologyAmendmentService(
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
         IUserService userService = null,
-        IMethodologyService methodologyService = null)
+        IMethodologyService methodologyService = null
+    )
     {
         return new MethodologyAmendmentService(
             contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
@@ -49,6 +45,9 @@ public class MethodologyAmendmentServicePermissionTests
 
     private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
     {
-        return MockUtils.MockPersistenceHelper<ContentDbContext, MethodologyVersion>(_methodologyVersion.Id, _methodologyVersion);
+        return MockUtils.MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
+            _methodologyVersion.Id,
+            _methodologyVersion
+        );
     }
 }

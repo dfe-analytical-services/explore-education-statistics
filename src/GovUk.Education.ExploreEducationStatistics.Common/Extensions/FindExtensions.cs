@@ -10,14 +10,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
  */
 public static class FindExtensions
 {
-    public static IQueryable<TEntity> FindByPrimaryKey<TEntity>(this IQueryable<TEntity> queryable,
-        DbContext context, object key) where TEntity : class
+    public static IQueryable<TEntity> FindByPrimaryKey<TEntity>(
+        this IQueryable<TEntity> queryable,
+        DbContext context,
+        object key
+    )
+        where TEntity : class
     {
         return FindByPrimaryKey(queryable, context, new[] { key });
     }
 
-    public static IQueryable<TEntity> FindByPrimaryKey<TEntity>(this IQueryable<TEntity> queryable,
-        DbContext context, object[] key) where TEntity : class
+    public static IQueryable<TEntity> FindByPrimaryKey<TEntity>(
+        this IQueryable<TEntity> queryable,
+        DbContext context,
+        object[] key
+    )
+        where TEntity : class
     {
         return queryable.Where(context.FindByPrimaryKeyPredicate<TEntity>(key));
     }
@@ -28,11 +36,16 @@ public static class FindExtensions
         var keyProperties = dbContext.GetPrimaryKeyProperties<T>();
         var parameter = Expression.Parameter(typeof(T), "e");
         var body = keyProperties
-            .Select((p, i) => Expression.Equal(
-                Expression.Property(parameter, p.Name),
-                Expression.Convert(
-                    Expression.PropertyOrField(Expression.Constant(new { id = id[i] }), "id"),
-                    p.ClrType)))
+            .Select(
+                (p, i) =>
+                    Expression.Equal(
+                        Expression.Property(parameter, p.Name),
+                        Expression.Convert(
+                            Expression.PropertyOrField(Expression.Constant(new { id = id[i] }), "id"),
+                            p.ClrType
+                        )
+                    )
+            )
             .Aggregate(Expression.AndAlso);
         return Expression.Lambda<Func<T, bool>>(body, parameter);
     }
