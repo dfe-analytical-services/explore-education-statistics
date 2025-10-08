@@ -233,6 +233,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                             .AddBulkOperationSupport()
                             .EnableCustomRetryOnFailure()
                 )
+                .EnableSqlServerQueryOptionsInterceptor()
                 .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment())
         );
 
@@ -578,6 +579,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             return new LoggingNotificationClient(logger);
         });
 
+        services.AddTransient<IRawSqlExecutor, RawSqlExecutor>();
+        services.AddTransient<ITemporaryTableCreator, TemporaryTableCreator>();
         services.AddTransient<IEmailService, EmailService>();
         services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
         services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
@@ -585,6 +588,15 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ITableBuilderService, TableBuilderService>();
         services.AddTransient<IFilterRepository, FilterRepository>();
         services.AddTransient<IFilterItemRepository, FilterItemRepository>();
+        services.AddTransient<
+            ISparseObservationsMatchedFilterItemsStrategy,
+            SparseObservationsMatchedFilterItemsStrategy
+        >();
+        services.AddTransient<
+            IDenseObservationsMatchedFilterItemsStrategy,
+            DenseObservationsMatchedFilterItemsStrategy
+        >();
+        services.AddTransient<IAllObservationsMatchedFilterItemsStrategy, AllObservationsMatchedFilterItemsStrategy>();
         services.AddTransient<IFootnoteService, FootnoteService>();
         services.AddTransient<IFootnoteRepository, FootnoteRepository>();
         services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();

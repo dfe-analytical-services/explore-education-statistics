@@ -1,4 +1,4 @@
-﻿CREATE OR ALTER PROCEDURE InsertObservationFilterItems @ObservationFilterItems dbo.ObservationFilterItemType READONLY
+CREATE OR ALTER PROCEDURE InsertObservationFilterItems @ObservationFilterItems dbo.ObservationFilterItemType READONLY
 AS
 BEGIN
     INSERT INTO ObservationFilterItem
