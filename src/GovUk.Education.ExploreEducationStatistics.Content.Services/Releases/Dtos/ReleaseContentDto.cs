@@ -9,35 +9,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.D
 
 public record ReleaseContentDto
 {
+    public required Guid ReleaseId { get; init; }
+
+    public required Guid ReleaseVersionId { get; init; }
+
     public required ContentSectionDto[] Content { get; init; }
 
-    public required ContentSectionDto HeadlinesSection { get; init; }
+    public required ContentSectionDto? HeadlinesSection { get; init; }
 
     public required KeyStatisticBaseDto[] KeyStatistics { get; init; }
 
-    public required ContentSectionDto KeyStatisticsSecondarySection { get; init; }
+    public required ContentSectionDto? KeyStatisticsSecondarySection { get; init; }
 
-    public required ContentSectionDto SummarySection { get; init; }
+    public required ContentSectionDto? SummarySection { get; init; }
 
-    public ContentSectionDto[] GetAllSections() =>
-        [HeadlinesSection, KeyStatisticsSecondarySection, SummarySection, .. Content];
+    public ContentSectionDto[] GetAllSections()
+    {
+        ContentSectionDto?[] optionalSections = [HeadlinesSection, KeyStatisticsSecondarySection, SummarySection];
+        return optionalSections.OfType<ContentSectionDto>().Concat(Content).ToArray();
+    }
 
     public static ReleaseContentDto FromReleaseVersion(ReleaseVersion releaseVersion) =>
         new()
         {
+            ReleaseId = releaseVersion.ReleaseId,
+            ReleaseVersionId = releaseVersion.Id,
             Content = releaseVersion
                 .GenericContent.OrderBy(cs => cs.Order)
                 .Select(ContentSectionDto.FromContentSection)
                 .ToArray(),
-            HeadlinesSection = ContentSectionDto.FromContentSection(releaseVersion.HeadlinesSection),
+            HeadlinesSection =
+                releaseVersion.HeadlinesSection != null
+                    ? ContentSectionDto.FromContentSection(releaseVersion.HeadlinesSection)
+                    : null,
             KeyStatistics = releaseVersion
                 .KeyStatistics.OrderBy(ks => ks.Order)
                 .Select(KeyStatisticBaseDto.FromKeyStatistic)
                 .ToArray(),
-            KeyStatisticsSecondarySection = ContentSectionDto.FromContentSection(
-                releaseVersion.KeyStatisticsSecondarySection
-            ),
-            SummarySection = ContentSectionDto.FromContentSection(releaseVersion.SummarySection),
+            KeyStatisticsSecondarySection =
+                releaseVersion.KeyStatisticsSecondarySection != null
+                    ? ContentSectionDto.FromContentSection(releaseVersion.KeyStatisticsSecondarySection)
+                    : null,
+            SummarySection =
+                releaseVersion.SummarySection != null
+                    ? ContentSectionDto.FromContentSection(releaseVersion.SummarySection)
+                    : null,
         };
 }
 

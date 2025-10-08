@@ -7,9 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.
 
 public class ReleaseContentDtoBuilder
 {
+    private Guid _releaseId = Guid.NewGuid();
+    private Guid _releaseVersionId = Guid.NewGuid();
     private ContentSectionDto[] _content = [new ContentSectionDtoBuilder().Build()];
-
-    private ContentSectionDto _headlinesSection = new ContentSectionDtoBuilder().Build();
+    private ContentSectionDto? _headlinesSection = new ContentSectionDtoBuilder().Build();
 
     private KeyStatisticBaseDto[] _keyStatistics =
     [
@@ -17,13 +18,14 @@ public class ReleaseContentDtoBuilder
         new KeyStatisticTextDtoBuilder().Build(),
     ];
 
-    private ContentSectionDto _summarySection = new ContentSectionDtoBuilder().Build();
-
-    private ContentSectionDto _keyStatisticsSecondarySection = new ContentSectionDtoBuilder().Build();
+    private ContentSectionDto? _summarySection = new ContentSectionDtoBuilder().Build();
+    private ContentSectionDto? _keyStatisticsSecondarySection = new ContentSectionDtoBuilder().Build();
 
     public ReleaseContentDto Build() =>
         new()
         {
+            ReleaseId = _releaseId,
+            ReleaseVersionId = _releaseVersionId,
             Content = _content,
             HeadlinesSection = _headlinesSection,
             KeyStatistics = _keyStatistics,
@@ -31,13 +33,25 @@ public class ReleaseContentDtoBuilder
             SummarySection = _summarySection,
         };
 
+    public ReleaseContentDtoBuilder WithReleaseId(Guid releaseId)
+    {
+        _releaseId = releaseId;
+        return this;
+    }
+
+    public ReleaseContentDtoBuilder WithReleaseVersionId(Guid releaseVersionId)
+    {
+        _releaseVersionId = releaseVersionId;
+        return this;
+    }
+
     public ReleaseContentDtoBuilder WithContent(ContentSectionDto[] content)
     {
         _content = content;
         return this;
     }
 
-    public ReleaseContentDtoBuilder WithHeadlinesSection(ContentSectionDto headlinesSection)
+    public ReleaseContentDtoBuilder WithHeadlinesSection(ContentSectionDto? headlinesSection)
     {
         _headlinesSection = headlinesSection;
         return this;
@@ -49,13 +63,13 @@ public class ReleaseContentDtoBuilder
         return this;
     }
 
-    public ReleaseContentDtoBuilder WithKeyStatisticsSecondarySection(ContentSectionDto keyStatisticsSecondarySection)
+    public ReleaseContentDtoBuilder WithKeyStatisticsSecondarySection(ContentSectionDto? keyStatisticsSecondarySection)
     {
         _keyStatisticsSecondarySection = keyStatisticsSecondarySection;
         return this;
     }
 
-    public ReleaseContentDtoBuilder WithSummarySection(ContentSectionDto summarySection)
+    public ReleaseContentDtoBuilder WithSummarySection(ContentSectionDto? summarySection)
     {
         _summarySection = summarySection;
         return this;
