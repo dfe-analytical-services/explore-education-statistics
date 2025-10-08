@@ -14,7 +14,7 @@
     <CompilerVisibleProperty Include="ProjectDir" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
     <!-- Required to execute unit tests in IDE -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.21" />
   </ItemGroup>

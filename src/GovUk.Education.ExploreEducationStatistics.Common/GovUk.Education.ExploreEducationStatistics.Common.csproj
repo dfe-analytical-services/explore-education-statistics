@@ -15,18 +15,18 @@
     <PackageReference Include="AngleSharp" Version="1.3.0" />
     <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
     <!-- v2.8.1 is compatible with MacOS -->
-    <PackageReference Include="Aspects.Universal" Version="1.0.2" />
-    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Aspects.Universal" Version="2.9.0" />
+    <PackageReference Include="AutoMapper" Version="15.0.1" />
     <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
     <PackageReference Include="Azure.Identity" Version="1.16.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.25.1" />
     <PackageReference Include="Cronos" Version="0.11.1" />
-    <PackageReference Include="CsvHelper" Version="31.0.4" />
-    <PackageReference Include="FluentValidation" Version="11.11.0" />
-    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
+    <PackageReference Include="CsvHelper" Version="33.1.0" />
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
     <PackageReference Include="Generator.Equals" Version="3.2.1" />
     <PackageReference Include="InterpolatedSql" Version="2.4.0" />
-    <PackageReference Include="Medo.Uuid7" Version="1.9.1" />
+    <PackageReference Include="Medo.Uuid7" Version="3.1.0" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.23.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.21" />
     <!-- TODO EES-4202 DataMovement depends on deprecated Microsoft.Azure.Storage.Blob SDK v11 -->
@@ -35,7 +35,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.21" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.21" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.7.1" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
     <PackageReference Include="Namotion.Reflection" Version="3.4.3" />
     <PackageReference Include="NaturalSort.Extension" Version="4.4.0" />
     <PackageReference Include="NCrontab.Signed" Version="3.4.0" />
@@ -43,13 +43,13 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
     <PackageReference Include="Azure.Storage.Queues" Version="12.23.0" />
     <PackageReference Include="ObjectCloner" Version="2.2.2" />
-    <PackageReference Include="Semver" Version="2.3.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.7.1" />
+    <PackageReference Include="Semver" Version="3.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.3" />
     <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
     <PackageReference Include="Mime" Version="3.8.0" />
     <PackageReference Include="Mime-Detective" Version="0.0.6-beta5" />
-    <PackageReference Include="System.Text.Json" Version="8.0.6" />
+    <PackageReference Include="System.Text.Json" Version="9.0.9" />
     <PackageReference Include="Thinktecture.EntityFrameworkCore.BulkOperations" Version="8.4.0" />
     <PackageReference Include="ZstdSharp.Port" Version="0.8.6" />
   </ItemGroup>
