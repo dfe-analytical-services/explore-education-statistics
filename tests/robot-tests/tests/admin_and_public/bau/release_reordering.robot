@@ -461,5 +461,7 @@ Navigate to second published release on public frontend after changing the lates
     user navigates to    ${PUBLIC_RELEASE_2_URL}
 
 Validate second published release is not the latest release after changing the latest release
+    user waits for caches to expire
+    user reloads page
     user checks page contains    This is not the latest release
-    user waits until page contains link    View latest data: ${RELEASE_1_NAME}
+    user checks page contains    View latest data: ${RELEASE_1_NAME}
