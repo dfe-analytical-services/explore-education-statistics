@@ -11,17 +11,17 @@ import requests
 To generate datablocks.csv, use this SQL query against the Content DB:
 
 SELECT ContentBlock.Id                              AS ContentBlockId,
-       Releases.Id                                  AS ReleaseId,
+       ReleaseVersions.Id                           AS ReleaseVersionId,
        JSON_VALUE([DataBlock_Query], '$.SubjectId') AS SubjectId,
        ContentBlock.DataBlock_Query                 AS Query
 FROM ContentBlock
 LEFT JOIN DataBlockVersions ON DataBlockVersions.ContentBlockId = ContentBlock.Id
-LEFT JOIN Releases ON DataBlockVersions.ReleaseId = Releases.Id
+LEFT JOIN ReleaseVersions ON DataBlockVersions.ReleaseVersionId = ReleaseVersions.Id
 LEFT JOIN KeyStatisticsDataBlock ON ContentBlock.Id = KeyStatisticsDataBlock.DataBlockId
 LEFT JOIN FeaturedTables ON ContentBlock.Id = FeaturedTables.DataBlockId
 WHERE ContentBlock.Type = 'DataBlock'
-  AND Releases.Published IS NOT NULL
-  AND Releases.SoftDeleted = 0
+  AND ReleaseVersions.Published IS NOT NULL
+  AND ReleaseVersions.SoftDeleted = 0
   AND (
     -- Include DataBlocks that are linked to Content Sections
     ContentSectionId IS NOT NULL
@@ -33,16 +33,19 @@ WHERE ContentBlock.Type = 'DataBlock'
   -- Include only DataBlocks that are from the latest published Release
   AND NOT EXISTS(
     SELECT 1
-    FROM Releases PublicationReleases
-    WHERE PublicationReleases.PublicationId = Releases.PublicationId
-      AND PublicationReleases.Published IS NOT NULL
-      AND PublicationReleases.SoftDeleted = 0
-      AND PublicationReleases.Id <> Releases.Id
-      AND PublicationReleases.PreviousVersionId = Releases.Id
+    FROM ReleaseVersions PublicationReleaseVersions
+    WHERE PublicationReleaseVersions.PublicationId = ReleaseVersions.PublicationId
+      AND PublicationReleaseVersions.Published IS NOT NULL
+      AND PublicationReleaseVersions.SoftDeleted = 0
+      AND PublicationReleaseVersions.Id <> ReleaseVersions.Id
+      AND PublicationReleaseVersions.PreviousVersionId = ReleaseVersions.Id
   );
 
 And then save the results as a CSV in MS SQL Server Management Studio.
 Place it in the same directory as this script.
+
+Example usage of script:
+python get_data_block_responses.py --env dev --stage filters --file dev-datablocks.csv --sleep 1
 
 Find blocks that took over 10 seconds to respond:
 grep -r "time for response: [0-9][0-9][0-9]*" * | awk '{split($0,a,":"); print a[1];}' | zip -@ test.zip
@@ -79,7 +82,7 @@ parser.add_argument(
     help="CSV of data blocks (see comment in this script)",
 )
 parser.add_argument(
-    "-s", "-sleep", dest="sleep_duration", default=1, help="duration to sleep between requests", type=int
+    "-s", "--sleep", dest="sleep_duration", default=1, help="duration to sleep between requests", type=int
 )
 args = parser.parse_args()
 
