@@ -19,12 +19,16 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
 {
     private const DataSetVersionImportStage Stage = DataSetVersionImportStage.ImportingData;
 
-    public static readonly TheoryData<ProcessorTestData> Data = new() { ProcessorTestData.AbsenceSchool };
+    public static readonly TheoryData<ProcessorTestData> DataSets =
+    [
+        ProcessorTestData.AbsenceSchool,
+        ProcessorTestData.LargeDataSet,
+    ];
 
     public class ImportDataTests(ProcessorFunctionsIntegrationTestFixture fixture) : ImportDataFunctionTests(fixture)
     {
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(DataSets))]
         public async Task Success(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
@@ -47,7 +51,7 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectRowCount(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
@@ -69,7 +73,7 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectColumns(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
@@ -100,7 +104,7 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectDistinctGeographicLevels(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
@@ -125,7 +129,7 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectDistinctLocationOptions(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
@@ -161,7 +165,7 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectDistinctFilterOptions(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
@@ -200,7 +204,7 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectDistinctTimePeriods(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());

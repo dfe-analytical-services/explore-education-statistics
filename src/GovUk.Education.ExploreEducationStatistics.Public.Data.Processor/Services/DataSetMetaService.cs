@@ -186,11 +186,17 @@ public class DataSetMetaService(
     {
         var columns = (
             await duckDbConnection
-                .SqlBuilder($"DESCRIBE SELECT * FROM '{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}'")
+                .SqlBuilder(
+                    $"""
+                    DESCRIBE SELECT *
+                    FROM read_csv(
+                        '{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}',
+                        {DuckDbConstants.ReadCsvOptions:raw}
+                    )
+                    """
+                )
                 .QueryAsync<(string ColumnName, string ColumnType)>(cancellationToken: cancellationToken)
-        )
-            .Select(row => row.ColumnName)
-            .ToList();
+        ).Select(row => row.ColumnName).ToList();
 
         return [.. columns];
     }
@@ -244,7 +250,10 @@ public class DataSetMetaService(
             .SqlBuilder(
                 $"""
                 SELECT COUNT(*)
-                FROM '{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}'
+                FROM read_csv(
+                    '{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}',
+                    {DuckDbConstants.ReadCsvOptions:raw}
+                )   
                 """
             )
             .QuerySingleAsync<int>(cancellationToken: cancellationToken);
