@@ -6,7 +6,7 @@ import DataBlockTabs from '@frontend/modules/find-statistics/components/DataBloc
 import EmbedBlock from '@common/modules/find-statistics/components/EmbedBlock';
 import ExploreDataButton from '@frontend/modules/find-statistics/components/ExploreDataButton';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
-import { ReleaseVersion } from '@common/services/publicationService';
+import { BlockViewModel } from '@common/services/publicationService';
 import { Block } from '@common/services/types/blocks';
 import glossaryService from '@frontend/services/glossaryService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
@@ -14,20 +14,20 @@ import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 
 export interface PublicationSectionBlocksProps {
-  releaseVersion: ReleaseVersion;
-  blocks: Block[];
+  releaseVersionId: string;
+  blocks: Block[] | BlockViewModel[];
   visible?: boolean;
 }
 
 const PublicationSectionBlocks = ({
-  releaseVersion,
+  releaseVersionId,
   blocks,
   visible,
 }: PublicationSectionBlocksProps) => {
-  const getReleaseFile = useGetReleaseFile(releaseVersion.id);
+  const getReleaseFile = useGetReleaseFile(releaseVersionId);
 
   const transformImageAttributes = useReleaseImageAttributeTransformer({
-    releaseVersionId: releaseVersion.id,
+    releaseVersionId,
     rootUrl: process.env.CONTENT_API_BASE_URL.replace('/api', ''),
   });
 
@@ -42,18 +42,37 @@ const PublicationSectionBlocks = ({
           );
         }
 
+        if (block.type === 'EmbedBlock') {
+          return (
+            <Gate condition={!!visible} key={block.id}>
+              <EmbedBlock
+                url={block.embedBlock.url}
+                title={block.embedBlock.title}
+              />
+            </Gate>
+          );
+        }
+
         if (block.type === 'DataBlock') {
+          const dataBlock =
+            'dataBlockVersion' in block
+              ? {
+                  id: block.id,
+                  type: block.type,
+                  ...block.dataBlockVersion,
+                }
+              : block;
           return (
             <Gate condition={!!visible} key={block.id}>
               <DataBlockTabs
-                dataBlock={block}
+                dataBlock={dataBlock}
                 dataBlockStaleTime={Infinity}
-                releaseVersionId={releaseVersion.id}
+                releaseVersionId={releaseVersionId}
                 getInfographic={getReleaseFile}
                 onToggle={section => {
                   logEvent({
                     category: 'Publication Release Data Tabs',
-                    action: `${section.title} (${block.name}) tab opened`,
+                    action: `${section.title} (${dataBlock.name}) tab opened`,
                     label: window.location.pathname,
                   });
                 }}
@@ -61,13 +80,13 @@ const PublicationSectionBlocks = ({
                   <div className="govuk-!-display-none-print">
                     <h3 className="govuk-heading-m">
                       Explore and edit this data online
-                      <VisuallyHidden>{` for ${block.heading}`}</VisuallyHidden>
+                      <VisuallyHidden>{` for ${dataBlock.heading}`}</VisuallyHidden>
                     </h3>
 
                     <p>Use our table tool to explore this data.</p>
                     <ExploreDataButton
-                      block={block}
-                      hiddenText={`for ${block.heading}`}
+                      block={dataBlock}
+                      hiddenText={`for ${dataBlock.heading}`}
                     />
                   </div>
                 }

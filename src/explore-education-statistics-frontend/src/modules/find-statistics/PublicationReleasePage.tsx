@@ -1,5 +1,6 @@
 /* eslint-disable react/destructuring-assignment */
 import { NavItem } from '@common/components/PageNavExpandable';
+import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
 import { contactUsNavItem } from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import publicationService, {
   PublicationMethodologiesList,
@@ -83,19 +84,36 @@ const PublicationReleasePage: NextPage<Props> = props => {
 
   const generateNavItems = (): NavItem[] => {
     switch (page) {
-      case 'home':
+      case 'home': {
+        // TODO
+        // loop through content sections and add sub nav items
+        const navContentSectionItems = props.homeContent.content.map(
+          section => {
+            const { heading } = section;
+            return {
+              id: generateIdFromHeading(heading),
+              text: heading,
+            };
+          },
+        );
         return [
+          props.homeContent.summarySection?.content.length > 0 && {
+            id: 'background-information',
+            text: 'Background information',
+          },
           {
             id: 'headlines-section',
             text: 'Headlines facts and figures',
           },
+          ...navContentSectionItems,
           contactUsNavItem,
-        ];
+        ].filter(item => !!item);
+      }
 
       case 'methodology': {
         const hasMethodologies =
           props.methodologiesSummary.methodologies.length > 0 ||
-          props.methodologiesSummary.externalMethodology;
+          !!props.methodologiesSummary.externalMethodology;
 
         return [
           hasMethodologies && {

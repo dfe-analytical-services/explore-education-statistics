@@ -1,7 +1,10 @@
-import SectionBreak from '@common/components/SectionBreak';
-import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
+import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
+import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import ReleaseSummaryBlockMobile from '@common/modules/release/components/ReleaseSummaryBlockMobile';
 import {
   PublicationSummaryRedesign,
@@ -9,6 +12,9 @@ import {
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 import Link from '@frontend/components/Link';
+import PublicationReleaseHeadlinesSection from '@frontend/modules/find-statistics/components/PublicationReleaseHeadlinesSectionRedesign';
+import PublicationSectionBlocks from '@frontend/modules/find-statistics/components/PublicationSectionBlocks';
+import glossaryService from '@frontend/services/glossaryService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React, { Fragment } from 'react';
 
@@ -25,6 +31,7 @@ const PublicationReleasePage = ({
 }: Props) => {
   const {
     content,
+    headlinesSection,
     keyStatistics,
     keyStatisticsSecondarySection,
     summarySection,
@@ -102,32 +109,77 @@ const PublicationReleasePage = ({
         </section>
       )}
 
-      <section id="headlines-section" data-page-section>
-        <h2>Summary Section</h2>
-        {summarySection.content.map(block => (
-          <p key={block.id}>{block.type}</p>
-        ))}
-        <h2>Key Statistics</h2>
-        {keyStatistics.map(ks => (
-          <p key={ks.id}>{ks.type}</p>
-        ))}
-        <h2>Key Statistics Secondary</h2>
-        {keyStatisticsSecondarySection.content.map(block => (
-          <p key={block.id}>{block.type}</p>
-        ))}
-      </section>
-      <SectionBreak size="xl" />
-      {content.map(section => (
-        <Fragment key={section.id}>
-          <section id={section.id} data-page-section>
-            <h2>{section.heading}</h2>
-            {section.content.map(block => (
-              <p key={block.id}>{block.type}</p>
-            ))}
-          </section>
-          <SectionBreak size="xl" />
-        </Fragment>
-      ))}
+      {summarySection.content?.length > 0 && (
+        <ReleasePageContentSection
+          heading="Background information"
+          id="background-information"
+        >
+          {summarySection.content.map(block => (
+            <ContentBlockRenderer
+              key={block.id}
+              block={block}
+              getGlossaryEntry={glossaryService.getEntry}
+              trackGlossaryLinks={glossaryEntrySlug =>
+                logEvent({
+                  category: `Publication Release Summary Glossary Link`,
+                  action: `Glossary link clicked`,
+                  label: glossaryEntrySlug,
+                })
+              }
+            />
+          ))}
+        </ReleasePageContentSection>
+      )}
+
+      <PublicationReleaseHeadlinesSection
+        headlinesSection={headlinesSection}
+        keyStatistics={keyStatistics}
+        keyStatisticsSecondarySection={keyStatisticsSecondarySection}
+        releaseVersionId={releaseVersionSummary.id}
+      />
+
+      {isMobileMedia ? (
+        <Accordion
+          className="govuk-!-margin-top-9"
+          id="content"
+          onSectionOpen={accordionSection => {
+            logEvent({
+              category: `${publicationSummary.title} release page`,
+              action: `Content accordion opened`,
+              label: `${accordionSection.title}`,
+            });
+          }}
+        >
+          {content.map(({ heading, content: sectionContent }) => {
+            return (
+              <AccordionSection heading={heading} key={heading}>
+                {({ open }) => (
+                  <PublicationSectionBlocks
+                    blocks={sectionContent}
+                    releaseVersionId={releaseVersionSummary.id}
+                    visible={open}
+                  />
+                )}
+              </AccordionSection>
+            );
+          })}
+        </Accordion>
+      ) : (
+        content.map(section => (
+          <ReleasePageContentSection
+            heading={section.heading}
+            key={section.id}
+            id={section.id}
+          >
+            <PublicationSectionBlocks
+              blocks={section.content}
+              releaseVersionId={releaseVersionSummary.id}
+              visible
+            />
+          </ReleasePageContentSection>
+        ))
+      )}
+
       <ContactUsSection
         publicationContact={publicationSummary.contact}
         publicationTitle={publicationSummary.title}
