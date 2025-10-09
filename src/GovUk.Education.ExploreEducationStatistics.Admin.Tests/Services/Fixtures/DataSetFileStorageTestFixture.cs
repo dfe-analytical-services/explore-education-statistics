@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
@@ -273,7 +273,6 @@ public class DataSetFileStorageTestFixture
                         user.Id,
                         null,
                         null,
-                        null,
                         0
                     )
                 )
@@ -330,7 +329,6 @@ public class DataSetFileStorageTestFixture
                     user.Id,
                     dataSetName,
                     ReleaseFile.File,
-                    null,
                     0
                 )
             )
@@ -367,7 +365,6 @@ public class DataSetFileStorageTestFixture
                         It.IsAny<Guid>(),
                         It.Is<string>(actual => actual == dataSetName),
                         It.IsAny<File>(),
-                        null,
                         It.IsAny<int>()
                     )
                 )
@@ -479,7 +476,6 @@ public class DataSetFileStorageTestFixture
                     user.Id,
                     dataSetName,
                     DataFileReplace,
-                    null,
                     1
                 )
             )
@@ -509,7 +505,6 @@ public class DataSetFileStorageTestFixture
                         157,
                         FileType.Metadata,
                         user.Id,
-                        null,
                         null,
                         null,
                         0

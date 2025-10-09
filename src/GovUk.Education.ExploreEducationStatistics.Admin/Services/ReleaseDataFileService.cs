@@ -98,18 +98,6 @@ public class ReleaseDataFileService(
 
                         await fileRepository.Delete(file.Id);
                         await fileRepository.Delete(metaFile.Id);
-
-                        if (
-                            file.SourceId.HasValue
-                            // A bulk upload zip may be linked to multiple files - only delete zip if all have been removed
-                            && !await contentDbContext.Files.AnyAsync(f => f.SourceId == file.SourceId.Value)
-                        )
-                        {
-                            var zipFile = await fileRepository.Get(file.SourceId.Value);
-                            await privateBlobStorageService.DeleteBlob(PrivateReleaseFiles, zipFile.Path());
-                            // N.B. No ReleaseFiles row for source links
-                            await fileRepository.Delete(zipFile.Id);
-                        }
                     }
                 }
             });
