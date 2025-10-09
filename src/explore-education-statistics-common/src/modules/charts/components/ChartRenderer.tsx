@@ -81,6 +81,7 @@ function ChartRenderer({
               setSelectedBoundaryLevelId(number);
               return chart.onBoundaryLevelChange(number);
             }}
+            onChangeCategoricalDataConfig={chart.onChangeCategoricalDataConfig}
             id={`${id}-map`}
           />
         );

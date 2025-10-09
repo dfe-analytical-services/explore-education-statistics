@@ -389,7 +389,7 @@ export default function createDataSetCategories({
 
 export const toChartData = (chartCategory: DataSetCategory): ChartData => {
   const dataSets = Object.entries(chartCategory.dataSets).reduce<
-    Dictionary<number>
+    Dictionary<number | string>
   >((acc, [key, dataSet]) => {
     acc[key] = dataSet.value;
 
