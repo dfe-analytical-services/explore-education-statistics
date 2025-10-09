@@ -1,5 +1,6 @@
 import styles from '@common/components/Banner.module.scss';
 import ButtonText from '@common/components/ButtonText';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 
@@ -38,7 +39,7 @@ export default function Banner({
                 className={classNames(styles.close, 'govuk-!-margin-bottom-2')}
                 onClick={onClose}
               >
-                Close
+                Close<VisuallyHidden> {label}</VisuallyHidden>
               </ButtonText>
             </div>
           )}

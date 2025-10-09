@@ -23,8 +23,8 @@ Verify can accept cookie banner
 
     cookie should have value    ees_banner_seen    true
     cookie should have value    ees_disable_google_analytics    false
-    user clicks button    Hide this message
-    user checks page does not contain button    Hide this message
+    user clicks button    Hide cookie message
+    user checks page does not contain button    Hide cookie message
 
 Validate homepage
     user checks page contains element    link:Explore

@@ -102,7 +102,7 @@ function CookieBanner({ width }: Props) {
                   setVisible(false);
                 }}
               >
-                Hide this message
+                Hide cookie message
               </Button>
             </ButtonGroup>
           </div>

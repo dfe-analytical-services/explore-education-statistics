@@ -74,7 +74,7 @@ describe('UserTestingBanner', () => {
 
     expect(handleUserTestingBannerSeen).not.toHaveBeenCalled();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Close' }));
+    await userEvent.click(screen.getByRole('button', { name: /Close/ }));
 
     expect(handleUserTestingBannerSeen).toHaveBeenCalledWith(
       useCookies.userTestingBannerVersion,
