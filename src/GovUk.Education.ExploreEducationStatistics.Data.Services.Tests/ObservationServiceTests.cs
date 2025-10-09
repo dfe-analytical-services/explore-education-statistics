@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -91,7 +90,16 @@ public class ObservationServiceTests
             .Setup(s => s.CreateTemporaryTable<MatchedObservation, StatisticsDbContext>(context, cancellationToken))
             .ReturnsAsync(matchingObservationsTable.Object);
 
-        var queryGenerator = new MatchingObservationsQueryGenerator { TempTableCreator = tempTableCreator.Object };
+        var sqlHelper = new Mock<ISqlStatementsHelper>(Strict);
+
+        sqlHelper
+            .Setup(s => s.CreateRandomIndexName("#MatchedObservation", "Id"))
+            .Returns("IX_#MatchedObservation_Id_1234");
+
+        var queryGenerator = new MatchingObservationsQueryGenerator(
+            tempTableCreator: tempTableCreator.Object,
+            sqlHelper: sqlHelper.Object
+        );
 
         var (sql, sqlParameters, _) = await queryGenerator.GetMatchingObservationsQuery(
             context,
@@ -102,16 +110,23 @@ public class ObservationServiceTests
             cancellationToken
         );
 
-        VerifyAllMocks(tempTableCreator);
+        VerifyAllMocks(tempTableCreator, sqlHelper);
 
         const string expectedSql =
             @"
-                  INSERT INTO #MatchedObservation WITH (TABLOCK)
-                  SELECT o.id FROM Observation o
-                  WHERE o.SubjectId = @subjectId
-                  OPTION(RECOMPILE, MAXDOP 4);";
+            INSERT INTO #MatchedObservation WITH (TABLOCK)
+            SELECT o.id FROM Observation o
+            WHERE o.SubjectId = @subjectId
+            OPTION(RECOMPILE, MAXDOP 4);
+                
+            CREATE UNIQUE CLUSTERED INDEX [IX_#MatchedObservation_Id_1234]
+            ON #MatchedObservation(Id) WITH (MAXDOP = 4);
 
-        AssertInsertIntoMatchingObservationsCorrect(sql, expectedSql);
+            UPDATE STATISTICS #MatchedObservation WITH FULLSCAN;
+            ";
+
+        Assert.Equal(NormaliseSqlFormatting(expectedSql), NormaliseSqlFormatting(sql));
+
         sqlParameters.AssertDeepEqualTo(ListOf(new SqlParameter("subjectId", subjectId)));
     }
 
@@ -133,7 +148,16 @@ public class ObservationServiceTests
             .Setup(s => s.CreateTemporaryTable<MatchedObservation, StatisticsDbContext>(context, cancellationToken))
             .ReturnsAsync(matchingObservationsTable.Object);
 
-        var queryGenerator = new MatchingObservationsQueryGenerator { TempTableCreator = tempTableCreator.Object };
+        var sqlHelper = new Mock<ISqlStatementsHelper>(Strict);
+
+        sqlHelper
+            .Setup(s => s.CreateRandomIndexName("#MatchedObservation", "Id"))
+            .Returns("IX_#MatchedObservation_Id_1234");
+
+        var queryGenerator = new MatchingObservationsQueryGenerator(
+            tempTableCreator: tempTableCreator.Object,
+            sqlHelper: sqlHelper.Object
+        );
 
         var (sql, sqlParameters, _) = await queryGenerator.GetMatchingObservationsQuery(
             context,
@@ -150,21 +174,28 @@ public class ObservationServiceTests
             cancellationToken
         );
 
-        VerifyAllMocks(tempTableCreator);
+        VerifyAllMocks(tempTableCreator, sqlHelper);
 
         const string expectedSql =
             @"
-                  INSERT INTO #MatchedObservation WITH (TABLOCK)
-                  SELECT o.id FROM Observation o
-                  WHERE o.SubjectId = @subjectId
-                  AND (
-                    (o.TimeIdentifier = 'AY' AND o.Year = 2015) OR 
-                    (o.TimeIdentifier = 'AY' AND o.Year = 2016) OR 
-                    (o.TimeIdentifier = 'AY' AND o.Year = 2017)
-                  )
-                  OPTION(RECOMPILE, MAXDOP 4);";
+                INSERT INTO #MatchedObservation WITH (TABLOCK)
+                SELECT o.id FROM Observation o
+                WHERE o.SubjectId = @subjectId
+                AND (
+                  (o.TimeIdentifier = 'AY' AND o.Year = 2015) OR
+                  (o.TimeIdentifier = 'AY' AND o.Year = 2016) OR
+                  (o.TimeIdentifier = 'AY' AND o.Year = 2017)
+                )
+                OPTION(RECOMPILE, MAXDOP 4);
+                
+                CREATE UNIQUE CLUSTERED INDEX [IX_#MatchedObservation_Id_1234]
+                ON #MatchedObservation(Id) WITH (MAXDOP = 4);
 
-        AssertInsertIntoMatchingObservationsCorrect(sql, expectedSql);
+                UPDATE STATISTICS #MatchedObservation WITH FULLSCAN;
+            ";
+
+        Assert.Equal(NormaliseSqlFormatting(expectedSql), NormaliseSqlFormatting(sql));
+
         sqlParameters.AssertDeepEqualTo(ListOf(new SqlParameter("subjectId", subjectId)));
     }
 
@@ -198,7 +229,16 @@ public class ObservationServiceTests
             )
             .ReturnsAsync(locationIdsTempTableReference.Object);
 
-        var queryGenerator = new MatchingObservationsQueryGenerator { TempTableCreator = tempTableCreator.Object };
+        var sqlHelper = new Mock<ISqlStatementsHelper>(Strict);
+
+        sqlHelper
+            .Setup(s => s.CreateRandomIndexName("#MatchedObservation", "Id"))
+            .Returns("IX_#MatchedObservation_Id_1234");
+
+        var queryGenerator = new MatchingObservationsQueryGenerator(
+            tempTableCreator: tempTableCreator.Object,
+            sqlHelper: sqlHelper.Object
+        );
 
         var (sql, sqlParameters, _) = await queryGenerator.GetMatchingObservationsQuery(
             context,
@@ -213,22 +253,273 @@ public class ObservationServiceTests
 
         const string expectedSql =
             @"
-                  INSERT INTO #MatchedObservation WITH (TABLOCK)
-                  SELECT o.id FROM Observation o
-                  WHERE o.SubjectId = @subjectId
-                  AND (o.LocationId IN (SELECT Id FROM #LocationTempTable)) 
-                  OPTION(RECOMPILE, MAXDOP 4);";
+                INSERT INTO #MatchedObservation WITH (TABLOCK)
+                SELECT o.id FROM Observation o
+                WHERE o.SubjectId = @subjectId
+                AND (o.LocationId IN (SELECT Id FROM #LocationTempTable))
+                OPTION(RECOMPILE, MAXDOP 4);
+                
+                CREATE UNIQUE CLUSTERED INDEX [IX_#MatchedObservation_Id_1234]
+                ON #MatchedObservation(Id) WITH (MAXDOP = 4);
 
-        AssertInsertIntoMatchingObservationsCorrect(sql, expectedSql);
+                UPDATE STATISTICS #MatchedObservation WITH FULLSCAN;
+                ";
+
+        Assert.Equal(NormaliseSqlFormatting(expectedSql), NormaliseSqlFormatting(sql));
 
         sqlParameters.AssertDeepEqualTo(ListOf(new SqlParameter("subjectId", subjectId)));
     }
 
-    [Fact]
-    public async Task QueryGenerator_FilterItems()
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public async Task QueryGenerator_FilterItems_LessThanOrHalfItemsChosenForFilter_NotExistsCheck(
+        int numberOfSelectedItems
+    )
     {
         var subjectId = Guid.NewGuid();
 
+        // Create a Filter with 6 Filter Items in total.
+        var filter = new Filter
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = subjectId,
+            FilterGroups = CreateFilterGroups(numberOfFilterItemsPerFilterGroup: 6),
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            await context.AddRangeAsync(filter);
+            await context.SaveChangesAsync();
+        }
+
+        var tempTableCreator = new Mock<ITemporaryTableCreator>(Strict);
+
+        var sqlHelper = new Mock<ISqlStatementsHelper>(Strict);
+
+        sqlHelper
+            .Setup(s => s.CreateRandomIndexName("#MatchedObservation", "Id"))
+            .Returns("IX_#MatchedObservation_Id_1234");
+
+        var queryGenerator = new MatchingObservationsQueryGenerator(
+            tempTableCreator: tempTableCreator.Object,
+            sqlHelper: sqlHelper.Object
+        );
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
+
+            // We are selecting half or less of the Filter Items out of the
+            // available 6 for the Filter, meaning that it is cheaper to exclude
+            // Observations by checking for the *non-existence* of these Filter
+            // Items against Observation rows.
+            var selectedFilterItemIds = filter
+                .FilterGroups[0]
+                .FilterItems.Take(numberOfSelectedItems)
+                .Select(fi => fi.Id)
+                .ToList();
+
+            var matchingObservationsTable = new Mock<ITempTableReference>(Strict);
+            matchingObservationsTable.SetupGet(t => t.Name).Returns("#MatchedObservation");
+
+            tempTableCreator
+                .Setup(s => s.CreateTemporaryTable<MatchedObservation, StatisticsDbContext>(context, cancellationToken))
+                .ReturnsAsync(matchingObservationsTable.Object);
+
+            var selectedFilterItemTempTableEntriesForFilter = selectedFilterItemIds
+                .Select(id => new IdTempTable(id))
+                .ToList();
+
+            var filterItemIdTempTableReference = GenerateSetupsForFilterItemTempTable(
+                filterNumber: 1,
+                selectedFilterItemTempTableEntriesForFilter,
+                tempTableCreator,
+                context,
+                cancellationToken
+            );
+
+            var (sql, sqlParameters, _) = await queryGenerator.GetMatchingObservationsQuery(
+                context,
+                subjectId,
+                selectedFilterItemIds,
+                [],
+                null,
+                cancellationToken
+            );
+
+            VerifyAllMocks(tempTableCreator, sqlHelper, filterItemIdTempTableReference);
+
+            //
+            // Ensure that the DELETE statement uses a NOT EXISTS check against
+            // its temp table, that includes the Filter Item Ids selected by
+            // the user. This allows the DELETE statement to exclude any Observations
+            // that don't have any of the Filter Items selected for that particular
+            // Filter in the most efficient manner, by only evaluating the smaller
+            // number of Filter Item Ids.
+            //
+            const string expectedSql =
+                @"
+                    INSERT INTO #MatchedObservation WITH (TABLOCK)
+                    SELECT o.id FROM Observation o
+                    WHERE o.SubjectId = @subjectId
+                    OPTION(RECOMPILE, MAXDOP 4);
+                
+                    CREATE UNIQUE CLUSTERED INDEX [IX_#MatchedObservation_Id_1234]
+                    ON #MatchedObservation(Id) WITH (MAXDOP = 4);
+
+                    DELETE CandidateObservation WITH (TABLOCK)
+                    FROM #MatchedObservation CandidateObservation
+                    WHERE NOT EXISTS (
+                        SELECT 1
+                        FROM ObservationFilterItem OFI
+                        JOIN #Filter1TempTable SelectedFilterItem ON SelectedFilterItem.Id = OFI.FilterItemId
+                        WHERE OFI.ObservationId = CandidateObservation.Id
+                    )
+                    OPTION(RECOMPILE, MAXDOP 4);
+
+                    UPDATE STATISTICS #MatchedObservation WITH FULLSCAN;
+                    ";
+
+            Assert.Equal(NormaliseSqlFormatting(expectedSql), NormaliseSqlFormatting(sql));
+
+            sqlParameters.AssertDeepEqualTo(ListOf(new SqlParameter("subjectId", subjectId)));
+        }
+    }
+
+    [Theory]
+    [InlineData(4)]
+    [InlineData(5)]
+    public async Task QueryGenerator_FilterItems_MoreThanHalfItemsChosenForFilter_ExistsCheck(int numberOfSelectedItems)
+    {
+        var subjectId = Guid.NewGuid();
+
+        // Create a Filter with 6 Filter Items in total.
+        var filter = new Filter
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = subjectId,
+            FilterGroups = CreateFilterGroups(numberOfFilterItemsPerFilterGroup: 6),
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            await context.AddRangeAsync(filter);
+            await context.SaveChangesAsync();
+        }
+
+        var tempTableCreator = new Mock<ITemporaryTableCreator>(Strict);
+
+        var sqlHelper = new Mock<ISqlStatementsHelper>(Strict);
+
+        sqlHelper
+            .Setup(s => s.CreateRandomIndexName("#MatchedObservation", "Id"))
+            .Returns("IX_#MatchedObservation_Id_1234");
+
+        var queryGenerator = new MatchingObservationsQueryGenerator(
+            tempTableCreator: tempTableCreator.Object,
+            sqlHelper: sqlHelper.Object
+        );
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
+
+            // We are selecting more than half of the Filter Items out of the
+            // available 6 for the Filter, meaning that it is cheaper to exclude
+            // Observations by checking for the *existence* of the *unselected*
+            // Filter Items against Observation rows.
+            var selectedFilterItems = filter.FilterGroups[0].FilterItems.Take(numberOfSelectedItems).ToList();
+
+            var selectedFilterItemIds = selectedFilterItems.Select(fi => fi.Id).ToList();
+
+            var unselectedFilterItemIds = filter
+                .FilterGroups[0]
+                .FilterItems.Except(selectedFilterItems)
+                .Select(fi => fi.Id)
+                .ToList();
+
+            var matchingObservationsTable = new Mock<ITempTableReference>(Strict);
+            matchingObservationsTable.SetupGet(t => t.Name).Returns("#MatchedObservation");
+
+            tempTableCreator
+                .Setup(s => s.CreateTemporaryTable<MatchedObservation, StatisticsDbContext>(context, cancellationToken))
+                .ReturnsAsync(matchingObservationsTable.Object);
+
+            var unselectedFilterItemTempTableEntriesForFilter = unselectedFilterItemIds
+                .Select(id => new IdTempTable(id))
+                .ToList();
+
+            var filterItemIdTempTableReference = GenerateSetupsForFilterItemTempTable(
+                filterNumber: 1,
+                // Note here we are populating THIS Filter's temp table with the
+                // opposite of the user's Filter Item selection, as that
+                // provides the smaller set to test against.
+                unselectedFilterItemTempTableEntriesForFilter,
+                tempTableCreator,
+                context,
+                cancellationToken
+            );
+
+            var (sql, sqlParameters, _) = await queryGenerator.GetMatchingObservationsQuery(
+                context,
+                subjectId,
+                selectedFilterItemIds,
+                [],
+                null,
+                cancellationToken
+            );
+
+            VerifyAllMocks(tempTableCreator, sqlHelper, filterItemIdTempTableReference);
+
+            //
+            // Ensure that the DELETE statement uses an EXISTS check against
+            // its temp table, that includes the Filter Item Ids *not* selected by
+            // the user. This allows the DELETE statement to exclude any Observations
+            // that have any of the Filter Items *not* selected for that particular
+            // Filter in the most efficient manner, by only evaluating the smaller
+            // number of Filter Item Ids.
+            //
+            const string expectedSql =
+                @"
+                    INSERT INTO #MatchedObservation WITH (TABLOCK)
+                    SELECT o.id FROM Observation o
+                    WHERE o.SubjectId = @subjectId
+                    OPTION(RECOMPILE, MAXDOP 4);
+                
+                    CREATE UNIQUE CLUSTERED INDEX [IX_#MatchedObservation_Id_1234]
+                    ON #MatchedObservation(Id) WITH (MAXDOP = 4);
+
+                    DELETE CandidateObservation WITH (TABLOCK)
+                    FROM #MatchedObservation CandidateObservation
+                    WHERE EXISTS (
+                        SELECT 1
+                        FROM ObservationFilterItem OFI
+                        JOIN #Filter1TempTable SelectedFilterItem ON SelectedFilterItem.Id = OFI.FilterItemId
+                        WHERE OFI.ObservationId = CandidateObservation.Id
+                    )
+                    OPTION(RECOMPILE, MAXDOP 4);
+
+                    UPDATE STATISTICS #MatchedObservation WITH FULLSCAN;
+                    ";
+
+            Assert.Equal(NormaliseSqlFormatting(expectedSql), NormaliseSqlFormatting(sql));
+
+            sqlParameters.AssertDeepEqualTo(ListOf(new SqlParameter("subjectId", subjectId)));
+        }
+    }
+
+    [Fact]
+    public async Task QueryGenerator_FilterItems_NoItemsChosenForFilter_FilterStatementExcluded()
+    {
+        var subjectId = Guid.NewGuid();
+
+        // Create a Filter with 10 Filter Items in total.
         var filter1 = new Filter
         {
             Id = Guid.NewGuid(),
@@ -236,6 +527,7 @@ public class ObservationServiceTests
             FilterGroups = CreateFilterGroups(5, 5),
         };
 
+        // Create a Filter with 10 Filter Items in total.
         var filter2 = new Filter
         {
             Id = Guid.NewGuid(),
@@ -243,14 +535,281 @@ public class ObservationServiceTests
             FilterGroups = CreateFilterGroups(10),
         };
 
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            await context.AddRangeAsync(filter1, filter2);
+            await context.SaveChangesAsync();
+        }
+
+        var tempTableCreator = new Mock<ITemporaryTableCreator>(Strict);
+
+        var sqlHelper = new Mock<ISqlStatementsHelper>(Strict);
+
+        sqlHelper
+            .Setup(s => s.CreateRandomIndexName("#MatchedObservation", "Id"))
+            .Returns("IX_#MatchedObservation_Id_1234");
+
+        var queryGenerator = new MatchingObservationsQueryGenerator(
+            tempTableCreator: tempTableCreator.Object,
+            sqlHelper: sqlHelper.Object
+        );
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
+
+            // Set up some selected Filter Item Ids for only 1 Filter from this Subject.
+            // The Filter with no selections should not have any DELETE statement as
+            // it does not affect the outcome - it's treated in the same way as if the
+            // user had selected ALL Filter Items for that Filter.
+            //
+
+            // We are selecting Filter Items for Filter 1.
+            var selectedFilterItemIds = ListOf(
+                filter1.FilterGroups.ToList()[0].FilterItems.ToList()[0].Id,
+                filter1.FilterGroups.ToList()[0].FilterItems.ToList()[2].Id,
+                filter1.FilterGroups.ToList()[1].FilterItems.ToList()[1].Id
+            );
+
+            var matchingObservationsTable = new Mock<ITempTableReference>(Strict);
+            matchingObservationsTable.SetupGet(t => t.Name).Returns("#MatchedObservation");
+
+            tempTableCreator
+                .Setup(s => s.CreateTemporaryTable<MatchedObservation, StatisticsDbContext>(context, cancellationToken))
+                .ReturnsAsync(matchingObservationsTable.Object);
+
+            var selectedFilterItemTempTableEntriesForFilter1 = selectedFilterItemIds
+                .Select(id => new IdTempTable(id))
+                .ToList();
+
+            // Note that we're only expecting a temp table to be created for Filter 1.  Filter 2 will not get one
+            // as it has none of its Filter Items selected.
+            var filterItemIdTempTableReference = GenerateSetupsForFilterItemTempTable(
+                filterNumber: 1,
+                selectedFilterItemTempTableEntriesForFilter1,
+                tempTableCreator,
+                context,
+                cancellationToken
+            );
+
+            var (sql, sqlParameters, _) = await queryGenerator.GetMatchingObservationsQuery(
+                context,
+                subjectId,
+                selectedFilterItemIds,
+                [],
+                null,
+                cancellationToken
+            );
+
+            VerifyAllMocks(tempTableCreator, sqlHelper, filterItemIdTempTableReference);
+
+            // Ensure that the DELETE statements appear in the expected order in the generated query,
+            // with the most selective Filter (smallest ratio of selected Filter Items) first.
+            // This allows us to hopefully eliminate many more #MatchedObservation rows on the first pass,
+            // meaning that less #MatchedObservation rows need to be scanned for the 2nd Filter, and
+            // then less for the 3rd, etc.
+            //
+            const string expectedSql =
+                @"
+                    INSERT INTO #MatchedObservation WITH (TABLOCK)
+                    SELECT o.id FROM Observation o
+                    WHERE o.SubjectId = @subjectId
+                    OPTION(RECOMPILE, MAXDOP 4);
+                
+                    CREATE UNIQUE CLUSTERED INDEX [IX_#MatchedObservation_Id_1234]
+                    ON #MatchedObservation(Id) WITH (MAXDOP = 4);
+
+                    DELETE CandidateObservation WITH (TABLOCK)
+                    FROM #MatchedObservation CandidateObservation
+                    WHERE NOT EXISTS (
+                        SELECT 1
+                        FROM ObservationFilterItem OFI
+                        JOIN #Filter1TempTable SelectedFilterItem ON SelectedFilterItem.Id = OFI.FilterItemId
+                        WHERE OFI.ObservationId = CandidateObservation.Id
+                    )
+                    OPTION(RECOMPILE, MAXDOP 4);
+
+                    UPDATE STATISTICS #MatchedObservation WITH FULLSCAN;
+                    ";
+
+            Assert.Equal(NormaliseSqlFormatting(expectedSql), NormaliseSqlFormatting(sql));
+
+            sqlParameters.AssertDeepEqualTo(ListOf(new SqlParameter("subjectId", subjectId)));
+        }
+    }
+
+    [Fact]
+    public async Task QueryGenerator_FilterItems_AllItemsChosenForFilter_FilterStatementExcluded()
+    {
+        var subjectId = Guid.NewGuid();
+
+        // Create a Filter with 10 Filter Items in total.
+        var filter1 = new Filter
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = subjectId,
+            FilterGroups = CreateFilterGroups(10),
+        };
+
+        // Create a Filter with 10 Filter Items in total.
+        var filter2 = new Filter
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = subjectId,
+            FilterGroups = CreateFilterGroups(5, 5),
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            await context.AddRangeAsync(filter1, filter2);
+            await context.SaveChangesAsync();
+        }
+
+        var tempTableCreator = new Mock<ITemporaryTableCreator>(Strict);
+
+        var sqlHelper = new Mock<ISqlStatementsHelper>(Strict);
+
+        sqlHelper
+            .Setup(s => s.CreateRandomIndexName("#MatchedObservation", "Id"))
+            .Returns("IX_#MatchedObservation_Id_1234");
+
+        var queryGenerator = new MatchingObservationsQueryGenerator(
+            tempTableCreator: tempTableCreator.Object,
+            sqlHelper: sqlHelper.Object
+        );
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
+
+            // Set up ALL selected Filter Item Ids for Filter1, and select just some
+            // Filter Item Ids for Filter 2.
+            //
+            // The Filter with all Items selected should not have any DELETE statement as
+            // it does not affect the outcome - it cannot exclude any Observation rows if
+            // all its Items have been chosen, as it's guaranteed that any Observation row
+            // will have one of the selected Items.
+            //
+
+            // We are selecting ALL Filter Items for Filter 1.
+            var selectedFilter1ItemIds = filter1
+                .FilterGroups.SelectMany(fg => fg.FilterItems)
+                .Select(fi => fi.Id)
+                .ToList();
+
+            // We are selecting some Filter Items for Filter 2.
+            var selectedFilter2ItemIds = ListOf(
+                filter2.FilterGroups.ToList()[0].FilterItems.ToList()[0].Id,
+                filter2.FilterGroups.ToList()[0].FilterItems.ToList()[2].Id,
+                filter2.FilterGroups.ToList()[1].FilterItems.ToList()[1].Id
+            );
+
+            var selectedFilterItemIds = selectedFilter1ItemIds.Concat(selectedFilter2ItemIds).ToList();
+
+            var matchingObservationsTable = new Mock<ITempTableReference>(Strict);
+            matchingObservationsTable.SetupGet(t => t.Name).Returns("#MatchedObservation");
+
+            tempTableCreator
+                .Setup(s => s.CreateTemporaryTable<MatchedObservation, StatisticsDbContext>(context, cancellationToken))
+                .ReturnsAsync(matchingObservationsTable.Object);
+
+            var selectedFilterItemTempTableEntriesForFilter2 = selectedFilter2ItemIds
+                .Select(id => new IdTempTable(id))
+                .ToList();
+
+            // Note that we're only expecting a temp table to be created for Filter 2.  Filter 1 will not get one
+            // as it has all of its Filter Items selected, and therefore cannot be used to exclude anything.
+            var filterItemIdTempTableReference = GenerateSetupsForFilterItemTempTable(
+                filterNumber: 1,
+                selectedFilterItemTempTableEntriesForFilter2,
+                tempTableCreator,
+                context,
+                cancellationToken
+            );
+
+            var (sql, sqlParameters, _) = await queryGenerator.GetMatchingObservationsQuery(
+                context,
+                subjectId,
+                selectedFilterItemIds,
+                [],
+                null,
+                cancellationToken
+            );
+
+            VerifyAllMocks(tempTableCreator, sqlHelper, filterItemIdTempTableReference);
+
+            // Ensure that a DELETE statement only appears for Filter 2.
+            const string expectedSql =
+                @"
+                    INSERT INTO #MatchedObservation WITH (TABLOCK)
+                    SELECT o.id FROM Observation o
+                    WHERE o.SubjectId = @subjectId
+                    OPTION(RECOMPILE, MAXDOP 4);
+                
+                    CREATE UNIQUE CLUSTERED INDEX [IX_#MatchedObservation_Id_1234]
+                    ON #MatchedObservation(Id) WITH (MAXDOP = 4);
+
+                    DELETE CandidateObservation WITH (TABLOCK)
+                    FROM #MatchedObservation CandidateObservation
+                    WHERE NOT EXISTS (
+                        SELECT 1
+                        FROM ObservationFilterItem OFI
+                        JOIN #Filter1TempTable SelectedFilterItem ON SelectedFilterItem.Id = OFI.FilterItemId
+                        WHERE OFI.ObservationId = CandidateObservation.Id
+                    )
+                    OPTION(RECOMPILE, MAXDOP 4);
+
+                    UPDATE STATISTICS #MatchedObservation WITH FULLSCAN;
+                    ";
+
+            Assert.Equal(NormaliseSqlFormatting(expectedSql), NormaliseSqlFormatting(sql));
+
+            sqlParameters.AssertDeepEqualTo(ListOf(new SqlParameter("subjectId", subjectId)));
+        }
+    }
+
+    [Fact]
+    public async Task QueryGenerator_MultipleFiltersAndFilterItems()
+    {
+        var subjectId = Guid.NewGuid();
+
+        // Create a Filter with 10 Filter Items in total.
+        var filter1 = new Filter
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = subjectId,
+            FilterGroups = CreateFilterGroups(5, 5),
+        };
+
+        // Create a Filter with 10 Filter Items in total.
+        var filter2 = new Filter
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = subjectId,
+            FilterGroups = CreateFilterGroups(10),
+        };
+
+        // Create a Filter with 100 Filter Items in total.
         var filter3 = new Filter
         {
             Id = Guid.NewGuid(),
             SubjectId = subjectId,
-            FilterGroups = CreateFilterGroups(2, 2, 2, 2, 2),
+            FilterGroups = CreateFilterGroups(20, 20, 20, 20, 20),
         };
 
-        var unselectedFilter4 = new Filter
+        // Create a Filter with 2 Filter Items in total.
+        var filter4 = new Filter
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = subjectId,
+            FilterGroups = CreateFilterGroups(2),
+        };
+
+        var unselectedFilter5 = new Filter
         {
             Id = Guid.NewGuid(),
             SubjectId = subjectId,
@@ -267,14 +826,22 @@ public class ObservationServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            await context.AddRangeAsync(filter1, filter2, filter3, unselectedFilter4, unrelatedFilter);
-
+            await context.AddRangeAsync(filter1, filter2, filter3, filter4, unselectedFilter5, unrelatedFilter);
             await context.SaveChangesAsync();
         }
 
         var tempTableCreator = new Mock<ITemporaryTableCreator>(Strict);
 
-        var queryGenerator = new MatchingObservationsQueryGenerator { TempTableCreator = tempTableCreator.Object };
+        var sqlHelper = new Mock<ISqlStatementsHelper>(Strict);
+
+        sqlHelper
+            .Setup(s => s.CreateRandomIndexName("#MatchedObservation", "Id"))
+            .Returns("IX_#MatchedObservation_Id_1234");
+
+        var queryGenerator = new MatchingObservationsQueryGenerator(
+            tempTableCreator: tempTableCreator.Object,
+            sqlHelper: sqlHelper.Object
+        );
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
@@ -283,19 +850,38 @@ public class ObservationServiceTests
 
             // Set up some selected Filter Item Ids from 3 of the 4 Filters on this Subject.
             //
-            // Filter1 has the least Filter Items selected and will therefore appear first
-            // in the list of EXISTS clauses, in order for it to filter as many table rows down
-            // as possible before the next EXISTS clause is evaluated.
+            // We are selecting 3 Filter Items out of 10 for Filter 1, making it
+            // a 30% ratio.
             //
-            // Filter3 then has the second lowest number of Filter Items selected so it will
-            // appear as the second EXISTS clause, and finally Filter3 will be the final EXISTS
-            // clause.
+            // We are selecting 7 filter items out of 10 for Filter 2, making it
+            // a 70% ratio.
+            //
+            // We are selecting 12 filter items out of 100 for Filter 3,
+            // making it a 12% ratio.
+            //
+            // We are selecting 1 filter item out of 2 for Filter 4,
+            // making it a 50% ratio.
+            //
+            // Therefore, based on using the most selective Filter first, we expect the
+            // order of Filter deletion statements to look like:
+            //
+            // * Filter 3 (12%)
+            // * Filter 1 (30%)
+            // * Filter 4 (50%)
+            // * Filter 2 (70%)
+
+            // We are selecting 3 Filter Items out of 10 for Filter 1, making it
+            // a 30% ratio.
             var selectedFilter1FilterItemIds = ListOf(
                 filter1.FilterGroups.ToList()[0].FilterItems.ToList()[0].Id,
                 filter1.FilterGroups.ToList()[0].FilterItems.ToList()[2].Id,
                 filter1.FilterGroups.ToList()[1].FilterItems.ToList()[1].Id
             );
 
+            // We are selecting 7 filter items out of 10 for Filter 2, making it
+            // a 70% ratio.  Because this is more than half the items selected,
+            // we'll expect the opposite selection to be used during the exclusion
+            // process in tandem with an "EXISTS" clause.
             var selectedFilter2FilterItemIds = ListOf(
                 filter2.FilterGroups.ToList()[0].FilterItems.ToList()[0].Id,
                 filter2.FilterGroups.ToList()[0].FilterItems.ToList()[2].Id,
@@ -306,14 +892,32 @@ public class ObservationServiceTests
                 filter2.FilterGroups.ToList()[0].FilterItems.ToList()[8].Id
             );
 
+            var unselectedFilter2FilterItemIds = filter2
+                .FilterGroups.ToList()[0]
+                .FilterItems.Select(fi => fi.Id)
+                .Except(selectedFilter2FilterItemIds)
+                .ToList();
+
+            // We are selecting 12 filter items out of 100 for Filter 3,
+            // making it a 12% ratio.
             var selectedFilter3FilterItemIds = ListOf(
                 filter3.FilterGroups.ToList()[0].FilterItems.ToList()[0].Id,
                 filter3.FilterGroups.ToList()[0].FilterItems.ToList()[1].Id,
                 filter3.FilterGroups.ToList()[1].FilterItems.ToList()[0].Id,
                 filter3.FilterGroups.ToList()[2].FilterItems.ToList()[1].Id,
                 filter3.FilterGroups.ToList()[3].FilterItems.ToList()[0].Id,
-                filter3.FilterGroups.ToList()[4].FilterItems.ToList()[1].Id
+                filter3.FilterGroups.ToList()[4].FilterItems.ToList()[1].Id,
+                filter3.FilterGroups.ToList()[4].FilterItems.ToList()[2].Id,
+                filter3.FilterGroups.ToList()[4].FilterItems.ToList()[3].Id,
+                filter3.FilterGroups.ToList()[4].FilterItems.ToList()[4].Id,
+                filter3.FilterGroups.ToList()[4].FilterItems.ToList()[5].Id,
+                filter3.FilterGroups.ToList()[4].FilterItems.ToList()[6].Id,
+                filter3.FilterGroups.ToList()[4].FilterItems.ToList()[7].Id
             );
+
+            // We are selecting 1 filter item out of 2 for Filter 4,
+            // making it a 50% ratio.
+            var selectedFilter4FilterItemIds = ListOf(filter4.FilterGroups.ToList()[0].FilterItems.ToList()[0].Id);
 
             // An accidental inclusion of a Filter Item Id that doesn't belong to a
             // Filter on this Subject will be ignored.
@@ -321,9 +925,10 @@ public class ObservationServiceTests
                 unrelatedFilter.FilterGroups.ToList()[0].FilterItems.ToList()[0].Id
             );
 
-            var selectFilterItemIds = selectedFilter1FilterItemIds
+            var allSelectedFilterItemIds = selectedFilter1FilterItemIds
                 .Concat(selectedFilter2FilterItemIds)
                 .Concat(selectedFilter3FilterItemIds)
+                .Concat(selectedFilter4FilterItemIds)
                 .Concat(invalidUnrelatedFilterFilterItemIds)
                 .ToList();
 
@@ -336,8 +941,10 @@ public class ObservationServiceTests
 
             var selectedFilterItemsByFilter = ListOf(
                 selectedFilter1FilterItemIds,
-                selectedFilter2FilterItemIds,
-                selectedFilter3FilterItemIds
+                // Expect the inverse selection for Filter 2.
+                unselectedFilter2FilterItemIds,
+                selectedFilter3FilterItemIds,
+                selectedFilter4FilterItemIds
             );
 
             var selectedFilterItemTempTableEntriesByFilter = selectedFilterItemsByFilter
@@ -345,62 +952,90 @@ public class ObservationServiceTests
                 .ToList();
 
             var filterItemIdTempTableReferences = selectedFilterItemTempTableEntriesByFilter
-                .Select(tempTableEntries =>
-                {
-                    var filterNumber = selectedFilterItemTempTableEntriesByFilter.IndexOf(tempTableEntries) + 1;
-
-                    var orderedIds = tempTableEntries.OrderBy(t => t.Id).ToList();
-
-                    var tempTableReference = new Mock<ITempTableQuery<IdTempTable>>();
-                    tempTableReference.SetupGet(t => t.Name).Returns($"#Filter{filterNumber}TempTable");
-
-                    tempTableCreator
-                        .Setup(s =>
-                            s.CreateAnonymousTemporaryTableAndPopulate(
-                                context,
-                                ItIs.ListSequenceEqualTo(orderedIds),
-                                cancellationToken
-                            )
+                .Select(
+                    (tempTableEntries, i) =>
+                        GenerateSetupsForFilterItemTempTable(
+                            filterNumber: i + 1,
+                            tempTableEntries,
+                            tempTableCreator,
+                            context,
+                            cancellationToken
                         )
-                        .ReturnsAsync(tempTableReference.Object);
-
-                    return tempTableReference;
-                })
+                )
                 .ToList();
 
             var (sql, sqlParameters, _) = await queryGenerator.GetMatchingObservationsQuery(
                 context,
                 subjectId,
-                selectFilterItemIds,
+                allSelectedFilterItemIds,
                 [],
                 null,
                 cancellationToken
             );
 
-            VerifyAllMocks(tempTableCreator);
+            VerifyAllMocks(tempTableCreator, sqlHelper);
             VerifyAllMocks(filterItemIdTempTableReferences.Cast<Mock>().ToArray());
 
-            // Ensure that the EXISTS clauses appear in the expected order in the generated query,
-            // with the Filter with the least number of Filter Items chosen being the first.
+            // Ensure that the DELETE statements appear in the expected order in the generated query,
+            // with the most selective Filter (smallest ratio of selected Filter Items) first.
+            // This allows us to hopefully eliminate many more #MatchedObservation rows on the first pass,
+            // meaning that less #MatchedObservation rows need to be scanned for the 2nd Filter, and
+            // then less for the 3rd, etc.
+            //
             const string expectedSql =
                 @"
-                      INSERT INTO #MatchedObservation WITH (TABLOCK) 
-                      SELECT o.id FROM Observation o
-                      WHERE o.SubjectId = @subjectId 
-                      AND (
-                          EXISTS (SELECT 1 FROM ObservationFilterItem ofi 
-                                  WHERE ofi.ObservationId = o.id 
-                                  AND ofi.FilterItemId IN (SELECT Id FROM #Filter1TempTable)) AND
-                          EXISTS (SELECT 1 FROM ObservationFilterItem ofi 
-                                  WHERE ofi.ObservationId = o.id 
-                                  AND ofi.FilterItemId IN (SELECT Id FROM #Filter3TempTable)) AND
-                          EXISTS (SELECT 1 FROM ObservationFilterItem ofi 
-                                  WHERE ofi.ObservationId = o.id 
-                                  AND ofi.FilterItemId IN (SELECT Id FROM #Filter2TempTable))
-                      )
-                      OPTION(RECOMPILE, MAXDOP 4);";
+                    INSERT INTO #MatchedObservation WITH (TABLOCK)
+                    SELECT o.id FROM Observation o
+                    WHERE o.SubjectId = @subjectId
+                    OPTION(RECOMPILE, MAXDOP 4);
+                
+                    CREATE UNIQUE CLUSTERED INDEX [IX_#MatchedObservation_Id_1234]
+                    ON #MatchedObservation(Id) WITH (MAXDOP = 4);
 
-            AssertInsertIntoMatchingObservationsCorrect(sql, expectedSql);
+                    DELETE CandidateObservation WITH (TABLOCK)
+                    FROM #MatchedObservation CandidateObservation
+                    WHERE NOT EXISTS (
+                        SELECT 1
+                        FROM ObservationFilterItem OFI
+                        JOIN #Filter3TempTable SelectedFilterItem ON SelectedFilterItem.Id = OFI.FilterItemId
+                        WHERE OFI.ObservationId = CandidateObservation.Id
+                    )
+                    OPTION(RECOMPILE, MAXDOP 4);
+
+                    DELETE CandidateObservation WITH (TABLOCK)
+                    FROM #MatchedObservation CandidateObservation
+                    WHERE NOT EXISTS (
+                        SELECT 1
+                        FROM ObservationFilterItem OFI
+                        JOIN #Filter1TempTable SelectedFilterItem ON SelectedFilterItem.Id = OFI.FilterItemId
+                        WHERE OFI.ObservationId = CandidateObservation.Id
+                    )
+                    OPTION(RECOMPILE, MAXDOP 4);
+
+                    DELETE CandidateObservation WITH (TABLOCK)
+                    FROM #MatchedObservation CandidateObservation
+                    WHERE NOT EXISTS (
+                        SELECT 1
+                        FROM ObservationFilterItem OFI
+                        JOIN #Filter4TempTable SelectedFilterItem ON SelectedFilterItem.Id = OFI.FilterItemId
+                        WHERE OFI.ObservationId = CandidateObservation.Id
+                    )
+                    OPTION(RECOMPILE, MAXDOP 4);
+
+                    DELETE CandidateObservation WITH (TABLOCK)
+                    FROM #MatchedObservation CandidateObservation
+                    WHERE EXISTS (
+                        SELECT 1
+                        FROM ObservationFilterItem OFI
+                        JOIN #Filter2TempTable SelectedFilterItem ON SelectedFilterItem.Id = OFI.FilterItemId
+                        WHERE OFI.ObservationId = CandidateObservation.Id
+                    )
+                    OPTION(RECOMPILE, MAXDOP 4);
+
+                    UPDATE STATISTICS #MatchedObservation WITH FULLSCAN;
+                    ";
+
+            Assert.Equal(NormaliseSqlFormatting(expectedSql), NormaliseSqlFormatting(sql));
 
             sqlParameters.AssertDeepEqualTo(ListOf(new SqlParameter("subjectId", subjectId)));
         }
@@ -427,7 +1062,16 @@ public class ObservationServiceTests
 
         var tempTableCreator = new Mock<ITemporaryTableCreator>(Strict);
 
-        var queryGenerator = new MatchingObservationsQueryGenerator { TempTableCreator = tempTableCreator.Object };
+        var sqlHelper = new Mock<ISqlStatementsHelper>(Strict);
+
+        sqlHelper
+            .Setup(s => s.CreateRandomIndexName("#MatchedObservation", "Id"))
+            .Returns("IX_#MatchedObservation_Id_1234");
+
+        var queryGenerator = new MatchingObservationsQueryGenerator(
+            tempTableCreator: tempTableCreator.Object,
+            sqlHelper: sqlHelper.Object
+        );
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
@@ -497,28 +1141,39 @@ public class ObservationServiceTests
                 cancellationToken
             );
 
-            VerifyAllMocks(tempTableCreator);
+            VerifyAllMocks(tempTableCreator, sqlHelper);
             VerifyAllMocks(tempTableMocks.Cast<Mock>().ToArray());
 
             const string expectedSql =
                 @"
-                      INSERT INTO #MatchedObservation WITH (TABLOCK)
-                      SELECT o.id FROM Observation o
-                      WHERE o.SubjectId = @subjectId 
-                      AND (
-                        (o.TimeIdentifier = 'AY' AND o.Year = 2015) OR 
-                        (o.TimeIdentifier = 'AY' AND o.Year = 2016) OR 
-                        (o.TimeIdentifier = 'AY' AND o.Year = 2017)
-                      ) 
-                      AND (o.LocationId IN (SELECT Id FROM #LocationTempTable)) 
-                      AND (
-                          EXISTS (SELECT 1 FROM ObservationFilterItem ofi 
-                                  WHERE ofi.ObservationId = o.id 
-                                  AND ofi.FilterItemId IN (SELECT Id FROM #FilterTempTable))
-                      )
-                      OPTION(RECOMPILE, MAXDOP 4);";
+                    INSERT INTO #MatchedObservation WITH (TABLOCK)
+                    SELECT o.id FROM Observation o
+                    WHERE o.SubjectId = @subjectId
+                    AND (
+                      (o.TimeIdentifier = 'AY' AND o.Year = 2015) OR
+                      (o.TimeIdentifier = 'AY' AND o.Year = 2016) OR
+                      (o.TimeIdentifier = 'AY' AND o.Year = 2017)
+                    )
+                    AND (o.LocationId IN (SELECT Id FROM #LocationTempTable))
+                    OPTION(RECOMPILE, MAXDOP 4);
+                
+                    CREATE UNIQUE CLUSTERED INDEX [IX_#MatchedObservation_Id_1234]
+                    ON #MatchedObservation(Id) WITH (MAXDOP = 4);
 
-            AssertInsertIntoMatchingObservationsCorrect(sql, expectedSql);
+                    DELETE CandidateObservation WITH (TABLOCK)
+                    FROM #MatchedObservation CandidateObservation
+                    WHERE NOT EXISTS (
+                        SELECT 1
+                        FROM ObservationFilterItem OFI
+                        JOIN #FilterTempTable SelectedFilterItem ON SelectedFilterItem.Id = OFI.FilterItemId
+                        WHERE OFI.ObservationId = CandidateObservation.Id
+                    )
+                    OPTION(RECOMPILE, MAXDOP 4);
+
+                    UPDATE STATISTICS #MatchedObservation WITH FULLSCAN;
+                    ";
+
+            Assert.Equal(NormaliseSqlFormatting(expectedSql), NormaliseSqlFormatting(sql));
 
             sqlParameters.AssertDeepEqualTo(ListOf(new SqlParameter("subjectId", subjectId)));
         }
@@ -530,13 +1185,12 @@ public class ObservationServiceTests
         IRawSqlExecutor? sqlExecutor = null
     )
     {
-        var service = new ObservationService(context, Mock.Of<ILogger<ObservationService>>())
-        {
-            QueryGenerator = queryGenerator ?? Mock.Of<IMatchingObservationsQueryGenerator>(Strict),
-            SqlExecutor = sqlExecutor ?? Mock.Of<IRawSqlExecutor>(Strict),
-        };
-
-        return service;
+        return new ObservationService(
+            context: context,
+            queryGenerator: queryGenerator ?? Mock.Of<IMatchingObservationsQueryGenerator>(Strict),
+            sqlExecutor: sqlExecutor ?? Mock.Of<IRawSqlExecutor>(Strict),
+            logger: Mock.Of<ILogger<ObservationService>>()
+        );
     }
 
     private static List<FilterGroup> CreateFilterGroups(params int[] numberOfFilterItemsPerFilterGroup)
@@ -553,21 +1207,29 @@ public class ObservationServiceTests
             .ToList();
     }
 
-    private static void AssertInsertIntoMatchingObservationsCorrect(string sql, string expectedSql)
+    private static Mock<ITempTableQuery<IdTempTable>> GenerateSetupsForFilterItemTempTable(
+        int filterNumber,
+        List<IdTempTable> tempTableEntries,
+        Mock<ITemporaryTableCreator> tempTableCreator,
+        StatisticsDbContext? context,
+        CancellationToken cancellationToken
+    )
     {
-        // Check the expected query is present to insert matching Observation Ids into
-        // the temp table.
-        var actualSql = NormaliseSqlFormatting(sql);
-        Assert.StartsWith(NormaliseSqlFormatting(expectedSql), actualSql);
+        var orderedIds = tempTableEntries.OrderBy(t => t.Id).ToList();
 
-        // Check the expected index is applied to the temp table after the insert.
-        var restOfSql = actualSql.Split(NormaliseSqlFormatting(expectedSql))[1].TrimStart();
-        var indexSqlPattern = new Regex(
-            @"CREATE UNIQUE CLUSTERED INDEX \[IX_#MatchedObservation_Id_.{36}\].* "
-                + @"ON #MatchedObservation\(Id\) WITH \(MAXDOP = 4\);\s*"
-                + @"UPDATE STATISTICS #MatchedObservation WITH FULLSCAN;"
-        );
+        var tempTableReference = new Mock<ITempTableQuery<IdTempTable>>();
+        tempTableReference.SetupGet(t => t.Name).Returns($"#Filter{filterNumber}TempTable");
 
-        Assert.Matches(indexSqlPattern, restOfSql);
+        tempTableCreator
+            .Setup(s =>
+                s.CreateAnonymousTemporaryTableAndPopulate(
+                    context,
+                    ItIs.ListSequenceEqualTo(orderedIds),
+                    cancellationToken
+                )
+            )
+            .ReturnsAsync(tempTableReference.Object);
+
+        return tempTableReference;
     }
 }

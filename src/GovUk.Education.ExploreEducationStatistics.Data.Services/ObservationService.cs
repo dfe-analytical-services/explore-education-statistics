@@ -3,7 +3,6 @@ using System.Diagnostics;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -12,24 +11,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Thinktecture.EntityFrameworkCore.TempTables;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.ObservationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 
-public class ObservationService : IObservationService
+public class ObservationService(
+    StatisticsDbContext context,
+    IMatchingObservationsQueryGenerator queryGenerator,
+    IRawSqlExecutor sqlExecutor,
+    ILogger<ObservationService> logger
+) : IObservationService
 {
-    private readonly StatisticsDbContext _context;
-    private readonly ILogger<ObservationService> _logger;
-
-    public IMatchingObservationsQueryGenerator QueryGenerator = new MatchingObservationsQueryGenerator();
-
-    public IRawSqlExecutor SqlExecutor = new RawSqlExecutor();
-
-    public ObservationService(StatisticsDbContext context, ILogger<ObservationService> logger)
-    {
-        _context = context;
-        _logger = logger;
-    }
-
     public async Task<ITempTableReference> GetMatchedObservations(
         FullTableQuery query,
         CancellationToken cancellationToken = default
@@ -37,8 +29,8 @@ public class ObservationService : IObservationService
     {
         var sw = Stopwatch.StartNew();
 
-        var (sql, sqlParameters, matchingObservationTable) = await QueryGenerator.GetMatchingObservationsQuery(
-            _context,
+        var (sql, sqlParameters, matchingObservationTable) = await queryGenerator.GetMatchingObservationsQuery(
+            context,
             query.SubjectId,
             query.GetFilterItemIds(),
             query.LocationIds,
@@ -47,18 +39,18 @@ public class ObservationService : IObservationService
         );
 
         // Execute the query to find matching Observation Ids.
-        await SqlExecutor.ExecuteSqlRaw(
-            context: _context,
+        await sqlExecutor.ExecuteSqlRaw(
+            context: context,
             sql: sql,
             parameters: sqlParameters,
             cancellationToken: cancellationToken
         );
 
-        if (_logger.IsEnabled(LogLevel.Trace))
+        if (logger.IsEnabled(LogLevel.Trace))
         {
-            _logger.LogTrace(
+            logger.LogTrace(
                 "Finished fetching {ObservationCount} Observations in a total of {Milliseconds} ms",
-                _context.MatchedObservations.Count(),
+                context.MatchedObservations.Count(),
                 sw.Elapsed.TotalMilliseconds
             );
         }
@@ -78,10 +70,11 @@ public class ObservationService : IObservationService
         );
     }
 
-    public class MatchingObservationsQueryGenerator : IMatchingObservationsQueryGenerator
+    public class MatchingObservationsQueryGenerator(
+        ITemporaryTableCreator tempTableCreator,
+        ISqlStatementsHelper sqlHelper
+    ) : IMatchingObservationsQueryGenerator
     {
-        public ITemporaryTableCreator TempTableCreator = new TemporaryTableCreator();
-
         public async Task<(string, IList<SqlParameter>, ITempTableReference)> GetMatchingObservationsQuery(
             StatisticsDbContext context,
             Guid subjectId,
@@ -93,7 +86,7 @@ public class ObservationService : IObservationService
         {
             // Generate a keyless temp table to allow quick inserting of
             // matching Observation Ids into a heap in parallel.
-            var matchingObservationTable = await TempTableCreator.CreateTemporaryTable<
+            var matchingObservationTable = await tempTableCreator.CreateTemporaryTable<
                 MatchedObservation,
                 StatisticsDbContext
             >(context: context, cancellationToken: cancellationToken);
@@ -107,11 +100,17 @@ public class ObservationService : IObservationService
             var locationIdsClause =
                 locationIds.Count > 0 ? await GetLocationsClause(context, locationIds, cancellationToken) : default;
 
-            // Generate a "WHERE" clause to limit matched Observations to selected
-            // Filter Items, if any.
-            var filterItemIdsClause =
+            // For each Filter, generate a DELETE statement to eliminate any #MatchedObservation rows
+            // that don't have any matching FilterItem selections for that Filter.
+            var filterItemIdsReductions =
                 filterItemIds.Count > 0
-                    ? await GetSelectedFilterItemIdsClause(context, subjectId, filterItemIds, cancellationToken)
+                    ? await GetSelectedFilterItemIdsReductions(
+                        context: context,
+                        subjectId: subjectId,
+                        filterItemIds: filterItemIds,
+                        matchingObservationTable: matchingObservationTable,
+                        cancellationToken: cancellationToken
+                    )
                     : default;
 
             // Insert matching Observation Ids into the heap.
@@ -128,7 +127,6 @@ public class ObservationService : IObservationService
                     WHERE o.SubjectId = @subjectId "
                 + (timePeriodsClause != null ? $"AND ({timePeriodsClause}) " : "")
                 + (locationIdsClause != null ? $"AND ({locationIdsClause}) " : "")
-                + (filterItemIdsClause != null ? $"AND ({filterItemIdsClause}) " : "")
                 + "OPTION(RECOMPILE, MAXDOP 4);";
 
             // Add a unique clustered index *after* the heap insert for better performance,
@@ -137,26 +135,50 @@ public class ObservationService : IObservationService
             //
             // Update its statistics so that any future joins can make full use of its
             // accurate stats.
+            var indexName = sqlHelper.CreateRandomIndexName(
+                matchingObservationTable.Name,
+                nameof(MatchedObservation.Id)
+            );
+
             var indexSql =
                 $@"
-                CREATE UNIQUE CLUSTERED INDEX [IX_{matchingObservationTable.Name}_{nameof(MatchedObservation.Id)}_{Guid.NewGuid()}]
-                ON {matchingObservationTable.Name}({nameof(MatchedObservation.Id)})
-                WITH (MAXDOP = 4);
+                    CREATE UNIQUE CLUSTERED INDEX [{indexName}]
+                    ON {matchingObservationTable.Name}({nameof(MatchedObservation.Id)})
+                    WITH (MAXDOP = 4);
+                ";
 
-                UPDATE STATISTICS {matchingObservationTable.Name} WITH FULLSCAN;";
+            var updateStatisticsSql = $"UPDATE STATISTICS {matchingObservationTable.Name} WITH FULLSCAN;";
 
             var parameters = ListOf(new SqlParameter("subjectId", subjectId));
 
-            return ($"{matchingObservationSql}\n\n{indexSql}", parameters, matchingObservationTable);
+            return (
+                @$"
+                {matchingObservationSql}
+                {indexSql}
+                {filterItemIdsReductions ?? ""}
+                {updateStatisticsSql}",
+                parameters,
+                matchingObservationTable
+            );
         }
 
-        private async Task<string> GetSelectedFilterItemIdsClause(
+        private async Task<string> GetSelectedFilterItemIdsReductions(
             StatisticsDbContext context,
             Guid subjectId,
             IList<Guid> filterItemIds,
+            ITempTableReference matchingObservationTable,
             CancellationToken cancellationToken
         )
         {
+            //
+            // Firstly we gather information about each Filter for this Subject and the choices the user has made.
+            //
+            // We find for each Filter:
+            //
+            // * Its ID.
+            // * The Filter Items that the user has chosen.
+            // * The total number of Filter Items available for the user to have chosen.
+            //
             var selectedFilterItemIdsByFilter = await GetSelectedFilterItemIdsByFilter(
                 context,
                 filterItemIds,
@@ -164,49 +186,83 @@ public class ObservationService : IObservationService
                 cancellationToken
             );
 
-            // This line adds a potential optimisation to the final generated SQL by placing the EXISTS clauses
-            // with the least number of selected Filter Item Ids first, thus attempting to narrow down the list
-            // of candidate rows for the next EXISTS clause in line to match against, and so on and so on.
             //
-            // This could also be done by determining the ratio of selected Filter Item Ids for a given Filter
-            // versus the number of potential options for that Filter.  A Filter with 5,000 possible Filter Items
-            // but only one of them selected would no doubt be very selective too before passing to the next EXISTS
-            // clause, but if ratios are being used to determine the order, then if 2,500 options are selected for
-            // this Filter that would give a ratio of 50% selected, and when compared to another Filter with 10
-            // possible options and 6 selected, the 5,000-options Filter clause would be placed first in the EXISTS
-            // chain, which would be less efficient.
+            // We are now ready to start eliminating potential candidate Observation rows from the final table results.
+            // For each Filter, we are going to eliminate any candidate Observation rows that don't have a matching
+            // Filter Item selected for that particular Filter e.g. if for a "School type" Filter the user selected
+            // "Primary" and "Secondary", we would be eliminating any rows that had "Special" or "All schools" selected
+            // in the "School type" column, for instance.
             //
-            // Thus for now we simply order by the least number of selected Filter Items first.
-            var selectedFilterItemsInLeastOptionsOrder = selectedFilterItemIdsByFilter
-                .Where(filterItemIdsForFilter => !filterItemIdsForFilter.Value.IsNullOrEmpty())
-                .OrderBy(filterItemIdsForFilter => filterItemIdsForFilter.Value.Count);
+            // We do this by issuing separate DELETE statements to remove candidate Observations from the
+            // #MatchedObservation temp table, one for each Filter.
+            //
+            // We order the Filters with the most selective first - that is, the Filter with the lowest ratio of its
+            // Filter Items selected first.  We do this in order to attempt to eliminate as many Observation row
+            // candidates as possible in the first DELETE statement.  If for example we had a filter with 1,000 possible
+            // Filter Items available, and the user selected 10 of them, they have selected only 1% of the possible options.
+            // Assuming a fairly even spread of those Filter Items over, say 1,000,000 Observation rows, we will have
+            // already potentially whittled our remaining candidate Observations down from 1,000,000 to 10,000.
+            //
+            // This means that while the first DELETE statement would have 1,000,000 Observations in its outer loop to
+            // evaluate, the next would only need to consider around 10,000, and then the Filter after that many less
+            // again etc.
+            //
+            // In contrast, had we not done this and had chosen to use a Filter first with only 2 Filter Items available
+            // to it, and only one selection from the user, assuming a fairly even spread then this would only have
+            // eliminated around 50% of the Observations on the first pass, leaving the next Filter to deal with
+            // 500,000 candidate Observations.
+            //
+            var selectedFilterItemsByMostSelectiveFirst = selectedFilterItemIdsByFilter
+                // Exclude any Filters for which there are no selections.
+                .Where(filterItemIdsForFilter => !filterItemIdsForFilter.SelectedFilterItemIds.IsNullOrEmpty())
+                // Exclude any Filters where every Filter Item has been chosen.
+                .Where(filterItemIdsForFilter =>
+                    filterItemIdsForFilter.SelectedFilterItemIds.Count < filterItemIdsForFilter.TotalFilterItemCount
+                )
+                // Order any remaining Filters by how selective they will be
+                // (how likely they will be to exclude as many Observations as possible)
+                .OrderByDescending(filterItemIdsForFilter => filterItemIdsForFilter.SelectivenessFactor);
 
-            var filterItemIdTempTablesPerFilter = selectedFilterItemsInLeastOptionsOrder.ToDictionary(
-                filterItemIdsForFilter => filterItemIdsForFilter.Key,
+            // For each Filter, create its own temp table with its respective Filter Item Ids in it.
+            var filterItemIdTempTablesPerFilter = selectedFilterItemsByMostSelectiveFirst.ToDictionary(
+                filterItemIdsForFilter => filterItemIdsForFilter,
                 filterItemIdsForFilter =>
                 {
-                    var ids = filterItemIdsForFilter.Value.OrderBy(id => id).Select(id => new IdTempTable(id)).ToList();
+                    var selectedFilterItemIds = filterItemIdsForFilter
+                        .FilterItemIdsToUseInCheck.OrderBy(id => id)
+                        .Select(id => new IdTempTable(id))
+                        .ToList();
 
-                    return TempTableCreator
-                        .CreateAnonymousTemporaryTableAndPopulate(context, ids, cancellationToken)
+                    return tempTableCreator
+                        .CreateAnonymousTemporaryTableAndPopulate(context, selectedFilterItemIds, cancellationToken)
                         .Result;
                 }
             );
 
-            var clauses = filterItemIdTempTablesPerFilter.Select(filterItemIdTempTableForFilter =>
+            // For each Filter, issue a DELETE statement to exclude Observations if
+            // they don't meet the criteria of the Filter Item selection.
+            var deleteStatements = filterItemIdTempTablesPerFilter.Select(filterItemIdTempTableForFilter =>
             {
+                var exclusionType = filterItemIdTempTableForFilter.Key.ExclusionType;
                 var filterItemIdsTempTableName = filterItemIdTempTableForFilter.Value.Name;
 
-                return $"EXISTS ("
-                    + $"    SELECT 1 FROM ObservationFilterItem ofi WHERE ofi.ObservationId = o.id "
-                    + $"    AND ofi.FilterItemId IN (SELECT Id FROM {filterItemIdsTempTableName})"
-                    + $")";
+                return @$"
+                DELETE CandidateObservation WITH (TABLOCK)
+                FROM {matchingObservationTable.Name} CandidateObservation
+                WHERE {(exclusionType == FilterAndFilterItemInfo.ExclusionCheckType.NotExists ? "NOT" : "")} EXISTS (
+                    SELECT 1
+                    FROM ObservationFilterItem OFI
+                    JOIN {filterItemIdsTempTableName} SelectedFilterItem ON SelectedFilterItem.Id = OFI.FilterItemId
+                    WHERE OFI.ObservationId = CandidateObservation.Id
+                )
+                OPTION(RECOMPILE, MAXDOP 4);
+                ";
             });
 
-            return clauses.JoinToString(" AND ");
+            return deleteStatements.JoinToString("\n\n");
         }
 
-        private static async Task<IDictionary<Guid, List<Guid>>> GetSelectedFilterItemIdsByFilter(
+        private static async Task<List<FilterAndFilterItemInfo>> GetSelectedFilterItemIdsByFilter(
             StatisticsDbContext context,
             IList<Guid> filterItemIds,
             Guid subjectId,
@@ -219,17 +275,24 @@ public class ObservationService : IObservationService
                 .Where(filterItem => filterItem.SubjectId == subjectId)
                 .ToListAsync(cancellationToken);
 
-            return filtersForSubject.ToDictionary(
-                filter => filter.Id,
-                filter =>
+            return filtersForSubject
+                .Select(filter =>
                 {
                     var allFilterItemIdsForFilter = filter
                         .FilterGroups.SelectMany(f => f.FilterItems)
-                        .Select(f => f.Id);
-
-                    return allFilterItemIdsForFilter.Intersect(filterItemIds).ToList();
-                }
-            );
+                        .Select(f => f.Id)
+                        .ToList();
+                    var selectedFilterItemsForFilter = allFilterItemIdsForFilter.Intersect(filterItemIds).ToList();
+                    return new FilterAndFilterItemInfo
+                    {
+                        FilterId = filter.Id,
+                        SelectedFilterItemIds = selectedFilterItemsForFilter,
+                        UnselectedFilterItemIds = allFilterItemIdsForFilter
+                            .Except(selectedFilterItemsForFilter)
+                            .ToList(),
+                    };
+                })
+                .ToList();
         }
 
         private async Task<string> GetLocationsClause(
@@ -238,7 +301,7 @@ public class ObservationService : IObservationService
             CancellationToken cancellationToken
         )
         {
-            var locationsTempTable = await TempTableCreator.CreateAnonymousTemporaryTableAndPopulate(
+            var locationsTempTable = await tempTableCreator.CreateAnonymousTemporaryTableAndPopulate(
                 context,
                 locationIds.Select(id => new IdTempTable(id)),
                 cancellationToken
@@ -255,5 +318,32 @@ public class ObservationService : IObservationService
             );
             return timePeriodClauses.JoinToString(" OR ");
         }
+    }
+
+    private record FilterAndFilterItemInfo
+    {
+        public enum ExclusionCheckType
+        {
+            Exists,
+            NotExists,
+        }
+
+        public required Guid FilterId { get; init; }
+
+        public required List<Guid> SelectedFilterItemIds { get; init; }
+
+        public required List<Guid> UnselectedFilterItemIds { get; init; }
+
+        public int TotalFilterItemCount => SelectedFilterItemIds.Count + UnselectedFilterItemIds.Count;
+
+        public ExclusionCheckType ExclusionType =>
+            SelectedFilterItemIds.Count > UnselectedFilterItemIds.Count
+                ? ExclusionCheckType.Exists
+                : ExclusionCheckType.NotExists;
+
+        public List<Guid> FilterItemIdsToUseInCheck =>
+            ExclusionType == ExclusionCheckType.Exists ? UnselectedFilterItemIds : SelectedFilterItemIds;
+
+        public double SelectivenessFactor => (double)TotalFilterItemCount / SelectedFilterItemIds.Count;
     }
 }

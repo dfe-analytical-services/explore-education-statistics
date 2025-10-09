@@ -52,7 +52,7 @@ grep -r "time for response: [0-9][0-9][0-9]*" * | awk '{split($0,a,":"); print a
 
 Compare two result directories for differences, but ignoring response time (and any responses that are both Not Found
 responses, as they contain unique traceIds):
-diff -I"^time for response:.*" -I "Not Found" -r results_dev1/responses results_dev2/responses
+diff -I"Run info - .*" -I "Not Found" -r results_dev1/responses results_dev2/responses
 """
 
 parser = argparse.ArgumentParser(
@@ -229,12 +229,12 @@ processing_time = round(end_time - start_time)
 sleep_time = args.sleep_duration * len(datablocks)
 processing_time_minus_sleep_time = round(processing_time - sleep_time)
 
-print_to_console(f"Total processed: {processed}")
-print_to_console(f"Total successes: {processed_successfully}")
-print_to_console(f"Total failures: {processed - processed_successfully}")
-print_to_console(f"Total time: {processing_time} seconds")
-print_to_console(f"Sleep time: {sleep_time} seconds")
-print_to_console(f"Total minus sleep time: {processing_time_minus_sleep_time} seconds")
+print_to_console(f"Run info - Total processed: {processed}")
+print_to_console(f"Run info - Total successes: {processed_successfully}")
+print_to_console(f"Run info - Total failures: {processed - processed_successfully}")
+print_to_console(f"Run info - Total time: {processing_time} seconds")
+print_to_console(f"Run info - Sleep time: {sleep_time} seconds")
+print_to_console(f"Run info - Total minus sleep time: {processing_time_minus_sleep_time} seconds")
 print_to_console(
-    f"Average processing time per block: {round(processing_time_minus_sleep_time / len(datablocks), 2)} seconds"
+    f"Run info - Average processing time per block: {round(processing_time_minus_sleep_time / len(datablocks), 2)} seconds"
 )

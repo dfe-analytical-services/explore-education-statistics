@@ -33,6 +33,7 @@ public abstract class SparseObservationsMatchedFilterItemsStrategyTests
 
             var tempTableCreator = new Mock<ITemporaryTableCreator>(Strict);
             var sqlExecutor = new Mock<IRawSqlExecutor>(Strict);
+            var sqlHelper = new Mock<ISqlStatementsHelper>(Strict);
 
             var matchingObservationsTable = new Mock<ITempTableReference>(Strict);
             matchingObservationsTable.SetupGet(t => t.Name).Returns("#MatchedObservation");
@@ -63,17 +64,23 @@ public abstract class SparseObservationsMatchedFilterItemsStrategyTests
                 )
                 .Returns(Task.CompletedTask);
 
-            var expectedIndexSqlRegex = new Regex(
-                @"CREATE UNIQUE CLUSTERED INDEX \[IX_#MatchedFilterItem_Id_.{36}\].* "
-                    + @"ON #MatchedFilterItem\(Id\) WITH \(MAXDOP = 4\);\s*"
-                    + @"UPDATE STATISTICS #MatchedFilterItem WITH FULLSCAN;"
-            );
+            sqlHelper
+                .Setup(s => s.CreateRandomIndexName("#MatchedFilterItem", "Id"))
+                .Returns("IX_#MatchedFilterItem_Id_1234");
+
+            var expectedIndexSql =
+                @"
+                    CREATE UNIQUE CLUSTERED INDEX [IX_#MatchedFilterItem_Id_1234]
+                    ON #MatchedFilterItem(Id) WITH (MAXDOP = 4);
+                    
+                    UPDATE STATISTICS #MatchedFilterItem WITH FULLSCAN;
+                    ";
 
             sqlExecutor
                 .Setup(s =>
                     s.ExecuteSqlRaw(
                         context,
-                        It.Is<string>(sql => expectedIndexSqlRegex.IsMatch(NormaliseSqlFormatting(sql))),
+                        It.Is<string>(sql => NormaliseSqlFormatting(expectedIndexSql) == NormaliseSqlFormatting(sql)),
                         default
                     )
                 )
@@ -82,6 +89,7 @@ public abstract class SparseObservationsMatchedFilterItemsStrategyTests
             var strategy = new SparseObservationsMatchedFilterItemsStrategy(
                 sqlExecutor: sqlExecutor.Object,
                 temporaryTableCreator: tempTableCreator.Object,
+                sqlHelper: sqlHelper.Object,
                 context: context,
                 logger: Mock.Of<ILogger<SparseObservationsMatchedFilterItemsStrategy>>()
             );
@@ -92,7 +100,7 @@ public abstract class SparseObservationsMatchedFilterItemsStrategyTests
                 cancellationToken: default
             );
 
-            VerifyAllMocks(tempTableCreator, sqlExecutor);
+            VerifyAllMocks(tempTableCreator, sqlHelper, sqlExecutor);
         }
 
         [Fact]
@@ -157,6 +165,7 @@ public abstract class SparseObservationsMatchedFilterItemsStrategyTests
             var strategy = new SparseObservationsMatchedFilterItemsStrategy(
                 sqlExecutor: sqlExecutor.Object,
                 temporaryTableCreator: tempTableCreator.Object,
+                sqlHelper: Mock.Of<ISqlStatementsHelper>(),
                 context: context,
                 logger: Mock.Of<ILogger<SparseObservationsMatchedFilterItemsStrategy>>()
             );
