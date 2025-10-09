@@ -15,7 +15,8 @@ public partial class Ees6481AddObservationIdFilterItemIdIndexToObservationFilter
             IF EXISTS (
                 SELECT 1
                 FROM sys.indexes
-                WHERE name = 'TakesTooLongToRunOnDeploy')
+                WHERE name = 'TakesTooLongToRunOnDeploy'
+                AND object_id = OBJECT_ID('dbo.ObservationFilterItem')
             )
             BEGIN
                 CREATE INDEX IX_ObservationFilterItem_ObservationId_FilterItemId

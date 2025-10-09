@@ -16,7 +16,8 @@ public partial class Ees6481DropUnusedObservationAndObservationFilterItemIndexes
             IF EXISTS (
                 SELECT 1
                 FROM sys.indexes
-                WHERE name = 'TakesTooLongToRunOnDeploy')
+                WHERE name = 'TakesTooLongToRunOnDeploy'
+                AND object_id = OBJECT_ID('dbo.Observation')
             )
             BEGIN
                 DROP INDEX IX_Observation_Year
