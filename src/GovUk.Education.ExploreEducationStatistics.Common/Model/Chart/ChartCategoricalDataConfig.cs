@@ -9,4 +9,3 @@ public class ChartCategoricalDataConfig
     public string Value;
     public string Colour;
 }
-
