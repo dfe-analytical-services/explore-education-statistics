@@ -676,13 +676,15 @@ The migration tool is installed by running:
 dotnet tool restore
 ```
 
+Use this format for the name of your migration: `Ees1234MigrationName`.
+
 #### Content DB migrations
 
 To generate a migration for the content db:
 
 ```sh
 cd src/GovUk.Education.ExploreEducationStatistics.Admin
-dotnet ef migrations add EES1234_MigrationNameHere --context ContentDbContext --output-dir Migrations/ContentMigrations -v
+dotnet ef migrations add Ees1234MigrationNameHere --context ContentDbContext --output-dir Migrations/ContentMigrations -v
 ```
 
 #### Statistics DB migrations
@@ -691,7 +693,7 @@ To generate a migration for the statistics db:
 
 ```sh
 cd src/GovUk.Education.ExploreEducationStatistics.Data.Api
-dotnet ef migrations add EES1234_MigrationNameHere --context StatisticsDbContext --project ../GovUk.Education.ExploreEducationStatistics.Data.Model -v
+dotnet ef migrations add Ees1234MigrationNameHere --context StatisticsDbContext --project ../GovUk.Education.ExploreEducationStatistics.Data.Model -v
 ```
 
 #### Users and Roles DB migrations
@@ -700,7 +702,7 @@ To generate a migration for the UsersAndRolesDbContext:
 
 ```sh
 cd src/GovUk.Education.ExploreEducationStatistics.Admin
-dotnet ef migrations add EES1234_MigrationNameGoesHere --context UsersAndRolesDbContext --output-dir Migrations/UsersAndRolesMigrations -v
+dotnet ef migrations add Ees1234MigrationNameGoesHere --context UsersAndRolesDbContext --output-dir Migrations/UsersAndRolesMigrations -v
 ```
 
 #### Public Data API DB migrations
@@ -709,7 +711,7 @@ To generate a migration for the public data API db:
 
 ```sh
 cd src/GovUk.Education.ExploreEducationStatistics.Public.Data.Api
-dotnet ef migrations add EES1234_MigrationNameHere --context PublicDataDbContext --project ../GovUk.Education.ExploreEducationStatistics.Public.Data.Model -v
+dotnet ef migrations add Ees1234MigrationNameHere --context PublicDataDbContext --project ../GovUk.Education.ExploreEducationStatistics.Public.Data.Model -v
 ```
 
 ### Troubleshoot: `Unable to retrieve project metadata` error
