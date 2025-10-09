@@ -2,10 +2,7 @@ import { PublicationMethodologiesList } from '@common/services/publicationServic
 import { render, screen, within } from '@testing-library/react';
 import React from 'react';
 import ReleaseMethodologyPage from '../ReleaseMethodologyPage';
-import {
-  testPublicationSummary,
-  testReleaseVersionSummary,
-} from './__data__/testReleaseData';
+import { testPublicationSummary } from './__data__/testReleaseData';
 
 describe('Release release methodology page', () => {
   const testMethodologies: PublicationMethodologiesList = {
@@ -31,7 +28,6 @@ describe('Release release methodology page', () => {
     render(
       <ReleaseMethodologyPage
         methodologiesSummary={testMethodologies}
-        releaseVersionSummary={testReleaseVersionSummary}
         publicationSummary={testPublicationSummary}
       />,
     );
@@ -75,7 +71,6 @@ describe('Release release methodology page', () => {
           ...testMethodologies,
           externalMethodology: undefined,
         }}
-        releaseVersionSummary={testReleaseVersionSummary}
         publicationSummary={testPublicationSummary}
       />,
     );
@@ -107,7 +102,6 @@ describe('Release release methodology page', () => {
           ...testMethodologies,
           methodologies: [],
         }}
-        releaseVersionSummary={testReleaseVersionSummary}
         publicationSummary={testPublicationSummary}
       />,
     );
@@ -133,7 +127,6 @@ describe('Release release methodology page', () => {
         methodologiesSummary={{
           methodologies: [],
         }}
-        releaseVersionSummary={testReleaseVersionSummary}
         publicationSummary={testPublicationSummary}
       />,
     );
