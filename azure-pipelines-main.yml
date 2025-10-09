@@ -12,7 +12,7 @@ variables:
   IsBranchDeployable: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
   CI: true
   DotNetVersion: '8.0.x'
-  NodeVersion: '20.19.5'
+  NodeVersion: '22.20.0'
   RubyVersion: '3.2'
   AcrServiceConnection: s101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection
   PublicApiDir: GovUk.Education.ExploreEducationStatistics.Public.Data.Api
@@ -136,7 +136,7 @@ jobs:
         condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
           artifactName: analytics-function-app
-          targetPath: $(Build.ArtifactStagingDirectory)/analytics-function-app    
+          targetPath: $(Build.ArtifactStagingDirectory)/analytics-function-app
 
       - task: DotNetCoreCLI@2
         displayName: Package Data API
