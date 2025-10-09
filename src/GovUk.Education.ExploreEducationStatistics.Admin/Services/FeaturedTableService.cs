@@ -39,6 +39,7 @@ public class FeaturedTableService : IFeaturedTableService
 
     public async Task<Either<ActionResult, FeaturedTableViewModel>> Get(Guid releaseVersionId, Guid dataBlockId)
     {
+        // @MarkFix this as an example to change maybe?
         return await _persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
