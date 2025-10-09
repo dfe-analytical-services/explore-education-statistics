@@ -2406,7 +2406,6 @@
       "properties": {
         "accessTier": "Hot",
         "supportsHttpsTrafficOnly": true,
-        "allowBlobPublicAccess": false,
         "networkAcls": {
           "bypass": "AzureServices",
           "virtualNetworkRules": "[if(parameters('useSubnets'), variables('coreStorageVnetRules'), createArray())]",
@@ -2892,7 +2891,6 @@
       },
       "properties": {
         "supportsHttpsTrafficOnly": true,
-        "allowBlobPublicAccess": false,
         "networkAcls": {
           "bypass": "AzureServices",
           "virtualNetworkRules": "[if(parameters('useSubnets'), variables('notificationsStorageVnetRules'), createArray())]",
@@ -2941,7 +2939,6 @@
       },
       "properties": {
         "supportsHttpsTrafficOnly": true,
-        "allowBlobPublicAccess": false,
         "networkAcls": {
           "bypass": "AzureServices",
           "virtualNetworkRules": "[if(parameters('useSubnets'), variables('publicStorageVnetRules'), createArray())]",
@@ -3495,7 +3492,6 @@
       },
       "properties": {
         "supportsHttpsTrafficOnly": true,
-        "allowBlobPublicAccess": false,
         "networkAcls": {
           "bypass": "AzureServices",
           "ipRules": "[parameters('storageFirewallRules')]",
@@ -3543,8 +3539,7 @@
         "name": "Standard_GZRS"
       },
       "properties": {
-        "supportsHttpsTrafficOnly": true,
-        "allowBlobPublicAccess": false
+        "supportsHttpsTrafficOnly": true
       },
       "resources": [
         {
