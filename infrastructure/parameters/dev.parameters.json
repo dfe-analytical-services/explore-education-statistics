@@ -77,6 +77,9 @@
     "enableThemeDeletion": {
       "value": true
     },
+    "enableEinPublishedPageDeletion": {
+      "value": true
+    },
     "memoryCacheOverridesDurationInSeconds": {
       "value": 10
     },
