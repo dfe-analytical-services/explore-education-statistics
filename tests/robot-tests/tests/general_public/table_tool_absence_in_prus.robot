@@ -19,6 +19,7 @@ Select "Seed Data Theme 1 Publication 1" publication
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks related information panel is visible
 
 Validate "Absence in PRUs" subject details
     user clicks radio    Absence in PRUs
@@ -28,6 +29,7 @@ Validate "Absence in PRUs" subject details
 Select subject "Absence in PRUs"
     user clicks element    id:publicationDataStepForm-submit
     user waits until table tool wizard step is available    3    Choose locations
+    user checks related information panel is visible
     user checks previous table tool step contains    2    Data set    Absence in PRUs
 
 Select Location Country, England
@@ -35,6 +37,7 @@ Select Location Country, England
     user clicks checkbox    England
     user clicks element    id:locationFiltersForm-submit
     user waits until table tool wizard step is available    4    Choose time period
+    user checks related information panel is visible
     user checks previous table tool step contains    3    National    England
 
 Select Start date and End date
@@ -42,6 +45,7 @@ Select Start date and End date
     user chooses select option    id:timePeriodForm-end    2016/17
     user clicks element    id:timePeriodForm-submit
     user waits until table tool wizard step is available    5    Choose your filters
+    user checks related information panel is visible
     user waits until page contains element    id:filtersForm-indicators
     user checks previous table tool step contains    4    Time period    2013/14 to 2016/17
 
@@ -54,6 +58,7 @@ Create table
     user waits until results table appears    %{WAIT_SMALL}
     user waits until page contains element
     ...    xpath://*[@data-testid="dataTableCaption" and text()="Number of schools for 'Absence in PRUs' in England between 2013/14 and 2016/17"]
+    user checks related information panel is visible
 
 Validate results table column headings
     user checks table column heading contains    1    1    2016/17
@@ -73,6 +78,7 @@ Validate Number of schools row results
 Go back to Locations step
     user clicks button    Edit locations
     user waits until table tool wizard step is available    3    Choose locations
+    user checks related information panel is visible
 
 Unselect England as a location
     [Documentation]    DFE-1142    EES-231
@@ -123,6 +129,7 @@ Create table again
     user waits until results table appears    %{WAIT_SMALL}
     user waits until page contains element
     ...    xpath://*[@data-testid="dataTableCaption" and text()="'Absence in PRUs' in Barnet, Barnsley and Bedford between 2014/15 and 2015/16"]
+    user checks related information panel is visible
 
 Validate new table column headings
     user checks table column heading contains    1    1    2015/16
