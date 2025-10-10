@@ -91,7 +91,6 @@ export const testChartConfiguration: Chart = {
   title: 'Aggregated results chart',
   alt: 'Some alt text',
   height: 300,
-  width: 600,
 };
 
 export const testChartTableData: TableDataResponse = {
@@ -291,7 +290,6 @@ export const testEmptyChartConfiguration: Chart = {
   title: 'Emptychart',
   alt: 'Some alt text',
   height: 300,
-  width: 600,
 };
 
 export const testEmptyChartTableData: TableDataResponse = {

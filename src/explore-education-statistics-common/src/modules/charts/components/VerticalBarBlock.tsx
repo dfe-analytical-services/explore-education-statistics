@@ -69,7 +69,6 @@ const VerticalBarBlock = ({
   meta,
   showDataLabels,
   stacked,
-  width,
 }: VerticalBarProps) => {
   const { isMedia: isDesktopMedia } = useDesktopMedia();
   const [xAxisTickWidth, setXAxisTickWidth] = useState<number>();
@@ -189,7 +188,6 @@ const VerticalBarBlock = ({
       xAxisLabel={axes.major.label}
     >
       <ResponsiveContainer
-        width={width || '100%'}
         height={height || 300}
         onResize={handleResize}
         ref={containerRef}

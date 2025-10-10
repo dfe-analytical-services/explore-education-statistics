@@ -19,7 +19,6 @@ const InfographicBlock = ({
   alt,
   fileId,
   getInfographic,
-  width,
   height,
 }: InfographicChartProps) => {
   const {
@@ -47,7 +46,6 @@ const InfographicBlock = ({
           alt={alt}
           src={file}
           height={height ? `${height}px` : undefined}
-          width={width ? `${width}px` : undefined}
         />
       )}
     </LoadingSpinner>
@@ -60,7 +58,6 @@ export const infographicBlockDefinition: ChartDefinition = {
   options: {
     defaults: {
       height: 600,
-      width: undefined,
     },
   },
   legend: {},

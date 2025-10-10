@@ -19,11 +19,31 @@ import { screen, waitFor, within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import { AxiosError } from 'axios';
 import { forceVisible } from 'react-lazyload';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 jest.mock('@common/services/tableBuilderService');
 
 jest.mock('recharts/lib/util/LogUtils');
+
+// Responsive charts don't render in tests so have do
+// mock the responsive container and apply a fixed width.
+jest.mock('recharts', () => {
+  const OriginalModule = jest.requireActual('recharts');
+  return {
+    ...OriginalModule,
+    ResponsiveContainer: ({
+      children,
+      height,
+    }: {
+      children: ReactNode;
+      height: string;
+    }) => (
+      <OriginalModule.ResponsiveContainer width={800} height={height}>
+        {children}
+      </OriginalModule.ResponsiveContainer>
+    ),
+  };
+});
 
 const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService

@@ -132,7 +132,6 @@ export interface ChartProps {
   titleType?: TitleType;
   alt: string;
   height: number;
-  width?: number;
   axes: AxesConfiguration;
   legend?: LegendConfiguration;
   includeNonNumericData?: boolean;
@@ -170,7 +169,6 @@ export interface ChartCapabilities {
 export interface ChartDefinitionOptions {
   stacked?: boolean;
   height: number;
-  width?: number;
   barThickness?: number;
   subtitle?: string;
   title?: string;
@@ -228,7 +226,6 @@ interface HorizontalBarChart {
   titleType?: TitleType;
   alt: string;
   height: number;
-  width?: number;
   includeNonNumericData?: boolean;
   showDataLabels?: boolean;
   map?: MapConfig;
@@ -249,7 +246,6 @@ interface Infographic {
   titleType?: TitleType;
   alt: string;
   height: number;
-  width?: number;
   axes: AxesConfiguration;
   legend?: LegendConfiguration;
   includeNonNumericData?: boolean;
@@ -265,7 +261,6 @@ export interface LineChart {
   titleType?: TitleType;
   alt: string;
   height: number;
-  width?: number;
   includeNonNumericData?: boolean;
   showDataLabels?: boolean;
   map?: MapConfig;
@@ -293,7 +288,6 @@ export interface MapChart {
   titleType?: TitleType;
   alt: string;
   height: number;
-  width?: number;
   includeNonNumericData?: boolean;
   showDataLabels?: boolean;
   subtitle?: string;
@@ -305,7 +299,6 @@ interface VerticalBarChart {
   titleType?: TitleType;
   alt: string;
   height: number;
-  width?: number;
   includeNonNumericData?: boolean;
   showDataLabels?: boolean;
   map?: MapConfig;
