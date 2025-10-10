@@ -20,7 +20,7 @@ export default function UserTestingBanner() {
   if (isMounted && !isUserTestingBannerSeen) {
     return (
       <Banner
-        label="user-testing-banner"
+        label="Feedback banner"
         onClose={() => setUserTestingBannerSeenCookie(userTestingBannerVersion)}
       >
         <p className="govuk-!-font-weight-bold govuk-!-margin-bottom-0">
