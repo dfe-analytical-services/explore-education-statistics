@@ -10,6 +10,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
 public interface IBlobStorageService
 {
+    /// <summary>
+    /// Retrieve a list of blob paths within the specified container, optionally filtered by a directory prefix.
+    /// </summary>
+    /// <param name="containerName"></param>
+    /// <param name="prefixFilter">
+    /// Filter out blobs from the result set whose keys do not start with this value. Where a blob key would
+    /// ordinarily start with a GUID, for example with releases, this GUID is excluded from the matching function.
+    /// </param>
+    /// <param name="cancellationToken"></param>
+    Task<List<string>> GetBlobs(
+        IBlobContainer containerName,
+        string? prefixFilter = null,
+        CancellationToken cancellationToken = default
+    );
+
     Task<bool> CheckBlobExists(IBlobContainer containerName, string path);
 
     Task<BlobInfo?> FindBlob(IBlobContainer containerName, string path);

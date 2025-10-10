@@ -1,6 +1,7 @@
 #nullable enable
 using System.IO.Compression;
 using System.Net.Mime;
+using System.Text.RegularExpressions;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -33,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 /// changes that make it difficult to upgrade when relying on lower-level
 /// details e.g. Azure SDK v12 is an entirely new package compared to v11.
 /// </summary>
-public abstract class BlobStorageService(
+public abstract partial class BlobStorageService(
     string defaultConnectionString,
     BlobServiceClient client,
     ILogger<IBlobStorageService> logger,
@@ -55,6 +56,32 @@ public abstract class BlobStorageService(
             new StorageInstanceCreationUtil(),
             blobSasService
         ) { }
+
+    public async Task<List<string>> GetBlobs(
+        IBlobContainer containerName,
+        string? prefixFilter = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var container = await GetBlobContainer(containerName);
+
+        return string.IsNullOrWhiteSpace(prefixFilter)
+            ? await container
+                .GetBlobsAsync(cancellationToken: cancellationToken)
+                .Select(blob => blob.Name)
+                .ToListAsync(cancellationToken)
+            : await container
+                .GetBlobsAsync(cancellationToken: cancellationToken)
+                .Where(blob =>
+                {
+                    var releaseIdFilePrefix = GuidPattern();
+                    var blobKey = releaseIdFilePrefix.Replace(blob.Name, string.Empty);
+
+                    return blobKey.StartsWith(prefixFilter);
+                })
+                .Select(blob => blob.Name)
+                .ToListAsync(cancellationToken);
+    }
 
     public async Task<bool> CheckBlobExists(IBlobContainer containerName, string path)
     {
@@ -374,7 +401,7 @@ public abstract class BlobStorageService(
             });
     }
 
-    private async Task<Either<ActionResult, Stream>> GetDownloadStream(
+    private static async Task<Either<ActionResult, Stream>> GetDownloadStream(
         BlobClient blob,
         bool decompress = true,
         CancellationToken cancellationToken = default
@@ -701,11 +728,6 @@ public abstract class BlobStorageService(
         return client.Credentials.AccountName.ToLower() == "devstoreaccount1";
     }
 
-    private static void ThrowFileNotFoundException(IBlobContainer containerName, string path)
-    {
-        throw new FileNotFoundException($"Could not find file at {containerName}/{path}");
-    }
-
     private async Task<BlobInfo> GetBlob(IBlobContainer containerName, string path)
     {
         var blob = await GetBlobClient(containerName, path);
@@ -720,4 +742,7 @@ public abstract class BlobStorageService(
             updated: properties.LastModified
         );
     }
+
+    [GeneratedRegex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/")]
+    private static partial Regex GuidPattern();
 }

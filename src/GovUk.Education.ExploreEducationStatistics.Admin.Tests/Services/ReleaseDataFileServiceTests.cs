@@ -46,14 +46,6 @@ public class ReleaseDataFileServiceTests
 
         var subject = new Subject { Id = Guid.NewGuid() };
 
-        var zipFile = new File
-        {
-            RootPath = Guid.NewGuid(),
-            Filename = "data.zip",
-            Type = DataZip,
-            SubjectId = subject.Id,
-        };
-
         var releaseDataFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
@@ -64,7 +56,6 @@ public class ReleaseDataFileServiceTests
                 Filename = "data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id,
-                Source = zipFile,
             },
         };
 
@@ -111,7 +102,6 @@ public class ReleaseDataFileServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(releaseVersion);
-            contentDbContext.Files.Add(zipFile);
             contentDbContext.ReleaseFiles.AddRange(releaseDataFile, releaseMetaFile);
             contentDbContext.ReleaseFiles.AddRange(releaseFile1, releaseFile3, releaseFile4, releaseFile4Replacement);
             await contentDbContext.SaveChangesAsync();
@@ -123,14 +113,10 @@ public class ReleaseDataFileServiceTests
 
         dataImportService.Setup(mock => mock.DeleteImport(releaseDataFile.File.Id)).Returns(Task.CompletedTask);
 
-        // test that the deletion of the main data and metadata files completed, as well as any zip files that
-        // were uploaded
+        // test that the deletion of the main data and metadata files completed
         privateBlobStorageService
             .Setup(mock =>
-                mock.DeleteBlob(
-                    PrivateReleaseFiles,
-                    It.IsIn(releaseDataFile.Path(), releaseMetaFile.Path(), zipFile.Path())
-                )
+                mock.DeleteBlob(PrivateReleaseFiles, It.IsIn(releaseDataFile.Path(), releaseMetaFile.Path()))
             )
             .Returns(Task.CompletedTask);
 
@@ -159,10 +145,6 @@ public class ReleaseDataFileServiceTests
                 mock => mock.DeleteBlob(PrivateReleaseFiles, releaseMetaFile.Path()),
                 Times.Once()
             );
-            privateBlobStorageService.Verify(
-                mock => mock.DeleteBlob(PrivateReleaseFiles, zipFile.Path()),
-                Times.Once()
-            );
 
             dataImportService.Verify(mock => mock.DeleteImport(releaseDataFile.File.Id), Times.Once());
 
@@ -176,8 +158,6 @@ public class ReleaseDataFileServiceTests
 
             Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(releaseMetaFile.Id));
             Assert.Null(await contentDbContext.Files.FindAsync(releaseMetaFile.File.Id));
-
-            Assert.Null(await contentDbContext.Files.FindAsync(zipFile.Id));
 
             var dbReleaseFile1 = contentDbContext.ReleaseFiles.Single(rf => rf.Id == releaseFile1.Id);
             Assert.Equal(0, dbReleaseFile1.Order);
@@ -204,19 +184,11 @@ public class ReleaseDataFileServiceTests
 
         var replacementSubject = new Subject { Id = Guid.NewGuid() };
 
-        var zipFile = new File
-        {
-            Filename = "data.zip",
-            Type = DataZip,
-            SubjectId = subject.Id,
-        };
-
         var dataFile = new File
         {
             Filename = "data.csv",
             Type = FileType.Data,
             SubjectId = subject.Id,
-            Source = zipFile,
         };
 
         var metaFile = new File
@@ -226,14 +198,6 @@ public class ReleaseDataFileServiceTests
             SubjectId = subject.Id,
         };
 
-        var replacementZipFile = new File
-        {
-            RootPath = Guid.NewGuid(),
-            Filename = "replacement.zip",
-            Type = DataZip,
-            SubjectId = replacementSubject.Id,
-        };
-
         var replacementDataFile = new File
         {
             RootPath = Guid.NewGuid(),
@@ -241,7 +205,6 @@ public class ReleaseDataFileServiceTests
             Type = FileType.Data,
             SubjectId = replacementSubject.Id,
             Replacing = dataFile,
-            Source = replacementZipFile,
         };
 
         dataFile.ReplacedBy = replacementDataFile;
@@ -275,14 +238,7 @@ public class ReleaseDataFileServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(releaseVersion);
-            contentDbContext.Files.AddRange(
-                zipFile,
-                dataFile,
-                metaFile,
-                replacementZipFile,
-                replacementDataFile,
-                replacementMetaFile
-            );
+            contentDbContext.Files.AddRange(dataFile, metaFile, replacementDataFile, replacementMetaFile);
             contentDbContext.ReleaseFiles.AddRange(
                 releaseDataFile,
                 releaseMetaFile,
@@ -300,10 +256,7 @@ public class ReleaseDataFileServiceTests
 
         privateBlobStorageService
             .Setup(mock =>
-                mock.DeleteBlob(
-                    PrivateReleaseFiles,
-                    It.IsIn(replacementDataFile.Path(), replacementMetaFile.Path(), replacementZipFile.Path())
-                )
+                mock.DeleteBlob(PrivateReleaseFiles, It.IsIn(replacementDataFile.Path(), replacementMetaFile.Path()))
             )
             .Returns(Task.CompletedTask);
 
@@ -332,10 +285,6 @@ public class ReleaseDataFileServiceTests
                 mock => mock.DeleteBlob(PrivateReleaseFiles, replacementMetaFile.Path()),
                 Times.Once()
             );
-            privateBlobStorageService.Verify(
-                mock => mock.DeleteBlob(PrivateReleaseFiles, replacementZipFile.Path()),
-                Times.Once()
-            );
 
             dataImportService.Verify(mock => mock.DeleteImport(replacementDataFile.Id), Times.Once());
 
@@ -350,16 +299,12 @@ public class ReleaseDataFileServiceTests
             Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(replacementReleaseMetaFile.Id));
             Assert.Null(await contentDbContext.Files.FindAsync(replacementMetaFile.Id));
 
-            Assert.Null(await contentDbContext.Files.FindAsync(replacementZipFile.Id));
-
             // Check that original file remain untouched
             Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(releaseDataFile.Id));
             Assert.NotNull(await contentDbContext.Files.FindAsync(dataFile.Id));
 
             Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(releaseMetaFile.Id));
             Assert.NotNull(await contentDbContext.Files.FindAsync(metaFile.Id));
-
-            Assert.NotNull(await contentDbContext.Files.FindAsync(zipFile.Id));
 
             // Check that the reference to the replacement is removed
             Assert.Null((await contentDbContext.Files.FindAsync(dataFile.Id))?.ReplacedById);
@@ -375,21 +320,12 @@ public class ReleaseDataFileServiceTests
 
         var subject = new Subject { Id = Guid.NewGuid() };
 
-        var zipFile = new File
-        {
-            RootPath = Guid.NewGuid(),
-            Filename = "data.zip",
-            Type = DataZip,
-            SubjectId = subject.Id,
-        };
-
         var dataFile = new File
         {
             RootPath = Guid.NewGuid(),
             Filename = "data.csv",
             Type = FileType.Data,
             SubjectId = subject.Id,
-            Source = zipFile,
         };
 
         var metaFile = new File
@@ -413,7 +349,7 @@ public class ReleaseDataFileServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion, amendmentRelease);
-            contentDbContext.Files.AddRange(zipFile, dataFile, metaFile);
+            contentDbContext.Files.AddRange(dataFile, metaFile);
             contentDbContext.ReleaseFiles.AddRange(
                 releaseDataFile,
                 releaseMetaFile,
@@ -458,140 +394,6 @@ public class ReleaseDataFileServiceTests
 
             Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(releaseMetaFile.Id));
             Assert.NotNull(await contentDbContext.Files.FindAsync(metaFile.Id));
-
-            Assert.NotNull(await contentDbContext.Files.FindAsync(zipFile.Id));
-        }
-    }
-
-    [Fact]
-    public async Task Delete_DoNotRemoveSourceZipIfOtherFilesFromZipStillExist()
-    {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
-
-        var bulkZipFile = _fixture.DefaultFile().WithFilename("data.zip").WithType(BulkDataZip).Generate();
-
-        var subject = _fixture.DefaultSubject().Generate();
-
-        var dataFile = _fixture
-            .DefaultFile()
-            .WithFilename("data.csv")
-            .WithType(FileType.Data)
-            .WithSubjectId(subject.Id)
-            .WithSourceId(bulkZipFile.Id)
-            .Generate();
-
-        var metaFile = _fixture
-            .DefaultFile()
-            .WithFilename("data.meta.csv")
-            .WithType(Metadata)
-            .WithSubjectId(subject.Id)
-            .WithSourceId(bulkZipFile.Id)
-            .Generate();
-
-        var releaseDataFile = _fixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(releaseVersion)
-            .WithFile(dataFile)
-            .Generate();
-
-        var releaseMetaFile = _fixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(releaseVersion)
-            .WithFile(metaFile)
-            .Generate();
-
-        // otherSubject, from the same bulk zip file, will not be deleted
-        var otherSubject = _fixture.DefaultSubject().Generate();
-
-        var otherDataFile = _fixture
-            .DefaultFile()
-            .WithFilename("other-data.csv")
-            .WithType(FileType.Data)
-            .WithSubjectId(otherSubject.Id)
-            .WithSourceId(bulkZipFile.Id)
-            .Generate();
-
-        var otherMetaFile = _fixture
-            .DefaultFile()
-            .WithFilename("other-data.meta.csv")
-            .WithType(Metadata)
-            .WithSubjectId(otherSubject.Id)
-            .WithSourceId(bulkZipFile.Id)
-            .Generate();
-
-        var otherReleaseDataFile = _fixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(releaseVersion)
-            .WithFile(otherDataFile)
-            .Generate();
-
-        var otherReleaseMetaFile = _fixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(releaseVersion)
-            .WithFile(otherMetaFile)
-            .Generate();
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
-            contentDbContext.Files.AddRange(bulkZipFile, dataFile, metaFile, otherDataFile, otherMetaFile);
-            contentDbContext.ReleaseFiles.AddRange(
-                releaseDataFile,
-                releaseMetaFile,
-                otherReleaseDataFile,
-                otherReleaseMetaFile
-            );
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
-        var dataImportService = new Mock<IDataImportService>(Strict);
-        var releaseFileService = new Mock<IReleaseFileService>(Strict);
-
-        dataImportService.Setup(mock => mock.DeleteImport(dataFile.Id)).Returns(Task.CompletedTask);
-
-        releaseFileService
-            .Setup(mock => mock.CheckFileExists(releaseVersion.Id, dataFile.Id, FileType.Data))
-            .ReturnsAsync(dataFile);
-
-        privateBlobStorageService
-            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, dataFile.Path()))
-            .Returns(Task.CompletedTask);
-
-        privateBlobStorageService
-            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, metaFile.Path()))
-            .Returns(Task.CompletedTask);
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var service = SetupReleaseDataFileService(
-                contentDbContext: contentDbContext,
-                privateBlobStorageService: privateBlobStorageService.Object,
-                dataImportService: dataImportService.Object,
-                releaseFileService: releaseFileService.Object
-            );
-
-            var result = await service.Delete(releaseVersion.Id, dataFile.Id);
-
-            Assert.True(result.IsRight);
-
-            MockUtils.VerifyAllMocks(privateBlobStorageService, dataImportService, releaseFileService);
-        }
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(releaseDataFile.Id));
-            Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(releaseMetaFile.Id));
-
-            Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(otherReleaseDataFile.Id));
-            Assert.NotNull(await contentDbContext.Files.FindAsync(otherDataFile.Id));
-
-            Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(otherReleaseMetaFile.Id));
-            Assert.NotNull(await contentDbContext.Files.FindAsync(otherMetaFile.Id));
-
-            // Zip should not be removed since otherReleaseDataFile etc. still exist
-            Assert.NotNull(await contentDbContext.Files.FindAsync(bulkZipFile.Id));
         }
     }
 
@@ -614,14 +416,6 @@ public class ReleaseDataFileServiceTests
             File = new File { Filename = "chart.png", Type = Chart },
         };
 
-        var zipFile = new File
-        {
-            RootPath = Guid.NewGuid(),
-            Filename = "data.zip",
-            Type = DataZip,
-            SubjectId = subject.Id,
-        };
-
         var dataReleaseFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
@@ -631,7 +425,6 @@ public class ReleaseDataFileServiceTests
                 Filename = "data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id,
-                Source = zipFile,
             },
         };
 
@@ -652,7 +445,6 @@ public class ReleaseDataFileServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(releaseVersion);
-            contentDbContext.Files.Add(zipFile);
             contentDbContext.ReleaseFiles.AddRange(
                 ancillaryReleaseFile,
                 chartReleaseFile,
@@ -670,10 +462,7 @@ public class ReleaseDataFileServiceTests
 
         privateBlobStorageService
             .Setup(mock =>
-                mock.DeleteBlob(
-                    PrivateReleaseFiles,
-                    It.IsIn(dataReleaseFile.Path(), metaReleaseFile.Path(), zipFile.Path())
-                )
+                mock.DeleteBlob(PrivateReleaseFiles, It.IsIn(dataReleaseFile.Path(), metaReleaseFile.Path()))
             )
             .Returns(Task.CompletedTask);
 
@@ -702,10 +491,6 @@ public class ReleaseDataFileServiceTests
                 mock => mock.DeleteBlob(PrivateReleaseFiles, metaReleaseFile.Path()),
                 Times.Once()
             );
-            privateBlobStorageService.Verify(
-                mock => mock.DeleteBlob(PrivateReleaseFiles, zipFile.Path()),
-                Times.Once()
-            );
 
             dataImportService.Verify(mock => mock.DeleteImport(dataReleaseFile.File.Id), Times.Once());
 
@@ -719,8 +504,6 @@ public class ReleaseDataFileServiceTests
 
             Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(metaReleaseFile.Id));
             Assert.Null(await contentDbContext.Files.FindAsync(metaReleaseFile.File.Id));
-
-            Assert.Null(await contentDbContext.Files.FindAsync(zipFile.Id));
 
             // Check that other file types remain untouched
             Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(ancillaryReleaseFile.Id));
@@ -740,21 +523,12 @@ public class ReleaseDataFileServiceTests
 
         var subject = new Subject { Id = Guid.NewGuid() };
 
-        var zipFile = new File
-        {
-            RootPath = Guid.NewGuid(),
-            Filename = "data.zip",
-            Type = DataZip,
-            SubjectId = subject.Id,
-        };
-
         var dataFile = new File
         {
             RootPath = Guid.NewGuid(),
             Filename = "data.csv",
             Type = FileType.Data,
             SubjectId = subject.Id,
-            Source = zipFile,
         };
 
         var metaFile = new File
@@ -778,7 +552,7 @@ public class ReleaseDataFileServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion, amendmentRelease);
-            contentDbContext.Files.AddRange(zipFile, dataFile, metaFile);
+            contentDbContext.Files.AddRange(dataFile, metaFile);
             contentDbContext.ReleaseFiles.AddRange(
                 dataReleaseFile,
                 metaReleaseFile,
@@ -818,14 +592,12 @@ public class ReleaseDataFileServiceTests
             Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(amendmentReleaseDataFile.Id));
             Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(amendmentReleaseMetaFile.Id));
 
-            // Check that the data, meta and zip files linked to the previous version remain untouched
+            // Check that the data and meta files linked to the previous version remain untouched
             Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(dataReleaseFile.Id));
             Assert.NotNull(await contentDbContext.Files.FindAsync(dataReleaseFile.File.Id));
 
             Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(metaReleaseFile.Id));
             Assert.NotNull(await contentDbContext.Files.FindAsync(metaReleaseFile.File.Id));
-
-            Assert.NotNull(await contentDbContext.Files.FindAsync(zipFile.Id));
         }
     }
 

@@ -20,4 +20,10 @@ public static class Constants
         public const string PrivateMethodologyFiles = "methodologies";
         public const string PublicMethodologyFiles = "methodologies";
     }
+
+    public static class RegexPatterns
+    {
+        public const string Guid = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
+        public const string WildcardDirectoryName = "[^/]+";
+    }
 }
