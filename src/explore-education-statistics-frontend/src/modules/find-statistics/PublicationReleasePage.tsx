@@ -1,6 +1,7 @@
 /* eslint-disable react/destructuring-assignment */
 import { NavItem } from '@common/components/PageNavExpandable';
 import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
+import getNavItemsFromHtml from '@common/components/util/getNavItemsFromHtml';
 import { contactUsNavItem } from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import publicationService, {
   PublicationMethodologiesList,
@@ -85,19 +86,34 @@ const PublicationReleasePage: NextPage<Props> = props => {
   const generateNavItems = (): NavItem[] => {
     switch (page) {
       case 'home': {
-        // TODO
-        // loop through content sections and add sub nav items
-        const navContentSectionItems = props.homeContent.content.map(
-          section => {
-            const { heading } = section;
-            return {
-              id: generateIdFromHeading(heading),
-              text: heading,
-            };
-          },
-        );
+        const {
+          homeContent: { summarySection, content },
+        } = props;
+
+        const hasSummarySection = summarySection.content.length > 0;
+
+        // Get nav items for section headings (h2) and parse the section's
+        // HtmlBlocks for h3 headings to generate subNavItems
+        const contentSectionsItems = content.map(section => {
+          const { heading, content: sectionContent } = section;
+          const subNavItems = sectionContent
+            .flatMap(block => {
+              if (block.type === 'HtmlBlock') {
+                return getNavItemsFromHtml(block.body);
+              }
+              return null;
+            })
+            .filter(item => !!item);
+
+          return {
+            id: generateIdFromHeading(heading),
+            text: heading,
+            subNavItems,
+          };
+        });
+
         return [
-          props.homeContent.summarySection?.content.length > 0 && {
+          hasSummarySection && {
             id: 'background-information',
             text: 'Background information',
           },
@@ -105,7 +121,7 @@ const PublicationReleasePage: NextPage<Props> = props => {
             id: 'headlines-section',
             text: 'Headlines facts and figures',
           },
-          ...navContentSectionItems,
+          ...contentSectionsItems,
           contactUsNavItem,
         ].filter(item => !!item);
       }

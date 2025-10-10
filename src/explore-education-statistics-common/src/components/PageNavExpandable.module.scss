@@ -40,6 +40,8 @@
 
 .subNavItem {
   margin-bottom: govuk-spacing(2) !important;
+  display: flex;
+  align-items: center;
 
   &::before {
     content: '—';
@@ -50,6 +52,10 @@
 
 .subNavLink {
   padding-left: 4px;
-  display: inline-block;
-  vertical-align: middle;
+  // limit long items to three lines
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  display: -webkit-box; /* stylelint-disable-line value-no-vendor-prefix */
+  overflow: hidden;
 }

@@ -1,19 +1,20 @@
-import GlossaryEntryButton from '@common/components/GlossaryEntryButton';
 import styles from '@common/components/ContentHtml.module.scss';
-import formatContentLinkUrl from '@common/utils/url/formatContentLinkUrl';
-import getUrlAttributes from '@common/utils/url/getUrlAttributes';
+import GlossaryEntryButton from '@common/components/GlossaryEntryButton';
+import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
 import useMounted from '@common/hooks/useMounted';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import sanitizeHtml, {
   SanitizeHtmlOptions,
   defaultSanitizeOptions,
 } from '@common/utils/sanitizeHtml';
+import formatContentLinkUrl from '@common/utils/url/formatContentLinkUrl';
+import getUrlAttributes from '@common/utils/url/getUrlAttributes';
 import classNames from 'classnames';
 import { Element } from 'domhandler/lib/node';
 import parseHtmlString, {
   DOMNode,
-  domToReact,
   attributesToProps,
+  domToReact,
 } from 'html-react-parser';
 import React, { ReactElement, useMemo } from 'react';
 
@@ -115,6 +116,15 @@ export default function ContentHtml({
       // Tables
       if (node.name === 'figure' && node.attribs.class === 'table') {
         return renderTable(node);
+      }
+
+      if (node.name === 'h3') {
+        const text = domToReact(node.children);
+        return typeof text === 'string' ? (
+          <h3 id={generateIdFromHeading(text)}>{text}</h3>
+        ) : (
+          node
+        );
       }
 
       return undefined;

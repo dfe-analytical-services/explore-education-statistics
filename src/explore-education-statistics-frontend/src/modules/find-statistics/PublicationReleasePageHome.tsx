@@ -1,5 +1,6 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
@@ -150,9 +151,9 @@ const PublicationReleasePage = ({
             });
           }}
         >
-          {content.map(({ heading, content: sectionContent }) => {
+          {content.map(({ heading, id, content: sectionContent }) => {
             return (
-              <AccordionSection heading={heading} key={heading}>
+              <AccordionSection heading={heading} key={id}>
                 {({ open }) => (
                   <PublicationSectionBlocks
                     blocks={sectionContent}
@@ -165,14 +166,14 @@ const PublicationReleasePage = ({
           })}
         </Accordion>
       ) : (
-        content.map(section => (
+        content.map(({ heading, id, content: sectionContent }) => (
           <ReleasePageContentSection
-            heading={section.heading}
-            key={section.id}
-            id={section.id}
+            heading={heading}
+            key={id}
+            id={generateIdFromHeading(heading)}
           >
             <PublicationSectionBlocks
-              blocks={section.content}
+              blocks={sectionContent}
               releaseVersionId={releaseVersionSummary.id}
               visible
             />
