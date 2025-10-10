@@ -5,13 +5,13 @@ import { Label } from '@common/modules/charts/types/chart';
 import { LegendPosition } from '@common/modules/charts/types/legend';
 import classNames from 'classnames';
 import React, { ReactNode, useState } from 'react';
-import { LegendProps } from 'recharts';
+import { DefaultLegendContentProps, LegendProps } from 'recharts';
 import { DefaultLegendContent } from 'recharts/lib/component/DefaultLegendContent';
 
 interface Props {
   children: ReactNode;
   height: number;
-  legend?: LegendProps;
+  legend?: DefaultLegendContentProps;
   legendPosition?: LegendPosition;
   yAxisWidth?: number;
   yAxisLabel?: Label;
@@ -46,6 +46,8 @@ const ChartContainer = ({
   if (!isMounted) {
     return null;
   }
+
+  // TODO should legends have aria-hidden?
 
   return (
     <>

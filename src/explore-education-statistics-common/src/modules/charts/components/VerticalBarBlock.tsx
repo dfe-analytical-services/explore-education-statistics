@@ -28,6 +28,7 @@ import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
 import { otherAxisPositionTypes } from '@common/modules/charts/types/referenceLinePosition';
 import React, {
   memo,
+  ReactNode,
   RefObject,
   useCallback,
   useEffect,
@@ -72,7 +73,7 @@ const VerticalBarBlock = ({
 }: VerticalBarProps) => {
   const { isMedia: isDesktopMedia } = useDesktopMedia();
   const [xAxisTickWidth, setXAxisTickWidth] = useState<number>();
-  const containerRef = useRef<RefObject<HTMLDivElement>>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Make recharts show all x axis ticks, it automatically
   // shows / hides them depending on available space otherwise.
@@ -158,10 +159,8 @@ const VerticalBarBlock = ({
   );
 
   useEffect(() => {
-    // A known bug with refs in recharts 2.x results in having to use `current.current`.
-    // It should be fixed in v3.
-    if (showAllXAxisTicks && containerRef.current?.current?.clientWidth) {
-      resizeTicks(containerRef.current?.current?.clientWidth);
+    if (showAllXAxisTicks && containerRef.current?.clientWidth) {
+      resizeTicks(containerRef.current?.clientWidth);
     }
   }, [resizeTicks, showAllXAxisTicks]);
 
@@ -176,6 +175,7 @@ const VerticalBarBlock = ({
   return (
     <ChartContainer
       height={height || 300}
+      // TODO this reverses the legend order when bars are stacked so they reflect the order in the bars.
       legend={
         stacked && legendProps?.payload
           ? { ...legendProps, payload: [...legendProps.payload].reverse() }
@@ -193,9 +193,7 @@ const VerticalBarBlock = ({
         ref={containerRef}
       >
         <BarChart
-          aria-label={alt}
-          role="img"
-          focusable={false}
+          aria-label={`${alt}. Use the left and right arrow keys to browse data points.`}
           data={chartData}
           margin={{
             left: 30,
@@ -239,13 +237,14 @@ const VerticalBarBlock = ({
           />
 
           <Tooltip
-            content={
+            content={tooltipData => (
               <CustomTooltip
+                {...tooltipData}
                 dataSetCategories={dataSetCategories}
                 dataSetCategoryConfigs={dataSetCategoryConfigs}
                 order={stacked ? 'reverse' : 'default'}
               />
-            }
+            )}
             wrapperStyle={{ zIndex: 1000 }}
           />
 
@@ -266,17 +265,20 @@ const VerticalBarBlock = ({
               label={
                 showDataLabels
                   ? {
+                      fill: '#0b0c0c',
                       fontSize: 14,
                       offset: 5,
                       position: 'top',
-                      formatter: (value: string | number) =>
-                        formatPretty(
-                          value.toString(),
-                          dataSet.indicator.unit,
-                          dataSet.indicator.decimalPlaces,
-                        ),
+                      formatter: (label: ReactNode) =>
+                        label
+                          ? formatPretty(
+                              label.toString(),
+                              dataSet.indicator.unit,
+                              dataSet.indicator.decimalPlaces,
+                            )
+                          : undefined,
                     }
-                  : undefined
+                  : false
               }
             />
           ))}

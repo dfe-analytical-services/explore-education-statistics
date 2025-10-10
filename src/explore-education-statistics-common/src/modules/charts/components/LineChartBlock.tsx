@@ -138,9 +138,7 @@ const LineChartBlock = ({
     >
       <ResponsiveContainer height={height || 300}>
         <LineChart
-          aria-label={alt}
-          role="img"
-          focusable={false}
+          aria-label={`${alt}. Use the left and right arrow keys to browse data points.`}
           data={chartData}
           margin={{
             left: 30,
@@ -149,13 +147,14 @@ const LineChartBlock = ({
           }}
         >
           <Tooltip
-            content={
+            content={tooltipData => (
               <CustomTooltip
+                {...tooltipData}
                 dataSetCategories={dataSetCategories}
                 dataSetCategoryConfigs={dataSetCategoryConfigs}
                 order="value"
               />
-            }
+            )}
             wrapperStyle={{ zIndex: 1000 }}
           />
           {legend.position !== 'none' && legend.position !== 'inline' && (

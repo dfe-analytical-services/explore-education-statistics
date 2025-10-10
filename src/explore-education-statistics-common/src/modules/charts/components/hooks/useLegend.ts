@@ -3,8 +3,11 @@ import { useCallback, useState } from 'react';
 import { LegendProps, DefaultLegendContentProps } from 'recharts';
 import { ContentType } from 'recharts/types/component/DefaultLegendContent';
 
-export default function useLegend(): [LegendProps | undefined, ContentType] {
-  const [legendProps, setLegendProps] = useState<LegendProps>();
+export default function useLegend(): [
+  DefaultLegendContentProps | undefined,
+  ContentType,
+] {
+  const [legendProps, setLegendProps] = useState<DefaultLegendContentProps>();
 
   const renderLegend: ContentType = useCallback(
     (nextProps: DefaultLegendContentProps) => {

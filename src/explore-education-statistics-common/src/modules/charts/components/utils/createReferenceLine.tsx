@@ -81,7 +81,11 @@ export default function createReferenceLine({
       // Hide the reference line for perpendicular lines as we draw them
       // manually with the label.
       {...(perpendicularLine ? { stroke: 'none' } : styleProps)}
-      {...props}
+      // TODO not sure what the rest of the props would be here, need to check where it's used,
+      // it looks like they only pass in specific props
+      // commenting it out fixes the error
+      // need to check properly
+      // {...props}
       key={`${position}_${label}`}
       x={otherAxisStart && otherAxisEnd ? undefined : x}
       y={otherAxisStart && otherAxisEnd ? undefined : y}
