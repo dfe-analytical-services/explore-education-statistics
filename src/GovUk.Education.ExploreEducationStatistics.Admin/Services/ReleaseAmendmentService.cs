@@ -1,5 +1,4 @@
 #nullable enable
-using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -8,12 +7,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Utils.ContentFilterUtils;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -21,8 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class ReleaseAmendmentService : IReleaseAmendmentService
 {
-    private static readonly Regex CommentsRegex = new(ContentFilterUtils.CommentsFilterPattern, RegexOptions.Compiled);
-
     private readonly ContentDbContext _context;
     private readonly IFootnoteRepository _footnoteRepository;
     private readonly StatisticsDbContext _statisticsDbContext;
@@ -648,7 +645,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             return bodyText;
         }
 
-        return CommentsRegex.Replace(bodyText, _ => string.Empty);
+        return CommentsRegex().Replace(bodyText, _ => string.Empty);
     }
 }
 

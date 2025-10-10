@@ -1,3 +1,4 @@
+#nullable enable
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -17,11 +18,11 @@ public class ContentSection
 
     public int Order { get; set; }
 
-    public string Heading { get; set; }
+    public string? Heading { get; set; }
 
     public List<ContentBlock> Content { get; set; } = new();
 
-    public ReleaseVersion ReleaseVersion { get; set; }
+    public ReleaseVersion ReleaseVersion { get; set; } = null!;
 
     public Guid ReleaseVersionId { get; set; }
 

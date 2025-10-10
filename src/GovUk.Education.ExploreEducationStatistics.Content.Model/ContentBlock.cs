@@ -80,7 +80,7 @@ public class DataBlock : ContentBlock
 
     public string Name { get; set; }
 
-    public string Source { get; set; }
+    public string? Source { get; set; }
 
     public FullTableQuery Query { get; set; }
 
@@ -113,6 +113,9 @@ public class DataBlock : ContentBlock
     private List<IChart> ChartsInternal { get; set; } = new();
 
     public TableBuilderConfiguration Table { get; set; }
+
+    [JsonIgnore]
+    public DataBlockVersion DataBlockVersion { get; set; } = null!;
 }
 
 [AttributeUsage(AttributeTargets.Field)]
