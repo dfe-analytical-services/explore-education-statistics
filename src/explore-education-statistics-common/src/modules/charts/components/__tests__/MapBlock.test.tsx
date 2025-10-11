@@ -406,15 +406,13 @@ describe('MapBlock', () => {
         ).toBeInTheDocument();
       });
 
-      const mapEl = container.querySelector<HTMLElement>(
-        '.dfe-print-break-avoid',
-      );
+      const mapEl = container.querySelector<HTMLElement>('.leaflet-container');
       expect(mapEl).not.toBeNull();
 
       await waitFor(() => {
         expect(mapEl).toHaveAttribute(
           'aria-label',
-          'Interactive map showing education statistics by area',
+          'Interactive map showing education statistics by area, for alternative see table tab',
         );
       });
     });
@@ -429,13 +427,14 @@ describe('MapBlock', () => {
         ).toBeInTheDocument();
       });
 
-      const mapEl = container.querySelector<HTMLElement>(
-        '.dfe-print-break-avoid',
-      );
+      const mapEl = container.querySelector<HTMLElement>('.leaflet-container');
       expect(mapEl).not.toBeNull();
 
       await waitFor(() => {
-        expect(mapEl).toHaveAttribute('aria-label', altText);
+        expect(mapEl).toHaveAttribute(
+          'aria-label',
+          `${altText}, for alternative see table tab`,
+        );
       });
     });
   });

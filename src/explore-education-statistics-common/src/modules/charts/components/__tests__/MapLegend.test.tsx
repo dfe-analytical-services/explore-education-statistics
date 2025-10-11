@@ -26,7 +26,7 @@ describe('MapLegend', () => {
       }),
     ).toBeInTheDocument();
 
-    const listItems = screen.getAllByRole('listitem');
+    const listItems = screen.getAllByRole('definition');
     expect(listItems).toHaveLength(2);
     expect(listItems[0]).toHaveTextContent('Item 1');
     expect(listItems[1]).toHaveTextContent('Item 2');
@@ -36,5 +36,19 @@ describe('MapLegend', () => {
     expect(legendColours).toHaveLength(2);
     expect(legendColours[0].style.backgroundColor).toBe('rgb(128, 128, 128)');
     expect(legendColours[1].style.backgroundColor).toBe('rgb(0, 0, 0)');
+  });
+
+  test('renders a span with hex and colour name for each legend item', () => {
+    render(
+      <MapLegend
+        heading="Test heading"
+        legendDataGroups={testLegendDataGroups}
+      />,
+    );
+
+    const spans = screen.getAllByTestId('mapBlock-legend-item');
+    expect(spans).toHaveLength(2);
+    expect(spans[0]).toHaveTextContent('map colour #808080 (Gray)');
+    expect(spans[1]).toHaveTextContent('map colour #000000 (Black)');
   });
 });

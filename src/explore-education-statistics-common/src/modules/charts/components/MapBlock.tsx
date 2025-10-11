@@ -27,14 +27,9 @@ import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, Polyline } from 'leaflet';
+import type { LeafletEvent, Map as LeafletMap } from 'leaflet';
 import keyBy from 'lodash/keyBy';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
 import useToggle from '@common/hooks/useToggle';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -237,33 +232,6 @@ export default function MapBlock({
     selectedDataSetKey,
   ]);
 
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    // Run after render and whenever `alt` changes
-    const root = wrapperRef.current;
-    if (!root) return;
-
-    const el = root.querySelector<HTMLElement>('.dfe-print-break-avoid');
-    if (el) {
-      if (alt) {
-        el.setAttribute('aria-label', alt);
-        el.setAttribute('role', 'group');
-      } else {
-        el.setAttribute(
-          'aria-label',
-          'Interactive map showing education statistics by area',
-        );
-        el.setAttribute('role', 'group');
-      }
-    }
-  }, [alt]);
-
-  useEffect(() => {
-    if (categoricalDataGroups?.length) {
-      onChangeCategoricalDataConfig?.(categoricalDataGroups);
-    }
-  }, [categoricalDataGroups, onChangeCategoricalDataConfig]);
-
   const handleLocationChange = useCallback(
     (value: string) => {
       setSelectedFeature(features?.features.find(feat => feat.id === value));
@@ -318,7 +286,6 @@ export default function MapBlock({
 
       <div className="govuk-grid-row govuk-!-margin-bottom-4">
         <div
-          ref={wrapperRef}
           className={classNames(
             'govuk-grid-column-two-thirds',
             styles.mapWrapper,
@@ -342,6 +309,15 @@ export default function MapBlock({
             center={position}
             minZoom={5}
             zoom={5}
+            // @ts-expect-error The library's type definition is incorrect.
+            whenReady={(e: LeafletEvent) => {
+              const mapContainer = (e.target as LeafletMap).getContainer();
+              const altText = alt
+                ? `${alt}, for alternative see table tab`
+                : 'Interactive map showing education statistics by area, for alternative see table tab';
+              mapContainer?.setAttribute('aria-label', altText);
+              mapContainer?.setAttribute('role', 'group');
+            }}
           >
             <MapGeoJSON
               dataSetCategoryConfigs={dataSetCategoryConfigs}

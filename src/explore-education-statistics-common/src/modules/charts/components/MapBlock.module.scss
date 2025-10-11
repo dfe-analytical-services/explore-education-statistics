@@ -53,10 +53,27 @@
   margin-bottom: 0;
 }
 
+.legend dd {
+  margin: 0;
+  padding: 0;
+}
+
 .legendIcon {
   border: 1px solid govuk-colour('black');
   forced-color-adjust: none;
   height: 20px;
   margin-right: govuk-spacing(1);
   width: 20px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(100%);
+  white-space: nowrap;
 }
