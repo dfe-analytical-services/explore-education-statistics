@@ -25,6 +25,7 @@ public record PreviewTokenCreateRequest
 
     public class Validator : AbstractValidator<PreviewTokenCreateRequest>
     {
+        private const int ToleranceSeconds = 10;
         public Validator(TimeProvider currentTime)
         {
             var utcNow = currentTime.GetUtcNow();
@@ -34,9 +35,9 @@ public record PreviewTokenCreateRequest
             {
                 RuleFor(r => r.Activates)
                     .Cascade(CascadeMode.Stop)
-                    .Must(a => IsNotInPastWithTolerance(utcNow, a!.Value, TimeSpan.FromSeconds(10)))
+                    .Must(a => IsNotInPastWithTolerance(utcNow, a!.Value, TimeSpan.FromSeconds(ToleranceSeconds)))
                     .WithMessage("Activates date must not be in the past.")
-                    .Must(a => a!.Value.UtcDateTime<= utcNow.AddDays(7))
+                    .Must(activates => activates <= utcNow.AddDays(7))
                     .WithMessage("Activates date must be within the next 7 days.");
             });
 
@@ -45,11 +46,11 @@ public record PreviewTokenCreateRequest
             {
                 When(r => r.Activates.HasValue, () =>
                     {
-                        RuleFor(r => r)
+                        RuleFor(r => r.Expires)
                             .Cascade(CascadeMode.Stop)
-                            .Must(r => r.Activates!.Value < r.Expires!.Value)
+                            .Must((r, expires) => r.Activates!.Value < expires)
                             .WithMessage("Activates date must be before the expires date.")
-                            .Must(r => r.Expires!.Value.Date <= r.Activates!.Value.AddDays(7).Date) // ignore the time when comparing with the 'Activates'
+                            .Must((r, expires) => expires!.Value.Date <= r.Activates!.Value.AddDays(7).Date) // ignore the time when comparing with the 7 days after 'Activates'
                             .WithMessage("Expires date must be no more than 7 days after the activates date.");
                     })
                     .Otherwise(() =>
