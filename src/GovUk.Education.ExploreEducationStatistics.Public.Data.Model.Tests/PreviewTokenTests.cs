@@ -32,7 +32,7 @@ public abstract class PreviewTokenTests
                 DataSetVersionId = Guid.NewGuid(),
                 CreatedByUserId = Guid.NewGuid(),
                 Activates = now.AddDays(1), //Activates in the future
-                Expires = now // Revoked just now
+                Expires = now, // Revoked just now
             };
 
             Assert.Equal(PreviewTokenStatus.Expired, token.GetPreviewTokenStatus(new FakeTimeProvider(now)));
@@ -67,7 +67,7 @@ public abstract class PreviewTokenTests
                 CreatedByUserId = Guid.NewGuid(),
                 Created = now,
                 Activates = now,
-                Expires = expires
+                Expires = expires,
             };
 
             Assert.Equal(PreviewTokenStatus.Active, token.GetPreviewTokenStatus(new FakeTimeProvider(now)));

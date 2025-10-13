@@ -58,22 +58,26 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         private static readonly CreatePreviewTokenValidationError ExpectInvalidExpiryBeforeActivates = new(
             InvalidExpiryErrorBeforeActivates.Code,
             InvalidExpiryErrorBeforeActivates.Message,
-            "expires");
+            "expires"
+        );
 
         private static readonly CreatePreviewTokenValidationError ExpectInvalidExpiryOutOfBound = new(
             InvalidExpiryErrorOutOfBound.Code,
             InvalidExpiryErrorOutOfBound.Message,
-            "expires");
+            "expires"
+        );
 
         private static readonly CreatePreviewTokenValidationError ExpectInvalidActivatesInPast = new(
             InvalidActivatesErrorInPast.Code,
             InvalidActivatesErrorInPast.Message,
-            "activates");
+            "activates"
+        );
 
         private static readonly CreatePreviewTokenValidationError ExpectInvalidActivatesOutOfBound = new(
             InvalidActivatesErrorOutOfBound.Code,
             InvalidActivatesErrorOutOfBound.Message,
-            "activates");
+            "activates"
+        );
 
         [Fact]
         public async Task Success()
@@ -81,9 +85,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             var sevenDaysFromNow = DateTimeOffset.UtcNow.AddDays(7);
             var dataSetVersion = await SetUpCreatePreviewTokenSuccessTestData();
             var label = new string('A', count: 100);
-            var response = await CreatePreviewToken(
-                dataSetVersionId: dataSetVersion.Id,
-                label: label);
+            var response = await CreatePreviewToken(dataSetVersionId: dataSetVersion.Id, label: label);
 
             var (viewModel, createdEntityId) = response.AssertCreated<PreviewTokenViewModel>(
                 expectedLocationPrefix: "http://localhost/api/public-data/preview-tokens/"
@@ -93,7 +95,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             Assert.Multiple(
                 () => Assert.Equal(previewTokenId, viewModel.Id),
                 () => Assert.Equal(label, viewModel.Label),
-                () => Assert.Equal(PreviewTokenStatus.Active , viewModel.Status),
+                () => Assert.Equal(PreviewTokenStatus.Active, viewModel.Status),
                 () => Assert.Equal(CreatedByBauUser.Email, viewModel.CreatedByEmail),
                 () => viewModel.Created.AssertUtcNow(),
                 () => viewModel.Activates.AssertEqual(viewModel.Created),
@@ -130,37 +132,32 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
 
             DateTimeOffset? activates = activatesProvided ? twoDaysFromNow : null;
             var sevenDaysFromNow = DateTimeOffset.UtcNow.AddDays(7);
-            DateTimeOffset? expires = expiresProvided
-                ? activates?.AddDays(7)
-                  ?? sevenDaysFromNow
-                : null;
+            DateTimeOffset? expires = expiresProvided ? activates?.AddDays(7) ?? sevenDaysFromNow : null;
 
             var label = new string('A', count: 100);
             var response = await CreatePreviewToken(
                 dataSetVersionId: dataSetVersion.Id,
                 label: label,
                 activates: activates,
-                expires: expires);
+                expires: expires
+            );
 
-            var (viewModel, createdEntityId) =
-                response.AssertCreated<PreviewTokenViewModel>(
-                    expectedLocationPrefix: "http://localhost/api/public-data/preview-tokens/");
+            var (viewModel, createdEntityId) = response.AssertCreated<PreviewTokenViewModel>(
+                expectedLocationPrefix: "http://localhost/api/public-data/preview-tokens/"
+            );
             Assert.True(Guid.TryParse(createdEntityId, out var previewTokenId));
 
-            var expectedActivates = activatesProvided
-                ? twoDaysFromNow
-                : viewModel.Created;
-            var expectedExpiry = expires ?? (activatesProvided
-                ? nineDaysFromNow
-                : sevenDaysFromNow);
+            var expectedActivates = activatesProvided ? twoDaysFromNow : viewModel.Created;
+            var expectedExpiry = expires ?? (activatesProvided ? nineDaysFromNow : sevenDaysFromNow);
 
             Assert.Multiple(
                 () => Assert.Equal(previewTokenId, viewModel.Id),
                 () => Assert.Equal(label, viewModel.Label),
-                () => Assert.Equal(activatesProvided
-                    ? PreviewTokenStatus.Pending
-                    : PreviewTokenStatus.Active
-                    , viewModel.Status),
+                () =>
+                    Assert.Equal(
+                        activatesProvided ? PreviewTokenStatus.Pending : PreviewTokenStatus.Active,
+                        viewModel.Status
+                    ),
                 () => Assert.Equal(CreatedByBauUser.Email, viewModel.CreatedByEmail),
                 () => viewModel.Created.AssertUtcNow(),
                 () => viewModel.Activates.AssertEqual(expectedActivates),
@@ -184,27 +181,44 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             );
         }
 
-        public static TheoryData<DateTimeOffset, DateTimeOffset, CreatePreviewTokenValidationError> CustomDateOutOfRangeData => new()
-        {
-            { DateTimeOffset.UtcNow.AddDays(-2), DateTimeOffset.UtcNow.AddDays(2), ExpectInvalidActivatesInPast }, // Start date is in the past and therefore is out of range.
-            { DateTimeOffset.UtcNow.AddDays(1), DateTimeOffset.UtcNow.AddDays(15), ExpectInvalidExpiryOutOfBound }, // End date is longer than 7 days and therefore is out of range.
-            { DateTimeOffset.UtcNow.AddDays(8), DateTimeOffset.UtcNow.AddDays(9), ExpectInvalidActivatesOutOfBound }, // Start date beyond 7 days from current time and therefore is out of range.
-            { DateTimeOffset.UtcNow.AddDays(6), DateTimeOffset.UtcNow.AddDays(14), ExpectInvalidExpiryOutOfBound }, // Duration is longer than 7 days and therefore is out of range.
-            { DateTimeOffset.UtcNow.AddDays(6), DateTimeOffset.UtcNow.AddDays(3), ExpectInvalidExpiryBeforeActivates }, // Duration is longer than 7 days and therefore is out of range.
-        };
+        public static TheoryData<
+            DateTimeOffset,
+            DateTimeOffset,
+            CreatePreviewTokenValidationError
+        > CustomDateOutOfRangeData =>
+            new()
+            {
+                { DateTimeOffset.UtcNow.AddDays(-2), DateTimeOffset.UtcNow.AddDays(2), ExpectInvalidActivatesInPast }, // Start date is in the past and therefore is out of range.
+                { DateTimeOffset.UtcNow.AddDays(1), DateTimeOffset.UtcNow.AddDays(15), ExpectInvalidExpiryOutOfBound }, // End date is longer than 7 days and therefore is out of range.
+                {
+                    DateTimeOffset.UtcNow.AddDays(8),
+                    DateTimeOffset.UtcNow.AddDays(9),
+                    ExpectInvalidActivatesOutOfBound
+                }, // Start date beyond 7 days from current time and therefore is out of range.
+                { DateTimeOffset.UtcNow.AddDays(6), DateTimeOffset.UtcNow.AddDays(14), ExpectInvalidExpiryOutOfBound }, // Duration is longer than 7 days and therefore is out of range.
+                {
+                    DateTimeOffset.UtcNow.AddDays(6),
+                    DateTimeOffset.UtcNow.AddDays(3),
+                    ExpectInvalidExpiryBeforeActivates
+                }, // Duration is longer than 7 days and therefore is out of range.
+            };
 
         [Theory]
         [MemberData(nameof(CustomDateOutOfRangeData))]
-        public async Task CustomDateOutOfRange_ReturnsValidationProblem(DateTimeOffset activates, DateTimeOffset expires, CreatePreviewTokenValidationError expectedError)
+        public async Task CustomDateOutOfRange_ReturnsValidationProblem(
+            DateTimeOffset activates,
+            DateTimeOffset expires,
+            CreatePreviewTokenValidationError expectedError
+        )
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
-              .DefaultDataSetVersion()
-              .WithDataSet(dataSet)
-              .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -218,7 +232,8 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 dataSetVersion.Id,
                 new string('A', count: 100),
                 activates: activates,
-                expires: expires);
+                expires: expires
+            );
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -347,7 +362,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 DataSetVersionId = dataSetVersionId,
                 Activates = activates,
                 Expires = expires,
-                Label = label
+                Label = label,
             };
 
             return await client.PostAsJsonAsync(BaseUrl, request);
@@ -373,7 +388,6 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
             return dataSetVersion;
         }
-
     }
 
     public class GetPreviewTokenTests(TestApplicationFactory testApp) : PreviewTokenControllerTests(testApp)
