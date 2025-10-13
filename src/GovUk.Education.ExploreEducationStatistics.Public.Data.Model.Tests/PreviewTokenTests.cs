@@ -23,6 +23,22 @@ public abstract class PreviewTokenTests
         }
 
         [Fact]
+        public void WhenRevoked_ReturnsExpired()
+        {
+            var now = new DateTimeOffset(2025, 1, 1, 0, 0, 0, 0, TimeSpan.Zero);
+            var token = new PreviewToken
+            {
+                Label = "Expired token",
+                DataSetVersionId = Guid.NewGuid(),
+                CreatedByUserId = Guid.NewGuid(),
+                Activates = now.AddDays(1), //Activates in the future
+                Expiry = now // Revoked just now
+            };
+
+            Assert.Equal(PreviewTokenStatus.Expired, token.GetPreviewTokenStatus(new FakeTimeProvider(now)));
+        }
+
+        [Fact]
         public void WhenNowBeforeActivates_ReturnsPending()
         {
             var now = new DateTimeOffset(2025, 1, 1, 0, 0, 0, 0, TimeSpan.Zero);
