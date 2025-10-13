@@ -10,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Rel
 [ApiController]
 public class ReleaseVersionsController(
     IReleaseContentService releaseContentService,
+    IReleaseDataContentService releaseDataContentService,
     IReleaseVersionsService releaseVersionsService
 ) : ControllerBase
 {
@@ -21,6 +22,16 @@ public class ReleaseVersionsController(
     ) =>
         await releaseContentService
             .GetReleaseContent(publicationSlug: publicationSlug, releaseSlug: releaseSlug, cancellationToken)
+            .HandleFailuresOrOk();
+
+    [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/data-content")]
+    public async Task<ActionResult<ReleaseDataContentDto>> GetReleaseDataContent(
+        string publicationSlug,
+        string releaseSlug,
+        CancellationToken cancellationToken = default
+    ) =>
+        await releaseDataContentService
+            .GetReleaseDataContent(publicationSlug: publicationSlug, releaseSlug: releaseSlug, cancellationToken)
             .HandleFailuresOrOk();
 
     [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/version-summary")]

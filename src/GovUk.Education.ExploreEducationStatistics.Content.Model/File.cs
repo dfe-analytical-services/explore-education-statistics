@@ -45,4 +45,6 @@ public partial class File : ICreatedTimestamp<DateTime?>
     public User? CreatedBy { get; set; }
 
     public Guid? CreatedById { get; set; }
+
+    public string Extension => Path.GetExtension(Filename).TrimStart('.');
 }
