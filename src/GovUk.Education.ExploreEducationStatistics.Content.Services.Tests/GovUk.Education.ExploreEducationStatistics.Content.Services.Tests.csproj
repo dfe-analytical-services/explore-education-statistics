@@ -15,7 +15,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
     <!-- Required to execute unit tests in IDE -->
-    <PackageReference Include="MockQueryable.Moq" Version="9.0.0" />
+    <PackageReference Include="MockQueryable.Moq" Version="8.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />

@@ -535,12 +535,10 @@ public class PublicationsSearchServiceTests
             };
 
             var contentDbContext = new Mock<ContentDbContext>();
-            contentDbContext
-                .Setup(context => context.Publications)
-                .Returns(publications.AsQueryable().BuildMockDbSet().Object);
+            contentDbContext.Setup(context => context.Publications).Returns(publications.BuildMockDbSet().Object);
             contentDbContext
                 .Setup(context => context.PublicationsFreeTextTable("term"))
-                .Returns(freeTextRanks.AsQueryable().BuildMockDbSet().Object);
+                .Returns(freeTextRanks.BuildMockDbSet().Object);
 
             var service = BuildService(contentDbContext.Object);
 
@@ -648,12 +646,10 @@ public class PublicationsSearchServiceTests
             };
 
             var contentDbContext = new Mock<ContentDbContext>();
-            contentDbContext
-                .Setup(context => context.Publications)
-                .Returns(publications.AsQueryable().BuildMockDbSet().Object);
+            contentDbContext.Setup(context => context.Publications).Returns(publications.BuildMockDbSet().Object);
             contentDbContext
                 .Setup(context => context.PublicationsFreeTextTable("term"))
-                .Returns(freeTextRanks.AsQueryable().BuildMockDbSet().Object);
+                .Returns(freeTextRanks.BuildMockDbSet().Object);
 
             var service = BuildService(contentDbContext.Object);
 

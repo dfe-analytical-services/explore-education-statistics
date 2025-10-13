@@ -19,5 +19,5 @@ public static class UuidUtils
     /// <remarks>
     /// Use <see cref="UuidV7"/> if you are using non-MSSQL databases.
     /// </remarks>
-    public static Guid UuidV7MsSql() => Uuid7.NewGuidMsSql();
+    public static Guid UuidV7MsSql() => Uuid7.NewMsSqlUniqueIdentifier();
 }
