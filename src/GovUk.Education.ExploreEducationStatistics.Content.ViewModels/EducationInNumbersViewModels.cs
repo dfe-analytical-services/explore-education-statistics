@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public class EducationInNumbersViewModels
 {
-    public class EinNavItemViewModel
+    public record EinNavItemViewModel
     {
         public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
@@ -26,7 +26,7 @@ public class EducationInNumbersViewModels
         }
     }
 
-    public class EinPageViewModel
+    public record EinPageViewModel
     {
         public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
@@ -48,6 +48,21 @@ public class EducationInNumbersViewModels
                     .Content.Select(EinContentSectionViewModel.FromModel)
                     .OrderBy(section => section.Order)
                     .ToList(),
+            };
+        }
+    }
+
+    public record EinPageSitemapItemViewModel
+    {
+        public required string Slug { get; set; }
+        public required DateTimeOffset LastModified { get; set; }
+
+        public static EinPageSitemapItemViewModel FromModel(EducationInNumbersPage page)
+        {
+            return new EinPageSitemapItemViewModel
+            {
+                Slug = page.Slug ?? string.Empty, // ein root page has a null slug - we want an empty string in that case
+                LastModified = page.Updated ?? page.Created,
             };
         }
     }

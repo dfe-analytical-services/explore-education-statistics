@@ -232,7 +232,7 @@ public class EducationInNumbersService(
     public async Task<Either<ActionResult, List<EinSummaryViewModel>>> Reorder(List<Guid> newOrder)
     {
         var pageList = await contentDbContext
-            .EducationInNumbersPages.GroupBy(page => page.Slug ?? "ROOT PAGE") // needed because GroupBy doesn't play well with null - doesn't affect the returned page
+            .EducationInNumbersPages.GroupBy(page => page.Slug ?? "ROOT PAGE") // needed because GroupBy doesn't like null - doesn't affect the returned page
             .Select(group => group.OrderByDescending(p => p.Version).First())
             .ToListAsync();
 
