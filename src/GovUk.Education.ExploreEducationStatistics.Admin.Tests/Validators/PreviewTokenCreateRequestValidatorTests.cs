@@ -6,7 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Validators;
 
 public class PreviewTokenCreateRequestValidatorTests
 {
-
     // Fixed "now" for all tests: 2025-10-01T14:00:00Z
     private static readonly DateTimeOffset FixedUtcNow = new(2025, 10, 1, 14, 0, 0, TimeSpan.Zero);
 
