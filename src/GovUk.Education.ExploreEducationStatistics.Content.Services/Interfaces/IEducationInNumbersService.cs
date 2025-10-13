@@ -6,9 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 
 public interface IEducationInNumbersService
 {
-    Task<Either<ActionResult, List<EinNavItemViewModel>>> ListEinPages();
+    Task<Either<ActionResult, List<EinNavItemViewModel>>> ListEinPages(CancellationToken cancellationToken);
 
-    Task<Either<ActionResult, EinPageViewModel>> GetEinPage(string? slug);
+    Task<Either<ActionResult, EinPageViewModel>> GetEinPage(string? slug, CancellationToken cancellationToken);
 
-    Task<Either<ActionResult, List<EinPageSitemapItemViewModel>>> ListSitemapItems();
+    Task<Either<ActionResult, List<EinPageSitemapItemViewModel>>> ListSitemapItems(CancellationToken cancellationToken);
 }

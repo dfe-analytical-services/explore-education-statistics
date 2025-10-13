@@ -25,13 +25,13 @@ export interface EinPageSitemapItem {
 
 const educationInNumbersService = {
   getEducationInNumbersPage(slug: string): Promise<EinPage> {
-    return contentApi.get(`/education-in-numbers/${slug}`);
+    return contentApi.get(`/education-in-numbers/pages/${slug}`);
   },
   listEducationInNumbersPages(): Promise<EinNavItem[]> {
-    return contentApi.get('/education-in-numbers-nav');
+    return contentApi.get('/education-in-numbers/nav');
   },
   listSitemapItems(): Promise<EinPageSitemapItem[]> {
-    return contentApi.get(`/education-in-numbers-sitemap-items`);
+    return contentApi.get(`/education-in-numbers/sitemap-items`);
   },
 };
 

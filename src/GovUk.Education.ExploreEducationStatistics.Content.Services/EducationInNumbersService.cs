@@ -2,7 +2,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,30 +11,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
 public class EducationInNumbersService(ContentDbContext contentDbContext) : IEducationInNumbersService
 {
-    public async Task<Either<ActionResult, List<EinNavItemViewModel>>> ListEinPages()
+    public async Task<Either<ActionResult, List<EinNavItemViewModel>>> ListEinPages(CancellationToken cancellationToken)
     {
-        var uniqueSlugs = contentDbContext
+        var uniqueSlugs = await contentDbContext
             .EducationInNumbersPages.Where(page => page.Published != null)
             .Select(page => page.Slug)
             .Distinct()
-            .ToList();
+            .ToListAsync(cancellationToken: cancellationToken);
 
-        var latestPages = new List<EinNavItemViewModel>();
-        foreach (var slug in uniqueSlugs)
-        {
-            var latestPage = await contentDbContext
-                .EducationInNumbersPages.Where(page => page.Slug == slug && page.Published != null)
-                .OrderByDescending(page => page.Version)
-                .Select(page => EinNavItemViewModel.FromModel(page))
-                .FirstAsync();
-
-            latestPages.Add(latestPage);
-        }
-
-        return latestPages.OrderBy(page => page.Order).ToList();
+        return await uniqueSlugs
+            .ToAsyncEnumerable()
+            .SelectAwait(async slug =>
+                await contentDbContext
+                    .EducationInNumbersPages.Where(page => page.Slug == slug && page.Published != null)
+                    .OrderByDescending(page => page.Version)
+                    .Select(page => EinNavItemViewModel.FromModel(page))
+                    .FirstAsync(cancellationToken: cancellationToken)
+            )
+            .OrderBy(navItem => navItem.Order)
+            .ToListAsync(cancellationToken: cancellationToken);
     }
 
-    public async Task<Either<ActionResult, EinPageViewModel>> GetEinPage(string? slug)
+    public async Task<Either<ActionResult, EinPageViewModel>> GetEinPage(
+        string? slug,
+        CancellationToken cancellationToken
+    )
     {
         return await contentDbContext
             .EducationInNumbersPages.Include(page => page.Content)
@@ -44,29 +44,28 @@ public class EducationInNumbersService(ContentDbContext contentDbContext) : IEdu
             .Where(page => page.Slug == slug && page.Published != null)
             .OrderByDescending(page => page.Version)
             .Select(page => EinPageViewModel.FromModel(page))
-            .FirstOrNotFoundAsync();
+            .FirstOrNotFoundAsync(cancellationToken: cancellationToken);
     }
 
-    public async Task<Either<ActionResult, List<EinPageSitemapItemViewModel>>> ListSitemapItems()
+    public async Task<Either<ActionResult, List<EinPageSitemapItemViewModel>>> ListSitemapItems(
+        CancellationToken cancellationToken
+    )
     {
-        var uniqueSlugs = contentDbContext
+        var uniqueSlugs = await contentDbContext
             .EducationInNumbersPages.Where(page => page.Published != null)
             .Select(page => page.Slug)
             .Distinct()
-            .ToList();
+            .ToListAsync(cancellationToken: cancellationToken);
 
-        var latestPages = new List<EinPageSitemapItemViewModel>();
-        foreach (var slug in uniqueSlugs)
-        {
-            var latestPage = await contentDbContext
-                .EducationInNumbersPages.Where(page => page.Slug == slug && page.Published != null)
-                .OrderByDescending(page => page.Version)
-                .Select(page => EinPageSitemapItemViewModel.FromModel(page))
-                .FirstAsync();
-
-            latestPages.Add(latestPage);
-        }
-
-        return latestPages;
+        return await uniqueSlugs
+            .ToAsyncEnumerable()
+            .SelectAwait(async slug =>
+                await contentDbContext
+                    .EducationInNumbersPages.Where(page => page.Slug == slug && page.Published != null)
+                    .OrderByDescending(page => page.Version)
+                    .Select(page => EinPageSitemapItemViewModel.FromModel(page))
+                    .FirstAsync(cancellationToken: cancellationToken)
+            )
+            .ToListAsync(cancellationToken: cancellationToken);
     }
 }
