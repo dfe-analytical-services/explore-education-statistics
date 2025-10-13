@@ -1,13 +1,13 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
-    /// <inheritdoc />
     [ExcludeFromCodeCoverage]
     // ReSharper disable once InconsistentNaming
+    /// <inheritdoc />
     public partial class EES6232_RemoveFileSourceColumn : Migration
     {
         /// <inheritdoc />

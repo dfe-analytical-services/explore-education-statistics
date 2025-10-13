@@ -527,7 +527,7 @@ public class DataSetFileStorageTestFixture
             .Returns(Task.CompletedTask);
 
         DataImportService
-            .Setup(s => s.Import(It.IsAny<Guid>(), It.IsAny<File>(), It.IsAny<File>(), null))
+            .Setup(s => s.Import(It.IsAny<Guid>(), It.IsAny<File>(), It.IsAny<File>()))
             .ReturnsAsync(
                 new DataImport
                 {

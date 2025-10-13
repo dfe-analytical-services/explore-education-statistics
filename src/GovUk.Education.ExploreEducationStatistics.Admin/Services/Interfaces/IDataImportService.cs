@@ -19,5 +19,5 @@ public interface IDataImportService
 
     Task<DataImportStatusViewModel> GetImportStatus(Guid fileId);
 
-    Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile, File? sourceZipFile = null);
+    Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile);
 }

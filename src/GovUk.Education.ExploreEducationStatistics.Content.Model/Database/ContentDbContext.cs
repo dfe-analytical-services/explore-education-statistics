@@ -189,8 +189,6 @@ public class ContentDbContext : DbContext
 
         modelBuilder.Entity<DataImport>().HasOne(import => import.MetaFile).WithOne().OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<DataImport>().HasOne(import => import.ZipFile).WithMany().OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder
             .Entity<DataImport>()
             .Property(import => import.Status)
