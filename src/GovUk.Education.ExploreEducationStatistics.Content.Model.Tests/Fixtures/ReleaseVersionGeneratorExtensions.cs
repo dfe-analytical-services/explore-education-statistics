@@ -73,7 +73,7 @@ public static class ReleaseVersionGeneratorExtensions
 
     public static Generator<ReleaseVersion> WithDataGuidance(
         this Generator<ReleaseVersion> generator,
-        string dataGuidance
+        string? dataGuidance
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetDataGuidance(dataGuidance));
 
     public static Generator<ReleaseVersion> WithContent(
@@ -136,7 +136,7 @@ public static class ReleaseVersionGeneratorExtensions
 
     public static Generator<ReleaseVersion> WithPreReleaseAccessList(
         this Generator<ReleaseVersion> generator,
-        string preReleaseAccessList
+        string? preReleaseAccessList
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetPreReleaseAccessList(preReleaseAccessList));
 
     public static Generator<ReleaseVersion> WithRelatedInformation(
@@ -281,7 +281,7 @@ public static class ReleaseVersionGeneratorExtensions
 
     public static InstanceSetters<ReleaseVersion> SetDataGuidance(
         this InstanceSetters<ReleaseVersion> setters,
-        string dataGuidance
+        string? dataGuidance
     ) => setters.Set(releaseVersion => releaseVersion.DataGuidance, dataGuidance);
 
     public static InstanceSetters<ReleaseVersion> SetContentBlocks(
@@ -371,7 +371,7 @@ public static class ReleaseVersionGeneratorExtensions
 
     public static InstanceSetters<ReleaseVersion> SetPreReleaseAccessList(
         this InstanceSetters<ReleaseVersion> setters,
-        string preReleaseAccessList
+        string? preReleaseAccessList
     ) => setters.Set(releaseVersion => releaseVersion.PreReleaseAccessList, preReleaseAccessList);
 
     public static InstanceSetters<ReleaseVersion> SetRelatedInformation(
@@ -424,7 +424,7 @@ public static class ReleaseVersionGeneratorExtensions
         IEnumerable<ContentBlock> content
     ) =>
         setters.SetTopLevelContentSection(
-            releaseVersion => releaseVersion.HeadlinesSection,
+            releaseVersion => releaseVersion.SummarySection,
             ContentSectionType.ReleaseSummary,
             content
         );
