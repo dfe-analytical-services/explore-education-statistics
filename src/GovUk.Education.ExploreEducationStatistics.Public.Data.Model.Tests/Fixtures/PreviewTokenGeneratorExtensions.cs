@@ -4,11 +4,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fix
 
 public static class PreviewTokenGeneratorExtensions
 {
-    public static Generator<PreviewToken> DefaultPreviewToken(this DataFixture fixture, bool activated = true, bool expired = false) => 
-        fixture.Generator<PreviewToken>().WithDefaults(activated, expired);
+    public static Generator<PreviewToken> DefaultPreviewToken(
+        this DataFixture fixture,
+        bool activated = true,
+        bool expired = false
+    ) => fixture.Generator<PreviewToken>().WithDefaults(activated, expired);
 
-    public static Generator<PreviewToken> WithDefaults(this Generator<PreviewToken> generator, bool activated = true, bool expired = false) => 
-        generator.ForInstance(s => s.SetDefaults(activated, expired));
+    public static Generator<PreviewToken> WithDefaults(
+        this Generator<PreviewToken> generator,
+        bool activated = true,
+        bool expired = false
+    ) => generator.ForInstance(s => s.SetDefaults(activated, expired));
 
     public static Generator<PreviewToken> WithDataSetVersion(
         this Generator<PreviewToken> generator,
@@ -44,8 +50,11 @@ public static class PreviewTokenGeneratorExtensions
             .SetDefault(pt => pt.Label)
             .SetDefault(pt => pt.DataSetVersionId)
             .SetDefault(pt => pt.CreatedByUserId)
-            .Set(pt => pt.Expiry, expired ? DateTimeOffset.UtcNow.AddSeconds(-1) : DateTimeOffset.UtcNow.AddDays(1)) 
-            .Set(pt => pt.Activates, activated ? DateTimeOffset.UtcNow.AddSeconds(-1) : DateTimeOffset.UtcNow.AddDays(1));
+            .Set(pt => pt.Expires, expired ? DateTimeOffset.UtcNow.AddSeconds(-1) : DateTimeOffset.UtcNow.AddDays(1))
+            .Set(
+                pt => pt.Activates,
+                activated ? DateTimeOffset.UtcNow.AddSeconds(-1) : DateTimeOffset.UtcNow.AddDays(1)
+            );
 
     public static InstanceSetters<PreviewToken> SetDataSetVersion(
         this InstanceSetters<PreviewToken> instanceSetter,
