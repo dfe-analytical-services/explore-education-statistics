@@ -61,7 +61,7 @@ public class PreviewTokenCreateRequestValidatorTests
             DataSetVersionId = Guid.NewGuid(),
             Label = "Test",
             Activates = FixedUtcNow.AddDays(7).AddSeconds(1),
-            Expires = FixedUtcNow.AddDays(9)
+            Expires = null
         };
 
         var result = validator.TestValidate(request);

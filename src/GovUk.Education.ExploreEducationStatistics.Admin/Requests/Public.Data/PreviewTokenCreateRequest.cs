@@ -35,7 +35,7 @@ public record PreviewTokenCreateRequest
             {
                 RuleFor(r => r.Activates)
                     .Cascade(CascadeMode.Stop)
-                    .Must(a => IsNotInPastWithTolerance(utcNow, a!.Value, TimeSpan.FromSeconds(ToleranceSeconds)))
+                    .Must(activates => IsNotInPastWithTolerance(utcNow, activates!.Value, TimeSpan.FromSeconds(ToleranceSeconds)))
                     .WithMessage("Activates date must not be in the past.")
                     .Must(activates => activates <= utcNow.AddDays(7))
                     .WithMessage("Activates date must be within the next 7 days.");
@@ -59,7 +59,7 @@ public record PreviewTokenCreateRequest
                             .Cascade(CascadeMode.Stop)
                             .Must(e => utcNow<= e!.Value)
                             .WithMessage("Expires date must not be in the past.")
-                            .Must(e => e!.Value <=  utcNow.AddDays(7))
+                            .Must(expires => expires!.Value <=  utcNow.AddDays(7))
                             .WithMessage("Expires date must be no more than 7 days from today.");
                     });
             });
