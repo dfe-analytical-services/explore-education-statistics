@@ -46,7 +46,7 @@ public class PreviewTokenService(
                         DataSetVersionId = dataSetVersionId,
                         Label = label,
                         Created = DateTimeOffset.UtcNow,
-                        Activates = activatesUtc, 
+                        Activates = activatesUtc,
                         Expires = expiresUtc,
                         CreatedByUserId = userService.GetUserId(),
                     }
@@ -177,7 +177,7 @@ public class PreviewTokenService(
             Created = previewToken.Created,
             Activates = previewToken.Activates,
             Expires = previewToken.Expires,
-            Updated = previewToken.Updated
+            Updated = previewToken.Updated,
         };
     }
 }

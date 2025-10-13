@@ -15,22 +15,17 @@ public partial class EES6080_AddActivatesInPreviewTokensTable : Migration
             name: "Activates",
             table: "PreviewTokens",
             type: "timestamp with time zone",
-            nullable: true);
+            nullable: true
+        );
 
-        migrationBuilder.Sql(
-            @"UPDATE ""PreviewTokens"" SET ""Activates"" = ""Created"";");
+        migrationBuilder.Sql(@"UPDATE ""PreviewTokens"" SET ""Activates"" = ""Created"";");
 
-        migrationBuilder.AlterColumn<DateTimeOffset>(
-            name: "Activates",
-            table: "PreviewTokens",
-            nullable: false);
+        migrationBuilder.AlterColumn<DateTimeOffset>(name: "Activates", table: "PreviewTokens", nullable: false);
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "Activates",
-            table: "PreviewTokens");
+        migrationBuilder.DropColumn(name: "Activates", table: "PreviewTokens");
     }
 }
