@@ -56,7 +56,6 @@ public class DataImportServiceTests
         {
             File = new File(),
             MetaFile = new File(),
-            ZipFile = new File(),
             Status = STAGE_1,
         };
 
@@ -79,9 +78,6 @@ public class DataImportServiceTests
 
         Assert.NotNull(import.MetaFile);
         Assert.Equal(import.MetaFile.Id, result.MetaFile.Id);
-
-        Assert.NotNull(import.ZipFile);
-        Assert.Equal(import.ZipFile.Id, result.ZipFile!.Id);
     }
 
     [Fact]
@@ -92,7 +88,6 @@ public class DataImportServiceTests
             Errors = new List<DataImportError> { new("error 1"), new("error 2") },
             File = new File(),
             MetaFile = new File(),
-            ZipFile = new File(),
             Status = STAGE_1,
         };
 

@@ -33,9 +33,6 @@ public static class DataImportGeneratorExtensions
     public static Generator<DataImport> WithMetaFile(this Generator<DataImport> generator, File metaFile) =>
         generator.ForInstance(s => s.SetMetaFile(metaFile));
 
-    public static Generator<DataImport> WithZipFile(this Generator<DataImport> generator, File zipFile) =>
-        generator.ForInstance(s => s.SetZipFile(zipFile));
-
     public static Generator<DataImport> WithStatus(this Generator<DataImport> generator, DataImportStatus status) =>
         generator.ForInstance(s => s.SetStatus(status));
 
@@ -121,9 +118,6 @@ public static class DataImportGeneratorExtensions
 
     public static InstanceSetters<DataImport> SetMetaFile(this InstanceSetters<DataImport> setters, File file) =>
         setters.Set(d => d.MetaFile, file).Set(d => d.MetaFileId, (_, d) => d.MetaFile.Id);
-
-    public static InstanceSetters<DataImport> SetZipFile(this InstanceSetters<DataImport> setters, File file) =>
-        setters.Set(d => d.ZipFile, file).Set(d => d.ZipFileId, (_, d) => d.ZipFile?.Id);
 
     public static InstanceSetters<DataImport> SetStatus(
         this InstanceSetters<DataImport> setters,

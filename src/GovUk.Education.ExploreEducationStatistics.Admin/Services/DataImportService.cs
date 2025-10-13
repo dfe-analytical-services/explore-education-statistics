@@ -77,7 +77,7 @@ public class DataImportService(
         };
     }
 
-    public async Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile, File? sourceZipFile = null)
+    public async Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile)
     {
         var import = await dataImportRepository.Add(
             new DataImport
@@ -87,7 +87,6 @@ public class DataImportService(
                 MetaFileId = metaFile.Id,
                 SubjectId = subjectId,
                 Status = DataImportStatus.QUEUED,
-                ZipFileId = sourceZipFile?.Id,
             }
         );
 

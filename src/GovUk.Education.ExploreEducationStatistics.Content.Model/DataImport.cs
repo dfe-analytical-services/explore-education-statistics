@@ -38,10 +38,6 @@ public class DataImport
 
     public Guid MetaFileId { get; set; }
 
-    public File? ZipFile { get; set; }
-
-    public Guid? ZipFileId { get; set; }
-
     public int? TotalRows { get; set; } // Must be optional for failed imports
 
     /// <summary>
