@@ -176,9 +176,7 @@ public class MatchingObservationQueryGeneratorTests
         locationIdsTempTableReference.SetupGet(t => t.Name).Returns("#LocationTempTable");
 
         tempTableCreator
-            .Setup(s =>
-                s.CreateAnonymousTemporaryTableAndPopulate(context, locationIdsTempTableEntries, cancellationToken)
-            )
+            .Setup(s => s.CreateAndPopulateTemporaryTable(context, locationIdsTempTableEntries, cancellationToken))
             .ReturnsAsync(locationIdsTempTableReference.Object);
 
         var sqlHelper = new Mock<ISqlStatementsHelper>(Strict);
@@ -1053,7 +1051,7 @@ public class MatchingObservationQueryGeneratorTests
 
             tempTableCreator
                 .Setup(s =>
-                    s.CreateAnonymousTemporaryTableAndPopulate(
+                    s.CreateAndPopulateTemporaryTable(
                         context,
                         ItIs.EnumerableSequenceEqualTo(selectedLocationIdTempTableEntries),
                         cancellationToken
@@ -1066,7 +1064,7 @@ public class MatchingObservationQueryGeneratorTests
 
             tempTableCreator
                 .Setup(s =>
-                    s.CreateAnonymousTemporaryTableAndPopulate(
+                    s.CreateAndPopulateTemporaryTable(
                         context,
                         ItIs.ListSequenceEqualTo(
                             selectedFilterItemIds.OrderBy(id => id).Select(id => new IdTempTable(id)).ToList()
@@ -1157,11 +1155,7 @@ public class MatchingObservationQueryGeneratorTests
 
         tempTableCreator
             .Setup(s =>
-                s.CreateAnonymousTemporaryTableAndPopulate(
-                    context,
-                    ItIs.ListSequenceEqualTo(orderedIds),
-                    cancellationToken
-                )
+                s.CreateAndPopulateTemporaryTable(context, ItIs.ListSequenceEqualTo(orderedIds), cancellationToken)
             )
             .ReturnsAsync(tempTableReference.Object);
 

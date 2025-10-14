@@ -175,11 +175,7 @@ public class MatchingObservationsQueryGenerator(ITemporaryTableCreator tempTable
                     .ToList();
 
                 return tempTableCreator
-                    .CreateAnonymousTemporaryTableAndPopulate(
-                        context,
-                        filterItemIdsForExclusionClause,
-                        cancellationToken
-                    )
+                    .CreateAndPopulateTemporaryTable(context, filterItemIdsForExclusionClause, cancellationToken)
                     .Result;
             }
         );
@@ -243,7 +239,7 @@ public class MatchingObservationsQueryGenerator(ITemporaryTableCreator tempTable
         CancellationToken cancellationToken
     )
     {
-        var locationsTempTable = await tempTableCreator.CreateAnonymousTemporaryTableAndPopulate(
+        var locationsTempTable = await tempTableCreator.CreateAndPopulateTemporaryTable(
             context,
             locationIds.Select(id => new IdTempTable(id)),
             cancellationToken

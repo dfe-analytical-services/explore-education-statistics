@@ -30,27 +30,7 @@ public class TemporaryTableCreator : ITemporaryTableCreator
         return tempTable;
     }
 
-    public async Task<ITempTableReference> CreateAnonymousTemporaryTable<TEntity, TDbContext>(
-        TDbContext context,
-        CancellationToken cancellationToken
-    )
-        where TEntity : class
-        where TDbContext : DbContext
-    {
-        var options = new TempTableCreationOptions
-        {
-            TableNameProvider = new DefaultTempTableNameProvider(),
-            PrimaryKeyCreation = IPrimaryKeyPropertiesProvider.None,
-        };
-
-        var tempTable = await context.CreateTempTableAsync<TEntity>(options, cancellationToken);
-
-        ValidateTempTableName(tempTable.Name);
-
-        return tempTable;
-    }
-
-    public async Task<ITempTableQuery<TEntity>> CreateAnonymousTemporaryTableAndPopulate<TEntity, TDbContext>(
+    public async Task<ITempTableQuery<TEntity>> CreateAndPopulateTemporaryTable<TEntity, TDbContext>(
         TDbContext context,
         IEnumerable<TEntity> values,
         CancellationToken cancellationToken

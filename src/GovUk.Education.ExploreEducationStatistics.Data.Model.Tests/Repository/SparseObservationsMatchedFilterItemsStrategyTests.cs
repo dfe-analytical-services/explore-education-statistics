@@ -25,7 +25,7 @@ public abstract class SparseObservationsMatchedFilterItemsStrategyTests
 
         [Fact]
         [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
-        public async Task TempTablesCreated_QueriesRan_Successfully()
+        public async Task TempTablesCreatedAndQueriesExecuted()
         {
             var subjectId = Guid.NewGuid();
 

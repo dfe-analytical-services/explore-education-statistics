@@ -80,9 +80,14 @@ public class FilterItemRepositoryTests
         Assert.Equal(filterItemsToReturn, result);
     }
 
-    [Fact]
+    [Theory]
+    [InlineData(75)]
+    [InlineData(76)]
+    [InlineData(99)]
     [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
-    public async Task GetMatchedFilterItems_PercentThresholdObservationsMatched_DenseObservationsStrategyChosen()
+    public async Task GetMatchedFilterItems_PercentThresholdObservationsMatchedOrExceeded_DenseStrategyChosen(
+        int percentageObservationsMatched
+    )
     {
         var subjectId = Guid.NewGuid();
 
@@ -96,9 +101,9 @@ public class FilterItemRepositoryTests
             .WithSubject(new Subject { Id = Guid.NewGuid() })
             .GenerateList(100);
 
-        // Fill the #MatchedObservation temp table with 80% of the Observations for the Subject.
+        // Fill the #MatchedObservation temp table with a high percentage of the Observations for the Subject.
         var matchedObservationIds = allObservationsForSubject
-            .Take(75)
+            .Take(percentageObservationsMatched)
             .Select(o => new MatchedObservation(o.Id))
             .ToList();
 
@@ -144,9 +149,14 @@ public class FilterItemRepositoryTests
         Assert.Equal(filterItemsToReturn, result);
     }
 
-    [Fact]
+    [Theory]
+    [InlineData(74)]
+    [InlineData(73)]
+    [InlineData(1)]
     [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
-    public async Task GetMatchedFilterItems_LessThanPercentThresholdObservationsMatched_SparseObservationsStrategyChosen()
+    public async Task GetMatchedFilterItems_LessThanPercentThresholdObservationsMatched_SparseStrategyChosen(
+        int percentageObservationsMatched
+    )
     {
         var subjectId = Guid.NewGuid();
 
@@ -160,9 +170,9 @@ public class FilterItemRepositoryTests
             .WithSubject(new Subject { Id = Guid.NewGuid() })
             .GenerateList(10);
 
-        // Fill the #MatchedObservation temp table with less than 80% of the Observations for the Subject.
+        // Fill the #MatchedObservation temp table with a smaller percentage of the Observations for the Subject.
         var matchedObservationIds = allObservationsForSubject
-            .Take(74)
+            .Take(percentageObservationsMatched)
             .Select(o => new MatchedObservation(o.Id))
             .ToList();
 
@@ -206,6 +216,49 @@ public class FilterItemRepositoryTests
         VerifyAllMocks(sparseObservationsStrategy);
 
         Assert.Equal(filterItemsToReturn, result);
+    }
+
+    [Fact]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    public async Task GetMatchedFilterItems_NoObservationsMatched_NoFilterItemsReturned()
+    {
+        var subjectId = Guid.NewGuid();
+
+        var allObservationsForSubject = Fixture
+            .DefaultObservation()
+            .WithSubject(new Subject { Id = subjectId })
+            .GenerateList(100);
+
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            // Populate Observations for the Subject, but not any MatchedObservations.
+            await statisticsDbContext.Observation.AddRangeAsync(allObservationsForSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using var context = InMemoryStatisticsDbContext(statisticsDbContextId);
+
+        var allObservationsStrategy = new Mock<IAllObservationsMatchedFilterItemsStrategy>(Strict);
+        var sparseObservationsStrategy = new Mock<ISparseObservationsMatchedFilterItemsStrategy>(Strict);
+        var denseObservationsStrategy = new Mock<IDenseObservationsMatchedFilterItemsStrategy>(Strict);
+        var matchedObservationTempTable = Mock.Of<ITempTableReference>();
+
+        var repository = BuildFilterItemRepository(
+            context: context,
+            allObservationsMatchedFilterItemsStrategy: allObservationsStrategy.Object,
+            sparseObservationsMatchedFilterItemsStrategy: sparseObservationsStrategy.Object,
+            denseObservationsMatchedFilterItemsStrategy: denseObservationsStrategy.Object
+        );
+
+        var result = await repository.GetFilterItemsFromMatchedObservationIds(
+            subjectId: subjectId,
+            matchedObservationsTableReference: matchedObservationTempTable,
+            cancellationToken: default
+        );
+
+        Assert.Empty(result);
     }
 
     [Fact]

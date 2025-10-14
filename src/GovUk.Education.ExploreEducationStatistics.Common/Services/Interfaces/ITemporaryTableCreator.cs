@@ -12,14 +12,7 @@ public interface ITemporaryTableCreator
         where TEntity : class
         where TDbContext : DbContext;
 
-    Task<ITempTableReference> CreateAnonymousTemporaryTable<TEntity, TDbContext>(
-        TDbContext context,
-        CancellationToken cancellationToken
-    )
-        where TEntity : class
-        where TDbContext : DbContext;
-
-    Task<ITempTableQuery<TEntity>> CreateAnonymousTemporaryTableAndPopulate<TEntity, TDbContext>(
+    Task<ITempTableQuery<TEntity>> CreateAndPopulateTemporaryTable<TEntity, TDbContext>(
         TDbContext context,
         IEnumerable<TEntity> values,
         CancellationToken cancellationToken
