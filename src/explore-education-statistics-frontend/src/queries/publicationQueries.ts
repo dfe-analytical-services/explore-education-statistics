@@ -62,7 +62,7 @@ const publicationQueries = {
   },
   getPublicationMethodologies(
     publicationSlug: string,
-  ): UseQueryOptions<PublicationMethodologiesList[]> {
+  ): UseQueryOptions<PublicationMethodologiesList> {
     return {
       queryKey: ['publicationMethodologies', publicationSlug],
       queryFn: () =>

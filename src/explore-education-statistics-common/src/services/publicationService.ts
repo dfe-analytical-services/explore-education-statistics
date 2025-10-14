@@ -425,7 +425,7 @@ const publicationService = {
   },
   getPublicationMethodologies(
     publicationSlug: string,
-  ): Promise<PublicationMethodologiesList[]> {
+  ): Promise<PublicationMethodologiesList> {
     return contentApi.get(`/publications/${publicationSlug}/methodologies`);
   },
   getLatestPreReleaseAccessList(
