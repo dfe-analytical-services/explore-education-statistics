@@ -33,57 +33,43 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
 
     public class CreatePreviewTokenTests(TestApplicationFactory testApp) : PreviewTokenControllerTests(testApp)
     {
-        public record CreatePreviewTokenValidationError(string Code, string Message, string Path);
+        public record CreatePreviewTokenValidationError(string Message, string Path);
 
-        private static readonly LocalizableMessage InvalidExpiryErrorOutOfBound = new(
-            Code: "Predicate",
+        private static readonly CreatePreviewTokenValidationError InvalidExpiryErrorOutOfBound = new(
+            Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
             Message: "Expires date must be no more than 7 days after the activates date."
         );
 
-        private static readonly LocalizableMessage InvalidExpiryErrorBeforeActivates = new(
-            Code: "Predicate",
-            Message: "Activates date must be before the expires date."
+        private static readonly CreatePreviewTokenValidationError InvalidExpiryErrorBeforeActivates = new(
+            Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
+            Message: "Expires date must be after the activates date."
         );
 
-        private static readonly LocalizableMessage InvalidActivatesErrorOutOfBound = new(
-            Code: "Predicate",
+        private static readonly CreatePreviewTokenValidationError InvalidExpiryErrorInPast = new(
+            Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
+            Message: "Expires date must not be in the past."
+        );
+
+        private static readonly CreatePreviewTokenValidationError InvalidExpiryErrorLessThan7DaysFromToday = new(
+            Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
+            Message: "Expires date must be no more than 7 days from today."
+        );
+
+        private static readonly CreatePreviewTokenValidationError InvalidActivatesErrorOutOfBound = new(
+            Path: nameof(PreviewTokenCreateRequest.Activates).ToLowerFirst(),
             Message: "Activates date must be within the next 7 days."
         );
 
-        private static readonly LocalizableMessage InvalidActivatesErrorInPast = new(
-            Code: "Predicate",
+        private static readonly CreatePreviewTokenValidationError InvalidActivatesErrorInPast = new(
+            Path: nameof(PreviewTokenCreateRequest.Activates).ToLowerFirst(),
             Message: "Activates date must not be in the past."
-        );
-
-        private static readonly CreatePreviewTokenValidationError ExpectInvalidExpiryBeforeActivates = new(
-            InvalidExpiryErrorBeforeActivates.Code,
-            InvalidExpiryErrorBeforeActivates.Message,
-            "expires"
-        );
-
-        private static readonly CreatePreviewTokenValidationError ExpectInvalidExpiryOutOfBound = new(
-            InvalidExpiryErrorOutOfBound.Code,
-            InvalidExpiryErrorOutOfBound.Message,
-            "expires"
-        );
-
-        private static readonly CreatePreviewTokenValidationError ExpectInvalidActivatesInPast = new(
-            InvalidActivatesErrorInPast.Code,
-            InvalidActivatesErrorInPast.Message,
-            "activates"
-        );
-
-        private static readonly CreatePreviewTokenValidationError ExpectInvalidActivatesOutOfBound = new(
-            InvalidActivatesErrorOutOfBound.Code,
-            InvalidActivatesErrorOutOfBound.Message,
-            "activates"
         );
 
         [Fact]
         public async Task Success()
         {
             var sevenDaysFromNow = DateTimeOffset.UtcNow.AddDays(7);
-            var dataSetVersion = await SetUpCreatePreviewTokenSuccessTestData();
+            var dataSetVersion = await SetUpDataSetVersionTestData();
             var label = new string('A', count: 100);
             var response = await CreatePreviewToken(dataSetVersionId: dataSetVersion.Id, label: label);
 
@@ -113,7 +99,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 () => Assert.Equal(dataSetVersion.Id, actualPreviewToken.DataSetVersionId),
                 () => Assert.Equal(CreatedByBauUser.Id, actualPreviewToken.CreatedByUserId),
                 () => actualPreviewToken.Created.AssertUtcNow(),
-                () => actualPreviewToken.Activates.AssertEqual(actualPreviewToken.Created),
+                () => actualPreviewToken.Activates.AssertUtcNow(),
                 () => actualPreviewToken.Expires.AssertEqual(sevenDaysFromNow),
                 () => Assert.Null(actualPreviewToken.Updated)
             );
@@ -125,7 +111,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         [InlineData(false, true)]
         public async Task CustomActivatesOrExpiresProvided_Success(bool activatesProvided, bool expiresProvided)
         {
-            var dataSetVersion = await SetUpCreatePreviewTokenSuccessTestData();
+            var dataSetVersion = await SetUpDataSetVersionTestData();
 
             var twoDaysFromNow = DateTimeOffset.UtcNow.AddDays(2);
             var nineDaysFromNow = DateTimeOffset.UtcNow.AddDays(9);
@@ -182,31 +168,29 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         }
 
         public static TheoryData<
-            DateTimeOffset,
+            DateTimeOffset?,
             DateTimeOffset,
             CreatePreviewTokenValidationError
         > CustomDateOutOfRangeData =>
             new()
             {
-                { DateTimeOffset.UtcNow.AddDays(-2), DateTimeOffset.UtcNow.AddDays(2), ExpectInvalidActivatesInPast }, // Start date is in the past and therefore is out of range.
-                { DateTimeOffset.UtcNow.AddDays(1), DateTimeOffset.UtcNow.AddDays(15), ExpectInvalidExpiryOutOfBound }, // End date is longer than 7 days and therefore is out of range.
-                {
-                    DateTimeOffset.UtcNow.AddDays(8),
-                    DateTimeOffset.UtcNow.AddDays(9),
-                    ExpectInvalidActivatesOutOfBound
-                }, // Start date beyond 7 days from current time and therefore is out of range.
-                { DateTimeOffset.UtcNow.AddDays(6), DateTimeOffset.UtcNow.AddDays(14), ExpectInvalidExpiryOutOfBound }, // Duration is longer than 7 days and therefore is out of range.
+                { DateTimeOffset.UtcNow.AddDays(-2), DateTimeOffset.UtcNow.AddDays(2), InvalidActivatesErrorInPast }, // Start date is in the past and therefore is out of range.
+                { DateTimeOffset.UtcNow.AddDays(1), DateTimeOffset.UtcNow.AddDays(15), InvalidExpiryErrorOutOfBound }, // End date is longer than 7 days and therefore is out of range.
+                { DateTimeOffset.UtcNow.AddDays(8), DateTimeOffset.UtcNow.AddDays(9), InvalidActivatesErrorOutOfBound },
+                { DateTimeOffset.UtcNow.AddDays(6), DateTimeOffset.UtcNow.AddDays(14), InvalidExpiryErrorOutOfBound }, // Duration is longer than 7 days and therefore is out of range.
                 {
                     DateTimeOffset.UtcNow.AddDays(6),
                     DateTimeOffset.UtcNow.AddDays(3),
-                    ExpectInvalidExpiryBeforeActivates
-                }, // Duration is longer than 7 days and therefore is out of range.
+                    InvalidExpiryErrorBeforeActivates
+                },
+                { null, DateTimeOffset.UtcNow.AddDays(-1), InvalidExpiryErrorInPast },
+                { null, DateTimeOffset.UtcNow.AddDays(14), InvalidExpiryErrorLessThan7DaysFromToday },
             };
 
         [Theory]
         [MemberData(nameof(CustomDateOutOfRangeData))]
         public async Task CustomDateOutOfRange_ReturnsValidationProblem(
-            DateTimeOffset activates,
+            DateTimeOffset? activates,
             DateTimeOffset expires,
             CreatePreviewTokenValidationError expectedError
         )
@@ -236,13 +220,8 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             );
 
             var validationProblem = response.AssertValidationProblem();
-
-            // Assert that the validation error is for the date range
-            validationProblem.AssertHasError(
-                expectedPath: expectedError.Path,
-                expectedCode: expectedError.Code,
-                expectedMessage: expectedError.Message
-            );
+            var validationError = validationProblem.AssertHasPredicateError(expectedError.Path);
+            Assert.Equal(expectedError.Message, validationError.Message);
         }
 
         [Theory]
@@ -368,7 +347,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             return await client.PostAsJsonAsync(BaseUrl, request);
         }
 
-        private async Task<DataSetVersion> SetUpCreatePreviewTokenSuccessTestData()
+        private async Task<DataSetVersion> SetUpDataSetVersionTestData()
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 

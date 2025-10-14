@@ -88,9 +88,9 @@ public class PreviewTokenCreateRequestValidatorTests
     }
 
     [Theory]
-    [InlineData("2025-10-01T14:00:00 +00:00", "2025-10-01T14:00:00 +00:00", false)]
-    [InlineData("2025-10-01T14:00:00 +00:00", "2025-10-01T14:00:01 +00:00", true)]
-    [InlineData("2025-10-01T14:00:00 +00:00", "2025-10-07T22:59:00 +00:00", true)] // The expires date converts to October 7, 2025 at 23f:59 BST (British Summer Time)
+    [InlineData("2025-10-03T00:00:00 +00:00", "2025-10-03T00:00:00 +00:00", false)]
+    [InlineData("2025-10-03T00:00:00 +00:00", "2025-10-03T00:00:01 +00:00", true)]
+    [InlineData("2025-10-03T00:00:00 +00:00", "2025-10-10T23:59:59 +00:00", true)]
     public void Expires_BetweenActivatesAndActivatesPlus7Days_Passes(string activates, string expires, bool passes)
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
@@ -111,7 +111,7 @@ public class PreviewTokenCreateRequestValidatorTests
         {
             result
                 .ShouldHaveValidationErrorFor(r => r.Expires)
-                .WithErrorMessage("Activates date must be before the expires date.");
+                .WithErrorMessage("Expires date must be after the activates date.");
         }
     }
 
@@ -131,7 +131,7 @@ public class PreviewTokenCreateRequestValidatorTests
         var result = validator.TestValidate(request);
         result
             .ShouldHaveValidationErrorFor(r => r.Expires)
-            .WithErrorMessage("Activates date must be before the expires date.");
+            .WithErrorMessage("Expires date must be after the activates date.");
     }
 
     [Theory]
