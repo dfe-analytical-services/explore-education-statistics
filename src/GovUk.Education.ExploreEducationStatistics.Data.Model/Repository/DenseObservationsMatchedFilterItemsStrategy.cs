@@ -62,7 +62,7 @@ public class DenseObservationsMatchedFilterItemsStrategy(
             .Select(fi => fi.Id)
             .ToListAsync(cancellationToken);
 
-        var candidateFilterItemIdTable = await temporaryTableCreator.CreateAnonymousTemporaryTableAndPopulate(
+        var candidateFilterItemIdTable = await temporaryTableCreator.CreateAndPopulateTemporaryTable(
             context,
             allFilterItemIds.Select(fi => new IdTempTable(fi)),
             cancellationToken

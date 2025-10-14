@@ -48,22 +48,26 @@ public class FilterItemRepository(
     {
         var matchedObservationCount = await statisticsDbContext.MatchedObservations.CountAsync(cancellationToken);
 
+        // If no Observations have been matched, simply return no Filter Items.
+        if (matchedObservationCount == 0)
+        {
+            logger.LogDebug(message: "No Observations matched. Returning no Filter Items.");
+            return [];
+        }
+
         var fullObservationCount = await statisticsDbContext.Observation.CountAsync(
             o => o.SubjectId == subjectId,
             cancellationToken
         );
 
-        var percentageObservationsFound = matchedObservationCount * 100 / fullObservationCount;
-
-        logger.LogDebug(
-            message: "Found {PercantageObservationsFound}% Observations so far.",
-            percentageObservationsFound
-        );
-
+        //
         // Based on the number of Observations matched so far versus the number of
         // Observations actually on the Subject itself, choose the best strategy
         // for finding the matching Filter Items.
-        if (percentageObservationsFound == 100)
+        //
+
+        // If all Observations have been matched so far, return all Filter Items.
+        if (matchedObservationCount == fullObservationCount)
         {
             logger.LogDebug(
                 message: "Using {Strategy} to find FilterItems.",
@@ -76,8 +80,16 @@ public class FilterItemRepository(
             );
         }
 
-        // If we've matched 80% or more Observations of the Subject, favour the approach
-        // that matches Filter Items quickest against a large set of Observations.
+        var percentageObservationsFound = matchedObservationCount * 100 / fullObservationCount;
+
+        logger.LogDebug(
+            message: "Found {PercentageObservationsFound}% Observations so far.",
+            percentageObservationsFound
+        );
+
+        // If we've matched a particular percentage threshold or more Observations so far,
+        // favour the approach that matches Filter Items quickest against a large set of
+        // Observations.
         if (percentageObservationsFound >= PercentageObservationsFoundToUseDenseStrategy)
         {
             logger.LogDebug(message: "Using {Strategy} to find FilterItems.", nameof(denseMatchedFilterItemStrategy));
@@ -91,8 +103,9 @@ public class FilterItemRepository(
 
         logger.LogDebug(message: "Using {Strategy} to find FilterItems.", nameof(sparseMatchedFilterItemStrategy));
 
-        // If we've matched less than 80% of the Observations of the Subject, favour the approach
-        // that matches Filter Items quickest against a smaller set of Observations.
+        // If we've matched less than the percentage threshold of the Observations so far,
+        // favour the approach that matches Filter Items quickest against a smaller set of
+        // Observations.
         return await sparseMatchedFilterItemStrategy.GetFilterItemsFromMatchedObservationIds(
             subjectId: subjectId,
             matchedObservationsTableReference: matchedObservationsTableReference,

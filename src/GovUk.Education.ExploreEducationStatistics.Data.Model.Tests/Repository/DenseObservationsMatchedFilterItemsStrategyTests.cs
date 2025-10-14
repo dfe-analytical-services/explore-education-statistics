@@ -25,7 +25,7 @@ public abstract class DenseObservationsMatchedFilterItemsStrategyTests
 
         [Fact]
         [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
-        public async Task TempTablesCreated_QueriesRan_Successfully()
+        public async Task TempTablesCreatedAndQueriesExecuted()
         {
             // Create 4 filters for this Subject.
             var filters = Fixture
@@ -69,7 +69,7 @@ public abstract class DenseObservationsMatchedFilterItemsStrategyTests
 
             tempTableCreator
                 .Setup(t =>
-                    t.CreateAnonymousTemporaryTableAndPopulate(
+                    t.CreateAndPopulateTemporaryTable(
                         context,
                         It.Is<IEnumerable<IdTempTable>>(candidateFilterItemIds =>
                             filterItemIdsForSubject.ContainsAll(candidateFilterItemIds)
@@ -212,7 +212,7 @@ public abstract class DenseObservationsMatchedFilterItemsStrategyTests
 
             tempTableCreator
                 .Setup(t =>
-                    t.CreateAnonymousTemporaryTableAndPopulate(
+                    t.CreateAndPopulateTemporaryTable(
                         context,
                         It.Is<IEnumerable<IdTempTable>>(candidateFilterItemIds =>
                             filterItemIdsForSubject.ContainsAll(candidateFilterItemIds)
