@@ -38,9 +38,7 @@ public record PreviewTokenCreateRequest
                 {
                     RuleFor(r => r.Activates)
                         .Cascade(CascadeMode.Stop)
-                        .Must(activates =>
-                            IsNotInPastWithTolerance(utcNow, activates!.Value, TimeSpan.FromSeconds(ToleranceSeconds))
-                        )
+                        .Must(activates => activates >= utcNow.Subtract(TimeSpan.FromSeconds(ToleranceSeconds)))
                         .WithMessage("Activates date must not be in the past.")
                         .Must(activates => activates <= utcNow.AddDays(7))
                         .WithMessage("Activates date must be within the next 7 days.");
@@ -58,8 +56,8 @@ public record PreviewTokenCreateRequest
                             {
                                 RuleFor(r => r.Expires)
                                     .Cascade(CascadeMode.Stop)
-                                    .Must((r, expires) => r.Activates!.Value < expires)
-                                    .WithMessage("Activates date must be before the expires date.")
+                                    .Must((r, expires) => expires > r.Activates)
+                                    .WithMessage("Expires date must be after the activates date.")
                                     .Must((r, expires) => expires!.Value.Date <= r.Activates!.Value.AddDays(7).Date) // ignore the time when comparing with the 7 days after 'Activates'
                                     .WithMessage("Expires date must be no more than 7 days after the activates date.");
                             }
@@ -68,9 +66,9 @@ public record PreviewTokenCreateRequest
                         {
                             RuleFor(r => r.Expires)
                                 .Cascade(CascadeMode.Stop)
-                                .Must(e => utcNow <= e!.Value)
+                                .Must(expires => utcNow <= expires)
                                 .WithMessage("Expires date must not be in the past.")
-                                .Must(expires => expires!.Value <= utcNow.AddDays(7))
+                                .Must(expires => expires <= utcNow.AddDays(7))
                                 .WithMessage("Expires date must be no more than 7 days from today.");
                         });
                 }
@@ -79,10 +77,6 @@ public record PreviewTokenCreateRequest
             RuleFor(request => request.DataSetVersionId).NotEmpty();
 
             RuleFor(request => request.Label).NotEmpty().MaximumLength(100);
-            return;
-
-            static bool IsNotInPastWithTolerance(DateTimeOffset now, DateTimeOffset value, TimeSpan tolerance) =>
-                value >= now.Subtract(tolerance);
         }
     }
 }
