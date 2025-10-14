@@ -51,23 +51,21 @@ public abstract class PreviewTokenTests
                 Expires = now.AddHours(2),
             };
 
-            Assert.Equal(PreviewTokenStatus.Pending, token.GetPreviewTokenStatus(new FakeTimeProvider()));
+            Assert.Equal(PreviewTokenStatus.Pending, token.GetPreviewTokenStatus(new FakeTimeProvider(now)));
         }
 
         [Fact]
         public void AtActivates_IsActive()
         {
             var now = new DateTimeOffset(2025, 10, 01, 12, 00, 00, TimeSpan.Zero);
-            var expires = now.AddHours(1);
 
             var token = new PreviewToken
             {
                 Label = "Boundary activates",
                 DataSetVersionId = Guid.NewGuid(),
                 CreatedByUserId = Guid.NewGuid(),
-                Created = now,
                 Activates = now,
-                Expires = expires,
+                Expires = now.AddHours(1),
             };
 
             Assert.Equal(PreviewTokenStatus.Active, token.GetPreviewTokenStatus(new FakeTimeProvider(now)));
@@ -77,17 +75,14 @@ public abstract class PreviewTokenTests
         public void AtExpiry_IsExpired()
         {
             var now = new DateTimeOffset(2025, 10, 01, 12, 00, 00, TimeSpan.Zero);
-            var activates = now.AddHours(-1);
-            var expiry = now;
 
             var token = new PreviewToken
             {
                 Label = "Boundary expiry",
                 DataSetVersionId = Guid.NewGuid(),
                 CreatedByUserId = Guid.NewGuid(),
-                Created = activates,
-                Activates = activates,
-                Expires = expiry,
+                Activates = now.AddHours(-1),
+                Expires = now,
             };
 
             Assert.Equal(PreviewTokenStatus.Expired, token.GetPreviewTokenStatus(new FakeTimeProvider(now)));

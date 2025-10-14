@@ -73,13 +73,12 @@ public class PreviewTokenCreateRequestValidatorTests
     public void Expires_MoreThan7DaysAfterActivates_Fails()
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
-        var testDate = FixedUtcNow;
         var request = new PreviewTokenCreateRequest
         {
             DataSetVersionId = Guid.NewGuid(),
             Label = "Test",
-            Activates = testDate,
-            Expires = testDate.AddDays(8),
+            Activates = FixedUtcNow,
+            Expires = FixedUtcNow.AddDays(8),
         };
 
         var result = validator.TestValidate(request);
@@ -91,7 +90,7 @@ public class PreviewTokenCreateRequestValidatorTests
     [Theory]
     [InlineData("2025-10-01T14:00:00 +00:00", "2025-10-01T14:00:00 +00:00", false)]
     [InlineData("2025-10-01T14:00:00 +00:00", "2025-10-01T14:00:01 +00:00", true)]
-    [InlineData("2025-10-01T14:00:00 +00:00", "2025-10-07T22:59:00 +00:00", true)] // The expires date converts to October 7, 2025 at 23:59 BST (British Summer Time)
+    [InlineData("2025-10-01T14:00:00 +00:00", "2025-10-07T22:59:00 +00:00", true)] // The expires date converts to October 7, 2025 at 23f:59 BST (British Summer Time)
     public void Expires_BetweenActivatesAndActivatesPlus7Days_Passes(string activates, string expires, bool passes)
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
