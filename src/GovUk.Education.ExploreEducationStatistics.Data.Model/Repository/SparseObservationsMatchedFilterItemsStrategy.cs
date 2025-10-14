@@ -38,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 public class SparseObservationsMatchedFilterItemsStrategy(
     IRawSqlExecutor sqlExecutor,
     ITemporaryTableCreator temporaryTableCreator,
+    ISqlStatementsHelper sqlHelper,
     StatisticsDbContext context,
     ILogger<SparseObservationsMatchedFilterItemsStrategy> logger
 ) : ISparseObservationsMatchedFilterItemsStrategy
@@ -87,9 +88,11 @@ public class SparseObservationsMatchedFilterItemsStrategy(
         //
         // Update its statistics so that any future joins can make full use of its
         // accurate stats.
+        var indexName = sqlHelper.CreateRandomIndexName(matchedFilterItemIdTable.Name, nameof(MatchedFilterItem.Id));
+
         var indexSql =
             $@"
-            CREATE UNIQUE CLUSTERED INDEX [IX_{matchedFilterItemIdTable.Name}_{nameof(MatchedFilterItem.Id)}_{Guid.NewGuid()}]
+            CREATE UNIQUE CLUSTERED INDEX [{indexName}]
             ON {matchedFilterItemIdTable.Name}({nameof(MatchedFilterItem.Id)}) WITH (MAXDOP = 4);
 
             UPDATE STATISTICS {matchedFilterItemIdTable.Name} WITH FULLSCAN;";

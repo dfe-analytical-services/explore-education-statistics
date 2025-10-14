@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -60,6 +59,7 @@ public abstract class DenseObservationsMatchedFilterItemsStrategyTests
 
             var tempTableCreator = new Mock<ITemporaryTableCreator>(Strict);
             var sqlExecutor = new Mock<IRawSqlExecutor>(Strict);
+            var sqlHelper = new Mock<ISqlStatementsHelper>(Strict);
 
             var matchingObservationsTable = new Mock<ITempTableReference>(Strict);
             matchingObservationsTable.SetupGet(t => t.Name).Returns("#MatchedObservation");
@@ -110,17 +110,23 @@ public abstract class DenseObservationsMatchedFilterItemsStrategyTests
                 )
                 .Returns(Task.CompletedTask);
 
-            var expectedIndexSqlRegex = new Regex(
-                @"CREATE UNIQUE CLUSTERED INDEX \[IX_#MatchedFilterItem_Id_.{36}\].* "
-                    + @"ON #MatchedFilterItem\(Id\) WITH \(MAXDOP = 4\);\s*"
-                    + @"UPDATE STATISTICS #MatchedFilterItem WITH FULLSCAN;"
-            );
+            sqlHelper
+                .Setup(s => s.CreateRandomIndexName("#MatchedFilterItem", "Id"))
+                .Returns("IX_#MatchedFilterItem_Id_1234");
+
+            var expectedIndexSql =
+                @"
+                    CREATE UNIQUE CLUSTERED INDEX [IX_#MatchedFilterItem_Id_1234]
+                    ON #MatchedFilterItem(Id) WITH (MAXDOP = 4);
+                    
+                    UPDATE STATISTICS #MatchedFilterItem WITH FULLSCAN;
+                    ";
 
             sqlExecutor
                 .Setup(s =>
                     s.ExecuteSqlRaw(
                         context,
-                        It.Is<string>(sql => expectedIndexSqlRegex.IsMatch(NormaliseSqlFormatting(sql))),
+                        It.Is<string>(sql => NormaliseSqlFormatting(expectedIndexSql) == NormaliseSqlFormatting(sql)),
                         default
                     )
                 )
@@ -129,6 +135,7 @@ public abstract class DenseObservationsMatchedFilterItemsStrategyTests
             var strategy = new DenseObservationsMatchedFilterItemsStrategy(
                 sqlExecutor: sqlExecutor.Object,
                 temporaryTableCreator: tempTableCreator.Object,
+                sqlHelper: sqlHelper.Object,
                 context: context,
                 logger: Mock.Of<ILogger<DenseObservationsMatchedFilterItemsStrategy>>()
             );
@@ -139,7 +146,7 @@ public abstract class DenseObservationsMatchedFilterItemsStrategyTests
                 cancellationToken: default
             );
 
-            VerifyAllMocks(tempTableCreator, sqlExecutor);
+            VerifyAllMocks(tempTableCreator, sqlHelper, sqlExecutor);
         }
 
         [Fact]
@@ -225,6 +232,7 @@ public abstract class DenseObservationsMatchedFilterItemsStrategyTests
             var strategy = new DenseObservationsMatchedFilterItemsStrategy(
                 sqlExecutor: sqlExecutor.Object,
                 temporaryTableCreator: tempTableCreator.Object,
+                sqlHelper: Mock.Of<ISqlStatementsHelper>(),
                 context: context,
                 logger: Mock.Of<ILogger<DenseObservationsMatchedFilterItemsStrategy>>()
             );
