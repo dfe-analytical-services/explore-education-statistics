@@ -8,31 +8,18 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web;
+using System.Security.Claims;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Security;
 
 [Route("api")]
 [ApiController]
-public class SignInController : ControllerBase
+public class SignInController(
+    ILogger<SignInController> logger,
+    IHttpContextAccessor httpContextAccessor,
+    ISignInService signInService,
+    IUserService userService) : ControllerBase
 {
-    private readonly ILogger<SignInController> _logger;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly ISignInService _signInService;
-    private readonly IUserService _userService;
-
-    public SignInController(
-        ILogger<SignInController> logger,
-        IHttpContextAccessor httpContextAccessor,
-        ISignInService signInService,
-        IUserService userService
-    )
-    {
-        _logger = logger;
-        _httpContextAccessor = httpContextAccessor;
-        _signInService = signInService;
-        _userService = userService;
-    }
-
     [HttpPost("sign-in")]
     [AllowAnonymous]
     public async Task<ActionResult<SignInResponseViewModel>> RegisterOrSignIn()
@@ -40,32 +27,32 @@ public class SignInController : ControllerBase
         // Manually check that the user has the correct "access-admin-api" scope as provided by the Identity Provider
         // prior to accessing this endpoint.  It is not possible to do this via the Authorize attribute as the other
         // default policies still check to see if the user has been allocated a valid role at this point.
-        var authorizedByIdP = await _userService.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider);
+        var authorizedByIdP = await userService.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider);
         if (!authorizedByIdP)
         {
             return new ForbidResult();
         }
+        
+        var remoteUserId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimConstants.NameIdentifierId);
 
-        var remoteUserId = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimConstants.NameIdentifierId);
-
-        return await _signInService
+        return await signInService
             .RegisterOrSignIn()
             .OnFailureDo(_ =>
-                _logger.LogWarning("User with remote Id \"{UserId}\" " + "failed to sign in or register", remoteUserId)
+                logger.LogWarning("User with remote Id \"{UserId}\" " + "failed to sign in or register", remoteUserId)
             )
             .HandleFailuresOr(signInResponse =>
             {
                 switch (signInResponse.LoginResult)
                 {
                     case LoginResult.NoInvite:
-                        _logger.LogWarning("User with remote Id \"{UserId}\" had no invite to accept", remoteUserId);
+                        logger.LogWarning("User with remote Id \"{UserId}\" had no invite to accept", remoteUserId);
                         break;
                     case LoginResult.ExpiredInvite:
-                        _logger.LogWarning("User with remote Id \"{UserId}\" had an expired invite", remoteUserId);
+                        logger.LogWarning("User with remote Id \"{UserId}\" had an expired invite", remoteUserId);
                         break;
                 }
 
-                return new OkObjectResult(signInResponse);
+                return new ActionResult<SignInResponseViewModel>(signInResponse);
             });
     }
 }

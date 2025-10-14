@@ -10,7 +10,7 @@ public class UserTests
 
     public static TheoryData<bool, DateTime?, DateTimeOffset, bool> ExpiryData => new()
     {
-        // active, softDeletedDate, createdDate, expectShouldBeExpired
+        // active, softDeletedDate, createdDate, expectInviteHasExpired
 
         { false, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), true },
         { false, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
@@ -26,11 +26,11 @@ public class UserTests
 
     [Theory]
     [MemberData(nameof(ExpiryData))]
-    public void ShouldBeExpired(
+    public void InviteHasExpired(
         bool active, 
         DateTime? softDeletedDate, 
         DateTimeOffset createdDate, 
-        bool expectShouldBeExpired)
+        bool expectInviteHasExpired)
     {
         var user = _dataFixture.DefaultUser()
             .WithActive(active)
@@ -38,6 +38,30 @@ public class UserTests
             .WithCreated(createdDate)
             .Generate();
 
-        Assert.Equal(expectShouldBeExpired, user.ShouldBeExpired);
+        Assert.Equal(expectInviteHasExpired, user.InviteHasExpired);
+    }
+
+    [Theory]
+    [InlineData("", "", "")]
+    [InlineData(" ", " ", "")]
+    [InlineData("Joe", "", "Joe")]
+    [InlineData("Joe", " ", "Joe")]
+    [InlineData(" Joe ", "", "Joe")]
+    [InlineData("", "Smith", "Smith")]
+    [InlineData(" ", "Smith", "Smith")]
+    [InlineData("", " Smith ", "Smith")]
+    [InlineData("Joe", "Smith", "Joe Smith")]
+    [InlineData(" Joe ", " Smith ", "Joe Smith")]
+    public void DisplayName(
+        string? firstName,
+        string? lastName,
+        string expectedDisplayName)
+    {
+        var user = _dataFixture.DefaultUser()
+            .WithFirstName(firstName)
+            .WithLastName(lastName)
+            .Generate();
+
+        Assert.Equal(expectedDisplayName, user.DisplayName);
     }
 }

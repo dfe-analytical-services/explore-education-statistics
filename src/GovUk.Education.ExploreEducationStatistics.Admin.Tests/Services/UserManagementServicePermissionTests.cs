@@ -8,10 +8,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -25,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 public class UserManagementServicePermissionTests
 {
     private readonly DataFixture _dataFixture = new();
+    private static readonly Guid CreatedById = Guid.NewGuid();
 
     [Fact]
     public async Task ListAllUsers()
@@ -68,10 +69,11 @@ public class UserManagementServicePermissionTests
         await PolicyCheckBuilder<SecurityPolicies>()
             .ExpectCheckToFail(CanManageUsersOnSystem)
             .AssertForbidden(async userService =>
-            {
-                var service = SetupUserManagementService(userService: userService.Object);
-                return await service.GetUser(Guid.NewGuid());
-            });
+                {
+                    var service = SetupUserManagementService(userService: userService.Object);
+                    return await service.GetUser(Guid.NewGuid());
+                }
+            );
     }
 
     [Fact]
@@ -116,31 +118,102 @@ public class UserManagementServicePermissionTests
         await PolicyCheckBuilder<SecurityPolicies>()
             .ExpectCheckToFail(CanManageUsersOnSystem)
             .AssertForbidden(async userService =>
-            {
-                var service = SetupUserManagementService(userService: userService.Object);
-                return await service.UpdateUser(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
-            });
+                {
+                    var service = SetupUserManagementService(userService: userService.Object);
+                    return await service.UpdateUser(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+                }
+            );
     }
 
     [Fact]
-    public async Task Delete_User_Success()
+    public async Task DeleteUser_Success()
     {
-        await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
-        contentDbContext.Users.Add(_dataFixture.DefaultUser().WithEmail("ees-test.user@education.gov.uk"));
-        await contentDbContext.SaveChangesAsync();
+        var user = _dataFixture.DefaultUser()
+            .Generate();
+
+        var identityUser = new ApplicationUser
+        {
+            Email = user.Email,
+        };
+
+        var usersandRolesDbContextId = Guid.NewGuid().ToString();
+
+        await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersandRolesDbContextId))
+        {
+            usersAndRolesDbContext.Users.Add(identityUser);
+            await usersAndRolesDbContext.SaveChangesAsync();
+        }
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupCheck(CanManageUsersOnSystem)
             .AssertSuccess(async userService =>
-            {
-                userService.Setup(mock => mock.GetUserId()).Returns(Guid.NewGuid());
+                {
+                    await using var contentDbContext = InMemoryApplicationDbContext();
+                    await using var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersandRolesDbContextId);
 
-                var service = SetupUserManagementService(
-                    contentDbContext: contentDbContext,
-                    userService: userService.Object
-                );
-                return await service.DeleteUser("ees-test.user@education.gov.uk");
-            });
+                    userService.Setup(mock => mock.GetUserId())
+                        .Returns(CreatedById);        
+
+                    var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
+                    userPublicationInviteRepository
+                        .Setup(mock => mock.RemoveByUserEmail(user.Email, It.IsAny<CancellationToken>()))
+                        .Returns(Task.CompletedTask);
+
+                    var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
+                    userReleaseInviteRepository
+                        .Setup(mock => mock.RemoveByUserEmail(user.Email, It.IsAny<CancellationToken>()))
+                        .Returns(Task.CompletedTask);
+
+                    var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+                    userReleaseRoleRepository
+                        .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                        .Returns(Task.CompletedTask);
+
+                    var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+                    userPublicationRoleRepository
+                        .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
+                        .Returns(Task.CompletedTask);
+
+                    var userRepository = new Mock<IUserRepository>(Strict);
+                    userRepository
+                        .Setup(mock => mock.FindActiveUserByEmail(user.Email, It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(user);
+                    userRepository
+                        .Setup(mock => mock.SoftDeleteUser(
+                            It.Is<User>(u => u.Id == user.Id),
+                            CreatedById,
+                            It.IsAny<CancellationToken>()))
+                        .Returns(Task.CompletedTask);
+
+                    var userManager = MockUserManager();
+                    userManager
+                        .Setup(mock => mock.DeleteAsync(It.Is<ApplicationUser>(u => u.Id == identityUser.Id)))
+                        .ReturnsAsync(new IdentityResult());
+
+                    var service = SetupUserManagementService(
+                        contentDbContext: contentDbContext,
+                        usersAndRolesDbContext: usersAndRolesDbContext,
+                        userService: userService.Object,
+                        userRepository: userRepository.Object,
+                        userPublicationInviteRepository: userPublicationInviteRepository.Object,
+                        userReleaseInviteRepository: userReleaseInviteRepository.Object,
+                        userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                        userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                        userManager: userManager.Object);
+
+                    var result = await service.DeleteUser(user.Email);
+
+                    VerifyAllMocks(
+                        userRepository,
+                        userPublicationInviteRepository,
+                        userReleaseInviteRepository,
+                        userPublicationRoleRepository,
+                        userReleaseRoleRepository,
+                        userManager);
+
+                    return result;
+                }
+            );
     }
 
     private static UserManagementService SetupUserManagementService(
@@ -151,24 +224,14 @@ public class UserManagementServicePermissionTests
         IUserRoleService? userRoleService = null,
         IUserRepository? userRepository = null,
         IUserService? userService = null,
-        IUserInviteRepository? userInviteRepository = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null,
         IUserPublicationInviteRepository? userPublicationInviteRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-        UserManager<ApplicationUser>? userManager = null
-    )
+        UserManager<ApplicationUser>? userManager = null)
     {
         contentDbContext ??= InMemoryApplicationDbContext();
         usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
-        userRepository ??= new UserRepository(contentDbContext);
-
-        userReleaseRoleRepository ??= new UserReleaseRoleRepository(
-            contentDbContext,
-            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
-        );
-
-        userPublicationRoleRepository ??= new UserPublicationRoleRepository(contentDbContext);
 
         return new UserManagementService(
             usersAndRolesDbContext,
@@ -176,17 +239,12 @@ public class UserManagementServicePermissionTests
             usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
             emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
-            userRepository,
-            userService ?? AlwaysTrueUserService().Object,
-            userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
-            userReleaseInviteRepository
-                ?? new UserReleaseInviteRepository(
-                    contentDbContext: contentDbContext,
-                    logger: Mock.Of<ILogger<UserReleaseInviteRepository>>()
-                ),
-            userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext),
-            userReleaseRoleRepository,
-            userPublicationRoleRepository,
+            userRepository ?? Mock.Of<IUserRepository>(Strict),
+            userService ?? AlwaysTrueUserService(CreatedById).Object,
+            userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict),
+            userPublicationInviteRepository ?? Mock.Of<IUserPublicationInviteRepository>(Strict),
+            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
             userManager ?? MockUserManager().Object
         );
     }
