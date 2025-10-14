@@ -139,47 +139,49 @@ const PublicationReleasePage = ({
         releaseVersionId={releaseVersionSummary.id}
       />
 
-      {isMobileMedia ? (
-        <Accordion
-          className="govuk-!-margin-top-9"
-          id="content"
-          onSectionOpen={accordionSection => {
-            logEvent({
-              category: `${publicationSummary.title} release page`,
-              action: `Content accordion opened`,
-              label: `${accordionSection.title}`,
-            });
-          }}
-        >
-          {content.map(({ heading, id, content: sectionContent }) => {
-            return (
-              <AccordionSection heading={heading} key={id}>
-                {({ open }) => (
-                  <PublicationSectionBlocks
-                    blocks={sectionContent}
-                    releaseVersionId={releaseVersionSummary.id}
-                    visible={open}
-                  />
-                )}
-              </AccordionSection>
-            );
-          })}
-        </Accordion>
-      ) : (
-        content.map(({ heading, id, content: sectionContent }) => (
-          <ReleasePageContentSection
-            heading={heading}
-            key={id}
-            id={generateIdFromHeading(heading)}
+      <div id="content" data-testid="home-content">
+        {isMobileMedia ? (
+          <Accordion
+            className="govuk-!-margin-top-9"
+            id="accordion-content"
+            onSectionOpen={accordionSection => {
+              logEvent({
+                category: `${publicationSummary.title} release page`,
+                action: `Content accordion opened`,
+                label: `${accordionSection.title}`,
+              });
+            }}
           >
-            <PublicationSectionBlocks
-              blocks={sectionContent}
-              releaseVersionId={releaseVersionSummary.id}
-              visible
-            />
-          </ReleasePageContentSection>
-        ))
-      )}
+            {content.map(({ heading, id, content: sectionContent }) => {
+              return (
+                <AccordionSection heading={heading} key={id}>
+                  {({ open }) => (
+                    <PublicationSectionBlocks
+                      blocks={sectionContent}
+                      releaseVersionId={releaseVersionSummary.id}
+                      visible={open}
+                    />
+                  )}
+                </AccordionSection>
+              );
+            })}
+          </Accordion>
+        ) : (
+          content.map(({ heading, id, content: sectionContent }) => (
+            <ReleasePageContentSection
+              heading={heading}
+              key={id}
+              id={generateIdFromHeading(heading)}
+            >
+              <PublicationSectionBlocks
+                blocks={sectionContent}
+                releaseVersionId={releaseVersionSummary.id}
+                visible
+              />
+            </ReleasePageContentSection>
+          ))
+        )}
+      </div>
 
       <ContactUsSection
         publicationContact={publicationSummary.contact}

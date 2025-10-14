@@ -80,6 +80,7 @@ const PublicationReleaseHeadlinesSection = ({
     <ReleasePageContentSection
       heading="Headline facts and figures"
       id="headlines-section"
+      testId="headlines-section"
     >
       {!keyStatisticsSecondarySection.content.length ? (
         summaryTab
