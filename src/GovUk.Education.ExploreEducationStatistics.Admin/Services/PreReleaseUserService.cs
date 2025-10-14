@@ -196,7 +196,7 @@ public class PreReleaseUserService(
 
         return await context.RequireTransaction(async () =>
         {
-            var user = await userRepository.CreateOrUpdate(
+            await userRepository.CreateOrUpdate(
                 email: email,
                 role: Role.PrereleaseUser,
                 createdById: userService.GetUserId());

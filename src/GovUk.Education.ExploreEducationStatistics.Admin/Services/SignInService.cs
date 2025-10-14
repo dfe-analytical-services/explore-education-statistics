@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +47,7 @@ public class SignInService(
         var userInvitedToSystem = await contentDbContext
             .Users
             .Include(i => i.Role)
-            .Where(u => u.IsPendingInvite)
+            .WhereIsPendingInvite()
             .Where(u => u.Email.ToLower() == profile.Email.ToLower())
             .SingleOrDefaultAsync();
 
@@ -66,9 +67,9 @@ public class SignInService(
         UserProfileFromClaims profile
     )
     {
-        if (userInvitedToSystem.ShouldBeExpired)
+        if (userInvitedToSystem.InviteHasExpired)
         {
-            await HandleExpiredInvite(userInvitedToSystem, profile.Email);
+            await HandleExpiredInvite(profile.Email);
             return new SignInResponseViewModel(LoginResult.ExpiredInvite);
         }
 
@@ -147,16 +148,12 @@ public class SignInService(
         await userPublicationInviteRepository.RemoveByUserEmail(email);
     }
 
-    private async Task HandleExpiredInvite(
-        User inviteToSystem,
-        string email)
+    private async Task HandleExpiredInvite(string email)
     {
         await contentDbContext.RequireTransaction(async () =>
         {
             await userReleaseInviteRepository.RemoveByUserEmail(email);
             await userPublicationInviteRepository.RemoveByUserEmail(email);
-
-            inviteToSystem.SoftDeleted = DateTime.UtcNow;
 
             await contentDbContext.SaveChangesAsync();
         });

@@ -100,6 +100,13 @@ public static class ActionResultTestUtils
         Assert.Equal(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
     }
 
+    public static void AssertInternalServerError<T>(this ActionResult<T> result)
+    {
+        var statusCodeResult = Assert.IsType<StatusCodeResult>(result.Result);
+
+        Assert.Equal(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
+    }
+
     public static void AssertValidationProblem<T>(this ActionResult<T> result, params Enum[] expectedErrorCodes)
     {
         Assert.NotNull(result.Result);

@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Identity;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -11,21 +12,21 @@ public class User : ICreatedTimestamp<DateTimeOffset>
 
     public Guid Id { get; set; }
 
-    public string FirstName { get; set; } = null!;
+    public string? FirstName { get; set; }
 
-    public string LastName { get; set; } = null!;
+    public string? LastName { get; set; }
 
     public required string Email { get; set; }
 
     public Guid? DeletedById { get; set; }
 
-    public User DeletedBy { get; set; } = null!;
+    public User? DeletedBy { get; set; }
 
     public DateTime? SoftDeleted { get; set; }
 
     public required bool Active { get; set; }
 
-    public IdentityRole Role { get; set; } = null!;
+    public IdentityRole? Role { get; set; }
 
     public required string RoleId { get; set; }
 
@@ -35,10 +36,8 @@ public class User : ICreatedTimestamp<DateTimeOffset>
 
     public required Guid CreatedById { get; set; }
 
-    public string DisplayName => $"{FirstName} {LastName}".Trim();
+    public string DisplayName => $"{FirstName?.Trim()} {LastName?.Trim()}".Trim();
 
-    public bool IsPendingInvite => !Active && !SoftDeleted.HasValue;
-
-    public bool ShouldBeExpired => IsPendingInvite &&
+    public bool InviteHasExpired => this.IsPendingInvite() &&
                                 Created < DateTimeOffset.UtcNow.AddDays(-InviteExpiryDurationDays);
 }

@@ -10,15 +10,22 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class UserRepository(
-    ContentDbContext contentDbContext, 
-    UsersAndRolesDbContext usersAndRolesDbContext) : IUserRepository
+    ContentDbContext contentDbContext) : IUserRepository
 {
+    public async Task<User?> FindActiveUserByEmail(string email, CancellationToken cancellationToken = default)
+    {
+        return await contentDbContext.Users
+            .Where(u => u.Email.ToLower().Equals(email.ToLower()))
+            .Where(u => u.Active)
+            .SingleOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<User?> FindByEmail(string email, CancellationToken cancellationToken = default)
     {
-        return await contentDbContext.Users.SingleOrDefaultAsync(
-            u => u.Email.ToLower().Equals(email.ToLower()) && u.SoftDeleted == null,
-            cancellationToken
-        );
+        return await contentDbContext.Users
+            .Where(u => u.Email.ToLower().Equals(email.ToLower()))
+            .Where(u => u.SoftDeleted == null)
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
     public async Task<User> FindDeletedUserPlaceholder(CancellationToken cancellationToken = default)
@@ -34,56 +41,103 @@ public class UserRepository(
         string email,
         Role role,
         Guid createdById,
-        DateTime? createdDate = null)
-        => await CreateOrUpdate(email, role.GetEnumValue(), createdById, createdDate);
+        DateTimeOffset? createdDate = null,
+        CancellationToken cancellationToken = default)
+        => await CreateOrUpdate(
+            email: email,
+            roleId: role.GetEnumValue(),
+            createdById: createdById,
+            createdDate: createdDate,
+            cancellationToken: cancellationToken);
 
     public async Task<User> CreateOrUpdate(
         string email,
         string roleId,
         Guid createdById,
-        DateTime? createdDate = null)
+        DateTimeOffset? createdDate = null,
+        CancellationToken cancellationToken = default)
     {
-        if (await IdentityUserAlreadyExists(email))
-        {
-            throw new ArgumentException($"{nameof(User)} with email {email} already exists.");
-        }
-
-        if (createdDate > DateTime.UtcNow)
+        if (createdDate > DateTimeOffset.UtcNow)
         {
             throw new ArgumentException($"{nameof(User)} created date cannot be a future date.");
         }
 
-        var user = await contentDbContext
+        var existingUser = await contentDbContext
             .Users
             .SingleOrDefaultAsync(i => i.Email.ToLower().Equals(email.ToLower()));
 
-        if (user != null)
+        if (existingUser is null)
         {
-            user.RoleId = roleId;
-            user.CreatedById = createdById;
-            user.Created = createdDate ?? DateTime.UtcNow;
-            user.SoftDeleted = null;
-            user.DeletedById = null;
-        }
-        else
-        {
-            user = new User
-            {
-                Email = email.ToLower(),
-                RoleId = roleId,
-                Active = false,
-                CreatedById = createdById,
-                Created = createdDate ?? DateTime.UtcNow,
-            };
-
-            contentDbContext.Users.Add(user);
+            return await CreateNewUser(
+                email: email,
+                roleId: roleId,
+                createdById: createdById,
+                createdDate: createdDate,
+                cancellationToken: cancellationToken);
         }
 
-        await contentDbContext.SaveChangesAsync();
-        return user;
+        return existingUser.Active
+            ? throw new InvalidOperationException("Cannot create or update a user that is active.")
+            : await UpdateExistingUser(
+                existingUser: existingUser,
+                roleId: roleId,
+                createdById: createdById,
+                createdDate: createdDate,
+                cancellationToken: cancellationToken);
     }
 
-    private async Task<bool> IdentityUserAlreadyExists(string email)
-        => await usersAndRolesDbContext.Users
-            .AnyAsync(u => u.Email!.ToLower().Equals(email.ToLower()));
+    public async Task SoftDeleteUser(
+        User activeUser,
+        Guid deletedById,
+        CancellationToken cancellationToken = default)
+    {
+        contentDbContext.Attach(activeUser);
+
+        activeUser.Active = false;
+        activeUser.SoftDeleted = DateTime.UtcNow;
+        activeUser.DeletedById = deletedById;
+
+        await contentDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task<User> UpdateExistingUser(
+        User existingUser,
+        string roleId,
+        Guid createdById,
+        DateTimeOffset? createdDate,
+        CancellationToken cancellationToken)
+    {
+        existingUser.RoleId = roleId;
+        existingUser.CreatedById = createdById;
+        existingUser.Created = createdDate ?? DateTimeOffset.UtcNow;
+        existingUser.SoftDeleted = null;
+        existingUser.DeletedById = null;
+        existingUser.FirstName = null;
+        existingUser.LastName = null;
+
+        await contentDbContext.SaveChangesAsync(cancellationToken);
+        return existingUser;
+    }
+
+    private async Task<User> CreateNewUser(
+        string email,
+        string roleId,
+        Guid createdById,
+        DateTimeOffset? createdDate,
+        CancellationToken cancellationToken)
+    {
+        var newUser = new User
+        {
+            Email = email.ToLower(),
+            RoleId = roleId,
+            Active = false,
+            CreatedById = createdById,
+            Created = createdDate ?? DateTimeOffset.UtcNow,
+        };
+
+        contentDbContext.Users.Add(newUser);
+
+        await contentDbContext.SaveChangesAsync(cancellationToken);
+        return newUser;
+    }
 }

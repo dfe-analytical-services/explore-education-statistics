@@ -6,18 +6,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IUserRepository
 {
+    Task<User?> FindActiveUserByEmail(string email, CancellationToken cancellationToken = default);
+
     Task<User?> FindByEmail(string email, CancellationToken cancellationToken = default);
+
     Task<User> FindDeletedUserPlaceholder(CancellationToken cancellationToken = default);
 
     Task<User> CreateOrUpdate(
         string email,
         Role role,
         Guid createdById,
-        DateTime? createdDate = null);
+        DateTimeOffset? createdDate = null,
+        CancellationToken cancellationToken = default);
 
     Task<User> CreateOrUpdate(
         string email,
         string roleId,
         Guid createdById,
-        DateTime? createdDate = null);
+        DateTimeOffset? createdDate = null,
+        CancellationToken cancellationToken = default);
+
+    Task SoftDeleteUser(
+        User activeUser,
+        Guid deletedById,
+        CancellationToken cancellationToken = default);
 }

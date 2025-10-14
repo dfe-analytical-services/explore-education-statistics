@@ -18,9 +18,11 @@ public class BootstrapUsersService(
         var bauBootstrapUserEmailAddresses = configuration
             .GetSection("BootstrapUsers")?
             .GetValue<string>("BAU")?
-            .Split(',');
+            .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(email => email.Trim())
+            .Where(email => !email.IsNullOrWhitespace());
 
-        if (bauBootstrapUserEmailAddresses.IsNullOrEmpty())
+       if (bauBootstrapUserEmailAddresses.IsNullOrEmpty())
         {
             return;
         }
