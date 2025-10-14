@@ -1,6 +1,6 @@
 import { abbreviations } from '../../common/abbreviations.bicep'
 import { ResourceNames } from '../types.bicep'
-import { IpRange, StorageAccountConfig } from '../../common/types.bicep'
+import { IpRange } from '../../common/types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
