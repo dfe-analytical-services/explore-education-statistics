@@ -123,7 +123,6 @@ export default function MapBlock({
   meta,
   legend,
   position = { lat: 53.00986, lng: -3.2524038 },
-  width,
   height,
   axes,
   title,
@@ -308,7 +307,6 @@ export default function MapBlock({
           </a>
           <MapContainer
             style={{
-              width: (width && `${width}px`) || '100%',
               height: `${height || 600}px`,
             }}
             className={classNames(styles.map, 'dfe-print-break-avoid')}
@@ -319,7 +317,6 @@ export default function MapBlock({
             <MapGeoJSON
               dataSetCategoryConfigs={dataSetCategoryConfigs}
               features={features}
-              width={width}
               height={height}
               selectedDataSetKey={selectedDataSetKey}
               selectedFeature={selectedFeature}

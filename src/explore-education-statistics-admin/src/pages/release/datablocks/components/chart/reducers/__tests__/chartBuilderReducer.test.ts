@@ -405,7 +405,6 @@ describe('chartBuilderReducer', () => {
         type: 'UPDATE_CHART_OPTIONS',
         payload: {
           height: 500,
-          width: 400,
           subtitle: 'Test subtitle',
           title: 'Test title',
           titleType: 'alternative',
@@ -422,7 +421,6 @@ describe('chartBuilderReducer', () => {
 
       expect(nextState.options).toEqual<ChartOptions>({
         height: 500,
-        width: 400,
         subtitle: 'Test subtitle',
         title: 'Test title',
         titleType: 'alternative',
@@ -447,7 +445,6 @@ describe('chartBuilderReducer', () => {
         type: 'UPDATE_CHART_OPTIONS',
         payload: {
           height: 500,
-          width: 400,
           subtitle: '',
           title: '',
           titleType: 'default',
@@ -464,7 +461,6 @@ describe('chartBuilderReducer', () => {
 
       expect(nextState.options).toEqual<ChartOptions>({
         height: 500,
-        width: 400,
         subtitle: '',
         title: '',
         titleType: 'default',
@@ -478,7 +474,6 @@ describe('chartBuilderReducer', () => {
         ...initialState,
         options: {
           height: 300,
-          width: 400,
           subtitle: '',
           title: '',
           titleType: 'default',
@@ -490,7 +485,6 @@ describe('chartBuilderReducer', () => {
         type: 'UPDATE_CHART_OPTIONS',
         payload: {
           height: 300,
-          width: undefined,
           subtitle: '',
           title: '',
           titleType: 'default',
@@ -826,7 +820,6 @@ describe('chartBuilderReducer', () => {
           subtitle: '',
           title: 'Table title',
           titleType: 'default',
-          width: undefined,
         },
         legend: {
           position: 'top',
@@ -935,7 +928,6 @@ describe('chartBuilderReducer', () => {
           subtitle: '',
           title: 'Table title',
           titleType: 'default',
-          width: undefined,
         },
         legend: {
           position: 'top',
@@ -1125,7 +1117,6 @@ describe('chartBuilderReducer', () => {
           subtitle: '',
           title: 'Chart title',
           titleType: 'alternative',
-          width: undefined,
         },
         legend: {
           position: 'top',

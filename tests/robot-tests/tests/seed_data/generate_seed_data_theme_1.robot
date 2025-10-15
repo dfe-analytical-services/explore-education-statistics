@@ -209,7 +209,7 @@ Add line chart to ${RELEASE_1_NAME}
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
     user waits until table is visible
     user clicks edit data block link    Key Stats aggregate table
-    user configures basic chart    Line    500    800    Some alt text    A subtitle
+    user configures basic chart    Line    500    Some alt text    A subtitle
     user selects all data sets for chart
     user clicks link    Legend
     user chooses select option    id:chartLegendConfigurationForm-position    Top
@@ -649,7 +649,7 @@ Add line chart 1 to ${RELEASE_2_NAME}
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
     user waits until table is visible
     user clicks edit data block link    Generic data block 1
-    user configures basic chart    Line    500    800    Some alt text    A subtitle
+    user configures basic chart    Line    500    Some alt text    A subtitle
     user selects all data sets for chart
     user clicks link    Legend
     user chooses select option    id:chartLegendConfigurationForm-position    Top
@@ -663,7 +663,7 @@ Add line chart 2 to ${RELEASE_2_NAME}
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
     user waits until table is visible
     user clicks edit data block link    Generic data block 2
-    user configures basic chart    Line    500    800    Some alt text    A subtitle
+    user configures basic chart    Line    500    Some alt text    A subtitle
     user selects all data sets for chart
     user clicks link    Legend
     user chooses select option    id:chartLegendConfigurationForm-position    Top
@@ -677,7 +677,7 @@ Add line chart 3 to ${RELEASE_2_NAME}
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
     user waits until table is visible
     user clicks edit data block link    Key Stats aggregate table
-    user configures basic chart    Line    500    800    Some alt text    A subtitle
+    user configures basic chart    Line    500    Some alt text    A subtitle
     user selects all data sets for chart
     user clicks link    Legend
     user chooses select option    id:chartLegendConfigurationForm-position    Top

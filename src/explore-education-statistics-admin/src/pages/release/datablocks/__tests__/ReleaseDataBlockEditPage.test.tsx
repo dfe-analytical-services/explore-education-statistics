@@ -22,6 +22,7 @@ import { waitFor } from '@testing-library/dom';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { produce } from 'immer';
+import { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router';
 import { generatePath, Route } from 'react-router-dom';
 
@@ -49,13 +50,32 @@ jest.mock('@common/hooks/useMedia', () => ({
   },
 }));
 
+// Responsive charts don't render in tests so have do
+// mock the responsive container and apply a fixed width.
+jest.mock('recharts', () => {
+  const OriginalModule = jest.requireActual('recharts');
+  return {
+    ...OriginalModule,
+    ResponsiveContainer: ({
+      children,
+      height,
+    }: {
+      children: ReactNode;
+      height: string;
+    }) => (
+      <OriginalModule.ResponsiveContainer width={800} height={height}>
+        {children}
+      </OriginalModule.ResponsiveContainer>
+    ),
+  };
+});
+
 describe('ReleaseDataBlockEditPage', () => {
   const chart: Chart = {
     title: 'Test chart title',
     alt: 'Test chart alt',
     type: 'verticalbar',
     height: 300,
-    width: 600,
     axes: {
       major: {
         type: 'major',

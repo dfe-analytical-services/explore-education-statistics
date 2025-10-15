@@ -54,7 +54,7 @@ Create chart for data block
     user waits until page finishes loading
     user clicks link    Chart
 
-    user configures basic chart    Geographic    600    600    map chart alt    map chart subtitle
+    user configures basic chart    Geographic    600    map chart alt    map chart subtitle
     user selects all data sets for chart
     user waits until page contains element    id:chartBuilderPreview
     user clicks link    Boundary levels
