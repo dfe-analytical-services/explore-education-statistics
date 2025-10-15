@@ -175,7 +175,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             {
                 { DateTimeOffset.UtcNow.AddDays(-2), DateTimeOffset.UtcNow.AddDays(2), InvalidActivatesInPast }, // Start date is in the past and therefore is out of range.
                 { DateTimeOffset.UtcNow.AddDays(8), DateTimeOffset.UtcNow.AddDays(9), InvalidActivatesOutOfBound },
-                { DateTimeOffset.UtcNow.AddDays(6), DateTimeOffset.UtcNow.AddDays(14), InvalidExpiryOutOfBound }, // Duration is longer than 7 days and therefore is out of range.
+                { DateTimeOffset.UtcNow.AddDays(6), DateTimeOffset.UtcNow.AddDays(14), InvalidExpiryOutOfBound }, // Duration is longer than 8 days and therefore is out of range.
                 { DateTimeOffset.UtcNow.AddDays(6), DateTimeOffset.UtcNow.AddDays(3), InvalidExpiryBeforeActivates },
                 { null, DateTimeOffset.UtcNow.AddDays(-1), InvalidExpiryInPast },
                 { null, DateTimeOffset.UtcNow.AddDays(14), InvalidExpiryLessThan7DaysFromToday },
