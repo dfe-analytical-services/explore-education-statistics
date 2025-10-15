@@ -108,8 +108,16 @@ describe('ReleaseApiDataSetPreviewPage', () => {
 
     expect(previewTokenService.createPreviewToken).toHaveBeenCalledWith({
       dataSetVersionId: 'draft-version-id',
+      activates: expect.any(Date),
+      expires: expect.any(Date),
       label: 'Test label',
     });
+
+    const [[args]] = (previewTokenService.createPreviewToken as jest.Mock).mock
+      .calls;
+    expect(args.expires.getTime() - args.activates.getTime()).toBe(
+      24 * 60 * 60 * 1000,
+    ); // Assert token activates and expires within 24 hours
 
     await waitFor(() => {
       expect(history.location.pathname).toBe(
