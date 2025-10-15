@@ -12,6 +12,8 @@ public static class HostBuilderTestExtensions
     {
         return hostBuilder.ConfigureAppConfiguration(s =>
         {
+            Environment.SetEnvironmentVariable("ConnectionStrings__ContentDb", "TestContentDbConnectionString"); // To satisfy the test ContainerRegistrationTests.EnsureSUTCanBeResolved
+
             var configuration = new Dictionary<string, string>
             {
                 { "PublicDataDbExists", "false" },
