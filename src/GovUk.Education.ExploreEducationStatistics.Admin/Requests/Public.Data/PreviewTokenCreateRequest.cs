@@ -58,7 +58,7 @@ public record PreviewTokenCreateRequest
                                     .Cascade(CascadeMode.Stop)
                                     .Must((r, expires) => expires > r.Activates)
                                     .WithMessage("Expires date must be after the activates date.")
-                                    .Must((r, expires) => expires!.Value.Date <= r.Activates!.Value.AddDays(7).Date) // ignore the time when comparing with the 7 days after 'Activates'
+                                    .Must((r, expires) => expires!.Value.Date <= r.Activates!.Value.AddDays(7).Date) // ignore the time when comparing with the 7 days after 'Activates'. This is because the activates date may contain a time value (for example 8am, 5pm) that we don't want to include in the calculation as the expiry time is going to be the end of the day.
                                     .WithMessage("Expires date must be no more than 7 days after the activates date.");
                             }
                         )
