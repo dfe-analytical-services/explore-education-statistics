@@ -1,6 +1,6 @@
 import MapLegend from '@common/modules/charts/components/MapLegend';
 import { MapLegendItem } from '@common/modules/charts/types/chart';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import React from 'react';
 
 describe('MapLegend', () => {
@@ -40,15 +40,16 @@ describe('MapLegend', () => {
 
   test('renders a span with hex and colour name for each legend item', () => {
     render(
-      <MapLegend
-        heading="Test heading"
-        legendDataGroups={testLegendDataGroups}
-      />,
+      <MapLegend heading="Test heading" legendItems={testMapLegendItems} />,
     );
 
     const spans = screen.getAllByTestId('mapBlock-legend-item');
     expect(spans).toHaveLength(2);
-    expect(spans[0]).toHaveTextContent('map colour #808080 (Gray)');
-    expect(spans[1]).toHaveTextContent('map colour #000000 (Black)');
+    expect(within(spans[0]).getByRole('term')).toHaveTextContent(
+      'map colour rgb(128, 128, 128) (Gray)',
+    );
+    expect(within(spans[1]).getByRole('term')).toHaveTextContent(
+      'map colour rgb(0, 0, 0) (Black)',
+    );
   });
 });
