@@ -5,6 +5,7 @@ import noop from 'lodash/noop';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { AuthContext } from '@admin/contexts/AuthContext';
 import React from 'react';
+import { PreviewTokenCreateValues } from '@admin/pages/release/data/types/PreviewTokenCreateValues';
 
 const defaultPermissions = {
   isBauUser: true,
@@ -83,7 +84,13 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
 
     await waitFor(() => expect(handleSubmit).toHaveBeenCalledTimes(1));
 
-    expect(handleSubmit).toHaveBeenCalledWith('Test label', null, null, null);
+    const handleSubmitParam: PreviewTokenCreateValues = {
+      activates: null,
+      datePresetSpan: null,
+      expires: null,
+      label: 'Test label',
+    };
+    expect(handleSubmit).toHaveBeenCalledWith(handleSubmitParam);
   });
 
   test('submitting form with validation error does not call `onSubmit` handler', async () => {

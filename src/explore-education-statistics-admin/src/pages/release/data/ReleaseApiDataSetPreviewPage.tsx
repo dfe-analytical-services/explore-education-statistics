@@ -58,7 +58,7 @@ export default function ReleaseApiDataSetPreviewPage() {
     if (!dataSet?.draftVersion) {
       return;
     }
-    if (datePresetSpan > 0) {
+    if (datePresetSpan && datePresetSpan > 0) {
       startDate = new Date();
       endDate = getPresetSpanEndDate(datePresetSpan);
     } else if (activates && expires) {
