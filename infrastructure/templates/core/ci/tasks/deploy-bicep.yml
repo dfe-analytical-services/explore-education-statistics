@@ -1,0 +1,37 @@
+parameters:
+  - name: action
+    type: string
+    default: create
+    values:
+      - create
+      - validate
+  - name: displayName
+    type: string
+  - name: serviceConnection
+    type: string
+  - name: parameterFile
+    type: string
+
+steps:
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayName }}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      addSpnToEnvironment: true
+      inlineScript: |
+        set -e
+
+        # Workaround for AZ CLI 2.71.x breaks bicep deployments when using Azure Devops Agent
+        # See https://github.com/Azure/azure-cli/issues/31189
+        az config set bicep.use_binary_from_path=false
+
+        az deployment group ${{ parameters.action }} \
+          --name $(infraDeployName) \
+          --resource-group $(resourceGroupName) \
+          --template-file $(templateFile) \
+          --parameters ${{ parameters.parameterFile }} \
+          --parameters \
+              subscription='$(subscription)' \
+              resourceTags='$(resourceTags)'

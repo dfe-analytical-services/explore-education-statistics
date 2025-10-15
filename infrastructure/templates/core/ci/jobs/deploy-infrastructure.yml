@@ -1,0 +1,38 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: bicepParamFile
+    type: string
+
+jobs:
+  - deployment: DeployCoreInfrastructure
+    displayName: Deploy Core infrastructure
+    environment: ${{ parameters.environment }}
+    variables:
+      templateDirectory: $(Build.SourcesDirectory)/infrastructure/templates/core
+      templateFile: $(templateDirectory)/main.bicep
+      paramDirectory: $(templateDirectory)/parameters
+      paramFile: $(paramDirectory)/main-${{ parameters.bicepParamFile }}.bicepparam
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml
+
+            - template: ../tasks/deploy-bicep.yml
+              parameters:
+                displayName: Validate Bicep template
+                action: validate
+                serviceConnection: ${{ parameters.serviceConnection }}
+                parameterFile: $(paramFile)
+
+            - template: ../tasks/deploy-bicep.yml
+              parameters:
+                displayName: Deploy Bicep template
+                action: create
+                serviceConnection: ${{ parameters.serviceConnection }}
+                parameterFile: $(paramFile)
