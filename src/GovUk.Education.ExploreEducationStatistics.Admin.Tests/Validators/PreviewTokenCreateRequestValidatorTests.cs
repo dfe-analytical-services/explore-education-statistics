@@ -90,7 +90,9 @@ public class PreviewTokenCreateRequestValidatorTests
     [Theory]
     [InlineData("2025-10-03T00:00:00 +00:00", "2025-10-03T00:00:00 +00:00", false)]
     [InlineData("2025-10-03T00:00:00 +00:00", "2025-10-03T00:00:01 +00:00", true)]
-    [InlineData("2025-10-03T00:00:00 +00:00", "2025-10-10T23:59:59 +00:00", true)]
+    [InlineData("2025-10-03T00:00:00 +00:00", "2025-10-10T23:59:59 +00:00", true)] // This isn't strictly 7 days, it exceeds 7 days by just under a day.
+    // So the boundary instead of it being 2025-10-10T00:00:00 +00:00, it is exceeds this by 23:59:59 hours. This is by design.
+    // Because the user can't select the time when they are providing a date input for the expiry date, the frontend sets the expiry time as 23:59:59.
     public void Expires_BetweenActivatesAndActivatesPlus7Days_Passes(string activates, string expires, bool passes)
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());

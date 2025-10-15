@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -35,32 +34,32 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
     {
         public record CreatePreviewTokenValidationError(string Message, string Path);
 
-        private static readonly CreatePreviewTokenValidationError InvalidExpiryErrorOutOfBound = new(
+        private static readonly CreatePreviewTokenValidationError InvalidExpiryOutOfBound = new(
             Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
             Message: "Expires date must be no more than 7 days after the activates date."
         );
 
-        private static readonly CreatePreviewTokenValidationError InvalidExpiryErrorBeforeActivates = new(
+        private static readonly CreatePreviewTokenValidationError InvalidExpiryBeforeActivates = new(
             Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
             Message: "Expires date must be after the activates date."
         );
 
-        private static readonly CreatePreviewTokenValidationError InvalidExpiryErrorInPast = new(
+        private static readonly CreatePreviewTokenValidationError InvalidExpiryInPast = new(
             Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
             Message: "Expires date must not be in the past."
         );
 
-        private static readonly CreatePreviewTokenValidationError InvalidExpiryErrorLessThan7DaysFromToday = new(
+        private static readonly CreatePreviewTokenValidationError InvalidExpiryLessThan7DaysFromToday = new(
             Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
             Message: "Expires date must be no more than 7 days from today."
         );
 
-        private static readonly CreatePreviewTokenValidationError InvalidActivatesErrorOutOfBound = new(
+        private static readonly CreatePreviewTokenValidationError InvalidActivatesOutOfBound = new(
             Path: nameof(PreviewTokenCreateRequest.Activates).ToLowerFirst(),
             Message: "Activates date must be within the next 7 days."
         );
 
-        private static readonly CreatePreviewTokenValidationError InvalidActivatesErrorInPast = new(
+        private static readonly CreatePreviewTokenValidationError InvalidActivatesInPast = new(
             Path: nameof(PreviewTokenCreateRequest.Activates).ToLowerFirst(),
             Message: "Activates date must not be in the past."
         );
@@ -84,7 +83,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 () => Assert.Equal(PreviewTokenStatus.Active, viewModel.Status),
                 () => Assert.Equal(CreatedByBauUser.Email, viewModel.CreatedByEmail),
                 () => viewModel.Created.AssertUtcNow(),
-                () => viewModel.Activates.AssertEqual(viewModel.Created),
+                () => viewModel.Activates.AssertUtcNow(),
                 () => viewModel.Expires.AssertEqual(sevenDaysFromNow),
                 () => Assert.Null(viewModel.Updated)
             );
@@ -174,16 +173,12 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         > CustomDateOutOfRangeData =>
             new()
             {
-                { DateTimeOffset.UtcNow.AddDays(-2), DateTimeOffset.UtcNow.AddDays(2), InvalidActivatesErrorInPast }, // Start date is in the past and therefore is out of range.
-                { DateTimeOffset.UtcNow.AddDays(8), DateTimeOffset.UtcNow.AddDays(9), InvalidActivatesErrorOutOfBound },
-                { DateTimeOffset.UtcNow.AddDays(6), DateTimeOffset.UtcNow.AddDays(14), InvalidExpiryErrorOutOfBound }, // Duration is longer than 7 days and therefore is out of range.
-                {
-                    DateTimeOffset.UtcNow.AddDays(6),
-                    DateTimeOffset.UtcNow.AddDays(3),
-                    InvalidExpiryErrorBeforeActivates
-                },
-                { null, DateTimeOffset.UtcNow.AddDays(-1), InvalidExpiryErrorInPast },
-                { null, DateTimeOffset.UtcNow.AddDays(14), InvalidExpiryErrorLessThan7DaysFromToday },
+                { DateTimeOffset.UtcNow.AddDays(-2), DateTimeOffset.UtcNow.AddDays(2), InvalidActivatesInPast }, // Start date is in the past and therefore is out of range.
+                { DateTimeOffset.UtcNow.AddDays(8), DateTimeOffset.UtcNow.AddDays(9), InvalidActivatesOutOfBound },
+                { DateTimeOffset.UtcNow.AddDays(6), DateTimeOffset.UtcNow.AddDays(14), InvalidExpiryOutOfBound }, // Duration is longer than 7 days and therefore is out of range.
+                { DateTimeOffset.UtcNow.AddDays(6), DateTimeOffset.UtcNow.AddDays(3), InvalidExpiryBeforeActivates },
+                { null, DateTimeOffset.UtcNow.AddDays(-1), InvalidExpiryInPast },
+                { null, DateTimeOffset.UtcNow.AddDays(14), InvalidExpiryLessThan7DaysFromToday },
             };
 
         [Theory]

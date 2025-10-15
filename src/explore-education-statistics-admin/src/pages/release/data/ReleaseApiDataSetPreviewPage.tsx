@@ -42,6 +42,7 @@ export default function ReleaseApiDataSetPreviewPage() {
     }
 
     fromDate.setDate(fromDate.getDate() + days);
+    fromDate.setHours(23, 59, 59);
     return fromDate;
   }
 
