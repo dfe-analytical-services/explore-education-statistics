@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
