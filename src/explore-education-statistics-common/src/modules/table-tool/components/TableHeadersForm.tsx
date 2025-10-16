@@ -228,7 +228,7 @@ export default function TableHeadersForm({ onSubmit, initialValues }: Props) {
         <>
           {!showTableHeadersForm ? (
             <Button
-              className={styles.button}
+              className="govuk-!-margin-bottom-2"
               ariaControls={id}
               ariaExpanded={showTableHeadersForm}
               onClick={toggleShowTableHeadersForm}

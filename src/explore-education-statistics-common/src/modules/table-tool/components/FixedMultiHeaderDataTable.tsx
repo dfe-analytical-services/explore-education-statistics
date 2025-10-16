@@ -18,6 +18,7 @@ interface Props extends OmitStrict<MultiHeaderTableProps, 'ariaLabelledBy'> {
   footnotesId: string;
   source?: string;
   footnotesHeadingHiddenText?: string;
+  tableHeadersForm?: ReactNode;
 }
 
 const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
@@ -31,6 +32,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
       footnotesId,
       source,
       footnotesHeadingHiddenText,
+      tableHeadersForm,
     } = props;
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -74,6 +76,8 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
     return (
       <figure className={styles.figure} ref={ref}>
         <figcaption>{caption}</figcaption>
+
+        {tableHeadersForm}
 
         <div
           // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
