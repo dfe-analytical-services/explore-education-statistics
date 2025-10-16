@@ -170,7 +170,10 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
               const subNavItems = sectionContent
                 .flatMap(block => {
                   if (block.type === 'HtmlBlock') {
-                    return getNavItemsFromHtml(block.body);
+                    return getNavItemsFromHtml({
+                      html: block.body,
+                      blockId: block.id,
+                    });
                   }
                   return null;
                 })

@@ -16,7 +16,28 @@ describe('Get nav items from html', () => {
       },
     ];
 
-    const result = getNavItemsFromHtml(input);
+    const result = getNavItemsFromHtml({ html: input });
+    expect(result).toEqual(output);
+  });
+
+  test('Uses blockId as ID prefix if provided', () => {
+    const input =
+      '<h2>Test Level 2 Heading</h2><h3>Test Heading</h3><p>Lorem ipsum dolor sit amet, sea pertinax pertinacia appellantur in, est ad esse assentior mediocritatem, magna populo menandri cum te.</p><p>Lorema</p><h4>Level 4 Heading</h4><h3>Another H3 Heading!</h3>';
+    const output = [
+      {
+        id: 'test-test-heading',
+        text: 'Test Heading',
+      },
+      {
+        id: 'test-another-h-3-heading',
+        text: 'Another H3 Heading!',
+      },
+    ];
+
+    const result = getNavItemsFromHtml({
+      html: input,
+      blockId: 'test-id-prefix',
+    });
     expect(result).toEqual(output);
   });
 
@@ -42,7 +63,10 @@ describe('Get nav items from html', () => {
       },
     ];
 
-    const result = getNavItemsFromHtml(input, ['h2', 'h3', 'h4']);
+    const result = getNavItemsFromHtml({
+      html: input,
+      headingLevels: ['h2', 'h3', 'h4'],
+    });
     expect(result).toEqual(output);
   });
 
@@ -50,7 +74,7 @@ describe('Get nav items from html', () => {
     const input = '<p>Test content</p>';
     const output = [] as NavItem[];
 
-    const result = getNavItemsFromHtml(input);
+    const result = getNavItemsFromHtml({ html: input });
     expect(result).toEqual(output);
   });
 });

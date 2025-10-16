@@ -19,6 +19,7 @@ import parseHtmlString, {
 import React, { ReactElement, useMemo } from 'react';
 
 export interface ContentHtmlProps {
+  blockId?: string;
   className?: string;
   formatLinks?: boolean;
   getGlossaryEntry?: (slug: string) => Promise<GlossaryEntry>;
@@ -31,6 +32,7 @@ export interface ContentHtmlProps {
 }
 
 export default function ContentHtml({
+  blockId,
   className,
   formatLinks = true,
   getGlossaryEntry,
@@ -121,7 +123,10 @@ export default function ContentHtml({
       if (node.name === 'h3') {
         const text = domToReact(node.children);
         return typeof text === 'string' ? (
-          <h3 id={generateIdFromHeading(text)}>{text}</h3>
+          // generate an id optionally using 4 chars of the block id to ensure uniqueness
+          <h3 id={generateIdFromHeading(text, blockId?.substring(0, 4))}>
+            {text}
+          </h3>
         ) : (
           node
         );
