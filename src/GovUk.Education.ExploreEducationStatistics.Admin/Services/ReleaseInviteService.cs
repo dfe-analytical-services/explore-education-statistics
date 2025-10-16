@@ -47,13 +47,13 @@ public class ReleaseInviteService(
             {
                 var sanitisedEmail = email.Trim();
 
-                var user = await userRepository.FindByEmail(sanitisedEmail);
+                var activeUser = await userRepository.FindActiveUserByEmail(sanitisedEmail);
 
-                return user is null
-                    ? await CreateNewUserContributorInvite(releaseVersionIds, sanitisedEmail, publication.Title)
-                    : await CreateExistingUserContributorInvite(
+                return activeUser is null
+                    ? await CreateInactiveUserContributorInvite(releaseVersionIds, sanitisedEmail, publication.Title)
+                    : await CreateActiveUserContributorInvite(
                         releaseVersionIds,
-                        user.Id,
+                        activeUser.Id,
                         sanitisedEmail,
                         publication.Title);
             });
@@ -79,7 +79,7 @@ public class ReleaseInviteService(
             });
     }
 
-    private async Task<Either<ActionResult, Unit>> CreateNewUserContributorInvite(
+    private async Task<Either<ActionResult, Unit>> CreateInactiveUserContributorInvite(
         List<Guid> releaseVersionIds,
         string email,
         string publicationTitle
@@ -113,7 +113,7 @@ public class ReleaseInviteService(
         return Unit.Instance;
     }
 
-    private async Task<Either<ActionResult, Unit>> CreateExistingUserContributorInvite(
+    private async Task<Either<ActionResult, Unit>> CreateActiveUserContributorInvite(
         List<Guid> releaseVersionIds,
         Guid userId,
         string email,

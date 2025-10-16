@@ -12,8 +12,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -397,10 +397,7 @@ public class UserManagementService(
 
     private async Task<Either<ActionResult, User>> GetPendingUserInvite(string email)
     {
-        var pendingInvite = await contentDbContext.Users
-            .WhereIsPendingInvite()
-            .Where(u => u.Email == email)
-            .SingleOrDefaultAsync();
+        var pendingInvite = await userRepository.FindPendingUserInviteByEmail(email);
 
         return pendingInvite is null
             ? ValidationActionResult(InviteNotFound)

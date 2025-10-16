@@ -36,7 +36,7 @@ public abstract class ReleaseInviteServiceTests
     public class InviteContributorTests : ReleaseInviteServiceTests
     {
         [Fact]
-        public async Task NewUser()
+        public async Task InactiveUser()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -97,7 +97,7 @@ public abstract class ReleaseInviteServiceTests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_dataFixture.DefaultUser());
             userRepository
-                .Setup(mock => mock.FindByEmail(Email, It.IsAny<CancellationToken>()))
+                .Setup(mock => mock.FindActiveUserByEmail(Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -135,7 +135,7 @@ public abstract class ReleaseInviteServiceTests
         }
 
         [Fact]
-        public async Task ExistingUser()
+        public async Task ActiveUser()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -170,7 +170,6 @@ public abstract class ReleaseInviteServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.Publications.Add(publication);
-                contentDbContext.Users.Add(user);
                 contentDbContext.UserReleaseRoles.Add(existingUserReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -215,7 +214,7 @@ public abstract class ReleaseInviteServiceTests
 
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository
-                .Setup(mock => mock.FindByEmail(Email, It.IsAny<CancellationToken>()))
+                .Setup(mock => mock.FindActiveUserByEmail(Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(user);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -255,7 +254,7 @@ public abstract class ReleaseInviteServiceTests
         }
 
         [Fact]
-        public async Task UserAlreadyHasReleaseRoles() 
+        public async Task ActiveUserAlreadyHasReleaseRoles() 
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -295,7 +294,7 @@ public abstract class ReleaseInviteServiceTests
 
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository
-                .Setup(mock => mock.FindByEmail(user.Email, It.IsAny<CancellationToken>()))
+                .Setup(mock => mock.FindActiveUserByEmail(user.Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(user);
 
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
@@ -333,7 +332,7 @@ public abstract class ReleaseInviteServiceTests
         }
 
         [Fact]
-        public async Task NewUser_FailsSendingEmail()
+        public async Task InactiveUser_FailsSendingEmail()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -372,7 +371,7 @@ public abstract class ReleaseInviteServiceTests
 
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository
-                .Setup(mock => mock.FindByEmail(Email, It.IsAny<CancellationToken>()))
+                .Setup(mock => mock.FindActiveUserByEmail(Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -409,7 +408,7 @@ public abstract class ReleaseInviteServiceTests
         }
 
         [Fact]
-        public async Task ExistingUser_FailsSendingEmail()
+        public async Task ActiveExistingUser_FailsSendingEmail()
         {
             var user = _dataFixture.DefaultUser()
                 .WithEmail(Email)
@@ -425,7 +424,6 @@ public abstract class ReleaseInviteServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.Publications.Add(publication);
-                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -449,7 +447,7 @@ public abstract class ReleaseInviteServiceTests
 
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository
-                .Setup(mock => mock.FindByEmail(Email, It.IsAny<CancellationToken>()))
+                .Setup(mock => mock.FindActiveUserByEmail(Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(user);
 
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();

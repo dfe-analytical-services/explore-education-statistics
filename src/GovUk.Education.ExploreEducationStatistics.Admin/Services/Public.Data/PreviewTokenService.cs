@@ -21,7 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 public class PreviewTokenService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
-    IUserService userService
+    IUserService userService,
+    IUserRepository userRepository
 ) : IPreviewTokenService
 {
     public async Task<Either<ActionResult, PreviewTokenViewModel>> CreatePreviewToken(
@@ -163,17 +164,14 @@ public class PreviewTokenService(
 
     private async Task<PreviewTokenViewModel> MapPreviewToken(PreviewToken previewToken)
     {
-        var createdByEmail = await contentDbContext
-            .Users.Where(u => u.Id == previewToken.CreatedByUserId)
-            .Select(u => u.Email)
-            .SingleAsync();
+        var createdByUser = await userRepository.FindActiveUserById(previewToken.CreatedByUserId);
 
         return new PreviewTokenViewModel
         {
             Id = previewToken.Id,
             Label = previewToken.Label,
             Status = previewToken.Status,
-            CreatedByEmail = createdByEmail,
+            CreatedByEmail = createdByUser.Email,
             Created = previewToken.Created,
             Activates = previewToken.Activates,
             Expires = previewToken.Expires,

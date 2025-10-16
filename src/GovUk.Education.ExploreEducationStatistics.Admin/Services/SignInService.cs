@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,8 +46,8 @@ public class SignInService(
         // If the email address does not match an existing user in the service, see if they have been invited.
         var userInvitedToSystem = await contentDbContext
             .Users
-            .Include(i => i.Role)
-            .WhereIsPendingInvite()
+            .Include(u => u.Role)
+            .Where(u => !u.SoftDeleted.HasValue)
             .Where(u => u.Email.ToLower() == profile.Email.ToLower())
             .SingleOrDefaultAsync();
 
@@ -67,7 +67,7 @@ public class SignInService(
         UserProfileFromClaims profile
     )
     {
-        if (userInvitedToSystem.InviteHasExpired)
+        if (userInvitedToSystem.InviteHasExpired())
         {
             await HandleExpiredInvite(profile.Email);
             return new SignInResponseViewModel(LoginResult.ExpiredInvite);
