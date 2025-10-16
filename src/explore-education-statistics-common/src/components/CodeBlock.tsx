@@ -56,6 +56,7 @@ export default function CodeBlock({
         codeTagProps={{ tabIndex: 0 }}
         language={language}
         useInlineStyles={false}
+        wrapLongLines
       >
         {children}
       </SyntaxHighlighter>
