@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <!-- Required to execute unit tests in IDE -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.20" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.21" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />

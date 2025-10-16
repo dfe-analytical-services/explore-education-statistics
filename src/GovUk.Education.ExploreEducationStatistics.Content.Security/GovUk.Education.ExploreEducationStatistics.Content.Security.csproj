@@ -8,7 +8,7 @@
     <CompilerVisibleProperty Include="ProjectDir" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.20" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.21" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
