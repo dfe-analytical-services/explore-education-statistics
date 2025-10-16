@@ -58,11 +58,24 @@ public record PreviewTokenCreateRequest
                                     .Cascade(CascadeMode.Stop)
                                     .Must((r, expires) => expires > r.Activates)
                                     .WithMessage("Expires date must be after the activates date.")
-                                    .Must((r, expires) => expires <= r.Activates!.Value.AddDays(8))
-                                    // We allow expiry up to the end of the 7th calendar day after the Activates date.
-                                    // The UI sets the expiry time as 23:59:59 on the selected date.
-                                    // Activates may include a time-of-day (e.g. 08:00, 17:00).
-                                    // Comparing against Activates + 8 days (using <=) effectively permits any time up to 23:59:59 on the 7th day,
+                                    .Must(
+                                        (r, expires) =>
+                                        {
+                                            var maxExpires = r.Activates!.Value.AddDays(7);
+                                            // Allow for any time on the 7th day after activates, up to the end of the day
+                                            return expires
+                                                < new DateTimeOffset(
+                                                    maxExpires.Year,
+                                                    maxExpires.Month,
+                                                    maxExpires.Day,
+                                                    23,
+                                                    59,
+                                                    59,
+                                                    999,
+                                                    maxExpires.Offset
+                                                );
+                                        }
+                                    )
                                     .WithMessage("Expires date must be no more than 7 days after the activates date.");
                             }
                         )
