@@ -12,22 +12,14 @@ public class DataScreenerTestResult
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public TestResult Result { get; set; }
 
-    // TODO (EES-5353): The screener currently returns a single string, but the intention is for it to return a List
     [JsonPropertyName("message")]
     public string? Notes { get; set; }
 
-    [JsonPropertyName("stage")]
-    public Stage Stage { get; set; }
-}
+    [JsonPropertyName("guidance_url")]
+    public string? GuidanceUrl { get; set; }
 
-// TODO (EES-5353): Rename stages to be more descriptive
-public enum Stage
-{
-    InitialFileValidation = 1,
-    PreScreening1 = 2,
-    PreScreening2 = 3,
-    FullChecks = 4,
-    Passed = 5,
+    [JsonPropertyName("stage")]
+    public required string Stage { get; set; }
 }
 
 public enum TestResult
