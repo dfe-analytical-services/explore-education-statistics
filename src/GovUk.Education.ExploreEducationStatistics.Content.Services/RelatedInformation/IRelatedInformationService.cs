@@ -1,12 +1,12 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Model;
+﻿using CSharpFunctionalExtensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Errors;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation.Dtos;
-using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation;
 
 public interface IRelatedInformationService
 {
-    Task<Either<ActionResult, RelatedInformationDto[]>> GetRelatedInformationForRelease(
+    Task<Result<RelatedInformationDto[], ResourceNotFoundError>> GetRelatedInformationForRelease(
         string publicationSlug,
         string releaseSlug,
         CancellationToken cancellationToken = default

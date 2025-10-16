@@ -1,5 +1,6 @@
 #nullable enable
 using System.Linq.Expressions;
+using CSharpFunctionalExtensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -51,6 +52,15 @@ public static class QueryableExtensions
         CancellationToken cancellationToken = default
     )
         where T : class? => source.SingleOrDefaultAsync(predicate, cancellationToken).OrNotFound();
+
+    public static async Task<Maybe<T>> TryFirstAsync<T>(
+        this IQueryable<T> source,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var firstOrNull = await source.FirstOrDefaultAsync(cancellationToken);
+        return firstOrNull == null ? Maybe<T>.None : Maybe<T>.From(firstOrNull);
+    }
 
     /// <summary>
     /// Apply offset pagination to a queryable.

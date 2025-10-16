@@ -1,7 +1,7 @@
 ﻿#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation.Dtos;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.RelatedInformation;
@@ -11,16 +11,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Rel
 public class RelatedInformationController(IRelatedInformationService relatedInformationService) : ControllerBase
 {
     [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/related-information")]
-    public async Task<ActionResult<RelatedInformationDto[]>> GetRelatedInformationForRelease(
+    public Task<Results<Ok<RelatedInformationDto[]>, ProblemHttpResult>> GetRelatedInformationForRelease(
         string publicationSlug,
         string releaseSlug,
         CancellationToken cancellationToken = default
     ) =>
-        await relatedInformationService
+        relatedInformationService
             .GetRelatedInformationForRelease(
                 publicationSlug: publicationSlug,
                 releaseSlug: releaseSlug,
                 cancellationToken
             )
-            .HandleFailuresOrOk();
+            .ToOkHttpResult<RelatedInformationDto[]>();
 }
