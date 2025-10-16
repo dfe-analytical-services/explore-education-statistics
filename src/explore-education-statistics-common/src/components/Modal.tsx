@@ -20,6 +20,7 @@ export interface ModalProps {
   open?: boolean;
   showClose?: boolean;
   title: string;
+  titleId?: string;
   triggerButton?: ReactNode;
   underlayClass?: string;
   onExit?: () => void;
@@ -39,6 +40,7 @@ const Modal = ({
   open: initialOpen = false,
   showClose = false,
   title,
+  titleId = 'modal-title',
   triggerButton,
   underlayClass,
   onExit,
@@ -79,6 +81,7 @@ const Modal = ({
           data-testid="modal-underlay"
         >
           <Dialog.Content
+            aria-labelledby={titleId}
             className={classNames(styles.dialog, className, {
               [styles.fullScreen]: fullScreen,
             })}
@@ -99,6 +102,7 @@ const Modal = ({
                 className={classNames('govuk-heading-l', {
                   'govuk-visually-hidden': hideTitle,
                 })}
+                id={titleId}
               >
                 {title}
               </h2>

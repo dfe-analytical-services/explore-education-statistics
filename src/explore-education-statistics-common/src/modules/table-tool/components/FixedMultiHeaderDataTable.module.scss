@@ -22,7 +22,6 @@
 
 .container {
   display: inline-block;
-  max-height: 80vh;
   overflow: auto;
   padding-right: govuk-spacing(4);
   width: 100%;
@@ -32,4 +31,8 @@
     outline: $govuk-focus-colour solid $govuk-focus-width;
     outline-offset: 4px;
   }
+}
+
+.fullScreen {
+  padding: govuk-spacing(4);
 }
