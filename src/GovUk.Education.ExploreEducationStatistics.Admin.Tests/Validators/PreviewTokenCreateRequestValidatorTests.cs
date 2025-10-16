@@ -88,12 +88,20 @@ public class PreviewTokenCreateRequestValidatorTests
     }
 
     [Theory]
-    [InlineData("2025-10-03T00:00:00 +00:00", "2025-10-03T00:00:00 +00:00", false)]
     [InlineData("2025-10-03T00:00:00 +00:00", "2025-10-03T00:00:01 +00:00", true)]
-    [InlineData("2025-10-03T00:00:00 +00:00", "2025-10-10T23:59:59 +00:00", true)] // This isn't strictly 7 days, it exceeds 7 days by just under a day.
-    // So the boundary instead of it being 2025-10-10T00:00:00 +00:00, it is exceeds this by 23:59:59 hours. This is by design.
-    // Because the user can't select the time when they are providing a date input for the expiry date, the frontend sets the expiry time as 23:59:59.
-    public void Expires_BetweenActivatesAndActivatesPlus7Days_Passes(string activates, string expires, bool passes)
+    [InlineData("2025-10-03T00:00:00 +00:00", "2025-10-03T00:00:00 +00:00", false)]
+    [InlineData("2025-10-03T00:00:00 +00:00", "2025-10-10T23:59:59 +00:00", true)]
+    [InlineData("2025-10-03T00:00:00 +00:00", "2025-10-11T00:00:01 +00:00", false)]
+    [InlineData("2025-10-03T14:00:00 +00:00", "2025-10-11T14:00:00 +00:00", true)]
+    [InlineData("2025-10-03T14:00:00 +00:00", "2025-10-11T14:00:01 +00:00", false)]
+    // The backend validation boundary specified to be between the activates and expires dates is 8 days.
+    // This is because the user doesn't select the time when they are providing a date input for the expiry date;
+    // the frontend JS sets the expiry time as 23:59:59 of the end of the 7th day. This backend rule caters for that requirement.
+    public void Expires_BetweenActivatesAndActivatesPlus7Days_PassesOrFails(
+        string activates,
+        string expires,
+        bool passes
+    )
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
         var request = new PreviewTokenCreateRequest
@@ -111,9 +119,7 @@ public class PreviewTokenCreateRequestValidatorTests
         }
         else
         {
-            result
-                .ShouldHaveValidationErrorFor(r => r.Expires)
-                .WithErrorMessage("Expires date must be after the activates date.");
+            result.ShouldHaveValidationErrorFor(r => r.Expires);
         }
     }
 
