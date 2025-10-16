@@ -1,5 +1,6 @@
 #nullable enable
 using System.Security.Claims;
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -8,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web;
-using System.Security.Claims;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Security;
 
@@ -18,7 +18,8 @@ public class SignInController(
     ILogger<SignInController> logger,
     IHttpContextAccessor httpContextAccessor,
     ISignInService signInService,
-    IUserService userService) : ControllerBase
+    IUserService userService
+) : ControllerBase
 {
     [HttpPost("sign-in")]
     [AllowAnonymous]
@@ -32,7 +33,7 @@ public class SignInController(
         {
             return new ForbidResult();
         }
-        
+
         var remoteUserId = httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimConstants.NameIdentifierId);
 
         return await signInService

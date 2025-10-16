@@ -166,16 +166,20 @@ public class PreviewTokenService(
     {
         var createdByUser = await userRepository.FindActiveUserById(previewToken.CreatedByUserId);
 
-        return new PreviewTokenViewModel
-        {
-            Id = previewToken.Id,
-            Label = previewToken.Label,
-            Status = previewToken.Status,
-            CreatedByEmail = createdByUser.Email,
-            Created = previewToken.Created,
-            Activates = previewToken.Activates,
-            Expires = previewToken.Expires,
-            Updated = previewToken.Updated,
-        };
+        return createdByUser is null
+            ? throw new InvalidOperationException(
+                $"No active user found for '{nameof(previewToken.CreatedByUserId)}' '{previewToken.CreatedByUserId}'."
+            )
+            : new PreviewTokenViewModel
+            {
+                Id = previewToken.Id,
+                Label = previewToken.Label,
+                Status = previewToken.Status,
+                CreatedByEmail = createdByUser.Email,
+                Created = previewToken.Created,
+                Activates = previewToken.Activates,
+                Expires = previewToken.Expires,
+                Updated = previewToken.Updated,
+            };
     }
 }

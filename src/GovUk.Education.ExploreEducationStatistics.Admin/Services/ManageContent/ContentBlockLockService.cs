@@ -22,7 +22,8 @@ public class ContentBlockLockService(
     IPersistenceHelper<ContentDbContext> persistenceHelper,
     IUserService userService,
     IUserRepository userRepository,
-    IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext) : IContentBlockLockService
+    IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext
+) : IContentBlockLockService
 {
     /// <summary>
     /// Try to acquire the lock for a content block, notifying any
@@ -75,7 +76,7 @@ public class ContentBlockLockService(
             LockedUntil: block.LockedUntil!.Value,
             LockedBy: new UserDetailsViewModel(user)
         );
-        
+
         await hubContext.Clients.Group(viewModel.ReleaseVersionId.ToString()).ContentBlockLocked(viewModel);
 
         return viewModel;

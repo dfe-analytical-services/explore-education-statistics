@@ -30,12 +30,9 @@ public class BootstrapUsersServiceTests
         var bootstrapUsersSection = new Mock<IConfigurationSection>();
 
         var bauSection = new Mock<IConfigurationSection>();
-        bauSection.Setup(s => s.Value)
-            .Returns(bootstrappedEmailsString);
+        bauSection.Setup(s => s.Value).Returns(bootstrappedEmailsString);
 
-        bootstrapUsersSection
-            .Setup(s => s.GetSection("BAU"))
-            .Returns(bauSection.Object);
+        bootstrapUsersSection.Setup(s => s.GetSection("BAU")).Returns(bauSection.Object);
 
         bootstrappedUserEmailsConfiguration
             .Setup(c => c.GetSection("BootstrapUsers"))
@@ -61,10 +58,9 @@ public class BootstrapUsersServiceTests
     [Fact]
     public void AddBootstrapUsers_UsersAlreadyExist_DoesNothing()
     {
-        var placeholderDeletedUser = _dataFixture.DefaultUser()
-            .WithEmail(User.DeletedUserPlaceholderEmail)
-            .Generate();
-        var existingUsers = _dataFixture.DefaultUser()
+        var placeholderDeletedUser = _dataFixture.DefaultUser().WithEmail(User.DeletedUserPlaceholderEmail).Generate();
+        var existingUsers = _dataFixture
+            .DefaultUser()
             .ForIndex(0, s => s.SetEmail("test1@test.com"))
             .ForIndex(1, s => s.SetEmail("test2@test.com"))
             .GenerateList(2);
@@ -73,12 +69,9 @@ public class BootstrapUsersServiceTests
         var bootstrapUsersSection = new Mock<IConfigurationSection>();
 
         var bauSection = new Mock<IConfigurationSection>();
-        bauSection.Setup(s => s.Value)
-            .Returns($"{existingUsers[0].Email}, {existingUsers[1].Email}");
+        bauSection.Setup(s => s.Value).Returns($"{existingUsers[0].Email}, {existingUsers[1].Email}");
 
-        bootstrapUsersSection
-            .Setup(s => s.GetSection("BAU"))
-            .Returns(bauSection.Object);
+        bootstrapUsersSection.Setup(s => s.GetSection("BAU")).Returns(bauSection.Object);
 
         bootstrappedUserEmailsConfiguration
             .Setup(c => c.GetSection("BootstrapUsers"))
@@ -88,7 +81,7 @@ public class BootstrapUsersServiceTests
 
         using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.Users.AddRange([placeholderDeletedUser, ..existingUsers]);
+            contentDbContext.Users.AddRange([placeholderDeletedUser, .. existingUsers]);
             contentDbContext.SaveChanges();
         }
 
@@ -113,12 +106,8 @@ public class BootstrapUsersServiceTests
     [Fact]
     public void AddBootstrapUsers_SomeUsersAreNew_CreatesNewUsers()
     {
-        var placeholderDeletedUser = _dataFixture.DefaultUser()
-            .WithEmail(User.DeletedUserPlaceholderEmail)
-            .Generate();
-        var existingUser = _dataFixture.DefaultUser()
-            .WithEmail("test1@test.com")
-            .Generate();
+        var placeholderDeletedUser = _dataFixture.DefaultUser().WithEmail(User.DeletedUserPlaceholderEmail).Generate();
+        var existingUser = _dataFixture.DefaultUser().WithEmail("test1@test.com").Generate();
 
         var newUserEmail1 = "test2@test.com";
         var newUserEmail2 = "test3@test.com";
@@ -127,12 +116,9 @@ public class BootstrapUsersServiceTests
         var bootstrapUsersSection = new Mock<IConfigurationSection>();
 
         var bauSection = new Mock<IConfigurationSection>();
-        bauSection.Setup(s => s.Value)
-            .Returns($"{existingUser.Email}, {newUserEmail1}, {newUserEmail2}");
+        bauSection.Setup(s => s.Value).Returns($"{existingUser.Email}, {newUserEmail1}, {newUserEmail2}");
 
-        bootstrapUsersSection
-            .Setup(s => s.GetSection("BAU"))
-            .Returns(bauSection.Object);
+        bootstrapUsersSection.Setup(s => s.GetSection("BAU")).Returns(bauSection.Object);
 
         bootstrappedUserEmailsConfiguration
             .Setup(c => c.GetSection("BootstrapUsers"))
@@ -177,11 +163,9 @@ public class BootstrapUsersServiceTests
 
     private static BootstrapUsersService SetupService(
         ContentDbContext contentDbContext,
-        IConfiguration? configuration = null)
+        IConfiguration? configuration = null
+    )
     {
-        return new(
-            configuration ?? Mock.Of<IConfiguration>(MockBehavior.Strict),
-            contentDbContext 
-        );
+        return new(configuration ?? Mock.Of<IConfiguration>(MockBehavior.Strict), contentDbContext);
     }
 }

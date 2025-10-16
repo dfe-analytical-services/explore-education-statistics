@@ -182,13 +182,9 @@ public class UserManagementService(
             .CheckCanManageAllUsers()
             .OnSuccess(async () =>
             {
-                var pendingUserInvites = await contentDbContext.Users
-                    .WhereIsPendingInvite()
-                    .Select(u => new
-                    {
-                        u.Email,
-                        u.Role
-                    })
+                var pendingUserInvites = await contentDbContext
+                    .Users.WhereIsPendingInvite()
+                    .Select(u => new { u.Email, u.Role })
                     .OrderBy(u => u.Email)
                     .ToListAsync();
 
@@ -197,8 +193,7 @@ public class UserManagementService(
                     .SelectAwait(async pendingUserInvite =>
                     {
                         var userReleaseInvites = await contentDbContext
-                            .UserReleaseInvites
-                            .Include(uri => uri.ReleaseVersion)
+                            .UserReleaseInvites.Include(uri => uri.ReleaseVersion)
                             .ThenInclude(rv => rv.Release)
                             .ThenInclude(r => r.Publication)
                             .Where(uri => uri.Email.ToLower().Equals(pendingUserInvite.Email.ToLower()))
@@ -215,8 +210,7 @@ public class UserManagementService(
                             .ToList();
 
                         var userPublicationInvites = await contentDbContext
-                            .UserPublicationInvites
-                            .Include(upi => upi.Publication)
+                            .UserPublicationInvites.Include(upi => upi.Publication)
                             .Where(upi => upi.Email.ToLower().Equals(pendingUserInvite.Email.ToLower()))
                             .ToListAsync();
 
@@ -238,8 +232,7 @@ public class UserManagementService(
                         };
                     })
                     .ToListAsync();
-                }
-            );
+            });
     }
 
     public async Task<Either<ActionResult, User>> InviteUser(UserInviteCreateRequest request)
@@ -253,8 +246,7 @@ public class UserManagementService(
             .OnSuccess(() => ValidateIdentityUserDoesNotExist(email))
             .OnSuccess<ActionResult, Unit, User>(async () =>
             {
-                var role = await usersAndRolesDbContext.Roles
-                    .FirstOrDefaultAsync(r => r.Id == roleId);
+                var role = await usersAndRolesDbContext.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
 
                 if (role is null)
                 {
@@ -371,26 +363,19 @@ public class UserManagementService(
     {
         var activeUser = await userRepository.FindActiveUserByEmail(email);
 
-        return activeUser is null
-            ? new NotFoundResult()
-            : activeUser;
+        return activeUser is null ? new NotFoundResult() : activeUser;
     }
 
     private async Task<Either<ActionResult, ApplicationUser>> GetIdentityUser(string email)
     {
-        var identityUser = await usersAndRolesDbContext
-            .Users
-            .SingleOrDefaultAsync(user => user.Email == email);
+        var identityUser = await usersAndRolesDbContext.Users.SingleOrDefaultAsync(user => user.Email == email);
 
-        return identityUser is null
-            ? new NotFoundResult()
-            : identityUser;
+        return identityUser is null ? new NotFoundResult() : identityUser;
     }
 
     private async Task<Either<ActionResult, Unit>> ValidateIdentityUserDoesNotExist(string email)
     {
-        return await usersAndRolesDbContext.Users
-            .AnyAsync(u => u.Email!.ToLower().Equals(email.ToLower()))
+        return await usersAndRolesDbContext.Users.AnyAsync(u => u.Email!.ToLower().Equals(email.ToLower()))
             ? ValidationActionResult(UserAlreadyExists)
             : Unit.Instance;
     }
@@ -399,8 +384,6 @@ public class UserManagementService(
     {
         var pendingInvite = await userRepository.FindPendingUserInviteByEmail(email);
 
-        return pendingInvite is null
-            ? ValidationActionResult(InviteNotFound)
-            : pendingInvite;
+        return pendingInvite is null ? ValidationActionResult(InviteNotFound) : pendingInvite;
     }
 }

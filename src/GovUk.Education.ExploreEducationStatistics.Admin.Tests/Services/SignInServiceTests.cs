@@ -32,16 +32,20 @@ public class SignInServiceTests
         var firstName = "new";
         var lastName = "user";
 
-        var invitedUser = _dataFixture.DefaultUserWithPendingInvite()
-            .WithRole(new IdentityRole
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Role",
-                NormalizedName = "ROLE"
-            })
+        var invitedUser = _dataFixture
+            .DefaultUserWithPendingInvite()
+            .WithRole(
+                new IdentityRole
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Role",
+                    NormalizedName = "ROLE",
+                }
+            )
             .Generate();
 
-        var userReleaseInvites = _dataFixture.DefaultUserReleaseInvite()
+        var userReleaseInvites = _dataFixture
+            .DefaultUserReleaseInvite()
             .WithEmail(invitedUser.Email)
             .WithReleaseVersion(_dataFixture.DefaultReleaseVersion())
             .WithCreatedById(CreatedById)
@@ -50,7 +54,8 @@ public class SignInServiceTests
             .ForIndex(2, s => s.SetRole(ReleaseRole.PrereleaseViewer))
             .GenerateList(3);
 
-        var userPublicationInvites = _dataFixture.DefaultUserPublicationInvite()
+        var userPublicationInvites = _dataFixture
+            .DefaultUserPublicationInvite()
             .WithEmail(invitedUser.Email)
             .WithPublication(_dataFixture.DefaultPublication())
             .WithCreatedById(CreatedById)
@@ -68,16 +73,14 @@ public class SignInServiceTests
         }
 
         var userService = new Mock<IUserService>(Strict);
-        userService.Setup(mock => mock.GetProfileFromClaims())
-            .Returns(new UserProfileFromClaims(
-                Email: invitedUser.Email,
-                FirstName: firstName,
-                LastName: lastName));
+        userService
+            .Setup(mock => mock.GetProfileFromClaims())
+            .Returns(new UserProfileFromClaims(Email: invitedUser.Email, FirstName: firstName, LastName: lastName));
 
         var userManager = MockUserManager();
-        userManager.Setup(mock => mock.FindByEmailAsync(invitedUser.Email))
-            .ReturnsAsync((ApplicationUser?)null);
-        userManager.Setup(mock => mock.AddToRoleAsync(It.IsAny<ApplicationUser>(), invitedUser.Role.Name))
+        userManager.Setup(mock => mock.FindByEmailAsync(invitedUser.Email)).ReturnsAsync((ApplicationUser?)null);
+        userManager
+            .Setup(mock => mock.AddToRoleAsync(It.IsAny<ApplicationUser>(), invitedUser.Role.Name))
             .ReturnsAsync(IdentityResult.Success);
 
         var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
@@ -100,11 +103,14 @@ public class SignInServiceTests
         foreach (var userReleaseInvite in userReleaseInvites)
         {
             userReleaseRoleRepository
-                .Setup(mock => mock.Create(
-                    It.IsAny<Guid>(),
-                    userReleaseInvite.ReleaseVersionId,
-                    userReleaseInvite.Role,
-                    CreatedById))
+                .Setup(mock =>
+                    mock.Create(
+                        It.IsAny<Guid>(),
+                        userReleaseInvite.ReleaseVersionId,
+                        userReleaseInvite.Role,
+                        CreatedById
+                    )
+                )
                 .ReturnsAsync(new UserReleaseRole());
         }
 
@@ -112,11 +118,14 @@ public class SignInServiceTests
         foreach (var userPublicationInvite in userPublicationInvites)
         {
             userPublicationRoleRepository
-                .Setup(mock => mock.Create(
-                    It.IsAny<Guid>(),
-                    userPublicationInvite.PublicationId,
-                    userPublicationInvite.Role,
-                    CreatedById))
+                .Setup(mock =>
+                    mock.Create(
+                        It.IsAny<Guid>(),
+                        userPublicationInvite.PublicationId,
+                        userPublicationInvite.Role,
+                        CreatedById
+                    )
+                )
                 .ReturnsAsync(new UserPublicationRole());
         }
 
@@ -131,7 +140,8 @@ public class SignInServiceTests
                 userReleaseInviteRepository: userReleaseInviteRepository.Object,
                 userPublicationInviteRepository: userPublicationInviteRepository.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object,
-                userPublicationRoleRepository: userPublicationRoleRepository.Object);
+                userPublicationRoleRepository: userPublicationRoleRepository.Object
+            );
 
             var result = await service.RegisterOrSignIn();
 
@@ -148,13 +158,13 @@ public class SignInServiceTests
             userReleaseInviteRepository,
             userPublicationInviteRepository,
             userReleaseRoleRepository,
-            userPublicationRoleRepository);
+            userPublicationRoleRepository
+        );
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
-            var newIdentityUser = await usersAndRolesDbContext.Users
-                .SingleAsync(u => u.Email == invitedUser.Email);
+            var newIdentityUser = await usersAndRolesDbContext.Users.SingleAsync(u => u.Email == invitedUser.Email);
 
             Assert.Equal(invitedUser.Id.ToString(), newIdentityUser.Id);
             Assert.Equal(invitedUser.Email, newIdentityUser.Email);
@@ -162,8 +172,7 @@ public class SignInServiceTests
             Assert.Equal(firstName, newIdentityUser.FirstName);
             Assert.Equal(lastName, newIdentityUser.LastName);
 
-            var activatedUser = await contentDbContext.Users
-                .SingleAsync(u => u.Email == invitedUser.Email);
+            var activatedUser = await contentDbContext.Users.SingleAsync(u => u.Email == invitedUser.Email);
 
             Assert.Equal(invitedUser.Email, activatedUser.Email);
             Assert.Equal(firstName, activatedUser.FirstName);
@@ -186,7 +195,7 @@ public class SignInServiceTests
             Email = "test@test.com",
             UserName = "test@test.com",
             FirstName = "existing",
-            LastName = "user"
+            LastName = "user",
         };
 
         var usersAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -198,22 +207,26 @@ public class SignInServiceTests
         }
 
         var userService = new Mock<IUserService>(Strict);
-        userService.Setup(mock => mock.GetProfileFromClaims())
-            .Returns(new UserProfileFromClaims(
-                Email: aspNetUser.Email,
-                FirstName: aspNetUser.FirstName,
-                LastName: aspNetUser.LastName));
+        userService
+            .Setup(mock => mock.GetProfileFromClaims())
+            .Returns(
+                new UserProfileFromClaims(
+                    Email: aspNetUser.Email,
+                    FirstName: aspNetUser.FirstName,
+                    LastName: aspNetUser.LastName
+                )
+            );
 
         var userManager = MockUserManager();
-        userManager.Setup(mock => mock.FindByEmailAsync(aspNetUser.Email))
-            .ReturnsAsync(aspNetUser);
+        userManager.Setup(mock => mock.FindByEmailAsync(aspNetUser.Email)).ReturnsAsync(aspNetUser);
 
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
             var service = SetupService(
                 usersAndRolesDbContext: usersAndRolesDbContext,
                 userService: userService.Object,
-                userManager: userManager.Object);
+                userManager: userManager.Object
+            );
 
             var result = await service.RegisterOrSignIn();
 
@@ -224,21 +237,22 @@ public class SignInServiceTests
             Assert.Equal(aspNetUser.FirstName, signInResponse.UserProfile.FirstName);
         }
 
-        VerifyAllMocks(
-            userService,
-            userManager);
+        VerifyAllMocks(userService, userManager);
     }
 
     [Fact]
     public async Task RegisterOrSignIn_SoftDeletedUser_ReturnsNoInviteResult()
     {
-        var softDeletedUser = _dataFixture.DefaultSoftDeletedUser()
-            .WithRole(new IdentityRole
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Role",
-                NormalizedName = "ROLE"
-            })
+        var softDeletedUser = _dataFixture
+            .DefaultSoftDeletedUser()
+            .WithRole(
+                new IdentityRole
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Role",
+                    NormalizedName = "ROLE",
+                }
+            )
             .Generate();
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -250,22 +264,26 @@ public class SignInServiceTests
         }
 
         var userService = new Mock<IUserService>(Strict);
-        userService.Setup(mock => mock.GetProfileFromClaims())
-            .Returns(new UserProfileFromClaims(
-                Email: softDeletedUser.Email,
-                FirstName: "testFirstName",
-                LastName: "testLastName"));
+        userService
+            .Setup(mock => mock.GetProfileFromClaims())
+            .Returns(
+                new UserProfileFromClaims(
+                    Email: softDeletedUser.Email,
+                    FirstName: "testFirstName",
+                    LastName: "testLastName"
+                )
+            );
 
         var userManager = MockUserManager();
-        userManager.Setup(mock => mock.FindByEmailAsync(softDeletedUser.Email))
-            .ReturnsAsync((ApplicationUser?)null);
+        userManager.Setup(mock => mock.FindByEmailAsync(softDeletedUser.Email)).ReturnsAsync((ApplicationUser?)null);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = SetupService(
                 contentDbContext: contentDbContext,
                 userService: userService.Object,
-                userManager: userManager.Object);
+                userManager: userManager.Object
+            );
 
             var result = await service.RegisterOrSignIn();
 
@@ -275,9 +293,7 @@ public class SignInServiceTests
             Assert.Null(signInResponse.UserProfile);
         }
 
-        VerifyAllMocks(
-            userService,
-            userManager);
+        VerifyAllMocks(userService, userManager);
     }
 
     [Fact]
@@ -286,16 +302,20 @@ public class SignInServiceTests
         var firstName = "Bill";
         var lastName = "Piper";
 
-        var userWithExpiredInvite = _dataFixture.DefaultUserWithExpiredInvite()
-            .WithRole(new IdentityRole
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Role",
-                NormalizedName = "ROLE"
-            })
+        var userWithExpiredInvite = _dataFixture
+            .DefaultUserWithExpiredInvite()
+            .WithRole(
+                new IdentityRole
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Role",
+                    NormalizedName = "ROLE",
+                }
+            )
             .Generate();
 
-        var userReleaseInvites = _dataFixture.DefaultUserReleaseInvite()
+        var userReleaseInvites = _dataFixture
+            .DefaultUserReleaseInvite()
             .WithEmail(userWithExpiredInvite.Email)
             .WithReleaseVersion(_dataFixture.DefaultReleaseVersion())
             .WithCreatedById(CreatedById)
@@ -304,7 +324,8 @@ public class SignInServiceTests
             .ForIndex(2, s => s.SetRole(ReleaseRole.PrereleaseViewer))
             .GenerateList(3);
 
-        var userPublicationInvites = _dataFixture.DefaultUserPublicationInvite()
+        var userPublicationInvites = _dataFixture
+            .DefaultUserPublicationInvite()
             .WithEmail(userWithExpiredInvite.Email)
             .WithPublication(_dataFixture.DefaultPublication())
             .WithCreatedById(CreatedById)
@@ -322,14 +343,15 @@ public class SignInServiceTests
         }
 
         var userService = new Mock<IUserService>(Strict);
-        userService.Setup(mock => mock.GetProfileFromClaims())
-            .Returns(new UserProfileFromClaims(
-                Email: userWithExpiredInvite.Email,
-                FirstName: firstName,
-                LastName: lastName));
+        userService
+            .Setup(mock => mock.GetProfileFromClaims())
+            .Returns(
+                new UserProfileFromClaims(Email: userWithExpiredInvite.Email, FirstName: firstName, LastName: lastName)
+            );
 
         var userManager = MockUserManager();
-        userManager.Setup(mock => mock.FindByEmailAsync(userWithExpiredInvite.Email))
+        userManager
+            .Setup(mock => mock.FindByEmailAsync(userWithExpiredInvite.Email))
             .ReturnsAsync((ApplicationUser?)null);
 
         var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
@@ -351,7 +373,8 @@ public class SignInServiceTests
                 userService: userService.Object,
                 userManager: userManager.Object,
                 userReleaseInviteRepository: userReleaseInviteRepository.Object,
-                userPublicationInviteRepository: userPublicationInviteRepository.Object);
+                userPublicationInviteRepository: userPublicationInviteRepository.Object
+            );
 
             var result = await service.RegisterOrSignIn();
 
@@ -361,22 +384,18 @@ public class SignInServiceTests
             Assert.Null(signInResponse.UserProfile);
         }
 
-        VerifyAllMocks(
-            userService,
-            userManager,
-            userReleaseInviteRepository,
-            userPublicationInviteRepository);
+        VerifyAllMocks(userService, userManager, userReleaseInviteRepository, userPublicationInviteRepository);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
-            var newIdentityUser = await usersAndRolesDbContext.Users
-                .SingleOrDefaultAsync(u => u.Email == userWithExpiredInvite.Email);
+            var newIdentityUser = await usersAndRolesDbContext.Users.SingleOrDefaultAsync(u =>
+                u.Email == userWithExpiredInvite.Email
+            );
 
             Assert.Null(newIdentityUser);
 
-            var user = await contentDbContext.Users
-                .SingleAsync(u => u.Email == userWithExpiredInvite.Email);
+            var user = await contentDbContext.Users.SingleAsync(u => u.Email == userWithExpiredInvite.Email);
 
             // Everything on the User entity should remain unchanged
             Assert.Equal(userWithExpiredInvite.Email, user.Email);
@@ -399,7 +418,8 @@ public class SignInServiceTests
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null,
-        IUserPublicationInviteRepository? userPublicationInviteRepository = null)
+        IUserPublicationInviteRepository? userPublicationInviteRepository = null
+    )
     {
         contentDbContext ??= InMemoryApplicationDbContext();
         usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -413,7 +433,8 @@ public class SignInServiceTests
             userReleaseRoleRepository: userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(),
             userPublicationRoleRepository: userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(),
             userReleaseInviteRepository: userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(),
-            userPublicationInviteRepository: userPublicationInviteRepository ?? Mock.Of<IUserPublicationInviteRepository>()
+            userPublicationInviteRepository: userPublicationInviteRepository
+                ?? Mock.Of<IUserPublicationInviteRepository>()
         );
     }
 }
