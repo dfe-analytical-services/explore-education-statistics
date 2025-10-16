@@ -40,13 +40,12 @@ public abstract class ReleaseInviteServiceTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(2));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(2));
 
             var releaseVersionIds = ListOf(
                 publication.Releases[0].Versions[0].Id,
-                publication.Releases[1].Versions[0].Id);
+                publication.Releases[1].Versions[0].Id
+            );
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -59,42 +58,37 @@ public abstract class ReleaseInviteServiceTests
 
             var emailService = new Mock<IEmailService>(Strict);
             var expectedTemplateValues = GetExpectedContributorInviteTemplateValues(
-                publication.Title, "* Academic year 2000/01\n* Academic year 2001/02");
-            emailService.Setup(mock => mock.SendEmail(
-                Email,
-                    NotifyContributorTemplateId,
-                    expectedTemplateValues
-                ))
+                publication.Title,
+                "* Academic year 2000/01\n* Academic year 2001/02"
+            );
+            emailService
+                .Setup(mock => mock.SendEmail(Email, NotifyContributorTemplateId, expectedTemplateValues))
                 .Returns(Unit.Instance);
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
             userReleaseInviteRepository
-                .Setup(mock => mock.CreateManyIfNotExists(
-                    releaseVersionIds,
-                    Email,
-                    ReleaseRole.Contributor,
-                    true,
-                    CreatedById,
-                    null)
+                .Setup(mock =>
+                    mock.CreateManyIfNotExists(
+                        releaseVersionIds,
+                        Email,
+                        ReleaseRole.Contributor,
+                        true,
+                        CreatedById,
+                        null
+                    )
                 )
                 .Returns(Task.CompletedTask);
 
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
             releaseVersionRepository
-                .Setup(mock => mock.ListLatestReleaseVersionIds(
-                    publication.Id,
-                    false,
-                    It.IsAny<CancellationToken>()))
+                .Setup(mock => mock.ListLatestReleaseVersionIds(publication.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(releaseVersionIds);
 
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository
-                .Setup(mock => mock.CreateOrUpdate(
-                    Email,
-                    Role.Analyst,
-                    CreatedById,
-                    null,
-                    It.IsAny<CancellationToken>()))
+                .Setup(mock =>
+                    mock.CreateOrUpdate(Email, Role.Analyst, CreatedById, null, It.IsAny<CancellationToken>())
+                )
                 .ReturnsAsync(_dataFixture.DefaultUser());
             userRepository
                 .Setup(mock => mock.FindActiveUserByEmail(Email, It.IsAny<CancellationToken>()))
@@ -109,29 +103,24 @@ public abstract class ReleaseInviteServiceTests
                     emailService: emailService.Object,
                     userReleaseInviteRepository: userReleaseInviteRepository.Object,
                     userRepository: userRepository.Object,
-                    releaseVersionRepository: releaseVersionRepository.Object);
+                    releaseVersionRepository: releaseVersionRepository.Object
+                );
 
                 var result = await service.InviteContributor(
                     email: Email,
                     publicationId: publication.Id,
-                    releaseVersionIds: releaseVersionIds);
+                    releaseVersionIds: releaseVersionIds
+                );
 
                 result.AssertRight();
             }
 
             emailService.Verify(
-                s => s.SendEmail(
-                    Email,
-                    NotifyContributorTemplateId,
-                    expectedTemplateValues
-                ), Times.Once
+                s => s.SendEmail(Email, NotifyContributorTemplateId, expectedTemplateValues),
+                Times.Once
             );
 
-            VerifyAllMocks(
-                emailService,
-                userReleaseInviteRepository,
-                userRepository,
-                releaseVersionRepository);
+            VerifyAllMocks(emailService, userReleaseInviteRepository, userRepository, releaseVersionRepository);
         }
 
         [Fact]
@@ -139,17 +128,14 @@ public abstract class ReleaseInviteServiceTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(2));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(2));
 
-            var user = _dataFixture.DefaultUser()
-                .WithEmail(Email)
-                .Generate();
+            var user = _dataFixture.DefaultUser().WithEmail(Email).Generate();
 
             var newReleaseVersionIds = ListOf(
                 publication.Releases[0].Versions[0].Id,
-                publication.Releases[1].Versions[0].Id);
+                publication.Releases[1].Versions[0].Id
+            );
 
             var existingUserReleaseRole = new UserReleaseRole
             {
@@ -176,40 +162,37 @@ public abstract class ReleaseInviteServiceTests
 
             var emailService = new Mock<IEmailService>(Strict);
             var expectedTemplateValues = GetExpectedContributorInviteTemplateValues(
-                publication.Title, "* Academic year 2001/02");
-            emailService.Setup(mock => mock.SendEmail(
-                    Email,
-                    NotifyContributorTemplateId,
-                    expectedTemplateValues
-                ))
+                publication.Title,
+                "* Academic year 2001/02"
+            );
+            emailService
+                .Setup(mock => mock.SendEmail(Email, NotifyContributorTemplateId, expectedTemplateValues))
                 .Returns(Unit.Instance);
 
             var userRoleService = new Mock<IUserRoleService>(Strict);
             userRoleService
-                .Setup(mock =>
-                    mock.GetAssociatedGlobalRoleNameForReleaseRole(ReleaseRole.Contributor))
+                .Setup(mock => mock.GetAssociatedGlobalRoleNameForReleaseRole(ReleaseRole.Contributor))
                 .Returns(RoleNames.Analyst);
             userRoleService
-                .Setup(mock =>
-                    mock.UpgradeToGlobalRoleIfRequired(RoleNames.Analyst, user.Id))
+                .Setup(mock => mock.UpgradeToGlobalRoleIfRequired(RoleNames.Analyst, user.Id))
                 .ReturnsAsync(Unit.Instance);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository
-                .Setup(mock => mock.CreateManyIfNotExists(
-                    user.Id,
-                    missingReleaseRoleReleaseVersionIds,
-                    ReleaseRole.Contributor,
-                    CreatedById))
+                .Setup(mock =>
+                    mock.CreateManyIfNotExists(
+                        user.Id,
+                        missingReleaseRoleReleaseVersionIds,
+                        ReleaseRole.Contributor,
+                        CreatedById
+                    )
+                )
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
             releaseVersionRepository
-                .Setup(mock => mock.ListLatestReleaseVersionIds(
-                    publication.Id,
-                    false,
-                    It.IsAny<CancellationToken>()))
+                .Setup(mock => mock.ListLatestReleaseVersionIds(publication.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(newReleaseVersionIds);
 
             var userRepository = new Mock<IUserRepository>(Strict);
@@ -227,22 +210,21 @@ public abstract class ReleaseInviteServiceTests
                     emailService: emailService.Object,
                     userReleaseRoleRepository: userReleaseRoleRepository.Object,
                     releaseVersionRepository: releaseVersionRepository.Object,
-                    userRepository: userRepository.Object);
+                    userRepository: userRepository.Object
+                );
 
                 var result = await service.InviteContributor(
                     email: Email,
                     publicationId: publication.Id,
-                    releaseVersionIds: newReleaseVersionIds);
+                    releaseVersionIds: newReleaseVersionIds
+                );
 
                 result.AssertRight();
             }
 
             emailService.Verify(
-                s => s.SendEmail(
-                    Email,
-                    NotifyContributorTemplateId,
-                    expectedTemplateValues
-                ), Times.Once
+                s => s.SendEmail(Email, NotifyContributorTemplateId, expectedTemplateValues),
+                Times.Once
             );
 
             VerifyAllMocks(
@@ -250,21 +232,18 @@ public abstract class ReleaseInviteServiceTests
                 emailService,
                 userReleaseRoleRepository,
                 releaseVersionRepository,
-                userRepository);
+                userRepository
+            );
         }
 
         [Fact]
-        public async Task ActiveUserAlreadyHasReleaseRoles() 
+        public async Task ActiveUserAlreadyHasReleaseRoles()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(2));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(2));
 
-            var user = _dataFixture.DefaultUser()
-                .WithEmail(Email)
-                .Generate();
+            var user = _dataFixture.DefaultUser().WithEmail(Email).Generate();
 
             var userRelease1Role = new UserReleaseRole
             {
@@ -299,13 +278,8 @@ public abstract class ReleaseInviteServiceTests
 
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
             releaseVersionRepository
-                .Setup(mock => mock.ListLatestReleaseVersionIds(
-                    publication.Id, 
-                    false,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync([
-                    publication.Releases[0].Versions[0].Id, 
-                    publication.Releases[1].Versions[0].Id]);
+                .Setup(mock => mock.ListLatestReleaseVersionIds(publication.Id, false, It.IsAny<CancellationToken>()))
+                .ReturnsAsync([publication.Releases[0].Versions[0].Id, publication.Releases[1].Versions[0].Id]);
 
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -315,20 +289,22 @@ public abstract class ReleaseInviteServiceTests
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     userRepository: userRepository.Object,
-                    releaseVersionRepository: releaseVersionRepository.Object);
+                    releaseVersionRepository: releaseVersionRepository.Object
+                );
 
                 var result = await service.InviteContributor(
                     email: Email,
                     publicationId: publication.Id,
-                    releaseVersionIds: ListOf(publication.Releases[0].Versions[0].Id,
-                        publication.Releases[1].Versions[0].Id));
+                    releaseVersionIds: ListOf(
+                        publication.Releases[0].Versions[0].Id,
+                        publication.Releases[1].Versions[0].Id
+                    )
+                );
 
                 result.AssertBadRequest(ValidationErrorMessages.UserAlreadyHasReleaseRoles);
             }
 
-            VerifyAllMocks(
-                userRepository,
-                releaseVersionRepository);
+            VerifyAllMocks(userRepository, releaseVersionRepository);
         }
 
         [Fact]
@@ -336,9 +312,7 @@ public abstract class ReleaseInviteServiceTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
 
             var releaseVersionIds = ListOf(publication.Releases[0].Versions[0].Id);
 
@@ -353,20 +327,16 @@ public abstract class ReleaseInviteServiceTests
 
             var emailService = new Mock<IEmailService>(Strict);
             var expectedTemplateValues = GetExpectedContributorInviteTemplateValues(
-                publication.Title, "* Academic year 2000/01");
-            emailService.Setup(mock => mock.SendEmail(
-                    Email,
-                    NotifyContributorTemplateId,
-                    expectedTemplateValues
-                ))
+                publication.Title,
+                "* Academic year 2000/01"
+            );
+            emailService
+                .Setup(mock => mock.SendEmail(Email, NotifyContributorTemplateId, expectedTemplateValues))
                 .Returns(new BadRequestResult());
 
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
             releaseVersionRepository
-                .Setup(mock => mock.ListLatestReleaseVersionIds(
-                    publication.Id,
-                    false,
-                    It.IsAny<CancellationToken>()))
+                .Setup(mock => mock.ListLatestReleaseVersionIds(publication.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(releaseVersionIds);
 
             var userRepository = new Mock<IUserRepository>(Strict);
@@ -382,43 +352,35 @@ public abstract class ReleaseInviteServiceTests
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     emailService: emailService.Object,
                     releaseVersionRepository: releaseVersionRepository.Object,
-                    userRepository: userRepository.Object);
+                    userRepository: userRepository.Object
+                );
 
                 var result = await service.InviteContributor(
                     email: Email,
                     publicationId: publication.Id,
-                    releaseVersionIds: releaseVersionIds);
+                    releaseVersionIds: releaseVersionIds
+                );
 
                 var actionResult = result.AssertLeft();
                 Assert.IsType<BadRequestResult>(actionResult);
             }
 
             emailService.Verify(
-                s => s.SendEmail(
-                    Email,
-                    NotifyContributorTemplateId,
-                    expectedTemplateValues
-                ), Times.Once
+                s => s.SendEmail(Email, NotifyContributorTemplateId, expectedTemplateValues),
+                Times.Once
             );
 
-            VerifyAllMocks(
-                emailService,
-                releaseVersionRepository,
-                userRepository);
+            VerifyAllMocks(emailService, releaseVersionRepository, userRepository);
         }
 
         [Fact]
         public async Task ActiveExistingUser_FailsSendingEmail()
         {
-            var user = _dataFixture.DefaultUser()
-                .WithEmail(Email)
-                .Generate();
+            var user = _dataFixture.DefaultUser().WithEmail(Email).Generate();
 
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -429,20 +391,16 @@ public abstract class ReleaseInviteServiceTests
 
             var emailService = new Mock<IEmailService>(Strict);
             var expectedTemplateValues = GetExpectedContributorInviteTemplateValues(
-                publication.Title, "* Academic year 2000/01");
-            emailService.Setup(mock => mock.SendEmail(
-                    Email,
-                    NotifyContributorTemplateId,
-                    expectedTemplateValues
-                ))
+                publication.Title,
+                "* Academic year 2000/01"
+            );
+            emailService
+                .Setup(mock => mock.SendEmail(Email, NotifyContributorTemplateId, expectedTemplateValues))
                 .Returns(new BadRequestResult());
 
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
             releaseVersionRepository
-                .Setup(mock => mock.ListLatestReleaseVersionIds(
-                    publication.Id,
-                    false,
-                    It.IsAny<CancellationToken>()))
+                .Setup(mock => mock.ListLatestReleaseVersionIds(publication.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync([publication.Releases[0].Versions[0].Id]);
 
             var userRepository = new Mock<IUserRepository>(Strict);
@@ -459,25 +417,21 @@ public abstract class ReleaseInviteServiceTests
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     emailService: emailService.Object,
                     releaseVersionRepository: releaseVersionRepository.Object,
-                    userRepository: userRepository.Object);
+                    userRepository: userRepository.Object
+                );
 
                 var result = await service.InviteContributor(
                     email: Email,
                     publicationId: publication.Id,
-                    releaseVersionIds: ListOf(publication.Releases[0].Versions[0].Id));
-
-                emailService.Verify(
-                    s => s.SendEmail(
-                        Email,
-                        NotifyContributorTemplateId,
-                        expectedTemplateValues
-                    ), Times.Once
+                    releaseVersionIds: ListOf(publication.Releases[0].Versions[0].Id)
                 );
 
-                VerifyAllMocks(
-                    emailService,
-                    releaseVersionRepository,
-                    userRepository);
+                emailService.Verify(
+                    s => s.SendEmail(Email, NotifyContributorTemplateId, expectedTemplateValues),
+                    Times.Once
+                );
+
+                VerifyAllMocks(emailService, releaseVersionRepository, userRepository);
 
                 var actionResult = result.AssertLeft();
                 Assert.IsType<BadRequestResult>(actionResult);
@@ -489,9 +443,7 @@ public abstract class ReleaseInviteServiceTests
         {
             var (publication1, publication2) = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture
-                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    .Generate(1))
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1))
                 .GenerateTuple2();
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -503,10 +455,7 @@ public abstract class ReleaseInviteServiceTests
 
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
             releaseVersionRepository
-                .Setup(mock => mock.ListLatestReleaseVersionIds(
-                    publication1.Id,
-                    false,
-                    It.IsAny<CancellationToken>()))
+                .Setup(mock => mock.ListLatestReleaseVersionIds(publication1.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync([publication1.Releases[0].Versions[0].Id]);
 
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -516,13 +465,17 @@ public abstract class ReleaseInviteServiceTests
                 var service = SetupReleaseInviteService(
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
-                    releaseVersionRepository: releaseVersionRepository.Object);
+                    releaseVersionRepository: releaseVersionRepository.Object
+                );
 
                 var result = await service.InviteContributor(
                     email: Email,
                     publicationId: publication1.Id,
-                    releaseVersionIds: ListOf(publication1.Releases[0].Versions[0].Id,
-                        publication2.Releases[0].Versions[0].Id));
+                    releaseVersionIds: ListOf(
+                        publication1.Releases[0].Versions[0].Id,
+                        publication2.Releases[0].Versions[0].Id
+                    )
+                );
 
                 result.AssertBadRequest(ValidationErrorMessages.NotAllReleasesBelongToPublication);
             }
@@ -532,7 +485,8 @@ public abstract class ReleaseInviteServiceTests
 
         private static Dictionary<string, dynamic> GetExpectedContributorInviteTemplateValues(
             string publicationTitle,
-            string releaseList)
+            string releaseList
+        )
         {
             return new()
             {
@@ -548,8 +502,7 @@ public abstract class ReleaseInviteServiceTests
         [Fact]
         public async Task Success()
         {
-            var publication = _dataFixture.DefaultPublication()
-                .Generate();
+            var publication = _dataFixture.DefaultPublication().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -561,11 +514,9 @@ public abstract class ReleaseInviteServiceTests
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
             userReleaseInviteRepository
-                .Setup(mock => mock.RemoveByPublicationAndEmail(
-                    publication.Id,
-                    Email,
-                    default,
-                    ReleaseRole.Contributor))
+                .Setup(mock =>
+                    mock.RemoveByPublicationAndEmail(publication.Id, Email, default, ReleaseRole.Contributor)
+                )
                 .Returns(Task.CompletedTask)
                 .Verifiable();
 
@@ -573,12 +524,14 @@ public abstract class ReleaseInviteServiceTests
             {
                 var service = SetupReleaseInviteService(
                     contentDbContext: contentDbContext,
-                    userReleaseInviteRepository: userReleaseInviteRepository.Object);
+                    userReleaseInviteRepository: userReleaseInviteRepository.Object
+                );
 
                 var result = await service.RemoveByPublication(
                     email: Email,
                     publicationId: publication.Id,
-                    releaseRole: ReleaseRole.Contributor);
+                    releaseRole: ReleaseRole.Contributor
+                );
 
                 result.AssertRight();
             }
@@ -589,11 +542,14 @@ public abstract class ReleaseInviteServiceTests
         [Fact]
         public async Task NoPublication_ReturnsNotFound()
         {
-            UserReleaseInvite userReleaseInvite = _dataFixture.DefaultUserReleaseInvite()
-                .WithReleaseVersion(_dataFixture.DefaultReleaseVersion()
-                    .WithRelease(_dataFixture.DefaultRelease()
-                        .WithPublication(_dataFixture.DefaultPublication())))
-            .WithRole(ReleaseRole.Contributor);
+            UserReleaseInvite userReleaseInvite = _dataFixture
+                .DefaultUserReleaseInvite()
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+                )
+                .WithRole(ReleaseRole.Contributor);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -604,21 +560,20 @@ public abstract class ReleaseInviteServiceTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupReleaseInviteService(
-                    contentDbContext: contentDbContext);
+                var service = SetupReleaseInviteService(contentDbContext: contentDbContext);
 
                 var result = await service.RemoveByPublication(
                     email: userReleaseInvite.Email,
                     publicationId: Guid.NewGuid(),
-                    releaseRole: userReleaseInvite.Role);
+                    releaseRole: userReleaseInvite.Role
+                );
 
                 result.AssertNotFound();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var actualUserReleaseInvites = await contentDbContext.UserReleaseInvites
-                    .ToListAsync();
+                var actualUserReleaseInvites = await contentDbContext.UserReleaseInvites.ToListAsync();
                 Assert.Single(actualUserReleaseInvites);
 
                 Assert.Equal(userReleaseInvite.Id, actualUserReleaseInvites[0].Id);
@@ -648,7 +603,8 @@ public abstract class ReleaseInviteServiceTests
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IEmailService? emailService = null,
         IOptions<AppOptions>? appOptions = null,
-        IOptions<NotifyOptions>? notifyOptions = null)
+        IOptions<NotifyOptions>? notifyOptions = null
+    )
     {
         contentDbContext ??= InMemoryApplicationDbContext();
         usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();

@@ -21,8 +21,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task ActiveUser_ReturnsNull()
         {
-            var user = _dataFixture.DefaultUser()
-                .Generate();
+            var user = _dataFixture.DefaultUser().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -43,8 +42,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithPendingInvite_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUserWithPendingInvite()
-                .Generate();
+            var user = _dataFixture.DefaultUserWithPendingInvite().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -66,8 +64,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithExpiredInvite_ReturnsNull()
         {
-            var user = _dataFixture.DefaultUserWithExpiredInvite()
-                .Generate();
+            var user = _dataFixture.DefaultUserWithExpiredInvite().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -88,9 +85,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task DifferentCase_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUserWithPendingInvite()
-                .WithEmail("test@test.com")
-                .Generate();
+            var user = _dataFixture.DefaultUserWithPendingInvite().WithEmail("test@test.com").Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -113,8 +108,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task SoftDeletedUser_ReturnsNull()
         {
-            var user = _dataFixture.DefaultSoftDeletedUser()
-                .Generate();
+            var user = _dataFixture.DefaultSoftDeletedUser().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -149,8 +143,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task ActiveUser_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUser()
-                .Generate();
+            var user = _dataFixture.DefaultUser().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -172,8 +165,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithPendingInvite_ReturnsNull()
         {
-            var user = _dataFixture.DefaultUserWithPendingInvite()
-                .Generate();
+            var user = _dataFixture.DefaultUserWithPendingInvite().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -194,8 +186,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithExpiredInvite_ReturnsNull()
         {
-            var user = _dataFixture.DefaultUserWithExpiredInvite()
-                .Generate();
+            var user = _dataFixture.DefaultUserWithExpiredInvite().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -216,9 +207,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task DifferentCase_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUser()
-                .WithEmail("test@test.com")
-                .Generate();
+            var user = _dataFixture.DefaultUser().WithEmail("test@test.com").Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -241,8 +230,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task SoftDeletedUser_ReturnsNull()
         {
-            var user = _dataFixture.DefaultSoftDeletedUser()
-                .Generate();
+            var user = _dataFixture.DefaultSoftDeletedUser().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -277,8 +265,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task ActiveUser_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUser()
-                .Generate();
+            var user = _dataFixture.DefaultUser().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -300,8 +287,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithPendingInvite_ReturnsNull()
         {
-            var user = _dataFixture.DefaultUserWithPendingInvite()
-                .Generate();
+            var user = _dataFixture.DefaultUserWithPendingInvite().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -322,8 +308,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithExpiredInvite_ReturnsNull()
         {
-            var user = _dataFixture.DefaultUserWithExpiredInvite()
-                .Generate();
+            var user = _dataFixture.DefaultUserWithExpiredInvite().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -344,8 +329,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task SoftDeletedUser_ReturnsNull()
         {
-            var user = _dataFixture.DefaultSoftDeletedUser()
-                .Generate();
+            var user = _dataFixture.DefaultSoftDeletedUser().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -380,8 +364,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task ActiveUser_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUser()
-                .Generate();
+            var user = _dataFixture.DefaultUser().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -403,8 +386,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithPendingInvite_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUserWithPendingInvite()
-                .Generate();
+            var user = _dataFixture.DefaultUserWithPendingInvite().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -426,8 +408,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithExpiredInvite_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUserWithExpiredInvite()
-                .Generate();
+            var user = _dataFixture.DefaultUserWithExpiredInvite().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -449,9 +430,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task DifferentCase_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUser()
-                .WithEmail("test@test.com")
-                .Generate();
+            var user = _dataFixture.DefaultUser().WithEmail("test@test.com").Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -474,8 +453,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task SoftDeletedUser_ReturnsNull()
         {
-            var user = _dataFixture.DefaultSoftDeletedUser()
-                .Generate();
+            var user = _dataFixture.DefaultSoftDeletedUser().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -510,9 +488,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task Success()
         {
-            var user = _dataFixture.DefaultSoftDeletedUser()
-                .WithEmail(User.DeletedUserPlaceholderEmail)
-                .Generate();
+            var user = _dataFixture.DefaultSoftDeletedUser().WithEmail(User.DeletedUserPlaceholderEmail).Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -541,7 +517,9 @@ public abstract class UserRepositoryTests
 
             var repository = SetupUserRepository(contentDbContext);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await repository.FindDeletedUserPlaceholder());
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await repository.FindDeletedUserPlaceholder()
+            );
         }
     }
 
@@ -550,8 +528,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task Success()
         {
-            var user = _dataFixture.DefaultUser()
-                .Generate();
+            var user = _dataFixture.DefaultUser().Generate();
             var deletedById = Guid.NewGuid();
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -576,8 +553,7 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedUser = await contentDbContext.Users
-                    .SingleAsync(u => u.Id == user.Id);
+                var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
 
                 Assert.False(updatedUser.Active);
                 updatedUser.SoftDeleted.AssertUtcNow();
@@ -591,8 +567,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task ActiveUser_ThrowsException()
         {
-            var user = _dataFixture.DefaultUser()
-                .Generate();
+            var user = _dataFixture.DefaultUser().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -606,12 +581,14 @@ public abstract class UserRepositoryTests
             {
                 var repository = SetupUserRepository(contentDbContext);
 
-                await Assert.ThrowsAsync<InvalidOperationException>(async () 
-                    => await repository.CreateOrUpdate(
+                await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                    await repository.CreateOrUpdate(
                         email: user.Email,
                         role: GlobalRoles.Role.Analyst,
                         createdById: Guid.NewGuid(),
-                        createdDate: DateTimeOffset.UtcNow));
+                        createdDate: DateTimeOffset.UtcNow
+                    )
+                );
             }
         }
 
@@ -626,16 +603,18 @@ public abstract class UserRepositoryTests
         [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.Analyst, GlobalRoles.Role.BauUser)]
         [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
         public async Task UserWithPendingInvite_UpdatesUser(
-            GlobalRoles.Role oldRole, 
-            GlobalRoles.Role newRole, 
-            GlobalRoles.Role expectedUpdatedRole)
+            GlobalRoles.Role oldRole,
+            GlobalRoles.Role newRole,
+            GlobalRoles.Role expectedUpdatedRole
+        )
         {
             var oldCreatedById = Guid.NewGuid();
             var newCreatedById = Guid.NewGuid();
             var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
             var newCreatedDate = DateTimeOffset.UtcNow.AddDays(-1);
 
-            var user = _dataFixture.DefaultUserWithPendingInvite()
+            var user = _dataFixture
+                .DefaultUserWithPendingInvite()
                 .WithRoleId(oldRole.GetEnumValue())
                 .WithCreatedById(oldCreatedById)
                 .WithCreated(oldCreatedDate)
@@ -657,7 +636,8 @@ public abstract class UserRepositoryTests
                     email: user.Email,
                     role: newRole,
                     createdById: newCreatedById,
-                    createdDate: newCreatedDate);
+                    createdDate: newCreatedDate
+                );
 
                 // All of these fields should be untouched by the update
                 Assert.Equal(user.Id, result.Id);
@@ -672,13 +652,11 @@ public abstract class UserRepositoryTests
 
                 // The role should only be updated if the new one outranks (or equals) the existing one
                 Assert.Equal(expectedUpdatedRole.GetEnumValue(), result.RoleId);
-
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedUser = await contentDbContext.Users
-                    .SingleAsync(u => u.Id == user.Id);
+                var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
 
                 // All of these fields should be untouched by the update
                 Assert.Equal(user.Id, updatedUser.Id);
@@ -701,9 +679,7 @@ public abstract class UserRepositoryTests
         {
             var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
 
-            var user = _dataFixture.DefaultUserWithPendingInvite()
-                .WithCreated(oldCreatedDate)
-                .Generate();
+            var user = _dataFixture.DefaultUserWithPendingInvite().WithCreated(oldCreatedDate).Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -720,15 +696,15 @@ public abstract class UserRepositoryTests
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
                     role: GlobalRoles.Role.Analyst,
-                    createdById: Guid.NewGuid());
+                    createdById: Guid.NewGuid()
+                );
 
                 result.Created.AssertEqual(oldCreatedDate);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedUser = await contentDbContext.Users
-                    .SingleAsync(u => u.Id == user.Id);
+                var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
 
                 updatedUser.Created.AssertEqual(oldCreatedDate);
             }
@@ -747,13 +723,15 @@ public abstract class UserRepositoryTests
         public async Task UserWithExpiredInvite_UpdatesUser(
             GlobalRoles.Role oldRole,
             GlobalRoles.Role newRole,
-            GlobalRoles.Role expectedUpdatedRole)
+            GlobalRoles.Role expectedUpdatedRole
+        )
         {
             var oldCreatedById = Guid.NewGuid();
             var newCreatedById = Guid.NewGuid();
             var newCreatedDate = DateTimeOffset.UtcNow.AddDays(-1);
 
-            var user = _dataFixture.DefaultUserWithExpiredInvite()
+            var user = _dataFixture
+                .DefaultUserWithExpiredInvite()
                 .WithRoleId(oldRole.GetEnumValue())
                 .WithCreatedById(oldCreatedById)
                 .Generate();
@@ -774,7 +752,8 @@ public abstract class UserRepositoryTests
                     email: user.Email,
                     role: newRole,
                     createdById: newCreatedById,
-                    createdDate: newCreatedDate);
+                    createdDate: newCreatedDate
+                );
 
                 // All of these fields should be untouched by the update
                 Assert.Equal(user.Id, result.Id);
@@ -793,8 +772,7 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedUser = await contentDbContext.Users
-                    .SingleAsync(u => u.Id == user.Id);
+                var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
 
                 // All of these fields should be untouched by the update
                 Assert.Equal(user.Id, updatedUser.Id);
@@ -815,8 +793,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithExpiredInvite_CreatedDateNotSupplied_UpdatesUserCreatedDateToNow()
         {
-            var user = _dataFixture.DefaultUserWithExpiredInvite()
-                .Generate();
+            var user = _dataFixture.DefaultUserWithExpiredInvite().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -833,15 +810,15 @@ public abstract class UserRepositoryTests
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
                     role: GlobalRoles.Role.Analyst,
-                    createdById: Guid.NewGuid());
+                    createdById: Guid.NewGuid()
+                );
 
                 result.Created.AssertUtcNow();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedUser = await contentDbContext.Users
-                    .SingleAsync(u => u.Id == user.Id);
+                var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
 
                 updatedUser.Created.AssertUtcNow();
             }
@@ -860,14 +837,16 @@ public abstract class UserRepositoryTests
         public async Task SoftDeletedUser_UpdatesUser(
             GlobalRoles.Role oldRole,
             GlobalRoles.Role newRole,
-            GlobalRoles.Role expectedUpdatedRole)
+            GlobalRoles.Role expectedUpdatedRole
+        )
         {
             var oldCreatedById = Guid.NewGuid();
             var newCreatedById = Guid.NewGuid();
             var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
             var newCreatedDate = DateTimeOffset.UtcNow.AddDays(-1);
 
-            var user = _dataFixture.DefaultSoftDeletedUser()
+            var user = _dataFixture
+                .DefaultSoftDeletedUser()
                 .WithRoleId(oldRole.GetEnumValue())
                 .WithCreatedById(oldCreatedById)
                 .WithCreated(oldCreatedDate)
@@ -889,13 +868,14 @@ public abstract class UserRepositoryTests
                     email: user.Email,
                     role: newRole,
                     createdById: newCreatedById,
-                    createdDate: newCreatedDate);
+                    createdDate: newCreatedDate
+                );
 
                 // All of these fields should be untouched by the update
                 Assert.Equal(user.Id, result.Id);
                 Assert.Equal(user.Email, result.Email);
                 Assert.False(result.Active);
- 
+
                 // These fields should always be updated for soft-deleted users being re-invited
                 Assert.Equal(expectedUpdatedRole.GetEnumValue(), result.RoleId);
                 Assert.Equal(newCreatedById, result.CreatedById);
@@ -908,8 +888,7 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedUser = await contentDbContext.Users
-                    .SingleAsync(u => u.Id == user.Id);
+                var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
 
                 // All of these fields should be untouched by the update
                 Assert.Equal(user.Id, updatedUser.Id);
@@ -932,9 +911,7 @@ public abstract class UserRepositoryTests
         {
             var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
 
-            var user = _dataFixture.DefaultSoftDeletedUser()
-                .WithCreated(oldCreatedDate)
-                .Generate();
+            var user = _dataFixture.DefaultSoftDeletedUser().WithCreated(oldCreatedDate).Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -951,15 +928,15 @@ public abstract class UserRepositoryTests
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
                     role: GlobalRoles.Role.Analyst,
-                    createdById: Guid.NewGuid());
+                    createdById: Guid.NewGuid()
+                );
 
                 result.Created.AssertUtcNow();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedUser = await contentDbContext.Users
-                    .SingleAsync(u => u.Id == user.Id);
+                var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
 
                 updatedUser.Created.AssertUtcNow();
             }
@@ -982,7 +959,8 @@ public abstract class UserRepositoryTests
                     email: email,
                     role: GlobalRoles.Role.Analyst,
                     createdById: createdById,
-                    createdDate: createdDate);
+                    createdDate: createdDate
+                );
 
                 Assert.Equal(email.ToLower(), result.Email);
                 Assert.Null(result.FirstName);
@@ -997,8 +975,7 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var newUser = await contentDbContext.Users
-                    .SingleAsync();
+                var newUser = await contentDbContext.Users.SingleAsync();
 
                 Assert.Equal(email.ToLower(), newUser.Email);
                 Assert.Null(newUser.FirstName);
@@ -1017,8 +994,7 @@ public abstract class UserRepositoryTests
         {
             var newCreatedDate = DateTimeOffset.UtcNow.AddDays(1);
 
-            var user = _dataFixture.DefaultUserWithPendingInvite()
-                .Generate();
+            var user = _dataFixture.DefaultUserWithPendingInvite().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -1032,12 +1008,14 @@ public abstract class UserRepositoryTests
             {
                 var repository = SetupUserRepository(contentDbContext);
 
-                await Assert.ThrowsAsync<ArgumentException>(async ()
-                    => await repository.CreateOrUpdate(
+                await Assert.ThrowsAsync<ArgumentException>(async () =>
+                    await repository.CreateOrUpdate(
                         email: user.Email,
                         role: GlobalRoles.Role.Analyst,
                         createdById: Guid.NewGuid(),
-                        createdDate: newCreatedDate));
+                        createdDate: newCreatedDate
+                    )
+                );
             }
         }
 
@@ -1056,23 +1034,22 @@ public abstract class UserRepositoryTests
                 var result = await repository.CreateOrUpdate(
                     email: email,
                     role: GlobalRoles.Role.Analyst,
-                    createdById: createdById);
+                    createdById: createdById
+                );
 
                 result.Created.AssertUtcNow();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var newUser = await contentDbContext.Users
-                    .SingleAsync();
+                var newUser = await contentDbContext.Users.SingleAsync();
 
                 newUser.Created.AssertUtcNow();
             }
         }
     }
 
-    private static UserRepository SetupUserRepository(
-        ContentDbContext contentDbContext)
+    private static UserRepository SetupUserRepository(ContentDbContext contentDbContext)
     {
         return new(contentDbContext);
     }

@@ -19,15 +19,9 @@ public class UserTests
     [InlineData("", " Smith ", "Smith")]
     [InlineData("Joe", "Smith", "Joe Smith")]
     [InlineData(" Joe ", " Smith ", "Joe Smith")]
-    public void DisplayName(
-        string? firstName,
-        string? lastName,
-        string expectedDisplayName)
+    public void DisplayName(string? firstName, string? lastName, string expectedDisplayName)
     {
-        var user = _dataFixture.DefaultUser()
-            .WithFirstName(firstName)
-            .WithLastName(lastName)
-            .Generate();
+        var user = _dataFixture.DefaultUser().WithFirstName(firstName).WithLastName(lastName).Generate();
 
         Assert.Equal(expectedDisplayName, user.DisplayName);
     }

@@ -45,8 +45,7 @@ public class SignInService(
 
         // If the email address does not match an existing user in the service, see if they have been invited.
         var userInvitedToSystem = await contentDbContext
-            .Users
-            .Include(u => u.Role)
+            .Users.Include(u => u.Role)
             .Where(u => !u.SoftDeleted.HasValue)
             .Where(u => u.Email.ToLower() == profile.Email.ToLower())
             .SingleOrDefaultAsync();
@@ -113,9 +112,8 @@ public class SignInService(
 
         return new SignInResponseViewModel(
             LoginResult.RegistrationSuccess,
-            new UserProfile(
-                Guid.Parse(newAspNetUser.Id),
-                newAspNetUser.FirstName));
+            new UserProfile(Guid.Parse(newAspNetUser.Id), newAspNetUser.FirstName)
+        );
     }
 
     private async Task HandleReleaseInvites(Guid userId, string email)
@@ -124,11 +122,14 @@ public class SignInService(
 
         await releaseInvites
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(invite => userReleaseRoleRepository.Create(
-                userId: userId,
-                releaseVersionId: invite.ReleaseVersionId,
-                role: invite.Role,
-                createdById: invite.CreatedById));
+            .ForEachAwaitAsync(invite =>
+                userReleaseRoleRepository.Create(
+                    userId: userId,
+                    releaseVersionId: invite.ReleaseVersionId,
+                    role: invite.Role,
+                    createdById: invite.CreatedById
+                )
+            );
 
         await userReleaseInviteRepository.RemoveByUserEmail(email);
     }
@@ -139,11 +140,14 @@ public class SignInService(
 
         await publicationInvites
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(invite => userPublicationRoleRepository.Create(
-                userId: userId,
-                publicationId: invite.PublicationId,
-                role: invite.Role,
-                createdById: invite.CreatedById));
+            .ForEachAwaitAsync(invite =>
+                userPublicationRoleRepository.Create(
+                    userId: userId,
+                    publicationId: invite.PublicationId,
+                    role: invite.Role,
+                    createdById: invite.CreatedById
+                )
+            );
 
         await userPublicationInviteRepository.RemoveByUserEmail(email);
     }

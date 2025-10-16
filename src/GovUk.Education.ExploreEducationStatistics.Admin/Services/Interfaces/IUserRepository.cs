@@ -21,17 +21,16 @@ public interface IUserRepository
         Role role,
         Guid createdById,
         DateTimeOffset? createdDate = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<User> CreateOrUpdate(
         string email,
         string roleId,
         Guid createdById,
         DateTimeOffset? createdDate = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
-    Task SoftDeleteUser(
-        User activeUser,
-        Guid deletedById,
-        CancellationToken cancellationToken = default);
+    Task SoftDeleteUser(User activeUser, Guid deletedById, CancellationToken cancellationToken = default);
 }

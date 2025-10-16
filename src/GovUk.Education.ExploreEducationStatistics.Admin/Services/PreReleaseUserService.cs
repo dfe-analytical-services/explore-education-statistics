@@ -171,7 +171,8 @@ public class PreReleaseUserService(
                 await userReleaseInviteRepository.RemoveByReleaseVersionAndEmail(
                     email: email,
                     releaseVersionId: releaseVersionId,
-                    rolesToInclude: ReleaseRole.PrereleaseViewer);
+                    rolesToInclude: ReleaseRole.PrereleaseViewer
+                );
             });
     }
 
@@ -200,15 +201,18 @@ public class PreReleaseUserService(
             await userRepository.CreateOrUpdate(
                 email: email,
                 role: Role.PrereleaseUser,
-                createdById: userService.GetUserId());
+                createdById: userService.GetUserId()
+            );
 
             return await CreateInactiveUserReleaseInvite(releaseVersion, email)
                 .OnSuccess(_ => new PreReleaseUserViewModel(email));
         });
     }
 
-    private async Task<Either<ActionResult, Unit>> CreateInactiveUserReleaseInvite(ReleaseVersion releaseVersion,
-        string email)
+    private async Task<Either<ActionResult, Unit>> CreateInactiveUserReleaseInvite(
+        ReleaseVersion releaseVersion,
+        string email
+    )
     {
         if (!await userReleaseInviteRepository.UserHasInvite(releaseVersion.Id, email, ReleaseRole.PrereleaseViewer))
         {
@@ -236,7 +240,8 @@ public class PreReleaseUserService(
         return Unit.Instance;
     }
 
-    private async Task<Either<ActionResult, Unit>> CreateActiveUserReleaseInvite(ReleaseVersion releaseVersion,
+    private async Task<Either<ActionResult, Unit>> CreateActiveUserReleaseInvite(
+        ReleaseVersion releaseVersion,
         string email,
         User user
     )

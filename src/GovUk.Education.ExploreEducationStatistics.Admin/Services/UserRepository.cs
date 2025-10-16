@@ -10,37 +10,36 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserRepository(
-    ContentDbContext contentDbContext) : IUserRepository
+public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
 {
     public async Task<User?> FindPendingUserInviteByEmail(string email, CancellationToken cancellationToken = default)
     {
-        return await contentDbContext.Users
-            .WhereIsPendingInvite()
+        return await contentDbContext
+            .Users.WhereIsPendingInvite()
             .Where(u => u.Email.ToLower().Equals(email.ToLower()))
             .SingleOrDefaultAsync(cancellationToken);
     }
 
     public async Task<User?> FindActiveUserByEmail(string email, CancellationToken cancellationToken = default)
     {
-        return await contentDbContext.Users
-            .Where(u => u.Active)
+        return await contentDbContext
+            .Users.Where(u => u.Active)
             .Where(u => u.Email.ToLower().Equals(email.ToLower()))
             .SingleOrDefaultAsync(cancellationToken);
     }
 
     public async Task<User?> FindActiveUserById(Guid userId, CancellationToken cancellationToken = default)
     {
-        return await contentDbContext.Users
-            .Where(u => u.Active)
+        return await contentDbContext
+            .Users.Where(u => u.Active)
             .Where(u => u.Id == userId)
             .SingleOrDefaultAsync(cancellationToken);
     }
 
     public async Task<User?> FindUserByEmail(string email, CancellationToken cancellationToken = default)
     {
-        return await contentDbContext.Users
-            .Where(u => !u.SoftDeleted.HasValue)
+        return await contentDbContext
+            .Users.Where(u => !u.SoftDeleted.HasValue)
             .Where(u => u.Email.ToLower().Equals(email.ToLower()))
             .SingleOrDefaultAsync(cancellationToken);
     }
@@ -59,29 +58,32 @@ public class UserRepository(
         GlobalRoles.Role role,
         Guid createdById,
         DateTimeOffset? createdDate = null,
-        CancellationToken cancellationToken = default)
-        => await CreateOrUpdate(
+        CancellationToken cancellationToken = default
+    ) =>
+        await CreateOrUpdate(
             email: email,
             roleId: role.GetEnumValue(),
             createdById: createdById,
             createdDate: createdDate,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
     public async Task<User> CreateOrUpdate(
         string email,
         string roleId,
         Guid createdById,
         DateTimeOffset? createdDate = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         if (createdDate > DateTimeOffset.UtcNow)
         {
             throw new ArgumentException($"{nameof(User)} created date cannot be a future date.");
         }
 
-        var existingUser = await contentDbContext
-            .Users
-            .SingleOrDefaultAsync(i => i.Email.ToLower().Equals(email.ToLower()));
+        var existingUser = await contentDbContext.Users.SingleOrDefaultAsync(i =>
+            i.Email.ToLower().Equals(email.ToLower())
+        );
 
         return existingUser is null
             ? await CreateNewUser(
@@ -89,19 +91,18 @@ public class UserRepository(
                 roleId: roleId,
                 createdById: createdById,
                 createdDate: createdDate,
-                cancellationToken: cancellationToken)
+                cancellationToken: cancellationToken
+            )
             : await UpdateExistingUser(
                 existingUser: existingUser,
                 roleId: roleId,
                 createdById: createdById,
                 createdDate: createdDate,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
     }
 
-    public async Task SoftDeleteUser(
-        User activeUser,
-        Guid deletedById,
-        CancellationToken cancellationToken = default)
+    public async Task SoftDeleteUser(User activeUser, Guid deletedById, CancellationToken cancellationToken = default)
     {
         contentDbContext.Attach(activeUser);
 
@@ -117,7 +118,8 @@ public class UserRepository(
         string roleId,
         Guid createdById,
         DateTimeOffset? createdDate,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var newUser = new User
         {
@@ -139,42 +141,39 @@ public class UserRepository(
         string roleId,
         Guid createdById,
         DateTimeOffset? createdDate,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return existingUser.Active
-            ? throw new InvalidOperationException("Cannot update a user that is active.")
+        return existingUser.Active ? throw new InvalidOperationException("Cannot update a user that is active.")
             : existingUser.SoftDeleted.HasValue
-            ? await ResetSoftDeletedUser(
-                user: existingUser,
-                createdById: createdById,
-                createdDate: createdDate,
-                roleId: roleId,
-                cancellationToken: cancellationToken)
+                ? await ResetSoftDeletedUser(
+                    user: existingUser,
+                    createdById: createdById,
+                    createdDate: createdDate,
+                    roleId: roleId,
+                    cancellationToken: cancellationToken
+                )
             : existingUser.InviteHasExpired()
-            ? await ResetExpiredUserInvite(
-                user: existingUser,
-                createdById: createdById,
-                createdDate: createdDate,
-                roleId: roleId,
-                cancellationToken: cancellationToken)
-            : await ResetPendingUserInvite(
-                user: existingUser,
-                roleId: roleId,
-                cancellationToken: cancellationToken);
+                ? await ResetExpiredUserInvite(
+                    user: existingUser,
+                    createdById: createdById,
+                    createdDate: createdDate,
+                    roleId: roleId,
+                    cancellationToken: cancellationToken
+                )
+            : await ResetPendingUserInvite(user: existingUser, roleId: roleId, cancellationToken: cancellationToken);
     }
 
-    private async Task<User> ResetPendingUserInvite(
-        User user, 
-        string roleId, 
-        CancellationToken cancellationToken)
+    private async Task<User> ResetPendingUserInvite(User user, string roleId, CancellationToken cancellationToken)
     {
         var higherRoles = GlobalRoles.GetHigherRoles(
-                    EnumUtil.GetFromEnumValue<GlobalRoles.Role>(roleId).GetEnumLabel());
+            EnumUtil.GetFromEnumValue<GlobalRoles.Role>(roleId).GetEnumLabel()
+        );
 
         // For pending user invites, only the update role if the new one outranks (or equals) the existing one
         var newRoleId = higherRoles.Contains(EnumUtil.GetFromEnumValue<GlobalRoles.Role>(user.RoleId).GetEnumLabel())
-                ? user.RoleId
-                : roleId;
+            ? user.RoleId
+            : roleId;
 
         user.RoleId = newRoleId;
 
@@ -183,11 +182,12 @@ public class UserRepository(
     }
 
     private async Task<User> ResetSoftDeletedUser(
-        User user, 
-        Guid createdById, 
+        User user,
+        Guid createdById,
         DateTimeOffset? createdDate,
         string roleId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         user.SoftDeleted = null;
         user.DeletedById = null;
@@ -202,11 +202,12 @@ public class UserRepository(
     }
 
     private async Task<User> ResetExpiredUserInvite(
-        User user, 
-        Guid createdById, 
+        User user,
+        Guid createdById,
         DateTimeOffset? createdDate,
         string roleId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         user.CreatedById = createdById;
         user.Created = createdDate ?? DateTimeOffset.UtcNow;

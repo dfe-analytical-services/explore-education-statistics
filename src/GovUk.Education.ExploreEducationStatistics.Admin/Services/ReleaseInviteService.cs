@@ -55,7 +55,8 @@ public class ReleaseInviteService(
                         releaseVersionIds,
                         activeUser.Id,
                         sanitisedEmail,
-                        publication.Title);
+                        publication.Title
+                    );
             });
     }
 
@@ -96,11 +97,7 @@ public class ReleaseInviteService(
             return emailResult;
         }
 
-        await userRepository.CreateOrUpdate(
-            email: email,
-            role: Role.Analyst,
-            createdById: userService.GetUserId()
-        );
+        await userRepository.CreateOrUpdate(email: email, role: Role.Analyst, createdById: userService.GetUserId());
 
         await userReleaseInviteRepository.CreateManyIfNotExists(
             releaseVersionIds: releaseVersionIds,

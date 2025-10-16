@@ -1,4 +1,5 @@
 #nullable enable
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -10,10 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 using Moq;
-using System.Security.Claims;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Security;
 
@@ -23,87 +22,75 @@ public class SignInControllerTests
     public async Task RegisterOrSignIn_SignInServiceReturnsInternalServerError_ReturnsInternalServerError()
     {
         var remoteUserId = Guid.NewGuid().ToString();
-        var claims = new[]
-        {
-            new Claim(ClaimConstants.NameIdentifierId, remoteUserId)
-        };  
-        var httpContext = new DefaultHttpContext
-        {
-            User = new ClaimsPrincipal(new ClaimsIdentity(claims))
-        };
+        var claims = new[] { new Claim(ClaimConstants.NameIdentifierId, remoteUserId) };
+        var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity(claims)) };
 
         var logger = new Mock<ILogger<SignInController>>(Strict);
-        logger.Setup(x => x.Log(
-            LogLevel.Warning,
-            It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((v, t) => v.ToString()!
-                .Contains($"User with remote Id \"{remoteUserId}\" failed to sign in or register")),
-            It.IsAny<Exception>(),
-            It.IsAny<Func<It.IsAnyType, Exception?, string>>()));
+        logger.Setup(x =>
+            x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>(
+                    (v, t) =>
+                        v.ToString()!.Contains($"User with remote Id \"{remoteUserId}\" failed to sign in or register")
+                ),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+            )
+        );
 
         var httpContextAccessor = new Mock<IHttpContextAccessor>(Strict);
         httpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
 
         var userService = new Mock<IUserService>(Strict);
-        userService.Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
+        userService
+            .Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
             .ReturnsAsync(true);
 
         var signInService = new Mock<ISignInService>(Strict);
-        signInService.Setup(mock => mock.RegisterOrSignIn())
-            .ReturnsAsync(new StatusCodeResult(500));
+        signInService.Setup(mock => mock.RegisterOrSignIn()).ReturnsAsync(new StatusCodeResult(500));
 
         var service = SetupService(
             logger: logger.Object,
             httpContextAccessor: httpContextAccessor.Object,
             signInService: signInService.Object,
-            userService: userService.Object);
+            userService: userService.Object
+        );
 
         var result = await service.RegisterOrSignIn();
 
         result.AssertInternalServerError();
 
-        VerifyAllMocks(
-            logger,
-            httpContextAccessor,
-            userService,
-            signInService);
+        VerifyAllMocks(logger, httpContextAccessor, userService, signInService);
     }
 
     [Fact]
     public async Task RegisterOrSignIn_SignInServiceThrowsException_ThrowsException()
     {
         var remoteUserId = Guid.NewGuid().ToString();
-        var claims = new[]
-        {
-            new Claim(ClaimConstants.NameIdentifierId, remoteUserId)
-        };
-        var httpContext = new DefaultHttpContext
-        {
-            User = new ClaimsPrincipal(new ClaimsIdentity(claims))
-        };
+        var claims = new[] { new Claim(ClaimConstants.NameIdentifierId, remoteUserId) };
+        var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity(claims)) };
 
         var httpContextAccessor = new Mock<IHttpContextAccessor>(Strict);
         httpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
 
         var userService = new Mock<IUserService>(Strict);
-        userService.Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
+        userService
+            .Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
             .ReturnsAsync(true);
 
         var signInService = new Mock<ISignInService>(Strict);
-        signInService.Setup(mock => mock.RegisterOrSignIn())
-            .ThrowsAsync(new InvalidOperationException());
+        signInService.Setup(mock => mock.RegisterOrSignIn()).ThrowsAsync(new InvalidOperationException());
 
         var service = SetupService(
             httpContextAccessor: httpContextAccessor.Object,
             signInService: signInService.Object,
-            userService: userService.Object);
+            userService: userService.Object
+        );
 
         await Assert.ThrowsAsync<InvalidOperationException>(service.RegisterOrSignIn);
 
-        VerifyAllMocks(
-            httpContextAccessor,
-            userService,
-            signInService);
+        VerifyAllMocks(httpContextAccessor, userService, signInService);
     }
 
     [Fact]
@@ -111,34 +98,32 @@ public class SignInControllerTests
     {
         var userProfileId = Guid.NewGuid();
         var userProfileFirstName = "FirstName";
-        var claims = new[]
-        {
-            new Claim(ClaimConstants.NameIdentifierId, Guid.NewGuid().ToString())
-        };
-        var httpContext = new DefaultHttpContext
-        {
-            User = new ClaimsPrincipal(new ClaimsIdentity(claims))
-        };
+        var claims = new[] { new Claim(ClaimConstants.NameIdentifierId, Guid.NewGuid().ToString()) };
+        var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity(claims)) };
 
         var httpContextAccessor = new Mock<IHttpContextAccessor>(Strict);
         httpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
 
         var userService = new Mock<IUserService>(Strict);
-        userService.Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
+        userService
+            .Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
             .ReturnsAsync(true);
 
         var signInService = new Mock<ISignInService>(Strict);
-        signInService.Setup(mock => mock.RegisterOrSignIn())
-            .ReturnsAsync(new SignInResponseViewModel(
-                LoginResult.LoginSuccess,
-                new UserProfile(
-                    userProfileId,
-                    userProfileFirstName)));
+        signInService
+            .Setup(mock => mock.RegisterOrSignIn())
+            .ReturnsAsync(
+                new SignInResponseViewModel(
+                    LoginResult.LoginSuccess,
+                    new UserProfile(userProfileId, userProfileFirstName)
+                )
+            );
 
         var service = SetupService(
             httpContextAccessor: httpContextAccessor.Object,
             signInService: signInService.Object,
-            userService: userService.Object);
+            userService: userService.Object
+        );
 
         var result = await service.RegisterOrSignIn();
 
@@ -148,10 +133,7 @@ public class SignInControllerTests
         Assert.Equal(userProfileId, signInResponse.UserProfile!.Id);
         Assert.Equal(userProfileFirstName, signInResponse.UserProfile.FirstName);
 
-        VerifyAllMocks(
-            httpContextAccessor,
-            userService,
-            signInService);
+        VerifyAllMocks(httpContextAccessor, userService, signInService);
     }
 
     [Fact]
@@ -159,34 +141,32 @@ public class SignInControllerTests
     {
         var userProfileId = Guid.NewGuid();
         var userProfileFirstName = "FirstName";
-        var claims = new[]
-        {
-            new Claim(ClaimConstants.NameIdentifierId, Guid.NewGuid().ToString())
-        };
-        var httpContext = new DefaultHttpContext
-        {
-            User = new ClaimsPrincipal(new ClaimsIdentity(claims))
-        };
+        var claims = new[] { new Claim(ClaimConstants.NameIdentifierId, Guid.NewGuid().ToString()) };
+        var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity(claims)) };
 
         var httpContextAccessor = new Mock<IHttpContextAccessor>(Strict);
         httpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
 
         var userService = new Mock<IUserService>(Strict);
-        userService.Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
+        userService
+            .Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
             .ReturnsAsync(true);
 
         var signInService = new Mock<ISignInService>(Strict);
-        signInService.Setup(mock => mock.RegisterOrSignIn())
-            .ReturnsAsync(new SignInResponseViewModel(
-                LoginResult.RegistrationSuccess,
-                new UserProfile(
-                    userProfileId,
-                    userProfileFirstName)));
+        signInService
+            .Setup(mock => mock.RegisterOrSignIn())
+            .ReturnsAsync(
+                new SignInResponseViewModel(
+                    LoginResult.RegistrationSuccess,
+                    new UserProfile(userProfileId, userProfileFirstName)
+                )
+            );
 
         var service = SetupService(
             httpContextAccessor: httpContextAccessor.Object,
             signInService: signInService.Object,
-            userService: userService.Object);
+            userService: userService.Object
+        );
 
         var result = await service.RegisterOrSignIn();
 
@@ -196,50 +176,48 @@ public class SignInControllerTests
         Assert.Equal(userProfileId, signInResponse.UserProfile!.Id);
         Assert.Equal(userProfileFirstName, signInResponse.UserProfile.FirstName);
 
-        VerifyAllMocks(
-            httpContextAccessor,
-            userService,
-            signInService);
+        VerifyAllMocks(httpContextAccessor, userService, signInService);
     }
 
     [Fact]
     public async Task RegisterOrSignIn_NoInvite_ReturnsNoInvite()
     {
         var remoteUserId = Guid.NewGuid().ToString();
-        var claims = new[]
-        {
-            new Claim(ClaimConstants.NameIdentifierId, remoteUserId)
-        };
-        var httpContext = new DefaultHttpContext
-        {
-            User = new ClaimsPrincipal(new ClaimsIdentity(claims))
-        };
+        var claims = new[] { new Claim(ClaimConstants.NameIdentifierId, remoteUserId) };
+        var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity(claims)) };
 
         var logger = new Mock<ILogger<SignInController>>(Strict);
-        logger.Setup(x => x.Log(
-            LogLevel.Warning,
-            It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((v, t) => v.ToString()!
-                .Contains($"User with remote Id \"{remoteUserId}\" had no invite to accept")),
-            It.IsAny<Exception>(),
-            It.IsAny<Func<It.IsAnyType, Exception?, string>>()));
+        logger.Setup(x =>
+            x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>(
+                    (v, t) => v.ToString()!.Contains($"User with remote Id \"{remoteUserId}\" had no invite to accept")
+                ),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+            )
+        );
 
         var httpContextAccessor = new Mock<IHttpContextAccessor>(Strict);
         httpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
 
         var userService = new Mock<IUserService>(Strict);
-        userService.Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
+        userService
+            .Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
             .ReturnsAsync(true);
 
         var signInService = new Mock<ISignInService>(Strict);
-        signInService.Setup(mock => mock.RegisterOrSignIn())
+        signInService
+            .Setup(mock => mock.RegisterOrSignIn())
             .ReturnsAsync(new SignInResponseViewModel(LoginResult.NoInvite));
 
         var service = SetupService(
             logger: logger.Object,
             httpContextAccessor: httpContextAccessor.Object,
             signInService: signInService.Object,
-            userService: userService.Object);
+            userService: userService.Object
+        );
 
         var result = await service.RegisterOrSignIn();
 
@@ -248,51 +226,48 @@ public class SignInControllerTests
         Assert.Equal(LoginResult.NoInvite, signInResponse.LoginResult);
         Assert.Null(signInResponse.UserProfile);
 
-        VerifyAllMocks(
-            logger,
-            httpContextAccessor,
-            userService,
-            signInService);
+        VerifyAllMocks(logger, httpContextAccessor, userService, signInService);
     }
 
     [Fact]
     public async Task RegisterOrSignIn_ExpiredInvite_ReturnsExpiredInvite()
     {
         var remoteUserId = Guid.NewGuid().ToString();
-        var claims = new[]
-        {
-            new Claim(ClaimConstants.NameIdentifierId, remoteUserId)
-        };
-        var httpContext = new DefaultHttpContext
-        {
-            User = new ClaimsPrincipal(new ClaimsIdentity(claims))
-        };
+        var claims = new[] { new Claim(ClaimConstants.NameIdentifierId, remoteUserId) };
+        var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity(claims)) };
 
         var logger = new Mock<ILogger<SignInController>>(Strict);
-        logger.Setup(x => x.Log(
-            LogLevel.Warning,
-            It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((v, t) => v.ToString()!
-                .Contains($"User with remote Id \"{remoteUserId}\" had an expired invite")),
-            It.IsAny<Exception>(),
-            It.IsAny<Func<It.IsAnyType, Exception?, string>>()));
+        logger.Setup(x =>
+            x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>(
+                    (v, t) => v.ToString()!.Contains($"User with remote Id \"{remoteUserId}\" had an expired invite")
+                ),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+            )
+        );
 
         var httpContextAccessor = new Mock<IHttpContextAccessor>(Strict);
         httpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
 
         var userService = new Mock<IUserService>(Strict);
-        userService.Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
+        userService
+            .Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
             .ReturnsAsync(true);
 
         var signInService = new Mock<ISignInService>(Strict);
-        signInService.Setup(mock => mock.RegisterOrSignIn())
+        signInService
+            .Setup(mock => mock.RegisterOrSignIn())
             .ReturnsAsync(new SignInResponseViewModel(LoginResult.ExpiredInvite));
 
         var service = SetupService(
             logger: logger.Object,
             httpContextAccessor: httpContextAccessor.Object,
             signInService: signInService.Object,
-            userService: userService.Object);
+            userService: userService.Object
+        );
 
         var result = await service.RegisterOrSignIn();
 
@@ -301,11 +276,7 @@ public class SignInControllerTests
         Assert.Equal(LoginResult.ExpiredInvite, signInResponse.LoginResult);
         Assert.Null(signInResponse.UserProfile);
 
-        VerifyAllMocks(
-            logger,
-            httpContextAccessor,
-            userService,
-            signInService);
+        VerifyAllMocks(logger, httpContextAccessor, userService, signInService);
     }
 
     [Fact]
@@ -314,7 +285,8 @@ public class SignInControllerTests
         var remoteUserId = Guid.NewGuid().ToString();
 
         var userService = new Mock<IUserService>(Strict);
-        userService.Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
+        userService
+            .Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
             .ReturnsAsync(false);
 
         var service = SetupService(userService: userService.Object);
@@ -330,7 +302,8 @@ public class SignInControllerTests
         ILogger<SignInController>? logger = null,
         IHttpContextAccessor? httpContextAccessor = null,
         ISignInService? signInService = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new SignInController(
             logger: logger ?? Mock.Of<ILogger<SignInController>>(Strict),

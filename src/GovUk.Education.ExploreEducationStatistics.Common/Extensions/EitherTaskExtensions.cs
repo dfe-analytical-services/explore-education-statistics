@@ -63,15 +63,15 @@ public static class EitherTaskExtensions
 
     public static async Task<ActionResult<T>> HandleFailuresOr<T>(
         this Task<Either<ActionResult, T>> task,
-        Func<T, ActionResult<T>> successFn)
+        Func<T, ActionResult<T>> successFn
+    )
     {
         var result = await task;
 
         return result.IsRight ? successFn.Invoke(result.Right) : result.Left;
     }
 
-    public static async Task<ActionResult<T>> HandleFailuresOrOk<T>(
-        this Task<Either<ActionResult, T>> task)
+    public static async Task<ActionResult<T>> HandleFailuresOrOk<T>(this Task<Either<ActionResult, T>> task)
     {
         var result = await task;
 
