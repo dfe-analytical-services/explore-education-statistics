@@ -39,6 +39,11 @@
   }
 }
 
+.recharts-surface:focus {
+  box-shadow: 0 0 0 5px $govuk-focus-colour;
+  outline: #000 solid $govuk-focus-width;
+}
+
 @media print {
   .recharts-legend-wrapper ul {
     font-size: 0.7rem;

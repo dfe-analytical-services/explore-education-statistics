@@ -46,7 +46,12 @@ const CustomTooltip = ({
   };
 
   return (
-    <div className={styles.tooltip} data-testid="chartTooltip">
+    <div
+      className={styles.tooltip}
+      aria-live="assertive"
+      data-testid="chartTooltip"
+      role="status"
+    >
       <p className="govuk-!-font-weight-bold" data-testid="chartTooltip-label">
         {tooltipLabel}
       </p>
