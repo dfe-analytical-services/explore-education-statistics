@@ -31,3 +31,5 @@ resource vault 'Microsoft.DataProtection/backupVaults@2022-05-01' = {
   }
   tags: tagValues
 }
+
+output principalId string = vault.identity.principalId

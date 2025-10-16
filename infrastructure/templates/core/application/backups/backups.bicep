@@ -23,3 +23,11 @@ module backupBlobsPolicyModule 'backupVaultBlobsPolicy.bicep' = {
     resourcePrefix: resourcePrefix
   }
 }
+
+module backupPsqlFlexibleServerPolicyModule 'backupVaultPsqlFlexibleServerPolicy.bicep' = {
+  name: 'backupVaultPsqlFlexibleServerPolicyModuleDeploy'
+  params: {
+    vaultName: backupVaultModule.outputs.vaultName
+    resourcePrefix: resourcePrefix
+  }
+}

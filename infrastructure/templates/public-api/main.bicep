@@ -181,19 +181,23 @@ var legacyResourcePrefix = subscription
 
 var resourceNames = {
   existingResources: {
-    adminApp: '${legacyResourcePrefix}-as-ees-admin'
-    analyticsFileShare: '${commonResourcePrefix}-${abbreviations.fileShare}-anlyt'
-    analyticsStorageAccount: '${replace(commonResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
-    publisherFunction: '${legacyResourcePrefix}-fa-ees-publisher'
-    keyVault: '${legacyResourcePrefix}-kv-ees-01'
-    vNet: '${legacyResourcePrefix}-vnet-ees'
-    alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
     acr: 'eesacr'
     acrResourceGroup: acrResourceGroupName
-    // The Test Resource Group has broken from the naming convention of other environments for Core Storage
+    adminApp: '${legacyResourcePrefix}-as-ees-admin'
+    alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
+    analyticsFileShare: '${commonResourcePrefix}-${abbreviations.fileShare}-anlyt'
+    analyticsStorageAccount: '${replace(commonResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
+    backupVault: {
+      vault: '${commonResourcePrefix}-${abbreviations.backupVaults}'
+      psqlFlexibleServerBackupPolicy: '${commonResourcePrefix}-psql-flexible-server-${abbreviations.backupVaultPolicies}'
+    }
     coreStorageAccount: subscription == 's101t01' || subscription == 's101p02'
       ? '${legacyResourcePrefix}storageeescore'
       : '${legacyResourcePrefix}saeescore'
+    keyVault: '${legacyResourcePrefix}-kv-ees-01'
+    logAnalyticsWorkspace: '${commonResourcePrefix}-log'
+    publisherFunction: '${legacyResourcePrefix}-fa-ees-publisher'
+    // The Test Resource Group has broken from the naming convention of other environments for Core Storage
     subnets: {
       adminApp: '${legacyResourcePrefix}-snet-ees-admin'
       publisherFunction: '${legacyResourcePrefix}-snet-ees-publisher'
@@ -204,7 +208,7 @@ var resourceNames = {
       storagePrivateEndpoints: '${publicApiResourcePrefix}-snet-${abbreviations.storageStorageAccounts}-pep'
       psqlFlexibleServer: '${commonResourcePrefix}-snet-${abbreviations.dBforPostgreSQLServers}'
     }
-    logAnalyticsWorkspace: '${commonResourcePrefix}-log'
+    vNet: '${legacyResourcePrefix}-vnet-ees'
   }
   sharedResources: {
     appGateway: '${commonResourcePrefix}-${abbreviations.networkApplicationGateways}-01'

@@ -37,6 +37,8 @@ var formattedFirewallRules = map(firewallRules, rule => {
   cidr: rule.cidr
 })
 
+var serverName = resourceNames.sharedResources.postgreSqlFlexibleServer
+
 func createManagedIdentityConnectionString(templateString string, identityName string) string =>
   replaceMultiple(templateString, {
     '[database_name]': 'public_data'
@@ -46,7 +48,7 @@ func createManagedIdentityConnectionString(templateString string, identityName s
 module postgreSqlServerModule '../../components/postgreSqlFlexibleServer.bicep' = {
   name: 'postgreSQLDatabaseDeploy'
   params: {
-    databaseServerName: resourceNames.sharedResources.postgreSqlFlexibleServer
+    databaseServerName: serverName
     location: location
     createMode: 'Default'
     adminName: adminName
@@ -72,6 +74,33 @@ module postgreSqlServerModule '../../components/postgreSqlFlexibleServer.bicep' 
     } : null
     tagValues: tagValues
   }
+}
+
+resource backupVault 'Microsoft.DataProtection/backupVaults@2022-05-01' existing = {
+  name: resourceNames.existingResources.backupVault.vault
+}
+
+module backupVaultRoleAssignmentModule '../../../common/components/psql-flexible-server/roleAssignment.bicep' = {
+  name: '${serverName}BackupVaultRoleAssignmentDeploy'
+  params: {
+    psqlFlexibleServerName: postgreSqlServerModule.outputs.serverName
+    principalIds: [backupVault.identity.principalId]
+    role: 'PostgreSQL Flexible Server Long Term Retention Backup Role'
+  }
+}
+
+module backupInstanceModule '../../../common/components/data-protection/backupVaultInstance.bicep' = {
+  name: '${serverName}BackupInstanceDeploy'
+  params: {
+    vaultName: resourceNames.existingResources.backupVault.vault
+    dataSourceType: 'psqlFlexibleServer'
+    resourceId: postgreSqlServerModule.outputs.databaseRef
+    backupPolicyName: resourceNames.existingResources.backupVault.psqlFlexibleServerBackupPolicy
+    tagValues: tagValues
+  }
+  dependsOn: [
+    backupVaultRoleAssignmentModule
+  ]
 }
 
 var connectionStringTemplate = postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate

@@ -1,5 +1,4 @@
-type BackupVaultPolicyDataSourceType =
-  | 'blobs'
+import { BackupVaultPolicyDataSourceType, getFullBackupVaultDataSourceType } from '../../types.bicep'
 
 @description('Name of the backup policy.')
 param policyName string
@@ -8,7 +7,7 @@ param policyName string
 param vaultName string
 
 @description('Name of the Backup Policy')
-param backupDataSources BackupVaultPolicyDataSourceType[]
+param dataSourceTypes BackupVaultPolicyDataSourceType[]
 
 @description('Operational tier backup retention duration in days (for PITR recovery).')
 @minValue(1)
@@ -38,17 +37,12 @@ param vaultTierYearlyRetentionInYears int
 @description('Vault tier daily backup schedule time, in hh:mm format e.g. 07:00.')
 param vaultTierDailyBackupScheduleTime string
 
-var dataSourceTypeMap = {
- blobs: 'Microsoft.Storage/storageAccounts/blobServices'
-}
-
 var operationalTierRetentionDuration = 'P${operationalTierRetentionInDays}D'
 var vaultTierDefaultRetentionDuration = 'P${vaultTierDefaultRetentionInDays}D'
 var vaultTierWeeklyRetentionDuration = 'P${vaultTierWeeklyRetentionInWeeks}W'
 var vaultTierMonthlyRetentionDuration = 'P${vaultTierMonthlyRetentionInMonths}M'
 var vaultTierYearlyRetentionDuration = 'P${vaultTierYearlyRetentionInYears}Y'
 var repeatingTimeIntervals = 'R/2024-05-06T${vaultTierDailyBackupScheduleTime}:00+00:00/P1D'
-var dataSourceTypes = map(backupDataSources, source => dataSourceTypeMap[source])
 
 resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-05-01' = {
   name: '${vaultName}/${policyName}'
@@ -220,7 +214,7 @@ resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022
         }
       }
     ]
-    datasourceTypes: dataSourceTypes
+    datasourceTypes: map(dataSourceTypes, source => getFullBackupVaultDataSourceType(source))
     objectType: 'BackupPolicy'
   }
 }

@@ -22,17 +22,20 @@ type MonthOfYear =
 @export()
 type ResourceNames = {
   existingResources: {
-    adminApp: string
-    analyticsStorageAccount: string
-    analyticsFileShare: string
-    publisherFunction: string
-    keyVault: string
-    vNet: string
-    alertsGroup: string
     acr: string
     acrResourceGroup: string
+    adminApp: string
+    alertsGroup: string
+    analyticsFileShare: string
+    analyticsStorageAccount: string
+    backupVault: {
+      vault: string
+      psqlFlexibleServerBackupPolicy: string
+    }
     coreStorageAccount: string
+    keyVault: string
     logAnalyticsWorkspace: string
+    publisherFunction: string
     subnets: {
       dataProcessor: string
       dataProcessorPrivateEndpoints: string
@@ -43,6 +46,7 @@ type ResourceNames = {
       publisherFunction: string
       storagePrivateEndpoints: string
     }
+    vNet: string
   }
   sharedResources: {
     appGateway: string

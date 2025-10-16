@@ -21,4 +21,12 @@ module backupVaultModule '../../../common/components/data-protection/backupVault
   }
 }
 
+module resourceGroupReaderRoleAssignmentModule '../../../common/components/resource-group/roleAssignment.bicep' = {
+  name: '${vaultName}ResourceGroupRoleAssignmentDeploy'
+  params: {
+    principalIds: [backupVaultModule.outputs.principalId]
+    role: 'Reader'
+  }
+}
+
 output vaultName string = vaultName

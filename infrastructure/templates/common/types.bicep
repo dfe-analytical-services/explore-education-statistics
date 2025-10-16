@@ -33,13 +33,6 @@ type PrivateDnsZone =
   | 'custom'
 
 @export()
-type StorageAccountRole =
-  | 'Storage Blob Data Contributor'
-  | 'Storage Blob Data Owner'
-  | 'Storage Blob Data Reader'
-  | 'Storage Queue Data Contributor'
-
-@export()
 type StorageAccountConfig = {
   sku: 'Standard_LRS' | 'Premium_LRS' | 'Premium_ZRS'
   kind: 'StorageV2' | 'FileStorage'
@@ -48,3 +41,17 @@ type StorageAccountConfig = {
     accessTier: 'Cool' | 'Hot' | 'TransactionOptimized' | 'Premium'
   }
 }
+
+@export()
+type BackupVaultPolicyDataSourceType =
+  | 'blobs'
+  | 'psqlFlexibleServer'
+
+var dataSourceTypeMap = {
+ blobs: 'Microsoft.Storage/storageAccounts/blobServices'
+ psqlFlexibleServer: 'AzureDatabaseForPostgreSQLFlexibleServer'
+}
+
+@export()
+func getFullBackupVaultDataSourceType(shortType BackupVaultPolicyDataSourceType) string =>
+  dataSourceTypeMap[shortType]

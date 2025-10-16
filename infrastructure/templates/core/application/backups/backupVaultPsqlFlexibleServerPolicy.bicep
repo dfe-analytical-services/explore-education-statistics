@@ -6,7 +6,7 @@ param resourcePrefix string
 @description('Name of the backup vault that this policy belongs to.')
 param vaultName string
 
-var policyName = '${resourcePrefix}-blobs-${abbreviations.backupVaultPolicies}'
+var policyName = '${resourcePrefix}-psql-flexible-server-${abbreviations.backupVaultPolicies}'
 
 module backupVaultPolicyModule '../../../common/components/data-protection/backupVaultPolicy.bicep' = {
   name: '${policyName}Deploy'
@@ -19,6 +19,6 @@ module backupVaultPolicyModule '../../../common/components/data-protection/backu
     vaultTierWeeklyRetentionInWeeks: 52
     vaultTierMonthlyRetentionInMonths: 12
     vaultTierYearlyRetentionInYears: 1
-    dataSourceTypes: ['blobs']
+    dataSourceTypes: ['psqlFlexibleServer']
   }
 }

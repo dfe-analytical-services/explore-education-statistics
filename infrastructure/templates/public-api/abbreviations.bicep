@@ -3,6 +3,10 @@
 var abbreviations = {
   appContainerApps: 'ca'
   appManagedEnvironments: 'cae'
+  // Added from https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations
+  backupVaults: 'bvault'
+  // Added from https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations
+  backupVaultPolicies: 'bkpol'
   // TODO - remove the "-flexibleserver" suffix and change the suffix of our PSQL instance to "-01"
   dBforPostgreSQLServers: 'psql-flexibleserver'
   fileShare: 'share'
