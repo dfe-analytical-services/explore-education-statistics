@@ -161,10 +161,20 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
                     roleId: roleId,
                     cancellationToken: cancellationToken
                 )
-            : await ResetPendingUserInvite(user: existingUser, roleId: roleId, cancellationToken: cancellationToken);
+            : await ResetPendingUserInvite(
+                user: existingUser,
+                roleId: roleId,
+                createdDate: createdDate,
+                cancellationToken: cancellationToken
+            );
     }
 
-    private async Task<User> ResetPendingUserInvite(User user, string roleId, CancellationToken cancellationToken)
+    private async Task<User> ResetPendingUserInvite(
+        User user,
+        string roleId,
+        DateTimeOffset? createdDate,
+        CancellationToken cancellationToken
+    )
     {
         var higherRoles = GlobalRoles.GetHigherRoles(
             EnumUtil.GetFromEnumValue<GlobalRoles.Role>(roleId).GetEnumLabel()
@@ -176,6 +186,8 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
             : roleId;
 
         user.RoleId = newRoleId;
+        // Always update the created date to the new one, to reset the invite expiry
+        user.Created = createdDate ?? DateTimeOffset.UtcNow;
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
         return user;

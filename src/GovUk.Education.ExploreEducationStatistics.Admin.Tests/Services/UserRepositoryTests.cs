@@ -646,12 +646,12 @@ public abstract class UserRepositoryTests
                 Assert.Null(result.LastName);
                 Assert.False(result.Active);
                 Assert.Equal(oldCreatedById, result.CreatedById);
-                Assert.Equal(oldCreatedDate, result.Created);
                 Assert.Null(result.SoftDeleted);
                 Assert.Null(result.DeletedById);
 
                 // The role should only be updated if the new one outranks (or equals) the existing one
                 Assert.Equal(expectedUpdatedRole.GetEnumValue(), result.RoleId);
+                Assert.Equal(newCreatedDate, result.Created);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -665,17 +665,17 @@ public abstract class UserRepositoryTests
                 Assert.Null(updatedUser.LastName);
                 Assert.False(updatedUser.Active);
                 Assert.Equal(oldCreatedById, updatedUser.CreatedById);
-                Assert.Equal(oldCreatedDate, updatedUser.Created);
                 Assert.Null(updatedUser.SoftDeleted);
                 Assert.Null(updatedUser.DeletedById);
 
                 // The role should only be updated if the new one outranks (or equals) the existing one
                 Assert.Equal(expectedUpdatedRole.GetEnumValue(), updatedUser.RoleId);
+                Assert.Equal(newCreatedDate, updatedUser.Created);
             }
         }
 
         [Fact]
-        public async Task UserWithPendingInvite_CreatedDateNotSupplied_LeavesUserUntouched()
+        public async Task UserWithPendingInvite_CreatedDateNotSupplied_UpdatesUserCreatedDateToNow()
         {
             var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
 
@@ -699,14 +699,14 @@ public abstract class UserRepositoryTests
                     createdById: Guid.NewGuid()
                 );
 
-                result.Created.AssertEqual(oldCreatedDate);
+                result.Created.AssertUtcNow();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
 
-                updatedUser.Created.AssertEqual(oldCreatedDate);
+                updatedUser.Created.AssertUtcNow();
             }
         }
 
