@@ -35,8 +35,8 @@ export interface DataSetUpload {
 }
 
 export interface ScreenerResult {
-  overallResult: ScreenerOverallResult;
-  message: string;
+  overallResult: string;
+  passed: boolean;
   testResults: ScreenerTestSummary[];
 }
 
@@ -45,7 +45,8 @@ export interface ScreenerTestSummary {
   testFunctionName: string;
   result: ScreenerTestResult;
   notes: string | undefined;
-  stage: ScreenerTestStage;
+  guidanceUrl?: string | undefined;
+  stage: string;
 }
 
 export interface DeleteDataFilePlan {
@@ -121,16 +122,7 @@ export type DataSetUploadStatus =
   | 'PENDING_REVIEW'
   | 'PENDING_IMPORT';
 
-export type ScreenerOverallResult = 'Passed' | 'Failed';
-
 export type ScreenerTestResult = 'PASS' | 'FAIL' | 'WARNING';
-
-export type ScreenerTestStage =
-  | 'InitialFileValidation'
-  | 'PreScreening1'
-  | 'PreScreening2'
-  | 'FullChecks'
-  | 'Passed';
 
 export interface DataFileImportStatus {
   status: ImportStatusCode;

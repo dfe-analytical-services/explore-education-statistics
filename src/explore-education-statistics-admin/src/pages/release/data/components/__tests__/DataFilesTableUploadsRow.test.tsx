@@ -24,7 +24,7 @@ describe('DataFilesTableUploadsRow', () => {
       status: 'PENDING_IMPORT',
       screenerResult: {
         overallResult: 'Passed',
-        message: 'Passed all checks',
+        passed: true,
         testResults: [
           {
             id: 'pass-test-1',
@@ -62,7 +62,7 @@ describe('DataFilesTableUploadsRow', () => {
       status: 'PENDING_IMPORT',
       screenerResult: {
         overallResult: 'Passed',
-        message: 'Passed all checks',
+        passed: true,
         testResults: [
           {
             id: 'passAndWarning-test-1',
@@ -100,7 +100,7 @@ describe('DataFilesTableUploadsRow', () => {
       status: 'FAILED_SCREENING',
       screenerResult: {
         overallResult: 'Passed',
-        message: 'Passed all checks',
+        passed: true,
         testResults: [
           {
             id: 'fail-test-1',
