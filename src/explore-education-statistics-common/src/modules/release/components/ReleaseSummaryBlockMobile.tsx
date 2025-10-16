@@ -59,7 +59,7 @@ export default function ReleaseSummaryBlockMobile({
           <div className={styles.updatesContainer}>
             {(isEditing || lastUpdated) && (
               <p>
-                <span className={styles.grey}>Last updated</span>{' '}
+                <span className="dfe-colour--dark-grey">Last updated</span>{' '}
                 {isEditing && !lastUpdated && 'Currently editing'}
                 {lastUpdated && <FormattedDate>{lastUpdated}</FormattedDate>}
               </p>
@@ -69,7 +69,7 @@ export default function ReleaseSummaryBlockMobile({
           </div>
 
           <p>
-            <span className={styles.grey}>Produced by</span>{' '}
+            <span className="dfe-colour--dark-grey">Produced by</span>{' '}
             {renderProducerLink}
           </p>
         </div>

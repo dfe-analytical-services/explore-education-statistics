@@ -25,7 +25,7 @@ const PublicationReleaseHeadlinesSection = ({
 }) => {
   const getReleaseFile = useGetReleaseFile(releaseVersionId);
 
-  const dataBlockViewModel = keyStatisticsSecondarySection.content[0];
+  const secondaryKeyStatsDataBlock = keyStatisticsSecondarySection.content[0];
 
   const summaryTab = (
     <>
@@ -90,9 +90,9 @@ const PublicationReleaseHeadlinesSection = ({
           releaseVersionId={releaseVersionId}
           getInfographic={getReleaseFile}
           dataBlock={{
-            id: dataBlockViewModel.id,
-            type: dataBlockViewModel.type,
-            ...dataBlockViewModel.dataBlockVersion,
+            id: secondaryKeyStatsDataBlock.id,
+            type: secondaryKeyStatsDataBlock.type,
+            ...secondaryKeyStatsDataBlock.dataBlockVersion,
           }}
           dataBlockStaleTime={Infinity}
           firstTabs={

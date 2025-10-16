@@ -276,7 +276,6 @@ export const testReleaseHomeContent: ReleaseVersionHomeContent = {
                 subtitle: 'Chart subtitle',
                 alt: 'Alt text',
                 height: 600,
-                width: 400,
                 includeNonNumericData: false,
                 axes: {},
                 legend: {
@@ -422,7 +421,6 @@ export const testReleaseHomeContent: ReleaseVersionHomeContent = {
               subtitle: 'Test chart subtitle',
               alt: 'Alt text',
               height: 600,
-              width: 400,
               includeNonNumericData: false,
               axes: {},
             },

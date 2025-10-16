@@ -4,7 +4,6 @@ import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import classNames from 'classnames';
-import ButtonText from '@common/components/ButtonText';
 
 interface KeyStatContainerProps {
   children: ReactNode;
@@ -78,23 +77,11 @@ const KeyStat = ({
               ? styles.guidanceTitleRedesign
               : styles.guidanceTitle
           }
+          showCloseButton={isRedesignStyle}
           hiddenText={guidanceTitle === 'Help' ? `for ${title}` : undefined}
         >
           <div data-testid={`${testId}-guidanceText`}>
             <ReactMarkdown key={guidanceText}>{guidanceText}</ReactMarkdown>
-            {isRedesignStyle && (
-              <ButtonText
-                onClick={ev => {
-                  ev.preventDefault();
-                  if (ev.nativeEvent.target instanceof HTMLElement) {
-                    const details = ev.nativeEvent.target.closest('details');
-                    details?.removeAttribute('open');
-                  }
-                }}
-              >
-                Close
-              </ButtonText>
-            )}
           </div>
         </Details>
       )}

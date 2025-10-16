@@ -46,7 +46,6 @@
 /* stylelint-disable max-nesting-depth */
 .guidanceTitleRedesign {
   background: $_govuk-rebrand-light-blue-background-colour;
-  font-size: 16px !important;
   margin: 0;
   padding: 0;
   position: relative;
@@ -55,6 +54,7 @@
   border: 1px solid govuk-tint($govuk-brand-colour, 50%);
 
   :global(.govuk-details__summary) {
+    @include govuk-font-size($size: 16);
     padding: 0.5rem;
     padding-right: 2rem;
     color: govuk-colour('black');

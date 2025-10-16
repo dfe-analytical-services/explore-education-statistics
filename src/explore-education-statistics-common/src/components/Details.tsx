@@ -5,6 +5,7 @@ import { formatTestId } from '@common/utils/test-utils';
 import classNames from 'classnames';
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import styles from './Details.module.scss';
+import ButtonText from './ButtonText';
 import VisuallyHidden from './VisuallyHidden';
 
 let hasNativeDetails: boolean;
@@ -31,6 +32,7 @@ export interface DetailsProps {
   jsRequired?: boolean;
   onToggle?: DetailsToggleHandler;
   open?: boolean;
+  showCloseButton?: boolean;
   summary: string;
   summaryAfter?: ReactNode;
   hiddenText?: string;
@@ -46,6 +48,7 @@ const Details = ({
   jsRequired = false,
   open: defaultOpen = false,
   onToggle,
+  showCloseButton = false,
   summary,
   summaryAfter,
   hiddenText,
@@ -151,6 +154,17 @@ const Details = ({
         )}
       >
         {children}
+
+        {showCloseButton && (
+          <ButtonText
+            onClick={ev => {
+              ev.preventDefault();
+              toggleOpen();
+            }}
+          >
+            Close
+          </ButtonText>
+        )}
       </div>
     </details>
   );
