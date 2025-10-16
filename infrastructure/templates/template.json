@@ -2643,6 +2643,36 @@
           ]
         },
         {
+          "type": "Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies",
+          "apiVersion": "2023-08-01-preview",
+          "name": "[concat(string(variables('coreSqlServerName')), '/', variables('contentDbName'), '/default')]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers/databases', string(variables('coreSqlServerName')), variables('contentDbName'))]",
+            "[resourceId('Microsoft.Sql/servers', string(variables('coreSqlServerName')))]"
+          ],
+          "properties": {
+            "weeklyRetention": "P4W",
+            "monthlyRetention": "P12M",
+            "yearlyRetention": "P1Y",
+            "weekOfYear": 1
+          }
+        },
+        {
+          "type": "Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies",
+          "apiVersion": "2023-08-01-preview",
+          "name": "[concat(string(variables('coreSqlServerName')), '/', variables('statisticsDbName'), '/default')]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers/databases', string(variables('coreSqlServerName')), variables('statisticsDbName'))]",
+            "[resourceId('Microsoft.Sql/servers', string(variables('coreSqlServerName')))]"
+          ],
+          "properties": {
+            "weeklyRetention": "P4W",
+            "monthlyRetention": "P3M",
+            "yearlyRetention": "P1Y",
+            "weekOfYear": 1
+          }
+        },
+        {
           "type": "securityAlertPolicies",
           "name": "Default",
           "apiVersion": "2017-03-01-preview",
