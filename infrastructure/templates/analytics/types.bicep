@@ -1,13 +1,15 @@
 @export()
 type ResourceNames = {
   existingResources: {
-    keyVault: string
-    vNet: string
     alertsGroup: string
+    keyVault: string
     logAnalyticsWorkspace: string
+    recoveryVault: string
+    recoveryVaultFileShareBackupPolicy: string
     subnets: {
       analyticsFunctionApp: string
       storagePrivateEndpoints: string
     }
+    vNet: string
   }
 }
