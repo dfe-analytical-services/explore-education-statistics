@@ -350,14 +350,8 @@ public class DataSetFileService(
                 .ToList(),
             TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
             {
-                From = TimePeriodLabelFormatter.Format(
-                    meta.TimePeriodRange.Start.Period,
-                    meta.TimePeriodRange.Start.TimeIdentifier
-                ),
-                To = TimePeriodLabelFormatter.Format(
-                    meta.TimePeriodRange.End.Period,
-                    meta.TimePeriodRange.End.TimeIdentifier
-                ),
+                From = meta.TimePeriodRange.Start.ToLabel(),
+                To = meta.TimePeriodRange.End.ToLabel(),
             },
             Filters = GetOrderedFilters(meta.Filters, filterSequence),
             Indicators = GetOrderedIndicators(meta.Indicators, indicatorGroupSequence),
