@@ -16,6 +16,134 @@ public abstract class UserRepositoryTests
 {
     private readonly DataFixture _dataFixture = new();
 
+    public class FindPendingUserInviteByEmailTests : UserRepositoryTests
+    {
+        [Fact]
+        public async Task ActiveUser_ReturnsNull()
+        {
+            var user = _dataFixture.DefaultUser()
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = SetupUserRepository(contentDbContext);
+                var result = await repository.FindPendingUserInviteByEmail(user.Email);
+                Assert.Null(result);
+            }
+        }
+
+        [Fact]
+        public async Task UserWithPendingInvite_ReturnsUser()
+        {
+            var user = _dataFixture.DefaultUserWithPendingInvite()
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = SetupUserRepository(contentDbContext);
+                var result = await repository.FindPendingUserInviteByEmail(user.Email);
+                Assert.NotNull(result);
+                Assert.Equal(user.Id, result.Id);
+            }
+        }
+
+        [Fact]
+        public async Task UserWithExpiredInvite_ReturnsNull()
+        {
+            var user = _dataFixture.DefaultUserWithExpiredInvite()
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = SetupUserRepository(contentDbContext);
+                var result = await repository.FindPendingUserInviteByEmail(user.Email);
+                Assert.Null(result);
+            }
+        }
+
+        [Fact]
+        public async Task DifferentCase_ReturnsUser()
+        {
+            var user = _dataFixture.DefaultUserWithPendingInvite()
+                .WithEmail("test@test.com")
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = SetupUserRepository(contentDbContext);
+                var result = await repository.FindPendingUserInviteByEmail("TEST@TEST.COM");
+
+                Assert.NotNull(result);
+                Assert.Equal(user.Id, result.Id);
+            }
+        }
+
+        [Fact]
+        public async Task SoftDeletedUser_ReturnsNull()
+        {
+            var user = _dataFixture.DefaultSoftDeletedUser()
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = SetupUserRepository(contentDbContext);
+                var result = await repository.FindPendingUserInviteByEmail(user.Email);
+
+                Assert.Null(result);
+            }
+        }
+
+        [Fact]
+        public async Task UserDoesNotExist_ReturnsNull()
+        {
+            await using var contentDbContext = InMemoryApplicationDbContext();
+
+            var repository = SetupUserRepository(contentDbContext);
+            var result = await repository.FindPendingUserInviteByEmail("test@test.com");
+            Assert.Null(result);
+        }
+    }
+
     public class FindActiveUserByEmailTests : UserRepositoryTests
     {
         [Fact]
@@ -105,11 +233,6 @@ public abstract class UserRepositoryTests
                 var repository = SetupUserRepository(contentDbContext);
                 var result = await repository.FindActiveUserByEmail("TEST@TEST.COM");
 
-                // While this test could fail using the in-memory db if the comparison was accidentally case sensitive,
-                // it wouldn't fail using SqlServer which is using a case insensitive collation by default.
-                // C# equality is translated directly to SQL equality, which won't be case-sensitive with our config.
-                // EF 5.0 will allow setting a different collation making this test worth while.
-                // See https://docs.microsoft.com/en-us/ef/core/miscellaneous/collations-and-case-sensitivity
                 Assert.NotNull(result);
                 Assert.Equal(user.Id, result.Id);
             }
@@ -149,7 +272,7 @@ public abstract class UserRepositoryTests
         }
     }
 
-    public class FindByEmailTests : UserRepositoryTests
+    public class FindActiveUserByIdTests : UserRepositoryTests
     {
         [Fact]
         public async Task ActiveUser_ReturnsUser()
@@ -168,7 +291,110 @@ public abstract class UserRepositoryTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = SetupUserRepository(contentDbContext);
-                var result = await repository.FindByEmail(user.Email);
+                var result = await repository.FindActiveUserById(user.Id);
+                Assert.NotNull(result);
+                Assert.Equal(user.Id, result.Id);
+            }
+        }
+
+        [Fact]
+        public async Task UserWithPendingInvite_ReturnsNull()
+        {
+            var user = _dataFixture.DefaultUserWithPendingInvite()
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = SetupUserRepository(contentDbContext);
+                var result = await repository.FindActiveUserById(user.Id);
+                Assert.Null(result);
+            }
+        }
+
+        [Fact]
+        public async Task UserWithExpiredInvite_ReturnsNull()
+        {
+            var user = _dataFixture.DefaultUserWithExpiredInvite()
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = SetupUserRepository(contentDbContext);
+                var result = await repository.FindActiveUserById(user.Id);
+                Assert.Null(result);
+            }
+        }
+
+        [Fact]
+        public async Task SoftDeletedUser_ReturnsNull()
+        {
+            var user = _dataFixture.DefaultSoftDeletedUser()
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = SetupUserRepository(contentDbContext);
+                var result = await repository.FindActiveUserById(user.Id);
+
+                Assert.Null(result);
+            }
+        }
+
+        [Fact]
+        public async Task UserDoesNotExist_ReturnsNull()
+        {
+            await using var contentDbContext = InMemoryApplicationDbContext();
+
+            var repository = SetupUserRepository(contentDbContext);
+            var result = await repository.FindActiveUserById(Guid.NewGuid());
+            Assert.Null(result);
+        }
+    }
+
+    public class FindUserByEmailTests : UserRepositoryTests
+    {
+        [Fact]
+        public async Task ActiveUser_ReturnsUser()
+        {
+            var user = _dataFixture.DefaultUser()
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = SetupUserRepository(contentDbContext);
+                var result = await repository.FindUserByEmail(user.Email);
                 Assert.NotNull(result);
                 Assert.Equal(user.Id, result.Id);
             }
@@ -191,7 +417,7 @@ public abstract class UserRepositoryTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = SetupUserRepository(contentDbContext);
-                var result = await repository.FindByEmail(user.Email);
+                var result = await repository.FindUserByEmail(user.Email);
                 Assert.NotNull(result);
                 Assert.Equal(user.Id, result.Id);
             }
@@ -214,7 +440,7 @@ public abstract class UserRepositoryTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = SetupUserRepository(contentDbContext);
-                var result = await repository.FindByEmail(user.Email);
+                var result = await repository.FindUserByEmail(user.Email);
                 Assert.NotNull(result);
                 Assert.Equal(user.Id, result.Id);
             }
@@ -238,13 +464,8 @@ public abstract class UserRepositoryTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = SetupUserRepository(contentDbContext);
-                var result = await repository.FindByEmail("TEST@TEST.COM");
+                var result = await repository.FindUserByEmail("TEST@TEST.COM");
 
-                // While this test could fail using the in-memory db if the comparison was accidentally case sensitive,
-                // it wouldn't fail using SqlServer which is using a case insensitive collation by default.
-                // C# equality is translated directly to SQL equality, which won't be case-sensitive with our config.
-                // EF 5.0 will allow setting a different collation making this test worth while.
-                // See https://docs.microsoft.com/en-us/ef/core/miscellaneous/collations-and-case-sensitivity
                 Assert.NotNull(result);
                 Assert.Equal(user.Id, result.Id);
             }
@@ -267,7 +488,7 @@ public abstract class UserRepositoryTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = SetupUserRepository(contentDbContext);
-                var result = await repository.FindByEmail(user.Email);
+                var result = await repository.FindUserByEmail(user.Email);
 
                 Assert.Null(result);
             }
@@ -279,7 +500,7 @@ public abstract class UserRepositoryTests
             await using var contentDbContext = InMemoryApplicationDbContext();
 
             var repository = SetupUserRepository(contentDbContext);
-            var result = await repository.FindByEmail("test@test.com");
+            var result = await repository.FindUserByEmail("test@test.com");
             Assert.Null(result);
         }
     }
@@ -394,8 +615,20 @@ public abstract class UserRepositoryTests
             }
         }
 
-        [Fact]
-        public async Task UserWithPendingInvite_UpdatesUser()
+        [Theory]
+        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser)]
+        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
+        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.Analyst)]
+        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
+        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.Analyst, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        public async Task UserWithPendingInvite_UpdatesUser(
+            GlobalRoles.Role oldRole, 
+            GlobalRoles.Role newRole, 
+            GlobalRoles.Role expectedUpdatedRole)
         {
             var oldCreatedById = Guid.NewGuid();
             var newCreatedById = Guid.NewGuid();
@@ -403,7 +636,7 @@ public abstract class UserRepositoryTests
             var newCreatedDate = DateTimeOffset.UtcNow.AddDays(-1);
 
             var user = _dataFixture.DefaultUserWithPendingInvite()
-                .WithRoleId(GlobalRoles.Role.PrereleaseUser.GetEnumValue())
+                .WithRoleId(oldRole.GetEnumValue())
                 .WithCreatedById(oldCreatedById)
                 .WithCreated(oldCreatedDate)
                 .Generate();
@@ -422,20 +655,24 @@ public abstract class UserRepositoryTests
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
-                    role: GlobalRoles.Role.Analyst,
+                    role: newRole,
                     createdById: newCreatedById,
                     createdDate: newCreatedDate);
 
+                // All of these fields should be untouched by the update
                 Assert.Equal(user.Id, result.Id);
                 Assert.Equal(user.Email, result.Email);
                 Assert.Null(result.FirstName);
                 Assert.Null(result.LastName);
                 Assert.False(result.Active);
-                Assert.Equal(GlobalRoles.Role.Analyst.GetEnumValue(), result.RoleId);
-                Assert.Equal(newCreatedById, result.CreatedById);
-                Assert.Equal(newCreatedDate, result.Created);
+                Assert.Equal(oldCreatedById, result.CreatedById);
+                Assert.Equal(oldCreatedDate, result.Created);
                 Assert.Null(result.SoftDeleted);
                 Assert.Null(result.DeletedById);
+
+                // The role should only be updated if the new one outranks (or equals) the existing one
+                Assert.Equal(expectedUpdatedRole.GetEnumValue(), result.RoleId);
+
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -443,28 +680,81 @@ public abstract class UserRepositoryTests
                 var updatedUser = await contentDbContext.Users
                     .SingleAsync(u => u.Id == user.Id);
 
+                // All of these fields should be untouched by the update
                 Assert.Equal(user.Id, updatedUser.Id);
                 Assert.Equal(user.Email, updatedUser.Email);
                 Assert.Null(updatedUser.FirstName);
                 Assert.Null(updatedUser.LastName);
                 Assert.False(updatedUser.Active);
-                Assert.Equal(GlobalRoles.Role.Analyst.GetEnumValue(), updatedUser.RoleId);
-                Assert.Equal(newCreatedById, updatedUser.CreatedById);
-                Assert.Equal(newCreatedDate, updatedUser.Created);
+                Assert.Equal(oldCreatedById, updatedUser.CreatedById);
+                Assert.Equal(oldCreatedDate, updatedUser.Created);
                 Assert.Null(updatedUser.SoftDeleted);
                 Assert.Null(updatedUser.DeletedById);
+
+                // The role should only be updated if the new one outranks (or equals) the existing one
+                Assert.Equal(expectedUpdatedRole.GetEnumValue(), updatedUser.RoleId);
             }
         }
 
         [Fact]
-        public async Task UserWithExpiredInvite_UpdatesUser()
+        public async Task UserWithPendingInvite_CreatedDateNotSupplied_LeavesUserUntouched()
+        {
+            var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
+
+            var user = _dataFixture.DefaultUserWithPendingInvite()
+                .WithCreated(oldCreatedDate)
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = SetupUserRepository(contentDbContext);
+
+                var result = await repository.CreateOrUpdate(
+                    email: user.Email,
+                    role: GlobalRoles.Role.Analyst,
+                    createdById: Guid.NewGuid());
+
+                result.Created.AssertEqual(oldCreatedDate);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedUser = await contentDbContext.Users
+                    .SingleAsync(u => u.Id == user.Id);
+
+                updatedUser.Created.AssertEqual(oldCreatedDate);
+            }
+        }
+
+        [Theory]
+        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser)]
+        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
+        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser)]
+        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
+        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        public async Task UserWithExpiredInvite_UpdatesUser(
+            GlobalRoles.Role oldRole,
+            GlobalRoles.Role newRole,
+            GlobalRoles.Role expectedUpdatedRole)
         {
             var oldCreatedById = Guid.NewGuid();
             var newCreatedById = Guid.NewGuid();
             var newCreatedDate = DateTimeOffset.UtcNow.AddDays(-1);
 
             var user = _dataFixture.DefaultUserWithExpiredInvite()
-                .WithRoleId(GlobalRoles.Role.PrereleaseUser.GetEnumValue())
+                .WithRoleId(oldRole.GetEnumValue())
                 .WithCreatedById(oldCreatedById)
                 .Generate();
 
@@ -482,20 +772,23 @@ public abstract class UserRepositoryTests
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
-                    role: GlobalRoles.Role.Analyst,
+                    role: newRole,
                     createdById: newCreatedById,
                     createdDate: newCreatedDate);
 
+                // All of these fields should be untouched by the update
                 Assert.Equal(user.Id, result.Id);
                 Assert.Equal(user.Email, result.Email);
                 Assert.Null(result.FirstName);
                 Assert.Null(result.LastName);
                 Assert.False(result.Active);
-                Assert.Equal(GlobalRoles.Role.Analyst.GetEnumValue(), result.RoleId);
-                Assert.Equal(newCreatedById, result.CreatedById);
-                Assert.Equal(newCreatedDate, result.Created);
                 Assert.Null(result.SoftDeleted);
                 Assert.Null(result.DeletedById);
+
+                // These fields should always be updated for expired invites being re-invited
+                Assert.Equal(expectedUpdatedRole.GetEnumValue(), result.RoleId);
+                Assert.Equal(newCreatedById, result.CreatedById);
+                Assert.Equal(newCreatedDate, result.Created);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -503,88 +796,26 @@ public abstract class UserRepositoryTests
                 var updatedUser = await contentDbContext.Users
                     .SingleAsync(u => u.Id == user.Id);
 
+                // All of these fields should be untouched by the update
                 Assert.Equal(user.Id, updatedUser.Id);
                 Assert.Equal(user.Email, updatedUser.Email);
                 Assert.Null(updatedUser.FirstName);
                 Assert.Null(updatedUser.LastName);
                 Assert.False(updatedUser.Active);
-                Assert.Equal(GlobalRoles.Role.Analyst.GetEnumValue(), updatedUser.RoleId);
-                Assert.Equal(newCreatedById, updatedUser.CreatedById);
-                Assert.Equal(newCreatedDate, updatedUser.Created);
                 Assert.Null(updatedUser.SoftDeleted);
                 Assert.Null(updatedUser.DeletedById);
+
+                // These fields should always be updated for expired invites being re-invited
+                Assert.Equal(expectedUpdatedRole.GetEnumValue(), updatedUser.RoleId);
+                Assert.Equal(newCreatedById, updatedUser.CreatedById);
+                Assert.Equal(newCreatedDate, updatedUser.Created);
             }
         }
 
         [Fact]
-        public async Task SoftDeletedUser_ReturnsNull()
+        public async Task UserWithExpiredInvite_CreatedDateNotSupplied_UpdatesUserCreatedDateToNow()
         {
-            var oldCreatedById = Guid.NewGuid();
-            var newCreatedById = Guid.NewGuid();
-            var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
-            var newCreatedDate = DateTimeOffset.UtcNow.AddDays(-1);
-
-            var user = _dataFixture.DefaultSoftDeletedUser()
-                .WithRoleId(GlobalRoles.Role.PrereleaseUser.GetEnumValue())
-                .WithCreatedById(oldCreatedById)
-                .WithCreated(oldCreatedDate)
-                .Generate();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Users.AddAsync(user);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = SetupUserRepository(contentDbContext);
-
-                var result = await repository.CreateOrUpdate(
-                    email: user.Email,
-                    role: GlobalRoles.Role.Analyst,
-                    createdById: newCreatedById,
-                    createdDate: newCreatedDate);
-
-                Assert.Equal(user.Id, result.Id);
-                Assert.Equal(user.Email, result.Email);
-                Assert.Null(result.FirstName);
-                Assert.Null(result.LastName);
-                Assert.False(result.Active);
-                Assert.Equal(GlobalRoles.Role.Analyst.GetEnumValue(), result.RoleId);
-                Assert.Equal(newCreatedById, result.CreatedById);
-                Assert.Equal(newCreatedDate, result.Created);
-                Assert.Null(result.SoftDeleted);
-                Assert.Null(result.DeletedById);
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var updatedUser = await contentDbContext.Users
-                    .SingleAsync(u => u.Id == user.Id);
-
-                Assert.Equal(user.Id, updatedUser.Id);
-                Assert.Equal(user.Email, updatedUser.Email);
-                Assert.Null(updatedUser.FirstName);
-                Assert.Null(updatedUser.LastName);
-                Assert.False(updatedUser.Active);
-                Assert.Equal(GlobalRoles.Role.Analyst.GetEnumValue(), updatedUser.RoleId);
-                Assert.Equal(newCreatedById, updatedUser.CreatedById);
-                Assert.Equal(newCreatedDate, updatedUser.Created);
-                Assert.Null(updatedUser.SoftDeleted);
-                Assert.Null(updatedUser.DeletedById);
-            }
-        }
-
-        [Fact]
-        public async Task CreatedDateNotSupplied_UpdatesUserCreatedDateToNow()
-        {
-            var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
-
-            var user = _dataFixture.DefaultUserWithPendingInvite()
-                .WithCreated(oldCreatedDate)
+            var user = _dataFixture.DefaultUserWithExpiredInvite()
                 .Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -616,12 +847,30 @@ public abstract class UserRepositoryTests
             }
         }
 
-        [Fact]
-        public async Task SuppliedCreatedDateInFuture_ThrowsException()
+        [Theory]
+        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser)]
+        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
+        [InlineData(GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser)]
+        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
+        [InlineData(GlobalRoles.Role.Analyst, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.PrereleaseUser, GlobalRoles.Role.PrereleaseUser)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.Analyst, GlobalRoles.Role.Analyst)]
+        [InlineData(GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser, GlobalRoles.Role.BauUser)]
+        public async Task SoftDeletedUser_UpdatesUser(
+            GlobalRoles.Role oldRole,
+            GlobalRoles.Role newRole,
+            GlobalRoles.Role expectedUpdatedRole)
         {
-            var newCreatedDate = DateTimeOffset.UtcNow.AddDays(1);
+            var oldCreatedById = Guid.NewGuid();
+            var newCreatedById = Guid.NewGuid();
+            var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
+            var newCreatedDate = DateTimeOffset.UtcNow.AddDays(-1);
 
-            var user = _dataFixture.DefaultUserWithPendingInvite()
+            var user = _dataFixture.DefaultSoftDeletedUser()
+                .WithRoleId(oldRole.GetEnumValue())
+                .WithCreatedById(oldCreatedById)
+                .WithCreated(oldCreatedDate)
                 .Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -636,12 +885,83 @@ public abstract class UserRepositoryTests
             {
                 var repository = SetupUserRepository(contentDbContext);
 
-                await Assert.ThrowsAsync<ArgumentException>(async ()
-                    => await repository.CreateOrUpdate(
-                        email: user.Email,
-                        role: GlobalRoles.Role.Analyst,
-                        createdById: Guid.NewGuid(),
-                        createdDate: newCreatedDate));
+                var result = await repository.CreateOrUpdate(
+                    email: user.Email,
+                    role: newRole,
+                    createdById: newCreatedById,
+                    createdDate: newCreatedDate);
+
+                // All of these fields should be untouched by the update
+                Assert.Equal(user.Id, result.Id);
+                Assert.Equal(user.Email, result.Email);
+                Assert.False(result.Active);
+ 
+                // These fields should always be updated for soft-deleted users being re-invited
+                Assert.Equal(expectedUpdatedRole.GetEnumValue(), result.RoleId);
+                Assert.Equal(newCreatedById, result.CreatedById);
+                Assert.Equal(newCreatedDate, result.Created);
+                Assert.Null(result.SoftDeleted);
+                Assert.Null(result.DeletedById);
+                Assert.Null(result.FirstName);
+                Assert.Null(result.LastName);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedUser = await contentDbContext.Users
+                    .SingleAsync(u => u.Id == user.Id);
+
+                // All of these fields should be untouched by the update
+                Assert.Equal(user.Id, updatedUser.Id);
+                Assert.Equal(user.Email, updatedUser.Email);
+                Assert.False(updatedUser.Active);
+
+                // These fields should always be updated for soft-deleted users being re-invited
+                Assert.Equal(expectedUpdatedRole.GetEnumValue(), updatedUser.RoleId);
+                Assert.Equal(newCreatedById, updatedUser.CreatedById);
+                Assert.Equal(newCreatedDate, updatedUser.Created);
+                Assert.Null(updatedUser.SoftDeleted);
+                Assert.Null(updatedUser.DeletedById);
+                Assert.Null(updatedUser.FirstName);
+                Assert.Null(updatedUser.LastName);
+            }
+        }
+
+        [Fact]
+        public async Task SoftDeletedUser_CreatedDateNotSupplied_UpdatesUserCreatedDateToNow()
+        {
+            var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
+
+            var user = _dataFixture.DefaultSoftDeletedUser()
+                .WithCreated(oldCreatedDate)
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = SetupUserRepository(contentDbContext);
+
+                var result = await repository.CreateOrUpdate(
+                    email: user.Email,
+                    role: GlobalRoles.Role.Analyst,
+                    createdById: Guid.NewGuid());
+
+                result.Created.AssertUtcNow();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedUser = await contentDbContext.Users
+                    .SingleAsync(u => u.Id == user.Id);
+
+                updatedUser.Created.AssertUtcNow();
             }
         }
 
@@ -689,6 +1009,35 @@ public abstract class UserRepositoryTests
                 Assert.Equal(createdDate, newUser.Created);
                 Assert.Null(newUser.SoftDeleted);
                 Assert.Null(newUser.DeletedById);
+            }
+        }
+
+        [Fact]
+        public async Task SuppliedCreatedDateInFuture_ThrowsException()
+        {
+            var newCreatedDate = DateTimeOffset.UtcNow.AddDays(1);
+
+            var user = _dataFixture.DefaultUserWithPendingInvite()
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = SetupUserRepository(contentDbContext);
+
+                await Assert.ThrowsAsync<ArgumentException>(async ()
+                    => await repository.CreateOrUpdate(
+                        email: user.Email,
+                        role: GlobalRoles.Role.Analyst,
+                        createdById: Guid.NewGuid(),
+                        createdDate: newCreatedDate));
             }
         }
 

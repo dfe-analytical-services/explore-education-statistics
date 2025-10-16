@@ -73,7 +73,7 @@ public static class UserGeneratorExtensions
             .SetDefault(p => p.LastName)
             .Set(p => p.Email, f => f.Internet.Email().ToLower())
             .Set(p => p.Active, true)
-            .SetDefault(p => p.RoleId)
+            .Set(p => p.RoleId, "f9ddb43e-aa9e-41ed-837d-3062e130c425") // Default to "Analyst" Global Role
             .Set(u => u.Created, DateTimeOffset.UtcNow)
             .SetDefault(p => p.CreatedById);
 

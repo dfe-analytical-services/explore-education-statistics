@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Clients;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -16,26 +17,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 
-public class ContentBlockLockService : IContentBlockLockService
+public class ContentBlockLockService(
+    ContentDbContext contentDbContext,
+    IPersistenceHelper<ContentDbContext> persistenceHelper,
+    IUserService userService,
+    IUserRepository userRepository,
+    IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext) : IContentBlockLockService
 {
-    private readonly ContentDbContext _contentDbContext;
-    private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-    private readonly IUserService _userService;
-    private readonly IHubContext<ReleaseContentHub, IReleaseContentHubClient> _hubContext;
-
-    public ContentBlockLockService(
-        ContentDbContext contentDbContext,
-        IPersistenceHelper<ContentDbContext> persistenceHelper,
-        IUserService userService,
-        IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext
-    )
-    {
-        _contentDbContext = contentDbContext;
-        _persistenceHelper = persistenceHelper;
-        _userService = userService;
-        _hubContext = hubContext;
-    }
-
     /// <summary>
     /// Try to acquire the lock for a content block, notifying any
     /// subscribed hub clients if the lock was acquired.
@@ -46,7 +34,7 @@ public class ContentBlockLockService : IContentBlockLockService
     /// </returns>
     public async Task<Either<ActionResult, ContentBlockLockViewModel>> LockContentBlock(Guid id, bool force = false)
     {
-        var userId = _userService.GetUserId();
+        var userId = userService.GetUserId();
 
         return await GetContentBlock(id)
             .OnSuccessDo(CheckCanUpdateBlock)
@@ -63,11 +51,11 @@ public class ContentBlockLockService : IContentBlockLockService
 
     private async Task<ContentBlockLockViewModel> DoContentBlockLock(ContentBlock block, Guid userId)
     {
-        var user = await _contentDbContext.Users.FindAsync(userId);
+        var user = await userRepository.FindActiveUserById(userId);
 
         if (user is null)
         {
-            throw new ArgumentException($"User with id {userId} does not exist", nameof(userId));
+            throw new ArgumentException($"Active user with id {userId} does not exist", nameof(userId));
         }
 
         var now = DateTime.UtcNow;
@@ -75,9 +63,9 @@ public class ContentBlockLockService : IContentBlockLockService
         block.Locked = now;
         block.LockedById = user.Id;
 
-        _contentDbContext.ContentBlocks.Update(block);
+        contentDbContext.ContentBlocks.Update(block);
 
-        await _contentDbContext.SaveChangesAsync();
+        await contentDbContext.SaveChangesAsync();
 
         var viewModel = new ContentBlockLockViewModel(
             Id: block.Id,
@@ -87,8 +75,8 @@ public class ContentBlockLockService : IContentBlockLockService
             LockedUntil: block.LockedUntil!.Value,
             LockedBy: new UserDetailsViewModel(user)
         );
-
-        await _hubContext.Clients.Group(viewModel.ReleaseVersionId.ToString()).ContentBlockLocked(viewModel);
+        
+        await hubContext.Clients.Group(viewModel.ReleaseVersionId.ToString()).ContentBlockLocked(viewModel);
 
         return viewModel;
     }
@@ -100,7 +88,7 @@ public class ContentBlockLockService : IContentBlockLockService
     /// <returns>Nothing if the content block was successfully unlocked.</returns>
     public async Task<Either<ActionResult, Unit>> UnlockContentBlock(Guid id, bool force = false)
     {
-        var userId = _userService.GetUserId();
+        var userId = userService.GetUserId();
 
         return await GetContentBlock(id)
             .OnSuccessDo(CheckCanUpdateBlock)
@@ -110,9 +98,9 @@ public class ContentBlockLockService : IContentBlockLockService
                 block.Locked = null;
                 block.LockedById = null;
 
-                _contentDbContext.ContentBlocks.Update(block);
+                contentDbContext.ContentBlocks.Update(block);
 
-                await _contentDbContext.SaveChangesAsync();
+                await contentDbContext.SaveChangesAsync();
 
                 var viewModel = new ContentBlockUnlockViewModel(
                     Id: block.Id,
@@ -120,13 +108,13 @@ public class ContentBlockLockService : IContentBlockLockService
                     ReleaseVersionId: block.ContentSection!.ReleaseVersionId
                 );
 
-                await _hubContext.Clients.Group(viewModel.ReleaseVersionId.ToString()).ContentBlockUnlocked(viewModel);
+                await hubContext.Clients.Group(viewModel.ReleaseVersionId.ToString()).ContentBlockUnlocked(viewModel);
             });
     }
 
     private async Task<Either<ActionResult, ContentBlock>> GetContentBlock(Guid contentBlockId)
     {
-        return await _persistenceHelper.CheckEntityExists<ContentBlock>(
+        return await persistenceHelper.CheckEntityExists<ContentBlock>(
             contentBlockId,
             q =>
                 q.Include(block => block.ContentSection)
@@ -142,7 +130,7 @@ public class ContentBlockLockService : IContentBlockLockService
             return new ForbidResult();
         }
 
-        return await _userService
+        return await userService
             .CheckCanUpdateReleaseVersion(contentBlock.ContentSection.ReleaseVersion)
             .OnSuccessVoid();
     }

@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -176,7 +177,7 @@ public class PreReleaseUserService(
 
     private async Task<Either<ActionResult, User>> FindUserByEmail(string email)
     {
-        var user = await userRepository.FindByEmail(email);
+        var user = await userRepository.FindUserByEmail(email);
 
         return user is null ? new NotFoundResult() : user;
     }
@@ -186,11 +187,11 @@ public class PreReleaseUserService(
         string email
     )
     {
-        var user = await userRepository.FindByEmail(email);
+        var activeUser = await userRepository.FindActiveUserByEmail(email);
 
-        if (user is not null)
+        if (activeUser is not null)
         {
-            return await CreateExistingUserReleaseInvite(releaseVersion, email, user)
+            return await CreateActiveUserReleaseInvite(releaseVersion, email, activeUser)
                 .OnSuccess(_ => new PreReleaseUserViewModel(email));
         }
 
@@ -201,12 +202,13 @@ public class PreReleaseUserService(
                 role: Role.PrereleaseUser,
                 createdById: userService.GetUserId());
 
-            return await CreateUserReleaseInvite(releaseVersion, email)
+            return await CreateInactiveUserReleaseInvite(releaseVersion, email)
                 .OnSuccess(_ => new PreReleaseUserViewModel(email));
         });
     }
 
-    private async Task<Either<ActionResult, Unit>> CreateUserReleaseInvite(ReleaseVersion releaseVersion, string email)
+    private async Task<Either<ActionResult, Unit>> CreateInactiveUserReleaseInvite(ReleaseVersion releaseVersion,
+        string email)
     {
         if (!await userReleaseInviteRepository.UserHasInvite(releaseVersion.Id, email, ReleaseRole.PrereleaseViewer))
         {
@@ -234,8 +236,7 @@ public class PreReleaseUserService(
         return Unit.Instance;
     }
 
-    private async Task<Either<ActionResult, Unit>> CreateExistingUserReleaseInvite(
-        ReleaseVersion releaseVersion,
+    private async Task<Either<ActionResult, Unit>> CreateActiveUserReleaseInvite(ReleaseVersion releaseVersion,
         string email,
         User user
     )

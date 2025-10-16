@@ -166,14 +166,18 @@ public abstract class UserManagementServiceTests
         {
             var identityRole = new IdentityRole { Name = GlobalRoles.RoleNames.Analyst };
 
-            var pendingUserInvites = _dataFixture.DefaultUser()
-                .WithActive(false)
+            var pendingUserInvites = _dataFixture.DefaultUserWithPendingInvite()
                 .WithRole(identityRole)
-                // This user is active and so should not be returned
-                .ForIndex(3, s => s.SetActive(true))
-                // This user is soft-deleted and so should not be returned
-                .ForIndex(4, s => s.SetSoftDeleted(DateTime.UtcNow))
-                .GenerateList(5);
+                .GenerateList(3);
+
+            var activeUser = _dataFixture.DefaultUser()
+                .Generate();
+
+            var softDeletedUser = _dataFixture.DefaultSoftDeletedUser()
+                .Generate();
+
+            var expiredUser = _dataFixture.DefaultUserWithExpiredInvite()
+                .Generate();
 
             var publication = _dataFixture.DefaultPublication()
                 .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
@@ -187,11 +191,13 @@ public abstract class UserManagementServiceTests
                 .ForIndex(3, s => s.SetEmail(pendingUserInvites[1].Email))
                 .ForIndex(4, s => s.SetEmail(pendingUserInvites[2].Email))
                 .ForIndex(5, s => s.SetEmail(pendingUserInvites[2].Email))
-                .ForIndex(6, s => s.SetEmail(pendingUserInvites[3].Email))
-                .ForIndex(7, s => s.SetEmail(pendingUserInvites[3].Email))
-                .ForIndex(8, s => s.SetEmail(pendingUserInvites[4].Email))
-                .ForIndex(9, s => s.SetEmail(pendingUserInvites[4].Email))
-                .GenerateList(10);
+                .ForIndex(6, s => s.SetEmail(activeUser.Email))
+                .ForIndex(7, s => s.SetEmail(activeUser.Email))
+                .ForIndex(8, s => s.SetEmail(softDeletedUser.Email))
+                .ForIndex(9, s => s.SetEmail(softDeletedUser.Email))
+                .ForIndex(10, s => s.SetEmail(expiredUser.Email))
+                .ForIndex(11, s => s.SetEmail(expiredUser.Email))
+                .GenerateList(12);
 
             var userPublicationInvites = _dataFixture.DefaultUserPublicationInvite()
                 .WithPublication(publication)
@@ -201,11 +207,13 @@ public abstract class UserManagementServiceTests
                 .ForIndex(3, s => s.SetEmail(pendingUserInvites[1].Email))
                 .ForIndex(4, s => s.SetEmail(pendingUserInvites[2].Email))
                 .ForIndex(5, s => s.SetEmail(pendingUserInvites[2].Email))
-                .ForIndex(6, s => s.SetEmail(pendingUserInvites[3].Email))
-                .ForIndex(7, s => s.SetEmail(pendingUserInvites[3].Email))
-                .ForIndex(8, s => s.SetEmail(pendingUserInvites[4].Email))
-                .ForIndex(9, s => s.SetEmail(pendingUserInvites[4].Email))
-                .GenerateList(10);
+                .ForIndex(6, s => s.SetEmail(activeUser.Email))
+                .ForIndex(7, s => s.SetEmail(activeUser.Email))
+                .ForIndex(8, s => s.SetEmail(softDeletedUser.Email))
+                .ForIndex(9, s => s.SetEmail(softDeletedUser.Email))
+                .ForIndex(10, s => s.SetEmail(expiredUser.Email))
+                .ForIndex(11, s => s.SetEmail(expiredUser.Email))
+                .GenerateList(12);
 
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -234,6 +242,9 @@ public abstract class UserManagementServiceTests
                 var result = await service.ListPendingInvites();
 
                 var pendingInvites = result.AssertRight();
+
+                // Only the genuinely pending invites should be returned
+                Assert.Equal(3, pendingInvites.Count);
 
                 // Check they are ordered by email
                 Assert.True(
@@ -833,42 +844,26 @@ public abstract class UserManagementServiceTests
         [Fact]
         public async Task Success()
         {
-            var emailToCancelInvitesFor = "test@test.com";
-            var otherEmail = "should.not@be.removed";
-
-            var userToCancelInvitesFor = _dataFixture.DefaultUser()
-                .WithEmail(emailToCancelInvitesFor)
-                .WithCreated(DateTime.UtcNow.AddDays(-1))
-                .WithActive(false)
-                .Generate();
-
-            var otherUser = _dataFixture.DefaultUser()
-                .WithEmail(otherEmail)
-                .WithCreated(DateTime.UtcNow.AddDays(-1))
-                .WithActive(false)
+            var userToCancelInvitesFor = _dataFixture.DefaultUserWithPendingInvite()
                 .Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.Users.AddRange(userToCancelInvitesFor, otherUser);
-
-                await contentDbContext.SaveChangesAsync();
-            }
-
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
             userReleaseInviteRepository
-                .Setup(mock => mock.RemoveByUserEmail(emailToCancelInvitesFor, It.IsAny<CancellationToken>()))
+                .Setup(mock => mock.RemoveByUserEmail(userToCancelInvitesFor.Email, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
             userPublicationInviteRepository
-                .Setup(mock => mock.RemoveByUserEmail(emailToCancelInvitesFor, It.IsAny<CancellationToken>()))
+                .Setup(mock => mock.RemoveByUserEmail(userToCancelInvitesFor.Email, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             var userRepository = new Mock<IUserRepository>(Strict);
+            userRepository
+                .Setup(mock => mock.FindPendingUserInviteByEmail(userToCancelInvitesFor.Email, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(userToCancelInvitesFor);
             userRepository
                 .Setup(mock => mock.SoftDeleteUser(
                     It.Is<User>(u => u.Id == userToCancelInvitesFor.Id), 
@@ -886,7 +881,7 @@ public abstract class UserManagementServiceTests
                     userPublicationInviteRepository: userPublicationInviteRepository.Object,
                     userRepository: userRepository.Object);
 
-                var result = await service.CancelInvite(emailToCancelInvitesFor);
+                var result = await service.CancelInvite(userToCancelInvitesFor.Email);
 
                 result.AssertRight();
             }
@@ -898,15 +893,24 @@ public abstract class UserManagementServiceTests
         }
 
         [Fact]
-        public async Task UserInviteDoesNotExist_ValidationError()
+        public async Task PendingUserInviteDoesNotExist_ValidationError()
         {
-            var service = SetupUserManagementService();
+            var email = "test@test.com";
+            
+            var userRepository = new Mock<IUserRepository>(Strict);
+            userRepository
+                .Setup(mock => mock.FindPendingUserInviteByEmail(email, It.IsAny<CancellationToken>()))
+                .ReturnsAsync((User?)null);
 
-            var result = await service.CancelInvite("test@test.com");
+            var service = SetupUserManagementService(userRepository: userRepository.Object);
+
+            var result = await service.CancelInvite(email);
 
             var actionResult = result.AssertLeft();
 
             actionResult.AssertValidationProblem(ValidationErrorMessages.InviteNotFound);
+
+            VerifyAllMocks(userRepository);
         }
     }
 

@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -230,9 +231,11 @@ public class ReleaseApprovalService : IReleaseApprovalService
             .ToAsyncEnumerable()
             .SelectAwait(async invite =>
             {
-                var user = await _userRepository.FindByEmail(invite.Email);
-                return await _preReleaseUserService
-                    .SendPreReleaseInviteEmail(releaseVersion.Id, invite.Email.ToLower(), isNewUser: user == null)
+                var activeUser = await _userRepository.FindActiveUserByEmail(invite.Email);
+                return await _preReleaseUserService.SendPreReleaseInviteEmail(
+                        releaseVersion.Id,
+                        invite.Email.ToLower(),
+                        isNewUser: activeUser is null)
                     .OnSuccessDo(() => _preReleaseUserService.MarkInviteEmailAsSent(invite));
             })
             .ToListAsync();

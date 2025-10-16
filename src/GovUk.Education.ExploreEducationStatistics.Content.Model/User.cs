@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Identity;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -37,7 +36,4 @@ public class User : ICreatedTimestamp<DateTimeOffset>
     public required Guid CreatedById { get; set; }
 
     public string DisplayName => $"{FirstName?.Trim()} {LastName?.Trim()}".Trim();
-
-    public bool InviteHasExpired => this.IsPendingInvite() &&
-                                Created < DateTimeOffset.UtcNow.AddDays(-InviteExpiryDurationDays);
 }
