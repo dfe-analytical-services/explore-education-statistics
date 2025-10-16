@@ -9,6 +9,10 @@ var abbreviations = {
   appContainerApps: 'ca'
   authorizationPolicyDefinitions: 'policy'
   automationAutomationAccounts: 'aa'
+  // Added from https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations
+  backupVaults: 'bvault'
+  // Added from https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations
+  backupVaultPolicies: 'bkpol'
   blueprintBlueprints: 'bp'
   blueprintBlueprintsArtifacts: 'bpa'
   cacheRedis: 'redis'

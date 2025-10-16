@@ -1274,6 +1274,8 @@
         "id": "[variables('publisherSubnetRef')]"
       }
     ],
+    "backupVaultName": "[concat(parameters('subscription'), '-', parameters('environment'), '-bvault')]",
+    "backupVaultBlobPolicyName": "[concat(parameters('subscription'), '-', parameters('environment'), '-blobs-bkpol')]",
     "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
     "ees-admin-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-admin-govuknotify-api-key')]",
@@ -1353,7 +1355,8 @@
     "searchServiceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-srch')]",
     "searchReaderManagedIdentityName": "[concat(parameters('subscription'), '-', parameters('environment'), '-id-srch-reader')]",
     "searchServiceApiVersion": "2025-02-01-preview",
-    "userAssignedIdentitiesApiVersion": "2024-11-30"
+    "userAssignedIdentitiesApiVersion": "2024-11-30",
+    "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]"
   },
   "resources": [
     {
@@ -2401,7 +2404,7 @@
       "name": "[variables('coreStorageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2023-05-01",
-      "location": "westeurope",
+      "location": "[resourceGroup().location]",
       "kind": "StorageV2",
       "properties": {
         "accessTier": "Hot",
@@ -2448,6 +2451,71 @@
       "sku": {
         "name": "Standard_RAGRS"
       }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "condition": false,
+      "apiVersion": "2022-04-01",
+      "scope": "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
+      "name": "[guid(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), variables('storageAccountBackupContributorRoleId'), resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')))]",
+      "properties": {
+        "roleDefinitionId": "[variables('storageAccountBackupContributorRoleId')]",
+        "principalId": "[reference(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), '2021-01-01', 'Full').identity.principalId]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DataProtection/backupVaults/backupInstances",
+      "condition": false,
+      "apiVersion": "2022-05-01",
+      "name": "[format('{0}/{1}', variables('backupVaultName'), variables('coreStorageAccountName'))]",
+      "properties": {
+        "objectType": "BackupInstance",
+        "friendlyName": "[variables('coreStorageAccountName')]",
+        "dataSourceInfo": {
+          "objectType": "Datasource",
+          "resourceID": "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
+          "resourceName": "[variables('coreStorageAccountName')]",
+          "resourceType": "Microsoft.Storage/storageAccounts",
+          "resourceUri": "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
+          "resourceLocation": "[resourceGroup().location]",
+          "datasourceType": "Microsoft.Storage/storageAccounts/blobServices"
+        },
+        "dataSourceSetInfo": {
+          "objectType": "DatasourceSet",
+          "resourceID": "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
+          "resourceName": "[variables('coreStorageAccountName')]",
+          "resourceType": "Microsoft.Storage/storageAccounts",
+          "resourceUri": "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
+          "resourceLocation": "[resourceGroup().location]",
+          "datasourceType": "Microsoft.Storage/storageAccounts/blobServices"
+        },
+        "policyInfo": {
+          "policyId": "[resourceId('Microsoft.DataProtection/backupVaults/backupPolicies', variables('backupVaultName'), variables('backupVaultBlobPolicyName'))]",
+          "name": "[variables('backupVaultBlobPolicyName')]",
+          "policyParameters": {
+            "backupDatasourceParametersList": [
+              {
+                "objectType": "BlobBackupDatasourceParameters",
+                "containersList": [
+                  "cache",
+                  "downloads",
+                  "methodologies",
+                  "releases",
+                  "releases-temp"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')), 'Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), variables('storageAccountBackupContributorRoleId'), resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
+      ]
     },
     {
       "name": "[variables('coreSqlServerName')]",
@@ -2975,6 +3043,70 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "condition": false,
+      "apiVersion": "2022-04-01",
+      "scope": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
+      "name": "[guid(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), variables('storageAccountBackupContributorRoleId'), resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')))]",
+      "properties": {
+        "roleDefinitionId": "[variables('storageAccountBackupContributorRoleId')]",
+        "principalId": "[reference(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), '2021-01-01', 'Full').identity.principalId]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DataProtection/backupVaults/backupInstances",
+      "condition": false,
+      "apiVersion": "2022-05-01",
+      "name": "[format('{0}/{1}', variables('backupVaultName'), variables('publicStorageAccountName'))]",
+      "properties": {
+        "objectType": "BackupInstance",
+        "friendlyName": "[variables('publicStorageAccountName')]",
+        "dataSourceInfo": {
+          "objectType": "Datasource",
+          "resourceID": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
+          "resourceName": "[variables('publicStorageAccountName')]",
+          "resourceType": "Microsoft.Storage/storageAccounts",
+          "resourceUri": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
+          "resourceLocation": "[resourceGroup().location]",
+          "datasourceType": "Microsoft.Storage/storageAccounts/blobServices"
+        },
+        "dataSourceSetInfo": {
+          "objectType": "DatasourceSet",
+          "resourceID": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
+          "resourceName": "[variables('publicStorageAccountName')]",
+          "resourceType": "Microsoft.Storage/storageAccounts",
+          "resourceUri": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
+          "resourceLocation": "[resourceGroup().location]",
+          "datasourceType": "Microsoft.Storage/storageAccounts/blobServices"
+        },
+        "policyInfo": {
+          "policyId": "[resourceId('Microsoft.DataProtection/backupVaults/backupPolicies', variables('backupVaultName'), variables('backupVaultBlobPolicyName'))]",
+          "name": "[variables('backupVaultBlobPolicyName')]",
+          "policyParameters": {
+            "backupDatasourceParametersList": [
+              {
+                "objectType": "BlobBackupDatasourceParameters",
+                "containersList": [
+                  "cache",
+                  "downloads",
+                  "methodologies",
+                  "permalink-snapshots"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), 'Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), variables('storageAccountBackupContributorRoleId'), resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
+      ]
     },
     {
       "apiVersion": "2020-02-02",
