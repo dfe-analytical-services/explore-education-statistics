@@ -56,7 +56,6 @@ export interface MapBlockProps extends ChartProps {
   // dataGroups & dataClassification to be removed when
   // migrate old maps to use the new config
   // https://dfedigital.atlassian.net/browse/EES-4271
-  width?: number;
   dataGroups?: number;
   dataClassification?: DataGroupingType;
   id: string;
@@ -199,7 +198,7 @@ export default function MapBlock({
 
   const [legendItems, setLegendItems] = useState<MapLegendItem[]>([]);
 
-  const [categoricalDataGroups, setCategoricalDataGroups] = useState<
+  const [, setCategoricalDataGroups] = useState<
     MapCategoricalDataConfig[] | undefined
   >([]);
 
