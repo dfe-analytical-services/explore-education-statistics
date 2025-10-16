@@ -85,9 +85,10 @@ public class SignInService(
         await contentDbContext.RequireTransaction(async () =>
         {
             usersAndRolesDbContext.Users.Add(newAspNetUser);
+            await usersAndRolesDbContext.SaveChangesAsync();
 
             // Add them to their global role.
-            var roleResult = await userManager.AddToRoleAsync(newAspNetUser, userInvitedToSystem.Role.Name!);
+            var roleResult = await userManager.AddToRoleAsync(newAspNetUser, userInvitedToSystem.Role!.Name!);
 
             if (!roleResult.Succeeded)
             {
