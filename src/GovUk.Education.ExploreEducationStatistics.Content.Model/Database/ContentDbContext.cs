@@ -650,6 +650,8 @@ public class ContentDbContext : DbContext
         modelBuilder.Entity<User>().HasOne(c => c.CreatedBy).WithMany().OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<User>().HasOne(e => e.Role).WithMany().OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
     }
 
     private static void ConfigureUserPublicationRole(ModelBuilder modelBuilder)
