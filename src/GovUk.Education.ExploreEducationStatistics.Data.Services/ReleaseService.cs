@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -112,20 +113,20 @@ public class ReleaseService : IReleaseService
 
     private async Task<List<string>> GetFilters(Guid subjectId, List<FilterSequenceEntry>? filterSequence)
     {
-        var unorderedFilterList = await _statisticsDbContext
-            .Filter.Where(filter => filter.SubjectId == subjectId)
+        var filters = await _statisticsDbContext
+            .Filter.AsNoTracking()
+            .Where(filter => filter.SubjectId == subjectId)
             .ToListAsync();
 
-        if (filterSequence == null)
-        {
-            return unorderedFilterList.Select(filter => filter.Label).OrderBy(label => label).ToList();
-        }
-
-        var filterIdSequence = filterSequence.Select(filter => filter.Id).ToList();
-
-        return unorderedFilterList
-            .OrderBy(filter => filterIdSequence.IndexOf(filter.Id))
-            .Select(filter => filter.Label)
+        return MetaViewModelBuilderUtils
+            .OrderBySequenceOrLabel(
+                filters,
+                idSelector: value => value.Id,
+                labelSelector: value => value.Label,
+                sequenceIdSelector: sequenceEntry => sequenceEntry.Id,
+                resultSelector: value => value.Value.Label,
+                filterSequence
+            )
             .ToList();
     }
 
@@ -134,22 +135,21 @@ public class ReleaseService : IReleaseService
         List<IndicatorGroupSequenceEntry>? indicatorGroupSequence
     )
     {
-        var unorderedIndicators = await _statisticsDbContext
-            .Indicator.Where(indicator => indicator.IndicatorGroup.SubjectId == subjectId)
+        var indicators = await _statisticsDbContext
+            .Indicator.AsNoTracking()
+            .Where(indicator => indicator.IndicatorGroup.SubjectId == subjectId)
             .ToListAsync();
 
-        if (indicatorGroupSequence == null)
-        {
-            return unorderedIndicators.Select(indicator => indicator.Label).OrderBy(label => label).ToList();
-        }
-
-        var indicatorIdSequence = indicatorGroupSequence
-            .SelectMany(indicatorGroup => indicatorGroup.ChildSequence)
-            .ToList();
-
-        return unorderedIndicators
-            .OrderBy(indicator => indicatorIdSequence.IndexOf(indicator.Id))
-            .Select(indicator => indicator.Label)
+        var indicatorSequence = indicatorGroupSequence?.SelectMany(seq => seq.ChildSequence);
+        return MetaViewModelBuilderUtils
+            .OrderBySequenceOrLabel(
+                indicators,
+                idSelector: value => value.Id,
+                labelSelector: value => value.Label,
+                sequenceIdSelector: sequenceEntry => sequenceEntry,
+                resultSelector: value => value.Value.Label,
+                indicatorSequence
+            )
             .ToList();
     }
 

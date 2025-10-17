@@ -415,33 +415,36 @@ public class DataSetFileService(
     }
 
     private static List<string> GetOrderedFilters(
-        List<FilterMeta> metaFilters,
-        List<FilterSequenceEntry>? filterSequenceEntries
-    )
-    {
-        var filterSequence = filterSequenceEntries?.Select(fs => fs.Id).ToArray();
-
-        var filters =
-            filterSequence == null
-                ? metaFilters.OrderBy(f => f.Label)
-                : metaFilters.OrderBy(f => Array.IndexOf(filterSequence, f.Id));
-
-        return filters.Select(f => f.Label).ToList();
-    }
+        List<FilterMeta> filters,
+        List<FilterSequenceEntry>? filterSequence
+    ) =>
+        MetaViewModelBuilderUtils
+            .OrderBySequenceOrLabel(
+                filters,
+                idSelector: value => value.Id,
+                labelSelector: value => value.Label,
+                sequenceIdSelector: sequenceEntry => sequenceEntry.Id,
+                resultSelector: value => value.Value.Label,
+                filterSequence
+            )
+            .ToList();
 
     private static List<string> GetOrderedIndicators(
-        List<IndicatorMeta> metaIndicators,
-        List<IndicatorGroupSequenceEntry>? indicatorGroupSequenceEntries
+        List<IndicatorMeta> indicators,
+        List<IndicatorGroupSequenceEntry>? indicatorGroupSequence
     )
     {
-        var indicatorSequence = indicatorGroupSequenceEntries?.SelectMany(seq => seq.ChildSequence).ToArray();
-
-        var indicators =
-            indicatorSequence == null
-                ? metaIndicators.OrderBy(i => i.Label)
-                : metaIndicators.OrderBy(i => Array.IndexOf(indicatorSequence, i.Id));
-
-        return indicators.Select(i => i.Label).ToList();
+        var indicatorSequence = indicatorGroupSequence?.SelectMany(seq => seq.ChildSequence);
+        return MetaViewModelBuilderUtils
+            .OrderBySequenceOrLabel(
+                indicators,
+                idSelector: value => value.Id,
+                labelSelector: value => value.Label,
+                sequenceIdSelector: sequenceEntry => sequenceEntry,
+                resultSelector: value => value.Value.Label,
+                indicatorSequence
+            )
+            .ToList();
     }
 
     private static DataSetFileApiViewModel? BuildDataSetFileApiViewModel(ReleaseFile releaseFile)
