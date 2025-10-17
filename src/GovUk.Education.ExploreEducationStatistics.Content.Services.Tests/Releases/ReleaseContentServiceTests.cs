@@ -161,8 +161,20 @@ public class ReleaseContentServiceTests
                 .DefaultPublication()
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
             var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
 
-            // Release version has no content assigned to test that optional content sections are handled correctly
+            // Release version is set up with empty sections in the same way as a new release version would be
+            releaseVersion.HeadlinesSection = _dataFixture
+                .DefaultContentSection()
+                .WithType(ContentSectionType.Headlines);
+
+            releaseVersion.KeyStatisticsSecondarySection = _dataFixture
+                .DefaultContentSection()
+                .WithType(ContentSectionType.KeyStatisticsSecondary);
+
+            releaseVersion.SummarySection = _dataFixture
+                .DefaultContentSection()
+                .WithType(ContentSectionType.ReleaseSummary);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -183,9 +195,12 @@ public class ReleaseContentServiceTests
 
                 Assert.Equal(release.Id, result.ReleaseId);
                 Assert.Equal(release.Versions[0].Id, result.ReleaseVersionId);
-                Assert.Null(result.HeadlinesSection);
-                Assert.Null(result.KeyStatisticsSecondarySection);
-                Assert.Null(result.SummarySection);
+                Assert.NotNull(result.HeadlinesSection);
+                Assert.Empty(result.HeadlinesSection.Content);
+                Assert.NotNull(result.KeyStatisticsSecondarySection);
+                Assert.Empty(result.KeyStatisticsSecondarySection.Content);
+                Assert.NotNull(result.SummarySection);
+                Assert.Empty(result.SummarySection.Content);
                 Assert.Empty(result.Content);
                 Assert.Empty(result.KeyStatistics);
             }
