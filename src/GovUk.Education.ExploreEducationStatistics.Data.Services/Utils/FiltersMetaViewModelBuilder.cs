@@ -71,14 +71,15 @@ public static class FiltersMetaViewModelBuilder
         IEnumerable<Guid>? sequence = null
     )
     {
-        return OrderAsListTotalFirst(
-            values,
-            idSelector: value => value.Id,
-            labelSelector: value => value.Label,
-            sequenceIdSelector: sequenceEntry => sequenceEntry,
-            resultSelector: value => new FilterItemMetaViewModel(value),
-            sequence
-        );
+        return OrderBySequenceOrLabelTotalFirst(
+                values,
+                idSelector: value => value.Id,
+                labelSelector: value => value.Label,
+                sequenceIdSelector: sequenceEntry => sequenceEntry,
+                resultSelector: value => new FilterItemMetaViewModel(value),
+                sequence
+            )
+            .ToList();
     }
 
     private static List<Filter> GroupFilterItemsByFilter(IEnumerable<FilterItem> filterItems)
