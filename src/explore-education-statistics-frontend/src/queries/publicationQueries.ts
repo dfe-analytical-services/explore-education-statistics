@@ -5,6 +5,7 @@ import publicationService, {
   PublicationTreeOptions,
   ReleaseSummary,
   ReleaseVersion,
+  ReleaseVersionHomeContent,
   ReleaseVersionSummary,
   Theme,
 } from '@common/services/publicationService';
@@ -46,9 +47,22 @@ const publicationQueries = {
         ),
     };
   },
+  getReleaseVersionHomeContent(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): UseQueryOptions<ReleaseVersionHomeContent> {
+    return {
+      queryKey: ['releaseVersionHomeContent', publicationSlug, releaseSlug],
+      queryFn: () =>
+        publicationService.getReleaseVersionHomeContent(
+          publicationSlug,
+          releaseSlug,
+        ),
+    };
+  },
   getPublicationMethodologies(
     publicationSlug: string,
-  ): UseQueryOptions<PublicationMethodologiesList[]> {
+  ): UseQueryOptions<PublicationMethodologiesList> {
     return {
       queryKey: ['publicationMethodologies', publicationSlug],
       queryFn: () =>

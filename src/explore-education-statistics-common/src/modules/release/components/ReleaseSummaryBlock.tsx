@@ -8,12 +8,14 @@ import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import { parseISO } from 'date-fns';
 import React, { ReactNode } from 'react';
 
-interface ReleaseTypeIcon {
+export interface ReleaseTypeIcon {
   url: string;
   altText: string;
 }
 
-const releaseTypesToIcons: Partial<Record<ReleaseType, ReleaseTypeIcon>> = {
+export const releaseTypesToIcons: Partial<
+  Record<ReleaseType, ReleaseTypeIcon>
+> = {
   AccreditedOfficialStatistics: {
     url: '/assets/images/accredited-official-statistics-logo.svg',
     altText: 'UK statistics authority quality mark',

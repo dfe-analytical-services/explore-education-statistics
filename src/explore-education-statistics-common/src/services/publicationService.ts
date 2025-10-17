@@ -1,19 +1,22 @@
+import { Chart } from '@common/modules/charts/types/chart';
 import {
   ContentBlock,
   DataBlock,
   EmbedBlock,
+  Table,
 } from '@common/services/types/blocks';
 import { FileInfo } from '@common/services/types/file';
-import { ReleaseType } from '@common/services/types/releaseType';
 import {
-  MethodologySummary,
   ExternalMethodology,
   InternalMethodologySummary,
+  MethodologySummary,
 } from '@common/services/types/methodology';
 import { Organisation } from '@common/services/types/organisation';
+import { ReleaseType } from '@common/services/types/releaseType';
 import { SortDirection } from '@common/services/types/sort';
 import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
+import { TableDataQuery } from './tableBuilderService';
 import { PaginatedList, PaginationRequestParams } from './types/pagination';
 
 export type ReleaseApprovalStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
@@ -120,9 +123,6 @@ export interface KeyStatisticBase {
   trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;
-  order: number;
-  created: string;
-  updated?: string;
 }
 
 export const KeyStatisticTypes = {
@@ -136,6 +136,7 @@ export type KeyStatisticType =
 export interface KeyStatisticDataBlock extends KeyStatisticBase {
   type: 'KeyStatisticDataBlock';
   dataBlockParentId: string;
+  dataBlockVersionId?: string;
 }
 
 export interface KeyStatisticText extends KeyStatisticBase {
@@ -208,6 +209,70 @@ export interface ReleaseVersionSummary {
   type: ReleaseType;
   updateCount: number;
   yearTitle: string;
+}
+
+export interface ReleaseVersionHomeSection<BlockType> {
+  id: string;
+  content: BlockType[];
+}
+
+export interface ReleaseVersionHomeContentSection<BlockType>
+  extends ReleaseVersionHomeSection<BlockType> {
+  heading: string;
+}
+
+export interface HtmlBlockViewModel {
+  id: string;
+  type: 'HtmlBlock';
+  body: string;
+}
+
+export interface DataBlockViewModel {
+  id: string;
+  type: 'DataBlock';
+  dataBlockVersion: {
+    charts: Chart[];
+    dataBlockVersionId: string;
+    dataBlockParentId: string;
+    heading: string;
+    highlightDescription?: string;
+    highlightName?: string;
+    name: string;
+    query: TableDataQuery;
+    source?: string;
+    table: Table;
+  };
+}
+
+export interface EmbedBlockViewModel {
+  id: string;
+  type: 'EmbedBlock';
+  embedBlock: {
+    embedBlockId: string;
+    title: string;
+    url: string;
+  };
+}
+
+export type BlockViewModel =
+  | HtmlBlockViewModel
+  | DataBlockViewModel
+  | EmbedBlockViewModel;
+
+export interface ReleaseVersionHomeContent<
+  HtmlBlockType extends HtmlBlockViewModel = HtmlBlockViewModel,
+  DataBlockType extends DataBlockViewModel = DataBlockViewModel,
+  EmbedBlockType extends EmbedBlockViewModel = EmbedBlockViewModel,
+> {
+  content: ReleaseVersionHomeContentSection<
+    HtmlBlockType | DataBlockType | EmbedBlockType
+  >[];
+  headlinesSection: ReleaseVersionHomeSection<HtmlBlockType>;
+  keyStatistics: KeyStatistic[];
+  keyStatisticsSecondarySection: ReleaseVersionHomeSection<DataBlockType>;
+  releaseId: string;
+  releaseVersionId: string;
+  summarySection: ReleaseVersionHomeSection<HtmlBlockType>;
 }
 
 export interface PublicationLegacyReleaseListItem {
@@ -334,6 +399,14 @@ const publicationService = {
       `/publications/${publicationSlug}/releases/${releaseSlug}/version-summary`,
     );
   },
+  getReleaseVersionHomeContent(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): Promise<ReleaseVersionHomeContent> {
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/${releaseSlug}/content`,
+    );
+  },
   getPublicationReleaseList(
     publicationSlug: string,
     params?: PaginationRequestParams,
@@ -352,7 +425,7 @@ const publicationService = {
   },
   getPublicationMethodologies(
     publicationSlug: string,
-  ): Promise<PublicationMethodologiesList[]> {
+  ): Promise<PublicationMethodologiesList> {
     return contentApi.get(`/publications/${publicationSlug}/methodologies`);
   },
   getLatestPreReleaseAccessList(

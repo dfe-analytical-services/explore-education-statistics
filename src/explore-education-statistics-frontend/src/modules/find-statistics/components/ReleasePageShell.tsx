@@ -10,7 +10,10 @@ import ReleasePageTabNav, {
   TabRouteItem,
 } from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
 import ReleasePageTitle from '@frontend/modules/find-statistics/components/ReleasePageTitle';
-import { ReleasePageTabRouteKey } from '@frontend/modules/find-statistics/PublicationReleasePage';
+import {
+  releasePageTabRouteItems,
+  ReleasePageTabRouteKey,
+} from '@frontend/modules/find-statistics/PublicationReleasePage';
 import { NextPage } from 'next';
 import React, { ReactNode } from 'react';
 
@@ -34,6 +37,7 @@ const ReleasePageShell: NextPage<Props> = ({
   return (
     <Page
       title={publicationSummary.title}
+      metaTitle={`${releasePageTabRouteItems[activePage].title} - ${publicationSummary.title}`}
       description={publicationSummary.summary}
       breadcrumbs={[
         { name: 'Find statistics and data', link: '/find-statistics' },

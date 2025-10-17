@@ -26,7 +26,6 @@ import { Table } from '@common/services/types/blocks';
 import { produce } from 'immer';
 
 const emptyTable: Table = {
-  indicators: [],
   tableHeaders: {
     columnGroups: [],
     columns: [],
@@ -675,8 +674,6 @@ describe('ReleaseContentContext', () => {
       trend: 'keyStat-4 trend',
       guidanceTitle: 'keyStat-4 guidanceTitle',
       guidanceText: 'keyStat-4 guidanceText',
-      order: 1,
-      created: '2022-02-01T12:00:00Z',
     };
 
     const { release } = releaseReducer(

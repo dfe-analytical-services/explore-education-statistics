@@ -78,7 +78,6 @@ describe('DataBlockTabs', () => {
     },
     charts: [],
     table: {
-      indicators: [],
       tableHeaders: {
         columnGroups: [],
         columns: [
@@ -135,7 +134,6 @@ describe('DataBlockTabs', () => {
     },
     charts: [testMapConfiguration],
     table: {
-      indicators: [],
       tableHeaders: {
         columnGroups: [],
         columns: [{ value: '2016_AY', type: 'TimePeriod' }],
@@ -339,11 +337,6 @@ describe('DataBlockTabs', () => {
             tableHeaders: mapUnmappedTableHeaders(
               getDefaultTableHeaderConfig(fullTable),
             ),
-            indicators: [
-              'authorised-absence-rate',
-              'unauthorised-absence-rate',
-              'overall-absence-rate',
-            ],
           },
         }}
       />,
@@ -523,11 +516,6 @@ describe('DataBlockTabs', () => {
             tableHeaders: mapUnmappedTableHeaders(
               getDefaultTableHeaderConfig(fullTable),
             ),
-            indicators: [
-              'authorised-absence-rate',
-              'unauthorised-absence-rate',
-              'overall-absence-rate',
-            ],
           },
         }}
       />,
@@ -605,7 +593,6 @@ describe('DataBlockTabs', () => {
                   },
                 ],
               },
-              indicators: ['authorised-absence-sessions'],
             },
           }}
         />,

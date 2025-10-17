@@ -1,10 +1,13 @@
 /* eslint-disable react/destructuring-assignment */
 import { NavItem } from '@common/components/PageNavExpandable';
+import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
+import getNavItemsFromHtml from '@common/components/util/getNavItemsFromHtml';
 import { contactUsNavItem } from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import publicationService, {
   PublicationMethodologiesList,
   PublicationSummaryRedesign,
   ReleaseVersion,
+  ReleaseVersionHomeContent,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
@@ -42,13 +45,15 @@ export type ReleasePageTabRouteItems = typeof releasePageTabRouteItems;
 export type ReleasePageTabRouteKey = keyof ReleasePageTabRouteItems;
 
 interface BaseReleaseProps {
+  inPageNavItems: NavItem[];
   publicationSummary: PublicationSummaryRedesign;
-  releaseVersionSummary: ReleaseVersionSummary;
   page: ReleasePageTabRouteKey;
+  releaseVersionSummary: ReleaseVersionSummary;
 }
 
 interface HomeProps extends BaseReleaseProps {
   page: 'home';
+  homeContent: ReleaseVersionHomeContent;
 }
 
 interface ExploreDataProps extends BaseReleaseProps {
@@ -79,49 +84,21 @@ type Props =
 const PublicationReleasePage: NextPage<Props> = props => {
   const { page } = props;
 
-  const generateNavItems = (): NavItem[] => {
-    switch (page) {
-      case 'home':
-        return [
-          {
-            id: 'headlines-section',
-            text: 'Headlines facts and figures',
-          },
-          contactUsNavItem,
-        ];
-
-      case 'methodology': {
-        const hasMethodologies =
-          props.methodologiesSummary.methodologies.length > 0 ||
-          props.methodologiesSummary.externalMethodology;
-
-        return [
-          hasMethodologies && {
-            id: 'methodology-section',
-            text: 'Methodology',
-          },
-          contactUsNavItem,
-        ].filter(item => !!item);
-      }
-
-      default:
-        return [contactUsNavItem];
-    }
-  };
-
   return page === 'old' ? (
     <PublicationReleasePageCurrent releaseVersion={props.releaseVersion} />
   ) : (
     <ReleasePageShell
       activePage={page}
-      inPageNavItems={generateNavItems()}
+      inPageNavItems={props.inPageNavItems}
       publicationSummary={props.publicationSummary}
       releaseVersionSummary={props.releaseVersionSummary}
       tabNavItems={releasePageTabRouteItems}
     >
       {page === 'home' && (
         <PublicationReleasePageHome
+          homeContent={props.homeContent}
           publicationSummary={props.publicationSummary}
+          releaseVersionSummary={props.releaseVersionSummary}
         />
       )}
       {page === 'explore' && <p>TODO EES-6444 Explore Data page</p>}
@@ -175,40 +152,101 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
         };
 
         switch (tab) {
-          case undefined:
+          // Home tab
+          case undefined: {
+            const homeContent = await queryClient.fetchQuery(
+              publicationQueries.getReleaseVersionHomeContent(
+                publicationSlug,
+                releaseSlug,
+              ),
+            );
+            const { summarySection, content } = homeContent;
+
+            const hasSummarySection = summarySection.content.length > 0;
+            // Get nav items for section headings (h2) and parse the section's
+            // HtmlBlocks for h3 headings to generate subNavItems
+            const contentSectionsItems = content.map(section => {
+              const { heading, content: sectionContent } = section;
+              const subNavItems = sectionContent
+                .flatMap(block => {
+                  if (block.type === 'HtmlBlock') {
+                    return getNavItemsFromHtml({
+                      html: block.body,
+                      blockId: block.id,
+                    });
+                  }
+                  return null;
+                })
+                .filter(item => !!item);
+
+              return {
+                id: generateIdFromHeading(heading),
+                text: heading,
+                subNavItems,
+              };
+            });
+
             return {
               props: {
                 ...baseProps,
                 page: 'home',
+                homeContent,
+                inPageNavItems: [
+                  hasSummarySection && {
+                    id: 'background-information',
+                    text: 'Background information',
+                  },
+                  {
+                    id: 'headlines-section',
+                    text: 'Headlines facts and figures',
+                  },
+                  ...contentSectionsItems,
+                  contactUsNavItem,
+                ].filter(item => !!item),
               },
             };
+          }
 
           case 'explore':
             return {
               props: {
                 ...baseProps,
                 page: 'explore',
+                inPageNavItems: [contactUsNavItem],
               },
             };
 
-          case 'methodology':
+          case 'methodology': {
+            const methodologiesSummary = await queryClient.fetchQuery(
+              publicationQueries.getPublicationMethodologies(publicationSlug),
+            );
+
+            const hasMethodologies =
+              methodologiesSummary.methodologies.length > 0 ||
+              !!methodologiesSummary.externalMethodology;
+
             return {
               props: {
                 ...baseProps,
                 page: 'methodology',
-                methodologiesSummary: await queryClient.fetchQuery(
-                  publicationQueries.getPublicationMethodologies(
-                    publicationSlug,
-                  ),
-                ),
+                methodologiesSummary,
+                inPageNavItems: [
+                  hasMethodologies && {
+                    id: 'methodology-section',
+                    text: 'Methodology',
+                  },
+                  contactUsNavItem,
+                ].filter(item => !!item),
               },
             };
+          }
 
           case 'help':
             return {
               props: {
                 ...baseProps,
                 page: 'help',
+                inPageNavItems: [contactUsNavItem],
               },
             };
 

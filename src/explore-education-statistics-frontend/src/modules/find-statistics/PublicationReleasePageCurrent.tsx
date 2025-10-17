@@ -542,7 +542,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
                 {({ open }) => (
                   <PublicationSectionBlocks
                     blocks={content}
-                    releaseVersion={releaseVersion}
+                    releaseVersionId={releaseVersion.id}
                     visible={open}
                   />
                 )}

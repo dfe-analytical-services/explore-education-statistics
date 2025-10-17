@@ -286,7 +286,6 @@ describe('PreReleaseTableToolPage', () => {
         columns: [{ value: '2014_AY', type: 'TimePeriod' }],
         rows: [{ value: 'authorised-absence-sessions', type: 'Indicator' }],
       },
-      indicators: [],
     },
     charts: [],
     query: {

@@ -1,5 +1,5 @@
-import SectionBreak from '@common/components/SectionBreak';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import {
   PublicationMethodologiesList,
   PublicationSummaryRedesign,
@@ -28,43 +28,40 @@ const ReleaseMethodologyPage = ({
   return (
     <>
       {hasMethodologies && (
-        <>
-          <section id="methodology-section" data-page-section>
-            <h2>Methodology</h2>
-            <p>
-              Find out how and why we collect, process and publish these
-              statistics.
-            </p>
-            <ul
-              className="govuk-list govuk-list--spaced"
-              data-testid="methodologies-list"
-            >
-              {methodologiesSummary.methodologies.map(methodology => (
-                <li key={methodology.methodologyId}>
-                  <Link to={`/methodology/${methodology.slug}`}>
-                    {methodology.title}
-                  </Link>
-                </li>
-              ))}
-              {externalMethodology && (
-                <li>
-                  <Link
-                    to={externalMethodology.url}
-                    rel={`noopener noreferrer nofollow ${
-                      !externalMethodologyAttributes?.isTrusted
-                        ? 'external'
-                        : ''
-                    }`}
-                    target="_blank"
-                  >
-                    {externalMethodology.title} (opens in new tab)
-                  </Link>
-                </li>
-              )}
-            </ul>
-          </section>
-          <SectionBreak size="xl" />
-        </>
+        <ReleasePageContentSection
+          heading="Methodology"
+          id="methodology-section"
+        >
+          <p>
+            Find out how and why we collect, process and publish these
+            statistics.
+          </p>
+          <ul
+            className="govuk-list govuk-list--spaced"
+            data-testid="methodologies-list"
+          >
+            {methodologiesSummary.methodologies.map(methodology => (
+              <li key={methodology.methodologyId}>
+                <Link to={`/methodology/${methodology.slug}`}>
+                  {methodology.title}
+                </Link>
+              </li>
+            ))}
+            {externalMethodology && (
+              <li>
+                <Link
+                  to={externalMethodology.url}
+                  rel={`noopener noreferrer nofollow ${
+                    !externalMethodologyAttributes?.isTrusted ? 'external' : ''
+                  }`}
+                  target="_blank"
+                >
+                  {externalMethodology.title} (opens in new tab)
+                </Link>
+              </li>
+            )}
+          </ul>
+        </ReleasePageContentSection>
       )}
       <ContactUsSection
         publicationContact={publicationSummary.contact}

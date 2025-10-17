@@ -28,7 +28,7 @@ export default function PageNavExpandable({
     const sections = document.querySelectorAll('[data-page-section]');
 
     // Set a section as active when it's in the top third of the page.
-    const buffer = window.innerHeight / 3;
+    const buffer = window.innerHeight / 4;
     const scrollPosition = window.scrollY + buffer;
 
     sections.forEach(section => {

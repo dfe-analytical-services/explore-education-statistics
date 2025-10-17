@@ -69,8 +69,6 @@ describe('EditableKeyStatDataBlock', () => {
     trend: 'DataBlock trend',
     guidanceTitle: 'DataBlock guidance title',
     guidanceText: 'DataBlock guidance text',
-    order: 0,
-    created: '2023-01-01',
     dataBlockParentId: 'block-1',
   };
 
