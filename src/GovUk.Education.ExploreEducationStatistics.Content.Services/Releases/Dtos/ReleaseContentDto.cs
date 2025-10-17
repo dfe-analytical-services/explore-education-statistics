@@ -10,18 +10,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.D
 public record ReleaseContentDto
 {
     public required Guid ReleaseId { get; init; }
-
     public required Guid ReleaseVersionId { get; init; }
-
     public required ContentSectionDto[] Content { get; init; }
-
-    public required ContentSectionDto? HeadlinesSection { get; init; }
-
+    public required ContentSectionDto HeadlinesSection { get; init; }
     public required KeyStatisticBaseDto[] KeyStatistics { get; init; }
-
-    public required ContentSectionDto? KeyStatisticsSecondarySection { get; init; }
-
-    public required ContentSectionDto? SummarySection { get; init; }
+    public required ContentSectionDto KeyStatisticsSecondarySection { get; init; }
+    public required ContentSectionDto SummarySection { get; init; }
 
     public ContentSectionDto[] GetAllSections()
     {
@@ -38,31 +32,28 @@ public record ReleaseContentDto
                 .GenericContent.OrderBy(cs => cs.Order)
                 .Select(ContentSectionDto.FromContentSection)
                 .ToArray(),
-            HeadlinesSection =
-                releaseVersion.HeadlinesSection != null
-                    ? ContentSectionDto.FromContentSection(releaseVersion.HeadlinesSection)
-                    : null,
+            HeadlinesSection = ContentSectionDto.FromContentSection(
+                releaseVersion.HeadlinesSection
+                    ?? throw new ArgumentException("ReleaseVersion must have HeadlinesSection")
+            ),
             KeyStatistics = releaseVersion
                 .KeyStatistics.OrderBy(ks => ks.Order)
                 .Select(KeyStatisticBaseDto.FromKeyStatistic)
                 .ToArray(),
-            KeyStatisticsSecondarySection =
-                releaseVersion.KeyStatisticsSecondarySection != null
-                    ? ContentSectionDto.FromContentSection(releaseVersion.KeyStatisticsSecondarySection)
-                    : null,
-            SummarySection =
-                releaseVersion.SummarySection != null
-                    ? ContentSectionDto.FromContentSection(releaseVersion.SummarySection)
-                    : null,
+            KeyStatisticsSecondarySection = ContentSectionDto.FromContentSection(
+                releaseVersion.KeyStatisticsSecondarySection
+                    ?? throw new ArgumentException("ReleaseVersion must have KeyStatisticsSecondarySection")
+            ),
+            SummarySection = ContentSectionDto.FromContentSection(
+                releaseVersion.SummarySection ?? throw new ArgumentException("ReleaseVersion must have SummarySection")
+            ),
         };
 }
 
 public record ContentSectionDto
 {
     public required Guid Id { get; init; }
-
     public required string? Heading { get; init; }
-
     public required ContentBlockBaseDto[] Content { get; init; }
 
     public static ContentSectionDto FromContentSection(ContentSection contentSection) =>
@@ -109,19 +100,12 @@ public record DataBlockDto : ContentBlockBaseDto
 public record DataBlockVersionDto
 {
     public required Guid DataBlockVersionId { get; init; }
-
     public required Guid DataBlockParentId { get; init; }
-
     public required List<IChart> Charts { get; init; }
-
     public required string Heading { get; init; }
-
     public required string Name { get; init; }
-
     public required FullTableQuery Query { get; init; }
-
     public required string? Source { get; init; }
-
     public required TableBuilderConfiguration Table { get; init; }
 
     public static DataBlockVersionDto FromDataBlockVersion(DataBlockVersion dataBlockVersion) =>
@@ -150,9 +134,7 @@ public record EmbedBlockLinkDto : ContentBlockBaseDto
 public record EmbedBlockDto
 {
     public required Guid EmbedBlockId { get; init; }
-
     public required string Title { get; init; }
-
     public required string Url { get; init; }
 
     public static EmbedBlockDto FromEmbedBlock(EmbedBlock embedBlock) =>
@@ -177,11 +159,8 @@ public record HtmlBlockDto : ContentBlockBaseDto
 public abstract record KeyStatisticBaseDto
 {
     public required Guid Id { get; init; }
-
     public required string? GuidanceText { get; init; }
-
     public required string? GuidanceTitle { get; init; }
-
     public required string? Trend { get; init; }
 
     public static KeyStatisticBaseDto FromKeyStatistic(KeyStatistic keyStatistic) =>
@@ -197,7 +176,6 @@ public abstract record KeyStatisticBaseDto
 public record KeyStatisticDataBlockDto : KeyStatisticBaseDto
 {
     public required Guid DataBlockVersionId { get; init; }
-
     public required Guid DataBlockParentId { get; init; }
 
     public static KeyStatisticDataBlockDto FromKeyStatisticDataBlock(KeyStatisticDataBlock keyStatisticDataBlock) =>
@@ -216,7 +194,6 @@ public record KeyStatisticDataBlockDto : KeyStatisticBaseDto
 public record KeyStatisticTextDto : KeyStatisticBaseDto
 {
     public required string Statistic { get; init; }
-
     public required string Title { get; init; }
 
     public static KeyStatisticTextDto FromKeyStatisticText(KeyStatisticText keyStatisticText) =>

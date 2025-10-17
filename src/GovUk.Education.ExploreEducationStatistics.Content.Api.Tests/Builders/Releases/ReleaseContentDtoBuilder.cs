@@ -10,7 +10,7 @@ public class ReleaseContentDtoBuilder
     private Guid _releaseId = Guid.NewGuid();
     private Guid _releaseVersionId = Guid.NewGuid();
     private ContentSectionDto[] _content = [new ContentSectionDtoBuilder().Build()];
-    private ContentSectionDto? _headlinesSection = new ContentSectionDtoBuilder().Build();
+    private ContentSectionDto _headlinesSection = new ContentSectionDtoBuilder().Build();
 
     private KeyStatisticBaseDto[] _keyStatistics =
     [
@@ -18,8 +18,8 @@ public class ReleaseContentDtoBuilder
         new KeyStatisticTextDtoBuilder().Build(),
     ];
 
-    private ContentSectionDto? _summarySection = new ContentSectionDtoBuilder().Build();
-    private ContentSectionDto? _keyStatisticsSecondarySection = new ContentSectionDtoBuilder().Build();
+    private ContentSectionDto _summarySection = new ContentSectionDtoBuilder().Build();
+    private ContentSectionDto _keyStatisticsSecondarySection = new ContentSectionDtoBuilder().Build();
 
     public ReleaseContentDto Build() =>
         new()
@@ -51,7 +51,7 @@ public class ReleaseContentDtoBuilder
         return this;
     }
 
-    public ReleaseContentDtoBuilder WithHeadlinesSection(ContentSectionDto? headlinesSection)
+    public ReleaseContentDtoBuilder WithHeadlinesSection(ContentSectionDto headlinesSection)
     {
         _headlinesSection = headlinesSection;
         return this;
@@ -63,13 +63,13 @@ public class ReleaseContentDtoBuilder
         return this;
     }
 
-    public ReleaseContentDtoBuilder WithKeyStatisticsSecondarySection(ContentSectionDto? keyStatisticsSecondarySection)
+    public ReleaseContentDtoBuilder WithKeyStatisticsSecondarySection(ContentSectionDto keyStatisticsSecondarySection)
     {
         _keyStatisticsSecondarySection = keyStatisticsSecondarySection;
         return this;
     }
 
-    public ReleaseContentDtoBuilder WithSummarySection(ContentSectionDto? summarySection)
+    public ReleaseContentDtoBuilder WithSummarySection(ContentSectionDto summarySection)
     {
         _summarySection = summarySection;
         return this;
