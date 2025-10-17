@@ -1,3 +1,4 @@
+using System.Numerics;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -137,8 +138,8 @@ public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTest
         DataSetVersionImportStage importStage,
         DataSetVersionStatus status = DataSetVersionStatus.Processing,
         Guid? releaseFileId = null,
-        int versionMajor = 1,
-        int versionMinor = 0,
+        BigInteger? versionMajor = null, // default to 1 below
+        BigInteger versionMinor = default, // default == 0
         DataSetVersionMeta? meta = null
     )
     {
@@ -153,7 +154,7 @@ public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTest
             .WithDataSet(dataSet)
             .WithStatus(status)
             .WithImports(() => [dataSetVersionImport])
-            .WithVersionNumber(major: versionMajor, minor: versionMinor)
+            .WithVersionNumber(major: versionMajor ?? new BigInteger(1), minor: versionMinor)
             .FinishWith(dsv =>
             {
                 if (releaseFileId != null)

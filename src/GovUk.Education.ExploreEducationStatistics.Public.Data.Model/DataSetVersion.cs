@@ -1,3 +1,4 @@
+using System.Numerics;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -21,11 +22,11 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public required DataSetVersionStatus Status { get; set; }
 
-    public required int VersionMajor { get; set; }
+    public required BigInteger VersionMajor { get; set; }
 
-    public required int VersionMinor { get; set; }
+    public required BigInteger VersionMinor { get; set; }
 
-    public int VersionPatch { get; set; }
+    public BigInteger VersionPatch { get; set; }
 
     public required string Notes { get; set; }
 
@@ -103,6 +104,10 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
             builder.Property(dsv => dsv.Id).HasValueGenerator<UuidV7ValueGenerator>();
 
             builder.Property(dsv => dsv.Status).HasConversion<string>();
+
+            builder.Property(dsv => dsv.VersionMajor).HasConversion<BigIntegerToIntConverter>();
+            builder.Property(dsv => dsv.VersionMinor).HasConversion<BigIntegerToIntConverter>();
+            builder.Property(dsv => dsv.VersionPatch).HasConversion<BigIntegerToIntConverter>();
 
             builder.OwnsOne(
                 v => v.MetaSummary,
