@@ -66,6 +66,12 @@
       "enabled": false
     },
     {
+      "description": "Disable AutoMapper as v15+ requires a license - EES-6647 to remove AutoMapper",
+      "matchDatasources": ["nuget"],
+      "matchPackageNames": ["AutoMapper"],
+      "enabled": false
+    },
+    {
       "description": "Disable packages which need their major versions to be in sync with the .NET version or the EF Core version",
       "matchDatasources": ["nuget"],
       "matchPackagePrefixes": [

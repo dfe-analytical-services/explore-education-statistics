@@ -16,7 +16,7 @@
     <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
     <!-- v2.8.1 is compatible with MacOS -->
     <PackageReference Include="Aspects.Universal" Version="1.0.2" />
-    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
     <PackageReference Include="Azure.Identity" Version="1.16.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.25.1" />
