@@ -164,15 +164,11 @@ public class ReleaseContentServiceTests
             var releaseVersion = release.Versions[0];
 
             // Initialise the release version with empty sections to match how a newly created release would be configured
-            releaseVersion.HeadlinesSection = _dataFixture
-                .DefaultContentSection()
-                .WithType(ContentSectionType.Headlines);
-            releaseVersion.KeyStatisticsSecondarySection = _dataFixture
-                .DefaultContentSection()
-                .WithType(ContentSectionType.KeyStatisticsSecondary);
-            releaseVersion.SummarySection = _dataFixture
-                .DefaultContentSection()
-                .WithType(ContentSectionType.ReleaseSummary);
+            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
+            releaseVersion.KeyStatisticsSecondarySection = CreateContentSection(
+                ContentSectionType.KeyStatisticsSecondary
+            );
+            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -218,6 +214,11 @@ public class ReleaseContentServiceTests
                     .WithHeading("Section 1")
                     .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Old content</p>")]),
             ];
+            olderReleaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
+            olderReleaseVersion.KeyStatisticsSecondarySection = CreateContentSection(
+                ContentSectionType.KeyStatisticsSecondary
+            );
+            olderReleaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
 
             var latestPublishedReleaseVersion = release.Versions[1];
             latestPublishedReleaseVersion.GenericContent =
@@ -227,6 +228,11 @@ public class ReleaseContentServiceTests
                     .WithHeading("Section 1")
                     .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Latest published content</p>")]),
             ];
+            latestPublishedReleaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
+            latestPublishedReleaseVersion.KeyStatisticsSecondarySection = CreateContentSection(
+                ContentSectionType.KeyStatisticsSecondary
+            );
+            latestPublishedReleaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -321,6 +327,9 @@ public class ReleaseContentServiceTests
                 outcome.AssertNotFound();
             }
         }
+
+        private ContentSection CreateContentSection(ContentSectionType type) =>
+            _dataFixture.DefaultContentSection().WithType(type);
 
         private static void AssertContentSectionEqual(ContentSection expected, ContentSectionDto actual)
         {
