@@ -1,10 +1,12 @@
 using System.Net;
+using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Requests;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
@@ -103,4 +105,42 @@ internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient htt
 
         return publication ?? throw new NullReferenceException("Could not deserialize from content API response.");
     }
+}
+
+// TODO To be removed by EES-6470 - Added in a temporary commit to avoid build errors
+public record PublicationSearchResultViewModel
+{
+    public Guid Id { get; init; }
+    public string Slug { get; init; } = string.Empty;
+    public required string LatestReleaseSlug { get; init; }
+    public string Summary { get; init; } = string.Empty;
+    public string Title { get; init; } = string.Empty;
+    public string Theme { get; init; } = string.Empty;
+    public DateTime Published { get; init; }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+    public ReleaseType Type { get; init; }
+
+    public int Rank { get; set; }
+}
+
+// TODO To be removed by EES-6470 - Added in a temporary commit to avoid build errors
+public record PublicationsListPostRequest(
+    ReleaseType? ReleaseType = null,
+    Guid? ThemeId = null,
+    string? Search = null,
+    PublicationsSortBy? Sort = null,
+    SortDirection? SortDirection = null,
+    int Page = 1,
+    int PageSize = 10,
+    IEnumerable<Guid>? PublicationIds = null
+);
+
+// TODO To be removed by EES-6470 - Added in a temporary commit to avoid build errors
+public enum PublicationsSortBy
+{
+    Published,
+    Relevance,
+    Title,
 }
