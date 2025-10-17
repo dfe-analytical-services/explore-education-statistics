@@ -163,15 +163,13 @@ public class ReleaseContentServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            // Release version is set up with empty sections in the same way as a new release version would be
+            // Initialise the release version with empty sections to match how a newly created release would be configured
             releaseVersion.HeadlinesSection = _dataFixture
                 .DefaultContentSection()
                 .WithType(ContentSectionType.Headlines);
-
             releaseVersion.KeyStatisticsSecondarySection = _dataFixture
                 .DefaultContentSection()
                 .WithType(ContentSectionType.KeyStatisticsSecondary);
-
             releaseVersion.SummarySection = _dataFixture
                 .DefaultContentSection()
                 .WithType(ContentSectionType.ReleaseSummary);
@@ -195,14 +193,11 @@ public class ReleaseContentServiceTests
 
                 Assert.Equal(release.Id, result.ReleaseId);
                 Assert.Equal(release.Versions[0].Id, result.ReleaseVersionId);
-                Assert.NotNull(result.HeadlinesSection);
-                Assert.Empty(result.HeadlinesSection.Content);
-                Assert.NotNull(result.KeyStatisticsSecondarySection);
-                Assert.Empty(result.KeyStatisticsSecondarySection.Content);
-                Assert.NotNull(result.SummarySection);
-                Assert.Empty(result.SummarySection.Content);
                 Assert.Empty(result.Content);
+                Assert.Empty(result.HeadlinesSection.Content);
                 Assert.Empty(result.KeyStatistics);
+                Assert.Empty(result.KeyStatisticsSecondarySection.Content);
+                Assert.Empty(result.SummarySection.Content);
             }
         }
 
