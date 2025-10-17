@@ -227,11 +227,11 @@ public abstract class ReleaseServiceTests
                 // Content should not be copied when created from a template.
                 Assert.Empty(contentSections[0].Content);
                 Assert.Empty(contentSections[0].Content.AsReadOnly());
-                Assert.Equal(ContentSectionType.ReleaseSummary, newReleaseVersion.SummarySection.Type);
-                Assert.Equal(ContentSectionType.Headlines, newReleaseVersion.HeadlinesSection.Type);
+                Assert.Equal(ContentSectionType.ReleaseSummary, newReleaseVersion.SummarySection!.Type);
+                Assert.Equal(ContentSectionType.Headlines, newReleaseVersion.HeadlinesSection!.Type);
                 Assert.Equal(
                     ContentSectionType.KeyStatisticsSecondary,
-                    newReleaseVersion.KeyStatisticsSecondarySection.Type
+                    newReleaseVersion.KeyStatisticsSecondarySection!.Type
                 );
 
                 // Data Blocks should not be copied when created from a template.

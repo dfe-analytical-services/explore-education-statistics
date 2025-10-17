@@ -193,11 +193,11 @@ public class ManageContentPageServiceTests
             Assert.IsType<KeyStatisticTextViewModel>(contentRelease.KeyStatistics[1]);
 
             Assert.Equal(
-                releaseVersion.KeyStatisticsSecondarySection.Id,
+                releaseVersion.KeyStatisticsSecondarySection!.Id,
                 contentRelease.KeyStatisticsSecondarySection.Id
             );
-            Assert.Equal(releaseVersion.HeadlinesSection.Id, contentRelease.HeadlinesSection.Id);
-            Assert.Equal(releaseVersion.RelatedDashboardsSection.Id, contentRelease.RelatedDashboardsSection.Id);
+            Assert.Equal(releaseVersion.HeadlinesSection!.Id, contentRelease.HeadlinesSection.Id);
+            Assert.Equal(releaseVersion.RelatedDashboardsSection!.Id, contentRelease.RelatedDashboardsSection.Id);
             Assert.True(contentRelease.LatestRelease);
             Assert.Equal(releaseVersion.NextReleaseDate, contentRelease.NextReleaseDate);
             Assert.Equal(releaseVersion.Release.Year.ToString(), contentRelease.ReleaseName);
@@ -206,7 +206,7 @@ public class ManageContentPageServiceTests
             Assert.Equal(publication.Id, contentRelease.PublicationId);
             Assert.Equal(releaseVersion.Release.Slug, contentRelease.Slug);
             Assert.Equal(releaseVersion.Release.Title, contentRelease.Title);
-            Assert.Equal(releaseVersion.SummarySection.Id, contentRelease.SummarySection.Id);
+            Assert.Equal(releaseVersion.SummarySection!.Id, contentRelease.SummarySection.Id);
             Assert.Equal(releaseVersion.Type, contentRelease.Type);
             Assert.Equal(releaseVersion.Release.YearTitle, contentRelease.YearTitle);
             Assert.Empty(contentRelease.Updates);
