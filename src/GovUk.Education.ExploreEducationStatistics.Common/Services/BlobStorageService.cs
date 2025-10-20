@@ -1,4 +1,3 @@
-#nullable enable
 using System.IO.Compression;
 using System.Net.Mime;
 using System.Text.RegularExpressions;

@@ -1,4 +1,3 @@
-#nullable enable
 using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using static System.Int32;

@@ -16,7 +16,7 @@ public static class ComparerUtils
             _propertyGetter = propertyGetter;
         }
 
-        public bool Equals(T x, T y)
+        public bool Equals(T? x, T? y)
         {
             if (ReferenceEquals(x, y))
             {

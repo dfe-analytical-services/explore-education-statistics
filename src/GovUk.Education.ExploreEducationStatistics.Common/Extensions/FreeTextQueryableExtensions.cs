@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;

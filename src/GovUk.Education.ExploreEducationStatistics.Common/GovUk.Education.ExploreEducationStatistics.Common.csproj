@@ -3,6 +3,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Nullable>enable</Nullable>
     <!-- Disable build warnings for undocumented methods -->
     <NoWarn>1591</NoWarn>
   </PropertyGroup>

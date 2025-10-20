@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Database;
 public class EnumLabelValueAttribute : Attribute
 {
     public string Label { get; }
-    public string Value { get; }
+    public string? Value { get; }
 
     public EnumLabelValueAttribute(string label, string value)
     {

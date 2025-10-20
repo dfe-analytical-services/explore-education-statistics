@@ -1,4 +1,3 @@
-#nullable enable
 using Azure.Core;
 using Azure.Identity;
 using Microsoft.EntityFrameworkCore;

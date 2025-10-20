@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 public static class ContentEncodings
 {

@@ -10,7 +10,7 @@ public record BlobDownloadToken(string Token, string ContainerName, string Path,
         return JsonSerializer.Serialize(this).ToBase64String();
     }
 
-    public static BlobDownloadToken FromBase64JsonString(string token)
+    public static BlobDownloadToken? FromBase64JsonString(string token)
     {
         return JsonSerializer.Deserialize<BlobDownloadToken>(token.FromBase64String());
     }

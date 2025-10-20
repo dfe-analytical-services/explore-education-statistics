@@ -1,4 +1,3 @@
-#nullable enable
 using System.Security.Cryptography;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;

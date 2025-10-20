@@ -1,4 +1,3 @@
-#nullable enable
 using System.Security.Authentication;
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;

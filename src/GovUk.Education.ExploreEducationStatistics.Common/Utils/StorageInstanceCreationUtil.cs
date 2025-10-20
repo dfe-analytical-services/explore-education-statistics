@@ -1,4 +1,3 @@
-#nullable enable
 using System.Collections.Concurrent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
