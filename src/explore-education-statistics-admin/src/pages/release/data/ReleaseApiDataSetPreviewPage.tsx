@@ -65,6 +65,7 @@ export default function ReleaseApiDataSetPreviewPage() {
       if (isToday(activates)) {
         startDate = new Date(); // set activates to the current time
       } else {
+        activates.setHours(0, 0, 0, 0);
         startDate = activates;
       }
       endDate = expires;
