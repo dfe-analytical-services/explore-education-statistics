@@ -63,8 +63,17 @@ public record PreviewTokenCreateRequest
                                         {
                                             var maxExpires = r.Activates!.Value.AddDays(7);
                                             // Allow for any time on the 7th day after activates, up to the end of the day
-                                            return expires
-                                                < new DateTimeOffset(
+                                            return new DateTimeOffset(
+                                                    expires!.Value.Year,
+                                                    expires.Value.Month,
+                                                    expires.Value.Day,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    expires.Value.Offset
+                                                )
+                                                <= new DateTimeOffset(
                                                     maxExpires.Year,
                                                     maxExpires.Month,
                                                     maxExpires.Day,
