@@ -132,9 +132,8 @@ const HorizontalBarBlock = ({
     >
       <ResponsiveContainer height={height || 300}>
         <BarChart
-          aria-label={alt}
-          role="img"
-          focusable={false}
+          accessibilityLayer
+          aria-label={`${alt}. Use the left and right arrow keys to browse data points.`}
           data={chartData}
           layout="vertical"
           stackOffset={stacked ? 'sign' : undefined}
