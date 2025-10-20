@@ -93,8 +93,9 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
                 id={captionId}
               />
             }
-            tableJson={tableJson}
             captionId={captionId}
+            captionTitle={captionTitle}
+            tableJson={tableJson}
             footnotesClassName={footnotesClassName}
             footnotesId={
               dataBlockId

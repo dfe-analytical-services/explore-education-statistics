@@ -3,6 +3,9 @@ import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { OmitStrict } from '@common/types';
 import React, { forwardRef, ReactNode, Ref, useEffect, useRef } from 'react';
 import DataSymbolsModal from '@common/components/DataSymbolsModal';
+import ButtonText from '@common/components/ButtonText';
+import Modal from '@common/components/Modal';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import styles from './FixedMultiHeaderDataTable.module.scss';
 import MultiHeaderTable, { MultiHeaderTableProps } from './MultiHeaderTable';
 
@@ -11,6 +14,7 @@ const mobileWidth = 1024;
 interface Props extends OmitStrict<MultiHeaderTableProps, 'ariaLabelledBy'> {
   caption: ReactNode;
   captionId: string;
+  captionTitle?: string;
   innerRef?: Ref<HTMLElement>;
   footnotes?: FullTableMeta['footnotes'];
   footnotesClassName?: string;
@@ -26,6 +30,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
     const {
       caption,
       captionId,
+      captionTitle,
       footnotes = [],
       footnotesClassName,
       footnotesHeadingTag,
@@ -118,6 +123,26 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
             ref={mainTableRef}
           />
         </div>
+        <Modal
+          className={styles.fullScreen}
+          closeText="Close full screen table"
+          fullScreen
+          showClose
+          title={captionTitle ?? ''}
+          titleId={`modal-${captionId}`}
+          triggerButton={
+            <ButtonText className="govuk-!-margin-bottom-2">
+              Show full screen table
+              <VisuallyHidden>{`for ${captionTitle}`}</VisuallyHidden>
+            </ButtonText>
+          }
+        >
+          <MultiHeaderTable
+            {...props}
+            ariaLabelledBy={`modal-${captionId}`}
+            ref={mainTableRef}
+          />
+        </Modal>
         <p>
           <DataSymbolsModal />
         </p>

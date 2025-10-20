@@ -52,6 +52,15 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
       </tbody>
     </table>
   </div>
+  <button aria-disabled="false"
+          type="button"
+          class="button govuk-!-margin-bottom-2"
+  >
+    Show full screen table
+    <span class="govuk-visually-hidden">
+      for undefined
+    </span>
+  </button>
   <p>
     <button aria-disabled="false"
             type="button"
