@@ -393,7 +393,6 @@ describe('MapBlock', () => {
       meta: testFullTable.subjectMeta,
       data: testFullTable.results,
       height: 600,
-      width: 900,
       onBoundaryLevelChange,
     };
 
