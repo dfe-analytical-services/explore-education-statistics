@@ -61,28 +61,9 @@ public record PreviewTokenCreateRequest
                                     .Must(
                                         (r, expires) =>
                                         {
-                                            var maxExpires = r.Activates!.Value.AddDays(7);
-                                            // Allow for any time on the 7th day after activates, up to the end of the day
-                                            return new DateTimeOffset(
-                                                    expires!.Value.Year,
-                                                    expires.Value.Month,
-                                                    expires.Value.Day,
-                                                    0,
-                                                    0,
-                                                    0,
-                                                    0,
-                                                    expires.Value.Offset
-                                                )
-                                                <= new DateTimeOffset(
-                                                    maxExpires.Year,
-                                                    maxExpires.Month,
-                                                    maxExpires.Day,
-                                                    23,
-                                                    59,
-                                                    59,
-                                                    999,
-                                                    maxExpires.Offset
-                                                );
+                                            // Ensure expires is not 8 or more days after activates
+                                            var daysBetween = (expires!.Value.Date - r.Activates!.Value.Date).Days;
+                                            return daysBetween < 8;
                                         }
                                     )
                                     .WithMessage("Expires date must be no more than 7 days after the activates date.");
