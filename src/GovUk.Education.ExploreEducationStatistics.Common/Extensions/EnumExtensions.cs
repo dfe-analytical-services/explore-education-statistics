@@ -38,7 +38,7 @@ public static class EnumExtensions
 
     public class EnumValue
     {
-        public string? Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public int Value { get; set; }
     }
 }
