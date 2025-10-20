@@ -127,7 +127,7 @@ public class PreviewTokenCreateRequestValidatorTests
     // Activates at 2pm:
     [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-27T13:59:59 +00:00", true)] // <-- lt 7 days
     [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-27T14:00:00 +00:00", true)] // <-- eq 7 days
-    [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-27T23:59:59 +00:00", true)] // <-- valid through to the end of the 7th day /////
+    [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-27T23:59:59 +00:00", true)] // <-- valid through to the end of the 7th day
     [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-28T00:00:00 +00:00", false)] // <-- but not beyond that
     public void Expires_WhenActivatesIsNotNull_ValidUpTo7DaysAfterActivates(
         string activates,
