@@ -627,9 +627,6 @@ importers:
       classnames:
         specifier: ^2.3.2
         version: 2.3.2
-      color-namer:
-        specifier: ^1.4.0
-        version: 1.4.0
       color2k:
         specifier: ^2.0.2
         version: 2.0.2
@@ -751,9 +748,6 @@ importers:
       '@types/classnames':
         specifier: ^2.2.10
         version: 2.3.1
-      '@types/color-namer':
-        specifier: ^1.3.3
-        version: 1.3.3
       '@types/history':
         specifier: ^4.7.8
         version: 4.7.11
@@ -6786,10 +6780,6 @@ packages:
       classnames: 2.3.2
     dev: true
 
-  /@types/color-namer@1.3.3:
-    resolution: {integrity: sha512-DJ0MHHqazwb94dUBRhahK49nXhRGk2DIRNrVNVR3U3uQjYWY4uNhEjHXO+TbFQGpZcwli1pCj6xm3S3KsB/+3A==}
-    dev: true
-
   /@types/connect-history-api-fallback@1.3.5:
     resolution: {integrity: sha512-h8QJa8xSb1WD4fpKBDcATDNGXghFj6/3GRWG6dhmRcu0RX1Ubasur2Uvx5aeEwlf0MwblEC2bMzzMQntxnw/Cw==}
     dependencies:
@@ -8848,10 +8838,6 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /chroma-js@1.4.1:
-    resolution: {integrity: sha512-jTwQiT859RTFN/vIf7s+Vl/Z2LcMrvMv3WUFmd/4u76AdlFC0NTNgqEEFPcRiHmAswPsMiQEDZLM8vX8qXpZNQ==}
-    dev: false
-
   /chrome-trace-event@1.0.3:
     resolution: {integrity: sha512-p3KULyQg4S7NIHixdwbGX+nFHkoBiA4YQmyWtjb8XngSKV124nJmRysgAeujbUVb15vh+RvFUfCPqU7rXk+hZg==}
     engines: {node: '>=6.0'}
@@ -9059,13 +9045,6 @@ packages:
 
   /color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
-
-  /color-namer@1.4.0:
-    resolution: {integrity: sha512-3mQMY9MJyfdV2uhe+xjQWcKHtYnPtl5svGjt89V2WWT2MlaLAd7C02886Wq7H1MTjjIIEa/NJLYPNF/Lhxhq2A==}
-    dependencies:
-      chroma-js: 1.4.1
-      es6-weak-map: 2.0.3
-    dev: false
 
   /color-parse@1.4.2:
     resolution: {integrity: sha512-RI7s49/8yqDj3fECFZjUI1Yi0z/Gq1py43oNJivAIIDSyJiOZLfYCRQEgn8HEVAj++PcRe8AnL2XF0fRJ3BTnA==}

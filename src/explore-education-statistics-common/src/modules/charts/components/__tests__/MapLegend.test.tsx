@@ -46,10 +46,10 @@ describe('MapLegend', () => {
     const spans = screen.getAllByTestId('mapBlock-legend-item');
     expect(spans).toHaveLength(2);
     expect(within(spans[0]).getByRole('term')).toHaveTextContent(
-      'map colour rgb(128, 128, 128) (Gray)',
+      'Group 1 of 2',
     );
     expect(within(spans[1]).getByRole('term')).toHaveTextContent(
-      'map colour rgb(0, 0, 0) (Black)',
+      'Group 2 of 2',
     );
   });
 });
