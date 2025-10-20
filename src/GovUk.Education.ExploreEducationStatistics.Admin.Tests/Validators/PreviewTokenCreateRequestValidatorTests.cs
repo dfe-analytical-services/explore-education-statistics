@@ -93,7 +93,7 @@ public class PreviewTokenCreateRequestValidatorTests
     // *Activates and expires both fall outside daylight savings time*
     // Activates at start of day:
     [InlineData("2025-01-01T00:00:00 +00:00", "2025-01-07T23:59:59 +00:00", true)] // <-- lt 7 days
-    // [InlineData("2025-01-01T00:00:00 +00:00", "2025-01-08T00:00:00 +00:00", false)] // <-- eq 7 days TODO EES-6648: Fix and uncomment this test case
+    [InlineData("2025-01-01T00:00:00 +00:00", "2025-01-08T23:59:59 +00:00", true)] // <-- eq 7 days
     // Activates at 2pm:
     [InlineData("2025-01-01T14:00:00 +00:00", "2025-01-08T13:59:59 +00:00", true)] // <-- lt 7 days
     [InlineData("2025-01-01T14:00:00 +00:00", "2025-01-08T14:00:00 +00:00", true)] // <-- eq 7 days
@@ -102,7 +102,7 @@ public class PreviewTokenCreateRequestValidatorTests
     // *Activates and expires both fall within daylight savings time*
     // Activates at start of day:
     [InlineData("2025-10-03T00:00:00 +01:00", "2025-10-09T23:59:59 +01:00", true)] // <-- lt 7 days
-    // [InlineData("2025-10-03T00:00:00 +01:00", "2025-10-10T00:00:00 +01:00", false)] // <-- eq 7 days TODO EES-6648: Fix and uncomment this test case
+    [InlineData("2025-10-03T00:00:00 +01:00", "2025-10-10T00:00:00 +01:00", true)] // <-- eq 7 days
     // Activates at 2pm:
     [InlineData("2025-10-03T14:00:00 +01:00", "2025-10-10T13:59:59 +01:00", true)] // <-- lt 7 days
     [InlineData("2025-10-03T14:00:00 +01:00", "2025-10-10T14:00:00 +01:00", true)] // <-- eq 7 days
@@ -111,21 +111,20 @@ public class PreviewTokenCreateRequestValidatorTests
     // *Activates outside daylight savings time, expires within daylight savings time*
     // Activates at start of day:
     [InlineData("2025-03-28T00:00:00 +00:00", "2025-04-03T23:59:59 +01:00", true)] // <-- lt 7 days
-    // [InlineData("2025-03-28T00:00:00 +00:00", "2025-04-04T00:00:01 +01:00", false)] // <-- eq 7 days TODO EES-6648: Fix and uncomment this test case
+    [InlineData("2025-03-28T00:00:00 +00:00", "2025-04-04T00:00:01 +01:00", true)] // <--  lt 7 days (expires (2025-04-04T00:00:01 +01:00) → convert to UTC = 2025-04-03 23:00:01 +00:00; lt 7 days (6 days, 23 hours, 1 second))
     // Activates at 2pm:
     [InlineData("2025-03-28T14:00:00 +00:00", "2025-04-04T13:59:59 +01:00", true)] // <-- lt 7 days
     [InlineData("2025-03-28T14:00:00 +00:00", "2025-04-04T14:00:00 +01:00", true)] // <-- eq 7 days
-    [InlineData("2025-03-28T14:00:00 +00:00", "2025-04-04T23:59:59 +01:00", true)] // <-- valid through to the end of the 7th day
-    // [InlineData("2025-03-28T14:00:00 +00:00", "2025-04-05T00:00:00 +01:00", false)] // <-- but not beyond that TODO EES-6648: Fix and uncomment this test case
-
+    [InlineData("2025-03-28T14:00:00 +00:00", "2025-04-04T23:59:59 +01:00", true)] // <-- vlt 7 days (valid through to the end of the 7th day)
+    [InlineData("2025-03-28T14:00:00 +00:00", "2025-04-05T00:00:00 +01:00", true)] // <-- lt 7 days (expires (2025-04-05T00:00:00 +01:00) → convert to UTC = 2025-04-04 23:00:01 +00:00)
     // *Activates within daylight savings time, expires outside daylight savings time*
     // Activates at start of day:
     [InlineData("2025-10-20T00:00:00 +01:00", "2025-10-26T23:59:59 +00:00", true)] // <-- lt 7 days
-    // [InlineData("2025-10-20T00:00:00 +01:00", "2025-10-27T00:00:00 +00:00", false)] // <-- eq 7 days TODO EES-6648: Fix and uncomment this test case
+    [InlineData("2025-10-20T00:00:00 +01:00", "2025-10-27T00:00:00 +00:00", true)] // <-- eq 7 days
     // Activates at 2pm:
     [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-27T13:59:59 +00:00", true)] // <-- lt 7 days
     [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-27T14:00:00 +00:00", true)] // <-- eq 7 days
-    // [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-27T23:59:59 +00:00", true)] // <-- valid through to the end of the 7th day TODO EES-6648: Fix and uncomment this test case
+    [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-27T23:59:59 +00:00", true)] // <-- valid through to the end of the 7th day /////
     [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-28T00:00:00 +00:00", false)] // <-- but not beyond that
     public void Expires_WhenActivatesIsNotNull_ValidUpTo7DaysAfterActivates(
         string activates,
