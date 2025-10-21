@@ -21,6 +21,7 @@ public class MapperTests
         };
 
         var services = new ServiceCollection();
+
         services.AddAutoMapper(typeof(MappingProfiles));
 
         var serviceProvider = services.BuildServiceProvider();
