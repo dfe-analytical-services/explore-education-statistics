@@ -231,6 +231,36 @@ const DataFileDetailsTable = ({
             )}
           </tr>
         )}
+        <tr>
+          <th scope="row">API compatible</th>
+          <td data-testid="API compatible">
+            <div className="dfe-flex dfe-align-items--center">
+              {dataFile.publicApiCompatible === null && (
+                <Tag colour="orange">Not available</Tag>
+              )}
+              {dataFile.publicApiCompatible === true ? (
+                <Tag colour="green">Yes</Tag>
+              ) : (
+                <Tag colour="red">No</Tag>
+              )}
+            </div>
+            {dataFile.publicApiCompatible}
+          </td>
+          {replacementDataFile?.publicApiCompatible && (
+            <td data-testid="Replacement API compatible">
+              <div className="dfe-flex dfe-align-items--center">
+                {replacementDataFile.publicApiCompatible === null && (
+                  <Tag colour="orange">Not available</Tag>
+                )}
+                {replacementDataFile.publicApiCompatible === true ? (
+                  <Tag colour="green">Yes</Tag>
+                ) : (
+                  <Tag colour="red">No</Tag>
+                )}
+              </div>
+            </td>
+          )}
+        </tr>
 
         {children && (
           <tr>

@@ -8,6 +8,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
 import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
+import Tag from '@common/components/Tag';
 
 interface Props {
   dataFile: DataFile;
@@ -72,6 +73,16 @@ export default function DataFileSummaryList({
           </FormattedDate>
         </SummaryListItem>
       )}
+      <SummaryListItem term="API compatible">
+        {dataFile.publicApiCompatible === null && (
+          <Tag colour="orange">Not available</Tag>
+        )}
+        {dataFile.publicApiCompatible === true ? (
+          <Tag colour="green">Yes</Tag>
+        ) : (
+          <Tag colour="red">No</Tag>
+        )}
+      </SummaryListItem>
     </SummaryList>
   );
 }

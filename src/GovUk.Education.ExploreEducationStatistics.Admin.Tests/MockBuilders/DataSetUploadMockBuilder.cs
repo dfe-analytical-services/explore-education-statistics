@@ -92,6 +92,7 @@ public class DataSetUploadMockBuilder
                     },
                 ],
             },
+            PublicApiCompatible = true,
         };
     }
 

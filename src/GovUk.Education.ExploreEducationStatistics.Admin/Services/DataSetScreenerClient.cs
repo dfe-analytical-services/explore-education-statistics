@@ -23,7 +23,12 @@ public class DataSetScreenerClient(
     )
     {
         // TODO (EES-6341): Re-enable screening once fully implemented.
-        return new DataSetScreenerResponse { OverallResult = "Passed", Passed = true };
+        return new DataSetScreenerResponse
+        {
+            OverallResult = "Passed",
+            Passed = true,
+            PublicApiCompatible = true,
+        };
         //await authenticationManager.AddAuthentication(httpClient, cancellationToken);
 
         //var json = JsonSerializer.Serialize(dataSetRequest, _jsonSerializerOptions);

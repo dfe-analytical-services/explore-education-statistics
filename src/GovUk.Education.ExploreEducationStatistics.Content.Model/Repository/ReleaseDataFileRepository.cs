@@ -59,6 +59,7 @@ public class ReleaseDataFileRepository : IReleaseDataFileRepository
                 Type = type,
                 Replacing = replacingDataFile,
             },
+            PublicApiCompatible = true, // TODO (EES-6341): Replace hard-coding with a supplied value once the screener bypass is removed
         };
         var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
         if (replacingDataFile != null)

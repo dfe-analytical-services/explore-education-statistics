@@ -14,6 +14,7 @@ interface DataFileInfo extends FileInfo {
   replacedBy?: string; // the fileId of the replacement file, if it exists
   replacedByDataFile?: ReplacementDataFileInfo; // additional info about the replacement file - although not always returned by the backend, even if it exists!
   permissions: DataFilePermissions;
+  publicApiCompatible?: boolean;
 }
 
 interface ReplacementDataFileInfo extends DataFileInfo {
@@ -31,6 +32,7 @@ export interface DataSetUpload {
   screenerResult?: ScreenerResult; // Nullable if screening fails
   created: Date;
   uploadedBy: string;
+  publicApiCompatible?: boolean;
   replacingFileId?: string;
 }
 
@@ -74,6 +76,7 @@ export interface DataFile {
   isDeleting?: boolean;
   isCancelling?: boolean;
   permissions: DataFilePermissions;
+  publicApiCompatible?: boolean;
   publicApiDataSetId?: string;
   publicApiDataSetVersion?: string;
 }
@@ -146,6 +149,7 @@ function mapFile({ name, ...file }: DataFileInfo): DataFile {
       file.replacedByDataFile === undefined
         ? undefined
         : mapFile(file.replacedByDataFile),
+    publicApiCompatible: file.publicApiCompatible,
   };
 }
 

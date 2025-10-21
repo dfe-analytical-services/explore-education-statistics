@@ -71,6 +71,16 @@ export default function DataSetUploadSummaryList({
           {dataSetUpload.created}
         </FormattedDate>
       </SummaryListItem>
+      <SummaryListItem term="API compatible">
+        {dataSetUpload.publicApiCompatible === null && (
+          <Tag colour="orange">Not available</Tag>
+        )}
+        {dataSetUpload.publicApiCompatible === true ? (
+          <Tag colour="green">Yes</Tag>
+        ) : (
+          <Tag colour="red">No</Tag>
+        )}
+      </SummaryListItem>
     </SummaryList>
   );
 }
