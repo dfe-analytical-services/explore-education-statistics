@@ -80,6 +80,11 @@ public static class ReleaseFileGeneratorExtensions
         List<IndicatorGroupSequenceEntry> sequence
     ) => generator.ForInstance(s => s.SetIndicatorSequence(sequence));
 
+    public static Generator<ReleaseFile> WithApiCompatibility(
+        this Generator<ReleaseFile> generator,
+        bool isCompatible
+    ) => generator.ForInstance(s => s.SetApiCompatibility(isCompatible));
+
     public static Generator<ReleaseFile> WithPublicApiDataSetId(
         this Generator<ReleaseFile> generator,
         Guid publicApiDataSetId
@@ -137,6 +142,11 @@ public static class ReleaseFileGeneratorExtensions
         this InstanceSetters<ReleaseFile> setters,
         List<IndicatorGroupSequenceEntry> sequence
     ) => setters.Set(rf => rf.IndicatorSequence, sequence);
+
+    public static InstanceSetters<ReleaseFile> SetApiCompatibility(
+        this InstanceSetters<ReleaseFile> setters,
+        bool isCompatible
+    ) => setters.Set(rf => rf.PublicApiCompatible, isCompatible);
 
     public static InstanceSetters<ReleaseFile> SetPublicApiDataSetId(
         this InstanceSetters<ReleaseFile> setters,
