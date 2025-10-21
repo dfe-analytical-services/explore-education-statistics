@@ -117,6 +117,53 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
+        public async Task WhenDataSetHasMultipleGeographicLevels_ReturnsGeographicLevelsInLabelOrder()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            ReleaseFile dataSet = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(
+                    _dataFixture
+                        .DefaultFile(FileType.Data)
+                        .WithDataSetFileVersionGeographicLevels(
+                            [GeographicLevel.Ward, GeographicLevel.Country, GeographicLevel.LocalAuthority]
+                        )
+                )
+                .WithReleaseVersion(releaseVersion);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(dataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(
+                    publicationSlug: publication.Slug,
+                    releaseSlug: release.Slug
+                );
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                // Expect the geographic levels to be returned in alphabetical order
+                Assert.Equal(["Local authority", "National", "Ward"], result.DataSets[0].Meta.GeographicLevels);
+            }
+        }
+
+        [Fact]
         public async Task WhenReleaseVersionHasNoContent_ReturnsEmptyDataContent()
         {
             // Arrange
@@ -282,6 +329,7 @@ public abstract class ReleaseDataContentServiceTests
         {
             var expectedGeographicLevels = expected
                 .File.DataSetFileVersionGeographicLevels.Select(gl => gl.GeographicLevel.GetEnumLabel())
+                .Order()
                 .ToArray();
             Assert.Equal(expectedGeographicLevels, actual.GeographicLevels);
 

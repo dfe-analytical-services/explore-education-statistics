@@ -71,7 +71,7 @@ public record ReleaseDataContentDataSetMetaDto
         return new ReleaseDataContentDataSetMetaDto
         {
             Filters = GetOrderedFilters(meta.Filters, releaseFile.FilterSequence),
-            GeographicLevels = GetGeographicLevelLabels(file.DataSetFileVersionGeographicLevels),
+            GeographicLevels = GetOrderedGeographicLevels(file.DataSetFileVersionGeographicLevels),
             Indicators = GetOrderedIndicators(meta.Indicators, releaseFile.IndicatorSequence),
             NumDataFileRows = meta.NumDataFileRows,
             TimePeriodRange = ReleaseDataContentDataSetMetaTimePeriodRangeDto.FromTimePeriodRangeMeta(
@@ -80,9 +80,9 @@ public record ReleaseDataContentDataSetMetaDto
         };
     }
 
-    private static string[] GetGeographicLevelLabels(
+    private static string[] GetOrderedGeographicLevels(
         IEnumerable<DataSetFileVersionGeographicLevel> dataSetFileVersionGeographicLevels
-    ) => [.. dataSetFileVersionGeographicLevels.Select(level => level.GeographicLevel.GetEnumLabel())];
+    ) => [.. dataSetFileVersionGeographicLevels.Select(level => level.GeographicLevel.GetEnumLabel()).Order()];
 
     private static string[] GetOrderedFilters(
         IEnumerable<FilterMeta> filters,
