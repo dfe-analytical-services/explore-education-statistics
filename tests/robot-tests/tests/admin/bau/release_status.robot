@@ -317,7 +317,7 @@ Navigate to data replacement page
     user clicks link in table cell    1    4    View details    testid:Data file replacements table
     user checks table column heading contains    1    1    Original file
     user checks table column heading contains    1    2    Replacement file
-    user checks headed table body row cell contains    Data file import status    1    Complete
+    user checks headed table body row cell contains    Data file import status    2    Complete
     ...    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Validate checklist errors
