@@ -1772,14 +1772,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 Assert.Equal(
                     new DataSetFileTimePeriodRangeViewModel
                     {
-                        From = TimePeriodLabelFormatter.Format(
-                            originalMeta.TimePeriodRange.Start.Period,
-                            originalMeta.TimePeriodRange.Start.TimeIdentifier
-                        ),
-                        To = TimePeriodLabelFormatter.Format(
-                            originalMeta.TimePeriodRange.End.Period,
-                            originalMeta.TimePeriodRange.End.TimeIdentifier
-                        ),
+                        From = originalMeta.TimePeriodRange.Start.ToLabel(),
+                        To = originalMeta.TimePeriodRange.End.ToLabel(),
                     },
                     dataSetFileMetaViewModel.TimePeriodRange
                 );

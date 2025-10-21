@@ -28,4 +28,7 @@ public class ContentSection
 
     [JsonIgnore]
     public ContentSectionType Type { get; set; }
+
+    public T? FindSingleContentBlockOfType<T>()
+        where T : ContentBlock => Content.OfType<T>().SingleOrDefault();
 }

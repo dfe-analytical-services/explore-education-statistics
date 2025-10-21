@@ -11,7 +11,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Util
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Releases;
 
-public class ReleaseContentServiceTests
+public abstract class ReleaseContentServiceTests
 {
     private readonly DataFixture _dataFixture = new();
 

@@ -9,6 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 public abstract class ReleaseVersionsControllerTests
 {
     private readonly ReleaseContentServiceMockBuilder _releaseContentService = new();
+    private readonly ReleaseDataContentServiceMockBuilder _releaseDataContentService = new();
     private readonly ReleaseVersionsServiceMockBuilder _releaseVersionsService = new();
 
     private const string PublicationSlug = "test-publication";
@@ -50,6 +51,42 @@ public abstract class ReleaseVersionsControllerTests
         }
     }
 
+    public class GetReleaseDataContentTests : ReleaseVersionsControllerTests
+    {
+        [Fact]
+        public async Task WhenServiceReturnsReleaseDataContent_ReturnsOk()
+        {
+            // Arrange
+            var releaseDataContent = new ReleaseDataContentDtoBuilder().Build();
+            _releaseDataContentService.WhereHasReleaseDataContent(releaseDataContent);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetReleaseDataContent(PublicationSlug, ReleaseSlug);
+
+            // Assert
+            _releaseDataContentService.Assert.GetReleaseDataContentWasCalled(PublicationSlug, ReleaseSlug);
+            result.AssertOkResult(releaseDataContent);
+        }
+
+        [Fact]
+        public async Task WhenServiceReturnsNotFound_ReturnsNotFound()
+        {
+            // Arrange
+            _releaseDataContentService.WhereGetReleaseDataContentReturnsNotFound(PublicationSlug, ReleaseSlug);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetReleaseDataContent(PublicationSlug, ReleaseSlug);
+
+            // Assert
+            _releaseDataContentService.Assert.GetReleaseDataContentWasCalled(PublicationSlug, ReleaseSlug);
+            result.AssertNotFoundResult();
+        }
+    }
+
     public class GetReleaseVersionSummaryTests : ReleaseVersionsControllerTests
     {
         [Fact]
@@ -87,5 +124,5 @@ public abstract class ReleaseVersionsControllerTests
     }
 
     private ReleaseVersionsController BuildController() =>
-        new(_releaseContentService.Build(), _releaseVersionsService.Build());
+        new(_releaseContentService.Build(), _releaseDataContentService.Build(), _releaseVersionsService.Build());
 }
