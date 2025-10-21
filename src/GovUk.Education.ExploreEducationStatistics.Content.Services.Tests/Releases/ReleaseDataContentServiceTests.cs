@@ -117,6 +117,295 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
+        public async Task WhenDataSetHasNoFilterSequenceDefined_ReturnsFiltersInLabelOrder()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            // Define filters in non-alphabetical order
+            FilterMeta[] filters =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Filter B",
+                    ColumnName = "",
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Filter C",
+                    ColumnName = "",
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Filter A",
+                    ColumnName = "",
+                },
+            ];
+
+            ReleaseFile dataSet = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(
+                    _dataFixture
+                        .DefaultFile(FileType.Data)
+                        .WithDataSetFileMeta(_dataFixture.DefaultDataSetFileMeta().WithFilters([.. filters]))
+                )
+                .WithReleaseVersion(releaseVersion);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(dataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(
+                    publicationSlug: publication.Slug,
+                    releaseSlug: release.Slug
+                );
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Equal(["Filter A", "Filter B", "Filter C"], result.DataSets[0].Meta.Filters);
+            }
+        }
+
+        [Fact]
+        public async Task WhenDataSetHasFilterSequenceDefined_ReturnsFiltersInSequenceOrder()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            FilterMeta[] filters =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Filter A",
+                    ColumnName = "",
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Filter B",
+                    ColumnName = "",
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Filter C",
+                    ColumnName = "",
+                },
+            ];
+
+            // Define a custom filter sequence
+            FilterSequenceEntry[] filterSequence =
+            [
+                new(filters[1].Id, null!), // Filter B
+                new(filters[2].Id, null!), // Filter C
+                new(filters[0].Id, null!), // Filter A
+            ];
+
+            ReleaseFile dataSet = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(
+                    _dataFixture
+                        .DefaultFile(FileType.Data)
+                        .WithDataSetFileMeta(_dataFixture.DefaultDataSetFileMeta().WithFilters([.. filters]))
+                )
+                .WithFilterSequence([.. filterSequence])
+                .WithReleaseVersion(releaseVersion);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(dataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(
+                    publicationSlug: publication.Slug,
+                    releaseSlug: release.Slug
+                );
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Equal(["Filter B", "Filter C", "Filter A"], result.DataSets[0].Meta.Filters);
+            }
+        }
+
+        [Fact]
+        public async Task WhenDataSetHasNoIndicatorSequenceDefined_ReturnsIndicatorsInLabelOrder()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            // Define indicators in non-alphabetical order
+            IndicatorMeta[] indicators =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Indicator B",
+                    ColumnName = "",
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Indicator C",
+                    ColumnName = "",
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Indicator A",
+                    ColumnName = "",
+                },
+            ];
+
+            ReleaseFile dataSet = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(
+                    _dataFixture
+                        .DefaultFile(FileType.Data)
+                        .WithDataSetFileMeta(_dataFixture.DefaultDataSetFileMeta().WithIndicators([.. indicators]))
+                )
+                .WithReleaseVersion(releaseVersion);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(dataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(
+                    publicationSlug: publication.Slug,
+                    releaseSlug: release.Slug
+                );
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Equal(["Indicator A", "Indicator B", "Indicator C"], result.DataSets[0].Meta.Indicators);
+            }
+        }
+
+        [Fact]
+        public async Task WhenDataSetHasIndicatorSequenceDefined_ReturnsIndicatorsInSequenceOrder()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            IndicatorMeta[] indicators =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Indicator A",
+                    ColumnName = "",
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Indicator B",
+                    ColumnName = "",
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Indicator C",
+                    ColumnName = "",
+                },
+            ];
+
+            // Define a custom indicator sequence
+            IndicatorGroupSequenceEntry[] indicatorSequence =
+            [
+                new(
+                    Guid.Empty,
+                    [
+                        indicators[1].Id, // Indicator B
+                        indicators[2].Id, // Indicator C
+                        indicators[0].Id, // Indicator A
+                    ]
+                ),
+            ];
+
+            ReleaseFile dataSet = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(
+                    _dataFixture
+                        .DefaultFile(FileType.Data)
+                        .WithDataSetFileMeta(_dataFixture.DefaultDataSetFileMeta().WithIndicators([.. indicators]))
+                )
+                .WithIndicatorSequence([.. indicatorSequence])
+                .WithReleaseVersion(releaseVersion);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(dataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(
+                    publicationSlug: publication.Slug,
+                    releaseSlug: release.Slug
+                );
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Equal(["Indicator B", "Indicator C", "Indicator A"], result.DataSets[0].Meta.Indicators);
+            }
+        }
+
+        [Fact]
         public async Task WhenDataSetHasMultipleGeographicLevels_ReturnsGeographicLevelsInLabelOrder()
         {
             // Arrange
