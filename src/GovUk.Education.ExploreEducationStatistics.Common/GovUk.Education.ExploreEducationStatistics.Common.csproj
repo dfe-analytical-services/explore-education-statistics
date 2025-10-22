@@ -50,7 +50,7 @@
     <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
     <PackageReference Include="Mime" Version="3.8.0" />
     <PackageReference Include="Mime-Detective" Version="0.0.6-beta5" />
-    <PackageReference Include="System.Text.Json" Version="9.0.9" />
+    <PackageReference Include="System.Text.Json" Version="9.0.10" />
     <PackageReference Include="Thinktecture.EntityFrameworkCore.BulkOperations" Version="8.4.0" />
     <PackageReference Include="ZstdSharp.Port" Version="0.8.6" />
   </ItemGroup>
