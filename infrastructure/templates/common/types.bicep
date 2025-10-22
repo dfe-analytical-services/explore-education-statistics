@@ -49,7 +49,7 @@ type BackupVaultPolicyDataSourceType =
 
 var dataSourceTypeMap = {
  blobs: 'Microsoft.Storage/storageAccounts/blobServices'
- psqlFlexibleServer: 'AzureDatabaseForPostgreSQLFlexibleServer'
+ psqlFlexibleServer: 'Microsoft.DBforPostgreSQL/flexibleServers'
 }
 
 @export()
