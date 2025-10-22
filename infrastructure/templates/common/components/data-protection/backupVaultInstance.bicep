@@ -6,6 +6,9 @@ param dataSourceType BackupVaultPolicyDataSourceType
 @description('Full resource id of the resource instance that owns the data source.')
 param resourceId string
 
+@description('The location of the resource being backed up.')
+param resourceLocation string
+
 @description('Full resource id of the backup policy that is used to backup this resource.')
 param backupPolicyName string
 
@@ -16,7 +19,7 @@ param vaultName string
 param tagValues object
 
 resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-05-01' existing = {
-  name: backupPolicyName
+  name: '${vaultName}/${backupPolicyName}'
 }
 
 resource backupInstance 'Microsoft.DataProtection/backupVaults/backupInstances@2023-01-01' = {
@@ -26,6 +29,7 @@ resource backupInstance 'Microsoft.DataProtection/backupVaults/backupInstances@2
       datasourceType: getFullBackupVaultDataSourceType(dataSourceType)
       objectType: 'Datasource'
       resourceID: resourceId
+      resourceLocation: resourceLocation
     }
     policyInfo: {
       policyId: policy.id

@@ -1,18 +1,10 @@
-import { BackupVaultPolicyDataSourceType, getFullBackupVaultDataSourceType } from '../../types.bicep'
+import { getFullBackupVaultDataSourceType } from '../../types.bicep'
 
 @description('Name of the backup policy.')
 param policyName string
 
 @description('Name of the backup vault that this policy belongs to.')
 param vaultName string
-
-@description('Name of the Backup Policy')
-param dataSourceTypes BackupVaultPolicyDataSourceType[]
-
-@description('Operational tier backup retention duration in days (for PITR recovery).')
-@minValue(1)
-@maxValue(360)
-param operationalTierRetentionInDays int
 
 @description('Vault tier default backup retention duration in days.')
 @minValue(7)
@@ -37,7 +29,6 @@ param vaultTierYearlyRetentionInYears int
 @description('Vault tier daily backup schedule time, in hh:mm format e.g. 07:00.')
 param vaultTierDailyBackupScheduleTime string
 
-var operationalTierRetentionDuration = 'P${operationalTierRetentionInDays}D'
 var vaultTierDefaultRetentionDuration = 'P${vaultTierDefaultRetentionInDays}D'
 var vaultTierWeeklyRetentionDuration = 'P${vaultTierWeeklyRetentionInWeeks}W'
 var vaultTierMonthlyRetentionDuration = 'P${vaultTierMonthlyRetentionInMonths}M'
@@ -47,6 +38,8 @@ var repeatingTimeIntervals = 'R/2024-05-06T${vaultTierDailyBackupScheduleTime}:0
 resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-05-01' = {
   name: '${vaultName}/${policyName}'
   properties: {
+    objectType: 'BackupPolicy'
+    datasourceTypes: [getFullBackupVaultDataSourceType('psqlFlexibleServer')]
     policyRules: [
       {
         name: 'Default'
@@ -55,11 +48,11 @@ resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022
         lifecycles: [
           {
             deleteAfter: {
-              duration: operationalTierRetentionDuration
+              duration: vaultTierDefaultRetentionDuration
               objectType: 'AbsoluteDeleteOption'
             }
             sourceDataStore: {
-              dataStoreType: 'OperationalStore'
+              dataStoreType: 'VaultStore'
               objectType: 'DataStoreInfoBase'
             }
             targetDataStoreCopySettings: []
@@ -121,28 +114,10 @@ resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022
         ]
       }
       {
-        name: 'Default'
-        objectType: 'AzureRetentionRule'
-        isDefault: true
-        lifecycles: [
-          {
-            deleteAfter: {
-              duration: vaultTierDefaultRetentionDuration
-              objectType: 'AbsoluteDeleteOption'
-            }
-            sourceDataStore: {
-              dataStoreType: 'VaultStore'
-              objectType: 'DataStoreInfoBase'
-            }
-            targetDataStoreCopySettings: []
-          }
-        ]
-      }
-      {
         name: 'BackupDaily'
         objectType: 'AzureBackupRule'
         backupParameters: {
-          backupType: 'Discrete'
+          backupType: 'Full'
           objectType: 'AzureBackupParams'
         }
         dataStore: {
@@ -150,6 +125,7 @@ resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022
           objectType: 'DataStoreInfoBase'
         }
         trigger: {
+          objectType: 'ScheduleBasedTriggerContext'
           schedule: {
             timeZone: 'UTC'
             repeatingTimeIntervals: [
@@ -210,11 +186,8 @@ resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022
               }
             }
           ]
-          objectType: 'ScheduleBasedTriggerContext'
         }
       }
     ]
-    datasourceTypes: map(dataSourceTypes, source => getFullBackupVaultDataSourceType(source))
-    objectType: 'BackupPolicy'
   }
 }

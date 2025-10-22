@@ -21,7 +21,7 @@ jobs:
           steps:
             - checkout: self
 
-            # - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml
+            - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml
 
             - template: ../tasks/deploy-bicep.yml
               parameters:

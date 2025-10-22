@@ -42,7 +42,6 @@ var serverName = resourceNames.sharedResources.postgreSqlFlexibleServer
 // Our deploy SPN currently does not have permission to assign this role. 
 var deployBackupVaultRoleAssignment = false
 
-
 func createManagedIdentityConnectionString(templateString string, identityName string) string =>
   replaceMultiple(templateString, {
     '[database_name]': 'public_data'
@@ -94,11 +93,12 @@ module backupVaultRoleAssignmentModule '../../../common/components/psql-flexible
 }
 
 module backupInstanceModule '../../../common/components/data-protection/backupVaultInstance.bicep' = {
-  name: '${serverName}BackupInstanceDeploy'
+  name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}BackupInstanceDeploy'
   params: {
     vaultName: resourceNames.existingResources.backupVault.vault
     dataSourceType: 'psqlFlexibleServer'
     resourceId: postgreSqlServerModule.outputs.databaseRef
+    resourceLocation: location
     backupPolicyName: resourceNames.existingResources.backupVault.psqlFlexibleServerBackupPolicy
     tagValues: tagValues
   }
