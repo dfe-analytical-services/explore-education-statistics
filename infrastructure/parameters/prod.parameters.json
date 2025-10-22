@@ -103,6 +103,9 @@
     },
     "enableReplacementOfPublicApiDataSets": {
       "value": true
+    },
+    "deployBackupVaultRegistrations": {
+      "value": false
     }
   }
 }
