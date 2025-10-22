@@ -123,14 +123,28 @@ public class SignInService(
 
         await releaseInvites
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(invite =>
-                userReleaseRoleRepository.Create(
+            .ForEachAwaitAsync(async invite =>
+            {
+                await userReleaseRoleRepository.Create(
                     userId: userId,
                     releaseVersionId: invite.ReleaseVersionId,
                     role: invite.Role,
                     createdById: invite.CreatedById
-                )
-            );
+                );
+
+                // This will be removed in EES-6511 when we stop using UserReleaseRoleInvites/UserPublicationRoleInvites altogether.
+                // At that point, a role will always exist at the point of sending an email; which means we can always set the date at the point
+                // of sending.
+                if (invite.EmailSent)
+                {
+                    await userReleaseRoleRepository.MarkEmailAsSent(
+                        userId: userId,
+                        releaseVersionId: invite.ReleaseVersionId,
+                        role: invite.Role,
+                        emailSent: DateTimeOffset.MinValue
+                    );
+                }
+            });
 
         await userReleaseInviteRepository.RemoveByUserEmail(email);
     }
@@ -141,14 +155,25 @@ public class SignInService(
 
         await publicationInvites
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(invite =>
-                userPublicationRoleRepository.Create(
+            .ForEachAwaitAsync(async invite =>
+            {
+                await userPublicationRoleRepository.Create(
                     userId: userId,
                     publicationId: invite.PublicationId,
                     role: invite.Role,
                     createdById: invite.CreatedById
-                )
-            );
+                );
+
+                // This will be removed in EES-6511 when we stop using UserReleaseRoleInvites/UserPublicationRoleInvites altogether.
+                // At that point, a role will always exist at the point of sending an email; which means we can always set the date at the point
+                // of sending.
+                await userPublicationRoleRepository.MarkEmailAsSent(
+                    userId: userId,
+                    publicationId: invite.PublicationId,
+                    role: invite.Role,
+                    emailSent: DateTimeOffset.MinValue
+                );
+            });
 
         await userPublicationInviteRepository.RemoveByUserEmail(email);
     }

@@ -1,6 +1,5 @@
 #nullable enable
 using System.ComponentModel.DataAnnotations;
-using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -13,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -22,10 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class PreReleaseUserService(
     ContentDbContext context,
-    IEmailService emailService,
-    IOptions<AppOptions> appOptions,
-    IOptions<NotifyOptions> notifyOptions,
-    IPreReleaseService preReleaseService,
+    IUserResourceRoleNotificationService userResourceRoleNotificationService,
     IPersistenceHelper<ContentDbContext> persistenceHelper,
     IUserService userService,
     IUserRepository userRepository,
@@ -213,34 +208,27 @@ public class PreReleaseUserService(
         User user
     )
     {
-        if (
-            !await userReleaseInviteRepository.UserHasInvite(
-                releaseVersion.Id,
-                user.Email,
-                ReleaseRole.PrereleaseViewer
-            )
-        )
+        if (await userReleaseInviteRepository.UserHasInvite(releaseVersion.Id, user.Email, ReleaseRole.PrereleaseViewer))
         {
-            var sendEmail = releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved;
-            if (sendEmail)
-            {
-                // TODO EES-4681 - we're not currently marking this email as having been sent using
-                // MarkInviteEmailAsSent, but should we be doing so?
-                var emailResult = await SendPreReleaseInviteEmail(releaseVersion.Id, user.Email, isNewUser: true);
-                if (emailResult.IsLeft)
-                {
-                    return emailResult;
-                }
-            }
+            return Unit.Instance;
+        }
 
-            await userReleaseInviteRepository.Create(
-                releaseVersionId: releaseVersion.Id,
-                email: user.Email,
-                releaseRole: ReleaseRole.PrereleaseViewer,
-                emailSent: sendEmail,
-                createdById: userService.GetUserId()
+        var sendEmail = releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved;
+        if (sendEmail)
+        {
+            await userResourceRoleNotificationService.NotifyUserOfNewPreReleaseRole(
+                userEmail: user.Email,
+                releaseVersionId: releaseVersion.Id
             );
         }
+
+        await userReleaseInviteRepository.Create(
+            releaseVersionId: releaseVersion.Id,
+            email: user.Email,
+            releaseRole: ReleaseRole.PrereleaseViewer,
+            emailSent: sendEmail,
+            createdById: userService.GetUserId()
+        );
 
         return Unit.Instance;
     }
@@ -251,36 +239,34 @@ public class PreReleaseUserService(
         User user
     )
     {
-        if (!await userReleaseInviteRepository.UserHasInvite(releaseVersion.Id, email, ReleaseRole.PrereleaseViewer))
+        if (await userReleaseInviteRepository.UserHasInvite(releaseVersion.Id, email, ReleaseRole.PrereleaseViewer))
         {
-            var sendEmail = releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved;
+            return Unit.Instance;
+        }
 
-            if (sendEmail)
-            {
-                // TODO EES-4681 - we're not currently marking this email as having been sent using
-                // MarkInviteEmailAsSent, but should we be doing so?
-                var emailResult = await SendPreReleaseInviteEmail(releaseVersion.Id, email, isNewUser: false);
-                if (emailResult.IsLeft)
-                {
-                    return emailResult;
-                }
-            }
-            else
-            {
-                // Create an invite. The e-mail is sent if an invite exists when the release is approved
-                await userReleaseInviteRepository.Create(
-                    releaseVersionId: releaseVersion.Id,
-                    email: email,
-                    releaseRole: ReleaseRole.PrereleaseViewer,
-                    emailSent: false,
-                    createdById: userService.GetUserId()
-                );
-            }
+        await userReleaseRoleRepository.CreateIfNotExists(
+            userId: user.Id,
+            releaseVersionId: releaseVersion.Id,
+            role: ReleaseRole.PrereleaseViewer,
+            createdById: userService.GetUserId()
+        );
 
-            await userReleaseRoleRepository.CreateIfNotExists(
-                userId: user.Id,
+        var sendEmail = releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved;
+        if (sendEmail)
+        {
+            await userResourceRoleNotificationService.NotifyUserOfNewPreReleaseRole(
+                userEmail: email,
+                releaseVersionId: releaseVersion.Id
+            );
+        }
+        else
+        {
+            // Create an invite. The e-mail is sent if an invite exists when the release is approved
+            await userReleaseInviteRepository.Create(
                 releaseVersionId: releaseVersion.Id,
-                role: ReleaseRole.PrereleaseViewer,
+                email: email,
+                releaseRole: ReleaseRole.PrereleaseViewer,
+                emailSent: false,
                 createdById: userService.GetUserId()
             );
         }
@@ -288,71 +274,10 @@ public class PreReleaseUserService(
         return Unit.Instance;
     }
 
-    public async Task<Either<ActionResult, Unit>> SendPreReleaseInviteEmail(
-        Guid releaseVersionId,
-        string email,
-        bool isNewUser
-    )
-    {
-        return await context
-            .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
-            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
-            .OnSuccess(releaseVersion =>
-            {
-                var url = appOptions.Value.Url;
-                var template = notifyOptions.Value.PreReleaseTemplateId;
-
-                var prereleaseUrl =
-                    $"{url}/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/prerelease/content";
-
-                var preReleaseWindow = preReleaseService.GetPreReleaseWindow(releaseVersion);
-                var preReleaseWindowStart = preReleaseWindow.Start.ConvertUtcToUkTimeZone();
-                var publishScheduled = releaseVersion.PublishScheduled!.Value.ConvertUtcToUkTimeZone();
-
-                // TODO EES-828 This time should depend on the Publisher schedule
-                var publishScheduledTime = new TimeSpan(9, 30, 0);
-
-                var preReleaseDay = FormatDayForEmail(preReleaseWindowStart);
-                var preReleaseTime = FormatTimeForEmail(preReleaseWindowStart);
-                var publishDay = FormatDayForEmail(publishScheduled);
-                var publishTime = FormatTimeForEmail(publishScheduledTime);
-
-                var emailValues = new Dictionary<string, dynamic>
-                {
-                    { "newUser", isNewUser ? "yes" : "no" },
-                    { "release name", releaseVersion.Release.Title },
-                    { "publication name", releaseVersion.Release.Publication.Title },
-                    { "prerelease link", prereleaseUrl },
-                    { "prerelease day", preReleaseDay },
-                    { "prerelease time", preReleaseTime },
-                    { "publish day", publishDay },
-                    { "publish time", publishTime },
-                };
-
-                return emailService.SendEmail(email, template, emailValues);
-            });
-    }
-
     public async Task MarkInviteEmailAsSent(UserReleaseInvite invite)
     {
         invite.EmailSent = true;
         context.Update(invite);
         await context.SaveChangesAsync();
-    }
-
-    private static string FormatTimeForEmail(DateTime dateTime)
-    {
-        return dateTime.ToString("HH:mm");
-    }
-
-    private static string FormatTimeForEmail(TimeSpan timeSpan)
-    {
-        return timeSpan.ToString(@"hh\:mm");
-    }
-
-    private static string FormatDayForEmail(DateTime dateTime)
-    {
-        return dateTime.ToString("dddd dd MMMM yyyy");
     }
 }

@@ -24,61 +24,30 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Utils.CronExpress
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class ReleaseApprovalService : IReleaseApprovalService
+public class ReleaseApprovalService(
+    ContentDbContext context,
+    DateTimeProvider dateTimeProvider,
+    IUserService userService,
+    IPublishingService publishingService,
+    IReleaseChecklistService releaseChecklistService,
+    IContentService contentService,
+    IPreReleaseUserService preReleaseUserService,
+    IUserResourceRoleNotificationService userResourceRoleNotificationService,
+    IReleaseFileRepository releaseFileRepository,
+    IReleaseFileService releaseFileService,
+    IOptions<ReleaseApprovalOptions> options,
+    IUserReleaseRoleService userReleaseRoleService,
+    IEmailTemplateService emailTemplateService
+) : IReleaseApprovalService
 {
-    private readonly ContentDbContext _context;
-    private readonly DateTimeProvider _dateTimeProvider;
-    private readonly IUserService _userService;
-    private readonly IPublishingService _publishingService;
-    private readonly IReleaseChecklistService _releaseChecklistService;
-    private readonly IContentService _contentService;
-    private readonly IPreReleaseUserService _preReleaseUserService;
-    private readonly IReleaseFileRepository _releaseFileRepository;
-    private readonly IReleaseFileService _releaseFileService;
-    private readonly ReleaseApprovalOptions _options;
-    private readonly IUserReleaseRoleService _userReleaseRoleService;
-    private readonly IEmailTemplateService _emailTemplateService;
-    private readonly IUserRepository _userRepository;
-
-    public ReleaseApprovalService(
-        ContentDbContext context,
-        DateTimeProvider dateTimeProvider,
-        IUserService userService,
-        IPublishingService publishingService,
-        IReleaseChecklistService releaseChecklistService,
-        IContentService contentService,
-        IPreReleaseUserService preReleaseUserService,
-        IReleaseFileRepository releaseFileRepository,
-        IReleaseFileService releaseFileService,
-        IOptions<ReleaseApprovalOptions> options,
-        IUserReleaseRoleService userReleaseRoleService,
-        IEmailTemplateService emailTemplateService,
-        IUserRepository userRepository
-    )
-    {
-        _context = context;
-        _dateTimeProvider = dateTimeProvider;
-        _userService = userService;
-        _publishingService = publishingService;
-        _releaseChecklistService = releaseChecklistService;
-        _contentService = contentService;
-        _preReleaseUserService = preReleaseUserService;
-        _releaseFileRepository = releaseFileRepository;
-        _releaseFileService = releaseFileService;
-        _userReleaseRoleService = userReleaseRoleService;
-        _emailTemplateService = emailTemplateService;
-        _userRepository = userRepository;
-        _options = options.Value;
-    }
-
     public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> ListReleaseStatuses(Guid releaseVersionId)
     {
-        return await _context
+        return await context
             .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
-            .OnSuccess(_userService.CheckCanViewReleaseVersionStatusHistory)
+            .OnSuccess(userService.CheckCanViewReleaseVersionStatusHistory)
             .OnSuccess(async releaseVersion =>
             {
-                return await _context
+                return await context
                     .ReleaseStatus.Where(rs => rs.ReleaseVersion.ReleaseId == releaseVersion.ReleaseId)
                     .OrderByDescending(rs => rs.Created)
                     .Select(rs => new ReleaseStatusViewModel
@@ -99,11 +68,11 @@ public class ReleaseApprovalService : IReleaseApprovalService
         ReleaseStatusCreateRequest request
     )
     {
-        return await _context
+        return await context
             .ReleaseVersions.HydrateReleaseForChecklist()
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccessDo(releaseVersion =>
-                _userService.CheckCanUpdateReleaseVersionStatus(releaseVersion, request.ApprovalStatus)
+                userService.CheckCanUpdateReleaseVersionStatus(releaseVersion, request.ApprovalStatus)
             )
             .OnSuccessDo(() => ValidatePublishDate(request))
             .OnSuccessDo(() => RemoveUnusedImages(releaseVersionId))
@@ -122,7 +91,7 @@ public class ReleaseApprovalService : IReleaseApprovalService
                 releaseVersion.UpdatePublishedDate = request.UpdatePublishedDate ?? false;
                 releaseVersion.PublishScheduled =
                     request.PublishMethod == PublishMethod.Immediate
-                        ? _dateTimeProvider.UtcNow
+                        ? dateTimeProvider.UtcNow
                         : request.PublishScheduledDate;
 
                 var releaseStatus = new ReleaseStatus
@@ -131,7 +100,7 @@ public class ReleaseApprovalService : IReleaseApprovalService
                     ReleaseVersion = releaseVersion,
                     InternalReleaseNote = request.InternalReleaseNote,
                     ApprovalStatus = request.ApprovalStatus,
-                    CreatedById = _userService.GetUserId(),
+                    CreatedById = userService.GetUserId(),
                 };
 
                 var releasePublishingKey = new ReleasePublishingKey(releaseVersionId, releaseStatus.Id);
@@ -142,9 +111,9 @@ public class ReleaseApprovalService : IReleaseApprovalService
                             .OnSuccess(() => NotifyPublisher(releasePublishingKey, request, oldStatus))
                             .OnSuccessDo(async () =>
                             {
-                                _context.ReleaseVersions.Update(releaseVersion);
-                                await _context.AddAsync(releaseStatus);
-                                await _context.SaveChangesAsync();
+                                context.ReleaseVersions.Update(releaseVersion);
+                                await context.AddAsync(releaseStatus);
+                                await context.SaveChangesAsync();
                             })
                     );
             });
@@ -159,7 +128,7 @@ public class ReleaseApprovalService : IReleaseApprovalService
         // Only need to inform Publisher if changing release approval status to or from Approved
         if (oldStatus == ReleaseApprovalStatus.Approved || request.ApprovalStatus == ReleaseApprovalStatus.Approved)
         {
-            return await _publishingService.ReleaseChanged(
+            return await publishingService.ReleaseChanged(
                 releasePublishingKey,
                 immediate: request.PublishMethod == PublishMethod.Immediate
             );
@@ -178,7 +147,9 @@ public class ReleaseApprovalService : IReleaseApprovalService
             && request.PublishMethod == PublishMethod.Scheduled
         )
         {
-            return await SendPreReleaseUserInviteEmails(releaseVersion);
+            await SendPreReleaseUserInviteEmails(releaseVersion);
+
+            return Unit.Instance;
         }
 
         if (request.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview)
@@ -193,12 +164,12 @@ public class ReleaseApprovalService : IReleaseApprovalService
         ReleaseVersion releaseVersion
     )
     {
-        var userReleaseRoles = await _userReleaseRoleService.ListUserReleaseRolesByPublication(
+        var userReleaseRoles = await userReleaseRoleService.ListUserReleaseRolesByPublication(
             ReleaseRole.Approver,
             releaseVersion.Publication.Id
         );
 
-        var userPublicationRoles = await _context
+        var userPublicationRoles = await context
             .UserPublicationRoles.Include(upr => upr.User)
             .Where(upr => upr.PublicationId == releaseVersion.PublicationId && upr.Role == PublicationRole.Allower)
             .ToListAsync();
@@ -211,38 +182,43 @@ public class ReleaseApprovalService : IReleaseApprovalService
                 .Select(urr => urr.User.Email)
                 .Concat(userPublicationRoles.Select(upr => upr.User.Email))
                 .Distinct()
-                .Select(email => _emailTemplateService.SendReleaseHigherReviewEmail(email, releaseVersion))
+                .Select(email => emailTemplateService.SendReleaseHigherReviewEmail(email, releaseVersion))
                 .OnSuccessAllReturnVoid();
         }
 
         return Unit.Instance;
     }
 
-    private async Task<Either<ActionResult, Unit>> SendPreReleaseUserInviteEmails(ReleaseVersion releaseVersion)
+    private async Task SendPreReleaseUserInviteEmails(ReleaseVersion releaseVersion)
     {
-        var unsentUserReleaseInvites = await _context
+        var unsentUserReleaseInvites = await context
             .UserReleaseInvites.Where(i =>
                 i.ReleaseVersionId == releaseVersion.Id && i.Role == ReleaseRole.PrereleaseViewer && !i.EmailSent
             )
             .ToListAsync();
 
-        var emailResults = await unsentUserReleaseInvites
+        // This isn't ideal currently.
+        // If one email fails to send, this code will stop sending further emails and the calling code will not notify
+        // the Publisher and the release status will remain unchanged. This means some people will get an email saying they
+        // now have pre-release access to a Release which isn't approved yet.
+        // On the other hand, if we skip over failed emails and continue sending the rest, some people will not get notified
+        // of their access even when the Release is now approved. This makes them hard to detect.
+        await unsentUserReleaseInvites
             .ToAsyncEnumerable()
-            .SelectAwait(async invite =>
+            .ForEachAwaitAsync(async invite =>
             {
-                var activeUser = await _userRepository.FindActiveUserByEmail(invite.Email);
-                return await _preReleaseUserService
-                    .SendPreReleaseInviteEmail(releaseVersion.Id, invite.Email.ToLower(), isNewUser: activeUser is null)
-                    .OnSuccessDo(() => _preReleaseUserService.MarkInviteEmailAsSent(invite));
-            })
-            .ToListAsync();
+                await userResourceRoleNotificationService.NotifyUserOfNewPreReleaseRole(
+                    userEmail: invite.Email,
+                    releaseVersionId: releaseVersion.Id
+                );
 
-        return emailResults.OnSuccessAllReturnVoid();
+                await preReleaseUserService.MarkInviteEmailAsSent(invite);
+            });
     }
 
     private async Task<Either<ActionResult, Unit>> RemoveUnusedImages(Guid releaseVersionId)
     {
-        return await _contentService
+        return await contentService
             .GetContentBlocks<HtmlBlock>(releaseVersionId)
             .OnSuccess(async contentBlocks =>
             {
@@ -250,7 +226,7 @@ public class ReleaseApprovalService : IReleaseApprovalService
                     .SelectMany(contentBlock => HtmlImageUtil.GetReleaseImages(contentBlock.Body))
                     .Distinct();
 
-                var imageFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, types: FileType.Image);
+                var imageFiles = await releaseFileRepository.GetByFileType(releaseVersionId, types: FileType.Image);
 
                 var unusedImages = imageFiles
                     .Where(file => !contentImageIds.Contains(file.File.Id))
@@ -259,7 +235,7 @@ public class ReleaseApprovalService : IReleaseApprovalService
 
                 if (unusedImages.Any())
                 {
-                    return await _releaseFileService.Delete(
+                    return await releaseFileService.Delete(
                         releaseVersionId: releaseVersionId,
                         fileIds: unusedImages,
                         forceDelete: true
@@ -324,20 +300,20 @@ public class ReleaseApprovalService : IReleaseApprovalService
         var toUtc = fromUtc.AddDays(1).AddTicks(-1);
 
         // The publish date cannot be scheduled if it's already passed
-        if (_dateTimeProvider.UtcNow > toUtc)
+        if (dateTimeProvider.UtcNow > toUtc)
         {
             return false;
         }
 
         // The range should begin now rather than at midnight if the publish date is today
-        if (_dateTimeProvider.UtcNow > fromUtc)
+        if (dateTimeProvider.UtcNow > fromUtc)
         {
-            fromUtc = _dateTimeProvider.UtcNow;
+            fromUtc = dateTimeProvider.UtcNow;
         }
 
         // Publishing won't occur unless there's an occurrence of (1) between the publishing range
         var nextOccurrenceUtc = GetNextOccurrenceForCronExpression(
-            cronExpression: _options.StageScheduledReleasesFunctionCronSchedule,
+            cronExpression: options.Value.StageScheduledReleasesFunctionCronSchedule,
             fromUtc: fromUtc,
             toUtc: toUtc,
             timeZone: ukTimeZone
@@ -347,7 +323,7 @@ public class ReleaseApprovalService : IReleaseApprovalService
         {
             // Publishing won't occur unless there's an occurrence of (2) after (1) but before the end of the range
             return GetNextOccurrenceForCronExpression(
-                cronExpression: _options.PublishScheduledReleasesFunctionCronSchedule,
+                cronExpression: options.Value.PublishScheduledReleasesFunctionCronSchedule,
                 fromUtc: nextOccurrenceUtc.Value,
                 toUtc: toUtc,
                 timeZone: ukTimeZone
@@ -384,7 +360,7 @@ public class ReleaseApprovalService : IReleaseApprovalService
             return Unit.Instance;
         }
 
-        var errors = (await _releaseChecklistService.GetErrors(releaseVersion)).Select(error => error.Code).ToList();
+        var errors = (await releaseChecklistService.GetErrors(releaseVersion)).Select(error => error.Code).ToList();
 
         if (!errors.Any())
         {
