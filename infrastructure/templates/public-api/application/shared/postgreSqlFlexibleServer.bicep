@@ -39,6 +39,10 @@ var formattedFirewallRules = map(firewallRules, rule => {
 
 var serverName = resourceNames.sharedResources.postgreSqlFlexibleServer
 
+// Our deploy SPN currently does not have permission to assign this role. 
+var deployBackupVaultRoleAssignment = false
+
+
 func createManagedIdentityConnectionString(templateString string, identityName string) string =>
   replaceMultiple(templateString, {
     '[database_name]': 'public_data'
@@ -80,7 +84,7 @@ resource backupVault 'Microsoft.DataProtection/backupVaults@2022-05-01' existing
   name: resourceNames.existingResources.backupVault.vault
 }
 
-module backupVaultRoleAssignmentModule '../../../common/components/psql-flexible-server/roleAssignment.bicep' = {
+module backupVaultRoleAssignmentModule '../../../common/components/psql-flexible-server/roleAssignment.bicep' = if (deployBackupVaultRoleAssignment) {
   name: '${serverName}BackupVaultRoleAssignmentDeploy'
   params: {
     psqlFlexibleServerName: postgreSqlServerModule.outputs.serverName
@@ -98,9 +102,6 @@ module backupInstanceModule '../../../common/components/data-protection/backupVa
     backupPolicyName: resourceNames.existingResources.backupVault.psqlFlexibleServerBackupPolicy
     tagValues: tagValues
   }
-  dependsOn: [
-    backupVaultRoleAssignmentModule
-  ]
 }
 
 var connectionStringTemplate = postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
