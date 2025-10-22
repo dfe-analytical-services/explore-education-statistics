@@ -591,9 +591,13 @@ public class ReleaseDataFileService(
             : dataSetUpload;
     }
 
-    private static Either<ActionResult, DataSetUpload> ValidateDataSetCanBeImported(DataSetUpload dataSetUpload)
+    private async Task<Either<ActionResult, DataSetUpload>> ValidateDataSetCanBeImported(DataSetUpload dataSetUpload)
     {
-        return dataSetUpload.Status is not DataSetUploadStatus.PENDING_REVIEW and not DataSetUploadStatus.PENDING_IMPORT
+        var isBauUser = await userService.CheckIsBauUser();
+
+        return
+            !isBauUser.IsRight
+            && dataSetUpload.Status is not DataSetUploadStatus.PENDING_REVIEW and not DataSetUploadStatus.PENDING_IMPORT
             ? ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorDataSetIsNotInAnImportableState())
             : dataSetUpload;
     }

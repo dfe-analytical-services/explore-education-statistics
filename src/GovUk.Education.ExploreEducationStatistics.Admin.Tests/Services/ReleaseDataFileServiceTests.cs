@@ -1,5 +1,6 @@
 #nullable enable
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
@@ -19,7 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Semver;
@@ -1836,6 +1836,87 @@ public class ReleaseDataFileServiceTests
         privateBlobStorageService.SetupCheckBlobExists(PrivateReleaseTempFiles, dataPath, exists: true);
         privateBlobStorageService.SetupCheckBlobExists(PrivateReleaseTempFiles, metaPath, exists: true);
 
+        var userService = new Mock<IUserService>(Strict);
+
+        userService
+            .Setup(s => s.MatchesPolicy(releaseVersion, SecurityPolicies.CanUpdateSpecificReleaseVersion))
+            .ReturnsAsync(true);
+
+        userService.Setup(s => s.MatchesPolicy(SecurityPolicies.IsBauUser)).ReturnsAsync(false);
+
+        var service = SetupReleaseDataFileService(
+            contentDbContext: contentDbContext,
+            privateBlobStorageService: privateBlobStorageService.Object,
+            userService: userService.Object,
+            dataSetFileStorage: dataSetFileStorage.Object
+        );
+
+        // Act
+        var result = await service.SaveDataSetsFromTemporaryBlobStorage(
+            releaseVersion.Id,
+            [dataSetUpload.Id],
+            cancellationToken: default
+        );
+
+        // Assert
+        MockUtils.VerifyAllMocks(privateBlobStorageService, userService, dataSetFileStorage);
+        result.AssertLeft();
+        Assert.Single(contentDbContext.DataSetUploads);
+    }
+
+    [Fact]
+    public async Task SaveDataSetsFromTemporaryBlobStorage_InvalidUploadStatusBauUserOverride_ReturnsSuccess()
+    {
+        // Arrange
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+
+        var dataFile = _fixture.DefaultFile().WithType(FileType.Data).Generate();
+        var metaFile = _fixture.DefaultFile().WithType(FileType.Metadata).Generate();
+
+        var dataSetUpload = new DataSetUploadMockBuilder()
+            .WithReleaseVersionId(releaseVersion.Id)
+            .WithFailingTests()
+            .BuildEntity();
+
+        var import = new DataImport
+        {
+            File = dataFile,
+            FileId = dataFile.Id,
+            MetaFile = metaFile,
+            MetaFileId = metaFile.Id,
+        };
+
+        var releaseFiles = new List<ReleaseFile> { _fixture.DefaultReleaseFile().WithFile(dataFile).Generate() };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+
+        contentDbContext.ReleaseVersions.Add(releaseVersion);
+        contentDbContext.DataImports.Add(import);
+        contentDbContext.DataSetUploads.Add(dataSetUpload);
+        await contentDbContext.SaveChangesAsync();
+
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+        var dataSetFileStorage = new Mock<IDataSetFileStorage>(Strict);
+
+        var dataPath = $"{releaseVersion.Id}/data/{dataSetUpload.DataFileId}";
+        var metaPath = $"{releaseVersion.Id}/data/{dataSetUpload.MetaFileId}";
+
+        privateBlobStorageService.SetupCheckBlobExists(PrivateReleaseTempFiles, dataPath, exists: true);
+        privateBlobStorageService.SetupCheckBlobExists(PrivateReleaseTempFiles, metaPath, exists: true);
+
+        dataSetFileStorage
+            .Setup(mock =>
+                mock.MoveDataSetsToPermanentStorage(
+                    It.IsAny<Guid>(),
+                    It.IsAny<List<DataSetUpload>>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .Returns(Task.FromResult(releaseFiles));
+
         var service = SetupReleaseDataFileService(
             contentDbContext: contentDbContext,
             privateBlobStorageService: privateBlobStorageService.Object,
@@ -1851,8 +1932,9 @@ public class ReleaseDataFileServiceTests
 
         // Assert
         MockUtils.VerifyAllMocks(privateBlobStorageService, dataSetFileStorage);
-        result.AssertLeft();
-        Assert.Single(contentDbContext.DataSetUploads);
+
+        result.AssertRight();
+        Assert.Empty(contentDbContext.DataSetUploads);
     }
 
     private ReleaseDataFileService SetupReleaseDataFileService(

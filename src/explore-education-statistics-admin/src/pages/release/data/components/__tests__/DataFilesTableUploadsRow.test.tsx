@@ -383,7 +383,7 @@ describe('DataFilesTableUploadsRow', () => {
       ).toEqual(1);
       expect(
         within(fileDetailsTabPanel).getByText(
-          'You will need to delete this file (close this window, and select "Delete files"), fix the failed tests and upload again',
+          'You will need to delete this file (close this window, and select "Delete files"), fix the failed tests and upload again. If you have any questions, please get in touch with the explore.statistics@education.gov.uk team.',
         ),
       ).toBeInTheDocument();
     });
