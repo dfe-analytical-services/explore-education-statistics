@@ -27,6 +27,7 @@ import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, Polyline } from 'leaflet';
+import type { LeafletEvent, Map as LeafletMap } from 'leaflet';
 import keyBy from 'lodash/keyBy';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
@@ -119,6 +120,7 @@ export default function MapBlock({
   dataGroups: deprecatedDataGroups,
   dataClassification: deprecatedDataClassification,
   data,
+  alt,
   map,
   meta,
   legend,
@@ -313,6 +315,15 @@ export default function MapBlock({
             center={position}
             minZoom={5}
             zoom={5}
+            // @ts-expect-error The library's type definition is incorrect.
+            whenReady={(e: LeafletEvent) => {
+              const mapContainer = (e.target as LeafletMap).getContainer();
+              const altText = alt
+                ? `${alt}, for alternative see table tab`
+                : 'Interactive map showing education statistics by area, for alternative see table tab';
+              mapContainer?.setAttribute('aria-label', altText);
+              mapContainer?.setAttribute('role', 'group');
+            }}
           >
             <MapGeoJSON
               dataSetCategoryConfigs={dataSetCategoryConfigs}

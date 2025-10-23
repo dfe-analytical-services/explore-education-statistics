@@ -382,4 +382,59 @@ describe('MapBlock', () => {
     expect(legendColours[3].style.backgroundColor).toBe('rgb(108, 130, 183)');
     expect(legendColours[4].style.backgroundColor).toBe('rgb(71, 99, 165)');
   });
+
+  describe('MapBlock (aria-label)', () => {
+    const baseProps: MapBlockProps = {
+      ...testMapConfiguration,
+      boundaryLevel: 1,
+      id: 'testMapAria',
+      axes: testMapConfiguration.axes as MapBlockProps['axes'],
+      legend: testMapConfiguration.legend as LegendConfiguration,
+      meta: testFullTable.subjectMeta,
+      data: testFullTable.results,
+      height: 600,
+      onBoundaryLevelChange,
+    };
+
+    test('sets aria-label to "Interactive map showing education statistics by area" on the map container when alt is not provided', async () => {
+      const { container } = render(<MapBlock {...baseProps} />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('1. Select data to view'),
+        ).toBeInTheDocument();
+      });
+
+      const mapEl = container.querySelector<HTMLElement>('.leaflet-container');
+      expect(mapEl).not.toBeNull();
+
+      await waitFor(() => {
+        expect(mapEl).toHaveAttribute(
+          'aria-label',
+          'Interactive map showing education statistics by area, for alternative see table tab',
+        );
+      });
+    });
+
+    test('sets aria-label on both wrapper and map container when alt is provided', async () => {
+      const altText = 'Pupils absence map';
+      const { container } = render(<MapBlock {...baseProps} alt={altText} />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('1. Select data to view'),
+        ).toBeInTheDocument();
+      });
+
+      const mapEl = container.querySelector<HTMLElement>('.leaflet-container');
+      expect(mapEl).not.toBeNull();
+
+      await waitFor(() => {
+        expect(mapEl).toHaveAttribute(
+          'aria-label',
+          `${altText}, for alternative see table tab`,
+        );
+      });
+    });
+  });
 });

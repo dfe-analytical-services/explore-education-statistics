@@ -828,12 +828,12 @@ Validate basic geographic chart preview
 
     user checks map chart indicator tile contains    id:chartBuilderPreview    Admissions in 2014    9,854
 
-    user checks list has x items    testid:mapBlock-legend    5
-    user checks list item contains    testid:mapBlock-legend    1    1,054 to 2,813
-    user checks list item contains    testid:mapBlock-legend    2    2,814 to 4,573
-    user checks list item contains    testid:mapBlock-legend    3    4,574 to 6,333
-    user checks list item contains    testid:mapBlock-legend    4    6,334 to 8,093
-    user checks list item contains    testid:mapBlock-legend    5    8,094 to 9,854
+    user checks definition list has x items    testid:mapBlock-legend    5
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:first-child dd    1,054 to 2,813
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(2) dd    2,814 to 4,573
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(3) dd    4,574 to 6,333
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(4) dd    6,334 to 8,093
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(5) dd    8,094 to 9,854
 
 Change geographic chart data groupings
     user clicks link    Data groupings
@@ -880,27 +880,28 @@ Change geographic chart data groupings
     user checks table cell contains    4    2    Custom    testid:chart-data-groupings
 
 Validate basic geographic chart preview updates correctly
-    user checks list has x items    testid:mapBlock-legend    2
-    user checks list item contains    testid:mapBlock-legend    1    0 to 3,000
-    user checks list item contains    testid:mapBlock-legend    2    3,001 to 10,000
+    user checks definition list has x items    testid:mapBlock-legend    2
+
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:first-child dd    0 to 3,000
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(2) dd    3,001 to 10,000
 
     user chooses select option    id:chartBuilderPreview-map-selectedDataSet    Admissions in 2015
-    user checks list has x items    testid:mapBlock-legend    4
-    user checks list item contains    testid:mapBlock-legend    1    1,134 to 4,869
-    user checks list item contains    testid:mapBlock-legend    2    4,870 to 7,709
-    user checks list item contains    testid:mapBlock-legend    3    7,710 to 9,425
-    user checks list item contains    testid:mapBlock-legend    4    9,426 to 9,790
+    user checks definition list has x items    testid:mapBlock-legend    4
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:first-child dd    1,134 to 4,869
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(2) dd    4,870 to 7,709
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(3) dd    7,710 to 9,425
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(4) dd    9,426 to 9,790
 
     user chooses select option    id:chartBuilderPreview-map-selectedDataSet    Admissions in 2016
-    user checks list has x items    testid:mapBlock-legend    3
-    user checks list item contains    testid:mapBlock-legend    1    3,548 to 5,317
-    user checks list item contains    testid:mapBlock-legend    2    5,318 to 7,087
-    user checks list item contains    testid:mapBlock-legend    3    7,088 to 8,856
+    user checks definition list has x items    testid:mapBlock-legend    3
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:first-child dd    3,548 to 5,317
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(2) dd    5,318 to 7,087
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(3) dd    7,088 to 8,856
 
     user chooses select option    id:chartBuilderPreview-map-selectedDataSet    Admissions in 2017
-    user checks list has x items    testid:mapBlock-legend    2
-    user checks list item contains    testid:mapBlock-legend    1    0 to 3,000
-    user checks list item contains    testid:mapBlock-legend    2    3,001 to 10,000
+    user checks definition list has x items    testid:mapBlock-legend    2
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:first-child dd    0 to 3,000
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(2) dd    3,001 to 10,000
 
 Save and validate geographic chart embeds correctly
     user scrolls to the bottom of the page

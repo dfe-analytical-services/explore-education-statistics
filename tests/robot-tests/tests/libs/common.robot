@@ -983,6 +983,15 @@ user checks list has x items
     # CSS selector shouldn't be used here as child selector `>` doesn't seem to work.
     user waits until parent contains element    ${list}    xpath:./li    count=${count}
 
+user checks definition list has x items
+    [Arguments]    ${locator}    ${count}    ${parent}=css:body
+    user waits until parent contains element    ${parent}    ${locator}
+    ${list}=    get child element    ${parent}    ${locator}
+    # Use xpath to more precisely get the direct child items underneath the
+    # parent list and ignore any nested lists and their children.
+    # CSS selector shouldn't be used here as child selector `>` doesn't seem to work.
+    user waits until parent contains element    ${list}    xpath:./div    count=${count}
+
 user gets list item element
     [Arguments]    ${locator}    ${item_num}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
