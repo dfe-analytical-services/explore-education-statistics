@@ -468,9 +468,14 @@
       "type": "string",
       "defaultValue": "1.2",
       "allowedValues": [
-        "-1.0",
-        "1.1",
         "1.2"
+      ]
+    },
+    "minTlsVersionStorageAccounts": {
+      "type": "string",
+      "defaultValue": "TLS1_2",
+      "allowedValues": [
+        "TLS1_2"
       ]
     },
     "useSubnets": {
@@ -2412,6 +2417,7 @@
       "properties": {
         "accessTier": "Hot",
         "supportsHttpsTrafficOnly": true,
+        "minimumTlsVersion": "[parameters('minTlsVersionStorageAccounts')]",
         "networkAcls": {
           "bypass": "AzureServices",
           "virtualNetworkRules": "[if(parameters('useSubnets'), variables('coreStorageVnetRules'), createArray())]",
@@ -2994,6 +3000,7 @@
       },
       "properties": {
         "supportsHttpsTrafficOnly": true,
+        "minimumTlsVersion": "[parameters('minTlsVersionStorageAccounts')]",
         "networkAcls": {
           "bypass": "AzureServices",
           "virtualNetworkRules": "[if(parameters('useSubnets'), variables('notificationsStorageVnetRules'), createArray())]",
@@ -3042,6 +3049,7 @@
       },
       "properties": {
         "supportsHttpsTrafficOnly": true,
+        "minimumTlsVersion": "[parameters('minTlsVersionStorageAccounts')]",
         "networkAcls": {
           "bypass": "AzureServices",
           "virtualNetworkRules": "[if(parameters('useSubnets'), variables('publicStorageVnetRules'), createArray())]",
@@ -3659,6 +3667,7 @@
       },
       "properties": {
         "supportsHttpsTrafficOnly": true,
+        "minimumTlsVersion": "[parameters('minTlsVersionStorageAccounts')]",
         "networkAcls": {
           "bypass": "AzureServices",
           "ipRules": "[parameters('storageFirewallRules')]",
@@ -3706,7 +3715,8 @@
         "name": "Standard_GZRS"
       },
       "properties": {
-        "supportsHttpsTrafficOnly": true
+        "supportsHttpsTrafficOnly": true,
+        "minimumTlsVersion": "[parameters('minTlsVersionStorageAccounts')]"
       },
       "resources": [
         {
