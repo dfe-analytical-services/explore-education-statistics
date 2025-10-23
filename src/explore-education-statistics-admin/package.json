@@ -50,7 +50,6 @@
     "immer": "^10.0.2",
     "leaflet": "^1.9.4",
     "lodash": "^4.17.21",
-    "mini-css-extract-plugin": "^2.7.5",
     "normalize.css": "^8.0.1",
     "path-browserify": "^1.0.1",
     "postcss": "^8.4.21",
@@ -86,14 +85,15 @@
     "typescript": "^5.5.4",
     "url-search-params-polyfill": "^8.1.1",
     "use-immer": "^0.9.0",
-    "webpack": "^5.88.1",
-    "webpack-dev-server": "^4.15.1",
     "webpack-manifest-plugin": "^5.0.0",
     "whatwg-fetch": "^3.4.1",
     "workbox-webpack-plugin": "^7.0.0",
     "yup": "^1.3.3"
   },
   "devDependencies": {
+    "@rspack/core": "^1.5.8",
+    "@rspack/cli": "^1.5.8",
+    "@rspack/dev-server": "^1.1.4",
     "@testing-library/dom": "^9.3.4",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
@@ -125,7 +125,8 @@
     "jest-watch-typeahead": "^2.2.2",
     "react-test-renderer": "^18.2.0",
     "stylelint": "^15.7.0",
-    "stylelint-webpack-plugin": "^4.1.1"
+    "stylelint-webpack-plugin": "^4.1.1",
+    "ts-checker-rspack-plugin": "^1.1.6"
   },
   "scripts": {
     "start": "node scripts/start.js",
@@ -140,6 +141,7 @@
     "test:watch": "node scripts/test.js",
     "test:snapshot": "jest --updateSnapshot",
     "tsc": "tsc --noEmit"
+
   },
   "jest-junit": {
     "ancestorSeparator": " › ",

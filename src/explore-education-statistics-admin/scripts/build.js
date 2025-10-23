@@ -18,12 +18,12 @@ const fs = require('fs-extra');
 const bfj = require('bfj');
 const { checkBrowsers } = require('react-dev-utils/browsersHelper');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
-const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
+// const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const printHostingInstructions = require('react-dev-utils/printHostingInstructions');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
 const printBuildError = require('react-dev-utils/printBuildError');
-const webpack = require('webpack');
-const configFactory = require('../config/webpack.config');
+const { rspack } = require('@rspack/core');
+const configFactory = require('../config/rspack.config');
 const paths = require('../config/paths');
 
 const { measureFileSizesBeforeBuild, printFileSizesAfterBuild } =
@@ -133,39 +133,39 @@ checkBrowsers(paths.appPath, isInteractive)
 function build(previousFileSizes) {
   console.log('Creating an optimized production build...');
 
-  const compiler = webpack(config);
+  const compiler = rspack(config);
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
-      let messages;
-      if (err) {
-        if (!err.message) {
-          return reject(err);
-        }
+      // let messages;
+      // if (err) {
+      //   if (!err.message) {
+      //     return reject(err);
+      //   }
 
-        let errMessage = err.message;
+      //   let errMessage = err.message;
 
-        // Add additional information for postcss errors
-        if (Object.prototype.hasOwnProperty.call(err, 'postcssNode')) {
-          errMessage += `\nCompileError: Begins at CSS selector ${err.postcssNode.selector}`;
-        }
+      //   // Add additional information for postcss errors
+      //   if (Object.prototype.hasOwnProperty.call(err, 'postcssNode')) {
+      //     errMessage += `\nCompileError: Begins at CSS selector ${err.postcssNode.selector}`;
+      //   }
 
-        messages = formatWebpackMessages({
-          errors: [errMessage],
-          warnings: [],
-        });
-      } else {
-        messages = formatWebpackMessages(
-          stats.toJson({ all: false, warnings: true, errors: true }),
-        );
-      }
-      if (messages.errors.length) {
-        // Only keep the first error. Others are often indicative
-        // of the same problem, but confuse the reader with noise.
-        if (messages.errors.length > 1) {
-          messages.errors.length = 1;
-        }
-        return reject(new Error(messages.errors.join('\n\n')));
-      }
+      //   messages = formatWebpackMessages({
+      //     errors: [errMessage],
+      //     warnings: [],
+      //   });
+      // } else {
+      //   messages = formatWebpackMessages(
+      //     stats.toJson({ all: false, warnings: true, errors: true }),
+      //   );
+      // }
+      // if (messages.errors.length) {
+      //   // Only keep the first error. Others are often indicative
+      //   // of the same problem, but confuse the reader with noise.
+      //   if (messages.errors.length > 1) {
+      //     messages.errors.length = 1;
+      //   }
+      //   return reject(new Error(messages.errors.join('\n\n')));
+      // }
       // if (
       //   process.env.CI &&
       //   (typeof process.env.CI !== 'string' ||
