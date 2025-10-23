@@ -26,7 +26,7 @@ export default function UserTestingBanner({ width }: Props) {
   if (isMounted && !isUserTestingBannerSeen) {
     return (
       <Banner
-        className={classNames('govuk-width-container', {
+        className={classNames({
           'dfe-width-container--wide': width === 'wide',
           'dfe-width-container--full': width === 'full',
         })}

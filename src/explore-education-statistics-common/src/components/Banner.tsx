@@ -14,7 +14,7 @@ interface Props {
 
 export default function Banner({
   children,
-  className = 'govuk-width-container',
+  className,
   label = 'banner',
   onClose,
   testId,
@@ -26,7 +26,7 @@ export default function Banner({
       aria-label={label}
       role="region"
     >
-      <div className={className}>
+      <div className={classNames('govuk-width-container', className)}>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-three-quarters">{children}</div>
           {onClose && (
