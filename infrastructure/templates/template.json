@@ -486,6 +486,13 @@
       "type": "bool",
       "defaultValue": true
     },
+    "deployBackupVaultRegistrations": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Whether or not to register data sources with Backup Vault."
+      }
+    },
     "stageScheduledReleasesFunctionCronSchedule": {
       "type": "string",
       "defaultValue": "0 5 0 * * *",
@@ -2463,7 +2470,6 @@
     },
     {
       "type": "Microsoft.Authorization/roleAssignments",
-      "condition": false,
       "apiVersion": "2022-04-01",
       "scope": "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
       "name": "[guid(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), variables('storageAccountBackupContributorRoleId'), resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')))]",
@@ -2478,8 +2484,8 @@
     },
     {
       "type": "Microsoft.DataProtection/backupVaults/backupInstances",
-      "condition": false,
       "apiVersion": "2022-05-01",
+      "condition": "[parameters('deployBackupVaultRegistrations')]",
       "name": "[format('{0}/{1}', variables('backupVaultName'), variables('coreStorageAccountName'))]",
       "properties": {
         "objectType": "BackupInstance",
@@ -3089,7 +3095,6 @@
     },
     {
       "type": "Microsoft.Authorization/roleAssignments",
-      "condition": false,
       "apiVersion": "2022-04-01",
       "scope": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
       "name": "[guid(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), variables('storageAccountBackupContributorRoleId'), resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')))]",
@@ -3104,8 +3109,8 @@
     },
     {
       "type": "Microsoft.DataProtection/backupVaults/backupInstances",
-      "condition": false,
       "apiVersion": "2022-05-01",
+      "condition": "[parameters('deployBackupVaultRegistrations')]",
       "name": "[format('{0}/{1}', variables('backupVaultName'), variables('publicStorageAccountName'))]",
       "properties": {
         "objectType": "BackupInstance",
