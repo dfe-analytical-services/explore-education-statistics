@@ -59,7 +59,7 @@ const Page = ({
       />
       <PageHeader width={width} />
 
-      <UserTestingBanner />
+      <UserTestingBanner width={width} />
 
       <div
         className={classNames('govuk-width-container', className, {
