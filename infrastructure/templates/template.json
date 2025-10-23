@@ -2249,10 +2249,6 @@
             "type": "Notary",
             "status": "disabled"
           },
-          "retentionPolicy": {
-            "days": 7,
-            "status": "disabled"
-          },
           "exportPolicy": {
             "status": "enabled"
           },
@@ -2436,7 +2432,8 @@
         {
           "name": "default",
           "type": "blobServices",
-          "apiVersion": "2023-05-01",
+          "condition": "[not(parameters('deployBackupVaultRegistrations'))]",
+          "apiVersion": "2023-05-01",          
           "properties": {
             "deleteRetentionPolicy": {
               "enabled": "[parameters('blobDeleteRetentionEnabled')]",
@@ -3067,6 +3064,7 @@
         {
           "name": "default",
           "type": "blobServices",
+          "condition": "[not(parameters('deployBackupVaultRegistrations'))]",
           "apiVersion": "2019-04-01",
           "properties": {
             "deleteRetentionPolicy": {
