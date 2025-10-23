@@ -6,6 +6,7 @@ import {
   testApiDataSetVersion,
   testDataSetFile,
 } from '@frontend/modules/data-catalogue/__data__/testDataSets';
+import { testPublicationSummary } from '@frontend/modules/find-statistics/__tests__/__data__/testReleaseData';
 import DataSetFilePage from '@frontend/modules/data-catalogue/DataSetFilePage';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -19,7 +20,12 @@ const downloadService = _downloadService as jest.Mocked<
 
 describe('DataSetFilePage', () => {
   test('renders the data set file heading, summary and info', async () => {
-    render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+    render(
+      <DataSetFilePage
+        dataSetFile={testDataSetFile}
+        publicationSummary={testPublicationSummary}
+      />,
+    );
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -38,7 +44,12 @@ describe('DataSetFilePage', () => {
   });
 
   test('renders the `latest data` tag when it is the latest data', async () => {
-    render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+    render(
+      <DataSetFilePage
+        dataSetFile={testDataSetFile}
+        publicationSummary={testPublicationSummary}
+      />,
+    );
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -56,6 +67,7 @@ describe('DataSetFilePage', () => {
             isLatestPublishedRelease: false,
           },
         }}
+        publicationSummary={testPublicationSummary}
       />,
     );
 
@@ -76,6 +88,7 @@ describe('DataSetFilePage', () => {
             isSuperseded: true,
           },
         }}
+        publicationSummary={testPublicationSummary}
       />,
     );
 
@@ -87,7 +100,12 @@ describe('DataSetFilePage', () => {
   });
 
   test('calls the download service with the correct id when the download button is clicked', async () => {
-    const { user } = render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+    const { user } = render(
+      <DataSetFilePage
+        dataSetFile={testDataSetFile}
+        publicationSummary={testPublicationSummary}
+      />,
+    );
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -103,7 +121,12 @@ describe('DataSetFilePage', () => {
   });
 
   test('renders the data set details', async () => {
-    render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+    render(
+      <DataSetFilePage
+        dataSetFile={testDataSetFile}
+        publicationSummary={testPublicationSummary}
+      />,
+    );
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -113,7 +136,12 @@ describe('DataSetFilePage', () => {
   });
 
   test('renders the data set preview section', async () => {
-    render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+    render(
+      <DataSetFilePage
+        dataSetFile={testDataSetFile}
+        publicationSummary={testPublicationSummary}
+      />,
+    );
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -123,7 +151,12 @@ describe('DataSetFilePage', () => {
   });
 
   test('renders the data set variables section', async () => {
-    render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+    render(
+      <DataSetFilePage
+        dataSetFile={testDataSetFile}
+        publicationSummary={testPublicationSummary}
+      />,
+    );
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -133,7 +166,12 @@ describe('DataSetFilePage', () => {
   });
 
   test('renders the data set footnotes section', async () => {
-    render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+    render(
+      <DataSetFilePage
+        dataSetFile={testDataSetFile}
+        publicationSummary={testPublicationSummary}
+      />,
+    );
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -144,7 +182,10 @@ describe('DataSetFilePage', () => {
 
   test('does not render the data set footnotes section when there are no footnotes', async () => {
     render(
-      <DataSetFilePage dataSetFile={{ ...testDataSetFile, footnotes: [] }} />,
+      <DataSetFilePage
+        dataSetFile={{ ...testDataSetFile, footnotes: [] }}
+        publicationSummary={testPublicationSummary}
+      />,
     );
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
@@ -155,7 +196,12 @@ describe('DataSetFilePage', () => {
   });
 
   test('renders the data set usage section', async () => {
-    render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+    render(
+      <DataSetFilePage
+        dataSetFile={testDataSetFile}
+        publicationSummary={testPublicationSummary}
+      />,
+    );
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -171,9 +217,29 @@ describe('DataSetFilePage', () => {
     );
   });
 
+  test('renders the data set contact section', async () => {
+    render(
+      <DataSetFilePage
+        dataSetFile={testDataSetFile}
+        publicationSummary={testPublicationSummary}
+      />,
+    );
+
+    expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Contact us' }),
+    ).toBeInTheDocument();
+  });
+
   describe('non-API data set', () => {
     test('does not render the subscribe link', async () => {
-      render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+      render(
+        <DataSetFilePage
+          dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
+        />,
+      );
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -185,7 +251,12 @@ describe('DataSetFilePage', () => {
     });
 
     test('does not render API version info', async () => {
-      render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+      render(
+        <DataSetFilePage
+          dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
+        />,
+      );
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -196,7 +267,35 @@ describe('DataSetFilePage', () => {
     });
 
     test('renders the page navigation correctly', async () => {
-      render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+      render(
+        <DataSetFilePage
+          dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
+        />,
+      );
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      const nav = within(
+        screen.getByRole('navigation', { name: 'On this page' }),
+      );
+      const navLinks = nav.getAllByRole('link');
+      expect(navLinks).toHaveLength(6);
+      expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
+      expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
+      expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
+      expect(navLinks[3]).toHaveAttribute('href', '#dataSetFootnotes');
+      expect(navLinks[4]).toHaveAttribute('href', '#dataSetUsage');
+      expect(navLinks[5]).toHaveAttribute('href', '#dataSetContact');
+    });
+
+    test('renders the page navigation correctly when there are no footnotes', async () => {
+      render(
+        <DataSetFilePage
+          dataSetFile={{ ...testDataSetFile, footnotes: [] }}
+          publicationSummary={testPublicationSummary}
+        />,
+      );
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -208,30 +307,17 @@ describe('DataSetFilePage', () => {
       expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
       expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
       expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
-      expect(navLinks[3]).toHaveAttribute('href', '#dataSetFootnotes');
-      expect(navLinks[4]).toHaveAttribute('href', '#dataSetUsage');
-    });
-
-    test('renders the page navigation correctly when there are no footnotes', async () => {
-      render(
-        <DataSetFilePage dataSetFile={{ ...testDataSetFile, footnotes: [] }} />,
-      );
-
-      expect(await screen.findByText('On this page')).toBeInTheDocument();
-
-      const nav = within(
-        screen.getByRole('navigation', { name: 'On this page' }),
-      );
-      const navLinks = nav.getAllByRole('link');
-      expect(navLinks).toHaveLength(4);
-      expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
-      expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
-      expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
       expect(navLinks[3]).toHaveAttribute('href', '#dataSetUsage');
+      expect(navLinks[4]).toHaveAttribute('href', '#dataSetContact');
     });
 
     test('does not render the API version history section', async () => {
-      render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+      render(
+        <DataSetFilePage
+          dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
+        />,
+      );
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -241,7 +327,12 @@ describe('DataSetFilePage', () => {
     });
 
     test('does not render the Using the API section', async () => {
-      render(<DataSetFilePage dataSetFile={testDataSetFile} />);
+      render(
+        <DataSetFilePage
+          dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
+        />,
+      );
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
@@ -258,6 +349,7 @@ describe('DataSetFilePage', () => {
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
           dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
         />,
       );
 
@@ -274,6 +366,7 @@ describe('DataSetFilePage', () => {
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
           dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
         />,
       );
 
@@ -293,6 +386,35 @@ describe('DataSetFilePage', () => {
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
           dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
+        />,
+      );
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      const nav = within(
+        screen.getByRole('navigation', { name: 'On this page' }),
+      );
+
+      const navLinks = nav.getAllByRole('link');
+      expect(navLinks).toHaveLength(8);
+      expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
+      expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
+      expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
+      expect(navLinks[3]).toHaveAttribute('href', '#dataSetFootnotes');
+      expect(navLinks[4]).toHaveAttribute('href', '#dataSetUsage');
+      expect(navLinks[5]).toHaveAttribute('href', '#api');
+      expect(navLinks[6]).toHaveAttribute('href', '#apiVersionHistory');
+      expect(navLinks[7]).toHaveAttribute('href', '#dataSetContact');
+    });
+
+    test('renders the page navigation correctly when there are no footnotes', async () => {
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={testApiDataSetVersion}
+          dataSetFile={{ ...testDataSetFile, footnotes: [] }}
+          publicationSummary={testPublicationSummary}
         />,
       );
 
@@ -307,35 +429,10 @@ describe('DataSetFilePage', () => {
       expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
       expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
       expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
-      expect(navLinks[3]).toHaveAttribute('href', '#dataSetFootnotes');
-      expect(navLinks[4]).toHaveAttribute('href', '#dataSetUsage');
-      expect(navLinks[5]).toHaveAttribute('href', '#api');
-      expect(navLinks[6]).toHaveAttribute('href', '#apiVersionHistory');
-    });
-
-    test('renders the page navigation correctly when there are no footnotes', async () => {
-      render(
-        <DataSetFilePage
-          apiDataSet={testApiDataSet}
-          apiDataSetVersion={testApiDataSetVersion}
-          dataSetFile={{ ...testDataSetFile, footnotes: [] }}
-        />,
-      );
-
-      expect(await screen.findByText('On this page')).toBeInTheDocument();
-
-      const nav = within(
-        screen.getByRole('navigation', { name: 'On this page' }),
-      );
-
-      const navLinks = nav.getAllByRole('link');
-      expect(navLinks).toHaveLength(6);
-      expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
-      expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
-      expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
       expect(navLinks[3]).toHaveAttribute('href', '#dataSetUsage');
       expect(navLinks[4]).toHaveAttribute('href', '#api');
       expect(navLinks[5]).toHaveAttribute('href', '#apiVersionHistory');
+      expect(navLinks[6]).toHaveAttribute('href', '#dataSetContact');
     });
 
     test('renders the page navigation correctly when there is an API changelog', async () => {
@@ -364,6 +461,7 @@ describe('DataSetFilePage', () => {
           apiDataSetVersion={testApiDataSetVersion}
           apiDataSetVersionChanges={testApiDataSetVersionChanges}
           dataSetFile={{ ...testDataSetFile, footnotes: [] }}
+          publicationSummary={testPublicationSummary}
         />,
       );
 
@@ -410,6 +508,7 @@ describe('DataSetFilePage', () => {
           apiDataSetVersion={testApiDataSetVersion}
           apiDataSetVersionChanges={testApiDataSetVersionChanges}
           dataSetFile={{ ...testDataSetFile, footnotes: [] }}
+          publicationSummary={testPublicationSummary}
         />,
       );
 
@@ -432,6 +531,7 @@ describe('DataSetFilePage', () => {
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
           dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
         />,
       );
 
@@ -448,6 +548,7 @@ describe('DataSetFilePage', () => {
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
           dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
         />,
       );
 
@@ -487,6 +588,7 @@ describe('DataSetFilePage', () => {
           }}
           apiDataSetVersionChanges={testApiDataSetVersionChanges}
           dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
         />,
       );
 
@@ -531,6 +633,7 @@ describe('DataSetFilePage', () => {
           apiDataSetVersion={testApiDataSetVersion}
           apiDataSetVersionChanges={testApiDataSetVersionChanges}
           dataSetFile={{ ...testDataSetFile, footnotes: [] }}
+          publicationSummary={testPublicationSummary}
         />,
       );
 
@@ -547,6 +650,7 @@ describe('DataSetFilePage', () => {
           apiDataSet={testApiDataSet}
           apiDataSetVersion={testApiDataSetVersion}
           dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
         />,
       );
 
@@ -570,6 +674,7 @@ describe('DataSetFilePage', () => {
             patchHistory: [],
           }}
           dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
         />,
       );
 
@@ -584,7 +689,7 @@ describe('DataSetFilePage', () => {
 
 function assertNavigationIncludesChangelog(nav: ReturnType<typeof within>) {
   const navLinks = nav.getAllByRole('link');
-  expect(navLinks).toHaveLength(7);
+  expect(navLinks).toHaveLength(8);
   expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
   expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
   expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
@@ -592,4 +697,5 @@ function assertNavigationIncludesChangelog(nav: ReturnType<typeof within>) {
   expect(navLinks[4]).toHaveAttribute('href', '#api');
   expect(navLinks[5]).toHaveAttribute('href', '#apiVersionHistory');
   expect(navLinks[6]).toHaveAttribute('href', '#apiChangelog');
+  expect(navLinks[7]).toHaveAttribute('href', '#dataSetContact');
 }

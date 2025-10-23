@@ -90,3 +90,10 @@ Validate table tool link
     user checks page contains    Choose locations
     user checks previous table tool step contains    1    Publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks previous table tool step contains    2    Data set    Absence in PRUs
+
+Validate data set contact details
+    user checks page contains    Contact us
+    user checks page contains    UI test team name
+    user checks page contains    ui_test@test.com
+    user checks page contains    UI test contact name
+    user checks page contains    0123 4567
