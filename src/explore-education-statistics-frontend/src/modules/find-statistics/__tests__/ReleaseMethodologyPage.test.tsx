@@ -4,7 +4,7 @@ import React from 'react';
 import ReleaseMethodologyPage from '../ReleaseMethodologyPage';
 import { testPublicationSummary } from './__data__/testReleaseData';
 
-describe('Release release methodology page', () => {
+describe('ReleaseMethodologyPage', () => {
   const testMethodologies: PublicationMethodologiesList = {
     methodologies: [
       {

@@ -1,5 +1,4 @@
 import ContentHtml from '@common/components/ContentHtml';
-import FormattedDate from '@common/components/FormattedDate';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import {
@@ -39,7 +38,17 @@ const ReleaseHelpPage = ({
           id="related-information-section"
           includeSectionBreak={hasPraSummary}
         >
-          <p>Related Info here</p>
+          <ul
+            className="govuk-list govuk-list--spaced"
+            data-testid="related-information-list"
+          >
+            {relatedInformationItems &&
+              relatedInformationItems.map(link => (
+                <li key={link.id}>
+                  <a href={link.url}>{link.title}</a>
+                </li>
+              ))}
+          </ul>
         </ReleasePageContentSection>
       )}
 
@@ -49,28 +58,10 @@ const ReleaseHelpPage = ({
           id="pre-release-access-list-section"
           includeSectionBreak={false}
         >
-          <p>
-            Find out how and why we collect, process and publish these
-            statistics.
-          </p>
-          <ul
-            className="govuk-list govuk-list--spaced"
-            data-testid="methodologies-list"
-          >
-            {praSummary.published && (
-              <p className="govuk-!-margin-bottom-8">
-                <strong>
-                  Published{' '}
-                  <FormattedDate>{praSummary.published}</FormattedDate>
-                </strong>
-              </p>
-            )}
-
-            <ContentHtml
-              html={praSummary.preReleaseAccessList}
-              getGlossaryEntry={glossaryService.getEntry}
-            />
-          </ul>
+          <ContentHtml
+            html={praSummary.preReleaseAccessList}
+            getGlossaryEntry={glossaryService.getEntry}
+          />
         </ReleasePageContentSection>
       )}
     </>

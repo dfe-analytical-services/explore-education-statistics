@@ -5,7 +5,7 @@ import React from 'react';
 import PublicationReleaseListPage from '../PublicationReleaseListPage';
 import { testPublicationSummary } from './__data__/testReleaseData';
 
-describe('Publication release list page', () => {
+describe('PublicationReleaseListPage', () => {
   const testReleases: PaginatedList<PublicationReleaseSeriesItem> = {
     results: [
       {
