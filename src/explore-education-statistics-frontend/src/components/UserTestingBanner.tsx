@@ -1,13 +1,19 @@
 import Banner from '@common/components/Banner';
 import useMounted from '@common/hooks/useMounted';
 import Link from '@frontend/components/Link';
+import { PageWidth } from '@frontend/components/Page';
 import {
   useCookies,
   userTestingBannerVersion,
 } from '@frontend/hooks/useCookies';
+import classNames from 'classnames';
 import React from 'react';
 
-export default function UserTestingBanner() {
+interface Props {
+  width?: PageWidth;
+}
+
+export default function UserTestingBanner({ width }: Props) {
   const { isMounted } = useMounted();
   const { getCookie, setUserTestingBannerSeenCookie } = useCookies();
 
@@ -20,6 +26,10 @@ export default function UserTestingBanner() {
   if (isMounted && !isUserTestingBannerSeen) {
     return (
       <Banner
+        className={classNames({
+          'dfe-width-container--wide': width === 'wide',
+          'dfe-width-container--full': width === 'full',
+        })}
         label="Feedback banner"
         onClose={() => setUserTestingBannerSeenCookie(userTestingBannerVersion)}
       >

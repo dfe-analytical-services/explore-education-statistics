@@ -6,16 +6,16 @@ import React, { ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
+  className?: string;
   label?: string;
-  wide?: boolean;
   onClose?: () => void;
   testId?: string;
 }
 
 export default function Banner({
   children,
+  className,
   label = 'banner',
-  wide = false,
   onClose,
   testId,
 }: Props) {
@@ -26,11 +26,7 @@ export default function Banner({
       aria-label={label}
       role="region"
     >
-      <div
-        className={classNames('govuk-width-container', {
-          'dfe-width-container--wide': wide,
-        })}
-      >
+      <div className={classNames('govuk-width-container', className)}>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-three-quarters">{children}</div>
           {onClose && (
