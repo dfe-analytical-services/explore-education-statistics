@@ -198,7 +198,7 @@ export default function MapBlock({
 
   const [legendItems, setLegendItems] = useState<MapLegendItem[]>([]);
 
-  const [, setCategoricalDataGroups] = useState<
+  const [categoricalDataGroups, setCategoricalDataGroups] = useState<
     MapCategoricalDataConfig[] | undefined
   >([]);
 
@@ -231,6 +231,12 @@ export default function MapBlock({
     selectedDataSetConfig,
     selectedDataSetKey,
   ]);
+
+  useEffect(() => {
+    if (categoricalDataGroups?.length) {
+      onChangeCategoricalDataConfig?.(categoricalDataGroups);
+    }
+  }, [categoricalDataGroups, onChangeCategoricalDataConfig]);
 
   const handleLocationChange = useCallback(
     (value: string) => {

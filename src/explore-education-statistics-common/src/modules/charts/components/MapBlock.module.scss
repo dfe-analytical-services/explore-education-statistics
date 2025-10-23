@@ -46,15 +46,15 @@
   margin-bottom: 0;
 }
 
+.legend dd {
+  margin-left: govuk-spacing(1);
+}
+
 .legend {
   align-items: center;
   display: flex;
   line-height: 20px;
-  margin-bottom: 0;
-}
-
-.legend dd {
-  margin-left: govuk-spacing(1);
+  margin-bottom: govuk-spacing(1);
 }
 
 .legendIcon {

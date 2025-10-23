@@ -9,15 +9,13 @@ interface Props {
 }
 
 export default function MapLegend({ heading, legendItems }: Props) {
-  let rowNumber = 0;
   return (
     <>
       <h3 className="govuk-heading-s dfe-word-break--break-word">
         Key to {heading}
       </h3>
       <dl className="govuk-list" data-testid="mapBlock-legend">
-        {legendItems.map(({ value, colour }) => {
-          rowNumber += 1;
+        {legendItems.map(({ value, colour }, index) => {
           return (
             <div
               key={value}
@@ -33,7 +31,7 @@ export default function MapLegend({ heading, legendItems }: Props) {
                   }}
                 />
                 <VisuallyHidden>
-                  Group {rowNumber} of {legendItems.length}
+                  Group {index + 1} of {legendItems.length}
                 </VisuallyHidden>
               </dt>
               <dd>{value}</dd>
