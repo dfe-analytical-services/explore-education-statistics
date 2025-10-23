@@ -4155,6 +4155,7 @@
         "enabledForDiskEncryption": true,
         "enabledForTemplateDeployment": true,
         "enableSoftDelete": true,
+        "enablePurgeProtection": true,
         "accessPolicies": [],
         "enableRbacAuthorization": true
       },
