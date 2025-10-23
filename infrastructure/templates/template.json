@@ -1513,6 +1513,7 @@
       },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('dataPlanName'))]",
+        "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
@@ -1759,6 +1760,7 @@
       },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('contentPlanName'))]",
+        "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
@@ -2041,6 +2043,7 @@
       },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('adminPlanName'))]",
+        "httpsOnly": true,
         "siteConfig": {
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
