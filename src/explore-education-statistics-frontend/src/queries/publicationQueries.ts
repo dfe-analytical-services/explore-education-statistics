@@ -7,6 +7,7 @@ import publicationService, {
   RelatedInformationItem,
   ReleaseSummary,
   ReleaseVersion,
+  ReleaseVersionDataContent,
   ReleaseVersionHomeContent,
   ReleaseVersionSummary,
   Theme,
@@ -57,6 +58,19 @@ const publicationQueries = {
       queryKey: ['releaseVersionHomeContent', publicationSlug, releaseSlug],
       queryFn: () =>
         publicationService.getReleaseVersionHomeContent(
+          publicationSlug,
+          releaseSlug,
+        ),
+    };
+  },
+  getReleaseVersionDataContent(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): UseQueryOptions<ReleaseVersionDataContent> {
+    return {
+      queryKey: ['releaseVersionDataContent', publicationSlug, releaseSlug],
+      queryFn: () =>
+        publicationService.getReleaseVersionDataContent(
           publicationSlug,
           releaseSlug,
         ),

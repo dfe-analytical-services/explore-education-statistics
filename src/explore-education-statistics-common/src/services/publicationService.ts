@@ -281,6 +281,50 @@ export interface ReleaseVersionHomeContent<
   summarySection: ReleaseVersionHomeSection<HtmlBlockType>;
 }
 
+export interface ReleaseVersionDataContent {
+  releaseId: string;
+  releaseVersionId: string;
+  dataDashboards?: string;
+  dataGuidance: string;
+  dataSets: DataSetItem[];
+  featuredTables: FeaturedTableItem[];
+  supportingFiles: SupportingFileItem[];
+}
+
+export interface DataSetItem {
+  dataSetFileId: string;
+  fileId: string;
+  subjectId: string;
+  meta: {
+    filters: string[];
+    geographicLevels: string[];
+    indicators: string[];
+    numDataFileRows: number;
+    timePeriodRange: {
+      start: string;
+      end: string;
+    };
+  };
+  title: string;
+  summary: string;
+}
+
+export interface FeaturedTableItem {
+  featuredTableId: string;
+  dataBlockParentId: string;
+  title: string;
+  summary: string;
+}
+
+export interface SupportingFileItem {
+  fileId: string;
+  extension: string;
+  filename: string;
+  title: string;
+  summary: string;
+  size: string;
+}
+
 export interface PublicationLegacyReleaseListItem {
   title: string;
   url: string;
@@ -411,6 +455,14 @@ const publicationService = {
   ): Promise<ReleaseVersionHomeContent> {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/${releaseSlug}/content`,
+    );
+  },
+  getReleaseVersionDataContent(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): Promise<ReleaseVersionDataContent> {
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/${releaseSlug}/data-content`,
     );
   },
   getReleaseVersionRelatedInformation(
