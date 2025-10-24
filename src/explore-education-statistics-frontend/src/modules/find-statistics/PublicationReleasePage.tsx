@@ -4,8 +4,10 @@ import generateIdFromHeading from '@common/components/util/generateIdFromHeading
 import getNavItemsFromHtml from '@common/components/util/getNavItemsFromHtml';
 import { contactUsNavItem } from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import publicationService, {
+  PreReleaseAccessListSummary,
   PublicationMethodologiesList,
   PublicationSummaryRedesign,
+  RelatedInformationItem,
   ReleaseVersion,
   ReleaseVersionHomeContent,
   ReleaseVersionSummary,
@@ -16,6 +18,7 @@ import ReleasePageShell from '@frontend/modules/find-statistics/components/Relea
 import { TabRouteItem } from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
 import PublicationReleasePageCurrent from '@frontend/modules/find-statistics/PublicationReleasePageCurrent';
 import PublicationReleasePageHome from '@frontend/modules/find-statistics/PublicationReleasePageHome';
+import ReleaseHelpPage from '@frontend/modules/find-statistics/ReleaseHelpPage';
 import ReleaseMethodologyPage from '@frontend/modules/find-statistics/ReleaseMethodologyPage';
 import publicationQueries from '@frontend/queries/publicationQueries';
 import { QueryClient } from '@tanstack/react-query';
@@ -67,6 +70,8 @@ interface MethodologyProps extends BaseReleaseProps {
 
 interface HelpProps extends BaseReleaseProps {
   page: 'help';
+  praSummary: PreReleaseAccessListSummary;
+  relatedInformationItems: RelatedInformationItem[];
 }
 
 interface CurrentReleaseProps {
@@ -108,7 +113,13 @@ const PublicationReleasePage: NextPage<Props> = props => {
           methodologiesSummary={props.methodologiesSummary}
         />
       )}
-      {page === 'help' && <p>TODO EES-6446 Help and information page</p>}
+      {page === 'help' && (
+        <ReleaseHelpPage
+          praSummary={props.praSummary}
+          publicationSummary={props.publicationSummary}
+          relatedInformationItems={props.relatedInformationItems}
+        />
+      )}
     </ReleasePageShell>
   );
 };
@@ -198,7 +209,7 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
                   },
                   {
                     id: 'headlines-section',
-                    text: 'Headlines facts and figures',
+                    text: 'Headline facts and figures',
                   },
                   ...contentSectionsItems,
                   contactUsNavItem,
@@ -241,14 +252,41 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
             };
           }
 
-          case 'help':
+          case 'help': {
+            const praSummary = await queryClient.fetchQuery(
+              publicationQueries.getPreReleaseAccessList(
+                publicationSlug,
+                releaseSlug,
+              ),
+            );
+            const relatedInformationItems = await queryClient.fetchQuery(
+              publicationQueries.getReleaseVersionRelatedInformation(
+                publicationSlug,
+                releaseSlug,
+              ),
+            );
+            const hasRelatedInformation = !!relatedInformationItems.length;
+            const hasPraSummary = !!praSummary.preReleaseAccessList;
             return {
               props: {
                 ...baseProps,
                 page: 'help',
-                inPageNavItems: [contactUsNavItem],
+                inPageNavItems: [
+                  { ...contactUsNavItem, text: 'Get help by contacting us' },
+                  hasRelatedInformation && {
+                    id: 'related-information-section',
+                    text: 'Related information',
+                  },
+                  hasPraSummary && {
+                    id: 'pre-release-access-list-section',
+                    text: 'Pre-release access list',
+                  },
+                ].filter(item => !!item),
+                praSummary,
+                relatedInformationItems,
               },
             };
+          }
 
           default:
             return {

@@ -111,6 +111,12 @@ export interface BasicLink {
   url: string;
 }
 
+export interface RelatedInformationItem {
+  id: string;
+  title: string;
+  url: string;
+}
+
 export interface ReleaseNote {
   id: string;
   on: Date;
@@ -405,6 +411,14 @@ const publicationService = {
   ): Promise<ReleaseVersionHomeContent> {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/${releaseSlug}/content`,
+    );
+  },
+  getReleaseVersionRelatedInformation(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): Promise<RelatedInformationItem[]> {
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/${releaseSlug}/related-information`,
     );
   },
   getPublicationReleaseList(
