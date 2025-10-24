@@ -6,7 +6,6 @@ import {
   PublicationSummaryRedesign,
   RelatedInformationItem,
 } from '@common/services/publicationService';
-import glossaryService from '@frontend/services/glossaryService';
 import React from 'react';
 
 interface Props {
@@ -58,10 +57,7 @@ const ReleaseHelpPage = ({
           id="pre-release-access-list-section"
           includeSectionBreak={false}
         >
-          <ContentHtml
-            html={praSummary.preReleaseAccessList}
-            getGlossaryEntry={glossaryService.getEntry}
-          />
+          <ContentHtml html={praSummary.preReleaseAccessList} />
         </ReleasePageContentSection>
       )}
     </>
