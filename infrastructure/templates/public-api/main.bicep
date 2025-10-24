@@ -191,13 +191,13 @@ var resourceNames = {
       vault: '${commonResourcePrefix}-${abbreviations.backupVaults}'
       psqlFlexibleServerBackupPolicy: '${commonResourcePrefix}-psql-flexible-server-${abbreviations.backupVaultPolicies}'
     }
+    // The Test Resource Group has broken from the naming convention of other environments for Core Storage
     coreStorageAccount: subscription == 's101t01' || subscription == 's101p02'
       ? '${legacyResourcePrefix}storageeescore'
       : '${legacyResourcePrefix}saeescore'
     keyVault: '${legacyResourcePrefix}-kv-ees-01'
     logAnalyticsWorkspace: '${commonResourcePrefix}-log'
     publisherFunction: '${legacyResourcePrefix}-fa-ees-publisher'
-    // The Test Resource Group has broken from the naming convention of other environments for Core Storage
     subnets: {
       adminApp: '${legacyResourcePrefix}-snet-ees-admin'
       publisherFunction: '${legacyResourcePrefix}-snet-ees-publisher'

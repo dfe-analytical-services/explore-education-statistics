@@ -18,7 +18,7 @@ var rolesToRoleIds = {
 
 // Create the role assignment. Note that this is dependent on the deploying service principal having
 // "Microsoft.Authorization/roleAssignments/write" permissions on the Resource Group via an appropriate role.
-resource psqlFlexibleServerRoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principalId in principalIds: {
+resource roleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principalId in principalIds: {
   scope: resourceGroup()
   name: guid(resourceGroup().id, principalId, rolesToRoleIds[role])
   properties: {

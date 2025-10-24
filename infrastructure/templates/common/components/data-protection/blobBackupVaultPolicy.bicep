@@ -41,7 +41,7 @@ var vaultTierMonthlyRetentionDuration = 'P${vaultTierMonthlyRetentionInMonths}M'
 var vaultTierYearlyRetentionDuration = 'P${vaultTierYearlyRetentionInYears}Y'
 var repeatingTimeIntervals = 'R/2024-05-06T${vaultTierDailyBackupScheduleTime}:00+00:00/P1D'
 
-resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-05-01' = {
+resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2025-07-01' = {
   name: '${vaultName}/${policyName}'
   properties: {
     objectType: 'BackupPolicy'

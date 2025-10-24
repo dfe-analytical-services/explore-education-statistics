@@ -22,7 +22,7 @@ resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-05-01
   name: '${vaultName}/${backupPolicyName}'
 }
 
-resource backupInstance 'Microsoft.DataProtection/backupVaults/backupInstances@2023-01-01' = {
+resource backupInstance 'Microsoft.DataProtection/backupVaults/backupInstances@2025-07-01' = {
   name: '${vaultName}/PostgreSQLBackupInstance'
   properties: {
     dataSourceInfo: {
