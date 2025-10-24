@@ -11,6 +11,7 @@ import { useConfig } from '@admin/contexts/ConfigContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 import getDataSetVersionStatusText from './utils/getDataSetVersionStatusText';
+import ApiCompatibilityTag from './ApiCompatibilityTag';
 
 interface Props {
   children?: ReactNode;
@@ -235,28 +236,17 @@ const DataFileDetailsTable = ({
           <th scope="row">API compatible</th>
           <td data-testid="API compatible">
             <div className="dfe-flex dfe-align-items--center">
-              {dataFile.publicApiCompatible === null && (
-                <Tag colour="orange">Not available</Tag>
-              )}
-              {dataFile.publicApiCompatible === true ? (
-                <Tag colour="green">Yes</Tag>
-              ) : (
-                <Tag colour="red">No</Tag>
-              )}
+              <ApiCompatibilityTag
+                isCompatible={dataFile?.publicApiCompatible}
+              />
             </div>
-            {dataFile.publicApiCompatible}
           </td>
-          {replacementDataFile?.publicApiCompatible && (
+          {replacementDataFile && (
             <td data-testid="Replacement API compatible">
               <div className="dfe-flex dfe-align-items--center">
-                {replacementDataFile.publicApiCompatible === null && (
-                  <Tag colour="orange">Not available</Tag>
-                )}
-                {replacementDataFile.publicApiCompatible === true ? (
-                  <Tag colour="green">Yes</Tag>
-                ) : (
-                  <Tag colour="red">No</Tag>
-                )}
+                <ApiCompatibilityTag
+                  isCompatible={replacementDataFile?.publicApiCompatible}
+                />
               </div>
             </td>
           )}
