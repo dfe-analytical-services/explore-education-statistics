@@ -41,17 +41,3 @@ type StorageAccountConfig = {
     accessTier: 'Cool' | 'Hot' | 'TransactionOptimized' | 'Premium'
   }
 }
-
-@export()
-type BackupVaultPolicyDataSourceType =
-  | 'blobs'
-  | 'psqlFlexibleServer'
-
-var dataSourceTypeMap = {
- blobs: 'Microsoft.Storage/storageAccounts/blobServices'
- psqlFlexibleServer: 'Microsoft.DBforPostgreSQL/flexibleServers'
-}
-
-@export()
-func getFullBackupVaultDataSourceType(shortType BackupVaultPolicyDataSourceType) string =>
-  dataSourceTypeMap[shortType]

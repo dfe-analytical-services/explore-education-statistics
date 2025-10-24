@@ -1,4 +1,5 @@
-import { BackupVaultPolicyDataSourceType, getFullBackupVaultDataSourceType } from '../../types.bicep'
+import { BackupVaultPolicyDataSourceType } from 'types.bicep'
+import { getFullBackupVaultDataSourceType } from 'functions.bicep'
 
 @description('Type of data source to be backed up.')
 param dataSourceType BackupVaultPolicyDataSourceType

@@ -1,4 +1,4 @@
-import { getFullBackupVaultDataSourceType } from '../../types.bicep'
+import { getFullBackupVaultDataSourceType } from 'functions.bicep'
 
 @description('Name of the backup policy.')
 param policyName string
