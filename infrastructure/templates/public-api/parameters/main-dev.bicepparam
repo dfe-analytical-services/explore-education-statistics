@@ -27,6 +27,9 @@ param publicApiContainerAppWorkloadProfiles = [{
 }]
 
 param enableThemeDeletion = true
+
 param enableSwagger = true
 
 param enableReplacementOfPublicApiDataSets = true
+
+param deployPsqlBackupVaultRegistration = false
