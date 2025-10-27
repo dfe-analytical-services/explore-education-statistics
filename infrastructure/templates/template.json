@@ -1368,7 +1368,25 @@
     "searchReaderManagedIdentityName": "[concat(parameters('subscription'), '-', parameters('environment'), '-id-srch-reader')]",
     "searchServiceApiVersion": "2025-02-01-preview",
     "userAssignedIdentitiesApiVersion": "2024-11-30",
-    "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]"
+    "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
+    "baseAdminAllowedOrigins": [
+      "[concat('https://', parameters('adminUri'))]"
+    ],
+    "devAdminAllowedOrigins": [
+      "https://localhost:5021",
+      "http://localhost:5021"
+    ],
+    "conditionalDevAdminAllowedOrigins": "[if(equals(parameters('environmentName'), 'Development'), variables('devAdminAllowedOrigins'), createArray())]",
+    "basePublicAllowedOrigins": [
+      "[concat('https://', parameters('domain'))]",
+      "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]"
+    ],
+    "devPublicAllowedOrigins": [
+      "https://localhost:3000",
+      "http://localhost:3000",
+      "https://ees-public-site-dkbjhuezemehdzff.a03.azurefd.net"
+    ],
+    "conditionalDevPublicAllowedOrigins": "[if(equals(parameters('environmentName'), 'Development'), variables('devPublicAllowedOrigins'), createArray())]"
   },
   "resources": [
     {
@@ -1429,13 +1447,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]",
-              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
-              "https://localhost:3000",
-              "http://localhost:3000",
-              "http://127.0.0.1"
-            ]
+            "allowedOrigins": "[union(variables('basePublicAllowedOrigins'), variables('conditionalDevPublicAllowedOrigins'))]"
           },
           "connectionStrings": [
             {
@@ -1539,13 +1551,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]",
-              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
-              "https://localhost:3000",
-              "http://localhost:3000",
-              "http://127.0.0.1"
-            ]
+            "allowedOrigins": "[union(variables('basePublicAllowedOrigins'), variables('conditionalDevPublicAllowedOrigins'))]"
           }
         }
       },
@@ -1682,13 +1688,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]",
-              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
-              "https://localhost:3000",
-              "http://localhost:3000",
-              "http://127.0.0.1"
-            ]
+            "allowedOrigins": "[union(variables('basePublicAllowedOrigins'), variables('conditionalDevPublicAllowedOrigins'))]"
           },
           "connectionStrings": [
             {
@@ -1786,13 +1786,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]",
-              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
-              "https://localhost:3000",
-              "http://localhost:3000",
-              "http://127.0.0.1"
-            ]
+            "allowedOrigins": "[union(variables('basePublicAllowedOrigins'), variables('conditionalDevPublicAllowedOrigins'))]"
           }
         }
       },
@@ -1930,12 +1924,6 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
-          "cors": {
-            "allowedOrigins": [
-              "https://localhost:3000",
-              "http://localhost:3000"
-            ]
-          },
           "connectionStrings": [
             {
               "name": "StatisticsDb",
@@ -2067,13 +2055,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "use32BitWorkerProcess": false,
-          "cors": {
-            "allowedOrigins": [
-              "https://localhost:3000",
-              "http://localhost:3000"
-            ]
-          }
+          "use32BitWorkerProcess": false
         }
       },
       "resources": [
@@ -2163,11 +2145,7 @@
           }
         ],
         "cors": {
-          "allowedOrigins": [
-            "[concat('https://', parameters('adminUri'))]",
-            "https://localhost:5021",
-            "http://localhost:5021"
-          ]
+          "allowedOrigins": "[union(variables('baseAdminAllowedOrigins'), variables('conditionalDevAdminAllowedOrigins'))]"
         },
         "networkACLs": {
           "defaultAction": "deny",
@@ -3269,9 +3247,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]"
-            ]
+            "allowedOrigins": "[union(variables('basePublicAllowedOrigins'), variables('conditionalDevPublicAllowedOrigins'))]"
           },
           "connectionStrings": [
             {
@@ -3423,9 +3399,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "cors": {
-            "allowedOrigins": []
-          },
           "connectionStrings": [
             {
               "name": "StatisticsDb",
@@ -3579,9 +3552,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "cors": {
-            "allowedOrigins": []
-          },
           "connectionStrings": [
             {
               "name": "ContentDb",
