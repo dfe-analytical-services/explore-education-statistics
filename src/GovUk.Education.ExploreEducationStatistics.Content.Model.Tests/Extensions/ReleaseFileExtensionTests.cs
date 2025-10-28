@@ -48,7 +48,7 @@ public class ReleaseFileExtensionTests
     [Fact]
     public void ToFileInfo()
     {
-        var createdByUser = _dataFixture.DefaultUser().Generate();
+        User createdByUser = _dataFixture.DefaultUser();
 
         var releaseFile = new ReleaseFile
         {

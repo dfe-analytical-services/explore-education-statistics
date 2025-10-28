@@ -166,49 +166,48 @@ public abstract class UserManagementServiceTests
 
             var pendingUserInvites = _dataFixture.DefaultUserWithPendingInvite().WithRole(identityRole).GenerateList(3);
 
-            var activeUser = _dataFixture.DefaultUser().Generate();
+            User activeUser = _dataFixture.DefaultUser();
 
-            var softDeletedUser = _dataFixture.DefaultSoftDeletedUser().Generate();
+            User softDeletedUser = _dataFixture.DefaultSoftDeletedUser();
 
-            var expiredUser = _dataFixture.DefaultUserWithExpiredInvite().Generate();
+            User expiredUser = _dataFixture.DefaultUserWithExpiredInvite();
 
-            var publication = _dataFixture
+            Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)])
-                .Generate();
+                .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
             var userReleaseInvites = _dataFixture
                 .DefaultUserReleaseInvite()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
-                .ForIndex(0, s => s.SetEmail(pendingUserInvites[0].Email))
-                .ForIndex(1, s => s.SetEmail(pendingUserInvites[0].Email))
-                .ForIndex(2, s => s.SetEmail(pendingUserInvites[1].Email))
-                .ForIndex(3, s => s.SetEmail(pendingUserInvites[1].Email))
-                .ForIndex(4, s => s.SetEmail(pendingUserInvites[2].Email))
-                .ForIndex(5, s => s.SetEmail(pendingUserInvites[2].Email))
-                .ForIndex(6, s => s.SetEmail(activeUser.Email))
-                .ForIndex(7, s => s.SetEmail(activeUser.Email))
-                .ForIndex(8, s => s.SetEmail(softDeletedUser.Email))
-                .ForIndex(9, s => s.SetEmail(softDeletedUser.Email))
-                .ForIndex(10, s => s.SetEmail(expiredUser.Email))
-                .ForIndex(11, s => s.SetEmail(expiredUser.Email))
+                .ForIndex(0, s => s.SetEmail(pendingUserInvites[0].Email).SetRole(ReleaseRole.Contributor))
+                .ForIndex(1, s => s.SetEmail(pendingUserInvites[0].Email).SetRole(ReleaseRole.Approver))
+                .ForIndex(2, s => s.SetEmail(pendingUserInvites[1].Email).SetRole(ReleaseRole.Contributor))
+                .ForIndex(3, s => s.SetEmail(pendingUserInvites[1].Email).SetRole(ReleaseRole.Approver))
+                .ForIndex(4, s => s.SetEmail(pendingUserInvites[2].Email).SetRole(ReleaseRole.Contributor))
+                .ForIndex(5, s => s.SetEmail(pendingUserInvites[2].Email).SetRole(ReleaseRole.Approver))
+                .ForIndex(6, s => s.SetEmail(activeUser.Email).SetRole(ReleaseRole.Contributor))
+                .ForIndex(7, s => s.SetEmail(activeUser.Email).SetRole(ReleaseRole.Approver))
+                .ForIndex(8, s => s.SetEmail(softDeletedUser.Email).SetRole(ReleaseRole.Contributor))
+                .ForIndex(9, s => s.SetEmail(softDeletedUser.Email).SetRole(ReleaseRole.Approver))
+                .ForIndex(10, s => s.SetEmail(expiredUser.Email).SetRole(ReleaseRole.Contributor))
+                .ForIndex(11, s => s.SetEmail(expiredUser.Email).SetRole(ReleaseRole.Approver))
                 .GenerateList(12);
 
             var userPublicationInvites = _dataFixture
                 .DefaultUserPublicationInvite()
                 .WithPublication(publication)
-                .ForIndex(0, s => s.SetEmail(pendingUserInvites[0].Email))
-                .ForIndex(1, s => s.SetEmail(pendingUserInvites[0].Email))
-                .ForIndex(2, s => s.SetEmail(pendingUserInvites[1].Email))
-                .ForIndex(3, s => s.SetEmail(pendingUserInvites[1].Email))
-                .ForIndex(4, s => s.SetEmail(pendingUserInvites[2].Email))
-                .ForIndex(5, s => s.SetEmail(pendingUserInvites[2].Email))
-                .ForIndex(6, s => s.SetEmail(activeUser.Email))
-                .ForIndex(7, s => s.SetEmail(activeUser.Email))
-                .ForIndex(8, s => s.SetEmail(softDeletedUser.Email))
-                .ForIndex(9, s => s.SetEmail(softDeletedUser.Email))
-                .ForIndex(10, s => s.SetEmail(expiredUser.Email))
-                .ForIndex(11, s => s.SetEmail(expiredUser.Email))
+                .ForIndex(0, s => s.SetEmail(pendingUserInvites[0].Email).SetRole(PublicationRole.Owner))
+                .ForIndex(1, s => s.SetEmail(pendingUserInvites[0].Email).SetRole(PublicationRole.Allower))
+                .ForIndex(2, s => s.SetEmail(pendingUserInvites[1].Email).SetRole(PublicationRole.Owner))
+                .ForIndex(3, s => s.SetEmail(pendingUserInvites[1].Email).SetRole(PublicationRole.Allower))
+                .ForIndex(4, s => s.SetEmail(pendingUserInvites[2].Email).SetRole(PublicationRole.Owner))
+                .ForIndex(5, s => s.SetEmail(pendingUserInvites[2].Email).SetRole(PublicationRole.Allower))
+                .ForIndex(6, s => s.SetEmail(activeUser.Email).SetRole(PublicationRole.Owner))
+                .ForIndex(7, s => s.SetEmail(activeUser.Email).SetRole(PublicationRole.Allower))
+                .ForIndex(8, s => s.SetEmail(softDeletedUser.Email).SetRole(PublicationRole.Owner))
+                .ForIndex(9, s => s.SetEmail(softDeletedUser.Email).SetRole(PublicationRole.Allower))
+                .ForIndex(10, s => s.SetEmail(expiredUser.Email).SetRole(PublicationRole.Owner))
+                .ForIndex(11, s => s.SetEmail(expiredUser.Email).SetRole(PublicationRole.Allower))
                 .GenerateList(12);
 
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -815,7 +814,7 @@ public abstract class UserManagementServiceTests
         [Fact]
         public async Task Success()
         {
-            var userToCancelInvitesFor = _dataFixture.DefaultUserWithPendingInvite().Generate();
+            User userToCancelInvitesFor = _dataFixture.DefaultUserWithPendingInvite();
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -888,7 +887,7 @@ public abstract class UserManagementServiceTests
         [Fact]
         public async Task Success()
         {
-            var internalUser = _dataFixture.DefaultUser().Generate();
+            User internalUser = _dataFixture.DefaultUser();
 
             var identityUser = new ApplicationUser { Email = internalUser.Email };
 
@@ -985,7 +984,7 @@ public abstract class UserManagementServiceTests
         [Fact]
         public async Task IdentityUserDoesNotExist_ReturnsNotFound()
         {
-            var internalUser = _dataFixture.DefaultUser().Generate();
+            User internalUser = _dataFixture.DefaultUser();
 
             await using var usersAndRolesDbContext = InMemoryUserAndRolesDbContext();
             await using var contentDbContext = InMemoryApplicationDbContext();

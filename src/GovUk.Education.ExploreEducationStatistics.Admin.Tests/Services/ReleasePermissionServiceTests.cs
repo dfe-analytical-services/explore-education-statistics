@@ -282,12 +282,7 @@ public class ReleasePermissionServiceTests
 
         Publication publication = _dataFixture.DefaultPublication().WithReleases(ListOf(release1, release2));
 
-        var user1 = _dataFixture
-            .DefaultUser()
-            .WithFirstName("User1")
-            .WithLastName("One")
-            .WithEmail("user1@test.com")
-            .Generate();
+        User user1 = _dataFixture.DefaultUser().WithFirstName("User1").WithLastName("One").WithEmail("user1@test.com");
         var user1ReleaseRole1 = new UserReleaseRole
         {
             User = user1,
@@ -295,12 +290,7 @@ public class ReleasePermissionServiceTests
             Role = Contributor,
         };
 
-        var user2 = _dataFixture
-            .DefaultUser()
-            .WithFirstName("User2")
-            .WithLastName("Two")
-            .WithEmail("user2@test.com")
-            .Generate();
+        User user2 = _dataFixture.DefaultUser().WithFirstName("User2").WithLastName("Two").WithEmail("user2@test.com");
 
         var user2ReleaseRole1 = new UserReleaseRole
         {
@@ -309,7 +299,7 @@ public class ReleasePermissionServiceTests
             Role = Contributor,
         };
 
-        var user3 = _dataFixture.DefaultUser().Generate();
+        User user3 = _dataFixture.DefaultUser();
         var user3ReleaseRoleIgnored1 = new UserReleaseRole // Ignored because different publication
         {
             User = user3,

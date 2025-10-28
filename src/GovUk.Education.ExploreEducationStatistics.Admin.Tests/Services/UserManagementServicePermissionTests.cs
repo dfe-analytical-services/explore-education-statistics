@@ -126,7 +126,7 @@ public class UserManagementServicePermissionTests
     [Fact]
     public async Task DeleteUser_Success()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var identityUser = new ApplicationUser { Email = user.Email };
 

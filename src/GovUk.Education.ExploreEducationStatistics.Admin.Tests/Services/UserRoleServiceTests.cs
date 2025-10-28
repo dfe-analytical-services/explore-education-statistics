@@ -1315,12 +1315,7 @@ public class UserRoleServiceTests
     [Fact]
     public async Task GetPublicationRolesForUser()
     {
-        var user = _dataFixture
-            .DefaultUser()
-            .WithFirstName("User")
-            .WithLastName("1")
-            .WithEmail("user1@example.com")
-            .Generate();
+        User user = _dataFixture.DefaultUser().WithFirstName("User").WithLastName("1").WithEmail("user1@example.com");
 
         var userPublicationRole1 = new UserPublicationRole
         {
@@ -1388,27 +1383,22 @@ public class UserRoleServiceTests
     [Fact]
     public async Task GetPublicationRolesForUser_InvalidRolesNotReturned()
     {
-        var user = _dataFixture
-            .DefaultUser()
-            .WithFirstName("User")
-            .WithLastName("1")
-            .WithEmail("user1@example.com")
-            .Generate();
+        User user = _dataFixture.DefaultUser().WithFirstName("User").WithLastName("1").WithEmail("user1@example.com");
 
-        var userPublicationRole1 = _dataFixture
+        UserPublicationRole userPublicationRole1 = _dataFixture
             .DefaultUserPublicationRole()
             .WithUser(user)
             .WithPublication(_dataFixture.DefaultPublication())
             .WithRole(PublicationRole.Approver);
 
-        var userPublicationRole2 = _dataFixture
+        UserPublicationRole userPublicationRole2 = _dataFixture
             .DefaultUserPublicationRole()
             .WithUser(user)
             .WithPublication(_dataFixture.DefaultPublication())
             .WithRole(PublicationRole.Drafter);
 
         // Role assignment for a different user
-        var userPublicationRole3 = _dataFixture
+        UserPublicationRole userPublicationRole3 = _dataFixture
             .DefaultUserPublicationRole()
             .WithUser(_dataFixture.DefaultUser().Generate())
             .WithPublication(_dataFixture.DefaultPublication())
@@ -1449,19 +1439,9 @@ public class UserRoleServiceTests
     [Fact]
     public async Task GetPublicationRolesForPublication()
     {
-        var user1 = _dataFixture
-            .DefaultUser()
-            .WithFirstName("User")
-            .WithLastName("1")
-            .WithEmail("user1@example.com")
-            .Generate();
+        User user1 = _dataFixture.DefaultUser().WithFirstName("User").WithLastName("1").WithEmail("user1@example.com");
 
-        var user2 = _dataFixture
-            .DefaultUser()
-            .WithFirstName("User")
-            .WithLastName("2")
-            .WithEmail("user2@example.com")
-            .Generate();
+        User user2 = _dataFixture.DefaultUser().WithFirstName("User").WithLastName("2").WithEmail("user2@example.com");
 
         var publication = new Publication { Id = Guid.NewGuid(), Title = "Test Publication 1" };
 
@@ -1531,19 +1511,9 @@ public class UserRoleServiceTests
     [Fact]
     public async Task GetPublicationRolesForPublication_InvalidRolesNotReturned()
     {
-        var user1 = _dataFixture
-            .DefaultUser()
-            .WithFirstName("User")
-            .WithLastName("1")
-            .WithEmail("user1@example.com")
-            .Generate();
+        User user1 = _dataFixture.DefaultUser().WithFirstName("User").WithLastName("1").WithEmail("user1@example.com");
 
-        var user2 = _dataFixture
-            .DefaultUser()
-            .WithFirstName("User")
-            .WithLastName("2")
-            .WithEmail("user2@example.com")
-            .Generate();
+        User user2 = _dataFixture.DefaultUser().WithFirstName("User").WithLastName("2").WithEmail("user2@example.com");
 
         var publication1 = _dataFixture.DefaultPublication().Generate();
         var publication2 = _dataFixture.DefaultPublication().Generate();
@@ -1602,7 +1572,7 @@ public class UserRoleServiceTests
     [Fact]
     public async Task GetReleaseRoles()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var (publication1, publication2, publication3) = _dataFixture
             .DefaultPublication()
@@ -1674,7 +1644,7 @@ public class UserRoleServiceTests
     [Fact]
     public async Task RemoveUserPublicationRole()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var identityUser = new ApplicationUser { Id = user.Id.ToString() };
 
@@ -1753,7 +1723,7 @@ public class UserRoleServiceTests
     [Fact]
     public async Task RemoveUserPublicationRole_HasHigherGlobalRoleThanAnalyst()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var identityUser = new ApplicationUser { Id = user.Id.ToString() };
 
@@ -1817,7 +1787,7 @@ public class UserRoleServiceTests
     [Fact]
     public async Task RemoveUserPublicationRole_AnalystRoleStillRequiredForOtherPublications()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var identityUser = new ApplicationUser { Id = user.Id.ToString() };
 
@@ -1891,7 +1861,7 @@ public class UserRoleServiceTests
     [Fact]
     public async Task RemoveUserPublicationRole_AnalystRoleStillRequiredForOtherReleases()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var identityUser = new ApplicationUser { Id = user.Id.ToString() };
 
@@ -1961,7 +1931,7 @@ public class UserRoleServiceTests
     [Fact]
     public async Task RemoveUserPublicationRole_DowngradeToPrereleaseRole()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var identityUser = new ApplicationUser { Id = user.Id.ToString() };
 
@@ -2045,7 +2015,7 @@ public class UserRoleServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var identityUser = new ApplicationUser { Id = user.Id.ToString() };
 
@@ -2128,7 +2098,7 @@ public class UserRoleServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var identityUser = new ApplicationUser { Id = user.Id.ToString() };
 
@@ -2196,7 +2166,7 @@ public class UserRoleServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var identityUser = new ApplicationUser { Id = user.Id.ToString() };
 
@@ -2274,7 +2244,7 @@ public class UserRoleServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var analystGlobalRole = new IdentityRole { Id = Guid.NewGuid().ToString(), Name = Role.Analyst.ToString() };
 
@@ -2367,7 +2337,7 @@ public class UserRoleServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var identityUser = new ApplicationUser { Id = user.Id.ToString() };
 
@@ -2455,7 +2425,7 @@ public class UserRoleServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var identityUser = new ApplicationUser { Id = user.Id.ToString() };
 
@@ -2529,10 +2499,10 @@ public class UserRoleServiceTests
     [Fact]
     public async Task RemoveAllUserResourceRoles()
     {
-        var targetUser = _dataFixture.DefaultUser().WithEmail("test@test.com").Generate();
+        User targetUser = _dataFixture.DefaultUser().WithEmail("test@test.com");
         var targetIdentityUser = new ApplicationUser { Id = targetUser.Id.ToString() };
 
-        var otherUser = _dataFixture.DefaultUser().WithEmail("otherTestUser@test.com").Generate();
+        User otherUser = _dataFixture.DefaultUser().WithEmail("otherTestUser@test.com");
         var otherIdentityUser = new ApplicationUser { Id = otherUser.Id.ToString() };
 
         var userManager = MockUserManager();

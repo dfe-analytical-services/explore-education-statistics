@@ -2626,7 +2626,7 @@ public abstract class ReleaseVersionServiceTests
         {
             var contextId = Guid.NewGuid().ToString();
 
-            var otherUser = _fixture.DefaultUser().Generate();
+            User otherUser = _fixture.DefaultUser();
 
             var publications = _fixture
                 .DefaultPublication()
@@ -2729,7 +2729,7 @@ public abstract class ReleaseVersionServiceTests
         {
             var contextId = Guid.NewGuid().ToString();
 
-            var otherUser = _fixture.DefaultUser().Generate();
+            User otherUser = _fixture.DefaultUser();
 
             var publications = _fixture
                 .DefaultPublication()

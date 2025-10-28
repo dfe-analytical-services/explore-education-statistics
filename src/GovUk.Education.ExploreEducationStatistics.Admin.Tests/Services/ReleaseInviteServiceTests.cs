@@ -130,7 +130,7 @@ public abstract class ReleaseInviteServiceTests
                 .DefaultPublication()
                 .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(2));
 
-            var user = _dataFixture.DefaultUser().WithEmail(Email).Generate();
+            User user = _dataFixture.DefaultUser().WithEmail(Email);
 
             var newReleaseVersionIds = ListOf(
                 publication.Releases[0].Versions[0].Id,
@@ -243,7 +243,7 @@ public abstract class ReleaseInviteServiceTests
                 .DefaultPublication()
                 .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(2));
 
-            var user = _dataFixture.DefaultUser().WithEmail(Email).Generate();
+            User user = _dataFixture.DefaultUser().WithEmail(Email);
 
             var userRelease1Role = new UserReleaseRole
             {
@@ -376,7 +376,7 @@ public abstract class ReleaseInviteServiceTests
         [Fact]
         public async Task ActiveExistingUser_FailsSendingEmail()
         {
-            var user = _dataFixture.DefaultUser().WithEmail(Email).Generate();
+            User user = _dataFixture.DefaultUser().WithEmail(Email);
 
             Publication publication = _dataFixture
                 .DefaultPublication()

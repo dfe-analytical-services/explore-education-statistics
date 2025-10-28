@@ -139,34 +139,19 @@ public abstract class NotificationsServiceTests
                     0,
                     s =>
                         s.SetRole(PublicationRole.Owner)
-                            .SetUser(
-                                _dataFixture
-                                    .DefaultUser()
-                                    .WithEmail("affected-publication-owner@example.com")
-                                    .Generate()
-                            )
+                            .SetUser(_dataFixture.DefaultUser().WithEmail("affected-publication-owner@example.com"))
                 )
                 .ForIndex(
                     1,
                     s =>
                         s.SetRole(PublicationRole.Allower)
-                            .SetUser(
-                                _dataFixture
-                                    .DefaultUser()
-                                    .WithEmail("affected-publication-approver1@example.com")
-                                    .Generate()
-                            )
+                            .SetUser(_dataFixture.DefaultUser().WithEmail("affected-publication-approver1@example.com"))
                 )
                 .ForIndex(
                     2,
                     s =>
                         s.SetRole(PublicationRole.Allower)
-                            .SetUser(
-                                _dataFixture
-                                    .DefaultUser()
-                                    .WithEmail("affected-publication-approver2@example.com")
-                                    .Generate()
-                            )
+                            .SetUser(_dataFixture.DefaultUser().WithEmail("affected-publication-approver2@example.com"))
                 )
                 .GenerateList();
 
@@ -174,7 +159,7 @@ public abstract class NotificationsServiceTests
                 .DefaultUserPublicationRole()
                 .WithPublication(otherPublication)
                 .WithRole(PublicationRole.Owner)
-                .WithUser(_dataFixture.DefaultUser().WithEmail("other-publication-owner@example.com").Generate())
+                .WithUser(_dataFixture.DefaultUser().WithEmail("other-publication-owner@example.com"))
                 .GenerateList(1);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -269,20 +254,18 @@ public abstract class NotificationsServiceTests
         [Fact]
         public async Task MultipleReleaseVersionPublished_MultipleEmailsSentToTeam()
         {
-            var publication = _dataFixture
+            Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(2))
-                .Generate();
+                .WithReleases(_ => _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(2));
 
             var release1Version = publication.Releases[0].Versions[0];
             var release2Version = publication.Releases[1].Versions[0];
 
-            var publicationOwner = _dataFixture
+            UserPublicationRole publicationOwner = _dataFixture
                 .DefaultUserPublicationRole()
                 .WithPublication(publication)
                 .WithRole(PublicationRole.Owner)
-                .WithUser(_dataFixture.DefaultUser().WithEmail("publication-owner@example.com").Generate())
-                .Generate();
+                .WithUser(_dataFixture.DefaultUser().WithEmail("publication-owner@example.com"));
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -362,10 +345,9 @@ public abstract class NotificationsServiceTests
         [Fact]
         public async Task OldApproverRoleAndDrafterRole_NoEmailsSent()
         {
-            var publication = _dataFixture
+            Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1))
-                .Generate();
+                .WithReleases(_ => _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
 
             var filteredOutPublicationRoles = _dataFixture
                 .DefaultUserPublicationRole()
@@ -375,22 +357,14 @@ public abstract class NotificationsServiceTests
                     s =>
                         s.SetRole(PublicationRole.Approver)
                             .SetUser(
-                                _dataFixture
-                                    .DefaultUser()
-                                    .WithEmail("affected-publication-old-approver@example.com")
-                                    .Generate()
+                                _dataFixture.DefaultUser().WithEmail("affected-publication-old-approver@example.com")
                             )
                 )
                 .ForIndex(
                     1,
                     s =>
                         s.SetRole(PublicationRole.Drafter)
-                            .SetUser(
-                                _dataFixture
-                                    .DefaultUser()
-                                    .WithEmail("affected-publication-drafter@example.com")
-                                    .Generate()
-                            )
+                            .SetUser(_dataFixture.DefaultUser().WithEmail("affected-publication-drafter@example.com"))
                 )
                 .Generate();
 

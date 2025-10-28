@@ -2948,7 +2948,7 @@ public class MethodologyServiceTests
         public async Task DifferentUserIsApproverOnOwningPublication_NotIncluded()
         {
             // Set up a different User as the Approver for the owning Publication.
-            var otherUser = _fixture.DefaultUser().Generate();
+            User otherUser = _fixture.DefaultUser();
 
             var publication = _fixture.DefaultPublication().WithContact(MockContact).Generate();
 
@@ -3220,7 +3220,7 @@ public class MethodologyServiceTests
         public async Task DifferentUserIsApproverOnOwningPublicationRelease_NotIncluded()
         {
             // Set up a different User as the Approver for the owning Publication.
-            var otherUser = _fixture.DefaultUser().Generate();
+            User otherUser = _fixture.DefaultUser();
 
             var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
