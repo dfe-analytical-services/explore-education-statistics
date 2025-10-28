@@ -1,6 +1,5 @@
 #nullable enable
 using System.Security.Claims;
-using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -53,7 +52,7 @@ public class SignInController(
                         break;
                 }
 
-                return new ActionResult<SignInResponseViewModel>(signInResponse);
+                return signInResponse;
             });
     }
 }

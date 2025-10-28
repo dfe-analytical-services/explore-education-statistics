@@ -15,10 +15,11 @@ public class BootstrapUsersService(IConfiguration configuration, ContentDbContex
     {
         var bauBootstrapUserEmailAddresses = configuration
             .GetSection("BootstrapUsers")
-            ?.GetValue<string>("BAU")
+            .GetValue<string>("BAU")
             ?.Split(',', StringSplitOptions.RemoveEmptyEntries)
             .Select(email => email.Trim())
-            .Where(email => !email.IsNullOrWhitespace());
+            .Where(email => !email.IsNullOrWhitespace())
+            .ToList();
 
         if (bauBootstrapUserEmailAddresses.IsNullOrEmpty())
         {
@@ -39,7 +40,7 @@ public class BootstrapUsersService(IConfiguration configuration, ContentDbContex
                 Email = email,
                 RoleId = Role.BauUser.GetEnumValue(),
                 Active = false,
-                Created = DateTime.UtcNow,
+                Created = DateTimeOffset.UtcNow,
                 CreatedById = placeholderDeletedUserId,
             })
             .ToList();

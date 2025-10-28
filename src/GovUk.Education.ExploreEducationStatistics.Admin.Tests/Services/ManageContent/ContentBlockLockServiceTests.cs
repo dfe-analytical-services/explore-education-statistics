@@ -17,7 +17,6 @@ using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent;
@@ -50,7 +49,7 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            contentDbContext.Add(contentBlock);
+            contentDbContext.ContentBlocks.Add(contentBlock);
             contentDbContext.Users.Add(user);
             await contentDbContext.SaveChangesAsync();
         }
@@ -129,7 +128,7 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            contentDbContext.Add(contentBlock);
+            contentDbContext.ContentBlocks.Add(contentBlock);
             contentDbContext.Users.Add(user);
             await contentDbContext.SaveChangesAsync();
         }
@@ -225,7 +224,7 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            await contentDbContext.AddAsync(contentBlock);
+            contentDbContext.ContentBlocks.Add(contentBlock);
             contentDbContext.Users.Add(nextUser);
             await contentDbContext.SaveChangesAsync();
         }
@@ -313,7 +312,7 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            await contentDbContext.AddAsync(contentBlock);
+            contentDbContext.ContentBlocks.Add(contentBlock);
             contentDbContext.Users.Add(user);
             await contentDbContext.SaveChangesAsync();
         }
@@ -402,7 +401,7 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            await contentDbContext.AddAsync(contentBlock);
+            contentDbContext.ContentBlocks.Add(contentBlock);
             contentDbContext.Users.Add(nextUser);
             await contentDbContext.SaveChangesAsync();
         }
@@ -461,7 +460,7 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            contentDbContext.Add(contentBlock);
+            contentDbContext.ContentBlocks.Add(contentBlock);
             contentDbContext.Users.AddRange(user1, user2);
             await contentDbContext.SaveChangesAsync();
         }
@@ -558,7 +557,7 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            await contentDbContext.AddAsync(contentBlock);
+            contentDbContext.ContentBlocks.Add(contentBlock);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -596,8 +595,8 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            await contentDbContext.AddAsync(contentBlock);
-            await contentDbContext.AddAsync(user);
+            contentDbContext.ContentBlocks.Add(contentBlock);
+            contentDbContext.Users.Add(user);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -679,8 +678,8 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            await contentDbContext.AddAsync(contentBlock);
-            await contentDbContext.AddAsync(nextUser);
+            contentDbContext.ContentBlocks.Add(contentBlock);
+            contentDbContext.Users.Add(nextUser);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -764,8 +763,8 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            await contentDbContext.AddAsync(contentBlock);
-            await contentDbContext.AddAsync(nextUser);
+            contentDbContext.ContentBlocks.Add(contentBlock);
+            contentDbContext.Users.Add(nextUser);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -823,8 +822,8 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            await contentDbContext.AddAsync(contentBlock);
-            await contentDbContext.AddAsync(nextUser);
+            contentDbContext.ContentBlocks.Add(contentBlock);
+            contentDbContext.Users.Add(nextUser);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -893,7 +892,7 @@ public class ContentBlockLockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            await contentDbContext.AddAsync(contentBlock);
+            contentDbContext.ContentBlocks.Add(contentBlock);
             await contentDbContext.SaveChangesAsync();
         }
 

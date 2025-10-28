@@ -32,5 +32,5 @@ public interface IUserRepository
         CancellationToken cancellationToken = default
     );
 
-    Task SoftDeleteUser(User activeUser, Guid deletedById, CancellationToken cancellationToken = default);
+    Task SoftDeleteUser(Guid activeUserId, Guid deletedById, CancellationToken cancellationToken = default);
 }

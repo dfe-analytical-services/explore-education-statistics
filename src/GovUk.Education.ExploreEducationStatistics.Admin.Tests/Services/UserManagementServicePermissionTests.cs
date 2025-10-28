@@ -130,9 +130,9 @@ public class UserManagementServicePermissionTests
 
         var identityUser = new ApplicationUser { Email = user.Email };
 
-        var usersandRolesDbContextId = Guid.NewGuid().ToString();
+        var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
-        await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersandRolesDbContextId))
+        await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
         {
             usersAndRolesDbContext.Users.Add(identityUser);
             await usersAndRolesDbContext.SaveChangesAsync();
@@ -143,7 +143,7 @@ public class UserManagementServicePermissionTests
             .AssertSuccess(async userService =>
             {
                 await using var contentDbContext = InMemoryApplicationDbContext();
-                await using var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersandRolesDbContextId);
+                await using var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId);
 
                 userService.Setup(mock => mock.GetUserId()).Returns(CreatedById);
 
@@ -172,13 +172,7 @@ public class UserManagementServicePermissionTests
                     .Setup(mock => mock.FindActiveUserByEmail(user.Email, It.IsAny<CancellationToken>()))
                     .ReturnsAsync(user);
                 userRepository
-                    .Setup(mock =>
-                        mock.SoftDeleteUser(
-                            It.Is<User>(u => u.Id == user.Id),
-                            CreatedById,
-                            It.IsAny<CancellationToken>()
-                        )
-                    )
+                    .Setup(mock => mock.SoftDeleteUser(user.Id, CreatedById, It.IsAny<CancellationToken>()))
                     .Returns(Task.CompletedTask);
 
                 var userManager = MockUserManager();

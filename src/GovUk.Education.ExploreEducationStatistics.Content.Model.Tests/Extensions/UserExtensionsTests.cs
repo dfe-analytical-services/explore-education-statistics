@@ -9,17 +9,24 @@ public class UserExtensionsTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    public static TheoryData<bool, DateTime?, bool> PendingInviteData =>
+    public static TheoryData<bool, DateTime?, DateTimeOffset, bool> IsInvitePendingData =>
         new()
         {
-            // active, softDeletedDate, expectIsPendingInvite
-            { false, null, true },
-            { false, DateTime.UtcNow, false },
-            { true, null, false },
-            { true, DateTime.UtcNow, false },
+            // active, softDeletedDate, createdDate, expectIsPendingInvite
+
+            { false, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), false },
+            { false, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), true },
+            { false, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), false },
+            { false, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
+            { true, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), false },
+            { true, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
+            // These two cases should be impossible in reality as a soft-deleted user cannot be active. However,
+            // they are included here for completeness.
+            { true, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), false },
+            { true, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
         };
 
-    public static TheoryData<bool, DateTime?, DateTimeOffset, bool> ExpiryData =>
+    public static TheoryData<bool, DateTime?, DateTimeOffset, bool> IsInviteExpiredData =>
         new()
         {
             // active, softDeletedDate, createdDate, expectInviteHasExpired
@@ -32,22 +39,32 @@ public class UserExtensionsTests
             { true, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
             // These two cases should be impossible in reality as a soft-deleted user cannot be active. However,
             // they are included here for completeness.
-            { true, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
+            { true, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), false },
             { true, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
         };
 
     [Theory]
-    [MemberData(nameof(PendingInviteData))]
-    public void IsPendingInvite(bool active, DateTime? softDeletedDate, bool expectIsPendingInvite)
+    [MemberData(nameof(IsInvitePendingData))]
+    public void IsInvitePending(
+        bool active,
+        DateTime? softDeletedDate,
+        DateTimeOffset createdDate,
+        bool expectIsPendingInvite
+    )
     {
-        var user = _dataFixture.DefaultUser().WithActive(active).WithSoftDeleted(softDeletedDate).Generate();
+        var user = _dataFixture
+            .DefaultUser()
+            .WithActive(active)
+            .WithSoftDeleted(softDeletedDate)
+            .WithCreated(createdDate)
+            .Generate();
 
-        Assert.Equal(expectIsPendingInvite, user.IsPendingInvite());
+        Assert.Equal(expectIsPendingInvite, user.IsInvitePending());
     }
 
     [Theory]
-    [MemberData(nameof(ExpiryData))]
-    public void InviteHasExpired(
+    [MemberData(nameof(IsInviteExpiredData))]
+    public void IsInviteExpired(
         bool active,
         DateTime? softDeletedDate,
         DateTimeOffset createdDate,
@@ -61,6 +78,6 @@ public class UserExtensionsTests
             .WithCreated(createdDate)
             .Generate();
 
-        Assert.Equal(expectInviteHasExpired, user.InviteHasExpired());
+        Assert.Equal(expectInviteHasExpired, user.IsInviteExpired());
     }
 }

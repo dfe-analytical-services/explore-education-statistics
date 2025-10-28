@@ -27,13 +27,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindPendingUserInviteByEmail(user.Email);
                 Assert.Null(result);
             }
@@ -48,13 +48,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindPendingUserInviteByEmail(user.Email);
                 Assert.NotNull(result);
                 Assert.Equal(user.Id, result.Id);
@@ -70,13 +70,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindPendingUserInviteByEmail(user.Email);
                 Assert.Null(result);
             }
@@ -91,13 +91,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindPendingUserInviteByEmail("TEST@TEST.COM");
 
                 Assert.NotNull(result);
@@ -114,13 +114,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindPendingUserInviteByEmail(user.Email);
 
                 Assert.Null(result);
@@ -132,7 +132,7 @@ public abstract class UserRepositoryTests
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
 
-            var repository = SetupUserRepository(contentDbContext);
+            var repository = BuildRepository(contentDbContext);
             var result = await repository.FindPendingUserInviteByEmail("test@test.com");
             Assert.Null(result);
         }
@@ -149,13 +149,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindActiveUserByEmail(user.Email);
                 Assert.NotNull(result);
                 Assert.Equal(user.Id, result.Id);
@@ -171,13 +171,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindActiveUserByEmail(user.Email);
                 Assert.Null(result);
             }
@@ -192,13 +192,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindActiveUserByEmail(user.Email);
                 Assert.Null(result);
             }
@@ -213,13 +213,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindActiveUserByEmail("TEST@TEST.COM");
 
                 Assert.NotNull(result);
@@ -236,13 +236,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindActiveUserByEmail(user.Email);
 
                 Assert.Null(result);
@@ -254,7 +254,7 @@ public abstract class UserRepositoryTests
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
 
-            var repository = SetupUserRepository(contentDbContext);
+            var repository = BuildRepository(contentDbContext);
             var result = await repository.FindActiveUserByEmail("test@test.com");
             Assert.Null(result);
         }
@@ -271,13 +271,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindActiveUserById(user.Id);
                 Assert.NotNull(result);
                 Assert.Equal(user.Id, result.Id);
@@ -293,13 +293,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindActiveUserById(user.Id);
                 Assert.Null(result);
             }
@@ -314,13 +314,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindActiveUserById(user.Id);
                 Assert.Null(result);
             }
@@ -335,13 +335,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindActiveUserById(user.Id);
 
                 Assert.Null(result);
@@ -353,7 +353,7 @@ public abstract class UserRepositoryTests
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
 
-            var repository = SetupUserRepository(contentDbContext);
+            var repository = BuildRepository(contentDbContext);
             var result = await repository.FindActiveUserById(Guid.NewGuid());
             Assert.Null(result);
         }
@@ -370,13 +370,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindUserByEmail(user.Email);
                 Assert.NotNull(result);
                 Assert.Equal(user.Id, result.Id);
@@ -392,13 +392,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindUserByEmail(user.Email);
                 Assert.NotNull(result);
                 Assert.Equal(user.Id, result.Id);
@@ -414,13 +414,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindUserByEmail(user.Email);
                 Assert.NotNull(result);
                 Assert.Equal(user.Id, result.Id);
@@ -436,13 +436,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindUserByEmail("TEST@TEST.COM");
 
                 Assert.NotNull(result);
@@ -459,13 +459,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
                 var result = await repository.FindUserByEmail(user.Email);
 
                 Assert.Null(result);
@@ -477,7 +477,7 @@ public abstract class UserRepositoryTests
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
 
-            var repository = SetupUserRepository(contentDbContext);
+            var repository = BuildRepository(contentDbContext);
             var result = await repository.FindUserByEmail("test@test.com");
             Assert.Null(result);
         }
@@ -488,19 +488,19 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task Success()
         {
-            var user = _dataFixture.DefaultSoftDeletedUser().WithEmail(User.DeletedUserPlaceholderEmail).Generate();
+            var user = _dataFixture.DefaultDeletedUserPlaceholder().Generate();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
 
                 var result = await repository.FindDeletedUserPlaceholder();
 
@@ -515,7 +515,7 @@ public abstract class UserRepositoryTests
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
 
-            var repository = SetupUserRepository(contentDbContext);
+            var repository = BuildRepository(contentDbContext);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await repository.FindDeletedUserPlaceholder()
@@ -535,7 +535,7 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -546,9 +546,9 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
 
-                await repository.SoftDeleteUser(user, deletedById);
+                await repository.SoftDeleteUser(user.Id, deletedById);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -573,13 +573,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
 
                 await Assert.ThrowsAsync<InvalidOperationException>(async () =>
                     await repository.CreateOrUpdate(
@@ -624,13 +624,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -675,6 +675,44 @@ public abstract class UserRepositoryTests
         }
 
         [Fact]
+        public async Task UserWithPendingInvite_SuppliedDateNotUtc_StoresCreatedDateInUtc()
+        {
+            var newCreatedDate = new DateTimeOffset(2025, 10, 28, 12, 0, 0, TimeSpan.FromHours(1));
+
+            var user = _dataFixture.DefaultUserWithPendingInvite().Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(contentDbContext);
+
+                var result = await repository.CreateOrUpdate(
+                    email: user.Email,
+                    role: GlobalRoles.Role.Analyst,
+                    createdById: Guid.NewGuid(),
+                    createdDate: newCreatedDate
+                );
+
+                Assert.Equal(newCreatedDate, result.Created);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
+
+                Assert.Equal(newCreatedDate, updatedUser.Created); // Still should represent the same instance in time
+                Assert.Equal(TimeSpan.Zero, updatedUser.Created.Offset); // But the offset should be zero as it is UTC
+            }
+        }
+
+        [Fact]
         public async Task UserWithPendingInvite_CreatedDateNotSupplied_UpdatesUserCreatedDateToNow()
         {
             var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
@@ -685,13 +723,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -740,13 +778,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -791,6 +829,44 @@ public abstract class UserRepositoryTests
         }
 
         [Fact]
+        public async Task UserWithExpiredInvite_SuppliedDateNotUtc_StoresCreatedDateInUtc()
+        {
+            var newCreatedDate = new DateTimeOffset(2025, 10, 28, 12, 0, 0, TimeSpan.FromHours(1));
+
+            var user = _dataFixture.DefaultUserWithExpiredInvite().Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(contentDbContext);
+
+                var result = await repository.CreateOrUpdate(
+                    email: user.Email,
+                    role: GlobalRoles.Role.Analyst,
+                    createdById: Guid.NewGuid(),
+                    createdDate: newCreatedDate
+                );
+
+                Assert.Equal(newCreatedDate, result.Created);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
+
+                Assert.Equal(newCreatedDate, updatedUser.Created); // Still should represent the same instance in time
+                Assert.Equal(TimeSpan.Zero, updatedUser.Created.Offset); // But the offset should be zero as it is UTC
+            }
+        }
+
+        [Fact]
         public async Task UserWithExpiredInvite_CreatedDateNotSupplied_UpdatesUserCreatedDateToNow()
         {
             var user = _dataFixture.DefaultUserWithExpiredInvite().Generate();
@@ -799,13 +875,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -856,13 +932,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -907,6 +983,44 @@ public abstract class UserRepositoryTests
         }
 
         [Fact]
+        public async Task SoftDeletedUser_SuppliedDateNotUtc_StoresCreatedDateInUtc()
+        {
+            var newCreatedDate = new DateTimeOffset(2025, 10, 28, 12, 0, 0, TimeSpan.FromHours(1));
+
+            var user = _dataFixture.DefaultSoftDeletedUser().Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(contentDbContext);
+
+                var result = await repository.CreateOrUpdate(
+                    email: user.Email,
+                    role: GlobalRoles.Role.Analyst,
+                    createdById: Guid.NewGuid(),
+                    createdDate: newCreatedDate
+                );
+
+                Assert.Equal(newCreatedDate, result.Created);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
+
+                Assert.Equal(newCreatedDate, updatedUser.Created); // Still should represent the same instance in time
+                Assert.Equal(TimeSpan.Zero, updatedUser.Created.Offset); // But the offset should be zero as it is UTC
+            }
+        }
+
+        [Fact]
         public async Task SoftDeletedUser_CreatedDateNotSupplied_UpdatesUserCreatedDateToNow()
         {
             var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
@@ -917,13 +1031,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
 
                 var result = await repository.CreateOrUpdate(
                     email: user.Email,
@@ -945,7 +1059,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserDoesNotExist_CreatesNewUser()
         {
-            var email = "TEST@test.com";
+            const string email = "TEST@test.com";
             var createdById = Guid.NewGuid();
             var createdDate = DateTimeOffset.UtcNow.AddDays(-1);
 
@@ -953,7 +1067,7 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
 
                 var result = await repository.CreateOrUpdate(
                     email: email,
@@ -1000,13 +1114,13 @@ public abstract class UserRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddAsync(user);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
 
                 await Assert.ThrowsAsync<ArgumentException>(async () =>
                     await repository.CreateOrUpdate(
@@ -1020,16 +1134,47 @@ public abstract class UserRepositoryTests
         }
 
         [Fact]
+        public async Task UserDoesNotExist_SuppliedDateNotUtc_StoresCreatedDateInUtc()
+        {
+            var createdDate = new DateTimeOffset(2025, 10, 28, 12, 0, 0, TimeSpan.FromHours(1));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(contentDbContext);
+
+                var result = await repository.CreateOrUpdate(
+                    email: "test@test.com",
+                    role: GlobalRoles.Role.Analyst,
+                    createdById: Guid.NewGuid(),
+                    createdDate: createdDate
+                );
+
+                Assert.Equal(createdDate, result.Created); // Still should represent the same instance in time
+                Assert.Equal(TimeSpan.Zero, result.Created.Offset); // But the offset should be zero as it is UTC
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var newUser = await contentDbContext.Users.SingleAsync();
+
+                Assert.Equal(createdDate, newUser.Created); // Still should represent the same instance in time
+                Assert.Equal(TimeSpan.Zero, newUser.Created.Offset); // But the offset should be zero as it is UTC
+            }
+        }
+
+        [Fact]
         public async Task UserDoesNotExist_CreatedDateNotSupplied_CreatesNewUserWithCreatedDateNow()
         {
-            var email = "test@test.com";
+            const string email = "test@test.com";
             var createdById = Guid.NewGuid();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = SetupUserRepository(contentDbContext);
+                var repository = BuildRepository(contentDbContext);
 
                 var result = await repository.CreateOrUpdate(
                     email: email,
@@ -1049,7 +1194,7 @@ public abstract class UserRepositoryTests
         }
     }
 
-    private static UserRepository SetupUserRepository(ContentDbContext contentDbContext)
+    private static UserRepository BuildRepository(ContentDbContext contentDbContext)
     {
         return new(contentDbContext);
     }

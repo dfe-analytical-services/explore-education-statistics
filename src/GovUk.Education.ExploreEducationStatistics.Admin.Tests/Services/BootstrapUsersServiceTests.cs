@@ -58,18 +58,18 @@ public class BootstrapUsersServiceTests
     [Fact]
     public void AddBootstrapUsers_UsersAlreadyExist_DoesNothing()
     {
-        var placeholderDeletedUser = _dataFixture.DefaultUser().WithEmail(User.DeletedUserPlaceholderEmail).Generate();
-        var existingUsers = _dataFixture
+        User placeholderDeletedUser = _dataFixture.DefaultDeletedUserPlaceholder().Generate();
+        var (user1, user2) = _dataFixture
             .DefaultUser()
             .ForIndex(0, s => s.SetEmail("test1@test.com"))
             .ForIndex(1, s => s.SetEmail("test2@test.com"))
-            .GenerateList(2);
+            .GenerateTuple2();
 
         var bootstrappedUserEmailsConfiguration = new Mock<IConfiguration>(MockBehavior.Strict);
         var bootstrapUsersSection = new Mock<IConfigurationSection>();
 
         var bauSection = new Mock<IConfigurationSection>();
-        bauSection.Setup(s => s.Value).Returns($"{existingUsers[0].Email}, {existingUsers[1].Email}");
+        bauSection.Setup(s => s.Value).Returns($"{user1.Email}, {user2.Email}");
 
         bootstrapUsersSection.Setup(s => s.GetSection("BAU")).Returns(bauSection.Object);
 
@@ -81,7 +81,7 @@ public class BootstrapUsersServiceTests
 
         using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.Users.AddRange([placeholderDeletedUser, .. existingUsers]);
+            contentDbContext.Users.AddRange([placeholderDeletedUser, user1, user2]);
             contentDbContext.SaveChanges();
         }
 
@@ -98,15 +98,15 @@ public class BootstrapUsersServiceTests
 
             Assert.Equal(3, usersInDatabase.Count);
             Assert.Equal(placeholderDeletedUser.Email, usersInDatabase[0].Email);
-            Assert.Equal(existingUsers[0].Email, usersInDatabase[1].Email);
-            Assert.Equal(existingUsers[1].Email, usersInDatabase[2].Email);
+            Assert.Equal(user1.Email, usersInDatabase[1].Email);
+            Assert.Equal(user2.Email, usersInDatabase[2].Email);
         }
     }
 
     [Fact]
     public void AddBootstrapUsers_SomeUsersAreNew_CreatesNewUsers()
     {
-        var placeholderDeletedUser = _dataFixture.DefaultUser().WithEmail(User.DeletedUserPlaceholderEmail).Generate();
+        var placeholderDeletedUser = _dataFixture.DefaultDeletedUserPlaceholder().Generate();
         var existingUser = _dataFixture.DefaultUser().WithEmail("test1@test.com").Generate();
 
         var newUserEmail1 = "test2@test.com";

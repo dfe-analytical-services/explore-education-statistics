@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -50,7 +49,7 @@ public class SignInControllerTests
         var signInService = new Mock<ISignInService>(Strict);
         signInService.Setup(mock => mock.RegisterOrSignIn()).ReturnsAsync(new StatusCodeResult(500));
 
-        var service = SetupService(
+        var service = BuildService(
             logger: logger.Object,
             httpContextAccessor: httpContextAccessor.Object,
             signInService: signInService.Object,
@@ -82,7 +81,7 @@ public class SignInControllerTests
         var signInService = new Mock<ISignInService>(Strict);
         signInService.Setup(mock => mock.RegisterOrSignIn()).ThrowsAsync(new InvalidOperationException());
 
-        var service = SetupService(
+        var service = BuildService(
             httpContextAccessor: httpContextAccessor.Object,
             signInService: signInService.Object,
             userService: userService.Object
@@ -101,6 +100,11 @@ public class SignInControllerTests
         var claims = new[] { new Claim(ClaimConstants.NameIdentifierId, Guid.NewGuid().ToString()) };
         var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity(claims)) };
 
+        var expectedViewModel = new SignInResponseViewModel(
+            LoginResult.LoginSuccess,
+            new UserProfile(userProfileId, userProfileFirstName)
+        );
+
         var httpContextAccessor = new Mock<IHttpContextAccessor>(Strict);
         httpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
 
@@ -110,16 +114,9 @@ public class SignInControllerTests
             .ReturnsAsync(true);
 
         var signInService = new Mock<ISignInService>(Strict);
-        signInService
-            .Setup(mock => mock.RegisterOrSignIn())
-            .ReturnsAsync(
-                new SignInResponseViewModel(
-                    LoginResult.LoginSuccess,
-                    new UserProfile(userProfileId, userProfileFirstName)
-                )
-            );
+        signInService.Setup(mock => mock.RegisterOrSignIn()).ReturnsAsync(expectedViewModel);
 
-        var service = SetupService(
+        var service = BuildService(
             httpContextAccessor: httpContextAccessor.Object,
             signInService: signInService.Object,
             userService: userService.Object
@@ -127,11 +124,7 @@ public class SignInControllerTests
 
         var result = await service.RegisterOrSignIn();
 
-        var signInResponse = result.AssertOkResult();
-
-        Assert.Equal(LoginResult.LoginSuccess, signInResponse.LoginResult);
-        Assert.Equal(userProfileId, signInResponse.UserProfile!.Id);
-        Assert.Equal(userProfileFirstName, signInResponse.UserProfile.FirstName);
+        var signInResponse = result.AssertOkResult(expectedViewModel);
 
         VerifyAllMocks(httpContextAccessor, userService, signInService);
     }
@@ -144,6 +137,11 @@ public class SignInControllerTests
         var claims = new[] { new Claim(ClaimConstants.NameIdentifierId, Guid.NewGuid().ToString()) };
         var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity(claims)) };
 
+        var expectedViewModel = new SignInResponseViewModel(
+            LoginResult.RegistrationSuccess,
+            new UserProfile(userProfileId, userProfileFirstName)
+        );
+
         var httpContextAccessor = new Mock<IHttpContextAccessor>(Strict);
         httpContextAccessor.SetupGet(x => x.HttpContext).Returns(httpContext);
 
@@ -153,16 +151,9 @@ public class SignInControllerTests
             .ReturnsAsync(true);
 
         var signInService = new Mock<ISignInService>(Strict);
-        signInService
-            .Setup(mock => mock.RegisterOrSignIn())
-            .ReturnsAsync(
-                new SignInResponseViewModel(
-                    LoginResult.RegistrationSuccess,
-                    new UserProfile(userProfileId, userProfileFirstName)
-                )
-            );
+        signInService.Setup(mock => mock.RegisterOrSignIn()).ReturnsAsync(expectedViewModel);
 
-        var service = SetupService(
+        var service = BuildService(
             httpContextAccessor: httpContextAccessor.Object,
             signInService: signInService.Object,
             userService: userService.Object
@@ -170,11 +161,7 @@ public class SignInControllerTests
 
         var result = await service.RegisterOrSignIn();
 
-        var signInResponse = result.AssertOkResult();
-
-        Assert.Equal(LoginResult.RegistrationSuccess, signInResponse.LoginResult);
-        Assert.Equal(userProfileId, signInResponse.UserProfile!.Id);
-        Assert.Equal(userProfileFirstName, signInResponse.UserProfile.FirstName);
+        var signInResponse = result.AssertOkResult(expectedViewModel);
 
         VerifyAllMocks(httpContextAccessor, userService, signInService);
     }
@@ -185,6 +172,8 @@ public class SignInControllerTests
         var remoteUserId = Guid.NewGuid().ToString();
         var claims = new[] { new Claim(ClaimConstants.NameIdentifierId, remoteUserId) };
         var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity(claims)) };
+
+        var expectedViewModel = new SignInResponseViewModel(LoginResult.NoInvite);
 
         var logger = new Mock<ILogger<SignInController>>(Strict);
         logger.Setup(x =>
@@ -208,11 +197,9 @@ public class SignInControllerTests
             .ReturnsAsync(true);
 
         var signInService = new Mock<ISignInService>(Strict);
-        signInService
-            .Setup(mock => mock.RegisterOrSignIn())
-            .ReturnsAsync(new SignInResponseViewModel(LoginResult.NoInvite));
+        signInService.Setup(mock => mock.RegisterOrSignIn()).ReturnsAsync(expectedViewModel);
 
-        var service = SetupService(
+        var service = BuildService(
             logger: logger.Object,
             httpContextAccessor: httpContextAccessor.Object,
             signInService: signInService.Object,
@@ -221,10 +208,7 @@ public class SignInControllerTests
 
         var result = await service.RegisterOrSignIn();
 
-        var signInResponse = result.AssertOkResult();
-
-        Assert.Equal(LoginResult.NoInvite, signInResponse.LoginResult);
-        Assert.Null(signInResponse.UserProfile);
+        var signInResponse = result.AssertOkResult(expectedViewModel);
 
         VerifyAllMocks(logger, httpContextAccessor, userService, signInService);
     }
@@ -235,6 +219,8 @@ public class SignInControllerTests
         var remoteUserId = Guid.NewGuid().ToString();
         var claims = new[] { new Claim(ClaimConstants.NameIdentifierId, remoteUserId) };
         var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity(claims)) };
+
+        var expectedViewModel = new SignInResponseViewModel(LoginResult.ExpiredInvite);
 
         var logger = new Mock<ILogger<SignInController>>(Strict);
         logger.Setup(x =>
@@ -258,11 +244,9 @@ public class SignInControllerTests
             .ReturnsAsync(true);
 
         var signInService = new Mock<ISignInService>(Strict);
-        signInService
-            .Setup(mock => mock.RegisterOrSignIn())
-            .ReturnsAsync(new SignInResponseViewModel(LoginResult.ExpiredInvite));
+        signInService.Setup(mock => mock.RegisterOrSignIn()).ReturnsAsync(expectedViewModel);
 
-        var service = SetupService(
+        var service = BuildService(
             logger: logger.Object,
             httpContextAccessor: httpContextAccessor.Object,
             signInService: signInService.Object,
@@ -271,10 +255,7 @@ public class SignInControllerTests
 
         var result = await service.RegisterOrSignIn();
 
-        var signInResponse = result.AssertOkResult();
-
-        Assert.Equal(LoginResult.ExpiredInvite, signInResponse.LoginResult);
-        Assert.Null(signInResponse.UserProfile);
+        var signInResponse = result.AssertOkResult(expectedViewModel);
 
         VerifyAllMocks(logger, httpContextAccessor, userService, signInService);
     }
@@ -282,14 +263,12 @@ public class SignInControllerTests
     [Fact]
     public async Task RegisterOrSignIn_NotAuthenticatedByIdentityProvider_ReturnsForbiddenResult()
     {
-        var remoteUserId = Guid.NewGuid().ToString();
-
         var userService = new Mock<IUserService>(Strict);
         userService
             .Setup(mock => mock.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider))
             .ReturnsAsync(false);
 
-        var service = SetupService(userService: userService.Object);
+        var service = BuildService(userService: userService.Object);
 
         var result = await service.RegisterOrSignIn();
 
@@ -298,7 +277,7 @@ public class SignInControllerTests
         VerifyAllMocks(userService);
     }
 
-    private static SignInController SetupService(
+    private static SignInController BuildService(
         ILogger<SignInController>? logger = null,
         IHttpContextAccessor? httpContextAccessor = null,
         ISignInService? signInService = null,

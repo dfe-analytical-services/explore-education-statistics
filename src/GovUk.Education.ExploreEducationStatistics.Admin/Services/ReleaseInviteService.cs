@@ -45,18 +45,11 @@ public class ReleaseInviteService(
             .OnSuccessDo(() => ValidateReleaseVersionIds(publicationId, releaseVersionIds))
             .OnSuccess(async publication =>
             {
-                var sanitisedEmail = email.Trim();
-
-                var activeUser = await userRepository.FindActiveUserByEmail(sanitisedEmail);
+                var activeUser = await userRepository.FindActiveUserByEmail(email);
 
                 return activeUser is null
-                    ? await CreateInactiveUserContributorInvite(releaseVersionIds, sanitisedEmail, publication.Title)
-                    : await CreateActiveUserContributorInvite(
-                        releaseVersionIds,
-                        activeUser.Id,
-                        sanitisedEmail,
-                        publication.Title
-                    );
+                    ? await CreateInactiveUserContributorInvite(releaseVersionIds, email, publication!.Title)
+                    : await CreateActiveUserContributorInvite(releaseVersionIds, activeUser, publication!.Title);
             });
     }
 
@@ -86,10 +79,12 @@ public class ReleaseInviteService(
         string publicationTitle
     )
     {
+        var normalizedEmail = email.Trim().ToLower();
+
         var emailResult = await SendContributorInviteEmail(
             publicationTitle: publicationTitle,
             releaseVersionIds: releaseVersionIds,
-            email: email
+            email: normalizedEmail
         );
 
         if (emailResult.IsLeft)
@@ -97,11 +92,15 @@ public class ReleaseInviteService(
             return emailResult;
         }
 
-        await userRepository.CreateOrUpdate(email: email, role: Role.Analyst, createdById: userService.GetUserId());
+        await userRepository.CreateOrUpdate(
+            email: normalizedEmail,
+            role: Role.Analyst,
+            createdById: userService.GetUserId()
+        );
 
         await userReleaseInviteRepository.CreateManyIfNotExists(
             releaseVersionIds: releaseVersionIds,
-            email: email,
+            email: normalizedEmail,
             releaseRole: Contributor,
             emailSent: true,
             createdById: userService.GetUserId()
@@ -112,8 +111,7 @@ public class ReleaseInviteService(
 
     private async Task<Either<ActionResult, Unit>> CreateActiveUserContributorInvite(
         List<Guid> releaseVersionIds,
-        Guid userId,
-        string email,
+        User user,
         string publicationTitle
     )
     {
@@ -121,7 +119,7 @@ public class ReleaseInviteService(
         var existingReleaseRoleReleaseVersionIds = contentDbContext
             .UserReleaseRoles.AsQueryable()
             .Where(urr =>
-                releaseVersionIds.Contains(urr.ReleaseVersionId) && urr.Role == Contributor && urr.UserId == userId
+                releaseVersionIds.Contains(urr.ReleaseVersionId) && urr.Role == Contributor && urr.UserId == user.Id
             )
             .Select(urr => urr.ReleaseVersionId)
             .ToList();
@@ -138,7 +136,7 @@ public class ReleaseInviteService(
         var emailResult = await SendContributorInviteEmail(
             publicationTitle: publicationTitle,
             releaseVersionIds: missingReleaseRoleReleaseVersionIds,
-            email: email
+            email: user.Email
         );
         if (emailResult.IsLeft)
         {
@@ -146,14 +144,14 @@ public class ReleaseInviteService(
         }
 
         await userReleaseRoleRepository.CreateManyIfNotExists(
-            userId: userId,
+            userId: user.Id,
             releaseVersionIds: missingReleaseRoleReleaseVersionIds,
             role: Contributor,
             createdById: userService.GetUserId()
         );
 
         var globalRoleNameToSet = userRoleService.GetAssociatedGlobalRoleNameForReleaseRole(Contributor);
-        return await userRoleService.UpgradeToGlobalRoleIfRequired(globalRoleNameToSet, userId);
+        return await userRoleService.UpgradeToGlobalRoleIfRequired(globalRoleNameToSet, user.Id);
     }
 
     private async Task<Either<ActionResult, Unit>> ValidateReleaseVersionIds(
