@@ -245,9 +245,7 @@ public abstract class UserManagementServiceTests
 
                 // Check they are ordered by email
                 Assert.True(
-                    pendingInvites
-                        .Select(pi => pi.Email)
-                        .SequenceEqual(pendingInvites.Select(pi => pi.Email).OrderBy(e => e))
+                    pendingInvites.Select(pi => pi.Email).SequenceEqual(pendingInvites.Select(pi => pi.Email).Order())
                 );
 
                 var expectedUserInvite1 = pendingUserInvites[0];
@@ -840,11 +838,7 @@ public abstract class UserManagementServiceTests
                 .ReturnsAsync(userToCancelInvitesFor);
             userRepository
                 .Setup(mock =>
-                    mock.SoftDeleteUser(
-                        It.Is<User>(u => u.Id == userToCancelInvitesFor.Id),
-                        CreatedById,
-                        It.IsAny<CancellationToken>()
-                    )
+                    mock.SoftDeleteUser(userToCancelInvitesFor.Id, CreatedById, It.IsAny<CancellationToken>())
                 )
                 .Returns(Task.CompletedTask);
 
@@ -898,7 +892,6 @@ public abstract class UserManagementServiceTests
 
             var identityUser = new ApplicationUser { Email = internalUser.Email };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -917,13 +910,7 @@ public abstract class UserManagementServiceTests
                 .Setup(mock => mock.FindActiveUserByEmail(internalUser.Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(internalUser);
             userRepository
-                .Setup(mock =>
-                    mock.SoftDeleteUser(
-                        It.Is<User>(u => u.Id == internalUser.Id),
-                        CreatedById,
-                        It.IsAny<CancellationToken>()
-                    )
-                )
+                .Setup(mock => mock.SoftDeleteUser(internalUser.Id, CreatedById, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
@@ -946,11 +933,9 @@ public abstract class UserManagementServiceTests
                 .Setup(mock => mock.RemoveForUser(internalUser.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
                 var service = SetupUserManagementService(
-                    contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     userManager: userManager.Object,
                     userRepository: userRepository.Object,

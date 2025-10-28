@@ -66,7 +66,7 @@ public class SignInService(
         UserProfileFromClaims profile
     )
     {
-        if (userInvitedToSystem.InviteHasExpired())
+        if (userInvitedToSystem.IsInviteExpired())
         {
             await HandleExpiredInvite(profile.Email);
             return new SignInResponseViewModel(LoginResult.ExpiredInvite);

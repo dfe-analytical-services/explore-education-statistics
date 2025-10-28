@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -198,30 +197,36 @@ public class PreReleaseUserService(
 
         return await context.RequireTransaction(async () =>
         {
-            await userRepository.CreateOrUpdate(
+            var createdUser = await userRepository.CreateOrUpdate(
                 email: email,
                 role: Role.PrereleaseUser,
                 createdById: userService.GetUserId()
             );
 
-            return await CreateInactiveUserReleaseInvite(releaseVersion, email)
+            return await CreateInactiveUserReleaseInvite(releaseVersion, createdUser)
                 .OnSuccess(_ => new PreReleaseUserViewModel(email));
         });
     }
 
     private async Task<Either<ActionResult, Unit>> CreateInactiveUserReleaseInvite(
         ReleaseVersion releaseVersion,
-        string email
+        User user
     )
     {
-        if (!await userReleaseInviteRepository.UserHasInvite(releaseVersion.Id, email, ReleaseRole.PrereleaseViewer))
+        if (
+            !await userReleaseInviteRepository.UserHasInvite(
+                releaseVersion.Id,
+                user.Email,
+                ReleaseRole.PrereleaseViewer
+            )
+        )
         {
             var sendEmail = releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved;
             if (sendEmail)
             {
                 // TODO EES-4681 - we're not currently marking this email as having been sent using
                 // MarkInviteEmailAsSent, but should we be doing so?
-                var emailResult = await SendPreReleaseInviteEmail(releaseVersion.Id, email, isNewUser: true);
+                var emailResult = await SendPreReleaseInviteEmail(releaseVersion.Id, user.Email, isNewUser: true);
                 if (emailResult.IsLeft)
                 {
                     return emailResult;
@@ -230,7 +235,7 @@ public class PreReleaseUserService(
 
             await userReleaseInviteRepository.Create(
                 releaseVersionId: releaseVersion.Id,
-                email: email,
+                email: user.Email,
                 releaseRole: ReleaseRole.PrereleaseViewer,
                 emailSent: sendEmail,
                 createdById: userService.GetUserId()

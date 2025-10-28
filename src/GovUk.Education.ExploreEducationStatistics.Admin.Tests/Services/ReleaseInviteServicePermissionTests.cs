@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -142,7 +141,6 @@ public class ReleaseInviteServicePermissionTest
 
     private static ReleaseInviteService SetupReleaseInviteService(
         ContentDbContext? contentDbContext = null,
-        UsersAndRolesDbContext? usersAndRolesDbContext = null,
         IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
         IUserRepository? userRepository = null,
@@ -156,7 +154,6 @@ public class ReleaseInviteServicePermissionTest
     )
     {
         contentDbContext ??= InMemoryApplicationDbContext();
-        usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
         userRepository ??= new UserRepository(contentDbContext);
 
         return new ReleaseInviteService(

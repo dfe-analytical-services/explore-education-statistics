@@ -14,17 +14,21 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
 {
     public async Task<User?> FindPendingUserInviteByEmail(string email, CancellationToken cancellationToken = default)
     {
+        var normalizedEmail = NormaliseEmail(email);
+
         return await contentDbContext
-            .Users.WhereIsPendingInvite()
-            .Where(u => u.Email.ToLower().Equals(email.ToLower()))
+            .Users.WhereInvitePending()
+            .Where(u => u.Email.ToLower().Equals(normalizedEmail))
             .SingleOrDefaultAsync(cancellationToken);
     }
 
     public async Task<User?> FindActiveUserByEmail(string email, CancellationToken cancellationToken = default)
     {
+        var normalizedEmail = NormaliseEmail(email);
+
         return await contentDbContext
             .Users.Where(u => u.Active)
-            .Where(u => u.Email.ToLower().Equals(email.ToLower()))
+            .Where(u => u.Email.ToLower().Equals(normalizedEmail))
             .SingleOrDefaultAsync(cancellationToken);
     }
 
@@ -38,9 +42,11 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
 
     public async Task<User?> FindUserByEmail(string email, CancellationToken cancellationToken = default)
     {
+        var normalizedEmail = NormaliseEmail(email);
+
         return await contentDbContext
             .Users.Where(u => !u.SoftDeleted.HasValue)
-            .Where(u => u.Email.ToLower().Equals(email.ToLower()))
+            .Where(u => u.Email.ToLower().Equals(normalizedEmail))
             .SingleOrDefaultAsync(cancellationToken);
     }
 
@@ -76,18 +82,20 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
         CancellationToken cancellationToken = default
     )
     {
+        var normalizedEmail = NormaliseEmail(email);
+
         if (createdDate > DateTimeOffset.UtcNow)
         {
             throw new ArgumentException($"{nameof(User)} created date cannot be a future date.");
         }
 
         var existingUser = await contentDbContext.Users.SingleOrDefaultAsync(i =>
-            i.Email.ToLower().Equals(email.ToLower())
+            i.Email.ToLower().Equals(normalizedEmail)
         );
 
         return existingUser is null
             ? await CreateNewUser(
-                email: email,
+                email: normalizedEmail,
                 roleId: roleId,
                 createdById: createdById,
                 createdDate: createdDate,
@@ -102,9 +110,11 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
             );
     }
 
-    public async Task SoftDeleteUser(User activeUser, Guid deletedById, CancellationToken cancellationToken = default)
+    public async Task SoftDeleteUser(Guid activeUserId, Guid deletedById, CancellationToken cancellationToken = default)
     {
-        contentDbContext.Attach(activeUser);
+        var activeUser =
+            await FindActiveUserById(activeUserId, cancellationToken)
+            ?? throw new InvalidOperationException("Cannot soft delete a user that is not active.");
 
         activeUser.Active = false;
         activeUser.SoftDeleted = DateTime.UtcNow;
@@ -121,13 +131,15 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
         CancellationToken cancellationToken
     )
     {
+        var normalizedEmail = NormaliseEmail(email);
+
         var newUser = new User
         {
-            Email = email.ToLower(),
+            Email = normalizedEmail,
             RoleId = roleId,
             Active = false,
             CreatedById = createdById,
-            Created = createdDate ?? DateTimeOffset.UtcNow,
+            Created = ToUniversalTime(createdDate),
         };
 
         contentDbContext.Users.Add(newUser);
@@ -153,7 +165,7 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
                     roleId: roleId,
                     cancellationToken: cancellationToken
                 )
-            : existingUser.InviteHasExpired()
+            : existingUser.IsInviteExpired()
                 ? await ResetExpiredUserInvite(
                     user: existingUser,
                     createdById: createdById,
@@ -187,7 +199,7 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
 
         user.RoleId = newRoleId;
         // Always update the created date to the new one, to reset the invite expiry
-        user.Created = createdDate ?? DateTimeOffset.UtcNow;
+        user.Created = ToUniversalTime(createdDate);
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
         return user;
@@ -206,7 +218,7 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
         user.FirstName = null;
         user.LastName = null;
         user.CreatedById = createdById;
-        user.Created = createdDate ?? DateTimeOffset.UtcNow;
+        user.Created = ToUniversalTime(createdDate);
         user.RoleId = roleId;
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
@@ -222,10 +234,15 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
     )
     {
         user.CreatedById = createdById;
-        user.Created = createdDate ?? DateTimeOffset.UtcNow;
+        user.Created = ToUniversalTime(createdDate);
         user.RoleId = roleId;
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
         return user;
     }
+
+    private static string NormaliseEmail(string email) => email.Trim().ToLower();
+
+    private static DateTimeOffset ToUniversalTime(DateTimeOffset? createdDate) =>
+        createdDate?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
 }

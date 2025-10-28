@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
@@ -22,8 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 public class PreviewTokenService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
-    IUserService userService,
-    IUserRepository userRepository
+    IUserService userService
 ) : IPreviewTokenService
 {
     public async Task<Either<ActionResult, PreviewTokenViewModel>> CreatePreviewToken(
@@ -165,22 +163,21 @@ public class PreviewTokenService(
 
     private async Task<PreviewTokenViewModel> MapPreviewToken(PreviewToken previewToken)
     {
-        var createdByUser = await userRepository.FindActiveUserById(previewToken.CreatedByUserId);
+        var createdByEmail = await contentDbContext
+            .Users.Where(u => u.Id == previewToken.CreatedByUserId)
+            .Select(u => u.Email)
+            .SingleAsync();
 
-        return createdByUser is null
-            ? throw new InvalidOperationException(
-                $"No active user found for '{nameof(previewToken.CreatedByUserId)}' '{previewToken.CreatedByUserId}'."
-            )
-            : new PreviewTokenViewModel
-            {
-                Id = previewToken.Id,
-                Label = previewToken.Label,
-                Status = previewToken.Status,
-                CreatedByEmail = createdByUser.Email,
-                Created = previewToken.Created,
-                Activates = previewToken.Activates,
-                Expires = previewToken.Expires,
-                Updated = previewToken.Updated,
-            };
+        return new PreviewTokenViewModel
+        {
+            Id = previewToken.Id,
+            Label = previewToken.Label,
+            Status = previewToken.Status,
+            CreatedByEmail = createdByEmail,
+            Created = previewToken.Created,
+            Activates = previewToken.Activates,
+            Expires = previewToken.Expires,
+            Updated = previewToken.Updated,
+        };
     }
 }

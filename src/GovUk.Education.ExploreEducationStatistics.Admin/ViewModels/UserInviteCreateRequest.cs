@@ -11,7 +11,7 @@ public class UserInviteCreateRequest
     [Required(AllowEmptyStrings = false)]
     public string RoleId { get; set; } = string.Empty;
 
-    public DateTimeOffset? CreatedDate { get; set; } = null;
+    public DateTimeOffset? CreatedDate { get; set; }
 
     public List<UserReleaseRoleCreateRequest> UserReleaseRoles { get; set; } = new();
 
