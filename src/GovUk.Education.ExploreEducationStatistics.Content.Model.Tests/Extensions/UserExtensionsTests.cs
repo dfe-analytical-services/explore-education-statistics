@@ -52,12 +52,11 @@ public class UserExtensionsTests
         bool expectIsPendingInvite
     )
     {
-        var user = _dataFixture
+        User user = _dataFixture
             .DefaultUser()
             .WithActive(active)
             .WithSoftDeleted(softDeletedDate)
-            .WithCreated(createdDate)
-            .Generate();
+            .WithCreated(createdDate);
 
         Assert.Equal(expectIsPendingInvite, user.IsInvitePending());
     }
@@ -71,12 +70,11 @@ public class UserExtensionsTests
         bool expectInviteHasExpired
     )
     {
-        var user = _dataFixture
+        User user = _dataFixture
             .DefaultUser()
             .WithActive(active)
             .WithSoftDeleted(softDeletedDate)
-            .WithCreated(createdDate)
-            .Generate();
+            .WithCreated(createdDate);
 
         Assert.Equal(expectInviteHasExpired, user.IsInviteExpired());
     }

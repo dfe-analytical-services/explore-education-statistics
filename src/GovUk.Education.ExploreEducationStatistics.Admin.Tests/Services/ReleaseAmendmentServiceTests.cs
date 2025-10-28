@@ -34,9 +34,9 @@ public class ReleaseAmendmentServiceTests
     [Fact]
     public async Task CreateReleaseAmendment()
     {
-        var originalCreatedBy = _fixture.DefaultUser().Generate();
+        User originalCreatedBy = _fixture.DefaultUser();
 
-        var amendmentCreator = _fixture.DefaultUser().WithId(_userId).Generate();
+        User amendmentCreator = _fixture.DefaultUser().WithId(_userId);
 
         var dataBlockParents = _fixture
             .DefaultDataBlockParent()

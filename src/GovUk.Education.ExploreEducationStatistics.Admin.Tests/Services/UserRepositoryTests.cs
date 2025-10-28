@@ -21,7 +21,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task ActiveUser_ReturnsNull()
         {
-            var user = _dataFixture.DefaultUser().Generate();
+            User user = _dataFixture.DefaultUser();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -42,7 +42,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithPendingInvite_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUserWithPendingInvite().Generate();
+            User user = _dataFixture.DefaultUserWithPendingInvite();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -64,7 +64,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithExpiredInvite_ReturnsNull()
         {
-            var user = _dataFixture.DefaultUserWithExpiredInvite().Generate();
+            User user = _dataFixture.DefaultUserWithExpiredInvite();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -85,7 +85,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task DifferentCase_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUserWithPendingInvite().WithEmail("test@test.com").Generate();
+            User user = _dataFixture.DefaultUserWithPendingInvite().WithEmail("test@test.com");
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -108,7 +108,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task SoftDeletedUser_ReturnsNull()
         {
-            var user = _dataFixture.DefaultSoftDeletedUser().Generate();
+            User user = _dataFixture.DefaultSoftDeletedUser();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -143,7 +143,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task ActiveUser_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUser().Generate();
+            User user = _dataFixture.DefaultUser();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -165,7 +165,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithPendingInvite_ReturnsNull()
         {
-            var user = _dataFixture.DefaultUserWithPendingInvite().Generate();
+            User user = _dataFixture.DefaultUserWithPendingInvite();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -186,7 +186,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithExpiredInvite_ReturnsNull()
         {
-            var user = _dataFixture.DefaultUserWithExpiredInvite().Generate();
+            User user = _dataFixture.DefaultUserWithExpiredInvite();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -207,7 +207,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task DifferentCase_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUser().WithEmail("test@test.com").Generate();
+            User user = _dataFixture.DefaultUser().WithEmail("test@test.com");
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -230,7 +230,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task SoftDeletedUser_ReturnsNull()
         {
-            var user = _dataFixture.DefaultSoftDeletedUser().Generate();
+            User user = _dataFixture.DefaultSoftDeletedUser();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -265,7 +265,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task ActiveUser_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUser().Generate();
+            User user = _dataFixture.DefaultUser();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -287,7 +287,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithPendingInvite_ReturnsNull()
         {
-            var user = _dataFixture.DefaultUserWithPendingInvite().Generate();
+            User user = _dataFixture.DefaultUserWithPendingInvite();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -308,7 +308,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithExpiredInvite_ReturnsNull()
         {
-            var user = _dataFixture.DefaultUserWithExpiredInvite().Generate();
+            User user = _dataFixture.DefaultUserWithExpiredInvite();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -329,7 +329,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task SoftDeletedUser_ReturnsNull()
         {
-            var user = _dataFixture.DefaultSoftDeletedUser().Generate();
+            User user = _dataFixture.DefaultSoftDeletedUser();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -364,7 +364,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task ActiveUser_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUser().Generate();
+            User user = _dataFixture.DefaultUser();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -386,7 +386,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithPendingInvite_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUserWithPendingInvite().Generate();
+            User user = _dataFixture.DefaultUserWithPendingInvite();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -408,7 +408,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithExpiredInvite_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUserWithExpiredInvite().Generate();
+            User user = _dataFixture.DefaultUserWithExpiredInvite();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -430,7 +430,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task DifferentCase_ReturnsUser()
         {
-            var user = _dataFixture.DefaultUser().WithEmail("test@test.com").Generate();
+            User user = _dataFixture.DefaultUser().WithEmail("test@test.com");
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -453,7 +453,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task SoftDeletedUser_ReturnsNull()
         {
-            var user = _dataFixture.DefaultSoftDeletedUser().Generate();
+            User user = _dataFixture.DefaultSoftDeletedUser();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -488,7 +488,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task Success()
         {
-            var user = _dataFixture.DefaultDeletedUserPlaceholder().Generate();
+            User user = _dataFixture.DefaultDeletedUserPlaceholder();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -528,7 +528,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task Success()
         {
-            var user = _dataFixture.DefaultUser().Generate();
+            User user = _dataFixture.DefaultUser();
             var deletedById = Guid.NewGuid();
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -567,7 +567,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task ActiveUser_ThrowsException()
         {
-            var user = _dataFixture.DefaultUser().Generate();
+            User user = _dataFixture.DefaultUser();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -613,12 +613,11 @@ public abstract class UserRepositoryTests
             var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
             var newCreatedDate = DateTimeOffset.UtcNow.AddDays(-1);
 
-            var user = _dataFixture
+            User user = _dataFixture
                 .DefaultUserWithPendingInvite()
                 .WithRoleId(oldRole.GetEnumValue())
                 .WithCreatedById(oldCreatedById)
-                .WithCreated(oldCreatedDate)
-                .Generate();
+                .WithCreated(oldCreatedDate);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -679,7 +678,7 @@ public abstract class UserRepositoryTests
         {
             var newCreatedDate = new DateTimeOffset(2025, 10, 28, 12, 0, 0, TimeSpan.FromHours(1));
 
-            var user = _dataFixture.DefaultUserWithPendingInvite().Generate();
+            User user = _dataFixture.DefaultUserWithPendingInvite();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -717,7 +716,7 @@ public abstract class UserRepositoryTests
         {
             var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
 
-            var user = _dataFixture.DefaultUserWithPendingInvite().WithCreated(oldCreatedDate).Generate();
+            User user = _dataFixture.DefaultUserWithPendingInvite().WithCreated(oldCreatedDate);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -768,11 +767,10 @@ public abstract class UserRepositoryTests
             var newCreatedById = Guid.NewGuid();
             var newCreatedDate = DateTimeOffset.UtcNow.AddDays(-1);
 
-            var user = _dataFixture
+            User user = _dataFixture
                 .DefaultUserWithExpiredInvite()
                 .WithRoleId(oldRole.GetEnumValue())
-                .WithCreatedById(oldCreatedById)
-                .Generate();
+                .WithCreatedById(oldCreatedById);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -833,7 +831,7 @@ public abstract class UserRepositoryTests
         {
             var newCreatedDate = new DateTimeOffset(2025, 10, 28, 12, 0, 0, TimeSpan.FromHours(1));
 
-            var user = _dataFixture.DefaultUserWithExpiredInvite().Generate();
+            User user = _dataFixture.DefaultUserWithExpiredInvite();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -869,7 +867,7 @@ public abstract class UserRepositoryTests
         [Fact]
         public async Task UserWithExpiredInvite_CreatedDateNotSupplied_UpdatesUserCreatedDateToNow()
         {
-            var user = _dataFixture.DefaultUserWithExpiredInvite().Generate();
+            User user = _dataFixture.DefaultUserWithExpiredInvite();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -921,12 +919,11 @@ public abstract class UserRepositoryTests
             var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
             var newCreatedDate = DateTimeOffset.UtcNow.AddDays(-1);
 
-            var user = _dataFixture
+            User user = _dataFixture
                 .DefaultSoftDeletedUser()
                 .WithRoleId(oldRole.GetEnumValue())
                 .WithCreatedById(oldCreatedById)
-                .WithCreated(oldCreatedDate)
-                .Generate();
+                .WithCreated(oldCreatedDate);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -987,7 +984,7 @@ public abstract class UserRepositoryTests
         {
             var newCreatedDate = new DateTimeOffset(2025, 10, 28, 12, 0, 0, TimeSpan.FromHours(1));
 
-            var user = _dataFixture.DefaultSoftDeletedUser().Generate();
+            User user = _dataFixture.DefaultSoftDeletedUser();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -1025,7 +1022,7 @@ public abstract class UserRepositoryTests
         {
             var oldCreatedDate = DateTimeOffset.UtcNow.AddDays(-2);
 
-            var user = _dataFixture.DefaultSoftDeletedUser().WithCreated(oldCreatedDate).Generate();
+            User user = _dataFixture.DefaultSoftDeletedUser().WithCreated(oldCreatedDate);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -1108,7 +1105,7 @@ public abstract class UserRepositoryTests
         {
             var newCreatedDate = DateTimeOffset.UtcNow.AddDays(1);
 
-            var user = _dataFixture.DefaultUserWithPendingInvite().Generate();
+            User user = _dataFixture.DefaultUserWithPendingInvite();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 

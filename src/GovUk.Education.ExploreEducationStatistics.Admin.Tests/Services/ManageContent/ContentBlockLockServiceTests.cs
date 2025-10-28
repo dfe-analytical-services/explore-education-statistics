@@ -31,13 +31,12 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var user = _dataFixture
+        User user = _dataFixture
             .DefaultUser()
             .WithId(_defaultUserId)
             .WithFirstName("Jane")
             .WithLastName("Doe")
-            .WithEmail("jane@test.com")
-            .Generate();
+            .WithEmail("jane@test.com");
 
         var contentBlock = new HtmlBlock
         {
@@ -106,13 +105,12 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var user = _dataFixture
+        User user = _dataFixture
             .DefaultUser()
             .WithId(_defaultUserId)
             .WithFirstName("Jane")
             .WithLastName("Doe")
-            .WithEmail("jane@test.com")
-            .Generate();
+            .WithEmail("jane@test.com");
 
         var previousLocked = DateTime.UtcNow.AddMinutes(-9);
 
@@ -192,20 +190,18 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var previousUser = _dataFixture
+        User previousUser = _dataFixture
             .DefaultUser()
             .WithFirstName("Rob")
             .WithLastName("Rowe")
-            .WithEmail("rob@test.com")
-            .Generate();
+            .WithEmail("rob@test.com");
 
-        var nextUser = _dataFixture
+        User nextUser = _dataFixture
             .DefaultUser()
             .WithId(_defaultUserId)
             .WithFirstName("Jane")
             .WithLastName("Doe")
-            .WithEmail("jane@test.com")
-            .Generate();
+            .WithEmail("jane@test.com");
 
         var contentBlock = new HtmlBlock
         {
@@ -285,13 +281,12 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var user = _dataFixture
+        User user = _dataFixture
             .DefaultUser()
             .WithId(_defaultUserId)
             .WithFirstName("Jane")
             .WithLastName("Doe")
-            .WithEmail("jane@test.com")
-            .Generate();
+            .WithEmail("jane@test.com");
 
         var contentBlock = new HtmlBlock
         {
@@ -370,20 +365,18 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var previousUser = _dataFixture
+        User previousUser = _dataFixture
             .DefaultUser()
             .WithFirstName("Rob")
             .WithLastName("Rowe")
-            .WithEmail("rob@test.com")
-            .Generate();
+            .WithEmail("rob@test.com");
 
-        var nextUser = _dataFixture
+        User nextUser = _dataFixture
             .DefaultUser()
             .WithId(_defaultUserId)
             .WithFirstName("Jane")
             .WithLastName("Doe")
-            .WithEmail("jane@test.com")
-            .Generate();
+            .WithEmail("jane@test.com");
 
         var locked = DateTime.UtcNow.AddMinutes(-9);
 
@@ -435,20 +428,14 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var user1 = _dataFixture
+        User user1 = _dataFixture
             .DefaultUser()
             .WithId(_defaultUserId)
             .WithFirstName("Jane")
             .WithLastName("Doe")
-            .WithEmail("jane@test.com")
-            .Generate();
+            .WithEmail("jane@test.com");
 
-        var user2 = _dataFixture
-            .DefaultUser()
-            .WithFirstName("Rob")
-            .WithLastName("Rowe")
-            .WithEmail("rob@test.com")
-            .Generate();
+        User user2 = _dataFixture.DefaultUser().WithFirstName("Rob").WithLastName("Rowe").WithEmail("rob@test.com");
 
         var contentBlock = new HtmlBlock
         {
@@ -575,13 +562,12 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var user = _dataFixture
+        User user = _dataFixture
             .DefaultUser()
             .WithId(_defaultUserId)
             .WithFirstName("Jane")
             .WithLastName("Doe")
-            .WithEmail("jane@test.com")
-            .Generate();
+            .WithEmail("jane@test.com");
 
         var contentBlock = new HtmlBlock
         {
@@ -648,20 +634,18 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var nextUser = _dataFixture
+        User nextUser = _dataFixture
             .DefaultUser()
             .WithId(_defaultUserId)
             .WithFirstName("Jane")
             .WithLastName("Doe")
-            .WithEmail("jane@test.com")
-            .Generate();
+            .WithEmail("jane@test.com");
 
-        var previousUser = _dataFixture
+        User previousUser = _dataFixture
             .DefaultUser()
             .WithFirstName("Rob")
             .WithLastName("Rowe")
-            .WithEmail("rob@test.com")
-            .Generate();
+            .WithEmail("rob@test.com");
 
         var contentBlock = new HtmlBlock
         {
@@ -731,20 +715,18 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var nextUser = _dataFixture
+        User nextUser = _dataFixture
             .DefaultUser()
             .WithId(_defaultUserId)
             .WithFirstName("Jane")
             .WithLastName("Doe")
-            .WithEmail("jane@test.com")
-            .Generate();
+            .WithEmail("jane@test.com");
 
-        var previousUser = _dataFixture
+        User previousUser = _dataFixture
             .DefaultUser()
             .WithFirstName("Rob")
             .WithLastName("Rowe")
-            .WithEmail("rob@test.com")
-            .Generate();
+            .WithEmail("rob@test.com");
 
         var locked = DateTime.UtcNow.AddMinutes(-5);
 
@@ -791,20 +773,18 @@ public class ContentBlockLockServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var nextUser = _dataFixture
+        User nextUser = _dataFixture
             .DefaultUser()
             .WithId(_defaultUserId)
             .WithFirstName("Jane")
             .WithLastName("Doe")
-            .WithEmail("jane@test.com")
-            .Generate();
+            .WithEmail("jane@test.com");
 
-        var previousUser = _dataFixture
+        User previousUser = _dataFixture
             .DefaultUser()
             .WithFirstName("Rob")
             .WithLastName("Rowe")
-            .WithEmail("rob@test.com")
-            .Generate();
+            .WithEmail("rob@test.com");
 
         var locked = DateTime.UtcNow.AddMinutes(-5);
 

@@ -32,7 +32,7 @@ public class SignInServiceTests
         const string firstName = "new";
         const string lastName = "user";
 
-        var invitedUser = _dataFixture
+        User invitedUser = _dataFixture
             .DefaultUserWithPendingInvite()
             .WithRole(
                 new IdentityRole
@@ -41,8 +41,7 @@ public class SignInServiceTests
                     Name = "Role",
                     NormalizedName = "ROLE",
                 }
-            )
-            .Generate();
+            );
 
         var userReleaseInvites = _dataFixture
             .DefaultUserReleaseInvite()
@@ -243,7 +242,7 @@ public class SignInServiceTests
     [Fact]
     public async Task RegisterOrSignIn_SoftDeletedUser_ReturnsNoInviteResult()
     {
-        var softDeletedUser = _dataFixture
+        User softDeletedUser = _dataFixture
             .DefaultSoftDeletedUser()
             .WithRole(
                 new IdentityRole
@@ -252,8 +251,7 @@ public class SignInServiceTests
                     Name = "Role",
                     NormalizedName = "ROLE",
                 }
-            )
-            .Generate();
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -302,7 +300,7 @@ public class SignInServiceTests
         const string firstName = "Bill";
         const string lastName = "Piper";
 
-        var userWithExpiredInvite = _dataFixture
+        User userWithExpiredInvite = _dataFixture
             .DefaultUserWithExpiredInvite()
             .WithRole(
                 new IdentityRole
@@ -311,8 +309,7 @@ public class SignInServiceTests
                     Name = "Role",
                     NormalizedName = "ROLE",
                 }
-            )
-            .Generate();
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var usersAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -397,7 +394,7 @@ public class SignInServiceTests
         const string firstName = "new";
         const string lastName = "user";
 
-        var invitedUser = _dataFixture
+        User invitedUser = _dataFixture
             .DefaultUserWithPendingInvite()
             .WithRole(
                 new IdentityRole
@@ -406,8 +403,7 @@ public class SignInServiceTests
                     Name = "Role",
                     NormalizedName = "ROLE",
                 }
-            )
-            .Generate();
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var usersAndRolesDbContextId = Guid.NewGuid().ToString();

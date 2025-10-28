@@ -58,7 +58,7 @@ public class BootstrapUsersServiceTests
     [Fact]
     public void AddBootstrapUsers_UsersAlreadyExist_DoesNothing()
     {
-        User placeholderDeletedUser = _dataFixture.DefaultDeletedUserPlaceholder().Generate();
+        User placeholderDeletedUser = _dataFixture.DefaultDeletedUserPlaceholder();
         var (user1, user2) = _dataFixture
             .DefaultUser()
             .ForIndex(0, s => s.SetEmail("test1@test.com"))
@@ -106,8 +106,8 @@ public class BootstrapUsersServiceTests
     [Fact]
     public void AddBootstrapUsers_SomeUsersAreNew_CreatesNewUsers()
     {
-        var placeholderDeletedUser = _dataFixture.DefaultDeletedUserPlaceholder().Generate();
-        var existingUser = _dataFixture.DefaultUser().WithEmail("test1@test.com").Generate();
+        User placeholderDeletedUser = _dataFixture.DefaultDeletedUserPlaceholder();
+        User existingUser = _dataFixture.DefaultUser().WithEmail("test1@test.com");
 
         var newUserEmail1 = "test2@test.com";
         var newUserEmail2 = "test3@test.com";

@@ -574,7 +574,7 @@ public abstract class PreReleaseUserServiceTests
                 .WithApprovalStatus(ReleaseApprovalStatus.Approved)
                 .WithPublishScheduled(PublishedScheduledStartOfDay);
 
-            var user = _dataFixture.DefaultUser().Generate();
+            User user = _dataFixture.DefaultUser();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -644,7 +644,7 @@ public abstract class PreReleaseUserServiceTests
                 .WithApprovalStatus(ReleaseApprovalStatus.Approved)
                 .WithPublishScheduled(PublishedScheduledStartOfDay);
 
-            var userToCreate = _dataFixture.DefaultUser().Generate();
+            User userToCreate = _dataFixture.DefaultUser();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -1242,7 +1242,7 @@ public abstract class PreReleaseUserServiceTests
         [Fact]
         public async Task Success()
         {
-            var user = _dataFixture.DefaultUser().Generate();
+            User user = _dataFixture.DefaultUser();
 
             var releaseVersion = _dataFixture
                 .DefaultReleaseVersion()
