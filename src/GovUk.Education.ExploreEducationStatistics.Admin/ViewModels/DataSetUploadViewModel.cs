@@ -23,5 +23,7 @@ public record DataSetUploadViewModel
 
     public required string UploadedBy { get; set; }
 
+    public bool? PublicApiCompatible { get; set; }
+
     public Guid? ReplacingFileId { get; init; }
 }

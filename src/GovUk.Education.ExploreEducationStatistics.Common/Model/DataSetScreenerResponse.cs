@@ -12,4 +12,7 @@ public record DataSetScreenerResponse
 
     [JsonPropertyName("results_table")]
     public List<DataScreenerTestResult> TestResults { get; init; } = [];
+
+    [JsonPropertyName("api_suitable")]
+    public bool PublicApiCompatible { get; set; }
 }

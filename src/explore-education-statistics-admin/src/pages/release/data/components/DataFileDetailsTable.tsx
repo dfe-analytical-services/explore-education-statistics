@@ -11,6 +11,7 @@ import { useConfig } from '@admin/contexts/ConfigContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 import getDataSetVersionStatusText from './utils/getDataSetVersionStatusText';
+import ApiCompatibilityTag from './ApiCompatibilityTag';
 
 interface Props {
   children?: ReactNode;
@@ -231,6 +232,25 @@ const DataFileDetailsTable = ({
             )}
           </tr>
         )}
+        <tr>
+          <th scope="row">API compatible</th>
+          <td data-testid="API compatible">
+            <div className="dfe-flex dfe-align-items--center">
+              <ApiCompatibilityTag
+                isCompatible={dataFile?.publicApiCompatible}
+              />
+            </div>
+          </td>
+          {replacementDataFile && (
+            <td data-testid="Replacement API compatible">
+              <div className="dfe-flex dfe-align-items--center">
+                <ApiCompatibilityTag
+                  isCompatible={replacementDataFile?.publicApiCompatible}
+                />
+              </div>
+            </td>
+          )}
+        </tr>
 
         {children && (
           <tr>

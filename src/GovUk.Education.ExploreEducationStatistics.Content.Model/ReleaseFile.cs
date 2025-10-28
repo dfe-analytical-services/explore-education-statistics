@@ -21,6 +21,8 @@ public class ReleaseFile
 
     public int Order { get; set; }
 
+    public bool? PublicApiCompatible { get; set; }
+
     public Guid? PublicApiDataSetId { get; set; }
 
     public SemVersion? PublicApiDataSetVersion { get; set; }
