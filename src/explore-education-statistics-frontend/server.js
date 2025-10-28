@@ -39,6 +39,11 @@ const cspConnectSrc = [
   'https://*.google-analytics.com',
   'https://*.analytics.google.com',
   'https://dc.services.visualstudio.com/v2/track',
+
+  // To allow a {PUBLIC_URL}/api requests when browsing the public site
+  // from azurewebsites.net or azurefd.net (app service or front door urls),
+  // which we may want to do for testing/debugging
+  `${process.env.PUBLIC_URL.replace(/\/$/, '')}/api/`,
 ];
 
 const cspScriptSrc = [
@@ -57,7 +62,7 @@ const url = new URL(process.env.PUBLIC_URL);
 const app = next({
   dev,
   hostname: url.hostname,
-  port: process.env.PORT || 3000,
+  port,
 });
 const handleRequest = app.getRequestHandler();
 
