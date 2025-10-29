@@ -1,10 +1,10 @@
-import DetailsMenu from '@common/components/DetailsMenu';
 import FormFieldCheckboxSearchSubGroups, {
   FormFieldCheckboxSearchSubGroupsProps,
 } from '@common/components/form/FormFieldCheckboxSearchSubGroups';
 import FormCheckboxSelectedCount from '@common/components/form/FormCheckboxSelectedCount';
+import FilterAccordion from '@common/modules/table-tool/components/FilterAccordion';
 import { OmitStrict } from '@common/types';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FieldValues, useFormContext } from 'react-hook-form';
 import get from 'lodash/get';
 
@@ -22,7 +22,15 @@ interface Props<TFormValues extends FieldValues>
 export default function FormFieldCheckboxGroupsMenu<
   TFormValues extends FieldValues,
 >(props: Props<TFormValues>) {
-  const { hiddenText, legend, name, open = false, id, onToggle } = props;
+  const {
+    hiddenText,
+    legend,
+    name,
+    open: defaultOpen = false,
+    id,
+    onToggle,
+  } = props;
+  const [open, setOpen] = useState(defaultOpen);
 
   const {
     formState: { errors },
@@ -33,22 +41,27 @@ export default function FormFieldCheckboxGroupsMenu<
   // an option in the group.
   useEffect(() => {
     if (!open && get(errors, name)) {
+      setOpen(true);
       onToggle?.(true);
     }
   }, [errors, name, open, onToggle]);
 
+  useEffect(() => {
+    setOpen(defaultOpen);
+  }, [defaultOpen]);
+
   return (
-    <DetailsMenu
-      id={`details-${id}`}
+    <FilterAccordion
+      id={`${id}-options`}
       open={open}
-      hiddenText={hiddenText}
-      jsRequired
+      label={legend}
+      labelAfter={<FormCheckboxSelectedCount name={name} />}
+      labelHiddenText={hiddenText}
       preventToggle={!!get(errors, name)}
-      summary={legend}
-      summaryAfter={<FormCheckboxSelectedCount name={name} />}
+      testId={`${id}-accordion`}
       onToggle={onToggle}
     >
       <FormFieldCheckboxSearchSubGroups {...props} legendHidden />
-    </DetailsMenu>
+    </FilterAccordion>
   );
 }

@@ -260,33 +260,25 @@ describe('LocationFiltersForm', () => {
 
     await userEvent.click(screen.getByLabelText('Local authority 2'));
 
-    expect(
-      screen.getByRole('button', {
-        name: 'Local authority - 1 selected',
-      }),
-    ).toBeInTheDocument();
+    const countrySection = within(
+      screen.getByTestId('locations-country-accordion'),
+    );
+    const localAuthoritySection = within(
+      screen.getByTestId('locations-localAuthority-accordion'),
+    );
+    const regionSection = within(
+      screen.getByTestId('locations-region-accordion'),
+    );
+
+    expect(localAuthoritySection.getByText('1 selected')).toBeInTheDocument();
 
     await userEvent.click(screen.getByLabelText('Local authority 3'));
     await userEvent.click(screen.getByLabelText('Country 1'));
     await userEvent.click(screen.getByLabelText('Region 2'));
 
-    expect(
-      screen.getByRole('button', {
-        name: 'Local authority - 2 selected',
-      }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole('button', {
-        name: 'Country - 1 selected',
-      }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole('button', {
-        name: 'Region - 1 selected',
-      }),
-    ).toBeInTheDocument();
+    expect(localAuthoritySection.getByText('2 selected')).toBeInTheDocument();
+    expect(countrySection.getByText('1 selected')).toBeInTheDocument();
+    expect(regionSection.getByText('1 selected')).toBeInTheDocument();
   });
 
   test('selecting options shows the number of selected options for each location group (with nested groups)', async () => {
@@ -299,28 +291,22 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
+    const countrySection = within(
+      screen.getByTestId('locations-country-accordion'),
+    );
+    const localAuthoritySection = within(
+      screen.getByTestId('locations-localAuthority-accordion'),
+    );
+
     await userEvent.click(screen.getByLabelText('Local authority 2'));
 
-    expect(
-      screen.getByRole('button', {
-        name: 'Local authority - 1 selected',
-      }),
-    ).toBeInTheDocument();
+    expect(localAuthoritySection.getByText('1 selected')).toBeInTheDocument();
 
     await userEvent.click(screen.getByLabelText('Local authority 3'));
     await userEvent.click(screen.getByLabelText('Country 1'));
 
-    expect(
-      screen.getByRole('button', {
-        name: 'Local authority - 2 selected',
-      }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole('button', {
-        name: 'Country - 1 selected',
-      }),
-    ).toBeInTheDocument();
+    expect(localAuthoritySection.getByText('2 selected')).toBeInTheDocument();
+    expect(countrySection.getByText('1 selected')).toBeInTheDocument();
   });
 
   test('shows validation errors if no location is selected', async () => {
@@ -410,11 +396,10 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    expect(
-      screen.getByRole('button', {
-        name: 'Country - 1 selected',
-      }),
-    ).toBeInTheDocument();
+    const countrySection = within(
+      screen.getByTestId('locations-country-accordion'),
+    );
+    expect(countrySection.getByText('1 selected')).toBeInTheDocument();
 
     const country = within(screen.getByRole('group', { name: 'Country' }));
 
@@ -457,11 +442,11 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    expect(
-      screen.getByRole('button', {
-        name: 'Local authority - 1 selected',
-      }),
-    ).toBeInTheDocument();
+    const localAuthoritySection = within(
+      screen.getByTestId('locations-localAuthority-accordion'),
+    );
+
+    expect(localAuthoritySection.getByText('1 selected')).toBeInTheDocument();
 
     const localAuthority = within(
       screen.getByRole('group', { name: 'Local authority' }),
@@ -474,7 +459,6 @@ describe('LocationFiltersForm', () => {
     expect(localAuthority.getByLabelText('Local authority 1')).toEqual(
       checkboxes[0],
     );
-    expect(localAuthority.getByLabelText('Local authority 1')).toBeVisible();
     expect(localAuthority.getByLabelText('Local authority 1')).toBeChecked();
   });
 

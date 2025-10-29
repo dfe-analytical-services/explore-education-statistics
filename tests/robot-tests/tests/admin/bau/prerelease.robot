@@ -523,7 +523,7 @@ Unschedule release
 user chooses location, time period and filters
     user waits until table tool wizard step is available    2    Choose locations    %{WAIT_MEDIUM}
 
-    user opens details dropdown    Ward
+    user clicks button    Ward
     user clicks checkbox    Nailsea Youngwood
     user clicks checkbox    Syon
     user clicks element    id:locationFiltersForm-submit

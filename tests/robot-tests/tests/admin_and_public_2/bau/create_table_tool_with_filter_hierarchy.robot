@@ -77,17 +77,17 @@ Check indicator is selected
     user checks checkbox is checked    Number of achievers
 
 Select filter hierarchy options
-    user opens details dropdown    Ethnicity minor (2 tiers)
+    user clicks button    Ethnicity minor (2 tiers)
     user clicks category checkbox    Browse all tiers of ethnicity minor    Asian
-    user opens details dropdown    Show ethnicity minor
-    user clicks button containing text    Select all 2 options
-    user closes details dropdown    Close ethnicity minor
-    user closes details dropdown    Ethnicity minor (2 tiers)
+    user clicks button    Show sub categories for asian
+    user clicks button containing text    Select all sub categories for asian
+    user clicks button    Close this sub category
+    user clicks button    Ethnicity minor (2 tiers)
 
-    user opens details dropdown    Learning aim title (3 tiers)
+    user clicks button    Learning aim title (3 tiers)
     user clicks category checkbox    Browse all tiers of learning aim title    Total
-    user opens details dropdown    Show qualification
-    user opens details dropdown    Show learning aim title
+    user clicks button    Show sub categories for digital technology
+    user clicks button    Show sub categories for award
     user clicks category checkbox    Browse all tiers of learning aim title    Cycle Mechanics
     user clicks category checkbox    Browse all tiers of learning aim title    Games Design and Development
     user clicks category checkbox    Browse all tiers of learning aim title    IT Users (ITQ)
@@ -236,17 +236,17 @@ Check indicator is selected
     user checks checkbox is checked    Number of achievers
 
 Select filter hierarchy options
-    user opens details dropdown    Ethnicity minor (2 tiers)
+    user clicks button    Ethnicity minor (2 tiers)
     user clicks category checkbox    Browse all tiers of ethnicity minor    Asian
-    user opens details dropdown    Show ethnicity minor
-    user clicks button containing text    Select all 2 options
-    user closes details dropdown    Close ethnicity minor
-    user closes details dropdown    Ethnicity minor (2 tiers)
+    user clicks button    Show sub categories for asian
+    user clicks button containing text    Select all sub categories for asian
+    user clicks button    Close this sub category
+    user clicks button    Ethnicity minor (2 tiers)
 
-    user opens details dropdown    Learning aim title (3 tiers)
+    user clicks button    Learning aim title (3 tiers)
     user clicks category checkbox    Browse all tiers of learning aim title    Total
-    user opens details dropdown    Show qualification
-    user opens details dropdown    Show learning aim title
+    user clicks button    Show sub categories for digital technology
+    user clicks button    Show sub categories for award
     user clicks category checkbox    Browse all tiers of learning aim title    Cycle Mechanics
     user clicks category checkbox    Browse all tiers of learning aim title    Games Design and Development
     user clicks category checkbox    Browse all tiers of learning aim title    IT Users (ITQ)

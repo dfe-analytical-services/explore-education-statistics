@@ -1,269 +1,22 @@
 import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
+import render from '@common-test/render';
 import FiltersForm, {
   TableQueryErrorCode,
 } from '@common/modules/table-tool/components/FiltersForm';
 import { testWizardStepProps } from '@common/modules/table-tool/components/__tests__/__data__/testWizardStepProps';
-import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
-import { render, screen, within, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import {
+  testSubject,
+  testSubjectMeta,
+  testSubjectMetaOneIndicator,
+  testSubjectMetaSingleFilters,
+  testSubjectMetaWithFilterHierarchy,
+} from '@common/modules/table-tool/components/__tests__/__data__/testFiltersData.data';
+import { screen, within, waitFor } from '@testing-library/react';
 import { produce } from 'immer';
 import noop from 'lodash/noop';
 import React from 'react';
 
 describe('FiltersForm', () => {
-  const testSubjectMeta: SubjectMeta = {
-    filters: {
-      SchoolType: {
-        id: 'school-type',
-        autoSelectFilterItemId: '',
-        hint: 'Filter by school type',
-        legend: 'School type',
-        options: {
-          Default: {
-            id: 'default',
-            label: 'Default',
-            options: [
-              {
-                label: 'State-funded secondary',
-                value: 'state-funded-secondary',
-              },
-              {
-                label: 'Special',
-                value: 'special',
-              },
-            ],
-            order: 0,
-          },
-        },
-        name: 'school_type',
-        order: 0,
-      },
-      Characteristic: {
-        id: 'characteristic',
-        autoSelectFilterItemId: '',
-        hint: 'Filter by pupil characteristic',
-        legend: 'Characteristic',
-        options: {
-          EthnicGroupMajor: {
-            id: 'ethnic-group-major',
-            label: 'Ethnic group major',
-            options: [
-              {
-                label: 'Ethnicity Major Black Total',
-                value: 'ethnicity-major-black-total',
-              },
-              {
-                label: 'Ethnicity Major Mixed Total',
-                value: 'ethnicity-major-mixed-total',
-              },
-              {
-                label: 'Ethnicity Major Asian Total',
-                value: 'ethnicity-major-asian-total',
-              },
-            ],
-            order: 0,
-          },
-          Gender: {
-            id: 'Gender',
-            label: 'Gender',
-            options: [
-              {
-                label: 'Gender female',
-                value: 'gender-female',
-              },
-              {
-                label: 'Gender male',
-                value: 'gender-male',
-              },
-            ],
-            order: 1,
-          },
-          Total: {
-            id: 'total',
-            label: 'Total',
-            options: [
-              {
-                label: 'Total',
-                value: 'total',
-              },
-            ],
-            order: 2,
-          },
-        },
-        name: 'characteristic',
-        order: 1,
-      },
-    },
-    indicators: {
-      AbsenceByReason: {
-        id: 'absence-by-reason',
-        label: 'Absence by reason',
-        options: [
-          {
-            label: 'Number of excluded sessions',
-            unit: '',
-            value: 'number-excluded-sessions',
-            name: 'sess_auth_excluded',
-          },
-          {
-            label: 'Number of unauthorised reasons sessions',
-            unit: '',
-            value: 'number-unauthorised-reasons-sessions',
-            name: 'sess_unauth_totalreasons',
-          },
-        ],
-        order: 0,
-      },
-      AbsenceFields: {
-        id: 'absence-fields',
-        label: 'Absence fields',
-        options: [
-          {
-            label: 'Authorised absence rate',
-            unit: '%',
-            value: 'authorised-absence-rate',
-            name: 'sess_authorised_percent',
-          },
-          {
-            label: 'Number of overall absence sessions',
-            unit: '',
-            value: 'number-overall-absence-sessions',
-            name: 'sess_overall',
-          },
-          {
-            label: 'Unauthorised absence rate',
-            unit: '%',
-            value: 'unauthorised-absence-rate',
-            name: 'sess_unauthorised_percent',
-          },
-        ],
-        order: 1,
-      },
-    },
-    locations: {},
-    timePeriod: {
-      hint: '',
-      legend: '',
-      options: [],
-    },
-  };
-
-  const testSubjectMetaSingleFilters: SubjectMeta = {
-    ...testSubjectMeta,
-    filters: {
-      Characteristic: {
-        id: 'characteristic',
-        autoSelectFilterItemId: '',
-        hint: 'Filter by pupil characteristic',
-        legend: 'Characteristic',
-        options: {
-          EthnicGroupMajor: {
-            id: 'ethnic-group-major',
-            label: 'Ethnic group major',
-            options: [
-              {
-                label: 'Ethnicity Major Black Total',
-                value: 'ethnicity-major-black-total',
-              },
-            ],
-            order: 0,
-          },
-        },
-        name: 'characteristic',
-        order: 0,
-      },
-      SchoolType: {
-        id: 'school-type',
-        autoSelectFilterItemId: '',
-        hint: 'Filter by school type',
-        legend: 'School type',
-        options: {
-          Default: {
-            id: 'default',
-            label: 'Default',
-            options: [
-              {
-                label: 'State-funded secondary',
-                value: 'state-funded-secondary',
-              },
-            ],
-            order: 0,
-          },
-        },
-        name: 'school_type',
-        order: 1,
-      },
-      FilterWithMultipleOptions: {
-        id: 'filter-with-multiple-options',
-        autoSelectFilterItemId: '',
-        hint: 'Filter by Filter With Multiple Options',
-        legend: 'Filter With Multiple Options',
-        options: {
-          OptionGroup1: {
-            id: 'option-group-1',
-            label: 'Option group 1',
-            options: [
-              {
-                label: 'Option group 1 option 1',
-                value: 'option-group-1-option-1',
-              },
-            ],
-            order: 0,
-          },
-          OptionGroup2: {
-            id: 'option-group-2',
-            label: 'Option group 2',
-            options: [
-              {
-                label: 'Option group 2 option 1',
-                value: 'option-group-2-option-1',
-              },
-              {
-                label: 'Option group 2 option 2',
-                value: 'option-group-2-option-2',
-              },
-            ],
-            order: 1,
-          },
-        },
-        name: 'characteristic',
-        order: 2,
-      },
-    },
-  };
-
-  const testSubjectMetaOneIndicator: SubjectMeta = {
-    ...testSubjectMeta,
-    indicators: {
-      AbsenceByReason: {
-        id: 'absence-by-reason',
-        label: 'Absence by reason',
-        options: [
-          {
-            label: 'Number of excluded sessions',
-            unit: '',
-            value: 'number-excluded-sessions',
-            name: 'sess_auth_excluded',
-          },
-        ],
-        order: 0,
-      },
-    },
-  };
-
-  const testSubject = {
-    id: 'subject-1',
-    name: 'Subject 1',
-    file: {
-      id: 'file-1',
-      fileName: 'File 1',
-      extension: 'csv',
-      name: 'File 1',
-      size: '100mb',
-      type: 'Data',
-    },
-  } as Subject;
-
   test('renders indicators and filter group options correctly', () => {
     render(
       <FiltersForm
@@ -347,11 +100,11 @@ describe('FiltersForm', () => {
       />,
     );
 
-    expect(
-      screen.getByRole('button', {
-        name: 'School type - 1 selected',
-      }),
-    ).toBeInTheDocument();
+    const schoolSection = within(
+      screen.getByTestId('filters-SchoolType-accordion'),
+    );
+    expect(schoolSection.getByText('1 selected')).toBeInTheDocument();
+
     const filterGroup1 = screen.getByRole('group', {
       name: 'School type',
     });
@@ -362,11 +115,11 @@ describe('FiltersForm', () => {
     );
     expect(filterCheckboxes1[0]).toBeChecked();
 
-    expect(
-      screen.getByRole('button', {
-        name: 'Characteristic - 1 selected',
-      }),
-    ).toBeInTheDocument();
+    const characteristicSection = within(
+      screen.getByTestId('filters-Characteristic-accordion'),
+    );
+    expect(characteristicSection.getByText('1 selected')).toBeInTheDocument();
+
     const filterGroup2 = screen.getByRole('group', {
       name: 'Characteristic',
     });
@@ -391,7 +144,7 @@ describe('FiltersForm', () => {
 
     expect(
       screen.getByRole('button', {
-        name: 'Filter With Multiple Options',
+        name: 'Filter With Multiple Options - show options',
       }),
     ).toBeInTheDocument();
     const filterGroup1 = screen.getByRole('group', {
@@ -426,7 +179,7 @@ describe('FiltersForm', () => {
   });
 
   test('selecting options shows the number of selected options for each filter and indicator group', async () => {
-    render(
+    const { user } = render(
       <FiltersForm
         {...testWizardStepProps}
         stepTitle="Choose your filters"
@@ -436,26 +189,24 @@ describe('FiltersForm', () => {
       />,
     );
 
-    await userEvent.click(screen.getByLabelText('State-funded secondary'));
+    await user.click(screen.getByLabelText('State-funded secondary'));
 
-    expect(
-      screen.getByRole('button', {
-        name: 'School type - 1 selected',
-      }),
-    ).toBeInTheDocument();
+    const characteristicSection = within(
+      screen.getByTestId('filters-Characteristic-accordion'),
+    );
+    const schoolSection = within(
+      screen.getByTestId('filters-SchoolType-accordion'),
+    );
+    expect(schoolSection.getByText('1 selected')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByLabelText('Ethnicity Major Mixed Total'));
-    await userEvent.click(screen.getByLabelText('Gender male'));
-    await userEvent.click(screen.getByLabelText('Total'));
+    await user.click(screen.getByLabelText('Ethnicity Major Mixed Total'));
+    await user.click(screen.getByLabelText('Gender male'));
+    await user.click(screen.getByLabelText('Total'));
 
-    expect(
-      screen.getByRole('button', {
-        name: 'Characteristic - 3 selected',
-      }),
-    ).toBeInTheDocument();
+    expect(characteristicSection.getByText('3 selected')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByLabelText('Number of excluded sessions'));
-    await userEvent.click(screen.getByLabelText('Unauthorised absence rate'));
+    await user.click(screen.getByLabelText('Number of excluded sessions'));
+    await user.click(screen.getByLabelText('Unauthorised absence rate'));
 
     expect(
       screen.getByRole('group', {
@@ -465,7 +216,7 @@ describe('FiltersForm', () => {
   });
 
   test('shows validation errors if no options are selected from the filter and indicator groups', async () => {
-    render(
+    const { user } = render(
       <FiltersForm
         {...testWizardStepProps}
         stepTitle="Choose your filters"
@@ -475,7 +226,7 @@ describe('FiltersForm', () => {
       />,
     );
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', {
         name: 'Create table',
       }),
@@ -571,7 +322,7 @@ describe('FiltersForm', () => {
   });
 
   test('upon submit automatically selects Total checkbox if no other options in that filter group are checked', async () => {
-    render(
+    const { user } = render(
       <FiltersForm
         {...testWizardStepProps}
         stepTitle="Choose your filters"
@@ -590,14 +341,14 @@ describe('FiltersForm', () => {
       />,
     );
 
-    await userEvent.click(screen.getByLabelText('State-funded secondary'));
-    await userEvent.click(screen.getByLabelText('Number of excluded sessions'));
+    await user.click(screen.getByLabelText('State-funded secondary'));
+    await user.click(screen.getByLabelText('Number of excluded sessions'));
 
     expect((screen.getByLabelText('Total') as HTMLInputElement).checked).toBe(
       false,
     );
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', {
         name: 'Create table',
       }),
@@ -611,7 +362,7 @@ describe('FiltersForm', () => {
   });
 
   test('renders a read-only view of selected options when no longer the current step', async () => {
-    const { container, rerender } = render(
+    const { container, rerender, user } = render(
       <FiltersForm
         {...testWizardStepProps}
         stepTitle="Choose your filters"
@@ -621,9 +372,9 @@ describe('FiltersForm', () => {
       />,
     );
 
-    await userEvent.click(screen.getByLabelText('State-funded secondary'));
-    await userEvent.click(screen.getByLabelText('Ethnicity Major Black Total'));
-    await userEvent.click(screen.getByLabelText('Number of excluded sessions'));
+    await user.click(screen.getByLabelText('State-funded secondary'));
+    await user.click(screen.getByLabelText('Ethnicity Major Black Total'));
+    await user.click(screen.getByLabelText('Number of excluded sessions'));
 
     await rerender(
       <FiltersForm
@@ -647,7 +398,7 @@ describe('FiltersForm', () => {
     ]);
     const onSubmit = jest.fn(() => Promise.reject(errorResponse));
 
-    render(
+    const { user } = render(
       <FiltersForm
         {...testWizardStepProps}
         stepTitle="Choose your filters"
@@ -666,11 +417,11 @@ describe('FiltersForm', () => {
       />,
     );
 
-    await userEvent.click(screen.getByLabelText('State-funded secondary'));
-    await userEvent.click(screen.getByLabelText('Number of excluded sessions'));
-    await userEvent.click(screen.getByLabelText('Total'));
+    await user.click(screen.getByLabelText('State-funded secondary'));
+    await user.click(screen.getByLabelText('Number of excluded sessions'));
+    await user.click(screen.getByLabelText('Total'));
 
-    await userEvent.click(screen.getByRole('button', { name: 'Create table' }));
+    await user.click(screen.getByRole('button', { name: 'Create table' }));
 
     await waitFor(() => {
       expect(screen.getByText(/Could not create table/)).toBeInTheDocument();
@@ -695,7 +446,7 @@ describe('FiltersForm', () => {
     ]);
     const onSubmit = jest.fn(() => Promise.reject(errorResponse));
 
-    render(
+    const { user } = render(
       <FiltersForm
         {...testWizardStepProps}
         stepTitle="Choose your filters"
@@ -714,11 +465,11 @@ describe('FiltersForm', () => {
       />,
     );
 
-    await userEvent.click(screen.getByLabelText('State-funded secondary'));
-    await userEvent.click(screen.getByLabelText('Number of excluded sessions'));
-    await userEvent.click(screen.getByLabelText('Total'));
+    await user.click(screen.getByLabelText('State-funded secondary'));
+    await user.click(screen.getByLabelText('Number of excluded sessions'));
+    await user.click(screen.getByLabelText('Total'));
 
-    await userEvent.click(screen.getByRole('button', { name: 'Create table' }));
+    await user.click(screen.getByRole('button', { name: 'Create table' }));
 
     await waitFor(() => {
       expect(screen.getByText(/Could not create table/)).toBeInTheDocument();
@@ -755,20 +506,26 @@ describe('FiltersForm', () => {
       />,
     );
 
-    const filters = within(
-      screen.getByRole('group', { name: 'Categories' }),
-    ).getAllByRole('group');
-    expect(within(filters[0]).getByRole('button', { name: 'Characteristic' }));
-    // there are 4 groups within the characteristic group, so school type is the 6th group
-    expect(
-      within(filters[5]).getByRole('button', {
-        name: 'School type',
-      }),
-    );
+    const filters = within(screen.getByRole('group', { name: 'Categories' }));
 
-    const characteristicGroups = within(filters[0]).getAllByRole('group', {
-      hidden: true,
-    });
+    const buttons = filters.getAllByRole('button');
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Characteristic - show options',
+      }),
+    ).toEqual(buttons[1]);
+
+    expect(
+      screen.getByRole('button', {
+        name: 'School type - show options',
+      }),
+    ).toEqual(buttons[5]);
+
+    const characteristicGroups = within(
+      screen.getByTestId('filters-Characteristic-accordion'),
+    ).getAllByRole('group');
+
     expect(characteristicGroups[1]).toEqual(
       screen.getByRole('group', { name: 'Total', hidden: true }),
     );
@@ -819,32 +576,11 @@ describe('FiltersForm', () => {
     );
 
     expect(
-      screen.getByRole('group', {
-        name: 'School type',
-        hidden: true,
-      }),
-    ).not.toBeVisible();
-
+      screen.getByRole('button', { name: 'School type - show options' }),
+    ).toHaveAttribute('aria-expanded', 'false');
     expect(
-      screen.getByRole('group', {
-        name: 'Ethnic group major',
-        hidden: true,
-      }),
-    ).not.toBeVisible();
-
-    expect(
-      screen.getByRole('group', {
-        name: 'Gender',
-        hidden: true,
-      }),
-    ).not.toBeVisible();
-
-    expect(
-      screen.getByRole('group', {
-        name: 'Total',
-        hidden: true,
-      }),
-    ).not.toBeVisible();
+      screen.getByRole('button', { name: 'Characteristic - show options' }),
+    ).toHaveAttribute('aria-expanded', 'false');
   });
 
   test('shows the expand all button if there are multiple filter groups', () => {
@@ -909,7 +645,7 @@ describe('FiltersForm', () => {
   });
 
   test('toggles expanding and collapsing all filter groups when click the button', async () => {
-    render(
+    const { user } = render(
       <FiltersForm
         {...testWizardStepProps}
         stepTitle="Choose your filters"
@@ -920,34 +656,13 @@ describe('FiltersForm', () => {
     );
 
     expect(
-      screen.getByRole('group', {
-        name: 'School type',
-        hidden: true,
-      }),
-    ).not.toBeVisible();
-
+      screen.getByRole('button', { name: 'School type - show options' }),
+    ).toHaveAttribute('aria-expanded', 'false');
     expect(
-      screen.getByRole('group', {
-        name: 'Ethnic group major',
-        hidden: true,
-      }),
-    ).not.toBeVisible();
+      screen.getByRole('button', { name: 'Characteristic - show options' }),
+    ).toHaveAttribute('aria-expanded', 'false');
 
-    expect(
-      screen.getByRole('group', {
-        name: 'Gender',
-        hidden: true,
-      }),
-    ).not.toBeVisible();
-
-    expect(
-      screen.getByRole('group', {
-        name: 'Total',
-        hidden: true,
-      }),
-    ).not.toBeVisible();
-
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Expand all categories' }),
     );
 
@@ -956,34 +671,13 @@ describe('FiltersForm', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('group', {
-        name: 'School type',
-        hidden: true,
-      }),
-    ).toBeVisible();
-
+      screen.getByRole('button', { name: 'School type - hide options' }),
+    ).toHaveAttribute('aria-expanded', 'true');
     expect(
-      screen.getByRole('group', {
-        name: 'Ethnic group major',
-        hidden: true,
-      }),
-    ).toBeVisible();
+      screen.getByRole('button', { name: 'Characteristic - hide options' }),
+    ).toHaveAttribute('aria-expanded', 'true');
 
-    expect(
-      screen.getByRole('group', {
-        name: 'Gender',
-        hidden: true,
-      }),
-    ).toBeVisible();
-
-    expect(
-      screen.getByRole('group', {
-        name: 'Total',
-        hidden: true,
-      }),
-    ).toBeVisible();
-
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Collapse all categories' }),
     );
 
@@ -992,32 +686,11 @@ describe('FiltersForm', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('group', {
-        name: 'School type',
-        hidden: true,
-      }),
-    ).not.toBeVisible();
-
+      screen.getByRole('button', { name: 'School type - show options' }),
+    ).toHaveAttribute('aria-expanded', 'false');
     expect(
-      screen.getByRole('group', {
-        name: 'Ethnic group major',
-        hidden: true,
-      }),
-    ).not.toBeVisible();
-
-    expect(
-      screen.getByRole('group', {
-        name: 'Gender',
-        hidden: true,
-      }),
-    ).not.toBeVisible();
-
-    expect(
-      screen.getByRole('group', {
-        name: 'Total',
-        hidden: true,
-      }),
-    ).not.toBeVisible();
+      screen.getByRole('button', { name: 'Characteristic - show options' }),
+    ).toHaveAttribute('aria-expanded', 'false');
   });
 
   test('shows additional hint text if any filters contain a "Total"', async () => {
@@ -1083,445 +756,92 @@ describe('FiltersForm', () => {
   });
 
   describe('FilterHierarchies', () => {
-    const subjectMetaWithFilterHierarchy: SubjectMeta = {
-      filters: {
-        LevelOfQualification: {
-          id: 'filter-660d764b',
-          legend: 'Level of qualification',
-          options: {
-            Default: {
-              id: '174bf78d-e667-4407-937d-e2edd0c10546',
-              label: 'Default',
-              options: [
-                {
-                  label: 'Total',
-                  value: 'option-99890dde',
-                },
-                {
-                  label: 'Entry level',
-                  value: 'option-ae8fc558',
-                },
-                {
-                  label: 'Higher',
-                  value: 'option-a84c4bd9',
-                },
-              ],
-              order: 0,
-            },
-          },
-          name: 'qualification_level',
-          autoSelectFilterItemId: 'option-99890dde',
-          order: 0,
-        },
-        NameOfCourseBeingStudied: {
-          id: 'filter-5709a7b4',
-          legend: 'Name of course being studied',
-          options: {
-            Default: {
-              id: '96be2505-40fb-4b31-9ec4-8163a829272c',
-              label: 'Default',
-              options: [
-                {
-                  label: 'Total',
-                  value: 'option-9f53e999',
-                },
-                {
-                  label: 'Biochemistry',
-                  value: 'option-8949eb4e',
-                },
-                {
-                  label: 'Bricklaying',
-                  value: 'option-482ac7e3',
-                },
-                {
-                  label: 'Bricklaying01',
-                  value: 'option-f5db81a9',
-                },
-                {
-                  label: 'Bricklaying02',
-                  value: 'option-12321f4d',
-                },
-                {
-                  label: 'Bricklaying03',
-                  value: 'option-952a34be',
-                },
-                {
-                  label: 'Bricklaying04',
-                  value: 'option-f1cb3b00',
-                },
-                {
-                  label: 'Bricklaying05',
-                  value: 'option-1195279c',
-                },
-                {
-                  label: 'Bricklaying06',
-                  value: 'option-5aa58bd1',
-                },
-                {
-                  label: 'Bricklaying07',
-                  value: 'option-5a44c859',
-                },
-                {
-                  label: 'Civil engineering',
-                  value: 'option-99087931',
-                },
-                {
-                  label: 'Electrical engineering',
-                  value: 'option-8387bb38',
-                },
-                {
-                  label: 'Forestry',
-                  value: 'option-d467c799',
-                },
-                {
-                  label: 'Hedge rows',
-                  value: 'option-76b2bc7a',
-                },
-                {
-                  label: 'Physics',
-                  value: 'option-437f2fd2',
-                },
-                {
-                  label: 'Plastering',
-                  value: 'option-17eabb0d',
-                },
-              ],
-              order: 0,
-            },
-          },
-          name: 'course_title',
-          autoSelectFilterItemId: 'option-9f53e999',
-          order: 1,
-        },
-        SectorSubjectArea: {
-          id: 'filter-949b438b',
-          legend: 'Sector subject area',
-          options: {
-            Default: {
-              id: '79c98ff8-0d40-4071-b7e1-8b23c8f7e96d',
-              label: 'Default',
-              options: [
-                {
-                  label: 'Total',
-                  value: 'option-dcbf7d26',
-                },
-                {
-                  label: 'Construction',
-                  value: 'option-4f110129',
-                },
-                {
-                  label: 'Engineering',
-                  value: 'option-5687872a',
-                },
-                {
-                  label: 'Horticulture',
-                  value: 'option-ef6f22e5',
-                },
-                {
-                  label: 'Science',
-                  value: 'option-7b4cc4f3',
-                },
-              ],
-              order: 0,
-            },
-          },
-          name: 'subject_area',
-          autoSelectFilterItemId: 'option-dcbf7d26',
-          order: 2,
-        },
-      },
-      indicators: {
-        Default: {
-          id: '6c23bee1',
-          label: 'Default',
-          options: [
-            {
-              label: 'Number of students enrolled',
-              unit: '',
-              value: 'indicator-76d5e064',
-              name: 'enrollment_count',
-            },
-          ],
-          order: 0,
-        },
-      },
-      locations: {},
-      timePeriod: {
-        hint: '',
-        legend: '',
-        options: [],
-      },
-      filterHierarchies: [
-        [
-          {
-            level: 0,
-            filterId: 'filter-660d764b',
-            childFilterId: 'filter-949b438b',
-            hierarchy: {
-              'option-ae8fc558': [
-                'option-5687872a',
-                'option-7b4cc4f3',
-                'option-dcbf7d26',
-              ],
-              'option-99890dde': ['option-dcbf7d26'],
-              'option-a84c4bd9': [
-                'option-4f110129',
-                'option-dcbf7d26',
-                'option-ef6f22e5',
-              ],
-            },
-          },
-          {
-            level: 1,
-            filterId: 'filter-949b438b',
-            childFilterId: 'filter-5709a7b4',
-            hierarchy: {
-              'option-5687872a': [
-                'option-8387bb38',
-                'option-99087931',
-                'option-9f53e999',
-              ],
-              'option-4f110129': [
-                'option-1195279c',
-                'option-17eabb0d',
-                'option-f1cb3b00',
-                'option-952a34be',
-                'option-5a44c859',
-                'option-5aa58bd1',
-                'option-9f53e999',
-                'option-12321f4d',
-                'option-f5db81a9',
-                'option-482ac7e3',
-              ],
-              'option-7b4cc4f3': [
-                'option-8949eb4e',
-                'option-437f2fd2',
-                'option-9f53e999',
-              ],
-              'option-dcbf7d26': ['option-9f53e999'],
-              'option-ef6f22e5': [
-                'option-76b2bc7a',
-                'option-d467c799',
-                'option-9f53e999',
-              ],
-            },
-          },
-        ],
-      ],
-    };
-    test('renders as expected', async () => {
-      render(
-        <FiltersForm
-          {...testWizardStepProps}
-          stepTitle="Choose your filters"
-          subject={testSubject}
-          subjectMeta={subjectMetaWithFilterHierarchy}
-          onSubmit={noop}
-        />,
-      );
-
-      expect(
-        screen.getByText('Select at least one indicator below'),
-      ).toBeInTheDocument();
-
-      const hierarchyMenu = screen.getByRole('button', {
-        name: 'Name of course being studied (3 tiers)',
-      });
-      expect(hierarchyMenu).toBeInTheDocument();
-      await userEvent.click(hierarchyMenu);
-
-      const searchBar = screen.getByLabelText(
-        'Search all tiers and name of course being studied',
-      );
-      expect(searchBar).toBeInTheDocument();
-
-      const modalButton = screen.getByRole('button', {
-        name: 'What are name of course being studied tiers?',
-      });
-      expect(modalButton).toBeInTheDocument();
-      await userEvent.click(modalButton);
-
-      const modal = screen.getByRole('dialog');
-      expect(modal).toBeInTheDocument();
-
-      expect(
-        within(modal).getAllByTestId('modal-tier-description-section'),
-      ).toHaveLength(3);
-      await userEvent.click(screen.getByText('Close'));
-      expect(modal).not.toBeInTheDocument();
-
-      const optionsContainer = screen.getByTestId('filter-hierarchy-options');
-      expect(optionsContainer).toBeInTheDocument();
-      expect(
-        within(optionsContainer).getAllByRole('checkbox', {
-          hidden: false,
-        }),
-      ).toHaveLength(22);
-
-      expect(
-        within(optionsContainer).getByRole('checkbox', {
-          name: 'Total',
-          description: 'Level of qualification',
-        }),
-      ).toBeInTheDocument();
-
-      expect(
-        within(optionsContainer).getByRole('checkbox', {
-          name: 'Higher',
-          description: 'Level of qualification',
-        }),
-      ).toBeInTheDocument();
-
-      const entryLevelOption = within(optionsContainer).getByRole('checkbox', {
-        name: 'Entry level',
-        description: 'Level of qualification',
-      });
-      expect(entryLevelOption).toBeInTheDocument();
-      const entryLevelOptionContainer = within(optionsContainer).getByTestId(
-        `filter-hierarchy-options-option-ae8fc558,option-dcbf7d26,option-9f53e999`,
-      );
-      expect(entryLevelOptionContainer).toBeInTheDocument();
-      const entryLevelOptionsMenu = within(entryLevelOptionContainer).getByText(
-        'Show sector subject area',
-      );
-
-      expect(entryLevelOptionsMenu).toBeInTheDocument();
-      await userEvent.click(entryLevelOptionsMenu);
-      expect(entryLevelOptionsMenu).toHaveTextContent(
-        'Close sector subject area',
-      );
-
-      expect(
-        within(entryLevelOptionContainer).getByRole('checkbox', {
-          name: 'Science',
-          description: 'Sector subject area',
-        }),
-      ).toBeInTheDocument();
-      const engineeringOption = within(entryLevelOptionContainer).getByRole(
-        'checkbox',
-        {
-          name: 'Engineering',
-          description: 'Sector subject area',
-        },
-      );
-      expect(engineeringOption).toBeInTheDocument();
-      const engineeringOptionContainer = within(optionsContainer).getByTestId(
-        `filter-hierarchy-options-option-ae8fc558,option-5687872a,option-9f53e999`,
-      );
-      expect(engineeringOptionContainer).toBeInTheDocument();
-      const engineeringOptionsMenu = within(
-        engineeringOptionContainer,
-      ).getByText('Show name of course being studied');
-      expect(engineeringOptionsMenu).toBeInTheDocument();
-      await userEvent.click(engineeringOptionsMenu);
-      expect(engineeringOptionsMenu).toHaveTextContent(
-        'Close name of course being studied',
-      );
-
-      expect(
-        within(engineeringOptionContainer).getByRole('checkbox', {
-          name: 'Civil engineering',
-        }),
-      ).toBeInTheDocument();
-      expect(
-        within(engineeringOptionContainer).getByRole('checkbox', {
-          name: 'Electrical engineering',
-        }),
-      ).toBeInTheDocument();
-    });
-
-    test('filter hierarchies form submit with correct values ', async () => {
+    test('filter hierarchies form submits with correct values ', async () => {
       const onSubmit = jest.fn();
-      render(
+      const { user } = render(
         <FiltersForm
           {...testWizardStepProps}
           stepTitle="Choose your filters"
           subject={testSubject}
-          subjectMeta={subjectMetaWithFilterHierarchy}
+          subjectMeta={testSubjectMetaWithFilterHierarchy}
           onSubmit={onSubmit}
         />,
       );
 
-      // open details
-      const hierarchyMenu = screen.getByRole('button', {
-        name: 'Name of course being studied (3 tiers)',
-      });
-      await userEvent.click(hierarchyMenu);
-
-      // open some options
-      const optionsContainer = screen.getByTestId('filter-hierarchy-options');
-      const entryLevelOption = within(optionsContainer).getByRole('checkbox', {
-        name: 'Entry level',
-        description: 'Level of qualification',
-      });
-      expect(entryLevelOption).toBeInTheDocument();
-      const entryLevelOptionContainer = within(optionsContainer).getByTestId(
-        `filter-hierarchy-options-option-ae8fc558,option-dcbf7d26,option-9f53e999`,
+      // Expand filter
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Name of course being studied (3 tiers) - show options',
+        }),
       );
 
-      const entryLevelOptionsMenu = within(entryLevelOptionContainer).getByText(
-        'Show sector subject area',
+      // Expand entry
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Show sub categories for entry level',
+        }),
       );
-      await userEvent.click(entryLevelOptionsMenu);
-      const engineeringOption = within(entryLevelOptionContainer).getByRole(
-        'checkbox',
-        {
+      // Select some options
+      await user.click(
+        screen.getByRole('checkbox', {
+          name: 'Entry level',
+        }),
+      );
+      await user.click(
+        screen.getByRole('checkbox', {
           name: 'Engineering',
-          description: 'Sector subject area',
-        },
+        }),
       );
-      const engineeringOptionContainer = within(optionsContainer).getByTestId(
-        `filter-hierarchy-options-option-ae8fc558,option-5687872a,option-9f53e999`,
-      );
-      const engineeringOptionsMenu = within(
-        engineeringOptionContainer,
-      ).getByText('Show name of course being studied');
-      await userEvent.click(engineeringOptionsMenu);
 
-      const civilEngineering = within(engineeringOptionContainer).getByRole(
-        'checkbox',
-        {
+      // Expand engineering
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Show sub categories for engineering',
+        }),
+      );
+      // Select an option
+      await user.click(
+        screen.getByRole('checkbox', {
           name: 'Civil engineering',
-        },
+        }),
       );
-      // select some options
-      await userEvent.click(entryLevelOption);
-      await userEvent.click(engineeringOption);
-      await userEvent.click(civilEngineering);
-      // expect '3 items selected' tag on screen
-      const selectionCounter = within(hierarchyMenu).getByText('3 selected');
-      expect(selectionCounter).toBeInTheDocument();
-      // expect for to be submitted with some option's values
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Create table' }),
-      );
+
+      // Check count tag updated
+      expect(
+        within(
+          screen.getByTestId('filterHierarchies.filter-3-count'),
+        ).getByText('3 selected'),
+      ).toBeInTheDocument();
+
+      // Submit form
+      expect(onSubmit).toHaveBeenCalledTimes(0);
+      await user.click(screen.getByRole('button', { name: 'Create table' }));
       expect(onSubmit).toHaveBeenCalledTimes(1);
       expect(onSubmit).toHaveBeenCalledWith({
         filterHierarchies: {
-          'filter-5709a7b4': [
-            entryLevelOption.getAttribute('value'),
-            engineeringOption.getAttribute('value'),
-            civilEngineering.getAttribute('value'),
+          'filter-3': [
+            'option-1,option-4,option-11',
+            'option-1,option-2,option-11',
+            'option-1,option-2,option-10',
           ],
         },
         filters: {},
-        indicators: ['indicator-76d5e064'],
+        indicators: ['indicator-1'],
       });
     });
+
     test('filter hierarchy validation errors show and function', async () => {
-      render(
+      const { user } = render(
         <FiltersForm
           {...testWizardStepProps}
           stepTitle="Choose your filters"
           subject={testSubject}
-          subjectMeta={subjectMetaWithFilterHierarchy}
+          subjectMeta={testSubjectMetaWithFilterHierarchy}
           onSubmit={jest.fn}
         />,
       );
       // attempt to submit no filter hierarchy selectiosn
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Create table' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'Create table' }));
       // validation error kicks in
       const errorSummaryContainer = screen.getByTestId('errorSummary');
       expect(errorSummaryContainer).toBeInTheDocument();
@@ -1535,167 +855,6 @@ describe('FiltersForm', () => {
       );
       expect(fhFieldset.parentElement?.getAttribute('id')).toEqual(
         fhErrorLink.getAttribute('href')?.slice(1),
-      );
-    });
-    test('filter hierarchy search filters the list and emboldeneds the option labels', async () => {
-      render(
-        <FiltersForm
-          {...testWizardStepProps}
-          stepTitle="Choose your filters"
-          subject={testSubject}
-          subjectMeta={subjectMetaWithFilterHierarchy}
-          onSubmit={noop}
-        />,
-      );
-
-      // open details
-      const hierarchyMenu = screen.getByRole('button', {
-        name: 'Name of course being studied (3 tiers)',
-      });
-      await userEvent.click(hierarchyMenu);
-
-      const optionsContainer = screen.getByTestId('filter-hierarchy-options');
-      const options = within(optionsContainer).getAllByRole('checkbox');
-      expect(options).toHaveLength(22);
-
-      // type a term into the search
-      const hierarchySearch = screen.getByLabelText(
-        'Search all tiers and name of course being studied',
-      );
-      expect(hierarchySearch).toBeInTheDocument();
-      await userEvent.type(hierarchySearch, 'engineering');
-      await userEvent.click(screen.getByRole('button', { name: 'Search' }));
-      expect(
-        screen.getByText(
-          `Searching 'engineering' in all tiers of name of course being studied`,
-        ),
-      ).toBeInTheDocument();
-      const clearSearchButton = screen.getByRole('button', {
-        name: 'Clear search',
-      });
-      expect(clearSearchButton).toBeInTheDocument();
-
-      // see options list has changed
-      const filteredOptions = within(optionsContainer).getAllByRole('checkbox');
-      expect(filteredOptions).toHaveLength(4);
-      expect(filteredOptions.length).not.toEqual(options.length);
-
-      const entryLevelOption =
-        within(optionsContainer).getByLabelText('Entry level');
-      expect(filteredOptions).toContain(entryLevelOption);
-      const engineeringOption =
-        within(optionsContainer).getByLabelText('Engineering');
-      expect(filteredOptions).toContain(engineeringOption);
-      const civilOption =
-        within(optionsContainer).getByLabelText('Civil engineering');
-
-      expect(filteredOptions).toContain(civilOption);
-      const electricalOption = within(optionsContainer).getByLabelText(
-        'Electrical engineering',
-      );
-      expect(filteredOptions).toContain(electricalOption);
-
-      // see options contain search term or children with search term
-      const entryLevelOptionContainer = within(optionsContainer).getByTestId(
-        `filter-hierarchy-options-option-ae8fc558,option-dcbf7d26,option-9f53e999`,
-      );
-      expect(entryLevelOptionContainer).toContainElement(engineeringOption);
-      expect(entryLevelOptionContainer).toContainElement(civilOption);
-      expect(entryLevelOptionContainer).toContainElement(electricalOption);
-
-      const searchHighlights =
-        within(optionsContainer).getAllByTestId('search-highlight');
-      expect(searchHighlights).toHaveLength(3);
-
-      // see labels with search term contain the matching term text in bold
-      searchHighlights.forEach(highlight =>
-        expect(
-          within(highlight).getByText('engineering', { exact: false }).nodeName,
-        ).toEqual('EM'),
-      );
-
-      expect(within(optionsContainer).getAllByRole('checkbox')).toHaveLength(4);
-      // clear search
-      await userEvent.click(clearSearchButton);
-      expect(within(optionsContainer).getAllByRole('checkbox')).toHaveLength(
-        22,
-      );
-    });
-    test('filter hierarchy clearing search resets the UI', async () => {
-      render(
-        <FiltersForm
-          {...testWizardStepProps}
-          stepTitle="Choose your filters"
-          subject={testSubject}
-          subjectMeta={subjectMetaWithFilterHierarchy}
-          onSubmit={noop}
-        />,
-      );
-
-      // open details
-      const hierarchyMenu = screen.getByRole('button', {
-        name: 'Name of course being studied (3 tiers)',
-      });
-      await userEvent.click(hierarchyMenu);
-
-      const optionsContainer = screen.getByTestId('filter-hierarchy-options');
-      expect(within(optionsContainer).getAllByRole('checkbox')).toHaveLength(
-        22,
-      );
-
-      // type a term into the search
-      const hierarchySearch = screen.getByLabelText(
-        'Search all tiers and name of course being studied',
-      );
-      await userEvent.type(hierarchySearch, 'bricklaying');
-      await userEvent.click(screen.getByRole('button', { name: 'Search' }));
-
-      const searchDescription = screen.getByText(
-        `Searching 'bricklaying' in all tiers of name of course being studied`,
-      );
-      expect(searchDescription).toBeInTheDocument();
-
-      // see options list has changed
-      expect(within(optionsContainer).getAllByRole('checkbox')).toHaveLength(
-        10,
-      );
-
-      // submit empty search term
-
-      await userEvent.clear(hierarchySearch);
-      await userEvent.type(hierarchySearch, ' ');
-      await userEvent.click(screen.getByRole('button', { name: 'Search' }));
-
-      // expect UI to be resetted
-      expect(searchDescription).toHaveTextContent(
-        'Browse all tiers of name of course being studied',
-      );
-      expect(within(optionsContainer).getAllByRole('checkbox')).toHaveLength(
-        22,
-      );
-
-      // type a term into the search
-      await userEvent.type(hierarchySearch, 'engineering');
-      await userEvent.click(screen.getByRole('button', { name: 'Search' }));
-
-      // see options list has changed
-      expect(searchDescription).toHaveTextContent(
-        `Searching 'engineering' in all tiers of name of course being studied`,
-      );
-      expect(within(optionsContainer).getAllByRole('checkbox')).toHaveLength(4);
-
-      // click clear search
-      const clearSearchButton = screen.getByRole('button', {
-        name: 'Clear search',
-      });
-      await userEvent.click(clearSearchButton);
-
-      // expect UI to be resetted
-      expect(searchDescription).toHaveTextContent(
-        'Browse all tiers of name of course being studied',
-      );
-      expect(within(optionsContainer).getAllByRole('checkbox')).toHaveLength(
-        22,
       );
     });
   });

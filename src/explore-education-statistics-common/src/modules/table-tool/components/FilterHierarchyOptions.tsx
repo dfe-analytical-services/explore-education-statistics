@@ -1,14 +1,15 @@
 import ButtonText from '@common/components/ButtonText';
 import ContentHtml from '@common/components/ContentHtml';
-import DetailsMenu from '@common/components/DetailsMenu';
 import { FormCheckbox, FormTextSearchInput } from '@common/components/form';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import getFilterOptionIdsRecursively from '@common/modules/table-tool/utils/getFilterOptionIdsRecursively';
+import FilterAccordion from '@common/modules/table-tool/components/FilterAccordion';
+import styles from '@common/modules/table-tool/components/FilterHierarchyOptions.module.scss';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import styles from './FilterHierarchyOptions.module.scss';
 
 export type FilterHierarchyOption = {
   value: string;
@@ -25,14 +26,14 @@ export type SelectedChildren = {
 
 interface FilterHierarchyOptionsProps {
   disabled?: boolean;
-  expandedOptionsList: string[];
-  hierarchySearchTerm: string;
+  expandedOptionsList?: string[];
+  hierarchySearchTerm?: string;
   level: number;
   name: string;
   optionTree: FilterHierarchyOption;
-  selectedValues: string[];
-  toggleOptions: (optionId: string) => void;
+  selectedValues?: string[];
   selectedChildren: SelectedChildren;
+  onToggleOptions: (optionId: string) => void;
 }
 
 function FilterHierarchyOptions({
@@ -41,10 +42,10 @@ function FilterHierarchyOptions({
   disabled,
   level,
   selectedValues = [],
-  expandedOptionsList,
-  hierarchySearchTerm,
-  toggleOptions,
+  expandedOptionsList = [],
+  hierarchySearchTerm = '',
   selectedChildren,
+  onToggleOptions,
 }: FilterHierarchyOptionsProps) {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
@@ -64,6 +65,7 @@ function FilterHierarchyOptions({
     optionTree.value,
     selectedChildren.valuesRelatedToSelectedValuesCountMap,
   ]);
+
   const renderLabel = useCallback(
     (label: string) => {
       const termIndex = label.toLowerCase().indexOf(hierarchySearchTerm);
@@ -103,6 +105,20 @@ function FilterHierarchyOptions({
     };
   }, [selectedValues, filteredOptions]);
 
+  const { thisAndAllChildOptionIds, hasThisAndAllChildOptionsSelected } =
+    useMemo(() => {
+      const allOptionIds =
+        filteredOptions.flatMap(getFilterOptionIdsRecursively) ?? [];
+      const allIds = [optionTree.value, ...allOptionIds];
+
+      return {
+        thisAndAllChildOptionIds: allIds,
+        hasThisAndAllChildOptionsSelected: allIds.every(childOptionId =>
+          selectedValues.includes(childOptionId),
+        ),
+      };
+    }, [filteredOptions, optionTree.value, selectedValues]);
+
   const isExpanded = expandedOptionsList.includes(optionTree.value);
   const { setValue, register } = useFormContext();
   const { ref: inputRef, ...field } = register(name);
@@ -121,6 +137,27 @@ function FilterHierarchyOptions({
       Array.from(new Set([...selectedValues, ...childOptionIds])),
     );
   }, [childOptionIds, setValue, hasAllSelected, selectedValues, name]);
+
+  const toggleSelectThisAndSubCategories = useCallback(() => {
+    if (hasThisAndAllChildOptionsSelected) {
+      return setValue(
+        name,
+        selectedValues.filter(
+          selectedValue => !thisAndAllChildOptionIds.includes(selectedValue),
+        ),
+      );
+    }
+    return setValue(
+      name,
+      Array.from(new Set([...selectedValues, ...thisAndAllChildOptionIds])),
+    );
+  }, [
+    hasThisAndAllChildOptionsSelected,
+    name,
+    selectedValues,
+    setValue,
+    thisAndAllChildOptionIds,
+  ]);
 
   return (
     <div
@@ -149,26 +186,45 @@ function FilterHierarchyOptions({
         />
       </div>
       {!!optionTree.options?.length && (
-        <DetailsMenu
-          summary={`${
-            isExpanded ? 'Close' : 'Show'
-          } ${optionTree.childFilterLabel?.toLocaleLowerCase()}`}
-          summaryAfter={renderSelectedCount()}
-          hiddenText={`options for ${optionTree.label.toLocaleLowerCase()}`}
+        <FilterAccordion
+          label={`${
+            isExpanded ? 'Close this sub category' : 'Show sub categories'
+          }`}
+          labelAfter={
+            <>
+              {!!optionTree.options?.length && isExpanded && (
+                <>
+                  <span aria-hidden className={styles.divider}>
+                    |
+                  </span>
+                  <ButtonText
+                    className={styles.selectThisAndAllButton}
+                    underline={false}
+                    onClick={toggleSelectThisAndSubCategories}
+                  >
+                    {`${
+                      hasThisAndAllChildOptionsSelected ? 'Unselect' : 'Select'
+                    } this and all sub categories`}
+                    <VisuallyHidden>{` for ${optionTree.label.toLocaleLowerCase()}`}</VisuallyHidden>
+                  </ButtonText>
+                </>
+              )}
+              {renderSelectedCount()}
+            </>
+          }
+          labelHiddenText={` for ${optionTree.label.toLocaleLowerCase()}`}
+          id={`${name}-${optionTree.value}-options`}
           open={isExpanded}
-          onToggle={() => toggleOptions(optionTree.value)}
-          className={styles.detailsMenu}
+          onToggle={() => onToggleOptions(optionTree.value)}
         >
           {level !== 0 &&
             optionTree.options.length > 6 &&
             !hierarchySearchTerm && (
               <div className={styles.search}>
                 <FormTextSearchInput
-                  id={`${name}-search`}
+                  id={`${name}-${optionTree.value}-search`}
                   name={`${name}-search`}
-                  label={`Search ${
-                    optionTree.label
-                  } (${optionTree.childFilterLabel?.toLocaleLowerCase()})`}
+                  label={`Search ${optionTree.label}`}
                   width={20}
                   onChange={event => setSearchTerm(event.target.value)}
                   onKeyPress={event => {
@@ -185,18 +241,14 @@ function FilterHierarchyOptions({
                 className={styles.selectAllButton}
                 onClick={toggleSelectAll}
               >
-                {hasAllSelected ? 'Unselect' : 'Select'} all{' '}
-                {filteredOptions.length} <span aria-hidden>options</span>
+                {hasAllSelected ? 'Unselect all' : 'Select all'}
                 <VisuallyHidden>
-                  {' '}
-                  {optionTree.childFilterLabel!.toLowerCase()} options for{' '}
-                  {optionTree.label.toLocaleLowerCase()}
+                  {` sub categories for ${optionTree.label.toLocaleLowerCase()}`}
                 </VisuallyHidden>
               </ButtonText>
             )}
             {filteredOptions?.map(childOptionTree => (
               <FilterHierarchyOptions
-                toggleOptions={toggleOptions}
                 expandedOptionsList={expandedOptionsList}
                 optionTree={childOptionTree}
                 key={childOptionTree.value}
@@ -206,10 +258,11 @@ function FilterHierarchyOptions({
                 level={level + 1}
                 hierarchySearchTerm={hierarchySearchTerm}
                 selectedChildren={selectedChildren}
+                onToggleOptions={onToggleOptions}
               />
             ))}
           </div>
-        </DetailsMenu>
+        </FilterAccordion>
       )}
     </div>
   );

@@ -334,10 +334,10 @@ Select subject "${SUBJECT_2_NAME}"
 
 Select locations
     user waits until table tool wizard step is available    2    Choose locations
-    user opens details dropdown    Opportunity area
+    user clicks button    Opportunity area
     user clicks checkbox    Bolton 001
     user clicks checkbox    Bolton 004
-    user opens details dropdown    Ward
+    user clicks button    Ward
     user clicks checkbox    Nailsea Youngwood
     user clicks checkbox    Syon
     user waits until button is enabled    Next step    %{WAIT_SMALL}
@@ -389,7 +389,7 @@ Select subject "${SUBJECT_2_NAME}" again
 
 Select locations again
     user waits until table tool wizard step is available    2    Choose locations
-    user opens details dropdown    Opportunity area
+    user clicks button    Opportunity area
     user clicks checkbox    Bolton 001
     user waits until button is enabled    Next step    %{WAIT_SMALL}
     user clicks button    Next step
@@ -567,7 +567,7 @@ Select subject "${SUBJECT_2_NAME}" in table tool
     user checks previous table tool step contains    2    Data set    ${SUBJECT_2_NAME}
 
 Select locations in table tool
-    user clicks element    testid:Expand Details Section Local authority
+    user clicks button    Local authority    testid:locations-localAuthority-accordion
     user clicks checkbox    Barnsley
     user clicks checkbox    Birmingham
 
