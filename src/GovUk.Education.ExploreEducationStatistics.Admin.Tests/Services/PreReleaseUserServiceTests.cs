@@ -896,7 +896,14 @@ public abstract class PreReleaseUserServiceTests
                             It.IsAny<CancellationToken>()
                         )
                     )
-                    .ReturnsAsync(_dataFixture.DefaultUser());
+                    .ReturnsAsync(
+                        _dataFixture
+                            .DefaultUserWithPendingInvite()
+                            .WithEmail(email)
+                            .WithRoleId(GlobalRoles.Role.PrereleaseUser.GetEnumValue())
+                            .WithCreatedById(_userId)
+                            .WithCreated(DateTimeOffset.UtcNow)
+                    );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1094,7 +1101,14 @@ public abstract class PreReleaseUserServiceTests
                             It.IsAny<CancellationToken>()
                         )
                     )
-                    .ReturnsAsync(_dataFixture.DefaultUser());
+                    .ReturnsAsync(
+                        _dataFixture
+                            .DefaultUserWithPendingInvite()
+                            .WithEmail(email)
+                            .WithRoleId(GlobalRoles.Role.PrereleaseUser.GetEnumValue())
+                            .WithCreatedById(_userId)
+                            .WithCreated(DateTimeOffset.UtcNow)
+                    );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
