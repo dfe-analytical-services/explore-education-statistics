@@ -12,6 +12,7 @@ import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
 import Tag from '@common/components/Tag';
 import { Dictionary } from '@common/types';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import DataSetUploadSummaryList from './DataSetUploadSummaryList';
 import dataSetUploadTabIds from '../utils/dataSetUploadTabIds';
 import ScreenerResultsTable from './ScreenerResultsTable';
@@ -38,6 +39,8 @@ export default function DataFilesTableUploadRow({
 }: Props) {
   const [openImportConfirm, toggleOpenImportConfirm] = useToggle(false);
   const [openDeleteConfirm, toggleOpenDeleteConfirm] = useToggle(false);
+  const { user } = useAuthContext();
+  const isBauUser = user?.permissions.isBauUser ?? false;
 
   const hasFailures = dataSetUpload.screenerResult?.testResults.some(
     testResult => testResult.result === 'FAIL',
@@ -82,7 +85,8 @@ export default function DataFilesTableUploadRow({
   const failuresNoticeMessage = (
     <WarningMessage>
       You will need to delete this file (close this window, and select "Delete
-      files"), fix the failed tests and upload again
+      files"), fix the failed tests and upload again. If you have any questions,
+      please get in touch with the explore.statistics@education.gov.uk team.
     </WarningMessage>
   );
 
@@ -111,9 +115,13 @@ export default function DataFilesTableUploadRow({
     onConfirmDelete,
   ]);
 
-  const confirmText = hasWarnings
+  let confirmText = hasWarnings
     ? 'Continue import with warnings'
     : 'Continue import';
+
+  if (hasFailures) {
+    confirmText = 'Continue import (override failures)';
+  }
 
   return (
     <tr key={dataSetUpload.dataSetTitle}>
@@ -134,7 +142,10 @@ export default function DataFilesTableUploadRow({
             title="Data set details"
             open={openImportConfirm}
             hideConfirm={
-              !canUpdateRelease || hasFailures || !dataSetUpload.screenerResult
+              !isBauUser &&
+              (!canUpdateRelease ||
+                hasFailures ||
+                !dataSetUpload.screenerResult)
             }
             disableConfirm={
               !Object.values(warningAcknowledgements).every(

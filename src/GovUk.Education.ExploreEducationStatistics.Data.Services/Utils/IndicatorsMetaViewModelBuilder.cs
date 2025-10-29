@@ -32,13 +32,14 @@ public static class IndicatorsMetaViewModelBuilder
         IEnumerable<Guid>? sequence = null
     )
     {
-        return OrderAsList(
-            values,
-            idSelector: value => value.Id,
-            labelSelector: value => value.Label,
-            sequenceIdSelector: sequenceEntry => sequenceEntry,
-            resultSelector: value => new IndicatorMetaViewModel(value),
-            sequence
-        );
+        return OrderBySequenceOrLabel(
+                values,
+                idSelector: value => value.Id,
+                labelSelector: value => value.Label,
+                sequenceIdSelector: sequenceEntry => sequenceEntry,
+                resultSelector: value => new IndicatorMetaViewModel(value),
+                sequence
+            )
+            .ToList();
     }
 }

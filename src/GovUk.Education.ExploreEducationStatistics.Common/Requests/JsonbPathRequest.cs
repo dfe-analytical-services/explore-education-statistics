@@ -5,13 +5,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Requests;
 /// </summary>
 public record JsonbPathRequest<TRowId>
 {
-    public string TableName { get; init; }
+    public required string TableName { get; init; }
 
-    public string IdColumnName { get; init; }
+    public required string IdColumnName { get; init; }
 
-    public string JsonbColumnName { get; init; }
+    public required string JsonbColumnName { get; init; }
 
-    public TRowId RowId { get; init; }
+    public required TRowId RowId { get; init; }
 
-    public string[] PathSegments { get; init; }
+    public required string[] PathSegments { get; init; }
 }

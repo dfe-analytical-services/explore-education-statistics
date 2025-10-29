@@ -50,14 +50,16 @@ var resourcePrefix = '${subscription}-ees'
 
 var resourceNames = {
   existingResources: {
-    keyVault: '${subscription}-kv-ees-01'
-    vNet: '${subscription}-vnet-ees'
     alertsGroup: '${subscription}-ag-ees-alertedusers'
+    keyVault: '${subscription}-kv-ees-01'
     logAnalyticsWorkspace: '${resourcePrefix}-log'
+    recoveryVault: '${resourcePrefix}-${abbreviations.recoveryServicesVaults}'
+    recoveryVaultFileShareBackupPolicy: 'DailyPolicy'
     subnets: {
       analyticsFunctionApp: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-analytics'
       storagePrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.storageStorageAccounts}-anlyt-${abbreviations.privateEndpoints}'
     }
+    vNet: '${subscription}-vnet-ees'
   }
 }
 
@@ -80,6 +82,17 @@ module analyticsStorageModule 'application/analyticsStorage.bicep' = {
     resourceNames: resourceNames
     storageFirewallRules: maintenanceIpRanges
     deployAlerts: true
+    tagValues: tagValues
+  }
+}
+
+module publicApiStorageBackupModule '../public-api/components/recoveryVaultFileShareRegistration.bicep' = {
+  name: 'publicApiStorageBackupModuleDeploy'
+  params: {
+    vaultName: resourceNames.existingResources.recoveryVault
+    backupPolicyName: resourceNames.existingResources.recoveryVaultFileShareBackupPolicy
+    storageAccountName: analyticsStorageModule.outputs.storageAccountName
+    fileShareName: analyticsStorageModule.outputs.fileShareName
     tagValues: tagValues
   }
 }

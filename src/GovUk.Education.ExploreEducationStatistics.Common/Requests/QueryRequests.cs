@@ -1,4 +1,3 @@
-#nullable enable
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.FilterHierarchiesOptionsUtils;

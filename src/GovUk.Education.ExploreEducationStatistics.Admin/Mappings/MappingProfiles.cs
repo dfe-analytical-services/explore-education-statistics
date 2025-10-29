@@ -262,23 +262,14 @@ public class MappingProfiles : CommonMappingProfile
 
     private static string GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)
     {
-        // TODO (EES-5353): This first condition shouldn't be required to determine pass or fail and should eventually be removed.
-        // This is an issue with the WIP screener package where a "stage" passes, even though it contains failing tests.
-        var hasIndividualTestFailures =
-            screenerResult is null || screenerResult.TestResults.Any(test => test.Result == TestResult.FAIL);
-        if (hasIndividualTestFailures)
+        if (screenerResult.Passed && screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING))
         {
-            return DataSetUploadStatus.FAILED_SCREENING.ToString();
+            return DataSetUploadStatus.PENDING_REVIEW.ToString();
         }
 
-        return screenerResult.OverallResult switch
-        {
-            ScreenerResult.Passed => screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING)
-                ? DataSetUploadStatus.PENDING_REVIEW.ToString()
-                : DataSetUploadStatus.PENDING_IMPORT.ToString(),
-            ScreenerResult.Failed => DataSetUploadStatus.FAILED_SCREENING.ToString(),
-            _ => throw new ArgumentOutOfRangeException(nameof(screenerResult), screenerResult, null),
-        };
+        return !screenerResult.Passed
+            ? DataSetUploadStatus.FAILED_SCREENING.ToString()
+            : DataSetUploadStatus.PENDING_IMPORT.ToString();
     }
 
     private void CreateContentBlockMap()

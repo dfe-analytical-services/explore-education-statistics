@@ -25,8 +25,9 @@ public class DataSetScreenerClient(
         // TODO (EES-6341): Re-enable screening once fully implemented.
         return new DataSetScreenerResponse
         {
-            OverallResult = ScreenerResult.Passed,
-            Message = "Screening has been bypassed awaiting full implementation.",
+            OverallResult = "Passed",
+            Passed = true,
+            PublicApiCompatible = true,
         };
         //await authenticationManager.AddAuthentication(httpClient, cancellationToken);
 

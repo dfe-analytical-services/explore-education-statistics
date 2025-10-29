@@ -1,19 +1,29 @@
+import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import { Contact } from '@common/services/publicationService';
 import React from 'react';
 
+export const contactUsNavItem = {
+  id: 'contact-us-section',
+  text: 'Contact us',
+};
+
 const ContactUsSection = ({
-  sectionTitle = 'Contact us',
+  includeSectionBreak = false,
   publicationContact,
   publicationTitle,
+  sectionTitle = 'Contact us',
 }: {
-  sectionTitle?: string;
+  includeSectionBreak?: boolean;
   publicationContact: Contact;
   publicationTitle: string;
+  sectionTitle?: string;
 }) => {
   return (
-    <section id="contact-us-section">
-      <h2 id="contact-us">{sectionTitle}</h2>
-
+    <ReleasePageContentSection
+      heading={sectionTitle}
+      id="contact-us-section"
+      includeSectionBreak={includeSectionBreak}
+    >
       <p>
         If you have a specific enquiry about {publicationTitle} statistics and
         data:
@@ -59,7 +69,7 @@ const ContactUsSection = ({
       <p className="govuk-!-margin-top-0">
         Monday to Friday from 9.30am to 5pm (excluding bank holidays)
       </p>
-    </section>
+    </ReleasePageContentSection>
   );
 };
 

@@ -1,4 +1,3 @@
-#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cache;
 
 [AttributeUsage(AttributeTargets.Parameter)]

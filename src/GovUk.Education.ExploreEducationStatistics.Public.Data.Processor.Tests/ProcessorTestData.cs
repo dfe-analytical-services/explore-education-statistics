@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests;
@@ -644,6 +645,358 @@ public record ProcessorTestData
                     Label = "Number of students enrolled",
                     DecimalPlaces = 0,
                     Unit = IndicatorUnit.None,
+                    DataSetVersionId = Guid.Empty,
+                },
+            ],
+        };
+
+    /// <summary>
+    /// This test data set was introduced to reproduce and then fix
+    /// a bug whereby DuckDB, performing some early optimisations,
+    /// caused CSV reading to fail when a quote-separated CSV cell
+    /// was introduced far down in the CSV. We fix this by being
+    /// explicit in the CSV-reading configuration we provide via
+    /// <see cref="DuckDbConstants.ReadCsvOptions"/>.
+    /// </summary>
+    public static ProcessorTestData LargeDataSet =>
+        new()
+        {
+            Name = nameof(LargeDataSet),
+            ExpectedTotalResults = 20499,
+            ExpectedTimePeriods =
+            [
+                new TimePeriodMeta
+                {
+                    Code = TimeIdentifier.Week37,
+                    Period = "2025",
+                    DataSetVersionId = Guid.Empty,
+                },
+            ],
+            ExpectedGeographicLevels =
+            [
+                GeographicLevel.LocalAuthority,
+                GeographicLevel.Country,
+                GeographicLevel.Region,
+            ],
+            ExpectedLocations =
+            [
+                new LocationMeta
+                {
+                    Id = 1,
+                    Level = GeographicLevel.LocalAuthority,
+                    DataSetVersionId = Guid.Empty,
+                    Options =
+                    [
+                        new LocationLocalAuthorityOptionMeta
+                        {
+                            Id = 1,
+                            OldCode = "805",
+                            Code = "E06000001",
+                            Label = "Hartlepool",
+                        },
+                        new LocationLocalAuthorityOptionMeta
+                        {
+                            Id = 2,
+                            OldCode = "807",
+                            Code = "E06000003",
+                            Label = "Redcar and Cleveland",
+                        },
+                        new LocationLocalAuthorityOptionMeta
+                        {
+                            Id = 3,
+                            OldCode = "841",
+                            Code = "E06000005",
+                            Label = "Darlington",
+                        },
+                        new LocationLocalAuthorityOptionMeta
+                        {
+                            Id = 4,
+                            OldCode = "810",
+                            Code = "E06000010",
+                            Label = "Kingston upon Hull, City of",
+                        },
+                        new LocationLocalAuthorityOptionMeta
+                        {
+                            Id = 5,
+                            OldCode = "391",
+                            Code = "E08000021",
+                            Label = "Newcastle upon Tyne",
+                        },
+                        new LocationLocalAuthorityOptionMeta
+                        {
+                            Id = 6,
+                            OldCode = "393",
+                            Code = "E08000023",
+                            Label = "South Tyneside",
+                        },
+                    ],
+                },
+                new LocationMeta
+                {
+                    Id = 2,
+                    Level = GeographicLevel.Country,
+                    DataSetVersionId = Guid.Empty,
+                    Options =
+                    [
+                        new LocationCodedOptionMeta
+                        {
+                            Id = 7,
+                            Code = "E92000001",
+                            Label = "England",
+                        },
+                    ],
+                },
+                new LocationMeta
+                {
+                    Id = 3,
+                    Level = GeographicLevel.Region,
+                    DataSetVersionId = Guid.Empty,
+                    Options =
+                    [
+                        new LocationCodedOptionMeta
+                        {
+                            Id = 8,
+                            Code = "E12000001",
+                            Label = "North East",
+                        },
+                        new LocationCodedOptionMeta
+                        {
+                            Id = 9,
+                            Code = "E12000002",
+                            Label = "North West",
+                        },
+                        new LocationCodedOptionMeta
+                        {
+                            Id = 10,
+                            Code = "E12000003",
+                            Label = "Yorkshire and The Humber",
+                        },
+                    ],
+                },
+            ],
+            ExpectedFilters =
+            [
+                new FilterMeta
+                {
+                    Id = 1,
+                    PublicId = SqidEncoder.Encode(1),
+                    Column = "attendance_reason",
+                    Label = "Attendance reason",
+                    Hint = "",
+                    DataSetVersionId = Guid.Empty,
+                    Options =
+                    [
+                        new FilterOptionMeta { Id = 8, Label = "All present" },
+                        new FilterOptionMeta { Id = 9, Label = "Regulated performance (c1)" },
+                        new FilterOptionMeta { Id = 10, Label = "Travel disruption (y2)" },
+                    ],
+                    OptionLinks =
+                    [
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 3,
+                            OptionId = 8,
+                            PublicId = SqidEncoder.Encode(8),
+                        },
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 3,
+                            OptionId = 9,
+                            PublicId = SqidEncoder.Encode(9),
+                        },
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 3,
+                            OptionId = 10,
+                            PublicId = SqidEncoder.Encode(10),
+                        },
+                    ],
+                },
+                new FilterMeta
+                {
+                    Id = 2,
+                    PublicId = SqidEncoder.Encode(2),
+                    Column = "attendance_status",
+                    Label = "Attendance status",
+                    Hint = "",
+                    DataSetVersionId = Guid.Empty,
+                    Options =
+                    [
+                        new FilterOptionMeta { Id = 8, Label = "Absence" },
+                        new FilterOptionMeta { Id = 9, Label = "Attendance" },
+                        new FilterOptionMeta { Id = 10, Label = "Late sessions" },
+                        new FilterOptionMeta { Id = 10, Label = "Management and legacy codes" },
+                        new FilterOptionMeta { Id = 10, Label = "Possible sessions" },
+                    ],
+                    OptionLinks =
+                    [
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 3,
+                            OptionId = 8,
+                            PublicId = SqidEncoder.Encode(8),
+                        },
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 3,
+                            OptionId = 9,
+                            PublicId = SqidEncoder.Encode(9),
+                        },
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 3,
+                            OptionId = 10,
+                            PublicId = SqidEncoder.Encode(10),
+                        },
+                    ],
+                },
+                new FilterMeta
+                {
+                    Id = 3,
+                    PublicId = SqidEncoder.Encode(3),
+                    Column = "attendance_type",
+                    Label = "Attendance type",
+                    Hint = "",
+                    DataSetVersionId = Guid.Empty,
+                    Options =
+                    [
+                        new FilterOptionMeta { Id = 8, Label = "Management and legacy codes" },
+                        new FilterOptionMeta { Id = 9, Label = "Present" },
+                        new FilterOptionMeta { Id = 10, Label = "Unauthorised" },
+                    ],
+                    OptionLinks =
+                    [
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 3,
+                            OptionId = 8,
+                            PublicId = SqidEncoder.Encode(8),
+                        },
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 3,
+                            OptionId = 9,
+                            PublicId = SqidEncoder.Encode(9),
+                        },
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 3,
+                            OptionId = 10,
+                            PublicId = SqidEncoder.Encode(10),
+                        },
+                    ],
+                },
+                new FilterMeta
+                {
+                    Id = 4,
+                    PublicId = SqidEncoder.Encode(4),
+                    Column = "education_phase",
+                    Label = "Education phase",
+                    Hint = "",
+                    DataSetVersionId = Guid.Empty,
+                    Options =
+                    [
+                        new FilterOptionMeta { Id = 4, Label = "All schools" },
+                        new FilterOptionMeta { Id = 5, Label = "Primary" },
+                        new FilterOptionMeta { Id = 6, Label = "Secondary" },
+                        new FilterOptionMeta { Id = 7, Label = "Special" },
+                    ],
+                    OptionLinks =
+                    [
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 2,
+                            OptionId = 4,
+                            PublicId = SqidEncoder.Encode(4),
+                        },
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 2,
+                            OptionId = 5,
+                            PublicId = SqidEncoder.Encode(5),
+                        },
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 2,
+                            OptionId = 6,
+                            PublicId = SqidEncoder.Encode(6),
+                        },
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 2,
+                            OptionId = 7,
+                            PublicId = SqidEncoder.Encode(7),
+                        },
+                    ],
+                },
+                new FilterMeta
+                {
+                    Id = 5,
+                    PublicId = SqidEncoder.Encode(5),
+                    Column = "time_frame",
+                    Label = "Time frame",
+                    Hint = "",
+                    DataSetVersionId = Guid.Empty,
+                    Options =
+                    [
+                        new FilterOptionMeta { Id = 5, Label = "Friday" },
+                        new FilterOptionMeta { Id = 1, Label = "Monday" },
+                        new FilterOptionMeta { Id = 4, Label = "Thursday" },
+                        new FilterOptionMeta { Id = 2, Label = "Tuesday" },
+                        new FilterOptionMeta { Id = 3, Label = "Wednesday" },
+                        new FilterOptionMeta { Id = 6, Label = "Week" },
+                        new FilterOptionMeta { Id = 7, Label = "Year to date" },
+                    ],
+                    OptionLinks =
+                    [
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 1,
+                            OptionId = 1,
+                            PublicId = SqidEncoder.Encode(1),
+                        },
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 1,
+                            OptionId = 2,
+                            PublicId = SqidEncoder.Encode(2),
+                        },
+                        new FilterOptionMetaLink
+                        {
+                            MetaId = 1,
+                            OptionId = 3,
+                            PublicId = SqidEncoder.Encode(3),
+                        },
+                    ],
+                },
+            ],
+            ExpectedIndicators =
+            [
+                new IndicatorMeta
+                {
+                    Id = 1,
+                    PublicId = SqidEncoder.Encode(1),
+                    Column = "reference_date",
+                    Label = "Enrolments",
+                    DecimalPlaces = 0,
+                    DataSetVersionId = Guid.Empty,
+                },
+                new IndicatorMeta
+                {
+                    Id = 2,
+                    PublicId = SqidEncoder.Encode(2),
+                    Column = "session_count",
+                    Label = "Number of authorised sessions",
+                    DecimalPlaces = 0,
+                    DataSetVersionId = Guid.Empty,
+                },
+                new IndicatorMeta
+                {
+                    Id = 3,
+                    PublicId = SqidEncoder.Encode(3),
+                    Column = "session_percent",
+                    Label = "Number of possible sessions",
+                    DecimalPlaces = 0,
                     DataSetVersionId = Guid.Empty,
                 },
             ],

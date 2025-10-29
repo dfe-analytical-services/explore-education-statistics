@@ -16,7 +16,8 @@
     <CompilerVisibleProperty Include="ProjectDir" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="9.9.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
     <!-- Required to execute unit tests in IDE -->
     <PackageReference Include="Moq.EntityFrameworkCore" Version="8.0.1.7" />
     <PackageReference Include="coverlet.collector" Version="6.0.4">

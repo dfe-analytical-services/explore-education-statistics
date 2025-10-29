@@ -104,7 +104,7 @@ public class DataBlockVersion : ICreatedUpdatedTimestamps<DateTime, DateTime?>
     }
 
     [NotMapped]
-    public string Source
+    public string? Source
     {
         get => ContentBlock.Source;
         set => ContentBlock.Source = value;

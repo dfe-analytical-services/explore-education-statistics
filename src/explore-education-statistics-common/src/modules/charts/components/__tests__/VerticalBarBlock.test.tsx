@@ -11,9 +11,29 @@ import VerticalBarBlock, {
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 jest.mock('recharts/lib/util/LogUtils');
+
+// Responsive charts don't render in tests so have do
+// mock the responsive container and apply a fixed width.
+jest.mock('recharts', () => {
+  const OriginalModule = jest.requireActual('recharts');
+  return {
+    ...OriginalModule,
+    ResponsiveContainer: ({
+      children,
+      height,
+    }: {
+      children: ReactNode;
+      height: string;
+    }) => (
+      <OriginalModule.ResponsiveContainer width={800} height={height}>
+        {children}
+      </OriginalModule.ResponsiveContainer>
+    ),
+  };
+});
 
 describe('VerticalBarBlock', () => {
   const fullTable = mapFullTable(testChartTableData);
@@ -236,21 +256,6 @@ describe('VerticalBarBlock', () => {
     expect(
       container.querySelector('.recharts-reference-line'),
     ).toHaveTextContent('hello');
-  });
-
-  test('can change width of chart', () => {
-    const { container } = render(<VerticalBarBlock {...props} width={200} />);
-
-    const responsiveContainer = container.querySelector(
-      '.recharts-responsive-container',
-    );
-
-    expect(responsiveContainer).toHaveProperty('style');
-
-    if (responsiveContainer) {
-      const div = responsiveContainer as HTMLElement;
-      expect(div.style.width).toEqual('200px');
-    }
   });
 
   test('can change height of chart', () => {

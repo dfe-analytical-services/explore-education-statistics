@@ -18,6 +18,7 @@ public class MapperUtils
     {
         var services = new ServiceCollection();
         services.AddTransient(_ => new DataBlockViewModelPostMappingAction(contentDbContext));
+
         services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfiles>(), Array.Empty<Assembly>());
 
         var serviceProvider = services.BuildServiceProvider();

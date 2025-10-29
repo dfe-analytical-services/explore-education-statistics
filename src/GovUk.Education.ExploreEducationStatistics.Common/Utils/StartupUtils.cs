@@ -11,7 +11,11 @@ public static class StartupUtils
         services.AddTransient<IPersistenceHelper<TDbContext>, PersistenceHelper<TDbContext>>(s =>
         {
             var dbContext = s.GetService<TDbContext>();
-            return new PersistenceHelper<TDbContext>(dbContext);
+            if (dbContext != null)
+            {
+                return new PersistenceHelper<TDbContext>(dbContext);
+            }
+            throw new InvalidOperationException("Could not detect database context");
         });
     }
 }

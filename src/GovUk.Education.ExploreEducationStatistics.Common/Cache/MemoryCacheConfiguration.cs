@@ -1,4 +1,3 @@
-#nullable enable
 using NCrontab;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cache;

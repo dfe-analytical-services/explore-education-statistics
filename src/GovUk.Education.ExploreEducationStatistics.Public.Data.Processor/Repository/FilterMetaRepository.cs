@@ -222,17 +222,16 @@ public class FilterMetaRepository(
                 .SqlBuilder(
                     $"""
                     SELECT DISTINCT "{filterColumn:raw}"
-                    FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(
-                        dataSetVersion
-                    ):raw}', ALL_VARCHAR = true) AS data
+                    FROM read_csv(
+                        '{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}',
+                        {DuckDbConstants.ReadCsvOptions:raw}
+                    ) AS data
                     WHERE "{filterColumn:raw}" != ''
                     ORDER BY "{filterColumn:raw}"
                     """
                 )
                 .QueryAsync<string>(cancellationToken: cancellationToken)
-        )
-            .Select(label => new FilterOptionMeta { Label = label })
-            .ToList();
+        ).Select(label => new FilterOptionMeta { Label = label }).ToList();
     }
 
     private async Task<PublicIdMappings> CreatePublicIdMappings(

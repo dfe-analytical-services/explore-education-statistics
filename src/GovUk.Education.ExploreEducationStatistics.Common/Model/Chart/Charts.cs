@@ -1,4 +1,3 @@
-#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -107,6 +106,8 @@ public class MapChart : Chart
 public class MapChartConfig
 {
     public List<ChartDataSetConfig> DataSetConfigs { get; set; } = new();
+
+    public List<ChartCategoricalDataConfig> CategoricalDataConfig { get; set; } = new();
 }
 
 public class InfographicChart : Chart

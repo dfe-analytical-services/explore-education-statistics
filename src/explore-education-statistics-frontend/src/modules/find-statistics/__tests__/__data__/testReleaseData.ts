@@ -2,6 +2,7 @@ import {
   Publication,
   PublicationSummaryRedesign,
   ReleaseVersion,
+  ReleaseVersionHomeContent,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 
@@ -247,4 +248,243 @@ export const testReleaseVersionSummary: ReleaseVersionSummary = {
   lastUpdated: '2025-08-11T14:30:00+01:00',
   isLatestRelease: true,
   updateCount: 5,
+};
+
+export const testReleaseHomeContent: ReleaseVersionHomeContent = {
+  releaseId: 'test-release-id',
+  releaseVersionId: 'test-release-version-id',
+  content: [
+    {
+      id: 'test-section-1-id',
+      heading: 'Section 1 heading',
+      content: [
+        {
+          type: 'HtmlBlock',
+          body: '<p>Section 1 block 1 text</p>',
+          id: 'test-section-1-block-1-id',
+        },
+        {
+          type: 'DataBlock',
+          dataBlockVersion: {
+            dataBlockVersionId: 'test-section-1-block-2-data-block-version-id',
+            dataBlockParentId: 'test-section-1-block-2-data-block-parent-id',
+            charts: [
+              {
+                type: 'infographic',
+                fileId: 'test-chart-file-id',
+                title: 'Chart title',
+                subtitle: 'Chart subtitle',
+                alt: 'Alt text',
+                height: 600,
+                includeNonNumericData: false,
+                axes: {},
+                legend: {
+                  items: [],
+                },
+              },
+            ],
+            heading: 'Data block heading',
+            name: 'Data block name',
+            query: {
+              subjectId: 'test-subject-id',
+              locationIds: ['test-location-id'],
+              timePeriod: {
+                startYear: 2025,
+                startCode: 'AY',
+                endYear: 2025,
+                endCode: 'AY',
+              },
+              filters: ['test-filter-id'],
+              indicators: ['test-indicator-id'],
+            },
+            source: 'Source',
+            table: {
+              tableHeaders: {
+                columnGroups: [],
+                columns: [
+                  {
+                    value: '2025_AY',
+                    type: 'TimePeriod',
+                  },
+                ],
+                rowGroups: [
+                  [
+                    {
+                      value: 'filter-id',
+                      type: 'Filter',
+                    },
+                  ],
+                  [
+                    {
+                      level: 'localAuthority',
+                      value: 'location-id',
+                      type: 'Location',
+                    },
+                  ],
+                ],
+                rows: [
+                  {
+                    value: 'indicator-id',
+                    type: 'Indicator',
+                  },
+                ],
+              },
+            },
+          },
+          id: 'test-section-1-block-2-id',
+        },
+        {
+          type: 'HtmlBlock',
+          body: '<p>Section 1 block 3 text</p>',
+          id: 'test-section-1-block-3-id',
+        },
+      ],
+    },
+    {
+      id: 'test-section-2-id',
+      heading: 'Section 2 heading',
+      content: [
+        {
+          type: 'HtmlBlock',
+          body: '<h3>Section 2 subheading</h3><p>Section 2 block 1 text</p>',
+          id: 'test-section-2-block-1-id',
+        },
+      ],
+    },
+    {
+      id: 'test-section-3-id',
+      heading: 'Section 3 heading',
+      content: [
+        {
+          type: 'EmbedBlock',
+          embedBlock: {
+            embedBlockId: 'test-embed-block-id',
+            title: 'Embedded dashboard title',
+            url: 'https://department-for-education.shinyapps.io/test-dashboard',
+          },
+          id: 'test-section-3-block-1-id',
+        },
+      ],
+    },
+  ],
+  headlinesSection: {
+    id: 'test-headlines-section-id',
+    content: [
+      {
+        type: 'HtmlBlock',
+        body: '<p>Headlines section text</p>',
+        id: 'test-headlines-section-block-1-id',
+      },
+    ],
+  },
+  keyStatistics: [
+    {
+      type: 'KeyStatisticText',
+      statistic: '999',
+      title: 'Key statistic 1 title',
+      id: 'test-key-statistic-1-id',
+      guidanceText: 'Guidance text',
+      guidanceTitle: 'Guidance title 1',
+      trend: 'Trend',
+    },
+    {
+      type: 'KeyStatisticDataBlock',
+      dataBlockVersionId: 'test-key-statistic-2-data-block-version-id',
+      dataBlockParentId: 'test-key-statistic-2-data-block-parent-id',
+      id: 'test-key-statistic-2-id',
+    },
+    {
+      type: 'KeyStatisticText',
+      statistic: '999',
+      title: 'Key statistic 2 title',
+      id: 'test-key-statistic-3-id',
+      guidanceText: 'Guidance text',
+      guidanceTitle: 'Guidance title 2',
+      trend: 'Trend',
+    },
+  ],
+  keyStatisticsSecondarySection: {
+    id: 'test-key-statistics-secondary-section-id',
+    content: [
+      {
+        type: 'DataBlock',
+        dataBlockVersion: {
+          dataBlockVersionId:
+            'test-key-statistics-secondary-data-block-version-id',
+          dataBlockParentId:
+            'test-key-statistics-secondary-data-block-parent-id',
+          charts: [
+            {
+              type: 'infographic',
+              fileId: 'test-key-statistics-secondary-chart-file-id',
+              title: 'Test chart title',
+              subtitle: 'Test chart subtitle',
+              alt: 'Alt text',
+              height: 600,
+              includeNonNumericData: false,
+              axes: {},
+            },
+          ],
+          heading: 'Test data block heading',
+          name: 'Test data block name',
+          query: {
+            subjectId: 'test-subject-id',
+            locationIds: ['test-location-id'],
+            timePeriod: {
+              startYear: 2025,
+              startCode: 'AY',
+              endYear: 2025,
+              endCode: 'AY',
+            },
+            filters: ['test-filter-id'],
+            indicators: ['test-indicator-id'],
+          },
+          source: 'Source',
+          table: {
+            tableHeaders: {
+              columnGroups: [],
+              columns: [
+                {
+                  value: '2025_AY',
+                  type: 'TimePeriod',
+                },
+              ],
+              rowGroups: [
+                [
+                  {
+                    value: 'filter-id',
+                    type: 'Filter',
+                  },
+                ],
+                [
+                  {
+                    level: 'localAuthority',
+                    value: 'location-id',
+                    type: 'Location',
+                  },
+                ],
+              ],
+              rows: [
+                {
+                  value: 'indicator-id',
+                  type: 'Indicator',
+                },
+              ],
+            },
+          },
+        },
+        id: 'test-key-statistics-secondary-block-1-id',
+      },
+    ],
+  },
+  summarySection: {
+    id: 'test-summary-section-id',
+    content: [
+      {
+        type: 'HtmlBlock',
+        body: '<p>Summary section text</p>',
+        id: 'test-summary-section-block-1-id',
+      },
+    ],
+  },
 };

@@ -1,3 +1,4 @@
+using System.Numerics;
 using Bogus;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
@@ -52,9 +53,9 @@ public static class DataSetVersionGeneratorExtensions
 
     public static Generator<DataSetVersion> WithVersionNumber(
         this Generator<DataSetVersion> generator,
-        int major,
-        int minor,
-        int patch = 0
+        BigInteger major,
+        BigInteger minor,
+        BigInteger patch = default // 0 because BigInteger is a struct
     ) => generator.ForInstance(s => s.SetVersionNumber(major, minor, patch));
 
     public static Generator<DataSetVersion> WithPublished(
@@ -236,9 +237,9 @@ public static class DataSetVersionGeneratorExtensions
 
     public static InstanceSetters<DataSetVersion> SetVersionNumber(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        int major,
-        int minor,
-        int patch = 0
+        BigInteger major,
+        BigInteger minor,
+        BigInteger patch = default // default == 0
     ) =>
         instanceSetter
             .Set(dsv => dsv.VersionMajor, major)

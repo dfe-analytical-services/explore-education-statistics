@@ -668,6 +668,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTimeOffset>("Activates")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 

@@ -189,8 +189,6 @@ public class ContentDbContext : DbContext
 
         modelBuilder.Entity<DataImport>().HasOne(import => import.MetaFile).WithOne().OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<DataImport>().HasOne(import => import.ZipFile).WithMany().OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder
             .Entity<DataImport>()
             .Property(import => import.Status)
@@ -596,6 +594,8 @@ public class ContentDbContext : DbContext
                 v => JsonConvert.SerializeObject(v),
                 v => JsonConvert.DeserializeObject<TableBuilderConfiguration>(v)
             );
+
+        modelBuilder.Entity<DataBlock>().Navigation(block => block.DataBlockVersion).AutoInclude();
     }
 
     private static void ConfigureHtmlBlock(ModelBuilder modelBuilder)
@@ -608,6 +608,8 @@ public class ContentDbContext : DbContext
         modelBuilder.Entity<EmbedBlockLink>().Property(block => block.EmbedBlockId).HasColumnName("EmbedBlockId");
 
         modelBuilder.Entity<EmbedBlockLink>().HasOne(eb => eb.EmbedBlock).WithOne().OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<EmbedBlockLink>().Navigation(eb => eb.EmbedBlock).AutoInclude();
     }
 
     private static void ConfigureFeaturedTable(ModelBuilder modelBuilder)
@@ -786,30 +788,29 @@ public class ContentDbContext : DbContext
     {
         modelBuilder.Entity<DataBlockVersion>().ToTable("DataBlockVersions");
 
-        modelBuilder.Entity<DataBlockVersion>().Property(f => f.DataBlockParentId).HasColumnName("DataBlockId");
+        modelBuilder.Entity<DataBlockVersion>().Property(v => v.DataBlockParentId).HasColumnName("DataBlockId");
 
         modelBuilder
             .Entity<DataBlockVersion>()
-            .Property(invite => invite.Published)
+            .Property(v => v.Published)
             .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
         modelBuilder
             .Entity<DataBlockVersion>()
-            .Property(invite => invite.Created)
+            .Property(v => v.Created)
             .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
         modelBuilder
             .Entity<DataBlockVersion>()
-            .Property(invite => invite.Updated)
+            .Property(v => v.Updated)
             .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
+        modelBuilder.Entity<DataBlockVersion>().HasOne(v => v.ContentBlock).WithOne(db => db.DataBlockVersion);
 
         // Automatically include the backing ContentBlock of type "DataBlock" whenever we retrieve
         // DataBlockVersions, as DataBlockVersions encapsulate their backing ContentBlocks and will replace them
         // entirely in EES-4640.
-        modelBuilder
-            .Entity<DataBlockVersion>()
-            .Navigation(dataBlockVersion => dataBlockVersion.ContentBlock)
-            .AutoInclude();
+        modelBuilder.Entity<DataBlockVersion>().Navigation(v => v.ContentBlock).AutoInclude();
     }
 
     private static void ConfigureKeyStatisticsText(ModelBuilder modelBuilder)

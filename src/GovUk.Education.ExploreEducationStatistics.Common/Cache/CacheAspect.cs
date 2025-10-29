@@ -1,4 +1,3 @@
-#nullable enable
 using System.Reflection;
 using AspectInjector.Broker;
 using Aspects.Universal.Aspects;

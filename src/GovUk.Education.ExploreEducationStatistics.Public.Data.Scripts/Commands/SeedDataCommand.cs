@@ -309,7 +309,10 @@ public class SeedDataCommand : ICommand
                     .SqlBuilder(
                         $"""
                         SELECT DISTINCT geographic_level
-                        FROM read_csv('{_dataFilePath:raw}', ALL_VARCHAR = true)
+                        FROM read_csv(
+                            '{_dataFilePath:raw}',
+                            {DuckDbConstants.ReadCsvOptions:raw}
+                        )
                         """
                     )
                     .QueryAsync<string>(cancellationToken: _cancellationToken)
@@ -320,7 +323,10 @@ public class SeedDataCommand : ICommand
                     .SqlBuilder(
                         $"""
                         SELECT DISTINCT time_period, time_identifier
-                        FROM read_csv('{_dataFilePath:raw}', ALL_VARCHAR = true)
+                        FROM read_csv(
+                            '{_dataFilePath:raw}',
+                            {DuckDbConstants.ReadCsvOptions:raw}
+                        )
                         ORDER BY time_period
                         """
                     )
@@ -462,7 +468,10 @@ public class SeedDataCommand : ICommand
                         .SqlBuilder(
                             $"""
                             SELECT DISTINCT "{meta.Column:raw}"
-                            FROM read_csv('{_dataFilePath:raw}', ALL_VARCHAR = true) AS data
+                            FROM read_csv(
+                                '{_dataFilePath:raw}',
+                                {DuckDbConstants.ReadCsvOptions:raw}
+                            ) AS data
                             WHERE "{meta.Column:raw}" != ''
                             ORDER BY "{meta.Column:raw}"
                             """
@@ -582,7 +591,10 @@ public class SeedDataCommand : ICommand
                         .SqlBuilder(
                             $"""
                             SELECT {cols.JoinToString(", "):raw}
-                            FROM read_csv('{_dataFilePath:raw}', ALL_VARCHAR = true)
+                            FROM read_csv(
+                                '{_dataFilePath:raw}',
+                                {DuckDbConstants.ReadCsvOptions:raw}
+                            )
                             WHERE {cols.Select(col => $"{col} != ''").JoinToString(" AND "):raw}
                             GROUP BY {cols.JoinToString(", "):raw}
                             ORDER BY {cols.JoinToString(", "):raw}
@@ -741,7 +753,10 @@ public class SeedDataCommand : ICommand
                     .SqlBuilder(
                         $"""
                         SELECT DISTINCT time_period, time_identifier
-                        FROM read_csv('{_dataFilePath:raw}', ALL_VARCHAR = true)
+                        FROM read_csv(
+                            '{_dataFilePath:raw}',
+                             {DuckDbConstants.ReadCsvOptions:raw}
+                        )
                         ORDER BY time_period
                         """
                     )
@@ -859,7 +874,10 @@ public class SeedDataCommand : ICommand
                     INSERT INTO {DataTable.TableName:raw}
                     SELECT
                     {insertColumns.JoinToString(",\n"):raw}
-                    FROM read_csv('{_dataFilePath:raw}', ALL_VARCHAR = true) AS {DataSourceTable.TableName:raw}
+                    FROM read_csv(
+                        '{_dataFilePath:raw}',
+                        {DuckDbConstants.ReadCsvOptions:raw}
+                    ) AS {DataSourceTable.TableName:raw}
                     {insertJoins.JoinToString('\n'):raw}
                     ORDER BY
                     {DataSourceTable.Ref.GeographicLevel:raw} ASC,

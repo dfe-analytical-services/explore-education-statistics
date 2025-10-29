@@ -1,4 +1,3 @@
-#nullable enable
 using System.Reflection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;

@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -30,7 +31,7 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     public Guid PublicationId { get; set; }
 
     [Obsolete("Use ReleaseVersion.Release.Publication. This will be removed in EES-5818")]
-    public Publication Publication { get; set; }
+    public Publication Publication { get; set; } = null!;
 
     public List<Update> Updates { get; set; } = new();
 
@@ -40,7 +41,7 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     {
         get
         {
-            return ReleaseStatuses?.Count > 0
+            return ReleaseStatuses.Count > 0
                 ? ReleaseStatuses.OrderBy(rs => rs.Created).Last().InternalReleaseNote
                 : null;
         }
@@ -53,9 +54,9 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
 
     public List<FeaturedTable> FeaturedTables { get; set; } = new();
 
-    public string PreReleaseAccessList { get; set; } = string.Empty;
+    public string? PreReleaseAccessList { get; set; }
 
-    public string DataGuidance { get; set; } = string.Empty;
+    public string? DataGuidance { get; set; }
 
     public bool NotifySubscribers { get; set; }
 
@@ -87,68 +88,58 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     [JsonProperty("Content")]
     public IEnumerable<ContentSection> GenericContent
     {
-        get
-        {
-            if (Content == null)
-            {
-                return new List<ContentSection>();
-            }
-
-            return Content.Where(section => section.Type == ContentSectionType.Generic).ToImmutableList();
-        }
+        get => Content.Where(section => section.Type == ContentSectionType.Generic).ToImmutableList();
         set => ReplaceContentSectionsOfType(ContentSectionType.Generic, value);
     }
 
     [NotMapped]
-    public ContentSection KeyStatisticsSecondarySection
+    public ContentSection? KeyStatisticsSecondarySection
     {
         get => FindSingleSectionByType(ContentSectionType.KeyStatisticsSecondary);
-        set =>
-            ReplaceContentSectionsOfType(ContentSectionType.KeyStatisticsSecondary, new List<ContentSection> { value });
+        set => ReplaceContentSectionsOfType(ContentSectionType.KeyStatisticsSecondary, value);
     }
 
     [NotMapped]
-    public ContentSection HeadlinesSection
+    public ContentSection? HeadlinesSection
     {
         get => FindSingleSectionByType(ContentSectionType.Headlines);
-        set => ReplaceContentSectionsOfType(ContentSectionType.Headlines, new List<ContentSection> { value });
+        set => ReplaceContentSectionsOfType(ContentSectionType.Headlines, value);
     }
 
     [NotMapped]
-    public ContentSection SummarySection
+    public ContentSection? SummarySection
     {
         get => FindSingleSectionByType(ContentSectionType.ReleaseSummary);
-        set => ReplaceContentSectionsOfType(ContentSectionType.ReleaseSummary, new List<ContentSection> { value });
+        set => ReplaceContentSectionsOfType(ContentSectionType.ReleaseSummary, value);
     }
 
     [NotMapped]
-    public ContentSection RelatedDashboardsSection
+    public ContentSection? RelatedDashboardsSection
     {
         get => FindSingleSectionByType(ContentSectionType.RelatedDashboards);
-        set => ReplaceContentSectionsOfType(ContentSectionType.RelatedDashboards, new List<ContentSection> { value });
+        set => ReplaceContentSectionsOfType(ContentSectionType.RelatedDashboards, value);
     }
 
     public List<DataBlockVersion> DataBlockVersions { get; set; } = new();
 
-    private ContentSection FindSingleSectionByType(ContentSectionType type)
+    private ContentSection? FindSingleSectionByType(ContentSectionType type)
     {
-        if (Content == null)
-        {
-            Content = new List<ContentSection>();
-        }
-
         return Content.SingleOrDefault(section => section.Type == type);
     }
 
     private void ReplaceContentSectionsOfType(ContentSectionType type, IEnumerable<ContentSection> replacementSections)
     {
-        if (Content == null)
-        {
-            Content = new List<ContentSection>();
-        }
-
         Content.RemoveAll(section => section.Type == type);
         Content.AddRange(replacementSections);
+    }
+
+    private void ReplaceContentSectionsOfType(ContentSectionType type, ContentSection? replacementSection)
+    {
+        Content.RemoveAll(section => section.Type == type);
+        if (replacementSection != null)
+        {
+            Content.Add(replacementSection);
+        }
     }
 
     public ReleaseType Type { get; set; }

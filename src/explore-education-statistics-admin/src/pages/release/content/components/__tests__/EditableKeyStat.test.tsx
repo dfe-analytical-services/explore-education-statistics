@@ -40,8 +40,6 @@ describe('EditableKeyStat', () => {
       trend: 'Text trend',
       guidanceTitle: 'Text guidance title',
       guidanceText: 'Text guidance text',
-      order: 0,
-      created: '2023-01-01',
     };
 
     test('renders correctly', async () => {
@@ -145,8 +143,6 @@ describe('EditableKeyStat', () => {
       trend: 'Trend',
       guidanceTitle: 'Guidance title',
       guidanceText: 'Guidance text',
-      order: 0,
-      created: '2023-01-01',
       dataBlockParentId: 'block-1',
     };
 
@@ -297,7 +293,6 @@ describe('EditableKeyStat', () => {
               id: 'KeyStat-1',
               title: 'Key stat title',
               order: 0,
-              created: '2023-01-01',
             } as never
           }
           keyStats={[]}

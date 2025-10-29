@@ -6,6 +6,13 @@ public interface IBlobContainer
     public string EmulatedName { get; }
 }
 
+///
+/// Note that if adding new containers here, we should also consider whether or not they need
+/// to be added to the Blob Storage backup policies configured in the ARM template.
+///
+/// These are maintained per Storage Account as a list of containers to backup, referenced in
+/// the "backupDatasourceParametersList" parameter.
+///
 public static class BlobContainers
 {
     public static readonly IBlobContainer PrivateReleaseFiles = new BlobContainer(

@@ -51,7 +51,7 @@ public static class ConnectionUtils
             );
         }
 
-        return connectionString;
+        return connectionString ?? throw new Exception($"Connection string '{name}' not found");
     }
 
     private static readonly Dictionary<ConnectionTypes, string> ConnectionTypeValues = new Dictionary<

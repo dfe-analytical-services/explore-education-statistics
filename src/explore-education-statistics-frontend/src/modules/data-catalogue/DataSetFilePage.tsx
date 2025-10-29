@@ -7,6 +7,7 @@ import Tag from '@common/components/Tag';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useToggle from '@common/hooks/useToggle';
 import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
+import { PublicationSummaryRedesign } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
 import SubscribeLink from '@frontend/components/SubscribeLink';
@@ -20,6 +21,8 @@ import DataSetFilePreview from '@frontend/modules/data-catalogue/components/Data
 import DataSetFileUsage from '@frontend/modules/data-catalogue/components/DataSetFileUsage';
 import DataSetFileVariables from '@frontend/modules/data-catalogue/components/DataSetFileVariables';
 import styles from '@frontend/modules/data-catalogue/DataSetPage.module.scss';
+import getDataSetFileMetaCSVW from '@frontend/modules/data-catalogue/utils/getDataSetFileMetaCSVW';
+import DataSetFileContact from '@frontend/modules/data-catalogue/components/DataSetFileContact';
 import NotFoundPage from '@frontend/modules/NotFoundPage';
 import apiDataSetQueries from '@frontend/queries/apiDataSetQueries';
 import dataSetFileQueries from '@frontend/queries/dataSetFileQueries';
@@ -27,16 +30,16 @@ import {
   ApiDataSet,
   ApiDataSetVersion,
 } from '@frontend/services/apiDataSetService';
+import downloadService from '@frontend/services/downloadService';
 import { DataSetFile } from '@frontend/services/dataSetFileService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
+import publicationQueries from '@frontend/queries/publicationQueries';
 import { dehydrate, QueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
 import { GetServerSideProps } from 'next';
 import isPatchVersion from '@common/utils/isPatchVersion';
 import React, { useEffect, useMemo, useState } from 'react';
 import omit from 'lodash/omit';
-import downloadService from '@frontend/services/downloadService';
-import getDataSetFileMetaCSVW from './utils/getDataSetFileMetaCSVW';
 
 export const pageBaseSections = {
   dataSetDetails: 'Data set details',
@@ -55,6 +58,7 @@ export const pageApiSections = {
 export const pageSections = {
   ...pageBaseSections,
   ...pageApiSections,
+  dataSetContact: 'Contact us',
 } as const;
 
 export type PageSections = typeof pageSections;
@@ -65,6 +69,7 @@ interface Props {
   apiDataSetVersion?: ApiDataSetVersion;
   apiDataSetVersionChanges?: ApiDataSetVersionChanges | null;
   dataSetFile: DataSetFile;
+  publicationSummary: PublicationSummaryRedesign;
 }
 
 export default function DataSetFilePage({
@@ -72,6 +77,7 @@ export default function DataSetFilePage({
   apiDataSetVersion,
   apiDataSetVersionChanges,
   dataSetFile,
+  publicationSummary,
 }: Props) {
   const [activeSection, setActiveSection] =
     useState<PageSectionId>('dataSetDetails');
@@ -146,6 +152,9 @@ export default function DataSetFilePage({
     if (hasNoApiChangelog && hasNoPatchApiChangelog) {
       sections = omit(sections, 'apiChangelog');
     }
+
+    // Contact should be last for both nav versions
+    sections.dataSetContact = 'Contact us';
 
     return Object.entries(sections).map<NavItem>(([id, text]) => {
       return {
@@ -289,6 +298,11 @@ export default function DataSetFilePage({
                   )}
                 </>
               )}
+
+              <DataSetFileContact
+                contact={publicationSummary.contact}
+                dataSetTitle={dataSetFile.title}
+              />
             </div>
           </div>
         </>
@@ -307,8 +321,15 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
       dataSetFileQueries.get(dataSetFileId),
     );
 
+    const publicationSummary = await queryClient.fetchQuery(
+      publicationQueries.getPublicationSummaryRedesign(
+        dataSetFile.release.publication.slug,
+      ),
+    );
+
     const props: Props = {
       dataSetFile,
+      publicationSummary,
     };
 
     if (dataSetFile.api) {

@@ -1,4 +1,3 @@
-#nullable enable
 using AngleSharp.Html.Parser;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils.Html;
 

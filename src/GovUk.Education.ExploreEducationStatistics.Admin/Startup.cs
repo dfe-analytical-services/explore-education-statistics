@@ -81,6 +81,7 @@ using Notify.Interfaces;
 using Semver;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.ObservationService;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
@@ -233,6 +234,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                             .AddBulkOperationSupport()
                             .EnableCustomRetryOnFailure()
                 )
+                .EnableSqlServerQueryOptionsInterceptor()
                 .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment())
         );
 
@@ -578,6 +580,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             return new LoggingNotificationClient(logger);
         });
 
+        services.AddTransient<ISqlStatementsHelper, SqlStatementsHelper>();
+        services.AddTransient<IRawSqlExecutor, RawSqlExecutor>();
+        services.AddTransient<ITemporaryTableCreator, TemporaryTableCreator>();
+
         services.AddTransient<IEmailService, EmailService>();
         services.AddTransient<IBoundaryLevelService, BoundaryLevelService>();
         services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
@@ -585,6 +591,15 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ITableBuilderService, TableBuilderService>();
         services.AddTransient<IFilterRepository, FilterRepository>();
         services.AddTransient<IFilterItemRepository, FilterItemRepository>();
+        services.AddTransient<
+            ISparseObservationsMatchedFilterItemsStrategy,
+            SparseObservationsMatchedFilterItemsStrategy
+        >();
+        services.AddTransient<
+            IDenseObservationsMatchedFilterItemsStrategy,
+            DenseObservationsMatchedFilterItemsStrategy
+        >();
+        services.AddTransient<IAllObservationsMatchedFilterItemsStrategy, AllObservationsMatchedFilterItemsStrategy>();
         services.AddTransient<IFootnoteService, FootnoteService>();
         services.AddTransient<IFootnoteRepository, FootnoteRepository>();
         services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();
@@ -595,6 +610,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IDataGuidanceService, DataGuidanceService>();
         services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
         services.AddTransient<IObservationService, ObservationService>();
+        services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();
         services.AddTransient<IOrganisationService, OrganisationService>();
         services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
         services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
@@ -1037,6 +1053,8 @@ internal class NoOpPreviewTokenService : IPreviewTokenService
     public Task<Either<ActionResult, PreviewTokenViewModel>> CreatePreviewToken(
         Guid dataSetVersionId,
         string label,
+        DateTimeOffset? activates,
+        DateTimeOffset? expires,
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
 

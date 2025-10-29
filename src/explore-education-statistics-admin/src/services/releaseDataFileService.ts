@@ -14,6 +14,7 @@ interface DataFileInfo extends FileInfo {
   replacedBy?: string; // the fileId of the replacement file, if it exists
   replacedByDataFile?: ReplacementDataFileInfo; // additional info about the replacement file - although not always returned by the backend, even if it exists!
   permissions: DataFilePermissions;
+  publicApiCompatible?: boolean;
 }
 
 interface ReplacementDataFileInfo extends DataFileInfo {
@@ -31,12 +32,13 @@ export interface DataSetUpload {
   screenerResult?: ScreenerResult; // Nullable if screening fails
   created: Date;
   uploadedBy: string;
+  publicApiCompatible?: boolean;
   replacingFileId?: string;
 }
 
 export interface ScreenerResult {
-  overallResult: ScreenerOverallResult;
-  message: string;
+  overallResult: string;
+  passed: boolean;
   testResults: ScreenerTestSummary[];
 }
 
@@ -45,7 +47,8 @@ export interface ScreenerTestSummary {
   testFunctionName: string;
   result: ScreenerTestResult;
   notes: string | undefined;
-  stage: ScreenerTestStage;
+  guidanceUrl?: string | undefined;
+  stage: string;
 }
 
 export interface DeleteDataFilePlan {
@@ -73,6 +76,7 @@ export interface DataFile {
   isDeleting?: boolean;
   isCancelling?: boolean;
   permissions: DataFilePermissions;
+  publicApiCompatible?: boolean;
   publicApiDataSetId?: string;
   publicApiDataSetVersion?: string;
 }
@@ -121,16 +125,7 @@ export type DataSetUploadStatus =
   | 'PENDING_REVIEW'
   | 'PENDING_IMPORT';
 
-export type ScreenerOverallResult = 'Passed' | 'Failed';
-
 export type ScreenerTestResult = 'PASS' | 'FAIL' | 'WARNING';
-
-export type ScreenerTestStage =
-  | 'InitialFileValidation'
-  | 'PreScreening1'
-  | 'PreScreening2'
-  | 'FullChecks'
-  | 'Passed';
 
 export interface DataFileImportStatus {
   status: ImportStatusCode;
@@ -154,6 +149,7 @@ function mapFile({ name, ...file }: DataFileInfo): DataFile {
       file.replacedByDataFile === undefined
         ? undefined
         : mapFile(file.replacedByDataFile),
+    publicApiCompatible: file.publicApiCompatible,
   };
 }
 

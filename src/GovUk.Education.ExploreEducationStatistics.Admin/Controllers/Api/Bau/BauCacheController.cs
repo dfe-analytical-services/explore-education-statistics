@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
+using static GovUk.Education.ExploreEducationStatistics.Common.Constants;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
@@ -26,10 +27,8 @@ public class BauCacheController : ControllerBase
     private readonly IMethodologyCacheService _methodologyCacheService;
     private readonly IPublicationCacheService _publicationCacheService;
 
-    private const string GuidPattern = "[\\da-zA-Z]{8}-([\\da-zA-Z]{4}-){3}[\\da-zA-Z]{12}";
     private const string ReleasePeriodPattern = "[0-9]{4}(-[^/]+)?\\";
     private const string BoundaryLevelIdPattern = "\\d{1,3}";
-    private const string WildcardDirectoryNamePattern = "[^/]+";
 
     public BauCacheController(
         IPrivateBlobStorageService privateBlobStorageService,
@@ -57,7 +56,7 @@ public class BauCacheController : ControllerBase
                 BlobContainers.PrivateContent,
                 options: new DeleteBlobsOptions
                 {
-                    IncludeRegex = new Regex($"^releases/{WildcardDirectoryNamePattern}/({pathString})/"),
+                    IncludeRegex = new Regex($"^releases/{RegexPatterns.WildcardDirectoryName}/({pathString})/"),
                 }
             );
         }
@@ -112,7 +111,7 @@ public class BauCacheController : ControllerBase
                 options: new DeleteBlobsOptions
                 {
                     IncludeRegex = new Regex(
-                        $"^publications/{WildcardDirectoryNamePattern}/releases/{WildcardDirectoryNamePattern}/({pathString})/"
+                        $"^publications/{RegexPatterns.WildcardDirectoryName}/releases/{RegexPatterns.WildcardDirectoryName}/({pathString})/"
                     ),
                 }
             );
@@ -159,7 +158,7 @@ public class BauCacheController : ControllerBase
             options: new DeleteBlobsOptions
             {
                 IncludeRegex = new Regex(
-                    $"^publications/{WildcardDirectoryNamePattern}/{publicationJsonFilenameRegex}$"
+                    $"^publications/{RegexPatterns.WildcardDirectoryName}/{publicationJsonFilenameRegex}$"
                 ),
             }
         );
@@ -191,7 +190,7 @@ public class BauCacheController : ControllerBase
                 // publications/***/releases/1234-q1.json
                 // publications/***/releases/1234-35-q1.json
                 IncludeRegex = new Regex(
-                    $"^publications/{WildcardDirectoryNamePattern}/({latestReleaseJsonFilenameRegex}|releases/[0-9]{{4}}(-[^/]+)?\\.json)$"
+                    $"^publications/{RegexPatterns.WildcardDirectoryName}/({latestReleaseJsonFilenameRegex}|releases/[0-9]{{4}}(-[^/]+)?\\.json)$"
                 ),
             }
         );
@@ -213,7 +212,7 @@ public class BauCacheController : ControllerBase
             {
                 // Match against pattern: releases/***/data-blocks/GUID-boundary-levels/GUID-2.json
                 IncludeRegex = new Regex(
-                    $"^releases/{WildcardDirectoryNamePattern}/data-blocks/{GuidPattern}-boundary-levels/{GuidPattern}-{BoundaryLevelIdPattern}\\.json$"
+                    $"^releases/{RegexPatterns.WildcardDirectoryName}/data-blocks/{RegexPatterns.Guid}-boundary-levels/{Constants.RegexPatterns.Guid}-{BoundaryLevelIdPattern}\\.json$"
                 ),
             }
         );
@@ -240,7 +239,7 @@ public class BauCacheController : ControllerBase
                 // publications/***/releases/1234-q1/data-blocks/GUID-boundary-levels/GUID-12.json
                 // publications/***/releases/1234-35-q1/data-blocks/GUID-boundary-levels/GUID-123.json
                 IncludeRegex = new Regex(
-                    $"^publications/{WildcardDirectoryNamePattern}/releases/{ReleasePeriodPattern}/data-blocks/{GuidPattern}-boundary-levels/{GuidPattern}-{BoundaryLevelIdPattern}\\.json$"
+                    $"^publications/{RegexPatterns.WildcardDirectoryName}/releases/{ReleasePeriodPattern}/data-blocks/{Constants.RegexPatterns.Guid}-boundary-levels/{Constants.RegexPatterns.Guid}-{BoundaryLevelIdPattern}\\.json$"
                 ),
             }
         );

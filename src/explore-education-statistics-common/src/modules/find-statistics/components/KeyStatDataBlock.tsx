@@ -11,6 +11,7 @@ export interface KeyStatDataBlockProps {
   trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;
+  isRedesignStyle?: boolean;
   testId?: string;
 }
 
@@ -21,6 +22,7 @@ export default function KeyStatDataBlock({
   trend,
   guidanceTitle = 'Help',
   guidanceText,
+  isRedesignStyle = false,
   testId = 'keyStat',
 }: KeyStatDataBlockProps) {
   const {
@@ -46,6 +48,7 @@ export default function KeyStatDataBlock({
         trend={trend}
         guidanceTitle={guidanceTitle}
         guidanceText={guidanceText}
+        isRedesignStyle={isRedesignStyle}
         testId={testId}
       >
         {children}

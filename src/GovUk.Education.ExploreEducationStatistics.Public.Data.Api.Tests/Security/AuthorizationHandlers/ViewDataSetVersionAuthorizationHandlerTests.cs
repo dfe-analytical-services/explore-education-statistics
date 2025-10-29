@@ -86,12 +86,17 @@ public class ViewDataSetVersionAuthorizationHandlerTests
         Assert.True(context.HasSucceeded);
     }
 
-    [Fact]
-    public async Task Failure_PreviewTokenIsExpired()
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public async Task Failure_PreviewTokenIsExpiredOrNotActiveYet(bool activated, bool expired)
     {
         DataSetVersion dataSetVersion = _dataFixture.DefaultDataSetVersion().WithStatus(DataSetVersionStatus.Draft);
 
-        PreviewToken previewToken = _dataFixture.DefaultPreviewToken(expired: true).WithDataSetVersion(dataSetVersion);
+        PreviewToken previewToken = _dataFixture
+            .DefaultPreviewToken(activated: activated, expired: expired)
+            .WithDataSetVersion(dataSetVersion);
 
         var publicDataDbContext = new Mock<PublicDataDbContext>();
         publicDataDbContext.SetupGet(dbContext => dbContext.DataSetVersions).ReturnsDbSet([dataSetVersion]);

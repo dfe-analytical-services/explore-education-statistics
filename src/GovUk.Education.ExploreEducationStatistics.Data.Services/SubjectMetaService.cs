@@ -206,7 +206,7 @@ public class SubjectMetaService(
                     )
                     .SingleAsync(cancellationToken: cancellationToken);
 
-                var observations = await observationService.GetMatchedObservations(
+                var matchingObservationsTable = await observationService.GetMatchedObservations(
                     request.AsFullTableQuery(),
                     cancellationToken
                 );
@@ -215,7 +215,8 @@ public class SubjectMetaService(
 
                 var filterItems = await filterItemRepository.GetFilterItemsFromMatchedObservationIds(
                     request.SubjectId,
-                    observations
+                    matchingObservationsTable,
+                    cancellationToken
                 );
                 var filters = FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
                     filterItems,

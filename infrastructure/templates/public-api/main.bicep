@@ -325,13 +325,10 @@ module publicApiStorageBackupModule 'components/recoveryVaultFileShareRegistrati
   params: {
     vaultName: resourceNames.sharedResources.recoveryVault
     backupPolicyName: resourceNames.sharedResources.recoveryVaultFileShareBackupPolicy
-    storageAccountName: resourceNames.publicApi.publicApiStorageAccount
-    fileShareName: resourceNames.publicApi.publicApiFileShare
+    storageAccountName: publicApiStorageModule.outputs.publicApiStorageAccountName
+    fileShareName: publicApiStorageModule.outputs.publicApiDataFileShareName
     tagValues: tagValues
   }
-  dependsOn: [
-    publicApiStorageModule
-  ]
 }
 
 module containerAppEnvironmentModule 'application/shared/containerAppEnvironment.bicep' = {

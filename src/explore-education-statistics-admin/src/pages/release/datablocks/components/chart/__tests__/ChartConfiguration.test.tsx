@@ -135,7 +135,6 @@ describe('ChartConfiguration', () => {
     showDataLabels: true,
     subtitle: 'This is the subtitle',
     titleType: 'default',
-    width: 400,
   };
 
   const testFormState: ChartBuilderForms = {
@@ -171,7 +170,6 @@ describe('ChartConfiguration', () => {
     expect(screen.getByLabelText('Subtitle')).toBeInTheDocument();
     expect(screen.getByLabelText('Alt text')).toBeInTheDocument();
     expect(screen.getByLabelText('Height (pixels)')).toBeInTheDocument();
-    expect(screen.getByLabelText('Width (pixels)')).toBeInTheDocument();
     expect(
       screen.getByLabelText('Include data sets with non-numerical values'),
     ).toBeInTheDocument();
@@ -197,7 +195,6 @@ describe('ChartConfiguration', () => {
     expect(screen.getByLabelText('Alt text')).toBeInTheDocument();
     expect(screen.getByLabelText('Stacked bars')).toBeInTheDocument();
     expect(screen.getByLabelText('Height (pixels)')).toBeInTheDocument();
-    expect(screen.getByLabelText('Width (pixels)')).toBeInTheDocument();
     expect(screen.getByLabelText('Bar thickness (pixels)')).toBeInTheDocument();
     expect(
       screen.getByLabelText('Include data sets with non-numerical values'),
@@ -224,7 +221,6 @@ describe('ChartConfiguration', () => {
     expect(screen.getByLabelText('Alt text')).toBeInTheDocument();
     expect(screen.getByLabelText('Stacked bars')).toBeInTheDocument();
     expect(screen.getByLabelText('Height (pixels)')).toBeInTheDocument();
-    expect(screen.getByLabelText('Width (pixels)')).toBeInTheDocument();
     expect(screen.getByLabelText('Bar thickness (pixels)')).toBeInTheDocument();
     expect(
       screen.getByLabelText('Include data sets with non-numerical values'),
@@ -250,7 +246,6 @@ describe('ChartConfiguration', () => {
     expect(screen.getByLabelText('Subtitle')).toBeInTheDocument();
     expect(screen.getByLabelText('Alt text')).toBeInTheDocument();
     expect(screen.getByLabelText('Height (pixels)')).toBeInTheDocument();
-    expect(screen.getByLabelText('Width (pixels)')).toBeInTheDocument();
   });
 
   test('submitting fails with default options', async () => {
@@ -296,7 +291,6 @@ describe('ChartConfiguration', () => {
 
     await user.type(screen.getByLabelText('Subtitle'), 'This is the subtitle');
     await user.type(screen.getByLabelText('Alt text'), 'This is the alt text');
-    await user.type(screen.getByLabelText('Width (pixels)'), '500');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
@@ -316,7 +310,6 @@ describe('ChartConfiguration', () => {
         subtitle: 'This is the subtitle',
         title: '',
         titleType: 'default',
-        width: 500,
       });
     });
   });
@@ -348,7 +341,6 @@ describe('ChartConfiguration', () => {
         subtitle: '',
         title: '',
         titleType: 'default',
-        width: undefined,
       });
     });
   });
@@ -372,7 +364,6 @@ describe('ChartConfiguration', () => {
       'This is the alt text',
     );
     expect(screen.getByLabelText('Height (pixels)')).toHaveNumericValue(600);
-    expect(screen.getByLabelText('Width (pixels)')).toHaveNumericValue(400);
     expect(
       screen.getByLabelText('Include data sets with non-numerical values'),
     ).toBeChecked();
@@ -412,7 +403,6 @@ describe('ChartConfiguration', () => {
         subtitle: '',
         title: 'The title',
         titleType: 'alternative',
-        width: undefined,
       });
     });
   });
@@ -456,7 +446,6 @@ describe('ChartConfiguration', () => {
         subtitle: '',
         title: '',
         titleType: 'default',
-        width: undefined,
       });
     });
   });

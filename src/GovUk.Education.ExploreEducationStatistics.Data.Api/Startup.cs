@@ -46,6 +46,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.ObservationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api;
 
@@ -104,6 +105,7 @@ public class Startup
                             .AddBulkOperationSupport()
                             .EnableCustomRetryOnFailure()
                 )
+                .EnableSqlServerQueryOptionsInterceptor()
                 .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
         );
 
@@ -140,6 +142,9 @@ public class Startup
         services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Section));
         services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.Section));
 
+        services.AddTransient<ISqlStatementsHelper, SqlStatementsHelper>();
+        services.AddTransient<IRawSqlExecutor, RawSqlExecutor>();
+        services.AddTransient<ITemporaryTableCreator, TemporaryTableCreator>();
         services.AddSingleton<IBlobSasService, BlobSasService>();
         services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(
             provider => new PublicBlobStorageService(
@@ -162,6 +167,15 @@ public class Startup
         services.AddTransient<ISubjectMetaService, SubjectMetaService>();
         services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
         services.AddTransient<IFilterItemRepository, FilterItemRepository>();
+        services.AddTransient<
+            ISparseObservationsMatchedFilterItemsStrategy,
+            SparseObservationsMatchedFilterItemsStrategy
+        >();
+        services.AddTransient<
+            IDenseObservationsMatchedFilterItemsStrategy,
+            DenseObservationsMatchedFilterItemsStrategy
+        >();
+        services.AddTransient<IAllObservationsMatchedFilterItemsStrategy, AllObservationsMatchedFilterItemsStrategy>();
         services.AddTransient<IFilterRepository, FilterRepository>();
         services.AddTransient<IFootnoteRepository, FootnoteRepository>();
         services.AddTransient<IFrontendService, FrontendService>();
@@ -170,6 +184,7 @@ public class Startup
         services.AddTransient<IIndicatorRepository, IndicatorRepository>();
         services.AddTransient<ILocationRepository, LocationRepository>();
         services.AddTransient<IObservationService, ObservationService>();
+        services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();
         services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
         services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
         services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();

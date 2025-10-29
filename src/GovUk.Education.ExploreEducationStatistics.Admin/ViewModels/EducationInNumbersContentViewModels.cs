@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public class EinContentViewModel
+public record EinContentViewModel
 {
     public Guid Id { get; set; }
 
@@ -33,7 +33,7 @@ public class EinContentViewModel
     }
 }
 
-public class EinContentSectionViewModel
+public record EinContentSectionViewModel
 {
     public Guid Id { get; set; }
 
@@ -55,7 +55,7 @@ public class EinContentSectionViewModel
     }
 }
 
-public class EinContentBlockViewModel
+public record EinContentBlockViewModel
 {
     public Guid Id { get; set; }
 
@@ -75,7 +75,7 @@ public class EinContentBlockViewModel
     }
 }
 
-public class EinHtmlBlockViewModel : EinContentBlockViewModel
+public record EinHtmlBlockViewModel : EinContentBlockViewModel
 {
     public string Body { get; set; } = string.Empty;
 
@@ -91,7 +91,7 @@ public class EinHtmlBlockViewModel : EinContentBlockViewModel
     }
 }
 
-public class EinTileGroupBlockViewModel : EinContentBlockViewModel
+public record EinTileGroupBlockViewModel : EinContentBlockViewModel
 {
     public string? Title { get; set; }
     public List<EinTileViewModel> Tiles { get; set; } = new();
@@ -109,7 +109,7 @@ public class EinTileGroupBlockViewModel : EinContentBlockViewModel
     }
 }
 
-public class EinTileViewModel
+public record EinTileViewModel
 {
     public Guid Id { get; set; }
 
@@ -128,7 +128,7 @@ public class EinTileViewModel
     }
 }
 
-public class EinFreeTextStatTileViewModel : EinTileViewModel
+public record EinFreeTextStatTileViewModel : EinTileViewModel
 {
     public string Title { get; set; } = string.Empty;
     public string Statistic { get; set; } = string.Empty;

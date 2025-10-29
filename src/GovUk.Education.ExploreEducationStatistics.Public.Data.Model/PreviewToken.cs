@@ -20,12 +20,21 @@ public class PreviewToken : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
 
     public DateTimeOffset Created { get; set; }
 
+    public required DateTimeOffset Activates { get; set; }
+
     public required DateTimeOffset Expires { get; set; }
 
     public DateTimeOffset? Updated { get; set; }
 
-    public PreviewTokenStatus Status =>
-        DateTimeOffset.UtcNow > Expires ? PreviewTokenStatus.Expired : PreviewTokenStatus.Active;
+    public PreviewTokenStatus Status => GetPreviewTokenStatus(TimeProvider.System);
+
+    public PreviewTokenStatus GetPreviewTokenStatus(TimeProvider dateTimeProvider)
+    {
+        var now = dateTimeProvider.GetUtcNow();
+        return now >= Expires ? PreviewTokenStatus.Expired
+            : now < Activates ? PreviewTokenStatus.Pending
+            : PreviewTokenStatus.Active;
+    }
 
     internal class Config : IEntityTypeConfiguration<PreviewToken>
     {
@@ -41,5 +50,6 @@ public class PreviewToken : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
 public enum PreviewTokenStatus
 {
     Active,
+    Pending,
     Expired,
 }

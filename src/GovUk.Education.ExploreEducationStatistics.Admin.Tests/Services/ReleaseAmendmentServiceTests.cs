@@ -505,8 +505,8 @@ public class ReleaseAmendmentServiceTests
             // Check Headlines have been copied over OK.
             AssertAmendedContentSectionCorrect(
                 amendment,
-                amendment.HeadlinesSection,
-                originalReleaseVersion.HeadlinesSection
+                amendment.HeadlinesSection!,
+                originalReleaseVersion.HeadlinesSection!
             );
 
             // Check Key Statistics ContentSection has been copied over OK.
@@ -514,22 +514,22 @@ public class ReleaseAmendmentServiceTests
             // KeyStatisticsText and KeyStatisticsDataBlock are no longer ContentBlocks themselves.
             AssertAmendedContentSectionCorrect(
                 amendment,
-                amendment.KeyStatisticsSecondarySection,
-                originalReleaseVersion.KeyStatisticsSecondarySection
+                amendment.KeyStatisticsSecondarySection!,
+                originalReleaseVersion.KeyStatisticsSecondarySection!
             );
 
             // Check Related Dashboards have been copied over OK.
             AssertAmendedContentSectionCorrect(
                 amendment,
-                amendment.RelatedDashboardsSection,
-                originalReleaseVersion.RelatedDashboardsSection
+                amendment.RelatedDashboardsSection!,
+                originalReleaseVersion.RelatedDashboardsSection!
             );
 
             // Check Summary section has been copied over OK.
             AssertAmendedContentSectionCorrect(
                 amendment,
-                amendment.SummarySection,
-                originalReleaseVersion.SummarySection
+                amendment.SummarySection!,
+                originalReleaseVersion.SummarySection!
             );
 
             // Check EmbedBlocks have been copied over OK.

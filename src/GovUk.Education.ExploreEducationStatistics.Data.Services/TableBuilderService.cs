@@ -184,9 +184,9 @@ public class TableBuilderService : ITableBuilderService
         CancellationToken cancellationToken
     )
     {
-        var matchedObservationIds = (await _observationService.GetMatchedObservations(query, cancellationToken)).Select(
-            row => row.Id
-        );
+        await _observationService.GetMatchedObservations(query, cancellationToken);
+
+        var matchedObservationIds = _statisticsDbContext.MatchedObservations.Select(o => o.Id);
 
         return await _statisticsDbContext
             .Observation.AsNoTracking()

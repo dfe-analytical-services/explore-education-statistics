@@ -66,6 +66,12 @@
       "enabled": false
     },
     {
+      "description": "Disable AutoMapper as v15 requires a license - EES-6647 to remove AutoMapper",
+      "matchDatasources": ["nuget"],
+      "matchPackageNames": ["AutoMapper"],
+      "enabled": false
+    },
+    {
       "description": "Disable packages which need their major versions to be in sync with the .NET version or the EF Core version",
       "matchDatasources": ["nuget"],
       "matchPackagePrefixes": [
@@ -73,8 +79,10 @@
         "Microsoft.EntityFrameworkCore",
         "Microsoft.Extensions",
         "Moq.EntityFrameworkCore",
+        "MockQueryable.Moq",
         "Npgsql.EntityFrameworkCore.PostgreSQL",
-        "Thinktecture.EntityFrameworkCore"
+        "Thinktecture.EntityFrameworkCore",
+        "linq2db.EntityFrameworkCore"
       ],
       "matchUpdateTypes": ["major"],
       "enabled": false
@@ -113,6 +121,12 @@
       "groupName": "Azure Bicep resources",
       "description": "Prevent unofficial resource versions being suggested",
       "enabled": false
+    },
+    {
+    "description": "Disable AspectInjector and Aspects.Universal due to an issue with AspectInjector 2.9.0. See https://github.com/pamidur/aspect-injector/issues/244",
+    "matchDatasources": ["nuget"],
+    "matchPackageNames": ["AspectInjector", "Aspects.Universal"],
+    "enabled": false
     }
   ]
 }

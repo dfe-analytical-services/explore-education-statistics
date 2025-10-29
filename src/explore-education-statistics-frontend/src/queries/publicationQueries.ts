@@ -1,10 +1,13 @@
 import publicationService, {
+  PreReleaseAccessListSummary,
   PublicationMethodologiesList,
   PublicationReleaseSeriesItem,
   PublicationSummaryRedesign,
   PublicationTreeOptions,
+  RelatedInformationItem,
   ReleaseSummary,
   ReleaseVersion,
+  ReleaseVersionHomeContent,
   ReleaseVersionSummary,
   Theme,
 } from '@common/services/publicationService';
@@ -46,9 +49,52 @@ const publicationQueries = {
         ),
     };
   },
+  getReleaseVersionHomeContent(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): UseQueryOptions<ReleaseVersionHomeContent> {
+    return {
+      queryKey: ['releaseVersionHomeContent', publicationSlug, releaseSlug],
+      queryFn: () =>
+        publicationService.getReleaseVersionHomeContent(
+          publicationSlug,
+          releaseSlug,
+        ),
+    };
+  },
+  getReleaseVersionRelatedInformation(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): UseQueryOptions<RelatedInformationItem[]> {
+    return {
+      queryKey: [
+        'releaseVersionRelatedInformation',
+        publicationSlug,
+        releaseSlug,
+      ],
+      queryFn: () =>
+        publicationService.getReleaseVersionRelatedInformation(
+          publicationSlug,
+          releaseSlug,
+        ),
+    };
+  },
+  getPreReleaseAccessList(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): UseQueryOptions<PreReleaseAccessListSummary> {
+    return {
+      queryKey: ['preReleaseAccessList', publicationSlug, releaseSlug],
+      queryFn: () =>
+        publicationService.getPreReleaseAccessList(
+          publicationSlug,
+          releaseSlug,
+        ),
+    };
+  },
   getPublicationMethodologies(
     publicationSlug: string,
-  ): UseQueryOptions<PublicationMethodologiesList[]> {
+  ): UseQueryOptions<PublicationMethodologiesList> {
     return {
       queryKey: ['publicationMethodologies', publicationSlug],
       queryFn: () =>

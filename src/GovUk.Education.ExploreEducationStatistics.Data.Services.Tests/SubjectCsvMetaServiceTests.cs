@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfac
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
@@ -1709,7 +1710,13 @@ public class SubjectCsvMetaServiceTests
             statisticsDbContext: statisticsDbContext,
             contentDbContext: contentDbContext,
             userService: AlwaysTrueUserService().Object,
-            filterItemRepository: new FilterItemRepository(statisticsDbContext),
+            filterItemRepository: new FilterItemRepository(
+                statisticsDbContext,
+                Mock.Of<IAllObservationsMatchedFilterItemsStrategy>(),
+                Mock.Of<ISparseObservationsMatchedFilterItemsStrategy>(),
+                Mock.Of<IDenseObservationsMatchedFilterItemsStrategy>(),
+                Mock.Of<ILogger<FilterItemRepository>>()
+            ),
             releaseFileBlobService: releaseFileBlobService ?? Mock.Of<IReleaseFileBlobService>(Strict)
         );
     }

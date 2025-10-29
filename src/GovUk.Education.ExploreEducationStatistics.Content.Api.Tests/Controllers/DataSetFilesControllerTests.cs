@@ -1772,14 +1772,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 Assert.Equal(
                     new DataSetFileTimePeriodRangeViewModel
                     {
-                        From = TimePeriodLabelFormatter.Format(
-                            originalMeta.TimePeriodRange.Start.Period,
-                            originalMeta.TimePeriodRange.Start.TimeIdentifier
-                        ),
-                        To = TimePeriodLabelFormatter.Format(
-                            originalMeta.TimePeriodRange.End.Period,
-                            originalMeta.TimePeriodRange.End.TimeIdentifier
-                        ),
+                        From = originalMeta.TimePeriodRange.Start.ToLabel(),
+                        To = originalMeta.TimePeriodRange.End.ToLabel(),
                     },
                     dataSetFileMetaViewModel.TimePeriodRange
                 );
@@ -1957,24 +1951,19 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             IEnumerable<FreeTextRank>? freeTextRanks = null
         )
         {
+            var releaseFilesArray = releaseFiles?.ToArray() ?? [];
+
             var contentDbContext = new Mock<ContentDbContext>();
             contentDbContext
                 .Setup(context => context.ReleaseVersions)
-                .Returns((releaseVersions ?? Array.Empty<ReleaseVersion>()).AsQueryable().BuildMockDbSet().Object);
-            contentDbContext
-                .Setup(context => context.ReleaseFiles)
-                .Returns((releaseFiles ?? Array.Empty<ReleaseFile>()).AsQueryable().BuildMockDbSet().Object);
+                .Returns((releaseVersions ?? []).ToArray().BuildMockDbSet().Object);
+            contentDbContext.Setup(context => context.ReleaseFiles).Returns(releaseFilesArray.BuildMockDbSet().Object);
             contentDbContext
                 .Setup(context => context.Files)
-                .Returns(
-                    (releaseFiles != null ? releaseFiles.Select(rf => rf.File).ToArray() : [])
-                        .AsQueryable()
-                        .BuildMockDbSet()
-                        .Object
-                );
+                .Returns(releaseFilesArray.Select(rf => rf.File).ToArray().BuildMockDbSet().Object);
             contentDbContext
                 .Setup(context => context.ReleaseFilesFreeTextTable(It.IsAny<string>()))
-                .Returns((freeTextRanks ?? Array.Empty<FreeTextRank>()).AsQueryable().BuildMockDbSet().Object);
+                .Returns((freeTextRanks ?? []).ToArray().BuildMockDbSet().Object);
             return contentDbContext;
         }
     }

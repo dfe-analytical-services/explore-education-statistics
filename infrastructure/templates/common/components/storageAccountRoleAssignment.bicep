@@ -18,6 +18,7 @@ var rolesToRoleIds = {
   'Storage Blob Data Owner': 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
   'Storage Blob Data Reader': '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
   'Storage Queue Data Contributor': '974c5e8b-45b9-4653-ba55-5f855dd0fb88'
+  'Storage Account Backup Contributor': 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1'
 }
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {

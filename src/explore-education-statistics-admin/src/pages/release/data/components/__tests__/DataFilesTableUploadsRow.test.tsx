@@ -24,7 +24,7 @@ describe('DataFilesTableUploadsRow', () => {
       status: 'PENDING_IMPORT',
       screenerResult: {
         overallResult: 'Passed',
-        message: 'Passed all checks',
+        passed: true,
         testResults: [
           {
             id: 'pass-test-1',
@@ -62,7 +62,7 @@ describe('DataFilesTableUploadsRow', () => {
       status: 'PENDING_IMPORT',
       screenerResult: {
         overallResult: 'Passed',
-        message: 'Passed all checks',
+        passed: true,
         testResults: [
           {
             id: 'passAndWarning-test-1',
@@ -100,7 +100,7 @@ describe('DataFilesTableUploadsRow', () => {
       status: 'FAILED_SCREENING',
       screenerResult: {
         overallResult: 'Passed',
-        message: 'Passed all checks',
+        passed: true,
         testResults: [
           {
             id: 'fail-test-1',
@@ -383,7 +383,7 @@ describe('DataFilesTableUploadsRow', () => {
       ).toEqual(1);
       expect(
         within(fileDetailsTabPanel).getByText(
-          'You will need to delete this file (close this window, and select "Delete files"), fix the failed tests and upload again',
+          'You will need to delete this file (close this window, and select "Delete files"), fix the failed tests and upload again. If you have any questions, please get in touch with the explore.statistics@education.gov.uk team.',
         ),
       ).toBeInTheDocument();
     });

@@ -28,7 +28,6 @@ const ReleasePageIntro = ({
   const { isMedia: isMobileMedia } = useMobileMedia();
   const {
     title,
-    id,
     lastUpdated,
     published,
     publishingOrganisations,
@@ -92,19 +91,6 @@ const ReleasePageIntro = ({
         >
           All releases in this series
         </Link>
-
-        <Link
-          to={`${process.env.CONTENT_API_BASE_URL}/releases/${id}/files?fromPage=ReleaseDownloads`}
-          className="govuk-!-display-none-print"
-          onClick={() => {
-            logEvent({
-              category: 'Downloads',
-              action: `Release page all files, Release: ${title}, File: All files`,
-            });
-          }}
-        >
-          Download all data (ZIP)
-        </Link>
       </div>
 
       {!isMobileMedia && (
@@ -144,7 +130,7 @@ const ReleasePageIntro = ({
                 to={`/find-statistics/${publicationSummary.slug}/${latestRelease.slug}/updates`}
               >
                 {updateCount} updates{' '}
-                <VisuallyHidden>for `${title}`</VisuallyHidden>
+                <VisuallyHidden>for {title}</VisuallyHidden>
               </Link>
             ) : undefined
           }

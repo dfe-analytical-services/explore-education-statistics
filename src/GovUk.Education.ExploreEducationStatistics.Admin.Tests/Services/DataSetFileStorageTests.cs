@@ -94,7 +94,6 @@ public class DataSetFileStorageTests
                         _user.Id,
                         dataSetName,
                         null,
-                        null,
                         0
                     )
                 )
@@ -109,7 +108,6 @@ public class DataSetFileStorageTests
                         157,
                         FileType.Metadata,
                         _user.Id,
-                        null,
                         null,
                         null,
                         0
@@ -131,7 +129,7 @@ public class DataSetFileStorageTests
                 .Returns(Task.CompletedTask);
 
             dataImportService
-                .Setup(s => s.Import(It.IsAny<Guid>(), It.IsAny<File>(), It.IsAny<File>(), null))
+                .Setup(s => s.Import(It.IsAny<Guid>(), It.IsAny<File>(), It.IsAny<File>()))
                 .ReturnsAsync(
                     new DataImport
                     {
@@ -492,7 +490,6 @@ public class DataSetFileStorageTests
                     _user.Id,
                     dataSetName,
                     originalDataFile,
-                    null,
                     0
                 )
             )
@@ -500,18 +497,7 @@ public class DataSetFileStorageTests
 
         releaseDataFileRepository
             .Setup(mock =>
-                mock.Create(
-                    releaseVersion.Id,
-                    subjectId,
-                    metaFileName,
-                    157,
-                    FileType.Metadata,
-                    _user.Id,
-                    null,
-                    null,
-                    null,
-                    0
-                )
+                mock.Create(releaseVersion.Id, subjectId, metaFileName, 157, FileType.Metadata, _user.Id, null, null, 0)
             )
             .Returns(Task.FromResult(metaFile));
 
@@ -522,7 +508,7 @@ public class DataSetFileStorageTests
             .Returns(Task.FromResult(true));
 
         dataImportService
-            .Setup(s => s.Import(It.IsAny<Guid>(), newDataFile, metaFile, null))
+            .Setup(s => s.Import(It.IsAny<Guid>(), newDataFile, metaFile))
             .ReturnsAsync(new DataImport { Status = QUEUED, MetaFile = metaFile });
 
         var contentDbContextId = Guid.NewGuid().ToString();

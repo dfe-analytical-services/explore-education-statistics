@@ -98,18 +98,6 @@ public class ReleaseDataFileService(
 
                         await fileRepository.Delete(file.Id);
                         await fileRepository.Delete(metaFile.Id);
-
-                        if (
-                            file.SourceId.HasValue
-                            // A bulk upload zip may be linked to multiple files - only delete zip if all have been removed
-                            && !await contentDbContext.Files.AnyAsync(f => f.SourceId == file.SourceId.Value)
-                        )
-                        {
-                            var zipFile = await fileRepository.Get(file.SourceId.Value);
-                            await privateBlobStorageService.DeleteBlob(PrivateReleaseFiles, zipFile.Path());
-                            // N.B. No ReleaseFiles row for source links
-                            await fileRepository.Delete(zipFile.Id);
-                        }
                     }
                 }
             });
@@ -603,9 +591,13 @@ public class ReleaseDataFileService(
             : dataSetUpload;
     }
 
-    private static Either<ActionResult, DataSetUpload> ValidateDataSetCanBeImported(DataSetUpload dataSetUpload)
+    private async Task<Either<ActionResult, DataSetUpload>> ValidateDataSetCanBeImported(DataSetUpload dataSetUpload)
     {
-        return dataSetUpload.Status is not DataSetUploadStatus.PENDING_REVIEW and not DataSetUploadStatus.PENDING_IMPORT
+        var isBauUser = await userService.CheckIsBauUser();
+
+        return
+            !isBauUser.IsRight
+            && dataSetUpload.Status is not DataSetUploadStatus.PENDING_REVIEW and not DataSetUploadStatus.PENDING_IMPORT
             ? ValidationUtils.ValidationResult(ValidationMessages.GenerateErrorDataSetIsNotInAnImportableState())
             : dataSetUpload;
     }

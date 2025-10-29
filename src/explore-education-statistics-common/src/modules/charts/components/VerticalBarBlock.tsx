@@ -69,11 +69,10 @@ const VerticalBarBlock = ({
   meta,
   showDataLabels,
   stacked,
-  width,
 }: VerticalBarProps) => {
   const { isMedia: isDesktopMedia } = useDesktopMedia();
   const [xAxisTickWidth, setXAxisTickWidth] = useState<number>();
-  const containerRef = useRef<RefObject<HTMLDivElement>>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Make recharts show all x axis ticks, it automatically
   // shows / hides them depending on available space otherwise.
@@ -159,10 +158,8 @@ const VerticalBarBlock = ({
   );
 
   useEffect(() => {
-    // A known bug with refs in recharts 2.x results in having to use `current.current`.
-    // It should be fixed in v3.
-    if (showAllXAxisTicks && containerRef.current?.current?.clientWidth) {
-      resizeTicks(containerRef.current?.current?.clientWidth);
+    if (showAllXAxisTicks && containerRef.current?.clientWidth) {
+      resizeTicks(containerRef.current?.clientWidth);
     }
   }, [resizeTicks, showAllXAxisTicks]);
 
@@ -189,15 +186,13 @@ const VerticalBarBlock = ({
       xAxisLabel={axes.major.label}
     >
       <ResponsiveContainer
-        width={width || '100%'}
         height={height || 300}
         onResize={handleResize}
         ref={containerRef}
       >
         <BarChart
-          aria-label={alt}
-          role="img"
-          focusable={false}
+          accessibilityLayer
+          aria-label={`${alt}. Use the left and right arrow keys to browse data points.`}
           data={chartData}
           margin={{
             left: 30,
@@ -268,6 +263,7 @@ const VerticalBarBlock = ({
               label={
                 showDataLabels
                   ? {
+                      fill: '#0b0c0c',
                       fontSize: 14,
                       offset: 5,
                       position: 'top',

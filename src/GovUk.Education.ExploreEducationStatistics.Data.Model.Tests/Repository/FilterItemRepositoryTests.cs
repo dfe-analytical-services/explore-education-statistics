@@ -1,14 +1,266 @@
 ﻿#nullable enable
+using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
+using Microsoft.Extensions.Logging;
+using Moq;
+using Thinktecture.EntityFrameworkCore.TempTables;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository;
 
 public class FilterItemRepositoryTests
 {
+    private static readonly DataFixture Fixture = new();
+
+    [Fact]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    public async Task GetMatchedFilterItems_AllObservationsMatched_AllObservationsStrategyChosen()
+    {
+        var subjectId = Guid.NewGuid();
+
+        var allObservationsForSubject = Fixture
+            .DefaultObservation()
+            .WithSubject(new Subject { Id = subjectId })
+            .GenerateList(10);
+
+        var observationsForAnotherSubject = Fixture
+            .DefaultObservation()
+            .WithSubject(new Subject { Id = Guid.NewGuid() })
+            .GenerateList(10);
+
+        // Fill the #MatchedObservation temp table with matches for every Observation for the Subject.
+        var matchedObservationIds = allObservationsForSubject.Select(o => new MatchedObservation(o.Id)).ToList();
+
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            await statisticsDbContext.Observation.AddRangeAsync(
+                allObservationsForSubject.Concat(observationsForAnotherSubject)
+            );
+            await statisticsDbContext.MatchedObservations.AddRangeAsync(matchedObservationIds);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using var context = InMemoryStatisticsDbContext(statisticsDbContextId);
+
+        var allObservationsStrategy = new Mock<IAllObservationsMatchedFilterItemsStrategy>(Strict);
+        var sparseObservationsStrategy = new Mock<ISparseObservationsMatchedFilterItemsStrategy>(Strict);
+        var denseObservationsStrategy = new Mock<IDenseObservationsMatchedFilterItemsStrategy>(Strict);
+
+        var filterItemsToReturn = Fixture.DefaultFilterItem().GenerateList(2);
+
+        allObservationsStrategy
+            .Setup(s => s.GetFilterItemsFromMatchedObservationIds(subjectId, default))
+            .ReturnsAsync(filterItemsToReturn);
+
+        var repository = BuildFilterItemRepository(
+            context: context,
+            allObservationsMatchedFilterItemsStrategy: allObservationsStrategy.Object,
+            sparseObservationsMatchedFilterItemsStrategy: sparseObservationsStrategy.Object,
+            denseObservationsMatchedFilterItemsStrategy: denseObservationsStrategy.Object
+        );
+
+        var result = await repository.GetFilterItemsFromMatchedObservationIds(
+            subjectId: subjectId,
+            matchedObservationsTableReference: Mock.Of<ITempTableReference>(),
+            cancellationToken: default
+        );
+
+        VerifyAllMocks(allObservationsStrategy);
+
+        Assert.Equal(filterItemsToReturn, result);
+    }
+
+    [Theory]
+    [InlineData(75)]
+    [InlineData(76)]
+    [InlineData(99)]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    public async Task GetMatchedFilterItems_PercentThresholdObservationsMatchedOrExceeded_DenseStrategyChosen(
+        int percentageObservationsMatched
+    )
+    {
+        var subjectId = Guid.NewGuid();
+
+        var allObservationsForSubject = Fixture
+            .DefaultObservation()
+            .WithSubject(new Subject { Id = subjectId })
+            .GenerateList(100);
+
+        var observationsForAnotherSubject = Fixture
+            .DefaultObservation()
+            .WithSubject(new Subject { Id = Guid.NewGuid() })
+            .GenerateList(100);
+
+        // Fill the #MatchedObservation temp table with a high percentage of the Observations for the Subject.
+        var matchedObservationIds = allObservationsForSubject
+            .Take(percentageObservationsMatched)
+            .Select(o => new MatchedObservation(o.Id))
+            .ToList();
+
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            await statisticsDbContext.Observation.AddRangeAsync(
+                allObservationsForSubject.Concat(observationsForAnotherSubject)
+            );
+            await statisticsDbContext.MatchedObservations.AddRangeAsync(matchedObservationIds);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using var context = InMemoryStatisticsDbContext(statisticsDbContextId);
+
+        var allObservationsStrategy = new Mock<IAllObservationsMatchedFilterItemsStrategy>(Strict);
+        var sparseObservationsStrategy = new Mock<ISparseObservationsMatchedFilterItemsStrategy>(Strict);
+        var denseObservationsStrategy = new Mock<IDenseObservationsMatchedFilterItemsStrategy>(Strict);
+        var matchedObservationTempTable = Mock.Of<ITempTableReference>();
+
+        var filterItemsToReturn = Fixture.DefaultFilterItem().GenerateList(2);
+
+        denseObservationsStrategy
+            .Setup(s => s.GetFilterItemsFromMatchedObservationIds(subjectId, matchedObservationTempTable, default))
+            .ReturnsAsync(filterItemsToReturn);
+
+        var repository = BuildFilterItemRepository(
+            context: context,
+            allObservationsMatchedFilterItemsStrategy: allObservationsStrategy.Object,
+            sparseObservationsMatchedFilterItemsStrategy: sparseObservationsStrategy.Object,
+            denseObservationsMatchedFilterItemsStrategy: denseObservationsStrategy.Object
+        );
+
+        var result = await repository.GetFilterItemsFromMatchedObservationIds(
+            subjectId: subjectId,
+            matchedObservationsTableReference: matchedObservationTempTable,
+            cancellationToken: default
+        );
+
+        VerifyAllMocks(denseObservationsStrategy);
+
+        Assert.Equal(filterItemsToReturn, result);
+    }
+
+    [Theory]
+    [InlineData(74)]
+    [InlineData(73)]
+    [InlineData(1)]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    public async Task GetMatchedFilterItems_LessThanPercentThresholdObservationsMatched_SparseStrategyChosen(
+        int percentageObservationsMatched
+    )
+    {
+        var subjectId = Guid.NewGuid();
+
+        var allObservationsForSubject = Fixture
+            .DefaultObservation()
+            .WithSubject(new Subject { Id = subjectId })
+            .GenerateList(100);
+
+        var observationsForAnotherSubject = Fixture
+            .DefaultObservation()
+            .WithSubject(new Subject { Id = Guid.NewGuid() })
+            .GenerateList(10);
+
+        // Fill the #MatchedObservation temp table with a smaller percentage of the Observations for the Subject.
+        var matchedObservationIds = allObservationsForSubject
+            .Take(percentageObservationsMatched)
+            .Select(o => new MatchedObservation(o.Id))
+            .ToList();
+
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            await statisticsDbContext.Observation.AddRangeAsync(
+                allObservationsForSubject.Concat(observationsForAnotherSubject)
+            );
+            await statisticsDbContext.MatchedObservations.AddRangeAsync(matchedObservationIds);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using var context = InMemoryStatisticsDbContext(statisticsDbContextId);
+
+        var allObservationsStrategy = new Mock<IAllObservationsMatchedFilterItemsStrategy>(Strict);
+        var sparseObservationsStrategy = new Mock<ISparseObservationsMatchedFilterItemsStrategy>(Strict);
+        var denseObservationsStrategy = new Mock<IDenseObservationsMatchedFilterItemsStrategy>(Strict);
+        var matchedObservationTempTable = Mock.Of<ITempTableReference>();
+
+        var filterItemsToReturn = Fixture.DefaultFilterItem().GenerateList(2);
+
+        sparseObservationsStrategy
+            .Setup(s => s.GetFilterItemsFromMatchedObservationIds(subjectId, matchedObservationTempTable, default))
+            .ReturnsAsync(filterItemsToReturn);
+
+        var repository = BuildFilterItemRepository(
+            context: context,
+            allObservationsMatchedFilterItemsStrategy: allObservationsStrategy.Object,
+            sparseObservationsMatchedFilterItemsStrategy: sparseObservationsStrategy.Object,
+            denseObservationsMatchedFilterItemsStrategy: denseObservationsStrategy.Object
+        );
+
+        var result = await repository.GetFilterItemsFromMatchedObservationIds(
+            subjectId: subjectId,
+            matchedObservationsTableReference: matchedObservationTempTable,
+            cancellationToken: default
+        );
+
+        VerifyAllMocks(sparseObservationsStrategy);
+
+        Assert.Equal(filterItemsToReturn, result);
+    }
+
+    [Fact]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    public async Task GetMatchedFilterItems_NoObservationsMatched_NoFilterItemsReturned()
+    {
+        var subjectId = Guid.NewGuid();
+
+        var allObservationsForSubject = Fixture
+            .DefaultObservation()
+            .WithSubject(new Subject { Id = subjectId })
+            .GenerateList(100);
+
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            // Populate Observations for the Subject, but not any MatchedObservations.
+            await statisticsDbContext.Observation.AddRangeAsync(allObservationsForSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using var context = InMemoryStatisticsDbContext(statisticsDbContextId);
+
+        var allObservationsStrategy = new Mock<IAllObservationsMatchedFilterItemsStrategy>(Strict);
+        var sparseObservationsStrategy = new Mock<ISparseObservationsMatchedFilterItemsStrategy>(Strict);
+        var denseObservationsStrategy = new Mock<IDenseObservationsMatchedFilterItemsStrategy>(Strict);
+        var matchedObservationTempTable = Mock.Of<ITempTableReference>();
+
+        var repository = BuildFilterItemRepository(
+            context: context,
+            allObservationsMatchedFilterItemsStrategy: allObservationsStrategy.Object,
+            sparseObservationsMatchedFilterItemsStrategy: sparseObservationsStrategy.Object,
+            denseObservationsMatchedFilterItemsStrategy: denseObservationsStrategy.Object
+        );
+
+        var result = await repository.GetFilterItemsFromMatchedObservationIds(
+            subjectId: subjectId,
+            matchedObservationsTableReference: matchedObservationTempTable,
+            cancellationToken: default
+        );
+
+        Assert.Empty(result);
+    }
+
     [Fact]
     public async Task CountFilterItemsByFilter()
     {
@@ -139,8 +391,19 @@ public class FilterItemRepositoryTests
         }
     }
 
-    private static FilterItemRepository BuildFilterItemRepository(StatisticsDbContext context)
+    private static FilterItemRepository BuildFilterItemRepository(
+        StatisticsDbContext context,
+        IAllObservationsMatchedFilterItemsStrategy? allObservationsMatchedFilterItemsStrategy = null,
+        ISparseObservationsMatchedFilterItemsStrategy? sparseObservationsMatchedFilterItemsStrategy = null,
+        IDenseObservationsMatchedFilterItemsStrategy? denseObservationsMatchedFilterItemsStrategy = null
+    )
     {
-        return new(context);
+        return new(
+            statisticsDbContext: context,
+            allObservationsMatchedFilterItemsStrategy ?? Mock.Of<IAllObservationsMatchedFilterItemsStrategy>(),
+            sparseObservationsMatchedFilterItemsStrategy ?? Mock.Of<ISparseObservationsMatchedFilterItemsStrategy>(),
+            denseObservationsMatchedFilterItemsStrategy ?? Mock.Of<IDenseObservationsMatchedFilterItemsStrategy>(),
+            Mock.Of<ILogger<FilterItemRepository>>()
+        );
     }
 }

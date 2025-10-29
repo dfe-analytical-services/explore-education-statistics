@@ -22,6 +22,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.Extensions.Options;
 using Moq;
 using Snapshooter.Xunit;
+using Thinktecture.EntityFrameworkCore.TempTables;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -139,9 +140,11 @@ public class TableBuilderServiceTests
 
             var observationService = new Mock<IObservationService>(Strict);
 
+            var matchedObservationsTable = Mock.Of<ITempTableReference>();
+
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
-                .ReturnsAsync(statisticsDbContext.MatchedObservations);
+                .ReturnsAsync(matchedObservationsTable);
 
             var subjectResultMetaService = new Mock<ISubjectResultMetaService>(Strict);
 
@@ -483,9 +486,11 @@ public class TableBuilderServiceTests
 
             var observationService = new Mock<IObservationService>(Strict);
 
+            var matchedObservationsTable = Mock.Of<ITempTableReference>();
+
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
-                .ReturnsAsync(statisticsDbContext.MatchedObservations);
+                .ReturnsAsync(matchedObservationsTable);
 
             var subjectResultMetaService = new Mock<ISubjectResultMetaService>(Strict);
 
@@ -840,9 +845,11 @@ public class TableBuilderServiceTests
 
             var observationService = new Mock<IObservationService>(Strict);
 
+            var matchedObservationsTable = Mock.Of<ITempTableReference>();
+
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
-                .ReturnsAsync(statisticsDbContext.MatchedObservations);
+                .ReturnsAsync(matchedObservationsTable);
 
             var subjectCsvMeta = new SubjectCsvMetaViewModel
             {
@@ -1204,9 +1211,11 @@ public class TableBuilderServiceTests
 
             var observationService = new Mock<IObservationService>(Strict);
 
+            var matchedObservationsTable = Mock.Of<ITempTableReference>();
+
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
-                .ReturnsAsync(statisticsDbContext.MatchedObservations);
+                .ReturnsAsync(matchedObservationsTable);
 
             var subjectCsvMeta = new SubjectCsvMetaViewModel
             {
@@ -1341,9 +1350,11 @@ public class TableBuilderServiceTests
 
             var observationService = new Mock<IObservationService>(Strict);
 
+            var matchedObservationsTable = Mock.Of<ITempTableReference>();
+
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
-                .ReturnsAsync(statisticsDbContext.MatchedObservations);
+                .ReturnsAsync(matchedObservationsTable);
 
             var subjectCsvMeta = new SubjectCsvMetaViewModel
             {

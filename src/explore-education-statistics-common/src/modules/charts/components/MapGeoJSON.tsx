@@ -20,14 +20,12 @@ interface Props {
   selectedFeature?: MapFeature;
   selectedDataSetKey: string;
   height: number;
-  width?: number;
   onSelectFeature: (feature: MapFeature) => void;
 }
 
 export default function MapGeoJSON({
   features,
   selectedFeature,
-  width,
   height,
   selectedDataSetKey,
   dataSetCategoryConfigs,
@@ -72,7 +70,7 @@ export default function MapGeoJSON({
     if (map) {
       map.invalidateSize();
     }
-  }, [map, width, height]);
+  }, [map, height]);
 
   // Reset the GeoJson layer if the geometry is changed,
   // updating the component doesn't do it once it's rendered

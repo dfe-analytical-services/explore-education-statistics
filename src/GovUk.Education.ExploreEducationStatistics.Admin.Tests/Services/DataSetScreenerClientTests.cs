@@ -30,12 +30,7 @@ public class DataSetScreenerClientTests
         [Fact(Skip = "EES-6341: Skip until screener has been re-enabled")]
         public async Task AuthenticationManagerCalled()
         {
-            var responseBody = new DataSetScreenerResponse
-            {
-                Message = "",
-                OverallResult = ScreenerResult.Failed,
-                TestResults = [],
-            };
+            var responseBody = new DataSetScreenerResponse { OverallResult = "Failed", TestResults = [] };
 
             _mockHttp
                 .Expect(HttpMethod.Post, BaseUri.AbsoluteUri)
@@ -86,20 +81,19 @@ public class DataSetScreenerClientTests
 
             var responseBody = new DataSetScreenerResponse
             {
-                Message = "A message",
-                OverallResult = ScreenerResult.Failed,
+                OverallResult = "Failed",
                 TestResults =
                 [
                     new DataScreenerTestResult
                     {
-                        Stage = Stage.PreScreening1,
+                        Stage = "PreScreening1",
                         Result = TestResult.WARNING,
                         Notes = "Some notes",
                         TestFunctionName = "Test 1",
                     },
                     new DataScreenerTestResult
                     {
-                        Stage = Stage.Passed,
+                        Stage = "Passed",
                         Result = TestResult.PASS,
                         TestFunctionName = "Test 2",
                     },

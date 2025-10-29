@@ -1,11 +1,11 @@
-#nullable enable
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Numerics;
 using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
-public record DataSetVersionNumber(int? Major, int? Minor, int? Patch)
+public record DataSetVersionNumber(BigInteger? Major, BigInteger? Minor, BigInteger? Patch)
 {
     public static bool TryParse(string versionString, [NotNullWhen(true)] out DataSetVersionNumber? version)
     {
@@ -26,7 +26,7 @@ public record DataSetVersionNumber(int? Major, int? Minor, int? Patch)
             return false;
         }
 
-        version = new DataSetVersionNumber(sv.Major, sv.Minor, sv.Patch);
+        version = new DataSetVersionNumber(sv?.Major, sv?.Minor, sv?.Patch);
         return successful;
     }
 }
@@ -64,6 +64,7 @@ public static class DataSetVersionWildcardHelper
             return false; // reject version strings like 1.*.1
 
         version = new DataSetVersionNumber(
+            // ints implicitly converted to BigIntegers
             parts[0],
             parts.Length > 1 ? parts[1] : null,
             parts.Length > 2 ? parts[2] : null

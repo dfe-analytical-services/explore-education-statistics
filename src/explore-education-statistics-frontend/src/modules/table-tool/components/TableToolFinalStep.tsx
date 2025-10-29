@@ -88,28 +88,29 @@ const TableToolFinalStep = ({
             )}
           </div>
 
-          <TableHeadersForm
-            initialValues={tableHeaders}
-            onSubmit={nextTableHeaders => {
-              onReorderTableHeaders(nextTableHeaders);
-              if (dataTableRef.current) {
-                // add a short delay so the reordering form is closed before it scrolls.
-                setTimeout(() => {
-                  dataTableRef?.current?.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                  });
-                }, 200);
-              }
-            }}
-          />
-
           <TimePeriodDataTable
             ref={dataTableRef}
             footnotesClassName="govuk-!-width-two-thirds"
             fullTable={table}
             query={query}
             tableHeadersConfig={tableHeaders}
+            tableHeadersForm={
+              <TableHeadersForm
+                initialValues={tableHeaders}
+                onSubmit={nextTableHeaders => {
+                  onReorderTableHeaders(nextTableHeaders);
+                  if (dataTableRef.current) {
+                    // add a short delay so the reordering form is closed before it scrolls.
+                    setTimeout(() => {
+                      dataTableRef?.current?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                      });
+                    }, 200);
+                  }
+                }}
+              />
+            }
             onError={message => {
               toggleHasTableError.on();
               logEvent({

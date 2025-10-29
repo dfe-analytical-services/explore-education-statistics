@@ -47,6 +47,7 @@ const ContentBlockRenderer = ({
     case 'HtmlBlock':
       return (
         <ContentHtml
+          blockId={block.id}
           html={body}
           sanitizeOptions={sanitizeOptions}
           getGlossaryEntry={getGlossaryEntry}

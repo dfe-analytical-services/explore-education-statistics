@@ -97,7 +97,9 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
 
             // Assert the data set has a new version and that it is the latest draft version.
             Assert.Equal(2, updatedDataSet.Versions.Count);
-            var nextDataSetVersion = updatedDataSet.Versions.OrderBy(v => v.SemVersion()).Last();
+            var nextDataSetVersion = updatedDataSet
+                .Versions.OrderBy(v => v.SemVersion(), SemVersion.PrecedenceComparer)
+                .Last();
             Assert.Equal(nextDataSetVersion, updatedDataSet.LatestDraftVersion);
 
             Assert.Equal(updatedDataSet.Id, nextDataSetVersion.DataSetId);

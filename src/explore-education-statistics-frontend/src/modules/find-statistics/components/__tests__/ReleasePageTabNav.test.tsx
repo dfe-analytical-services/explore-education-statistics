@@ -2,6 +2,7 @@ import render from '@common-test/render';
 import ReleasePageTabNav from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
+import { releasePageTabRouteItems } from '../../PublicationReleasePage';
 
 describe('ReleasePageTabNav', () => {
   test('renders the nav correctly', () => {
@@ -9,6 +10,7 @@ describe('ReleasePageTabNav', () => {
       <ReleasePageTabNav
         activePage="explore"
         releaseUrlBase="/find-statistics/test-publication/test-slug"
+        tabNavItems={releasePageTabRouteItems}
       />,
     );
 

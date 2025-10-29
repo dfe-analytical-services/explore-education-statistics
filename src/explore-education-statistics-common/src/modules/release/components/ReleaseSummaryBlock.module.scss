@@ -1,4 +1,5 @@
 @import '~govuk-frontend/dist/govuk/base';
+@import '@common/styles/variables';
 
 .container {
   display: flex;
@@ -7,10 +8,7 @@
   gap: govuk-spacing(4);
   margin-bottom: govuk-spacing(8);
   padding: govuk-spacing(2);
-  // N.b there is no govuk colour token for this yet -
-  // it has been introduced as part of the recent rebrand.
-  // We can swap it out for a token when available.
-  background-color: #f4f8fb;
+  background-color: $_govuk-rebrand-light-blue-background-colour;
 }
 
 .innerWrap {

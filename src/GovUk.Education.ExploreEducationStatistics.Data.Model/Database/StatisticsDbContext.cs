@@ -11,24 +11,19 @@ using Thinktecture;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 
-public class MatchedObservation
+public class MatchedObservation(Guid id)
 {
-    public Guid Id { get; }
-
-    public MatchedObservation(Guid id)
-    {
-        Id = id;
-    }
+    public Guid Id { get; } = id;
 }
 
-public class IdTempTable
+public class MatchedFilterItem(Guid id)
 {
-    public Guid Id { get; }
+    public Guid Id { get; } = id;
+}
 
-    public IdTempTable(Guid id)
-    {
-        Id = id;
-    }
+public class IdTempTable(Guid id)
+{
+    public Guid Id { get; } = id;
 
     protected bool Equals(IdTempTable other)
     {
@@ -124,6 +119,7 @@ public class StatisticsDbContext : DbContext
     public DbSet<ReleaseSubject> ReleaseSubject { get; set; } = null!;
     public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; } = null!;
     public DbSet<MatchedObservation> MatchedObservations => this.TempTableSet<MatchedObservation>();
+    public DbSet<MatchedFilterItem> MatchedFilterItems => this.TempTableSet<MatchedFilterItem>();
 
     private readonly EnumToEnumValueConverter<GeographicLevel> _geographicLevelConverter = new();
 
@@ -142,7 +138,7 @@ public class StatisticsDbContext : DbContext
         ConfigureMeasures(modelBuilder);
         ConfigureObservation(modelBuilder);
         ConfigureObservationFilterItem(modelBuilder);
-        ConfigureObservationRowResultTempTable(modelBuilder);
+        ConfigureTableBuilderTempTables(modelBuilder);
         ConfigurePublication(modelBuilder);
         ConfigureReleaseSubject(modelBuilder);
         ConfigureReleaseFootnote(modelBuilder);
@@ -273,11 +269,16 @@ public class StatisticsDbContext : DbContext
             .OnDelete(DeleteBehavior.Restrict);
     }
 
-    private static void ConfigureObservationRowResultTempTable(ModelBuilder modelBuilder)
+    private static void ConfigureTableBuilderTempTables(ModelBuilder modelBuilder)
     {
         modelBuilder.ConfigureTempTableEntity<MatchedObservation>(
             isKeyless: false,
             builder => builder.HasKey(matchedObservation => matchedObservation.Id)
+        );
+
+        modelBuilder.ConfigureTempTableEntity<MatchedFilterItem>(
+            isKeyless: false,
+            builder => builder.HasKey(matchedFilterItem => matchedFilterItem.Id)
         );
     }
 

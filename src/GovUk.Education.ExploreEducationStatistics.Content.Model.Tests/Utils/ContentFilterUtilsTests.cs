@@ -1,16 +1,13 @@
-using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Utils;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Utils.ContentFilterUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 
-public class ContentFilterUtilsTests
+public abstract class ContentFilterUtilsTests
 {
-    public class CommentsFilterPattern
+    public class CommentsRegexTests : ContentFilterUtilsTests
     {
-        private readonly Regex _regex = new(ContentFilterUtils.CommentsFilterPattern, RegexOptions.Compiled);
-
         [Fact]
         public void Replace_TypicalFormat()
         {
@@ -24,7 +21,7 @@ public class ContentFilterUtilsTests
                     Content 1
                     Content 2
                     Content 3".TrimIndent(),
-                _regex.Replace(content, string.Empty)
+                CommentsRegex().Replace(content, string.Empty)
             );
         }
 
@@ -41,7 +38,7 @@ public class ContentFilterUtilsTests
                     Content 1
                     Content 2
                     Content 3".TrimIndent(),
-                _regex.Replace(content, string.Empty)
+                CommentsRegex().Replace(content, string.Empty)
             );
         }
 
@@ -88,7 +85,7 @@ public class ContentFilterUtilsTests
                 Content 5
 
                 ".TrimIndent(),
-                _regex.Replace(content, string.Empty)
+                CommentsRegex().Replace(content, string.Empty)
             );
         }
 
@@ -115,7 +112,7 @@ public class ContentFilterUtilsTests
                         <li>Content 3</li>
                         <li>Content 4</li>
                     </ul>".TrimIndent(),
-                _regex.Replace(content, string.Empty)
+                CommentsRegex().Replace(content, string.Empty)
             );
         }
 
@@ -146,7 +143,7 @@ public class ContentFilterUtilsTests
                         </li>
                     </ul>".TrimIndent();
 
-            var replaced = _regex.Replace(content, string.Empty);
+            var replaced = CommentsRegex().Replace(content, string.Empty);
             Assert.Equal(
                 @"
                     <p>

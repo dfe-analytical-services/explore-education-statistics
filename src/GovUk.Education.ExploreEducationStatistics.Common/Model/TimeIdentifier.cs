@@ -1,4 +1,3 @@
-#nullable enable
 using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodLabelFormat;

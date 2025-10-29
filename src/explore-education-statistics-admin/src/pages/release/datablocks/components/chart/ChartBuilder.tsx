@@ -160,6 +160,11 @@ export default function ChartBuilder({
     [axes.major?.dataSets, meta.indicators],
   );
 
+  const [handleMapCategoricalDataConfigChange] = useDebouncedCallback(
+    actions.updateMapCategoricalDataConfig,
+    200,
+  );
+
   const chart = useMemo<ChartBuilderChartProps | undefined>(() => {
     if (!definition || !options) {
       return undefined;
@@ -209,6 +214,7 @@ export default function ChartBuilder({
           type: 'map',
           onBoundaryLevelChange: (boundaryLevel: number) =>
             onTableQueryUpdate({}, boundaryLevel),
+          onChangeCategoricalDataConfig: handleMapCategoricalDataConfigChange,
         };
       default:
         return undefined;
@@ -223,6 +229,7 @@ export default function ChartBuilder({
     options,
     map,
     onTableQueryUpdate,
+    handleMapCategoricalDataConfigChange,
   ]);
 
   const handleSubmit = useCallback(async () => {
@@ -355,6 +362,7 @@ export default function ChartBuilder({
       {definition && (
         <ChartBuilderFormsContextProvider
           definition={definition}
+          initialValid={['dataGroupings']}
           onSubmit={handleSubmit}
         >
           {({ forms }) => (
@@ -450,6 +458,7 @@ export default function ChartBuilder({
                     buttons={deleteButton}
                     data={data}
                     definition={definition}
+                    allowColourSelection={!map?.categoricalDataConfig?.length}
                     legend={legend}
                     meta={meta}
                     showDataLabels={options?.showDataLabels}

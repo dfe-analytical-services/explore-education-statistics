@@ -58,9 +58,10 @@ export default function ReleaseApiDataSetsSection() {
         </p>
 
         <p>
-          If the structure of your data set will not be stable with future
-          releases, you are advised to avoid using an API data set. Users can
-          still download and explore your data by creating their own tables.
+          If an API data set fails any API-specific screener tests, the file
+          upload will be marked as incompatible in the file details, and cannot
+          be used as an API data set. Users can still download and explore your
+          data by creating their own tables.
         </p>
 
         {!releaseVersion.published && (

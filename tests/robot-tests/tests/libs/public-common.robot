@@ -80,3 +80,6 @@ user checks methodology note
     [Arguments]    ${number}    ${displayDate}    ${content}
     user waits until element contains    css:#methodologyNotes li:nth-of-type(${number}) time    ${displayDate}
     user waits until element contains    css:#methodologyNotes li:nth-of-type(${number}) p    ${content}
+
+user checks related information panel is visible
+    user waits until page contains element    xpath://h2[text()='Related information']

@@ -155,7 +155,11 @@ public class ContentServiceTests
             {
                 new HtmlBlock { ReleaseVersion = releaseVersion },
                 new DataBlock { ReleaseVersion = releaseVersion },
-                new EmbedBlockLink { EmbedBlock = new EmbedBlock(), ReleaseVersion = releaseVersion },
+                new EmbedBlockLink
+                {
+                    EmbedBlock = new EmbedBlock { Title = "title", Url = "url" },
+                    ReleaseVersion = releaseVersion,
+                },
             },
             ReleaseVersion = releaseVersion,
         };

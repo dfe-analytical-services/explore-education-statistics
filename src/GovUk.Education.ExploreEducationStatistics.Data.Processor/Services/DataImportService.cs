@@ -52,7 +52,6 @@ public class DataImportService : IDataImportService
             .Include(import => import.Errors)
             .Include(import => import.File)
             .Include(import => import.MetaFile)
-            .Include(import => import.ZipFile)
             .SingleAsync(import => import.Id == id);
     }
 

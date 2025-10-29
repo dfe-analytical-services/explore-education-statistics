@@ -31,7 +31,12 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
 
             var releaseFiles = dataImports
                 .Select(di =>
-                    DataFixture.DefaultReleaseFile().WithFile(di.File).WithReleaseVersion(releaseVersion).Generate()
+                    DataFixture
+                        .DefaultReleaseFile()
+                        .WithFile(di.File)
+                        .WithReleaseVersion(releaseVersion)
+                        .WithApiCompatibility(true)
+                        .Generate()
                 )
                 .ToList();
 
@@ -163,6 +168,36 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
                 .WithFile(dataImport.File)
                 .WithReleaseVersion(releaseVersion)
                 .WithPublicApiDataSetId(Guid.NewGuid());
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.DataImports.Add(dataImport);
+                context.ReleaseFiles.Add(releaseFile);
+            });
+
+            var response = await GetDataSetCandidates(releaseVersion.Id);
+
+            var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
+
+            Assert.Empty(candidates);
+        }
+
+        [Fact]
+        public async Task ReleaseFileIsIncompatible_NotReturned()
+        {
+            Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true);
+
+            DataImport dataImport = DataFixture
+                .DefaultDataImport()
+                .WithFile(DataFixture.DefaultFile(FileType.Data).WithReplacingId(Guid.NewGuid()));
+
+            var releaseVersion = release.Versions.Single();
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithFile(dataImport.File)
+                .WithReleaseVersion(releaseVersion)
+                .WithApiCompatibility(false);
 
             await TestApp.AddTestData<ContentDbContext>(context =>
             {

@@ -55,9 +55,7 @@ const HorizontalBarBlock = ({
   meta,
   height,
   barThickness,
-  width,
   stacked = false,
-
   axes,
   legend,
   includeNonNumericData,
@@ -132,11 +130,10 @@ const HorizontalBarBlock = ({
       xAxisHeight={xAxisHeight}
       xAxisLabel={axes.minor.label}
     >
-      <ResponsiveContainer width={width || '100%'} height={height || 300}>
+      <ResponsiveContainer height={height || 300}>
         <BarChart
-          aria-label={alt}
-          role="img"
-          focusable={false}
+          accessibilityLayer
+          aria-label={`${alt}. Use the left and right arrow keys to browse data points.`}
           data={chartData}
           layout="vertical"
           stackOffset={stacked ? 'sign' : undefined}

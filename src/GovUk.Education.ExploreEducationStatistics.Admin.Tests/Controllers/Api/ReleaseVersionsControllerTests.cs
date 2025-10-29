@@ -1220,6 +1220,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             Assert.Equal("Pending import", dataSet.Status);
             Assert.Equal("", dataSet.UploadedBy);
             Assert.Equal("Passed", dataSet.ScreenerResult?.OverallResult);
+            Assert.True(dataSet.PublicApiCompatible);
             Assert.Null(dataSet.ReplacingFileId);
         }
 
@@ -1260,6 +1261,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             Assert.Equal("Pending import", dataSet.Status);
             Assert.Equal("", dataSet.UploadedBy);
             Assert.Equal("Passed", dataSet.ScreenerResult?.OverallResult);
+            Assert.True(dataSet.PublicApiCompatible);
             Assert.Null(dataSet.ReplacingFileId);
         }
 
@@ -1314,6 +1316,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             Assert.Equal("Pending import", dataSet1.Status);
             Assert.Equal("", dataSet1.UploadedBy);
             Assert.Equal("Passed", dataSet1.ScreenerResult?.OverallResult);
+            Assert.True(dataSet1.PublicApiCompatible);
             Assert.Null(dataSet1.ReplacingFileId);
 
             Assert.NotEqual(Guid.Empty, dataSet2.Id);
@@ -1325,6 +1328,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             Assert.Equal("Pending import", dataSet2.Status);
             Assert.Equal("", dataSet2.UploadedBy);
             Assert.Equal("Passed", dataSet2.ScreenerResult?.OverallResult);
+            Assert.True(dataSet2.PublicApiCompatible);
             Assert.Null(dataSet2.ReplacingFileId);
         }
 
@@ -1365,6 +1369,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             Assert.Equal("Pending import", dataSet1.Status);
             Assert.Equal("", dataSet1.UploadedBy);
             Assert.Equal("Passed", dataSet1.ScreenerResult?.OverallResult);
+            Assert.True(dataSet1.PublicApiCompatible);
             Assert.NotNull(dataSet1.ReplacingFileId);
 
             Assert.NotEqual(Guid.Empty, dataSet2.Id);
@@ -1375,6 +1380,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             Assert.Equal("318 Kb", dataSet2.MetaFileSize);
             Assert.Equal("Pending import", dataSet2.Status);
             Assert.Equal("", dataSet2.UploadedBy);
+            Assert.True(dataSet2.PublicApiCompatible);
             Assert.Equal("Passed", dataSet1.ScreenerResult?.OverallResult);
             Assert.Null(dataSet2.ReplacingFileId);
         }

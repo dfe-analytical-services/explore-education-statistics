@@ -27,7 +27,6 @@ public class ReleaseDataFileRepository : IReleaseDataFileRepository
         Guid createdById,
         string? name = null,
         File? replacingDataFile = null,
-        File? source = null,
         int order = 0
     )
     {
@@ -59,7 +58,6 @@ public class ReleaseDataFileRepository : IReleaseDataFileRepository
                 ContentType = "text/csv",
                 Type = type,
                 Replacing = replacingDataFile,
-                Source = source,
             },
         };
         var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
