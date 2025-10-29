@@ -1,4 +1,9 @@
-import { StorageAccountRole } from '../types.bicep'
+@export()
+type StorageAccountRole =
+  | 'Storage Blob Data Contributor'
+  | 'Storage Blob Data Owner'
+  | 'Storage Blob Data Reader'
+  | 'Storage Queue Data Contributor'
 
 @description('Specifies the name of the Storage Account.')
 param storageAccountName string

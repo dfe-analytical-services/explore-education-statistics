@@ -15,7 +15,7 @@ param location string = resourceGroup().location
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-resource vault 'Microsoft.DataProtection/backupVaults@2022-05-01' = {
+resource vault 'Microsoft.DataProtection/backupVaults@2025-07-01' = {
   name: name
   location: location
   identity: {
@@ -31,3 +31,5 @@ resource vault 'Microsoft.DataProtection/backupVaults@2022-05-01' = {
   }
   tags: tagValues
 }
+
+output principalId string = vault.identity.principalId

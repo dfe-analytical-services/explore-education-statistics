@@ -29,6 +29,9 @@ param entraIdAdminPrincipals PrincipalNameAndId[] = []
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
 
+@description('Whether to register this server with Backup Vault')
+param deployBackupVaultRegistration bool
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -37,6 +40,10 @@ var formattedFirewallRules = map(firewallRules, rule => {
   cidr: rule.cidr
 })
 
+var serverName = resourceNames.sharedResources.postgreSqlFlexibleServer
+
+// Our deploy SPN currently does not have permission to assign this role. 
+var deployBackupVaultRoleAssignment = false
 func createManagedIdentityConnectionString(templateString string, identityName string) string =>
   replaceMultiple(templateString, {
     '[database_name]': 'public_data'
@@ -46,7 +53,7 @@ func createManagedIdentityConnectionString(templateString string, identityName s
 module postgreSqlServerModule '../../components/postgreSqlFlexibleServer.bicep' = {
   name: 'postgreSQLDatabaseDeploy'
   params: {
-    databaseServerName: resourceNames.sharedResources.postgreSqlFlexibleServer
+    databaseServerName: serverName
     location: location
     createMode: 'Default'
     adminName: adminName
@@ -70,6 +77,31 @@ module postgreSqlServerModule '../../components/postgreSqlFlexibleServer.bicep' 
       deadlocks: true
       alertsGroupName: resourceNames.existingResources.alertsGroup
     } : null
+    tagValues: tagValues
+  }
+}
+
+resource backupVault 'Microsoft.DataProtection/backupVaults@2022-05-01' existing = {
+  name: resourceNames.existingResources.backupVault.vault
+}
+
+module backupVaultRoleAssignmentModule '../../../common/components/psql-flexible-server/roleAssignment.bicep' = if (deployBackupVaultRoleAssignment) {
+  name: '${serverName}BackupVaultRoleAssignmentDeploy'
+  params: {
+    psqlFlexibleServerName: postgreSqlServerModule.outputs.serverName
+    principalIds: [backupVault.identity.principalId]
+    role: 'PostgreSQL Flexible Server Long Term Retention Backup Role'
+  }
+}
+
+module backupInstanceModule '../../../common/components/data-protection/backupVaultInstance.bicep' = if (deployBackupVaultRegistration) {
+  name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}BackupInstanceDeploy'
+  params: {
+    vaultName: resourceNames.existingResources.backupVault.vault
+    dataSourceType: 'psqlFlexibleServer'
+    resourceId: postgreSqlServerModule.outputs.databaseRef
+    resourceLocation: location
+    backupPolicyName: resourceNames.existingResources.backupVault.psqlFlexibleServerBackupPolicy
     tagValues: tagValues
   }
 }
