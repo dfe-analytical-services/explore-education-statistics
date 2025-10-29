@@ -79,12 +79,10 @@ public class PreviewTokenCreateRequestValidatorTests
     [Fact]
     public void Activates_NotTodayAndAtMidnightBstTime_IsValid()
     {
-        var currentTime = new DateTimeOffset(2024, 6, 15, 10, 0, 0, TimeSpan.Zero); // BST period
-        var timeProvider = GetTimeProvider(currentTime);
+        var timeProvider = GetTimeProvider();
         var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
 
-        // Tomorrow at midnight BST (23:00 UTC on previous day)
-        var activates = new DateTimeOffset(2024, 6, 15, 23, 0, 0, TimeSpan.Zero);
+        var activates = new DateTimeOffset(2025, 10, 4, 0, 0, 0, TimeSpan.FromHours(1)); // Must set offset to +01:00
         var request = new PreviewTokenCreateRequest
         {
             DataSetVersionId = Guid.NewGuid(),
@@ -100,12 +98,11 @@ public class PreviewTokenCreateRequestValidatorTests
     [Fact]
     public void Activates_NotTodayAndAtMidnightNonBstTime_IsValid()
     {
-        var currentTime = new DateTimeOffset(2024, 1, 15, 10, 0, 0, TimeSpan.Zero); // BST period
+        var currentTime = new DateTimeOffset(2025, 1, 15, 10, 0, 0, TimeSpan.Zero);
         var timeProvider = GetTimeProvider(currentTime);
         var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
 
-        // Tomorrow at midnight BST (23:00 UTC on previous day)
-        var activates = new DateTimeOffset(2024, 1, 16, 0, 0, 0, TimeSpan.Zero);
+        var activates = new DateTimeOffset(2025, 1, 16, 0, 0, 0, TimeSpan.Zero);
         var request = new PreviewTokenCreateRequest
         {
             DataSetVersionId = Guid.NewGuid(),
@@ -121,12 +118,11 @@ public class PreviewTokenCreateRequestValidatorTests
     [Fact]
     public void Activates_TodayAndNotAtMidnight_IsValid()
     {
-        var currentTime = new DateTimeOffset(2024, 6, 15, 10, 0, 0, TimeSpan.Zero); // BST period
-        var timeProvider = GetTimeProvider(currentTime);
+        var timeProvider = GetTimeProvider();
         var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
 
         // Activates date is same as current date
-        var activates = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
+        var activates = DefaultUtcNow.AddHours(2);
         var request = new PreviewTokenCreateRequest
         {
             DataSetVersionId = Guid.NewGuid(),
@@ -140,14 +136,11 @@ public class PreviewTokenCreateRequestValidatorTests
     }
 
     [Fact]
-    public void Activates_NotTodayButNotMidnightUkTime_Fails()
+    public void Activates_NotTodayButNotMidnight_Fails()
     {
-        var currentTime = new DateTimeOffset(2024, 6, 15, 10, 0, 0, TimeSpan.Zero); // BST period
-        var timeProvider = new FakeTimeProvider(currentTime);
-        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
+        var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
 
-        // Tomorrow at 2 AM BST (1 AM UTC) - should be midnight BST
-        var activates = new DateTimeOffset(2024, 6, 16, 1, 0, 0, TimeSpan.Zero).AddHours(1); // 2 AM UTC = 3 AM BST
+        var activates = DefaultUtcNow.AddDays(1).AddMinutes(20);
         var request = new PreviewTokenCreateRequest
         {
             DataSetVersionId = Guid.NewGuid(),
@@ -327,13 +320,11 @@ public class PreviewTokenCreateRequestValidatorTests
     [Fact]
     public void Expires_EndOfDayBstTime_IsValid()
     {
-        var currentTime = new DateTimeOffset(2024, 6, 14, 10, 0, 0, TimeSpan.Zero); // BST period
-        var timeProvider = new FakeTimeProvider(currentTime);
-        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
-        var activates = new DateTimeOffset(2024, 6, 15, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
+        var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
+        var activates = new DateTimeOffset(2025, 10, 5, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
 
         // End of day BST (22:59:59 UTC = 23:59:59 BST)
-        var expires = new DateTimeOffset(2024, 6, 16, 22, 59, 59, TimeSpan.Zero);
+        var expires = new DateTimeOffset(2025, 10, 6, 22, 59, 59, TimeSpan.Zero);
         var request = new PreviewTokenCreateRequest
         {
             DataSetVersionId = Guid.NewGuid(),
@@ -350,13 +341,13 @@ public class PreviewTokenCreateRequestValidatorTests
     [Fact]
     public void Expires_EndOfDayNonBstTime_IsValid()
     {
-        var currentTime = new DateTimeOffset(2024, 1, 14, 10, 0, 0, TimeSpan.Zero); // BST period
+        var currentTime = new DateTimeOffset(2025, 1, 14, 10, 0, 0, TimeSpan.Zero);
         var timeProvider = new FakeTimeProvider(currentTime);
         var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
-        var activates = new DateTimeOffset(2024, 1, 15, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
+        var activates = new DateTimeOffset(2025, 1, 15, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
 
         // End of day BST (22:59:59 UTC = 23:59:59 BST)
-        var expires = new DateTimeOffset(2024, 1, 16, 23, 59, 59, TimeSpan.Zero);
+        var expires = new DateTimeOffset(2025, 1, 16, 23, 59, 59, TimeSpan.Zero);
         var request = new PreviewTokenCreateRequest
         {
             DataSetVersionId = Guid.NewGuid(),
@@ -371,15 +362,13 @@ public class PreviewTokenCreateRequestValidatorTests
     }
 
     [Fact]
-    public void Expires_NotEndOfDayUkTime_Fails()
+    public void Expires_NotEndOfDayBstTime_Fails()
     {
-        var currentTime = new DateTimeOffset(2024, 6, 15, 10, 0, 0, TimeSpan.Zero); // BST period
-        var timeProvider = new FakeTimeProvider(currentTime);
-        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
-        var activates = new DateTimeOffset(2024, 6, 16, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
+        var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
+        var activates = new DateTimeOffset(2025, 10, 6, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
 
         // End at 10 PM BST (21:00 UTC) instead of end of day
-        var expires = new DateTimeOffset(2024, 6, 17, 21, 0, 0, TimeSpan.Zero);
+        var expires = new DateTimeOffset(2025, 10, 7, 21, 0, 0, TimeSpan.Zero);
         var request = new PreviewTokenCreateRequest
         {
             DataSetVersionId = Guid.NewGuid(),
@@ -398,15 +387,14 @@ public class PreviewTokenCreateRequestValidatorTests
     [Fact]
     public void Success()
     {
-        var currentTime = new DateTimeOffset(2024, 1, 15, 10, 0, 0, TimeSpan.Zero);
-        var timeProvider = new FakeTimeProvider(currentTime);
-        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
-        var expires = new DateTimeOffset(2024, 1, 16, 23, 59, 59, TimeSpan.Zero);
+        var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
+        var activates = DefaultUtcNow.AddHours(1);
+        var expires = new DateTimeOffset(2025, 10, 1, 23, 59, 59, TimeSpan.Zero);
         var request = new PreviewTokenCreateRequest
         {
             DataSetVersionId = Guid.NewGuid(),
             Label = "Test Label",
-            Activates = currentTime,
+            Activates = activates,
             Expires = expires,
         };
 
