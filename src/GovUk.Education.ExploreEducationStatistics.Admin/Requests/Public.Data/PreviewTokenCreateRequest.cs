@@ -76,7 +76,16 @@ public record PreviewTokenCreateRequest
                                         }
                                     )
                                     .WithMessage("Expires date must be no more than 7 days after the activates date.")
-                                    .Must(expires => EndOfDayUk(expires!.Value.Date) == expires.Value.ToUniversalTime())
+                                    .Must(
+                                        (r, expires) =>
+                                        {
+                                            if (r.Activates!.Value.Date == utcNow.Date)
+                                            {
+                                                return true;
+                                            }
+                                            return EndOfDayUk(expires!.Value.Date) == expires.Value.ToUniversalTime();
+                                        }
+                                    )
                                     .WithMessage("Expires time must end at midnight GMT/BST for a given date.");
                             }
                         )
@@ -97,19 +106,23 @@ public record PreviewTokenCreateRequest
             RuleFor(request => request.Label).NotEmpty().MaximumLength(100);
         }
 
-        private static readonly TimeZoneInfo UkZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
+        private static DateTimeOffset StartOfDayUk(DateTime date) => TimeOfDayUk(date, 0, 0, 0);
 
-        private static DateTimeOffset StartOfDayUk(DateTime d)
-        {
-            var unspecified = new DateTime(d.Year, d.Month, d.Day, 0, 0, 0, DateTimeKind.Unspecified);
-            var offset = UkZone.GetUtcOffset(unspecified);
-            return new DateTimeOffset(unspecified, offset).ToUniversalTime();
-        }
+        private static DateTimeOffset EndOfDayUk(DateTime date) => TimeOfDayUk(date, 23, 59, 59);
 
-        private static DateTimeOffset EndOfDayUk(DateTime d)
+        private static DateTimeOffset TimeOfDayUk(DateTime date, int hour, int minute, int second)
         {
-            var unspecified = new DateTime(d.Year, d.Month, d.Day, 23, 59, 59, DateTimeKind.Unspecified);
-            var offset = UkZone.GetUtcOffset(unspecified);
+            var ukTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
+            var unspecified = new DateTime(
+                date.Year,
+                date.Month,
+                date.Day,
+                hour,
+                minute,
+                second,
+                DateTimeKind.Unspecified
+            );
+            var offset = ukTz.GetUtcOffset(unspecified);
             return new DateTimeOffset(unspecified, offset).ToUniversalTime();
         }
     }
