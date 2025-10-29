@@ -580,7 +580,7 @@ public abstract class UserRepositoryTests
             await using var contentDbContext = InMemoryApplicationDbContext();
 
             var repository = BuildRepository(contentDbContext);
-            var result = await repository.FindUserByEmail("test@test.com");
+            var result = await repository.FindUserById(Guid.NewGuid());
             Assert.Null(result);
         }
     }
