@@ -8,39 +8,21 @@ public class UserTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    public static TheoryData<bool, DateTime?, DateTimeOffset, bool> ExpiryData =>
-        new()
-        {
-            // active, softDeletedDate, createdDate, expectShouldExpire
-
-            { false, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), true },
-            { false, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
-            { false, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), false },
-            { false, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
-            { true, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays - 1), false },
-            { true, null, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
-            // These two cases should be impossible in reality as a soft-deleted user cannot be active. However,
-            // they are included here for completeness.
-            { true, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
-            { true, DateTime.UtcNow, DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays + 1), false },
-        };
-
     [Theory]
-    [MemberData(nameof(ExpiryData))]
-    public void ShouldExpire(
-        bool active,
-        DateTime? softDeletedDate,
-        DateTimeOffset createdDate,
-        bool expectShouldExpire
-    )
+    [InlineData("", "", "")]
+    [InlineData(" ", " ", "")]
+    [InlineData("Joe", "", "Joe")]
+    [InlineData("Joe", " ", "Joe")]
+    [InlineData(" Joe ", "", "Joe")]
+    [InlineData("", "Smith", "Smith")]
+    [InlineData(" ", "Smith", "Smith")]
+    [InlineData("", " Smith ", "Smith")]
+    [InlineData("Joe", "Smith", "Joe Smith")]
+    [InlineData(" Joe ", " Smith ", "Joe Smith")]
+    public void DisplayName(string? firstName, string? lastName, string expectedDisplayName)
     {
-        var user = _dataFixture
-            .DefaultUser()
-            .WithActive(active)
-            .WithSoftDeleted(softDeletedDate)
-            .WithCreated(createdDate)
-            .Generate();
+        var user = _dataFixture.DefaultUser().WithFirstName(firstName).WithLastName(lastName).Generate();
 
-        Assert.Equal(expectShouldExpire, user.ShouldExpire);
+        Assert.Equal(expectedDisplayName, user.DisplayName);
     }
 }

@@ -27,7 +27,7 @@ public class ReleaseVersionRepositoryTests
         [InlineData(ReleaseApprovalStatus.Draft)]
         public async Task ListReleasesForUser_Success(ReleaseApprovalStatus releaseApprovalStatus)
         {
-            var user = _fixture.DefaultUser().Generate();
+            User user = _fixture.DefaultUser();
 
             var userReleaseRoles = _fixture
                 .DefaultUserReleaseRole()
@@ -87,7 +87,7 @@ public class ReleaseVersionRepositoryTests
             ReleaseApprovalStatus releaseApprovalStatus
         )
         {
-            var user = _fixture.DefaultUser().Generate();
+            User user = _fixture.DefaultUser();
 
             var otherReleaseApprovalStatus = Enum.GetValues<ReleaseApprovalStatus>()
                 .Except([releaseApprovalStatus])
@@ -151,7 +151,7 @@ public class ReleaseVersionRepositoryTests
         [Fact]
         public async Task ListReleasesForUser_ExcludesOtherUsers()
         {
-            var user = _fixture.DefaultUser().Generate();
+            User user = _fixture.DefaultUser();
 
             UserReleaseRole userReleaseRole = _fixture
                 .DefaultUserReleaseRole()

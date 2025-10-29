@@ -15,7 +15,7 @@ public class PublicationRepositoryTests
     [Fact]
     public async Task ListPublicationsForUser()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         Theme theme = _dataFixture.DefaultTheme();
 
@@ -98,7 +98,7 @@ public class PublicationRepositoryTests
     [Fact]
     public async Task ListPublicationsForUser_NoThemeIdProvided()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         // Set up publication and release roles for the user
         // Publications are all in different themes
@@ -171,7 +171,7 @@ public class PublicationRepositoryTests
     [Fact]
     public async Task ListPublicationsForUser_NoPublicationsForTheme()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         Theme theme = _dataFixture.DefaultTheme();
 
@@ -220,7 +220,7 @@ public class PublicationRepositoryTests
     [Fact]
     public async Task ListPublicationsForUser_NoPublicationsForUser()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         Theme theme = _dataFixture.DefaultTheme();
 
@@ -269,7 +269,7 @@ public class PublicationRepositoryTests
     [Fact]
     public async Task ListPublicationsForUser_PublicationGrantedByBothPublicationAndReleaseRoles()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         Publication publication = _dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme());
 

@@ -1,4 +1,5 @@
 #nullable enable
+using AngleSharp.Dom;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -9,7 +10,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +31,6 @@ public class UserManagementService(
     IUserRoleService userRoleService,
     IUserRepository userRepository,
     IUserService userService,
-    IUserInviteRepository userInviteRepository,
     IUserReleaseInviteRepository userReleaseInviteRepository,
     IUserPublicationInviteRepository userPublicationInviteRepository,
     IUserReleaseRoleRepository userReleaseRoleRepository,
@@ -180,22 +182,21 @@ public class UserManagementService(
             .CheckCanManageAllUsers()
             .OnSuccess(async () =>
             {
-                var pendingInvites = await usersAndRolesDbContext
-                    .UserInvites.AsQueryable()
-                    .Where(ui => !ui.Accepted)
-                    .OrderBy(ui => ui.Email)
-                    .Include(ui => ui.Role)
+                var pendingUserInvites = await contentDbContext
+                    .Users.WhereInvitePending()
+                    .Select(u => new { u.Email, u.Role })
+                    .OrderBy(u => u.Email)
                     .ToListAsync();
 
-                return await pendingInvites
+                return await pendingUserInvites
                     .ToAsyncEnumerable()
-                    .SelectAwait(async invite =>
+                    .SelectAwait(async pendingUserInvite =>
                     {
                         var userReleaseInvites = await contentDbContext
                             .UserReleaseInvites.Include(uri => uri.ReleaseVersion)
                             .ThenInclude(rv => rv.Release)
                             .ThenInclude(r => r.Publication)
-                            .Where(uri => uri.Email.ToLower().Equals(invite.Email.ToLower()))
+                            .Where(uri => uri.Email.ToLower().Equals(pendingUserInvite.Email.ToLower()))
                             .ToListAsync();
 
                         var userReleaseRoles = userReleaseInvites
@@ -210,7 +211,7 @@ public class UserManagementService(
 
                         var userPublicationInvites = await contentDbContext
                             .UserPublicationInvites.Include(upi => upi.Publication)
-                            .Where(upi => upi.Email.ToLower().Equals(invite.Email.ToLower()))
+                            .Where(upi => upi.Email.ToLower().Equals(pendingUserInvite.Email.ToLower()))
                             .ToListAsync();
 
                         var userPublicationRoles = userPublicationInvites
@@ -224,8 +225,8 @@ public class UserManagementService(
 
                         return new PendingInviteViewModel
                         {
-                            Email = invite.Email,
-                            Role = invite.Role.Name,
+                            Email = pendingUserInvite.Email,
+                            Role = pendingUserInvite.Role.Name,
                             UserPublicationRoles = userPublicationRoles,
                             UserReleaseRoles = userReleaseRoles,
                         };
@@ -234,7 +235,7 @@ public class UserManagementService(
             });
     }
 
-    public async Task<Either<ActionResult, UserInvite>> InviteUser(UserInviteCreateRequest request)
+    public async Task<Either<ActionResult, User>> InviteUser(UserInviteCreateRequest request)
     {
         var email = request.Email;
         var sanitisedEmail = email.Trim().ToLower();
@@ -242,21 +243,21 @@ public class UserManagementService(
 
         return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(() => ValidateUserDoesNotExist(email))
-            .OnSuccess<ActionResult, Unit, UserInvite>(async () =>
+            .OnSuccess(() => ValidateIdentityUserDoesNotExist(email))
+            .OnSuccess<ActionResult, Unit, User>(async () =>
             {
-                var role = await usersAndRolesDbContext.Roles.AsQueryable().FirstOrDefaultAsync(r => r.Id == roleId);
+                var role = await usersAndRolesDbContext.Roles.AsNoTracking().SingleOrDefaultAsync(r => r.Id == roleId);
 
-                if (role == null)
+                if (role is null)
                 {
                     return ValidationActionResult(InvalidUserRole);
                 }
 
-                var userInvite = await userInviteRepository.CreateOrUpdate(
+                var user = await userRepository.CreateOrUpdate(
                     email: sanitisedEmail,
                     roleId: roleId,
                     createdById: userService.GetUserId(),
-                    request.CreatedDate
+                    createdDate: request.CreatedDate
                 );
 
                 // Clear out any pre-existing Release or Publication invites prior to adding
@@ -276,7 +277,7 @@ public class UserManagementService(
                         releaseRole: userReleaseRole.ReleaseRole,
                         emailSent: true,
                         createdById: userService.GetUserId(),
-                        request.CreatedDate
+                        request.CreatedDate?.UtcDateTime
                     );
                 }
 
@@ -284,12 +285,12 @@ public class UserManagementService(
                     request.UserPublicationRoles,
                     sanitisedEmail,
                     userService.GetUserId(),
-                    request.CreatedDate
+                    request.CreatedDate?.UtcDateTime
                 );
 
-                return userInvite;
+                return user;
             })
-            .OnSuccess(async userInvite =>
+            .OnSuccess(async user =>
             {
                 var userReleaseInvites = await contentDbContext
                     .UserReleaseInvites.Include(uri => uri.ReleaseVersion)
@@ -305,7 +306,7 @@ public class UserManagementService(
 
                 return emailTemplateService
                     .SendInviteEmail(sanitisedEmail, userReleaseInvites, userPublicationInvites)
-                    .OnSuccess(() => userInvite);
+                    .OnSuccess(() => user);
             });
     }
 
@@ -314,15 +315,14 @@ public class UserManagementService(
         return await userService
             .CheckCanManageAllUsers()
             .OnSuccess(async () => await GetPendingUserInvite(email))
-            .OnSuccessVoid(async invite =>
+            .OnSuccessVoid(async invitedUser =>
             {
                 await contentDbContext.RequireTransaction(async () =>
                 {
                     await userReleaseInviteRepository.RemoveByUserEmail(email);
                     await userPublicationInviteRepository.RemoveByUserEmail(email);
 
-                    usersAndRolesDbContext.UserInvites.Remove(invite);
-                    await usersAndRolesDbContext.SaveChangesAsync();
+                    await userRepository.SoftDeleteUser(invitedUser.Id, userService.GetUserId());
                 });
             });
     }
@@ -338,78 +338,39 @@ public class UserManagementService(
     {
         return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(async () => await GetIdentityUser(email))
-            .OnSuccess(async identityUser =>
-            {
-                var internalUser = await userRepository.FindByEmail(email);
-
-                return (identityUser, internalUser);
-            })
-            .OnSuccessDo(tuple =>
-            {
-                return tuple.identityUser is null && tuple.internalUser is null
-                    ? (Either<ActionResult, Unit>)new NotFoundResult()
-                    : Unit.Instance;
-            })
+            .OnSuccess(async () => await GetActiveUser(email))
+            .OnSuccessCombineWith(async _ => await GetIdentityUser(email))
             .OnSuccessVoid(async tuple =>
             {
-                var globalInvites = await usersAndRolesDbContext
-                    .UserInvites.Where(invite => invite.Email.ToLower() == email.ToLower())
-                    .ToListAsync();
+                var (activeInternalUser, identityUser) = tuple;
 
                 await contentDbContext.RequireTransaction(async () =>
                 {
-                    // Delete the Identity Framework user, if found.
-                    if (tuple.identityUser is not null)
-                    {
-                        await userManager.DeleteAsync(tuple.identityUser);
-                    }
+                    await userManager.DeleteAsync(identityUser);
 
-                    // Delete any invites that they may have had.
-                    usersAndRolesDbContext.UserInvites.RemoveRange(globalInvites);
+                    await userPublicationInviteRepository.RemoveByUserEmail(email);
+                    await userReleaseInviteRepository.RemoveByUserEmail(email);
 
-                    if (tuple.internalUser is not null)
-                    {
-                        await userPublicationInviteRepository.RemoveByUserEmail(email);
-                        await userReleaseInviteRepository.RemoveByUserEmail(email);
-                        await userReleaseRoleRepository.RemoveForUser(tuple.internalUser.Id);
-                        await userPublicationRoleRepository.RemoveForUser(tuple.internalUser.Id);
-                    }
+                    await userReleaseRoleRepository.RemoveForUser(activeInternalUser.Id);
+                    await userPublicationRoleRepository.RemoveForUser(activeInternalUser.Id);
 
-                    if (tuple.internalUser is { SoftDeleted: null })
-                    {
-                        tuple.internalUser.SoftDeleted = DateTime.UtcNow;
-                        tuple.internalUser.DeletedById = userService.GetUserId();
-                        tuple.internalUser.Active = false;
-                    }
-
-                    await contentDbContext.SaveChangesAsync();
-                    await usersAndRolesDbContext.SaveChangesAsync();
+                    await userRepository.SoftDeleteUser(activeInternalUser.Id, userService.GetUserId());
                 });
             });
     }
 
-    private async Task<ApplicationUser?> GetIdentityUser(string email)
-    {
-        return await usersAndRolesDbContext.Users.SingleOrDefaultAsync(user => user.Email == email);
-    }
+    private async Task<Either<ActionResult, User>> GetActiveUser(string email) =>
+        await userRepository.FindActiveUserByEmail(email) ?? new Either<ActionResult, User>(new NotFoundResult());
 
-    private async Task<Either<ActionResult, Unit>> ValidateUserDoesNotExist(string email)
-    {
-        if (await usersAndRolesDbContext.Users.AsQueryable().AnyAsync(u => u.Email!.ToLower() == email.ToLower()))
-        {
-            return ValidationActionResult(UserAlreadyExists);
-        }
+    private async Task<Either<ActionResult, ApplicationUser>> GetIdentityUser(string email) =>
+        await usersAndRolesDbContext.Users.SingleOrNotFoundAsync(user => user.Email == email);
 
-        return Unit.Instance;
-    }
+    private async Task<Either<ActionResult, Unit>> ValidateIdentityUserDoesNotExist(string email) =>
+        await usersAndRolesDbContext.Users.AnyAsync(u => u.Email!.ToLower().Equals(email.ToLower()))
+            ? ValidationActionResult(UserAlreadyExists)
+            : Unit.Instance;
 
-    private async Task<Either<ActionResult, UserInvite>> GetPendingUserInvite(string email)
-    {
-        var invite = await usersAndRolesDbContext.UserInvites.FirstOrDefaultAsync(i => i.Email == email);
-
-        return invite is null ? ValidationActionResult(InviteNotFound)
-            : invite.Accepted ? ValidationActionResult(InviteAlreadyAccepted)
-            : invite;
-    }
+    private async Task<Either<ActionResult, User>> GetPendingUserInvite(string email) =>
+        await userRepository.FindPendingUserInviteByEmail(email)
+        ?? new Either<ActionResult, User>(ValidationActionResult(InviteNotFound));
 }

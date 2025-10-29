@@ -47,6 +47,6 @@ Check that the user is on the Expired Invite page
     user waits until page contains    Your invitation to the service has expired.
     user waits until page contains    explore.statistics@education.gov.uk
 
-Check that the expired invite is now removed
+Check that the expired invite remains expired after logging in
     user navigates to admin homepage
-    user waits until h1 is visible    No invitation    %{WAIT_MEDIUM}
+    user waits until page contains title    Invitation expired
