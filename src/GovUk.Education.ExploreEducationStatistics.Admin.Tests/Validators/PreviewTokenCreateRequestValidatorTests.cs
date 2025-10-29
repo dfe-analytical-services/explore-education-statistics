@@ -70,6 +70,92 @@ public class PreviewTokenCreateRequestValidatorTests
     }
 
     [Fact]
+    public void Activates_NotTodayAndAtMidnightBstTime_IsValid()
+    {
+        var currentTime = new DateTimeOffset(2024, 6, 15, 10, 0, 0, TimeSpan.Zero); // BST period
+        var timeProvider = GetTimeProvider(currentTime);
+        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
+
+        // Tomorrow at midnight BST (23:00 UTC on previous day)
+        var activates = new DateTimeOffset(2024, 6, 15, 23, 0, 0, TimeSpan.Zero);
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result.ShouldNotHaveValidationErrorFor(r => r.Activates);
+    }
+
+    [Fact]
+    public void Activates_NotTodayAndAtMidnightNonBstTime_IsValid()
+    {
+        var currentTime = new DateTimeOffset(2024, 1, 15, 10, 0, 0, TimeSpan.Zero); // BST period
+        var timeProvider = GetTimeProvider(currentTime);
+        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
+
+        // Tomorrow at midnight BST (23:00 UTC on previous day)
+        var activates = new DateTimeOffset(2024, 1, 16, 0, 0, 0, TimeSpan.Zero);
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result.ShouldNotHaveValidationErrorFor(r => r.Activates);
+    }
+
+    [Fact]
+    public void Activates_TodayAndNotAtMidnight_IsValid()
+    {
+        var currentTime = new DateTimeOffset(2024, 6, 15, 10, 0, 0, TimeSpan.Zero); // BST period
+        var timeProvider = GetTimeProvider(currentTime);
+        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
+
+        // Activates date is same as current date
+        var activates = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result.ShouldNotHaveValidationErrorFor(r => r.Activates);
+    }
+
+    [Fact]
+    public void Activates_NotTodayButNotMidnightUkTime_Fails()
+    {
+        var currentTime = new DateTimeOffset(2024, 6, 15, 10, 0, 0, TimeSpan.Zero); // BST period
+        var timeProvider = new FakeTimeProvider(currentTime);
+        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
+
+        // Tomorrow at 2 AM BST (1 AM UTC) - should be midnight BST
+        var activates = new DateTimeOffset(2024, 6, 16, 1, 0, 0, TimeSpan.Zero).AddHours(1); // 2 AM UTC = 3 AM BST
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result
+            .ShouldHaveValidationErrorFor(r => r.Activates)
+            .WithErrorMessage("Activates time must be at midnight GMT/BST when it's not today's date.");
+    }
+
+    [Fact]
     public void Expires_MoreThan7DaysAfterActivates_Fails()
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
@@ -229,5 +315,96 @@ public class PreviewTokenCreateRequestValidatorTests
         result
             .ShouldHaveValidationErrorFor(r => r.Expires)
             .WithErrorMessage("Expires date must be no more than 7 days from today.");
+    }
+
+    [Fact]
+    public void Expires_EndOfDayBstTime_IsValid()
+    {
+        var currentTime = new DateTimeOffset(2024, 6, 14, 10, 0, 0, TimeSpan.Zero); // BST period
+        var timeProvider = new FakeTimeProvider(currentTime);
+        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
+        var activates = new DateTimeOffset(2024, 6, 15, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
+
+        // End of day BST (22:59:59 UTC = 23:59:59 BST)
+        var expires = new DateTimeOffset(2024, 6, 16, 22, 59, 59, TimeSpan.Zero);
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+            Expires = expires,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result.ShouldNotHaveValidationErrorFor(r => r.Expires);
+    }
+
+    [Fact]
+    public void Expires_EndOfDayNonBstTime_IsValid()
+    {
+        var currentTime = new DateTimeOffset(2024, 1, 14, 10, 0, 0, TimeSpan.Zero); // BST period
+        var timeProvider = new FakeTimeProvider(currentTime);
+        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
+        var activates = new DateTimeOffset(2024, 1, 15, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
+
+        // End of day BST (22:59:59 UTC = 23:59:59 BST)
+        var expires = new DateTimeOffset(2024, 1, 16, 23, 59, 59, TimeSpan.Zero);
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+            Expires = expires,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result.ShouldNotHaveValidationErrorFor(r => r.Expires);
+    }
+
+    [Fact]
+    public void Expires_NotEndOfDayUkTime_Fails()
+    {
+        var currentTime = new DateTimeOffset(2024, 6, 15, 10, 0, 0, TimeSpan.Zero); // BST period
+        var timeProvider = new FakeTimeProvider(currentTime);
+        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
+        var activates = new DateTimeOffset(2024, 6, 15, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
+
+        // End at 10 PM BST (21:00 UTC) instead of end of day
+        var expires = new DateTimeOffset(2024, 6, 16, 21, 0, 0, TimeSpan.Zero);
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+            Expires = expires,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result
+            .ShouldHaveValidationErrorFor(r => r.Expires)
+            .WithErrorMessage("Expires time must end at midnight GMT/BST for a given date.");
+    }
+
+    [Fact]
+    public void Success()
+    {
+        var currentTime = new DateTimeOffset(2024, 1, 15, 10, 0, 0, TimeSpan.Zero);
+        var timeProvider = new FakeTimeProvider(currentTime);
+        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
+        var expires = new DateTimeOffset(2024, 1, 16, 23, 59, 59, TimeSpan.Zero);
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = currentTime,
+            Expires = expires,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result.ShouldNotHaveAnyValidationErrors();
     }
 }

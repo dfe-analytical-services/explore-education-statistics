@@ -41,7 +41,16 @@ public record PreviewTokenCreateRequest
                         .Must(activates => activates >= utcNow.Subtract(TimeSpan.FromSeconds(ToleranceSeconds)))
                         .WithMessage("Activates date must not be in the past.")
                         .Must(activates => activates <= utcNow.AddDays(7))
-                        .WithMessage("Activates date must be within the next 7 days.");
+                        .WithMessage("Activates date must be within the next 7 days.")
+                        .Must(activates =>
+                        {
+                            if (activates!.Value.Date != utcNow.Date)
+                            {
+                                return StartOfDayUk(activates.Value.Date) == activates.Value.ToUniversalTime();
+                            }
+                            return true;
+                        })
+                        .WithMessage("Activates time must be at midnight GMT/BST when it's not today's date.");
                 }
             );
 
@@ -66,7 +75,9 @@ public record PreviewTokenCreateRequest
                                             return daysBetween < 8;
                                         }
                                     )
-                                    .WithMessage("Expires date must be no more than 7 days after the activates date.");
+                                    .WithMessage("Expires date must be no more than 7 days after the activates date.")
+                                    .Must(expires => EndOfDayUk(expires!.Value.Date) == expires.Value.ToUniversalTime())
+                                    .WithMessage("Expires time must end at midnight GMT/BST for a given date.");
                             }
                         )
                         .Otherwise(() =>
@@ -84,6 +95,22 @@ public record PreviewTokenCreateRequest
             RuleFor(request => request.DataSetVersionId).NotEmpty();
 
             RuleFor(request => request.Label).NotEmpty().MaximumLength(100);
+        }
+
+        private static readonly TimeZoneInfo UkZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
+
+        private static DateTimeOffset StartOfDayUk(DateTime d)
+        {
+            var unspecified = new DateTime(d.Year, d.Month, d.Day, 0, 0, 0, DateTimeKind.Unspecified);
+            var offset = UkZone.GetUtcOffset(unspecified);
+            return new DateTimeOffset(unspecified, offset).ToUniversalTime();
+        }
+
+        private static DateTimeOffset EndOfDayUk(DateTime d)
+        {
+            var unspecified = new DateTime(d.Year, d.Month, d.Day, 23, 59, 59, DateTimeKind.Unspecified);
+            var offset = UkZone.GetUtcOffset(unspecified);
+            return new DateTimeOffset(unspecified, offset).ToUniversalTime();
         }
     }
 }
