@@ -12,8 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Database;
 
 public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
 {
-    public DbSet<UserInvite> UserInvites { get; set; } = null!;
-
     public UsersAndRolesDbContext(DbContextOptions<UsersAndRolesDbContext> options, bool updateTimestamps = true)
         : base(options)
     {
@@ -43,27 +41,6 @@ public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, Identit
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder
-            .Entity<UserInvite>()
-            .HasOne(c => c.CreatedBy)
-            .WithMany()
-            .HasForeignKey("CreatedById")
-            .OnDelete(DeleteBehavior.SetNull);
-
-        modelBuilder
-            .Entity<UserInvite>()
-            .Property(invite => invite.Created)
-            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-
-        // Note that this logic is also present in UserInvite.Expired.
-        // It is implemented here as well because EF is not able to translate the "Expired" computed field for
-        // use in this QueryFilter.
-        modelBuilder
-            .Entity<UserInvite>()
-            .HasQueryFilter(invite =>
-                invite.Accepted || invite.Created >= DateTime.UtcNow.AddDays(-UserInvite.InviteExpiryDurationDays)
-            );
 
         modelBuilder
             .Entity<IdentityRole>()
