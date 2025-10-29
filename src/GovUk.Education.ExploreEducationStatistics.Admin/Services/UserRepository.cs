@@ -50,6 +50,14 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
             .SingleOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<User?> FindUserById(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await contentDbContext
+            .Users.Where(u => !u.SoftDeleted.HasValue)
+            .Where(u => u.Id == userId)
+            .SingleOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<User> FindDeletedUserPlaceholder(CancellationToken cancellationToken = default)
     {
         // This user should be seeded in the ContentDbContext as part of the migrations, so should always exist.
@@ -113,8 +121,10 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
     public async Task SoftDeleteUser(Guid activeUserId, Guid deletedById, CancellationToken cancellationToken = default)
     {
         var activeUser =
-            await FindActiveUserById(activeUserId, cancellationToken)
-            ?? throw new InvalidOperationException("Cannot soft delete a user that is not active.");
+            await FindUserById(activeUserId, cancellationToken)
+            ?? throw new InvalidOperationException(
+                "Cannot soft delete a user that is already soft deleted, or does not exist."
+            );
 
         activeUser.Active = false;
         activeUser.SoftDeleted = DateTime.UtcNow;

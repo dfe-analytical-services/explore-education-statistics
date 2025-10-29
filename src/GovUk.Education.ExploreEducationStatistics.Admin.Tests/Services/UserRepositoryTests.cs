@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using LinqToDB;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -483,6 +484,107 @@ public abstract class UserRepositoryTests
         }
     }
 
+    public class FindUserByIdTests : UserRepositoryTests
+    {
+        [Fact]
+        public async Task ActiveUser_ReturnsUser()
+        {
+            User user = _dataFixture.DefaultUser();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(contentDbContext);
+                var result = await repository.FindUserById(user.Id);
+                Assert.NotNull(result);
+                Assert.Equal(user.Id, result.Id);
+            }
+        }
+
+        [Fact]
+        public async Task UserWithPendingInvite_ReturnsUser()
+        {
+            User user = _dataFixture.DefaultUserWithPendingInvite();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(contentDbContext);
+                var result = await repository.FindUserById(user.Id);
+                Assert.NotNull(result);
+                Assert.Equal(user.Id, result.Id);
+            }
+        }
+
+        [Fact]
+        public async Task UserWithExpiredInvite_ReturnsUser()
+        {
+            User user = _dataFixture.DefaultUserWithExpiredInvite();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(contentDbContext);
+                var result = await repository.FindUserById(user.Id);
+                Assert.NotNull(result);
+                Assert.Equal(user.Id, result.Id);
+            }
+        }
+
+        [Fact]
+        public async Task SoftDeletedUser_ReturnsNull()
+        {
+            User user = _dataFixture.DefaultSoftDeletedUser();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(contentDbContext);
+                var result = await repository.FindUserById(user.Id);
+
+                Assert.Null(result);
+            }
+        }
+
+        [Fact]
+        public async Task UserDoesNotExist_ReturnsNull()
+        {
+            await using var contentDbContext = InMemoryApplicationDbContext();
+
+            var repository = BuildRepository(contentDbContext);
+            var result = await repository.FindUserById(Guid.NewGuid());
+            Assert.Null(result);
+        }
+    }
+
     public class FindDeletedUserPlaceholderTests : UserRepositoryTests
     {
         [Fact]
@@ -526,7 +628,7 @@ public abstract class UserRepositoryTests
     public class SoftDeleteUserTests : UserRepositoryTests
     {
         [Fact]
-        public async Task Success()
+        public async Task ActiveUser_SoftDeletesUser()
         {
             User user = _dataFixture.DefaultUser();
             var deletedById = Guid.NewGuid();
@@ -559,6 +661,114 @@ public abstract class UserRepositoryTests
                 updatedUser.SoftDeleted.AssertUtcNow();
                 Assert.Equal(deletedById, updatedUser.DeletedById);
             }
+        }
+
+        [Fact]
+        public async Task UserWithPendingInvite_SoftDeletesUser()
+        {
+            User user = _dataFixture.DefaultUserWithPendingInvite();
+            var deletedById = Guid.NewGuid();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            // Ensure initial state is correct
+            Assert.True(user.IsInvitePending());
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(contentDbContext);
+
+                await repository.SoftDeleteUser(user.Id, deletedById);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
+
+                Assert.False(updatedUser.Active);
+                updatedUser.SoftDeleted.AssertUtcNow();
+                Assert.Equal(deletedById, updatedUser.DeletedById);
+            }
+        }
+
+        [Fact]
+        public async Task UserWithExpiredInvite_SoftDeletesUser()
+        {
+            User user = _dataFixture.DefaultUserWithExpiredInvite();
+            var deletedById = Guid.NewGuid();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            // Ensure initial state is correct
+            Assert.True(user.IsInviteExpired());
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(contentDbContext);
+
+                await repository.SoftDeleteUser(user.Id, deletedById);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedUser = await contentDbContext.Users.SingleAsync(u => u.Id == user.Id);
+
+                Assert.False(updatedUser.Active);
+                updatedUser.SoftDeleted.AssertUtcNow();
+                Assert.Equal(deletedById, updatedUser.DeletedById);
+            }
+        }
+
+        [Fact]
+        public async Task UserAlreadySoftDeleted_ThrowsException()
+        {
+            User user = _dataFixture.DefaultSoftDeletedUser();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            // Ensure initial state is correct
+            Assert.False(user.Active);
+            Assert.NotNull(user.SoftDeleted);
+            Assert.NotNull(user.DeletedById);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = BuildRepository(contentDbContext);
+
+                await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                    await repository.SoftDeleteUser(user.Id, Guid.NewGuid())
+                );
+            }
+        }
+
+        [Fact]
+        public async Task UserDoesNotExist_ThrowsException()
+        {
+            await using var contentDbContext = InMemoryApplicationDbContext();
+
+            var repository = BuildRepository(contentDbContext);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await repository.SoftDeleteUser(Guid.NewGuid(), Guid.NewGuid())
+            );
         }
     }
 
