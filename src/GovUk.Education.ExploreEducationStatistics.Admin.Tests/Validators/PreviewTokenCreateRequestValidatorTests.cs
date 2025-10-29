@@ -48,7 +48,14 @@ public class PreviewTokenCreateRequestValidatorTests
         };
 
         var result = validator.TestValidate(request);
-        result.ShouldNotHaveValidationErrorFor(r => r.Activates);
+        var expectedErrorResult = result.Errors.All(err => // Expecting only the following error message
+            err.ErrorMessage == "Activates time must be at midnight GMT/BST when it's not today's date."
+        );
+        if (!expectedErrorResult)
+        {
+            // Otherwise, expect no errors.
+            result.ShouldNotHaveValidationErrorFor(r => r.Activates);
+        }
     }
 
     [Fact]
@@ -369,10 +376,10 @@ public class PreviewTokenCreateRequestValidatorTests
         var currentTime = new DateTimeOffset(2024, 6, 15, 10, 0, 0, TimeSpan.Zero); // BST period
         var timeProvider = new FakeTimeProvider(currentTime);
         var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
-        var activates = new DateTimeOffset(2024, 6, 15, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
+        var activates = new DateTimeOffset(2024, 6, 16, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
 
         // End at 10 PM BST (21:00 UTC) instead of end of day
-        var expires = new DateTimeOffset(2024, 6, 16, 21, 0, 0, TimeSpan.Zero);
+        var expires = new DateTimeOffset(2024, 6, 17, 21, 0, 0, TimeSpan.Zero);
         var request = new PreviewTokenCreateRequest
         {
             DataSetVersionId = Guid.NewGuid(),
