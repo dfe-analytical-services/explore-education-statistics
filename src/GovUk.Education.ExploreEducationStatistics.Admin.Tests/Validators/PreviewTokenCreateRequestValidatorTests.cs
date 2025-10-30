@@ -48,7 +48,14 @@ public class PreviewTokenCreateRequestValidatorTests
         };
 
         var result = validator.TestValidate(request);
-        result.ShouldNotHaveValidationErrorFor(r => r.Activates);
+        var expectedErrorResult = result.Errors.All(err => // Expecting only the following error message
+            err.ErrorMessage == "Activates time must be at midnight GMT/BST when it's not today's date."
+        );
+        if (!expectedErrorResult)
+        {
+            // Otherwise, expect no errors.
+            result.ShouldNotHaveValidationErrorFor(r => r.Activates);
+        }
     }
 
     [Fact]
@@ -67,6 +74,85 @@ public class PreviewTokenCreateRequestValidatorTests
         result
             .ShouldHaveValidationErrorFor(r => r.Activates)
             .WithErrorMessage("Activates date must be within the next 7 days.");
+    }
+
+    [Fact]
+    public void Activates_NotTodayAndAtMidnightBstTime_IsValid()
+    {
+        var timeProvider = GetTimeProvider();
+        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
+
+        var activates = new DateTimeOffset(2025, 10, 4, 0, 0, 0, TimeSpan.FromHours(1)); // Must set offset to +01:00
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result.ShouldNotHaveValidationErrorFor(r => r.Activates);
+    }
+
+    [Fact]
+    public void Activates_NotTodayAndAtMidnightNonBstTime_IsValid()
+    {
+        var currentTime = new DateTimeOffset(2025, 1, 15, 10, 0, 0, TimeSpan.Zero);
+        var timeProvider = GetTimeProvider(currentTime);
+        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
+
+        var activates = new DateTimeOffset(2025, 1, 16, 0, 0, 0, TimeSpan.Zero);
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result.ShouldNotHaveValidationErrorFor(r => r.Activates);
+    }
+
+    [Fact]
+    public void Activates_TodayAndNotAtMidnight_IsValid()
+    {
+        var timeProvider = GetTimeProvider();
+        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
+
+        // Activates date is same as current date
+        var activates = DefaultUtcNow.AddHours(2);
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result.ShouldNotHaveValidationErrorFor(r => r.Activates);
+    }
+
+    [Fact]
+    public void Activates_NotTodayButNotMidnight_Fails()
+    {
+        var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
+
+        var activates = DefaultUtcNow.AddDays(1).AddMinutes(20);
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result
+            .ShouldHaveValidationErrorFor(r => r.Activates)
+            .WithErrorMessage("Activates time must be at midnight GMT/BST when it's not today's date.");
     }
 
     [Fact]
@@ -93,7 +179,8 @@ public class PreviewTokenCreateRequestValidatorTests
     // *Activates and expires both fall outside daylight savings time*
     // Activates at start of day:
     [InlineData("2025-01-01T00:00:00 +00:00", "2025-01-07T23:59:59 +00:00", true)] // <-- lt 7 days
-    // [InlineData("2025-01-01T00:00:00 +00:00", "2025-01-08T00:00:00 +00:00", false)] // <-- eq 7 days TODO EES-6648: Fix and uncomment this test case
+    [InlineData("2025-01-01T00:00:00 +00:00", "2025-01-08T23:59:59 +00:00", true)] // <-- eq 7 days
+    [InlineData("2025-01-01T00:00:00 +00:00", "2025-01-09T00:00:00 +00:00", false)] // <-- but not beyond that
     // Activates at 2pm:
     [InlineData("2025-01-01T14:00:00 +00:00", "2025-01-08T13:59:59 +00:00", true)] // <-- lt 7 days
     [InlineData("2025-01-01T14:00:00 +00:00", "2025-01-08T14:00:00 +00:00", true)] // <-- eq 7 days
@@ -102,7 +189,8 @@ public class PreviewTokenCreateRequestValidatorTests
     // *Activates and expires both fall within daylight savings time*
     // Activates at start of day:
     [InlineData("2025-10-03T00:00:00 +01:00", "2025-10-09T23:59:59 +01:00", true)] // <-- lt 7 days
-    // [InlineData("2025-10-03T00:00:00 +01:00", "2025-10-10T00:00:00 +01:00", false)] // <-- eq 7 days TODO EES-6648: Fix and uncomment this test case
+    [InlineData("2025-10-03T00:00:00 +01:00", "2025-10-10T23:59:59 +01:00", true)] // <-- eq 7 days
+    [InlineData("2025-10-03T00:00:00 +01:00", "2025-10-11T00:00:00 +01:00", false)] // <-- but not beyond that
     // Activates at 2pm:
     [InlineData("2025-10-03T14:00:00 +01:00", "2025-10-10T13:59:59 +01:00", true)] // <-- lt 7 days
     [InlineData("2025-10-03T14:00:00 +01:00", "2025-10-10T14:00:00 +01:00", true)] // <-- eq 7 days
@@ -110,22 +198,22 @@ public class PreviewTokenCreateRequestValidatorTests
     [InlineData("2025-10-03T14:00:00 +01:00", "2025-10-11T00:00:00 +01:00", false)] // <-- but not beyond that
     // *Activates outside daylight savings time, expires within daylight savings time*
     // Activates at start of day:
-    [InlineData("2025-03-28T00:00:00 +00:00", "2025-04-03T23:59:59 +01:00", true)] // <-- lt 7 days
-    // [InlineData("2025-03-28T00:00:00 +00:00", "2025-04-04T00:00:01 +01:00", false)] // <-- eq 7 days TODO EES-6648: Fix and uncomment this test case
+    [InlineData("2025-03-28T00:00:00 +00:00", "2025-04-04T23:59:59 +01:00", true)] // <-- lt or eq to 7 days
+    [InlineData("2025-03-28T00:00:00 +00:00", "2025-04-05T00:00:00 +01:00", false)] // <-- but not beyond that
     // Activates at 2pm:
     [InlineData("2025-03-28T14:00:00 +00:00", "2025-04-04T13:59:59 +01:00", true)] // <-- lt 7 days
     [InlineData("2025-03-28T14:00:00 +00:00", "2025-04-04T14:00:00 +01:00", true)] // <-- eq 7 days
-    [InlineData("2025-03-28T14:00:00 +00:00", "2025-04-04T23:59:59 +01:00", true)] // <-- valid through to the end of the 7th day
-    // [InlineData("2025-03-28T14:00:00 +00:00", "2025-04-05T00:00:00 +01:00", false)] // <-- but not beyond that TODO EES-6648: Fix and uncomment this test case
-
+    [InlineData("2025-03-28T14:00:00 +00:00", "2025-04-04T23:59:59 +01:00", true)] // <-- vlt 7 days (valid through to the end of the 7th day)
+    [InlineData("2025-03-28T14:00:00 +00:00", "2025-04-05T00:00:00 +01:00", false)] // but not beyond that
     // *Activates within daylight savings time, expires outside daylight savings time*
     // Activates at start of day:
     [InlineData("2025-10-20T00:00:00 +01:00", "2025-10-26T23:59:59 +00:00", true)] // <-- lt 7 days
-    // [InlineData("2025-10-20T00:00:00 +01:00", "2025-10-27T00:00:00 +00:00", false)] // <-- eq 7 days TODO EES-6648: Fix and uncomment this test case
+    [InlineData("2025-10-20T00:00:00 +01:00", "2025-10-27T23:59:59 +00:00", true)] // <-- eq 7 days
+    [InlineData("2025-10-20T00:00:00 +01:00", "2025-10-28T00:00:00 +00:00", false)] // but not beyond that
     // Activates at 2pm:
     [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-27T13:59:59 +00:00", true)] // <-- lt 7 days
     [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-27T14:00:00 +00:00", true)] // <-- eq 7 days
-    // [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-27T23:59:59 +00:00", true)] // <-- valid through to the end of the 7th day TODO EES-6648: Fix and uncomment this test case
+    [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-27T23:59:59 +00:00", true)] // <-- valid through to the end of the 7th day
     [InlineData("2025-10-20T14:00:00 +01:00", "2025-10-28T00:00:00 +00:00", false)] // <-- but not beyond that
     public void Expires_WhenActivatesIsNotNull_ValidUpTo7DaysAfterActivates(
         string activates,
@@ -227,5 +315,91 @@ public class PreviewTokenCreateRequestValidatorTests
         result
             .ShouldHaveValidationErrorFor(r => r.Expires)
             .WithErrorMessage("Expires date must be no more than 7 days from today.");
+    }
+
+    [Fact]
+    public void Expires_EndOfDayBstTime_IsValid()
+    {
+        var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
+        var activates = new DateTimeOffset(2025, 10, 5, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
+
+        // End of day BST (22:59:59 UTC = 23:59:59 BST)
+        var expires = new DateTimeOffset(2025, 10, 6, 22, 59, 59, TimeSpan.Zero);
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+            Expires = expires,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result.ShouldNotHaveValidationErrorFor(r => r.Expires);
+    }
+
+    [Fact]
+    public void Expires_EndOfDayNonBstTime_IsValid()
+    {
+        var currentTime = new DateTimeOffset(2025, 1, 14, 10, 0, 0, TimeSpan.Zero);
+        var timeProvider = new FakeTimeProvider(currentTime);
+        var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
+        var activates = new DateTimeOffset(2025, 1, 15, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
+
+        // End of day BST (22:59:59 UTC = 23:59:59 BST)
+        var expires = new DateTimeOffset(2025, 1, 16, 23, 59, 59, TimeSpan.Zero);
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+            Expires = expires,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result.ShouldNotHaveValidationErrorFor(r => r.Expires);
+    }
+
+    [Fact]
+    public void Expires_NotEndOfDayBstTime_Fails()
+    {
+        var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
+        var activates = new DateTimeOffset(2025, 10, 6, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
+
+        // End at 10 PM BST (21:00 UTC) instead of end of day
+        var expires = new DateTimeOffset(2025, 10, 7, 21, 0, 0, TimeSpan.Zero);
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+            Expires = expires,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result
+            .ShouldHaveValidationErrorFor(r => r.Expires)
+            .WithErrorMessage("Expires time must end at midnight GMT/BST for a given date.");
+    }
+
+    [Fact]
+    public void Success()
+    {
+        var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
+        var activates = DefaultUtcNow.AddHours(1);
+        var expires = new DateTimeOffset(2025, 10, 1, 23, 59, 59, TimeSpan.Zero);
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test Label",
+            Activates = activates,
+            Expires = expires,
+        };
+
+        var result = validator.TestValidate(request);
+
+        result.ShouldNotHaveAnyValidationErrors();
     }
 }

@@ -6,6 +6,7 @@ import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { AuthContext } from '@admin/contexts/AuthContext';
 import React from 'react';
 import { PreviewTokenCreateValues } from '@admin/pages/release/data/types/PreviewTokenCreateValues';
+import Mock = jest.Mock;
 
 const defaultPermissions = {
   isBauUser: true,
@@ -134,12 +135,58 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
   });
 
   describe('Custom dates selection', () => {
+    test('sets activates as the beginning of the day and expires as the end of the day that the user selects.', async () => {
+      // Arrange
+      const activates = new Date();
+      activates.setDate(activates.getDate() + 1);
+      const expectedExpires = new Date();
+      expectedExpires.setDate(expectedExpires.getDate() + 4);
+      const handleSubmit = jest.fn();
+
+      // Act
+      await renderWithCustomDatesSelected(
+        activates,
+        expectedExpires,
+        handleSubmit,
+      );
+
+      // Assert
+      const expectedActivatesUtc = new Date(
+        Date.UTC(
+          activates.getFullYear(),
+          activates.getMonth(),
+          activates.getDate(),
+          0,
+          0,
+          0,
+          0,
+        ),
+      );
+      expectedExpires.setHours(23, 59, 59, 999);
+
+      const handleSubmitParam: PreviewTokenCreateValues = {
+        activates: expectedActivatesUtc,
+        datePresetSpan: null,
+        expires: expectedExpires,
+        label: 'Test label',
+      };
+
+      await waitFor(() =>
+        expect(handleSubmit).toHaveBeenCalledWith(handleSubmitParam),
+      );
+    });
+
     test('shows validation error when start date is in the past', async () => {
       const today = new Date();
       const beforeTodayBy8Days = new Date();
       beforeTodayBy8Days.setDate(today.getDate() - 8);
+      const handleSubmit = jest.fn();
 
-      await renderWithCustomDatesSelected(beforeTodayBy8Days, today);
+      await renderWithCustomDatesSelected(
+        beforeTodayBy8Days,
+        today,
+        handleSubmit,
+      );
 
       expect(
         await screen.findByText('Activates date must not be in the past', {
@@ -154,10 +201,12 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
       const afterTodayBy10Days = new Date();
       afterTodayBy8Days.setDate(today.getDate() + 8);
       afterTodayBy10Days.setDate(today.getDate() + 10);
+      const handleSubmit = jest.fn();
 
       await renderWithCustomDatesSelected(
         afterTodayBy8Days,
         afterTodayBy10Days,
+        handleSubmit,
       );
 
       expect(
@@ -174,8 +223,9 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
       const today = new Date();
       const beyond7 = new Date();
       beyond7.setDate(today.getDate() + 8);
+      const handleSubmit = jest.fn();
 
-      await renderWithCustomDatesSelected(today, beyond7);
+      await renderWithCustomDatesSelected(today, beyond7, handleSubmit);
 
       expect(
         await screen.findByText(
@@ -227,9 +277,8 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
 async function renderWithCustomDatesSelected(
   activatesDate: Date,
   expiresDate: Date,
+  handleSubmit: Mock<void, [PreviewTokenCreateValues], void>,
 ) {
-  const handleSubmit = jest.fn();
-
   const { user } = render(
     <TestConfigContextProvider>
       <AuthContext.Provider value={{ user: bau }}>
@@ -247,12 +296,6 @@ async function renderWithCustomDatesSelected(
     'Enter specific start and end dates',
     {
       selector: '#apiDataSetTokenCreateForm-selectionMethod-customDates',
-    },
-  );
-  const radioButtonPresetDays = await screen.findByLabelText(
-    'Choose number of days',
-    {
-      selector: '#apiDataSetTokenCreateForm-selectionMethod-presetDays',
     },
   );
   const activatesGroup = screen.getByRole('group', { name: /activates on/i });
