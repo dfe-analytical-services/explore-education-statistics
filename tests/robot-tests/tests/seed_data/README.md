@@ -95,11 +95,11 @@ To do this, perform the following steps:
 
 1. Run the following SQL against the `content` database:
    ```sql
-   SELECT ReleaseFiles.ReleaseId, Files.Id, Files.Filename, Files.Type
+   SELECT ReleaseFiles.ReleaseVersionId, Files.Id, Files.Filename, Files.Type
    FROM Files
    JOIN ReleaseFiles ON Files.Id = ReleaseFiles.FileId
    AND Files.Type IN ('Data', 'Metadata')
-   ORDER BY ReleaseFiles.ReleaseId, Files.Filename, Files.Type;
+   ORDER BY ReleaseFiles.ReleaseVersionId, Files.Filename, Files.Type;
    ```
 2. Save the contents to 
    [tests/robot-tests/tests/seed_data/seed_data_emulator_files.csv](tests/robot-tests/tests/seed_data/seed_data_emulator_files.csv)
