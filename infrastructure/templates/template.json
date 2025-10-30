@@ -2468,6 +2468,7 @@
     {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
+      "condition": "[parameters('deployBackupVaultRegistrations')]",
       "scope": "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
       "name": "[guid(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), variables('storageAccountBackupContributorRoleId'), resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName')))]",
       "properties": {
@@ -3094,6 +3095,7 @@
     {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
+      "condition": "[parameters('deployBackupVaultRegistrations')]",
       "scope": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
       "name": "[guid(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), variables('storageAccountBackupContributorRoleId'), resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')))]",
       "properties": {

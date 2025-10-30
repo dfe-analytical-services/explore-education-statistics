@@ -123,7 +123,7 @@
       "value": true
     },
     "deployBackupVaultRegistrations": {
-      "value": false
+      "value": true
     }
   }
 }
