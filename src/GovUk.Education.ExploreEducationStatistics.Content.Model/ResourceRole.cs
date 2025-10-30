@@ -21,7 +21,7 @@ public abstract class ResourceRole<TRoleEnum, TResource>
 
     public TRoleEnum Role { get; set; }
 
-    public DateTimeOffset? EmailSent { get; set; } = DateTimeOffset.MinValue; // This default value should be removed in EES-6510
+    public DateTimeOffset? EmailSent { get; set; }
 
     public Guid? CreatedById { get; set; }
 

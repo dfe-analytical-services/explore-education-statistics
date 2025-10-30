@@ -204,4 +204,25 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
 
         await base.RemoveMany(userReleaseRoles, cancellationToken);
     }
+
+    public async Task MarkEmailAsSent(
+        Guid userId,
+        Guid releaseVersionId,
+        ReleaseRole role,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var userReleaseRole = await GetUserReleaseRole(userId: userId, releaseVersionId: releaseVersionId, role: role);
+
+        if (userReleaseRole is null)
+        {
+            throw new InvalidOperationException(
+                $"No User Release Role found for {nameof(userId)} '{userId}', {nameof(releaseVersionId)} '{releaseVersionId}', {nameof(role)} '{role}'"
+            );
+        }
+
+        userReleaseRole.EmailSent = DateTimeOffset.UtcNow;
+
+        await ContentDbContext.SaveChangesAsync(cancellationToken);
+    }
 }

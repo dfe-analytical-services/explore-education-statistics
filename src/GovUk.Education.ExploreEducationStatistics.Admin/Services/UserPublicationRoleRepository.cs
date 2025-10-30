@@ -67,4 +67,29 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext)
 
         await base.RemoveMany(userPublicationRoles, cancellationToken);
     }
+
+    public async Task MarkEmailAsSent(
+        Guid userId,
+        Guid publicationId,
+        PublicationRole role,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var userPublicationRole = await GetUserPublicationRole(
+            userId: userId,
+            publicationId: publicationId,
+            role: role
+        );
+
+        if (userPublicationRole is null)
+        {
+            throw new InvalidOperationException(
+                $"No User Publication Role found for {nameof(userId)} '{userId}', {nameof(publicationId)} '{publicationId}', {nameof(role)} '{role}'"
+            );
+        }
+
+        userPublicationRole.EmailSent = DateTimeOffset.UtcNow;
+
+        await ContentDbContext.SaveChangesAsync(cancellationToken);
+    }
 }

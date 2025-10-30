@@ -46,6 +46,7 @@ public abstract class UserPublicationRoleRepositoryTests
                 Assert.Equal(PublicationRole.Owner, result.Role);
                 result.Created.AssertUtcNow();
                 Assert.Equal(createdBy.Id, result.CreatedById);
+                Assert.Null(result.EmailSent);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -59,6 +60,7 @@ public abstract class UserPublicationRoleRepositoryTests
                 Assert.Equal(PublicationRole.Owner, userPublicationRole.Role);
                 userPublicationRole.Created.AssertUtcNow();
                 Assert.Equal(createdBy.Id, userPublicationRole.CreatedById);
+                Assert.Null(userPublicationRole.EmailSent);
             }
         }
     }
