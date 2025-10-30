@@ -4,10 +4,14 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: govuk-spacing(4);
+  gap: govuk-spacing(2);
   margin: 0 0 govuk-spacing(8);
   list-style: none;
   padding: 0;
+
+  @include govuk-media-query($until: desktop) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .card {
@@ -41,7 +45,7 @@
 
 .highlight {
   background-color: govuk-colour('light-grey');
-  grid-column: span 2;
+  grid-column: 1 / -1;
   justify-content: center;
   text-align: center;
 }

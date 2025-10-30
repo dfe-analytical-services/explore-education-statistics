@@ -30,5 +30,9 @@ export function ReleaseDataPageCardLinkGrid({
 }: {
   children: ReactNode;
 }) {
-  return <ul className={styles.grid}>{children}</ul>;
+  return (
+    <ul className={styles.grid} data-testid="links-grid">
+      {children}
+    </ul>
+  );
 }
