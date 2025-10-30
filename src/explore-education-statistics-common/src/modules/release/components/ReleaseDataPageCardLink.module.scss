@@ -26,6 +26,7 @@
     text-decoration: none;
   }
 
+  // Make the whole card clickable, keeping the actual link content short
   a::before {
     content: '';
     position: absolute;

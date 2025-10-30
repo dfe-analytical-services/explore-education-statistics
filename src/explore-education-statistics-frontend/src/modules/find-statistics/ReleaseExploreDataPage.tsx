@@ -1,19 +1,20 @@
 import ContentHtml from '@common/components/ContentHtml';
 import { NavItem } from '@common/components/PageNavExpandable';
+import { useMobileMedia } from '@common/hooks/useMedia';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import ReleaseDataPageCardLink, {
   ReleaseDataPageCardLinkGrid,
 } from '@common/modules/release/components/ReleaseDataPageCardLink';
-import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import {
   PublicationSummaryRedesign,
   ReleaseVersionDataContent,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
 import Link from '@frontend/components/Link';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
-import { useMobileMedia } from '@common/hooks/useMedia';
 
 interface Props {
   dataContent: ReleaseVersionDataContent;
@@ -28,6 +29,14 @@ export const exploreDataPageSections = {
     caption:
       'This page provides a range of routes to access data from within this statistical release to suit different users.',
   },
+  featuredTables: {
+    id: 'featured-tables-section',
+    text: 'Featured tables',
+    caption:
+      "Featured tables are pre-prepared tables created from a statistical release's data sets. They provide statistics that are regularly requested by some users (such as local councils, regional government or government policy teams) and can be adapted to switch between different categories (such as different geographies, time periods or characteristics where available).",
+    linkCaption:
+      "Featured tables are pre-prepared tables created from a statistical release's data sets. They provide statistics that are regularly requested by users and can be adapted to switch between different categories.",
+  },
   datasets: {
     id: 'datasets-section',
     text: 'Data sets: download or create tables',
@@ -40,12 +49,6 @@ export const exploreDataPageSections = {
     caption:
       'Supporting files provide an area for teams to supply non-standard files for download by users where required.',
   },
-  featuredTables: {
-    id: 'featured-tables-section',
-    text: 'Featured tables',
-    caption:
-      "Featured tables are pre-prepared tables created from a statistical release's data sets. They provide statistics that are regularly requested by some users (such as local councils, regional government or government policy teams) and can be adapted to switch between different categories (such as different geographies, time periods or characteristics where available).",
-  },
   dataDashboards: {
     id: 'data-dashboards-section',
     text: 'Data dashboards',
@@ -56,9 +59,11 @@ export const exploreDataPageSections = {
     id: 'data-guidance-section',
     text: 'Data guidance',
     caption:
-      'Description of the data included in this release, this is a methodology document, providing information on data sources, their coverage and quality and how the data is produced',
+      'Description of the data included in this release, this is a methodology document, providing information on data sources, their coverage and quality and how the data is produced.',
   },
-} as const satisfies Record<string, NavItem & { caption: string }>;
+} as const satisfies Dictionary<
+  NavItem & { caption: string; linkCaption?: string }
+>;
 
 const ReleaseExploreDataPage = ({
   dataContent,
@@ -106,9 +111,94 @@ const ReleaseExploreDataPage = ({
               caption="This includes all data sets, guidance files and any supporting files"
               isHighlightVariant
             />
+
+            {hasFeaturedTables && (
+              <ReleaseDataPageCardLink
+                renderLink={
+                  <Link
+                    to={`#${exploreDataPageSections.featuredTables.id}`}
+                    unvisited
+                  >
+                    {exploreDataPageSections.featuredTables.text}
+                  </Link>
+                }
+                caption={exploreDataPageSections.featuredTables.linkCaption}
+              />
+            )}
+
+            <ReleaseDataPageCardLink
+              renderLink={
+                <Link to={`#${exploreDataPageSections.datasets.id}`} unvisited>
+                  {exploreDataPageSections.datasets.text}
+                </Link>
+              }
+              caption={exploreDataPageSections.datasets.caption}
+            />
+
+            {hasSupportingFiles && (
+              <ReleaseDataPageCardLink
+                renderLink={
+                  <Link
+                    to={`#${exploreDataPageSections.supportingFiles.id}`}
+                    unvisited
+                  >
+                    {exploreDataPageSections.supportingFiles.text}
+                  </Link>
+                }
+                caption={exploreDataPageSections.supportingFiles.caption}
+              />
+            )}
+
+            {hasDataDashboards && (
+              <ReleaseDataPageCardLink
+                renderLink={
+                  <Link
+                    to={`#${exploreDataPageSections.dataDashboards.id}`}
+                    unvisited
+                  >
+                    {exploreDataPageSections.dataDashboards.text}
+                  </Link>
+                }
+                caption={exploreDataPageSections.dataDashboards.caption}
+              />
+            )}
+
+            <ReleaseDataPageCardLink
+              renderLink={
+                <Link
+                  to={`#${exploreDataPageSections.dataGuidance.id}`}
+                  unvisited
+                >
+                  {exploreDataPageSections.dataGuidance.text}
+                </Link>
+              }
+              caption={exploreDataPageSections.dataGuidance.caption}
+            />
+
+            <ReleaseDataPageCardLink
+              renderLink={
+                <Link
+                  to={`/data-catalogue?themeId=${publicationSummary.theme.id}&publicationId=${publicationSummary.id}&releaseVersionId=${releaseVersionSummary.id}`}
+                  unvisited
+                >
+                  Data catalogue
+                </Link>
+              }
+              caption="Alternatively use our data catalogue to search and filter for specific data sets from this release or our entire library, providing full data summaries, data previews and access to API data sets."
+            />
           </ReleaseDataPageCardLinkGrid>
         )}
       </ReleasePageContentSection>
+
+      {hasFeaturedTables && (
+        <ReleasePageContentSection
+          heading={exploreDataPageSections.featuredTables.text}
+          id={exploreDataPageSections.featuredTables.id}
+          caption={exploreDataPageSections.featuredTables.caption}
+        >
+          {featuredTables.length} featured tables
+        </ReleasePageContentSection>
+      )}
 
       <ReleasePageContentSection
         heading={exploreDataPageSections.datasets.text}
@@ -125,16 +215,6 @@ const ReleaseExploreDataPage = ({
           caption={exploreDataPageSections.supportingFiles.caption}
         >
           <p>{supportingFiles.length} supporting files</p>
-        </ReleasePageContentSection>
-      )}
-
-      {hasFeaturedTables && (
-        <ReleasePageContentSection
-          heading={exploreDataPageSections.featuredTables.text}
-          id={exploreDataPageSections.featuredTables.id}
-          caption={exploreDataPageSections.featuredTables.caption}
-        >
-          {featuredTables.length} featured tables
         </ReleasePageContentSection>
       )}
 

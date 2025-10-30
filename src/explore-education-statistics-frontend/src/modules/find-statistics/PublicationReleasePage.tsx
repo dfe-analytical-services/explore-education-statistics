@@ -242,7 +242,6 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
             const hasDataDashboards =
               dataContent.dataDashboards &&
               dataContent.dataDashboards.length > 0;
-            const hasDataGuidance = dataContent.dataGuidance.length > 0;
 
             return {
               props: {
@@ -251,11 +250,11 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
                 dataContent,
                 inPageNavItems: [
                   exploreDataPageSections.explore,
+                  hasFeaturedTables && exploreDataPageSections.featuredTables,
                   exploreDataPageSections.datasets,
                   hasSupportingFiles && exploreDataPageSections.supportingFiles,
-                  hasFeaturedTables && exploreDataPageSections.featuredTables,
                   hasDataDashboards && exploreDataPageSections.dataDashboards,
-                  hasDataGuidance && exploreDataPageSections.dataGuidance,
+                  exploreDataPageSections.dataGuidance,
                   contactUsNavItem,
                 ].filter(item => !!item),
               },
