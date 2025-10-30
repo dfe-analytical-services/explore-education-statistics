@@ -89,6 +89,7 @@ const ReleaseExploreDataPage = ({
       <ReleasePageContentSection
         heading={exploreDataPageSections.explore.text}
         id={exploreDataPageSections.explore.id}
+        testId={exploreDataPageSections.explore.id}
         caption={exploreDataPageSections.explore.caption}
       >
         {!isMobileMedia && (
@@ -194,6 +195,7 @@ const ReleaseExploreDataPage = ({
         <ReleasePageContentSection
           heading={exploreDataPageSections.featuredTables.text}
           id={exploreDataPageSections.featuredTables.id}
+          testId={exploreDataPageSections.featuredTables.id}
           caption={exploreDataPageSections.featuredTables.caption}
         >
           {featuredTables.length} featured tables
@@ -203,6 +205,7 @@ const ReleaseExploreDataPage = ({
       <ReleasePageContentSection
         heading={exploreDataPageSections.datasets.text}
         id={exploreDataPageSections.datasets.id}
+        testId={exploreDataPageSections.datasets.id}
         caption={exploreDataPageSections.datasets.caption}
       >
         <p>{dataSets.length} datasets</p>
@@ -212,6 +215,7 @@ const ReleaseExploreDataPage = ({
         <ReleasePageContentSection
           heading={exploreDataPageSections.supportingFiles.text}
           id={exploreDataPageSections.supportingFiles.id}
+          testId={exploreDataPageSections.supportingFiles.id}
           caption={exploreDataPageSections.supportingFiles.caption}
         >
           <p>{supportingFiles.length} supporting files</p>
@@ -222,6 +226,7 @@ const ReleaseExploreDataPage = ({
         <ReleasePageContentSection
           heading={exploreDataPageSections.dataDashboards.text}
           id={exploreDataPageSections.dataDashboards.id}
+          testId={exploreDataPageSections.dataDashboards.id}
           caption={exploreDataPageSections.dataDashboards.caption}
         >
           <ContentHtml html={dataDashboards} testId="dataDashboards-content" />
@@ -231,6 +236,7 @@ const ReleaseExploreDataPage = ({
       <ReleasePageContentSection
         heading={exploreDataPageSections.dataGuidance.text}
         id={exploreDataPageSections.dataGuidance.id}
+        testId={exploreDataPageSections.dataGuidance.id}
         caption={exploreDataPageSections.dataGuidance.caption}
       >
         <ContentHtml html={dataGuidance} testId="dataGuidance-content" />
