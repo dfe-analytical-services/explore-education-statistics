@@ -1,7 +1,10 @@
 import ContentHtml from '@common/components/ContentHtml';
 import { NavItem } from '@common/components/PageNavExpandable';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+import ReleaseDataList from '@common/modules/find-statistics/components/ReleaseDataList';
+import ReleaseDataListItem from '@common/modules/find-statistics/components/ReleaseDataListItem';
 import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import ReleaseDataPageCardLink, {
   ReleaseDataPageCardLinkGrid,
@@ -198,7 +201,19 @@ const ReleaseExploreDataPage = ({
           testId={exploreDataPageSections.featuredTables.id}
           caption={exploreDataPageSections.featuredTables.caption}
         >
-          {featuredTables.length} featured tables
+          <ReleaseDataList
+            heading={`${featuredTables.length} featured table${
+              featuredTables.length > 1 ? 's' : ''
+            }`}
+          >
+            {featuredTables.map(featuredTable => (
+              <ReleaseDataListItem
+                key={featuredTable.featuredTableId}
+                title={featuredTable.title}
+                description={featuredTable.summary}
+              />
+            ))}
+          </ReleaseDataList>
         </ReleasePageContentSection>
       )}
 
@@ -218,7 +233,35 @@ const ReleaseExploreDataPage = ({
           testId={exploreDataPageSections.supportingFiles.id}
           caption={exploreDataPageSections.supportingFiles.caption}
         >
-          <p>{supportingFiles.length} supporting files</p>
+          <ReleaseDataList
+            heading={`${supportingFiles.length} supporting file${
+              supportingFiles.length > 1 ? 's' : ''
+            }`}
+          >
+            {supportingFiles.map(file => (
+              <ReleaseDataListItem
+                key={file.fileId}
+                title={file.title}
+                description={file.summary}
+                actions={[
+                  <Link
+                    key={file.fileId}
+                    to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files/${file.fileId}`}
+                    onClick={() => {
+                      logEvent({
+                        category: 'Downloads',
+                        action: 'Release page file downloaded',
+                        label: `Publication: ${publicationSummary.title}, Release: ${releaseVersionSummary.title}, File: ${file.title}`,
+                      });
+                    }}
+                  >
+                    Download <VisuallyHidden>${file.title}</VisuallyHidden>{' '}
+                    {`(${file.extension}, ${file.size})`}
+                  </Link>,
+                ]}
+              />
+            ))}
+          </ReleaseDataList>
         </ReleasePageContentSection>
       )}
 

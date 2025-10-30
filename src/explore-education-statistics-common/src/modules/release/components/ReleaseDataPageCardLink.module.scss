@@ -39,7 +39,7 @@
   }
 
   a:hover::before {
-    box-shadow: 0 0 0 1px govuk-tint($govuk-brand-colour, 50%) inset;
+    box-shadow: 0 0 0 1px $_govuk-rebrand-border-colour-on-blue-tint-95 inset;
   }
 }
 
