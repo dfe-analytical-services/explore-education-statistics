@@ -1,3 +1,4 @@
+import { useMobileMedia } from '@common/hooks/useMedia';
 import styles from '@common/modules/find-statistics/components/ReleaseDataList.module.scss';
 import React, { ReactNode } from 'react';
 
@@ -7,6 +8,7 @@ interface Props {
   heading: string;
   id?: string;
   testId?: string;
+  toggle?: ReactNode;
 }
 
 export default function ReleaseDataList({
@@ -15,19 +17,21 @@ export default function ReleaseDataList({
   heading,
   id,
   testId,
+  toggle,
 }: Props) {
+  const { isMedia: isMobileMedia } = useMobileMedia();
+
   return (
-    <div className={styles.container} id={id} data-testid={testId}>
-      <header
-        className={styles.header}
-        id={id}
-        data-page-section
-        data-testid={testId}
-      >
-        <h3 className={styles.heading}>{heading}</h3>
+    <article className={styles.container} id={id} data-testid={testId}>
+      <header className={styles.header}>
+        <div>
+          <h3 className="govuk-!-margin-bottom-0">{heading}</h3>
+          {!isMobileMedia && toggle}
+        </div>
         {actions}
+        {isMobileMedia && toggle}
       </header>
       <ul className={styles.list}>{children}</ul>
-    </div>
+    </article>
   );
 }

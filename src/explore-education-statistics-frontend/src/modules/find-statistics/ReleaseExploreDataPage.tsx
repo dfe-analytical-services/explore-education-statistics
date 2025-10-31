@@ -1,7 +1,10 @@
+import AccordionToggleButton from '@common/components/AccordionToggleButton';
+import ButtonText from '@common/components/ButtonText';
 import ContentHtml from '@common/components/ContentHtml';
 import { NavItem } from '@common/components/PageNavExpandable';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
+import useToggle from '@common/hooks/useToggle';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import ReleaseDataList from '@common/modules/find-statistics/components/ReleaseDataList';
 import ReleaseDataListItem from '@common/modules/find-statistics/components/ReleaseDataListItem';
@@ -16,6 +19,8 @@ import {
 } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import Link from '@frontend/components/Link';
+import ReleaseDataSetFileSummary from '@frontend/modules/find-statistics/components/ReleaseDataSetFileSummary';
+import downloadService from '@frontend/services/downloadService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
 
@@ -86,6 +91,8 @@ const ReleaseExploreDataPage = ({
   const hasDataDashboards = dataDashboards && dataDashboards.length > 0;
 
   const { isMedia: isMobileMedia } = useMobileMedia();
+
+  const [showAllDataSetDetails, toggleAllDataSetDetails] = useToggle(false);
 
   return (
     <>
@@ -211,6 +218,14 @@ const ReleaseExploreDataPage = ({
                 key={featuredTable.featuredTableId}
                 title={featuredTable.title}
                 description={featuredTable.summary}
+                actions={
+                  <Link
+                    to={`/data-tables/fast-track/${featuredTable.dataBlockParentId}`}
+                  >
+                    View, edit or download{' '}
+                    <VisuallyHidden>{featuredTable.title}</VisuallyHidden>
+                  </Link>
+                }
               />
             ))}
           </ReleaseDataList>
@@ -223,7 +238,85 @@ const ReleaseExploreDataPage = ({
         testId={exploreDataPageSections.datasets.id}
         caption={exploreDataPageSections.datasets.caption}
       >
-        <p>{dataSets.length} datasets</p>
+        <ReleaseDataList
+          heading={`${dataSets.length} data set${
+            dataSets.length > 1 ? 's' : ''
+          } available for download`}
+          actions={
+            <Link
+              to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
+              onClick={() => {
+                logEvent({
+                  category: 'Downloads',
+                  action: `Release page all files, Release: ${releaseVersionSummary.title}, File: All files`,
+                });
+              }}
+              className="govuk-!-font-weight-bold"
+              unvisited
+            >
+              Download all (ZIP)
+            </Link>
+          }
+          toggle={
+            <AccordionToggleButton
+              expanded={showAllDataSetDetails}
+              label={
+                showAllDataSetDetails
+                  ? 'Hide all details'
+                  : 'Show expanded view for all data sets'
+              }
+              onClick={() => {
+                toggleAllDataSetDetails();
+                logEvent({
+                  category: 'Data catalogue',
+                  action: 'All data set details toggled',
+                });
+              }}
+            />
+          }
+        >
+          {dataSets.map(dataset => (
+            <ReleaseDataListItem
+              key={dataset.fileId}
+              title={dataset.title}
+              description={dataset.summary}
+              metaInfo={dataset.meta.geographicLevels.join(', ')}
+              actions={
+                <>
+                  <Link
+                    to={`/data-tables/${publicationSummary.slug}/${releaseVersionSummary.slug}?subjectId=${dataset.subjectId}`}
+                  >
+                    Create table{' '}
+                    <VisuallyHidden>using {dataset.title}</VisuallyHidden>
+                  </Link>
+                  <ButtonText
+                    onClick={async () => {
+                      await downloadService.downloadZip(
+                        releaseVersionSummary.id,
+                        'ReleaseDownloads',
+                        dataset.fileId,
+                      );
+
+                      logEvent({
+                        category: 'Downloads',
+                        action: 'Release page data set file download',
+                        label: `Publication: ${publicationSummary.title}, Release: ${releaseVersionSummary.title}, Data set: ${dataset.title}`,
+                      });
+                    }}
+                  >
+                    Download <VisuallyHidden>{dataset.title}</VisuallyHidden>{' '}
+                    (ZIP)
+                  </ButtonText>
+                </>
+              }
+            >
+              <ReleaseDataSetFileSummary
+                dataSetFile={dataset}
+                expanded={showAllDataSetDetails}
+              />
+            </ReleaseDataListItem>
+          ))}
+        </ReleaseDataList>
       </ReleasePageContentSection>
 
       {hasSupportingFiles && (
@@ -234,7 +327,7 @@ const ReleaseExploreDataPage = ({
           caption={exploreDataPageSections.supportingFiles.caption}
         >
           <ReleaseDataList
-            heading={`${supportingFiles.length} supporting file${
+            heading={`${supportingFiles.length} supporting data file${
               supportingFiles.length > 1 ? 's' : ''
             }`}
           >
@@ -243,9 +336,8 @@ const ReleaseExploreDataPage = ({
                 key={file.fileId}
                 title={file.title}
                 description={file.summary}
-                actions={[
+                actions={
                   <Link
-                    key={file.fileId}
                     to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files/${file.fileId}`}
                     onClick={() => {
                       logEvent({
@@ -255,10 +347,10 @@ const ReleaseExploreDataPage = ({
                       });
                     }}
                   >
-                    Download <VisuallyHidden>${file.title}</VisuallyHidden>{' '}
+                    Download <VisuallyHidden>{file.title}</VisuallyHidden>{' '}
                     {`(${file.extension}, ${file.size})`}
-                  </Link>,
-                ]}
+                  </Link>
+                }
               />
             ))}
           </ReleaseDataList>
