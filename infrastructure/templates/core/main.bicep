@@ -39,3 +39,12 @@ module backupsModule 'application/backups/backups.bicep' = {
     tagValues: tagValues
   }
 }
+
+module frontDoorModule 'application/frontDoor/frontDoor.bicep' = {
+  name: 'frontDoorModuleDeploy'
+  params: {
+    subscription: subscription
+    resourcePrefix: resourcePrefix
+    tagValues: tagValues
+  }
+}

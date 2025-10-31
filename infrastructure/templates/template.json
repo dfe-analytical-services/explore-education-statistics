@@ -1310,6 +1310,8 @@
     "backupVaultName": "[concat(parameters('subscription'), '-', parameters('environment'), '-bvault')]",
     "backupVaultBlobPolicyName": "[concat(parameters('subscription'), '-', parameters('environment'), '-blobs-bkpol')]",
     "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
+    "frontDoorName": "[concat(parameters('subscription'), '-afd-', parameters('environment'))]",
+    "frontDoorEndpointName": "[concat(parameters('subscription'), '-fde')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
     "ees-admin-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-admin-govuknotify-api-key')]",
     "ees-notifier-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-govuknotify-api-key')]",
@@ -1397,6 +1399,7 @@
     "basePublicAllowedOrigins": [
       "[concat('https://', parameters('domain'))]",
       "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]"
+      // NOTE: We would like to add the frontDoor hostname here, but as we use `reference()` to get it, we cannot and so must added it in place everywhere we want to use 'publicAllowedOrigins'
     ],
     "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]"
   },
@@ -1459,7 +1462,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[variables('publicAllowedOrigins')]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/endpoints', variables('frontDoorName'), variables('frontDoorEndpointName'), '2023-05-01')).properties.hostName)))]"
           },
           "connectionStrings": [
             {
@@ -1563,7 +1566,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[variables('publicAllowedOrigins')]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/endpoints', variables('frontDoorName'), variables('frontDoorEndpointName'), '2023-05-01')).properties.hostName)))]"
           }
         }
       },
@@ -1700,7 +1703,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[variables('publicAllowedOrigins')]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/endpoints', variables('frontDoorName'), variables('frontDoorEndpointName'), '2023-05-01')).properties.hostName)))]"
           },
           "connectionStrings": [
             {
@@ -1798,7 +1801,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[variables('publicAllowedOrigins')]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/endpoints', variables('frontDoorName'), variables('frontDoorEndpointName'), '2023-05-01')).properties.hostName)))]"
           }
         }
       },
@@ -3259,7 +3262,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "cors": {
-            "allowedOrigins": "[variables('publicAllowedOrigins')]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/endpoints', variables('frontDoorName'), variables('frontDoorEndpointName'), '2023-05-01')).properties.hostName)))]"
           },
           "connectionStrings": [
             {
