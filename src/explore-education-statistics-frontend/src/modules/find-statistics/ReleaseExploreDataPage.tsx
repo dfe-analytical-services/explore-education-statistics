@@ -1,3 +1,5 @@
+import Accordion from '@common/components/Accordion';
+import AccordionSection from '@common/components/AccordionSection';
 import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import ButtonText from '@common/components/ButtonText';
 import ContentHtml from '@common/components/ContentHtml';
@@ -30,7 +32,7 @@ interface Props {
   releaseVersionSummary: ReleaseVersionSummary;
 }
 
-export const exploreDataPageSections = {
+export const pageSections = {
   explore: {
     id: 'explore-section',
     text: 'Explore data used in this release',
@@ -42,7 +44,7 @@ export const exploreDataPageSections = {
     text: 'Featured tables',
     caption:
       "Featured tables are pre-prepared tables created from a statistical release's data sets. They provide statistics that are regularly requested by some users (such as local councils, regional government or government policy teams) and can be adapted to switch between different categories (such as different geographies, time periods or characteristics where available).",
-    linkCaption:
+    shortCaption:
       "Featured tables are pre-prepared tables created from a statistical release's data sets. They provide statistics that are regularly requested by users and can be adapted to switch between different categories.",
   },
   datasets: {
@@ -70,7 +72,7 @@ export const exploreDataPageSections = {
       'Description of the data included in this release, this is a methodology document, providing information on data sources, their coverage and quality and how the data is produced.',
   },
 } as const satisfies Dictionary<
-  NavItem & { caption: string; linkCaption?: string }
+  NavItem & { caption: string; shortCaption?: string }
 >;
 
 const ReleaseExploreDataPage = ({
@@ -94,13 +96,151 @@ const ReleaseExploreDataPage = ({
 
   const [showAllDataSetDetails, toggleAllDataSetDetails] = useToggle(false);
 
+  const featuredTablesContent = (
+    <ReleaseDataList
+      heading={`${featuredTables.length} featured table${
+        featuredTables.length > 1 ? 's' : ''
+      }`}
+    >
+      {featuredTables.map(featuredTable => (
+        <ReleaseDataListItem
+          key={featuredTable.featuredTableId}
+          title={featuredTable.title}
+          description={featuredTable.summary}
+          actions={
+            <Link
+              to={`/data-tables/fast-track/${featuredTable.dataBlockParentId}`}
+            >
+              View, edit or download{' '}
+              <VisuallyHidden>{featuredTable.title}</VisuallyHidden>
+            </Link>
+          }
+        />
+      ))}
+    </ReleaseDataList>
+  );
+
+  const dataSetsContent = (
+    <ReleaseDataList
+      heading={`${dataSets.length} data set${
+        dataSets.length > 1 ? 's' : ''
+      } available for download`}
+      actions={
+        <Link
+          to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
+          onClick={() => {
+            logEvent({
+              category: 'Downloads',
+              action: `Release page all files, Release: ${releaseVersionSummary.title}, File: All files`,
+            });
+          }}
+          className="govuk-!-font-weight-bold"
+          unvisited
+        >
+          Download all (ZIP)
+        </Link>
+      }
+      toggle={
+        <AccordionToggleButton
+          expanded={showAllDataSetDetails}
+          label={
+            showAllDataSetDetails
+              ? 'Hide all details'
+              : 'Show expanded view for all data sets'
+          }
+          onClick={() => {
+            toggleAllDataSetDetails();
+            logEvent({
+              category: 'Data catalogue',
+              action: 'All data set details toggled',
+            });
+          }}
+        />
+      }
+    >
+      {dataSets.map(dataset => (
+        <ReleaseDataListItem
+          key={dataset.fileId}
+          title={dataset.title}
+          description={dataset.summary}
+          metaInfo={dataset.meta.geographicLevels.join(', ')}
+          actions={
+            <>
+              <Link
+                to={`/data-tables/${publicationSummary.slug}/${releaseVersionSummary.slug}?subjectId=${dataset.subjectId}`}
+              >
+                Create table{' '}
+                <VisuallyHidden>using {dataset.title}</VisuallyHidden>
+              </Link>
+              <ButtonText
+                onClick={async () => {
+                  await downloadService.downloadZip(
+                    releaseVersionSummary.id,
+                    'ReleaseDownloads',
+                    dataset.fileId,
+                  );
+
+                  logEvent({
+                    category: 'Downloads',
+                    action: 'Release page data set file download',
+                    label: `Publication: ${publicationSummary.title}, Release: ${releaseVersionSummary.title}, Data set: ${dataset.title}`,
+                  });
+                }}
+              >
+                Download <VisuallyHidden>{dataset.title}</VisuallyHidden> (ZIP)
+              </ButtonText>
+            </>
+          }
+        >
+          <ReleaseDataSetFileSummary
+            dataSetFile={dataset}
+            expanded={showAllDataSetDetails}
+          />
+        </ReleaseDataListItem>
+      ))}
+    </ReleaseDataList>
+  );
+
+  const supportingFilesContent = (
+    <ReleaseDataList
+      heading={`${supportingFiles.length} supporting data file${
+        supportingFiles.length > 1 ? 's' : ''
+      }`}
+    >
+      {supportingFiles.map(file => (
+        <ReleaseDataListItem
+          key={file.fileId}
+          title={file.title}
+          description={file.summary}
+          actions={
+            <Link
+              to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files/${file.fileId}`}
+              onClick={() => {
+                logEvent({
+                  category: 'Downloads',
+                  action: 'Release page file downloaded',
+                  label: `Publication: ${publicationSummary.title}, Release: ${releaseVersionSummary.title}, File: ${file.title}`,
+                });
+              }}
+            >
+              Download <VisuallyHidden>{file.title}</VisuallyHidden>{' '}
+              {`(${file.extension}, ${file.size})`}
+            </Link>
+          }
+        />
+      ))}
+    </ReleaseDataList>
+  );
+
   return (
     <>
       <ReleasePageContentSection
-        heading={exploreDataPageSections.explore.text}
-        id={exploreDataPageSections.explore.id}
-        testId={exploreDataPageSections.explore.id}
-        caption={exploreDataPageSections.explore.caption}
+        heading={pageSections.explore.text}
+        id={pageSections.explore.id}
+        testId={pageSections.explore.id}
+        caption={pageSections.explore.caption}
+        includeBackToTopLink={false}
+        includeSectionBreak={!isMobileMedia}
       >
         {!isMobileMedia && (
           <ReleaseDataPageCardLinkGrid>
@@ -126,64 +266,52 @@ const ReleaseExploreDataPage = ({
             {hasFeaturedTables && (
               <ReleaseDataPageCardLink
                 renderLink={
-                  <Link
-                    to={`#${exploreDataPageSections.featuredTables.id}`}
-                    unvisited
-                  >
-                    {exploreDataPageSections.featuredTables.text}
+                  <Link to={`#${pageSections.featuredTables.id}`} unvisited>
+                    {pageSections.featuredTables.text}
                   </Link>
                 }
-                caption={exploreDataPageSections.featuredTables.linkCaption}
+                caption={pageSections.featuredTables.shortCaption}
               />
             )}
 
             <ReleaseDataPageCardLink
               renderLink={
-                <Link to={`#${exploreDataPageSections.datasets.id}`} unvisited>
-                  {exploreDataPageSections.datasets.text}
+                <Link to={`#${pageSections.datasets.id}`} unvisited>
+                  {pageSections.datasets.text}
                 </Link>
               }
-              caption={exploreDataPageSections.datasets.caption}
+              caption={pageSections.datasets.caption}
             />
 
             {hasSupportingFiles && (
               <ReleaseDataPageCardLink
                 renderLink={
-                  <Link
-                    to={`#${exploreDataPageSections.supportingFiles.id}`}
-                    unvisited
-                  >
-                    {exploreDataPageSections.supportingFiles.text}
+                  <Link to={`#${pageSections.supportingFiles.id}`} unvisited>
+                    {pageSections.supportingFiles.text}
                   </Link>
                 }
-                caption={exploreDataPageSections.supportingFiles.caption}
+                caption={pageSections.supportingFiles.caption}
               />
             )}
 
             {hasDataDashboards && (
               <ReleaseDataPageCardLink
                 renderLink={
-                  <Link
-                    to={`#${exploreDataPageSections.dataDashboards.id}`}
-                    unvisited
-                  >
-                    {exploreDataPageSections.dataDashboards.text}
+                  <Link to={`#${pageSections.dataDashboards.id}`} unvisited>
+                    {pageSections.dataDashboards.text}
                   </Link>
                 }
-                caption={exploreDataPageSections.dataDashboards.caption}
+                caption={pageSections.dataDashboards.caption}
               />
             )}
 
             <ReleaseDataPageCardLink
               renderLink={
-                <Link
-                  to={`#${exploreDataPageSections.dataGuidance.id}`}
-                  unvisited
-                >
-                  {exploreDataPageSections.dataGuidance.text}
+                <Link to={`#${pageSections.dataGuidance.id}`} unvisited>
+                  {pageSections.dataGuidance.text}
                 </Link>
               }
-              caption={exploreDataPageSections.dataGuidance.caption}
+              caption={pageSections.dataGuidance.caption}
             />
 
             <ReleaseDataPageCardLink
@@ -201,181 +329,125 @@ const ReleaseExploreDataPage = ({
         )}
       </ReleasePageContentSection>
 
-      {hasFeaturedTables && (
-        <ReleasePageContentSection
-          heading={exploreDataPageSections.featuredTables.text}
-          id={exploreDataPageSections.featuredTables.id}
-          testId={exploreDataPageSections.featuredTables.id}
-          caption={exploreDataPageSections.featuredTables.caption}
+      {isMobileMedia ? (
+        <Accordion
+          className="govuk-!-margin-top-9"
+          id="accordion-content"
+          onSectionOpen={accordionSection => {
+            logEvent({
+              category: `${publicationSummary.title} release data page`,
+              action: `Content accordion opened`,
+              label: `${accordionSection.title}`,
+            });
+          }}
+          showOpenAll={false}
         >
-          <ReleaseDataList
-            heading={`${featuredTables.length} featured table${
-              featuredTables.length > 1 ? 's' : ''
-            }`}
-          >
-            {featuredTables.map(featuredTable => (
-              <ReleaseDataListItem
-                key={featuredTable.featuredTableId}
-                title={featuredTable.title}
-                description={featuredTable.summary}
-                actions={
-                  <Link
-                    to={`/data-tables/fast-track/${featuredTable.dataBlockParentId}`}
-                  >
-                    View, edit or download{' '}
-                    <VisuallyHidden>{featuredTable.title}</VisuallyHidden>
-                  </Link>
-                }
-              />
-            ))}
-          </ReleaseDataList>
-        </ReleasePageContentSection>
-      )}
-
-      <ReleasePageContentSection
-        heading={exploreDataPageSections.datasets.text}
-        id={exploreDataPageSections.datasets.id}
-        testId={exploreDataPageSections.datasets.id}
-        caption={exploreDataPageSections.datasets.caption}
-      >
-        <ReleaseDataList
-          heading={`${dataSets.length} data set${
-            dataSets.length > 1 ? 's' : ''
-          } available for download`}
-          actions={
-            <Link
-              to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
-              onClick={() => {
-                logEvent({
-                  category: 'Downloads',
-                  action: `Release page all files, Release: ${releaseVersionSummary.title}, File: All files`,
-                });
-              }}
-              className="govuk-!-font-weight-bold"
-              unvisited
+          {hasFeaturedTables && (
+            <AccordionSection
+              heading={pageSections.featuredTables.text}
+              id={pageSections.featuredTables.id}
+              caption={pageSections.featuredTables.shortCaption}
             >
-              Download all (ZIP)
-            </Link>
-          }
-          toggle={
-            <AccordionToggleButton
-              expanded={showAllDataSetDetails}
-              label={
-                showAllDataSetDetails
-                  ? 'Hide all details'
-                  : 'Show expanded view for all data sets'
-              }
-              onClick={() => {
-                toggleAllDataSetDetails();
-                logEvent({
-                  category: 'Data catalogue',
-                  action: 'All data set details toggled',
-                });
-              }}
-            />
-          }
-        >
-          {dataSets.map(dataset => (
-            <ReleaseDataListItem
-              key={dataset.fileId}
-              title={dataset.title}
-              description={dataset.summary}
-              metaInfo={dataset.meta.geographicLevels.join(', ')}
-              actions={
-                <>
-                  <Link
-                    to={`/data-tables/${publicationSummary.slug}/${releaseVersionSummary.slug}?subjectId=${dataset.subjectId}`}
-                  >
-                    Create table{' '}
-                    <VisuallyHidden>using {dataset.title}</VisuallyHidden>
-                  </Link>
-                  <ButtonText
-                    onClick={async () => {
-                      await downloadService.downloadZip(
-                        releaseVersionSummary.id,
-                        'ReleaseDownloads',
-                        dataset.fileId,
-                      );
+              {featuredTablesContent}
+            </AccordionSection>
+          )}
 
-                      logEvent({
-                        category: 'Downloads',
-                        action: 'Release page data set file download',
-                        label: `Publication: ${publicationSummary.title}, Release: ${releaseVersionSummary.title}, Data set: ${dataset.title}`,
-                      });
-                    }}
-                  >
-                    Download <VisuallyHidden>{dataset.title}</VisuallyHidden>{' '}
-                    (ZIP)
-                  </ButtonText>
-                </>
-              }
-            >
-              <ReleaseDataSetFileSummary
-                dataSetFile={dataset}
-                expanded={showAllDataSetDetails}
-              />
-            </ReleaseDataListItem>
-          ))}
-        </ReleaseDataList>
-      </ReleasePageContentSection>
-
-      {hasSupportingFiles && (
-        <ReleasePageContentSection
-          heading={exploreDataPageSections.supportingFiles.text}
-          id={exploreDataPageSections.supportingFiles.id}
-          testId={exploreDataPageSections.supportingFiles.id}
-          caption={exploreDataPageSections.supportingFiles.caption}
-        >
-          <ReleaseDataList
-            heading={`${supportingFiles.length} supporting data file${
-              supportingFiles.length > 1 ? 's' : ''
-            }`}
+          <AccordionSection
+            heading={pageSections.datasets.text}
+            id={pageSections.datasets.id}
+            caption={pageSections.datasets.caption}
           >
-            {supportingFiles.map(file => (
-              <ReleaseDataListItem
-                key={file.fileId}
-                title={file.title}
-                description={file.summary}
-                actions={
-                  <Link
-                    to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files/${file.fileId}`}
-                    onClick={() => {
-                      logEvent({
-                        category: 'Downloads',
-                        action: 'Release page file downloaded',
-                        label: `Publication: ${publicationSummary.title}, Release: ${releaseVersionSummary.title}, File: ${file.title}`,
-                      });
-                    }}
-                  >
-                    Download <VisuallyHidden>{file.title}</VisuallyHidden>{' '}
-                    {`(${file.extension}, ${file.size})`}
-                  </Link>
-                }
+            {dataSetsContent}
+          </AccordionSection>
+
+          {hasSupportingFiles && (
+            <AccordionSection
+              heading={pageSections.supportingFiles.text}
+              id={pageSections.supportingFiles.id}
+              caption={pageSections.supportingFiles.caption}
+            >
+              {supportingFilesContent}
+            </AccordionSection>
+          )}
+
+          {hasDataDashboards && (
+            <AccordionSection
+              heading={pageSections.dataDashboards.text}
+              id={pageSections.dataDashboards.id}
+              caption={pageSections.dataDashboards.caption}
+            >
+              <ContentHtml
+                html={dataDashboards}
+                testId="dataDashboards-content"
               />
-            ))}
-          </ReleaseDataList>
-        </ReleasePageContentSection>
-      )}
+            </AccordionSection>
+          )}
 
-      {hasDataDashboards && (
-        <ReleasePageContentSection
-          heading={exploreDataPageSections.dataDashboards.text}
-          id={exploreDataPageSections.dataDashboards.id}
-          testId={exploreDataPageSections.dataDashboards.id}
-          caption={exploreDataPageSections.dataDashboards.caption}
-        >
-          <ContentHtml html={dataDashboards} testId="dataDashboards-content" />
-        </ReleasePageContentSection>
-      )}
+          <AccordionSection
+            heading={pageSections.dataGuidance.text}
+            id={pageSections.dataGuidance.id}
+            caption={pageSections.dataGuidance.caption}
+          >
+            <ContentHtml html={dataGuidance} testId="dataGuidance-content" />
+          </AccordionSection>
+        </Accordion>
+      ) : (
+        <>
+          {hasFeaturedTables && (
+            <ReleasePageContentSection
+              heading={pageSections.featuredTables.text}
+              id={pageSections.featuredTables.id}
+              testId={pageSections.featuredTables.id}
+              caption={pageSections.featuredTables.caption}
+            >
+              {featuredTablesContent}
+            </ReleasePageContentSection>
+          )}
 
-      <ReleasePageContentSection
-        heading={exploreDataPageSections.dataGuidance.text}
-        id={exploreDataPageSections.dataGuidance.id}
-        testId={exploreDataPageSections.dataGuidance.id}
-        caption={exploreDataPageSections.dataGuidance.caption}
-      >
-        <ContentHtml html={dataGuidance} testId="dataGuidance-content" />
-      </ReleasePageContentSection>
+          <ReleasePageContentSection
+            heading={pageSections.datasets.text}
+            id={pageSections.datasets.id}
+            testId={pageSections.datasets.id}
+            caption={pageSections.datasets.caption}
+          >
+            {dataSetsContent}
+          </ReleasePageContentSection>
+
+          {hasSupportingFiles && (
+            <ReleasePageContentSection
+              heading={pageSections.supportingFiles.text}
+              id={pageSections.supportingFiles.id}
+              testId={pageSections.supportingFiles.id}
+              caption={pageSections.supportingFiles.caption}
+            >
+              {supportingFilesContent}
+            </ReleasePageContentSection>
+          )}
+
+          {hasDataDashboards && (
+            <ReleasePageContentSection
+              heading={pageSections.dataDashboards.text}
+              id={pageSections.dataDashboards.id}
+              testId={pageSections.dataDashboards.id}
+              caption={pageSections.dataDashboards.caption}
+            >
+              <ContentHtml
+                html={dataDashboards}
+                testId="dataDashboards-content"
+              />
+            </ReleasePageContentSection>
+          )}
+
+          <ReleasePageContentSection
+            heading={pageSections.dataGuidance.text}
+            id={pageSections.dataGuidance.id}
+            testId={pageSections.dataGuidance.id}
+            caption={pageSections.dataGuidance.caption}
+          >
+            <ContentHtml html={dataGuidance} testId="dataGuidance-content" />
+          </ReleasePageContentSection>
+        </>
+      )}
 
       <ContactUsSection
         publicationContact={publicationSummary.contact}

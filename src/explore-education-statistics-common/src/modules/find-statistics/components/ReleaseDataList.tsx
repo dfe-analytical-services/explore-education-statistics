@@ -1,4 +1,4 @@
-import { useMobileMedia } from '@common/hooks/useMedia';
+import { useDesktopMedia } from '@common/hooks/useMedia';
 import styles from '@common/modules/find-statistics/components/ReleaseDataList.module.scss';
 import React, { ReactNode } from 'react';
 
@@ -19,17 +19,17 @@ export default function ReleaseDataList({
   testId,
   toggle,
 }: Props) {
-  const { isMedia: isMobileMedia } = useMobileMedia();
+  const { isMedia: isDesktopMedia } = useDesktopMedia();
 
   return (
     <article className={styles.container} id={id} data-testid={testId}>
       <header className={styles.header}>
         <div>
           <h3 className="govuk-!-margin-bottom-0">{heading}</h3>
-          {!isMobileMedia && toggle}
+          {isDesktopMedia && toggle}
         </div>
         {actions}
-        {isMobileMedia && toggle}
+        {!isDesktopMedia && toggle}
       </header>
       <ul className={styles.list}>{children}</ul>
     </article>

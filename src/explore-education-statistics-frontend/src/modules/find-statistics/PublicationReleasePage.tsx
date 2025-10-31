@@ -26,7 +26,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import ReleaseExploreDataPage, {
-  exploreDataPageSections,
+  pageSections as exploreDataPageSections,
 } from './ReleaseExploreDataPage';
 
 export const releasePageTabRouteItems = {

@@ -168,11 +168,7 @@ const PublicationReleasePage = ({
           </Accordion>
         ) : (
           content.map(({ heading, id, content: sectionContent }) => (
-            <ReleasePageContentSection
-              heading={heading}
-              key={id}
-              id={generateIdFromHeading(heading)}
-            >
+            <ReleasePageContentSection heading={heading} key={id} id={id}>
               <PublicationSectionBlocks
                 blocks={sectionContent}
                 releaseVersionId={releaseVersionSummary.id}

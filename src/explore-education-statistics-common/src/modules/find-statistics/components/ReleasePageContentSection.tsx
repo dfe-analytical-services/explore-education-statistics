@@ -10,6 +10,7 @@ interface Props {
   className?: string;
   heading: string;
   id: string;
+  includeBackToTopLink?: boolean;
   includeSectionBreak?: boolean;
   testId?: string;
 }
@@ -21,6 +22,7 @@ export default function ReleasePageContentSection({
   heading,
   id,
   includeSectionBreak = true,
+  includeBackToTopLink = true,
   testId,
 }: Props) {
   const { isMedia: isMobileMedia } = useMobileMedia();
@@ -45,7 +47,9 @@ export default function ReleasePageContentSection({
         <div>
           {children}
 
-          {isMobileMedia && <GoToTopLink className="govuk-!-margin-top-8" />}
+          {isMobileMedia && includeBackToTopLink && (
+            <GoToTopLink className="govuk-!-margin-top-8" />
+          )}
         </div>
       </section>
 
