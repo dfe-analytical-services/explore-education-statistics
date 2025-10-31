@@ -1,10 +1,23 @@
-@description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
+@description('Environment : Used as a prefix for created resources.')
+@allowed([
+  's101d01'
+  's101t01'
+  's101p02'
+  's101p01'
+  '' // To avoid bicep linting errors, because the variable is fetched from DevOps Pipelines Library
+])
 param subscription string = ''
 
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
 
-@description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
+@description('Environment : Used for tagging resources, and creating environment-specific resources')
+@allowed([
+  'Development'
+  'Test'
+  'Pre-Production'
+  'Production'
+])
 param environmentName string
 
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
@@ -38,4 +51,10 @@ module backupsModule 'application/backups/backups.bicep' = {
     deployBackupVaultReaderRoleAssignment: deployBackupVaultReaderRoleAssignment
     tagValues: tagValues
   }
+}
+
+resource ddosProtectionPlan 'Microsoft.Network/ddosProtectionPlans@2019-02-01' = if (environmentName == 'Development') {
+  name: 'ees-common-ddos-protection-plan'
+  location: location
+  tags: tagValues
 }

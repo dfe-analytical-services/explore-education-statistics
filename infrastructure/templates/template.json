@@ -400,16 +400,27 @@
     },
     "environmentName": {
       "type": "string",
-      "defaultValue": "Unknown",
+      "allowedValues": [
+        "Development",
+        "Test",
+        "Pre-Production",
+        "Production"
+      ],
       "metadata": {
-        "description": "Tag Value - The name of the phase of the development lifecycle environment that the component will be used in e.g. Development / Test / Integration / Production"
+        "description": "Tag Value - The name of the phase of the development lifecycle environment that the component will be used in"
       }
     },
     "subscriptionName": {
       "type": "string",
-      "defaultValue": "Unknown",
+      "allowedValues": [
+        "s101-datahub-development",
+        "s101-datahub-test",
+        "s101-datahub-production",
+        "s180-statisticservices-test",
+        "s180-statisticservicess-production"
+      ],
       "metadata": {
-        "description": "Tag Value - Enter the full name of the Azure subscription where this resource is located e.g. s101-datahub-development / s101-datahub-test / s101-datahub-production"
+        "description": "Tag Value - Enter the full name of the Azure subscription where this resource is located"
       }
     },
     "solutionName": {
@@ -715,6 +726,25 @@
       "defaultValue": "eesacr",
       "metadata": {
         "description": "The name of the Container registry"
+      }
+    },
+    "ddosPlanCommonSubscriptionId": {
+      "type": "string",
+      "metadata": {
+        "description": "The subscription id of the common DdosProtectionPlan"
+      }
+    },
+    "ddosPlanCommonResourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource group name of the common DdosProtectionPlan"
+      }
+    },
+    "ddosPlanCommonName": {
+      "type": "string",
+      "defaultValue": "ees-common-ddos-protection-plan",
+      "metadata": {
+        "description": "The name of the common DdosProtectionPlan"
       }
     },
     "dockerRegistryServerUrl": {
@@ -3777,6 +3807,10 @@
           "addressPrefixes": [
             "10.0.0.0/16"
           ]
+        },
+        "enableDdosProtection": true,
+        "ddosProtectionPlan": {
+          "id": "[resourceId(parameters('ddosPlanCommonSubscriptionId'), parameters('ddosPlanCommonResourceGroupName'), 'Microsoft.Network/ddosProtectionPlans', parameters('ddosPlanCommonName'))]"
         },
         "subnets": [
           {
