@@ -22,7 +22,7 @@
   <ItemGroup>
     <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
     <!-- v2.8.1 is compatible with MacOS -->
-    <PackageReference Include="Azure.Identity" Version="1.16.0" />
+    <PackageReference Include="Azure.Identity" Version="1.17.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.21" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.21" PrivateAssets="all" />
     <PackageReference Include="GovukNotify" Version="7.2.0" />
