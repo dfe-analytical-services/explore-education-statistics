@@ -237,11 +237,10 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
               ),
             );
 
-            const hasSupportingFiles = dataContent.supportingFiles.length > 0;
-            const hasFeaturedTables = dataContent.featuredTables.length > 0;
+            const hasSupportingFiles = dataContent.supportingFiles.length;
+            const hasFeaturedTables = dataContent.featuredTables.length;
             const hasDataDashboards =
-              dataContent.dataDashboards &&
-              dataContent.dataDashboards.length > 0;
+              dataContent.dataDashboards && dataContent.dataDashboards.length;
 
             return {
               props: {

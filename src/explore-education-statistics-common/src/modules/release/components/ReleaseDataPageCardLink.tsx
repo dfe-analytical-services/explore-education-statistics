@@ -19,7 +19,7 @@ export default function ReleaseDataPageCardLink({
         [styles.highlight]: isHighlightVariant,
       })}
     >
-      <h3>{renderLink}</h3>
+      <p className="govuk-heading-m">{renderLink}</p>
       <p>{caption}</p>
     </li>
   );
