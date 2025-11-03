@@ -13,10 +13,10 @@ module backupVaultPolicyModule '../../../common/components/data-protection/postg
   params: {
     policyName: policyName
     vaultName: vaultName
-    vaultTierDailyBackupScheduleTime: '07:00'
-    vaultTierDefaultRetentionInDays: 30
-    vaultTierWeeklyRetentionInWeeks: 52
+    vaultTierWeeklyBackupScheduleTime: '07:00'
+    vaultTierDefaultRetentionInYears: 1
+    vaultTierWeeklyRetentionInWeeks: 12
     vaultTierMonthlyRetentionInMonths: 12
-    vaultTierYearlyRetentionInYears: 1
+    vaultTierYearlyRetentionInYears: 2
   }
 }
