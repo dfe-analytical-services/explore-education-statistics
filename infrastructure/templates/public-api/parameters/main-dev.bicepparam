@@ -32,4 +32,4 @@ param enableSwagger = true
 
 param enableReplacementOfPublicApiDataSets = true
 
-param deployPsqlBackupVaultRegistration = false
+param deployPsqlBackupVaultRegistration = true
