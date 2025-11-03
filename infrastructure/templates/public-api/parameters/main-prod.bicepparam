@@ -55,5 +55,3 @@ param recoveryVaultImmutable = true
 param enableThemeDeletion = false
 
 param enableReplacementOfPublicApiDataSets = true
-
-param deployPsqlBackupVaultRegistration = false
