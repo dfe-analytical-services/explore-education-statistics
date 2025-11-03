@@ -24,7 +24,7 @@ export default class PreviewTokenDateHelper {
     }
 
     if (activates && expires) {
-      const startDate = !isToday(activates)
+      const startDate = !isToday(activates) // Activates is DATE Only and so we don't worry calling `toUtcAtTime` or retaining the correct local timezone & UTC offsets
         ? this.toUtcAtTime(activates, '00:00:00')
         : this.nowUk;
       const endDate = this.toUtcAtTime(expires, '23:59:59'); // set custom dates
@@ -59,14 +59,11 @@ export default class PreviewTokenDateHelper {
 
   /** Convert a given Date's calendar day (in this.timezone) plus HH:mm:ss into UTC Date. */
   private toUtcAtTime(dateParam: Date, timeParam: string | null = null): Date {
-    const yyyy = dateParam.getFullYear();
-    const mm = String(dateParam.getMonth() + 1).padStart(2, '0');
-    const dd = String(dateParam.getDate()).padStart(2, '0');
     let time = timeParam;
     if (!timeParam) {
       time = this.hhmmss(dateParam);
     }
-    const localIso = `${yyyy}-${mm}-${dd}T${time}`;
+    const localIso = `${dateParam.toISOString().substring(0, 10)}T${time}`;
     return zonedTimeToUtc(localIso, this.timezone);
   }
 
