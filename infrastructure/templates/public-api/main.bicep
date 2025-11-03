@@ -161,8 +161,11 @@ param enableSwagger bool = false
 @description('Enable replacement of public API data sets.')
 param enableReplacementOfPublicApiDataSets bool = false
 
+@description('Whether to assign roles that enable us to register PostgreSQL Flexible Server with Backup Vault')
+param deployPsqlBackupVaultRoleAssignment bool = false
+
 @description('Whether to register PostgreSQL Flexible Server with Backup Vault')
-param deployPsqlBackupVaultRegistration bool
+param deployPsqlBackupVaultRegistration bool = false
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -310,7 +313,8 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
     serverConfig: postgreSqlServerConfig
     firewallRules: maintenanceIpRanges
     deployAlerts: deployAlerts
-    deployBackupVaultRegistration: deployPsqlBackupVaultRegistration 
+    deployBackupVaultRoleAssignment: deployPsqlBackupVaultRoleAssignment
+    deployBackupVaultRegistration: deployPsqlBackupVaultRegistration
     tagValues: tagValues
   }
   dependsOn: [

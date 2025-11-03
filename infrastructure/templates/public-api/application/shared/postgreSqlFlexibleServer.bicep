@@ -29,6 +29,9 @@ param entraIdAdminPrincipals PrincipalNameAndId[] = []
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
 
+@description('Whether to create role assignments in order to register this server with Backup Vault')
+param deployBackupVaultRoleAssignment bool
+
 @description('Whether to register this server with Backup Vault')
 param deployBackupVaultRegistration bool
 
@@ -42,8 +45,6 @@ var formattedFirewallRules = map(firewallRules, rule => {
 
 var serverName = resourceNames.sharedResources.postgreSqlFlexibleServer
 
-// Our deploy SPN currently does not have permission to assign this role. 
-var deployBackupVaultRoleAssignment = false
 func createManagedIdentityConnectionString(templateString string, identityName string) string =>
   replaceMultiple(templateString, {
     '[database_name]': 'public_data'

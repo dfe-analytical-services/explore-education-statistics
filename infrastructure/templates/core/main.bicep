@@ -7,6 +7,9 @@ param location string = resourceGroup().location
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
 
+@description('Whether or not to create role assignments necessary for performing certain backup actions.')
+param deployBackupVaultReaderRoleAssignment bool = false
+
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
   CostCentre: string
@@ -32,6 +35,7 @@ module backupsModule 'application/backups/backups.bicep' = {
   params: {
     location: location
     resourcePrefix: resourcePrefix
+    deployBackupVaultReaderRoleAssignment: deployBackupVaultReaderRoleAssignment
     tagValues: tagValues
   }
 }
