@@ -18,6 +18,7 @@ import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import { PreviewTokenCreateValues } from '@admin/pages/release/data/types/PreviewTokenCreateValues';
+import InsetText from '@common/components/InsetText';
 
 interface FormValues {
   agreeTerms: boolean;
@@ -212,6 +213,19 @@ export default function ApiDataSetPreviewTokenCreateForm({
                 <br />
               </>
             )}
+            {!isBau && (
+              <InsetText>
+                <p>
+                  If you would like to extend the period that this new token is
+                  valid for, please contact{' '}
+                  <a href="mailto:explore.statistics@education.gov.uk">
+                    explore.statistics@education.gov.uk
+                  </a>{' '}
+                  for support.
+                </p>
+              </InsetText>
+            )}
+
             <FormFieldset
               error={formState.errors?.agreeTerms?.message}
               id="terms"

@@ -4,7 +4,10 @@ import { zonedTimeToUtc } from 'date-fns-tz';
 export type DateRange = { startDate: Date; endDate: Date };
 
 export default class PreviewTokenDateHelper {
-  constructor(private readonly timezone: string = 'Europe/London') {}
+  constructor(
+    private readonly timezone: string = 'Europe/London',
+    private readonly nowUk: Date = this.toUtcAtTime(new Date()),
+  ) {}
 
   public setDateRangeBasedOnCustomDates(
     activates: Date | null | undefined,
@@ -20,17 +23,15 @@ export default class PreviewTokenDateHelper {
       );
     }
 
-    const now = new Date();
-
     if (activates && expires) {
       const startDate = !isToday(activates)
         ? this.toUtcAtTime(activates, '00:00:00')
-        : this.toUtcAtTime(now, this.hhmmss(now));
+        : this.nowUk;
       const endDate = this.toUtcAtTime(expires, '23:59:59'); // set custom dates
       return { startDate, endDate };
     }
-    const startDate = now;
-    const endDate = new Date(now);
+    const startDate = this.nowUk;
+    const endDate = new Date(this.nowUk);
     endDate.setUTCDate(endDate.getUTCDate() + 1); // 24 hours
     return { startDate, endDate };
   }
@@ -47,20 +48,24 @@ export default class PreviewTokenDateHelper {
         `The number of days (${datePresetSpan}) selected is not allowed, please select between 1 to 7 days.`,
       );
     }
-    const now = new Date();
-    const startDate = this.toUtcAtTime(now, this.hhmmss(now));
 
-    const endAnchor = new Date(startDate);
+    const endAnchor = new Date(this.nowUk);
     endAnchor.setUTCDate(endAnchor.getUTCDate() + datePresetSpan); // add pre set days
     const endDate = this.toUtcAtTime(endAnchor, '23:59:59');
-    return { startDate, endDate };
+
+    // use current time as start date
+    return { startDate: this.nowUk, endDate };
   }
 
   /** Convert a given Date's calendar day (in this.timezone) plus HH:mm:ss into UTC Date. */
-  private toUtcAtTime(date: Date, time: string): Date {
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
+  private toUtcAtTime(dateParam: Date, timeParam: string | null = null): Date {
+    const yyyy = dateParam.getFullYear();
+    const mm = String(dateParam.getMonth() + 1).padStart(2, '0');
+    const dd = String(dateParam.getDate()).padStart(2, '0');
+    let time = timeParam;
+    if (!timeParam) {
+      time = this.hhmmss(dateParam);
+    }
     const localIso = `${yyyy}-${mm}-${dd}T${time}`;
     return zonedTimeToUtc(localIso, this.timezone);
   }

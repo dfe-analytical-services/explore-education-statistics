@@ -144,14 +144,12 @@ public record PreviewTokenCreateRequest
 
         private static bool IsLocalMidnight(DateTimeOffset dtUk)
         {
-            var local = dtUk.ToOffset(UkTimeZone.GetUtcOffset(dtUk));
-            return local is { Hour: 0, Minute: 0, Second: 0 };
+            return dtUk is { Hour: 0, Minute: 0, Second: 0 };
         }
 
         private static bool IsEndOfDay(DateTimeOffset dtUk)
         {
-            var local = dtUk.ToOffset(UkTimeZone.GetUtcOffset(dtUk));
-            return local is { Hour: 23, Minute: 59, Second: 59 };
+            return dtUk is { Hour: 23, Minute: 59, Second: 59 };
         }
 
         private static bool IsSameDay(DateTimeOffset ukDate1, DateTimeOffset ukDate2) =>
