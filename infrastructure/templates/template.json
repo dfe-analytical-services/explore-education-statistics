@@ -416,8 +416,9 @@
         "s101-datahub-development",
         "s101-datahub-test",
         "s101-datahub-production",
-        "s180-statisticservices-test",
-        "s180-statisticservicess-production"
+        "s180-statisticsservices-development",
+        "s180-statisticsservices-test",
+        "s180-statistics-services-production"
       ],
       "metadata": {
         "description": "Tag Value - Enter the full name of the Azure subscription where this resource is located"
