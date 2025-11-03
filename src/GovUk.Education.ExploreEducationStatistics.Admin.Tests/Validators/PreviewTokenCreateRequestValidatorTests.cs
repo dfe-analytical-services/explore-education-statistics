@@ -12,8 +12,8 @@ public class PreviewTokenCreateRequestValidatorTests
         new(startDateTime ?? DefaultUtcNow);
 
     [Theory]
-    [InlineData("2025-09-30T14:00:00 +00:00")]
-    [InlineData("2025-10-01T13:59:49 +00:00")] // 1 second outside the 10-second tolerance
+    [InlineData("2025-09-30T14:00:00 +01:00")]
+    [InlineData("2025-10-01T13:59:49 +01:00")] // 1 second outside the 10-second tolerance
     public void Activates_InPast_Fails(string activates)
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());

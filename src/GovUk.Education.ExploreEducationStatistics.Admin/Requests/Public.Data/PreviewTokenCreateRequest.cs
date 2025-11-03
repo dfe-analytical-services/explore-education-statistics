@@ -68,7 +68,7 @@ public record PreviewTokenCreateRequest
                         {
                             var activatesUk = TimeZoneInfo.ConvertTime(activates!.Value, UkTimeZone);
                             var isLocalMidnight = IsLocalMidnight(activatesUk);
-                            return activatesUk.Date == nowUk.Date || isLocalMidnight;
+                            return IsSameDay(activatesUk, nowUk) || isLocalMidnight;
                         })
                         .WithMessage(
                             "Activates time must be set to midnight UK local time when it's not today's date."
@@ -112,7 +112,7 @@ public record PreviewTokenCreateRequest
                                             var expiresUk = TimeZoneInfo.ConvertTime(expires!.Value, UkTimeZone);
                                             var activatesUk = TimeZoneInfo.ConvertTime(r.Activates!.Value, UkTimeZone);
                                             var isEndOfExpiresDay = IsEndOfDay(expiresUk);
-                                            return activatesUk.Date == nowUk.Date || isEndOfExpiresDay;
+                                            return IsSameDay(activatesUk, nowUk) || isEndOfExpiresDay;
                                         }
                                     )
                                     .WithMessage("Expires time must be at 23:59:59 UK local time for that date.");
@@ -153,5 +153,8 @@ public record PreviewTokenCreateRequest
             var local = dtUk.ToOffset(UkTimeZone.GetUtcOffset(dtUk));
             return local is { Hour: 23, Minute: 59, Second: 59 };
         }
+
+        private static bool IsSameDay(DateTimeOffset ukDate1, DateTimeOffset ukDate2) =>
+            ukDate1.Year == ukDate2.Year && ukDate1.Month == ukDate2.Month && ukDate1.Day == ukDate2.Day;
     }
 }
