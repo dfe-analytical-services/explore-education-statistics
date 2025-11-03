@@ -1,0 +1,30 @@
+@import '~govuk-frontend/dist/govuk/base';
+@import '@common/styles/variables';
+
+.listItem {
+  padding: govuk-spacing(3) 0;
+  margin: 0;
+
+  @include govuk-media-query($from: 1024px) {
+    display: flex;
+    justify-content: space-between;
+    gap: govuk-spacing(3);
+    align-items: flex-start;
+  }
+}
+
+.content {
+  flex: 1;
+  max-width: 600px;
+}
+
+.title {
+  margin: 0 0 govuk-spacing(1) 0;
+}
+
+.actions {
+  margin-block: govuk-spacing(3);
+  display: flex;
+  align-items: center;
+  gap: govuk-spacing(4);
+}
