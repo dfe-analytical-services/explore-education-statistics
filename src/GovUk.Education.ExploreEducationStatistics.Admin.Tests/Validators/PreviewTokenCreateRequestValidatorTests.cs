@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Validators;
 
 public class PreviewTokenCreateRequestValidatorTests
 {
-    private static readonly DateTimeOffset DefaultUtcNow = new(2025, 10, 1, 14, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset DefaultUtcNow = new(2025, 10, 1, 14, 0, 0, TimeSpan.FromHours(1));
 
     private static FakeTimeProvider GetTimeProvider(DateTimeOffset? startDateTime = null) =>
         new(startDateTime ?? DefaultUtcNow);
@@ -34,6 +34,8 @@ public class PreviewTokenCreateRequestValidatorTests
     [Theory]
     [InlineData("2025-10-01T14:00:00 +00:00")]
     [InlineData("2025-10-01T14:00:01 +00:00")]
+    [InlineData("2025-10-07T23:00:00 +00:00")]
+    [InlineData("2025-10-08T00:00:00 +01:00")]
     [InlineData("2025-10-08T13:59:59 +00:00")]
     [InlineData("2025-10-08T14:00:00 +00:00")]
     public void Activates_Within7Days_Passes(string activates)
@@ -49,7 +51,7 @@ public class PreviewTokenCreateRequestValidatorTests
 
         var result = validator.TestValidate(request);
         var expectedErrorResult = result.Errors.All(err => // Expecting only the following error message
-            err.ErrorMessage == "Activates time must be at midnight GMT/BST when it's not today's date."
+            err.ErrorMessage == "Activates time must be set to midnight UK local time when it's not today's date."
         );
         if (!expectedErrorResult)
         {
@@ -62,11 +64,13 @@ public class PreviewTokenCreateRequestValidatorTests
     public void Activates_After7Days_Fails()
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
+        var activates = DefaultUtcNow.AddDays(8);
+
         var request = new PreviewTokenCreateRequest
         {
             DataSetVersionId = Guid.NewGuid(),
             Label = "Test",
-            Activates = DefaultUtcNow.AddDays(7).AddSeconds(1),
+            Activates = new DateTimeOffset(activates.Year, activates.Month, activates.Day, 0, 0, 0, activates.Offset),
             Expires = null,
         };
 
@@ -152,7 +156,7 @@ public class PreviewTokenCreateRequestValidatorTests
 
         result
             .ShouldHaveValidationErrorFor(r => r.Activates)
-            .WithErrorMessage("Activates time must be at midnight GMT/BST when it's not today's date.");
+            .WithErrorMessage("Activates time must be set to midnight UK local time when it's not today's date.");
     }
 
     [Fact]
@@ -303,12 +307,22 @@ public class PreviewTokenCreateRequestValidatorTests
     public void Expires_NoActivates_After7Days_Fails()
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
+        var eightDaysFromNow = DefaultUtcNow.AddDays(8);
+        var expires = new DateTimeOffset(
+            eightDaysFromNow.Year,
+            eightDaysFromNow.Month,
+            eightDaysFromNow.Day,
+            23,
+            59,
+            59,
+            eightDaysFromNow.Offset
+        );
         var request = new PreviewTokenCreateRequest
         {
             DataSetVersionId = Guid.NewGuid(),
             Label = "Test",
             Activates = null,
-            Expires = DefaultUtcNow.AddDays(7).AddSeconds(1),
+            Expires = expires,
         };
 
         var result = validator.TestValidate(request);
@@ -381,7 +395,7 @@ public class PreviewTokenCreateRequestValidatorTests
 
         result
             .ShouldHaveValidationErrorFor(r => r.Expires)
-            .WithErrorMessage("Expires time must end at midnight GMT/BST for a given date.");
+            .WithErrorMessage("Expires time must be at 23:59:59 UK local time for that date.");
     }
 
     [Fact]

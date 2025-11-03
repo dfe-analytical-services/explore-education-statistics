@@ -64,6 +64,20 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             Message: "Activates date must not be in the past."
         );
 
+        private static DateTimeOffset StartOfDay(DateTimeOffset d) => new(d.Year, d.Month, d.Day, 0, 0, 0, d.Offset);
+
+        private static DateTimeOffset EndOfDay(DateTimeOffset d) => new(d.Year, d.Month, d.Day, 23, 59, 59, d.Offset);
+
+        private static DateTimeOffset DaysFromNow(int days) => DateTimeOffset.UtcNow.AddDays(days);
+
+        private static DateTimeOffset NineDaysLater => DaysFromNow(9);
+        private static DateTimeOffset NineDaysLaterExpires => EndOfDay(NineDaysLater);
+        private static DateTimeOffset NineDaysLaterActivates => StartOfDay(NineDaysLater);
+        private static DateTimeOffset TwoDaysAgo => DaysFromNow(-2);
+        private static DateTimeOffset TwoDaysAgoActivates => StartOfDay(TwoDaysAgo);
+        private static DateTimeOffset SixDaysLater => DaysFromNow(6);
+        private static DateTimeOffset SixDaysLaterActivates => StartOfDay(SixDaysLater);
+
         [Fact]
         public async Task Success()
         {
@@ -108,6 +122,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         [InlineData(true, true)]
         [InlineData(true, false)]
         [InlineData(false, true)]
+        [InlineData(false, false)]
         public async Task CustomActivatesOrExpiresProvided_Success(bool activatesProvided, bool expiresProvided)
         {
             var dataSetVersion = await SetUpDataSetVersionTestData();
@@ -115,9 +130,37 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             var twoDaysFromNow = DateTimeOffset.UtcNow.AddDays(2);
             var nineDaysFromNow = DateTimeOffset.UtcNow.AddDays(9);
 
+            TimeZoneInfo ukTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
+
             DateTimeOffset? activates = activatesProvided ? twoDaysFromNow : null;
             var sevenDaysFromNow = DateTimeOffset.UtcNow.AddDays(7);
             DateTimeOffset? expires = expiresProvided ? activates?.AddDays(7) ?? sevenDaysFromNow : null;
+            if (activates.HasValue)
+            {
+                activates = TimeZoneInfo.ConvertTime(activates.Value, ukTimeZone);
+                activates = new DateTimeOffset(
+                    activates.Value.Year,
+                    activates.Value.Month,
+                    activates.Value.Day,
+                    0,
+                    0,
+                    0,
+                    activates.Value.Offset
+                );
+            }
+            if (expires.HasValue)
+            {
+                expires = TimeZoneInfo.ConvertTime(expires.Value, ukTimeZone);
+                expires = new DateTimeOffset(
+                    expires.Value.Year,
+                    expires.Value.Month,
+                    expires.Value.Day,
+                    23,
+                    59,
+                    59,
+                    expires.Value.Offset
+                );
+            }
 
             var label = new string('A', count: 100);
             var response = await CreatePreviewToken(
@@ -132,8 +175,22 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             );
             Assert.True(Guid.TryParse(createdEntityId, out var previewTokenId));
 
-            var expectedActivates = activatesProvided ? twoDaysFromNow : viewModel.Created;
-            var expectedExpiry = expires ?? (activatesProvided ? nineDaysFromNow : sevenDaysFromNow);
+            var expectedActivates = activatesProvided ? activates!.Value : viewModel.Created;
+            var expectedExpiry =
+                expires
+                ?? (
+                    activatesProvided
+                        ? new DateTimeOffset(
+                            nineDaysFromNow.Year,
+                            nineDaysFromNow.Month,
+                            nineDaysFromNow.Day,
+                            0,
+                            0,
+                            0,
+                            nineDaysFromNow.Offset
+                        )
+                        : sevenDaysFromNow
+                );
 
             Assert.Multiple(
                 () => Assert.Equal(previewTokenId, viewModel.Id),
@@ -173,10 +230,10 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         > CustomDateOutOfRangeData =>
             new()
             {
-                { DateTimeOffset.UtcNow.AddDays(-2), DateTimeOffset.UtcNow.AddDays(2), InvalidActivatesInPast }, // Start date is in the past and therefore is out of range.
-                { DateTimeOffset.UtcNow.AddDays(8), DateTimeOffset.UtcNow.AddDays(9), InvalidActivatesOutOfBound },
-                { DateTimeOffset.UtcNow.AddDays(6), DateTimeOffset.UtcNow.AddDays(14), InvalidExpiryOutOfBound }, // Duration is longer than 8 days and therefore is out of range.
-                { DateTimeOffset.UtcNow.AddDays(6), DateTimeOffset.UtcNow.AddDays(3), InvalidExpiryBeforeActivates },
+                { TwoDaysAgoActivates, DateTimeOffset.UtcNow.AddDays(2), InvalidActivatesInPast }, // Start date is in the past and therefore is out of range.
+                { NineDaysLaterActivates, NineDaysLaterExpires, InvalidActivatesOutOfBound },
+                { SixDaysLaterActivates, DateTimeOffset.UtcNow.AddDays(14), InvalidExpiryOutOfBound }, // Duration is longer than 8 days and therefore is out of range.
+                { SixDaysLaterActivates, DateTimeOffset.UtcNow.AddDays(3), InvalidExpiryBeforeActivates },
                 { null, DateTimeOffset.UtcNow.AddDays(-1), InvalidExpiryInPast },
                 { null, DateTimeOffset.UtcNow.AddDays(14), InvalidExpiryLessThan7DaysFromToday },
             };
