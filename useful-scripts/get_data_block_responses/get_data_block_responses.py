@@ -165,7 +165,11 @@ for datablock in datablocks:
     block_id = datablock[0]
     release_id = datablock[1]
     subject_id = datablock[2]
-    query_dict = json.loads(datablock[3])  # TODO Wrap in try/catch so can see line in CSV that it fails on?
+    try:
+        query_dict = json.loads(datablock[3])
+    except Exception as e:
+        print_to_console(f"Invalid JSON with block {block_id} subject {subject_id}, {e}")
+        continue
 
     if args.stage == "table":
         url = f"{data_api_url}/tablebuilder/release/{release_id}"
