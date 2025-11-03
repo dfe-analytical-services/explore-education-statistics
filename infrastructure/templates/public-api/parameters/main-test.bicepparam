@@ -14,4 +14,4 @@ param enableThemeDeletion = false
 
 param enableReplacementOfPublicApiDataSets = true
 
-param deployPsqlBackupVaultRegistration = false
+param deployPsqlBackupVaultRegistration = true
