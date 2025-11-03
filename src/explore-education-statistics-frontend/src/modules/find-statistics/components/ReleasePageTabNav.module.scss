@@ -10,18 +10,17 @@
 .navList {
   display: flex;
   align-items: flex-end;
-  gap: govuk-spacing(4);
+  gap: govuk-spacing(2);
   border-bottom: 1px solid $govuk-border-colour;
   min-width: 100%;
   overflow-y: hidden;
   overflow-x: auto;
   list-style: none;
   padding: 0;
-  margin-top: 0;
-  margin-bottom: govuk-spacing(4);
+  margin: 0;
 
   @include govuk-media-query($from: tablet) {
-    margin-bottom: govuk-spacing(8);
+    gap: govuk-spacing(4);
   }
 
   > li {
