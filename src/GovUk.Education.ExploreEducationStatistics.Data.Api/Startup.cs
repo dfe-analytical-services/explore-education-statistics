@@ -272,6 +272,9 @@ public class Startup
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
+
+            // CORS config for dev/test/etc. environments set in IaC config
+            app.UseCors(options => options.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
         }
         else
         {
@@ -298,10 +301,6 @@ public class Startup
         // ReSharper disable once CommentTypo
         // Adds Brotli and Gzip compressing
         app.UseResponseCompression();
-
-        app.UseCors(options =>
-            options.WithOrigins("http://localhost:3000", "https://localhost:3000").AllowAnyMethod().AllowAnyHeader()
-        );
 
         app.UseMvc();
         app.UseHealthChecks("/api/health");

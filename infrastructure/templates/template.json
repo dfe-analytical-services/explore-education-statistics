@@ -797,6 +797,20 @@
       "metadata": {
         "description": "Feature flag to control the replacement of public API data sets"
       }
+    },
+    "additionalAdminAllowedOrigins": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Additional CORS allowed origins for admin"
+      }
+    },
+    "additionalPublicAllowedOrigins": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Additional CORS allowed origins for the public"
+      }
     }
   },
   "variables": {
@@ -1372,21 +1386,12 @@
     "baseAdminAllowedOrigins": [
       "[concat('https://', parameters('adminUri'))]"
     ],
-    "devAdminAllowedOrigins": [
-      "https://localhost:5021",
-      "http://localhost:5021"
-    ],
-    "conditionalDevAdminAllowedOrigins": "[if(equals(parameters('environmentName'), 'Development'), variables('devAdminAllowedOrigins'), createArray())]",
+    "adminAllowedOrigins": "[union(variables('baseAdminAllowedOrigins'), parameters('additionalAdminAllowedOrigins'))]",
     "basePublicAllowedOrigins": [
       "[concat('https://', parameters('domain'))]",
       "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]"
     ],
-    "devPublicAllowedOrigins": [
-      "https://localhost:3000",
-      "http://localhost:3000",
-      "https://ees-public-site-dkbjhuezemehdzff.a03.azurefd.net"
-    ],
-    "conditionalDevPublicAllowedOrigins": "[if(equals(parameters('environmentName'), 'Development'), variables('devPublicAllowedOrigins'), createArray())]"
+    "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]"
   },
   "resources": [
     {
@@ -1447,7 +1452,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('basePublicAllowedOrigins'), variables('conditionalDevPublicAllowedOrigins'))]"
+            "allowedOrigins": "[variables('publicAllowedOrigins')]"
           },
           "connectionStrings": [
             {
@@ -1551,7 +1556,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('basePublicAllowedOrigins'), variables('conditionalDevPublicAllowedOrigins'))]"
+            "allowedOrigins": "[variables('publicAllowedOrigins')]"
           }
         }
       },
@@ -1688,7 +1693,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('basePublicAllowedOrigins'), variables('conditionalDevPublicAllowedOrigins'))]"
+            "allowedOrigins": "[variables('publicAllowedOrigins')]"
           },
           "connectionStrings": [
             {
@@ -1786,7 +1791,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('basePublicAllowedOrigins'), variables('conditionalDevPublicAllowedOrigins'))]"
+            "allowedOrigins": "[variables('publicAllowedOrigins')]"
           }
         }
       },
@@ -2145,7 +2150,7 @@
           }
         ],
         "cors": {
-          "allowedOrigins": "[union(variables('baseAdminAllowedOrigins'), variables('conditionalDevAdminAllowedOrigins'))]"
+          "allowedOrigins": "[variables('adminAllowedOrigins')]"
         },
         "networkACLs": {
           "defaultAction": "deny",
@@ -3247,7 +3252,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "cors": {
-            "allowedOrigins": "[union(variables('basePublicAllowedOrigins'), variables('conditionalDevPublicAllowedOrigins'))]"
+            "allowedOrigins": "[variables('publicAllowedOrigins')]"
           },
           "connectionStrings": [
             {

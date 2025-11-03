@@ -42,7 +42,8 @@ const cspConnectSrc = [
 
   // To allow a {PUBLIC_URL}/api requests when browsing the public site
   // from azurewebsites.net or azurefd.net (app service or front door urls),
-  // which we may want to do for testing/debugging
+  // which we may want to do for testing/debugging.
+  // The regex ensures this URL is correct regardless of whether PUBLIC_URL ends with a slash
   `${process.env.PUBLIC_URL.replace(/\/$/, '')}/api/`,
 ];
 
