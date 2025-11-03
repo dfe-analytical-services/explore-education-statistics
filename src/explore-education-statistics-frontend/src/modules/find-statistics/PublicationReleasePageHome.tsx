@@ -1,6 +1,5 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';

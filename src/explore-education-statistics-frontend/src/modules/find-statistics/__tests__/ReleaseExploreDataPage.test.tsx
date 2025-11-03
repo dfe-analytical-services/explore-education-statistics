@@ -14,6 +14,11 @@ jest.mock('@common/hooks/useMedia', () => ({
       isMedia: mockIsMedia,
     };
   },
+  useDesktopMedia: () => {
+    return {
+      isMedia: mockIsMedia,
+    };
+  },
 }));
 
 describe('ReleaseExploreDataPage', () => {
@@ -88,10 +93,19 @@ describe('ReleaseExploreDataPage', () => {
       }),
     ).toBeInTheDocument();
     expect(
+      within(featuredTablesSection).getByRole('heading', {
+        name: '2 featured tables',
+        level: 3,
+      }),
+    ).toBeInTheDocument();
+    expect(
       within(featuredTablesSection).getByText(
         "Featured tables are pre-prepared tables created from a statistical release's data sets. They provide statistics that are regularly requested by some users (such as local councils, regional government or government policy teams) and can be adapted to switch between different categories (such as different geographies, time periods or characteristics where available).",
       ),
     ).toBeInTheDocument();
+    expect(within(featuredTablesSection).getAllByRole('listitem')).toHaveLength(
+      2,
+    );
 
     const datasetsSection = screen.getByTestId('datasets-section');
     expect(
@@ -101,9 +115,54 @@ describe('ReleaseExploreDataPage', () => {
       }),
     ).toBeInTheDocument();
     expect(
+      within(datasetsSection).getByRole('heading', {
+        name: '2 data sets available for download',
+        level: 3,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(datasetsSection).getByRole('link', {
+        name: 'Download all (ZIP)',
+      }),
+    ).toBeInTheDocument();
+    expect(
       within(datasetsSection).getByText(
         'Data sets present comprehensive open data from which users can create their own tables using the EES table tool or download a zipped CSV file.',
       ),
+    ).toBeInTheDocument();
+    const dataSetItems = within(datasetsSection).getAllByTestId(
+      'release-data-list-item',
+    );
+    expect(dataSetItems).toHaveLength(2);
+    expect(
+      within(dataSetItems[0]).getByRole('heading', {
+        name: 'Test dataset 1',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(dataSetItems[0]).getByText(
+        'Local authority, Local authority district, National',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(dataSetItems[0]).getByText(/Test dataset 1 summary/),
+    ).toBeInTheDocument();
+    expect(
+      within(dataSetItems[0]).getByRole('link', { name: /Create table/ }),
+    ).toHaveAttribute(
+      'href',
+      '/data-tables/publication-slug/release-slug?subjectId=test-dataset-1-subjectid',
+    );
+    expect(
+      within(dataSetItems[0]).getByRole('link', {
+        name: /Data set information page/,
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/data-catalogue/data-set/test-dataset-1-datasetfileid',
+    );
+    expect(
+      within(dataSetItems[1]).getByRole('button', { name: /Download/ }),
     ).toBeInTheDocument();
 
     const supportingFilesSection = screen.getByTestId(
@@ -116,10 +175,19 @@ describe('ReleaseExploreDataPage', () => {
       }),
     ).toBeInTheDocument();
     expect(
+      within(supportingFilesSection).getByRole('heading', {
+        name: '2 supporting data files',
+        level: 3,
+      }),
+    ).toBeInTheDocument();
+    expect(
       within(supportingFilesSection).getByText(
         'Supporting files provide an area for teams to supply non-standard files for download by users where required.',
       ),
     ).toBeInTheDocument();
+    expect(
+      within(supportingFilesSection).getAllByRole('listitem'),
+    ).toHaveLength(2);
 
     const dataDashboardsSection = screen.getByTestId('data-dashboards-section');
     expect(
@@ -218,6 +286,31 @@ describe('ReleaseExploreDataPage', () => {
     );
 
     expect(screen.queryByTestId('links-grid')).not.toBeInTheDocument();
+    mockIsMedia = false;
+  });
+
+  test('does not render accordion sections on desktop', () => {
+    render(
+      <ReleaseExploreDataPage
+        releaseVersionSummary={testReleaseVersionSummary}
+        publicationSummary={testPublicationSummary}
+        dataContent={testReleaseDataContent}
+      />,
+    );
+    expect(screen.queryByTestId('accordion')).not.toBeInTheDocument();
+  });
+
+  test('renders some content sections as accordions on mobile', () => {
+    mockIsMedia = true;
+    render(
+      <ReleaseExploreDataPage
+        releaseVersionSummary={testReleaseVersionSummary}
+        publicationSummary={testPublicationSummary}
+        dataContent={testReleaseDataContent}
+      />,
+    );
+    expect(screen.getByTestId('accordion')).toBeInTheDocument();
+    expect(screen.getAllByTestId('accordionSection')).toHaveLength(5);
     mockIsMedia = false;
   });
 });

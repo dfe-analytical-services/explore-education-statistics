@@ -17,7 +17,7 @@ export default function ReleaseDataListItem({
   title,
 }: Props) {
   return (
-    <li className={styles.listItem}>
+    <li className={styles.listItem} data-testid="release-data-list-item">
       <div className={styles.content}>
         <h4 className={styles.title}>{title}</h4>
         {metaInfo && <p className="govuk-!-margin-bottom-1">{metaInfo}</p>}
