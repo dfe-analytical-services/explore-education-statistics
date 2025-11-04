@@ -150,7 +150,9 @@ Create a new table using the table tool
     user chooses select option    id:timePeriodForm-end    2018
     user clicks element    id:timePeriodForm-submit
 
-Verify filter groups are ignored in the table tool
+Verify filter used in filter_grouping_column is ignored in the table tool
     user waits until table tool wizard step is available    5    Choose your filters
+    user waits until element is visible
+    ...    xpath://*[@data-testid="Expand Details Section Name of course being studied"]
     @{filter_item_details_sections}=    Get WebElements    //*[starts-with(@data-testid, 'Expand Details Section')]
     Length Should Be    ${filter_item_details_sections}    1
