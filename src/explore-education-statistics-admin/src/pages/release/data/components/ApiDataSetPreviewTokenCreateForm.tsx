@@ -115,7 +115,9 @@ export default function ApiDataSetPreviewTokenCreateForm({
               test(value) {
                 if (value == null) return false;
                 const activatesUtc = ukStartOfDayUtc(value);
-                return !isBefore(activatesUtc, nowUk().setHours(0, 0, 0, 0));
+                const todayUkMidnight = nowUk();
+                todayUkMidnight.setHours(0, 0, 0, 0);
+                return !isBefore(activatesUtc, todayUkMidnight);
               },
             })
             .test({

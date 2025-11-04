@@ -44,7 +44,7 @@ public record PreviewTokenCreateRequest
                 0,
                 eightDaysFromNow.Offset
             );
-            ;
+
             When(
                 r => r.Activates.HasValue,
                 () =>
