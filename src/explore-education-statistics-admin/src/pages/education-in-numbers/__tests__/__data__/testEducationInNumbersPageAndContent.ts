@@ -1,3 +1,4 @@
+import testTile from '@admin/pages/education-in-numbers/content/__tests__/__data__/testTile';
 import { EinContent } from '@admin/services/educationInNumbersContentService';
 import { EinSummaryWithPrevVersion } from '@admin/services/educationInNumbersService';
 
@@ -18,7 +19,6 @@ export const testEinPageContent: EinContent = {
     {
       id: 'content-section-0',
       order: 0,
-      caption: '',
       heading: 'New section 3',
       content: [
         {
@@ -26,14 +26,12 @@ export const testEinPageContent: EinContent = {
           body: '',
           type: 'HtmlBlock',
           order: 0,
-          comments: [],
         },
         {
           id: 'content-section-0-content-1',
           body: 'Part 2',
           type: 'HtmlBlock',
-          order: 0,
-          comments: [],
+          order: 1,
         },
       ],
     },
@@ -42,7 +40,32 @@ export const testEinPageContent: EinContent = {
       order: 1,
       heading: 'New section',
       content: [],
-      caption: '',
+    },
+    {
+      id: 'content-section-2',
+      order: 2,
+      heading: 'New section',
+      content: [
+        {
+          id: 'content-section-0-content-0',
+          title: 'Test tile group',
+          type: 'TileGroupBlock',
+          order: 0,
+          tiles: [
+            testTile,
+            {
+              id: 'tile-2',
+              type: 'FreeTextStatTile',
+              order: 1,
+              title: 'Tile 2 title',
+              statistic: '2000',
+              trend: 'Tile 2 trend',
+              linkText: 'Tile 2 link text',
+              linkUrl: 'https://example.com/tile-2',
+            },
+          ],
+        },
+      ],
     },
   ],
 };

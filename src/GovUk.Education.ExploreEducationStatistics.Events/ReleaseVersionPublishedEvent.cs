@@ -19,7 +19,7 @@ public record ReleaseVersionPublishedEvent : IEvent
             LatestPublishedReleaseVersionId = eventInfo.LatestPublishedReleaseVersionId,
             PreviousLatestPublishedReleaseId = eventInfo.PreviousLatestPublishedReleaseId,
             PreviousLatestPublishedReleaseVersionId = eventInfo.PreviousLatestPublishedReleaseVersionId,
-            IsPublicationArchived = eventInfo.IsPublicationArchived
+            IsPublicationArchived = eventInfo.IsPublicationArchived,
         };
     }
 
@@ -104,7 +104,7 @@ public record ReleaseVersionPublishedEvent : IEvent
         /// The latest published release version id of the publication's latest published release before the release version was published.
         /// </summary>
         public required Guid? PreviousLatestPublishedReleaseVersionId { get; init; }
-        
+
         /// <summary>
         /// Indicates whether the associated publication is archived
         /// </summary>

@@ -1,4 +1,3 @@
-#nullable enable
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Security.Cryptography;
@@ -42,7 +41,8 @@ public static class StringExtensions
     /// </summary>
     public static IOrderedEnumerable<string> NaturalOrder(
         this IEnumerable<string> source,
-        StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        StringComparison comparison = StringComparison.OrdinalIgnoreCase
+    )
     {
         return source.Order(comparison.WithNaturalSort());
     }
@@ -77,16 +77,11 @@ public static class StringExtensions
 
     public static string TrimIndent(this string value)
     {
-        var lines = value.ToLines()
-            .ToList();
+        var lines = value.ToLines().ToList();
 
-        var minIndent = lines.Where(line => !string.IsNullOrEmpty(line))
-            .Select(line => line.IndentWidth())
-            .Min();
+        var minIndent = lines.Where(line => !string.IsNullOrEmpty(line)).Select(line => line.IndentWidth()).Min();
 
-        return lines
-            .Select(line => line.Skip(minIndent).JoinToString())
-            .JoinToString("\n");
+        return lines.Select(line => line.Skip(minIndent).JoinToString()).JoinToString("\n");
     }
 
     public static string AppendTrailingSlash(this string input)
@@ -107,16 +102,12 @@ public static class StringExtensions
 
     public static string ToLowerFirst(this string input)
     {
-        return input.IsNullOrEmpty() ?
-            input :
-            char.ToLowerInvariant(input[0]) + input[1..];
+        return input.IsNullOrEmpty() ? input : char.ToLowerInvariant(input[0]) + input[1..];
     }
 
     public static string ToUpperFirst(this string input)
     {
-        return input.IsNullOrEmpty()
-            ? input
-            : char.ToUpperInvariant(input[0]) + input[1..];
+        return input.IsNullOrEmpty() ? input : char.ToUpperInvariant(input[0]) + input[1..];
     }
 
     public static string ToTitleCase(this string input)
@@ -127,17 +118,10 @@ public static class StringExtensions
 
         words.ForEach(word =>
         {
-            titleCasedInputBuilder.Append(word
-                .ToLowerInvariant()
-                .ToUpperFirst())
-                .Append(' ');
+            titleCasedInputBuilder.Append(word.ToLowerInvariant().ToUpperFirst()).Append(' ');
         });
 
-        return input.IsNullOrEmpty()
-            ? input
-            : titleCasedInputBuilder
-                .ToString()
-                .TrimEnd();
+        return input.IsNullOrEmpty() ? input : titleCasedInputBuilder.ToString().TrimEnd();
     }
 
     public static bool IsNullOrEmpty([NotNullWhen(false)] this string? value)
@@ -190,9 +174,7 @@ public static class StringExtensions
 
         var inputBytes = (encoding ?? Encoding.UTF8).GetBytes(input);
 
-        return BitConverter.ToString(md5.ComputeHash(inputBytes))
-            .Replace("-", string.Empty)
-            .ToLowerInvariant();
+        return BitConverter.ToString(md5.ComputeHash(inputBytes)).Replace("-", string.Empty).ToLowerInvariant();
     }
 
     /// <summary>

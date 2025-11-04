@@ -1,36 +1,44 @@
 import styles from '@common/modules/charts/components/MapBlock.module.scss';
-import { LegendDataGroup } from '@common/modules/charts/components/utils/generateLegendDataGroups';
+import { MapLegendItem } from '@common/modules/charts/types/chart';
 import React from 'react';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 
 interface Props {
   heading: string;
-  legendDataGroups: LegendDataGroup[];
+  legendItems: MapLegendItem[];
 }
 
-export default function MapLegend({ heading, legendDataGroups }: Props) {
+export default function MapLegend({ heading, legendItems }: Props) {
   return (
     <>
       <h3 className="govuk-heading-s dfe-word-break--break-word">
         Key to {heading}
       </h3>
-      <ul className="govuk-list" data-testid="mapBlock-legend">
-        {legendDataGroups.map(({ min, max, colour }) => (
-          <li
-            key={`${min}-${max}-${colour}`}
-            className={styles.legend}
-            data-testid="mapBlock-legend-item"
-          >
-            <span
-              className={styles.legendIcon}
-              data-testid="mapBlock-legend-colour"
-              style={{
-                backgroundColor: colour,
-              }}
-            />
-            {`${min} to ${max}`}
-          </li>
-        ))}
-      </ul>
+      <dl className="govuk-list" data-testid="mapBlock-legend">
+        {legendItems.map(({ value, colour }, index) => {
+          return (
+            <div
+              key={value}
+              className={styles.legend}
+              data-testid="mapBlock-legend-item"
+            >
+              <dt>
+                <div
+                  className={styles.legendIcon}
+                  data-testid="mapBlock-legend-colour"
+                  style={{
+                    backgroundColor: colour,
+                  }}
+                />
+                <VisuallyHidden>
+                  Group {index + 1} of {legendItems.length}
+                </VisuallyHidden>
+              </dt>
+              <dd>{value}</dd>
+            </div>
+          );
+        })}
+      </dl>
     </>
   );
 }

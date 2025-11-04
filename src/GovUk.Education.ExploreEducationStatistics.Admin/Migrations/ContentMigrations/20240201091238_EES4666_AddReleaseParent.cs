@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 [ExcludeFromCodeCoverage]
+// ReSharper disable once InconsistentNaming
 public partial class EES4666_AddReleaseParent : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
@@ -14,7 +15,8 @@ public partial class EES4666_AddReleaseParent : Migration
             name: "ReleaseParentId",
             table: "Releases",
             type: "uniqueidentifier",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.CreateTable(
             name: "ReleaseParents",
@@ -22,41 +24,33 @@ public partial class EES4666_AddReleaseParent : Migration
             {
                 Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                Updated = table.Column<DateTime>(type: "datetime2", nullable: true)
+                Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
             },
             constraints: table =>
             {
                 table.PrimaryKey("PK_ReleaseParents", x => x.Id);
-            });
+            }
+        );
 
-        migrationBuilder.CreateIndex(
-            name: "IX_Releases_ReleaseParentId",
-            table: "Releases",
-            column: "ReleaseParentId");
+        migrationBuilder.CreateIndex(name: "IX_Releases_ReleaseParentId", table: "Releases", column: "ReleaseParentId");
 
         migrationBuilder.AddForeignKey(
             name: "FK_Releases_ReleaseParents_ReleaseParentId",
             table: "Releases",
             column: "ReleaseParentId",
             principalTable: "ReleaseParents",
-            principalColumn: "Id");
+            principalColumn: "Id"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropForeignKey(
-            name: "FK_Releases_ReleaseParents_ReleaseParentId",
-            table: "Releases");
+        migrationBuilder.DropForeignKey(name: "FK_Releases_ReleaseParents_ReleaseParentId", table: "Releases");
 
-        migrationBuilder.DropTable(
-            name: "ReleaseParents");
+        migrationBuilder.DropTable(name: "ReleaseParents");
 
-        migrationBuilder.DropIndex(
-            name: "IX_Releases_ReleaseParentId",
-            table: "Releases");
+        migrationBuilder.DropIndex(name: "IX_Releases_ReleaseParentId", table: "Releases");
 
-        migrationBuilder.DropColumn(
-            name: "ReleaseParentId",
-            table: "Releases");
+        migrationBuilder.DropColumn(name: "ReleaseParentId", table: "Releases");
     }
 }

@@ -23,50 +23,34 @@ public class ProcessorTests
         var import = new DataImport
         {
             Id = Guid.NewGuid(),
-            File = new File
-            {
-                Filename = "my_data_file.csv"
-            },
-            Status = QUEUED
+            File = new File { Filename = "my_data_file.csv" },
+            Status = QUEUED,
         };
 
         var processor = new Processor.Functions.Processor(
             dataImportService.Object,
             processorService.Object,
-            new Mock<ILogger<Processor.Functions.Processor>>().Object);
+            new Mock<ILogger<Processor.Functions.Processor>>().Object
+        );
 
-        dataImportService
-            .Setup(s => s.GetImport(import.Id))
-            .ReturnsAsync(import);
+        dataImportService.Setup(s => s.GetImport(import.Id)).ReturnsAsync(import);
 
-        dataImportService
-            .Setup(s => s.UpdateStatus(import.Id, STAGE_1, 0))
-            .Returns(Task.CompletedTask);
+        dataImportService.Setup(s => s.UpdateStatus(import.Id, STAGE_1, 0)).Returns(Task.CompletedTask);
 
         var importMessage = new ImportMessage(import.Id);
 
-        var outputMessages = await processor.ProcessUploads(
-            importMessage,
-            new TestFunctionContext());
+        var outputMessages = await processor.ProcessUploads(importMessage, new TestFunctionContext());
 
-        MockUtils.VerifyAllMocks(processorService,
-            dataImportService,
-            fileImportService);
+        MockUtils.VerifyAllMocks(processorService, dataImportService, fileImportService);
 
         // Verify that the message will be queued to trigger the next stage.
-        Assert.Equal(new[]
-        {
-            importMessage
-        }, outputMessages);
+        Assert.Equal(new[] { importMessage }, outputMessages);
     }
 
     [Fact]
     public async Task ProcessUploadsButImportIsFinished()
     {
-        var finishedStates = EnumUtil
-            .GetEnums<DataImportStatus>()
-            .Where(status => status.IsFinished())
-            .ToList();
+        var finishedStates = EnumUtil.GetEnums<DataImportStatus>().Where(status => status.IsFinished()).ToList();
 
         await finishedStates
             .ToAsyncEnumerable()
@@ -78,33 +62,25 @@ public class ProcessorTests
                 var import = new DataImport
                 {
                     Id = Guid.NewGuid(),
-                    File = new File
-                    {
-                        Filename = "my_data_file.csv"
-                    },
-                    Status = currentState
+                    File = new File { Filename = "my_data_file.csv" },
+                    Status = currentState,
                 };
 
                 var processor = new Processor.Functions.Processor(
                     dataImportService.Object,
                     processorService.Object,
-                    new Mock<ILogger<Processor.Functions.Processor>>().Object);
+                    new Mock<ILogger<Processor.Functions.Processor>>().Object
+                );
 
-                dataImportService
-                    .Setup(s => s.GetImport(import.Id))
-                    .ReturnsAsync(import);
+                dataImportService.Setup(s => s.GetImport(import.Id)).ReturnsAsync(import);
 
                 var importMessage = new ImportMessage(import.Id);
 
-                var outputMessages = await processor.ProcessUploads(
-                    importMessage,
-                    new TestFunctionContext());
+                var outputMessages = await processor.ProcessUploads(importMessage, new TestFunctionContext());
 
                 // Verify that no Status updates occurred and that no further attempt to add further processing
                 // messages to queues occurred.
-                MockUtils.VerifyAllMocks(processorService,
-                    dataImportService,
-                    fileImportService);
+                MockUtils.VerifyAllMocks(processorService, dataImportService, fileImportService);
 
                 Assert.Empty(outputMessages);
             });
@@ -119,37 +95,27 @@ public class ProcessorTests
         var import = new DataImport
         {
             Id = Guid.NewGuid(),
-            File = new File
-            {
-                Filename = "my_data_file.csv"
-            },
-            Status = CANCELLING
+            File = new File { Filename = "my_data_file.csv" },
+            Status = CANCELLING,
         };
 
         var processor = new Processor.Functions.Processor(
             dataImportService.Object,
             processorService.Object,
-            new Mock<ILogger<Processor.Functions.Processor>>().Object);
+            new Mock<ILogger<Processor.Functions.Processor>>().Object
+        );
 
-        dataImportService
-            .Setup(s => s.GetImport(import.Id))
-            .ReturnsAsync(import);
+        dataImportService.Setup(s => s.GetImport(import.Id)).ReturnsAsync(import);
 
-        dataImportService
-            .Setup(s => s.UpdateStatus(import.Id, CANCELLED, 100))
-            .Returns(Task.CompletedTask);
+        dataImportService.Setup(s => s.UpdateStatus(import.Id, CANCELLED, 100)).Returns(Task.CompletedTask);
 
         var importMessage = new ImportMessage(import.Id);
 
-        var outputMessages = await processor.ProcessUploads(
-            importMessage,
-            new TestFunctionContext());
+        var outputMessages = await processor.ProcessUploads(importMessage, new TestFunctionContext());
 
         // Verify that an import with the current Status of CANCELLING will be updated to be CANCELLED, and that
         // no further processing messages are added to any queues.
-        MockUtils.VerifyAllMocks(processorService,
-            dataImportService,
-            fileImportService);
+        MockUtils.VerifyAllMocks(processorService, dataImportService, fileImportService);
 
         Assert.Empty(outputMessages);
     }
@@ -163,13 +129,12 @@ public class ProcessorTests
         var processor = new Processor.Functions.Processor(
             dataImportService.Object,
             processorService.Object,
-            new Mock<ILogger<Processor.Functions.Processor>>().Object);
+            new Mock<ILogger<Processor.Functions.Processor>>().Object
+        );
 
         var message = new CancelImportMessage(Guid.NewGuid());
 
-        dataImportService
-            .Setup(s => s.UpdateStatus(message.Id, CANCELLING, 0))
-            .Returns(Task.CompletedTask);
+        dataImportService.Setup(s => s.UpdateStatus(message.Id, CANCELLING, 0)).Returns(Task.CompletedTask);
 
         await processor.CancelImports(message);
 
@@ -177,16 +142,8 @@ public class ProcessorTests
         MockUtils.VerifyAllMocks(processorService, dataImportService, fileImportService);
     }
 
-    private static (
-        Mock<IProcessorService>,
-        Mock<IDataImportService>,
-        Mock<IFileImportService>
-        ) Mocks()
+    private static (Mock<IProcessorService>, Mock<IDataImportService>, Mock<IFileImportService>) Mocks()
     {
-        return (
-            new Mock<IProcessorService>(),
-            new Mock<IDataImportService>(),
-            new Mock<IFileImportService>()
-        );
+        return (new Mock<IProcessorService>(), new Mock<IDataImportService>(), new Mock<IFileImportService>());
     }
 }

@@ -53,7 +53,8 @@ public class ReleaseApprovalService : IReleaseApprovalService
         IOptions<ReleaseApprovalOptions> options,
         IUserReleaseRoleService userReleaseRoleService,
         IEmailTemplateService emailTemplateService,
-        IUserRepository userRepository)
+        IUserRepository userRepository
+    )
     {
         _context = context;
         _dateTimeProvider = dateTimeProvider;
@@ -73,38 +74,37 @@ public class ReleaseApprovalService : IReleaseApprovalService
     public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> ListReleaseStatuses(Guid releaseVersionId)
     {
         return await _context
-            .ReleaseVersions
-            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+            .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(_userService.CheckCanViewReleaseVersionStatusHistory)
             .OnSuccess(async releaseVersion =>
             {
-                return await _context.ReleaseStatus
-                    .Where(rs => rs.ReleaseVersion.ReleaseId == releaseVersion.ReleaseId)
+                return await _context
+                    .ReleaseStatus.Where(rs => rs.ReleaseVersion.ReleaseId == releaseVersion.ReleaseId)
                     .OrderByDescending(rs => rs.Created)
-                    .Select(rs =>
-                        new ReleaseStatusViewModel
-                        {
-                            ReleaseStatusId = rs.Id,
-                            InternalReleaseNote = rs.InternalReleaseNote,
-                            ApprovalStatus = rs.ApprovalStatus,
-                            Created = rs.Created,
-                            CreatedByEmail = rs.CreatedBy == null ? null : rs.CreatedBy.Email,
-                            ReleaseVersion = rs.ReleaseVersion.Version
-                        })
+                    .Select(rs => new ReleaseStatusViewModel
+                    {
+                        ReleaseStatusId = rs.Id,
+                        InternalReleaseNote = rs.InternalReleaseNote,
+                        ApprovalStatus = rs.ApprovalStatus,
+                        Created = rs.Created,
+                        CreatedByEmail = rs.CreatedBy == null ? null : rs.CreatedBy.Email,
+                        ReleaseVersion = rs.ReleaseVersion.Version,
+                    })
                     .ToListAsync();
             });
     }
 
     public async Task<Either<ActionResult, Unit>> CreateReleaseStatus(
         Guid releaseVersionId,
-        ReleaseStatusCreateRequest request)
+        ReleaseStatusCreateRequest request
+    )
     {
         return await _context
-            .ReleaseVersions
-            .HydrateReleaseForChecklist()
+            .ReleaseVersions.HydrateReleaseForChecklist()
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccessDo(releaseVersion =>
-                _userService.CheckCanUpdateReleaseVersionStatus(releaseVersion, request.ApprovalStatus))
+                _userService.CheckCanUpdateReleaseVersionStatus(releaseVersion, request.ApprovalStatus)
+            )
             .OnSuccessDo(() => ValidatePublishDate(request))
             .OnSuccessDo(() => RemoveUnusedImages(releaseVersionId))
             .OnSuccess(async releaseVersion =>
@@ -118,12 +118,12 @@ public class ReleaseApprovalService : IReleaseApprovalService
 
                 releaseVersion.ApprovalStatus = request.ApprovalStatus;
                 releaseVersion.NextReleaseDate = request.NextReleaseDate;
-                releaseVersion.NotifySubscribers =
-                    releaseVersion.Version == 0 || (request.NotifySubscribers ?? false);
+                releaseVersion.NotifySubscribers = releaseVersion.Version == 0 || (request.NotifySubscribers ?? false);
                 releaseVersion.UpdatePublishedDate = request.UpdatePublishedDate ?? false;
-                releaseVersion.PublishScheduled = request.PublishMethod == PublishMethod.Immediate
-                    ? _dateTimeProvider.UtcNow
-                    : request.PublishScheduledDate;
+                releaseVersion.PublishScheduled =
+                    request.PublishMethod == PublishMethod.Immediate
+                        ? _dateTimeProvider.UtcNow
+                        : request.PublishScheduledDate;
 
                 var releaseStatus = new ReleaseStatus
                 {
@@ -131,36 +131,38 @@ public class ReleaseApprovalService : IReleaseApprovalService
                     ReleaseVersion = releaseVersion,
                     InternalReleaseNote = request.InternalReleaseNote,
                     ApprovalStatus = request.ApprovalStatus,
-                    CreatedById = _userService.GetUserId()
+                    CreatedById = _userService.GetUserId(),
                 };
 
                 var releasePublishingKey = new ReleasePublishingKey(releaseVersionId, releaseStatus.Id);
 
-                return await
-                    ValidateReleaseWithChecklist(releaseVersion)
+                return await ValidateReleaseWithChecklist(releaseVersion)
                     .OnSuccess(() =>
                         SendEmailNotificationsAndInvites(request, releaseVersion)
-                        .OnSuccess(() => NotifyPublisher(releasePublishingKey, request, oldStatus))
-                        .OnSuccessDo(async () =>
-                        {
-                            _context.ReleaseVersions.Update(releaseVersion);
-                            await _context.AddAsync(releaseStatus);
-                            await _context.SaveChangesAsync();
-                        }));
+                            .OnSuccess(() => NotifyPublisher(releasePublishingKey, request, oldStatus))
+                            .OnSuccessDo(async () =>
+                            {
+                                _context.ReleaseVersions.Update(releaseVersion);
+                                await _context.AddAsync(releaseStatus);
+                                await _context.SaveChangesAsync();
+                            })
+                    );
             });
     }
 
     private async Task<Either<ActionResult, Unit>> NotifyPublisher(
         ReleasePublishingKey releasePublishingKey,
         ReleaseStatusCreateRequest request,
-        ReleaseApprovalStatus oldStatus)
+        ReleaseApprovalStatus oldStatus
+    )
     {
         // Only need to inform Publisher if changing release approval status to or from Approved
-        if (oldStatus == ReleaseApprovalStatus.Approved ||
-            request.ApprovalStatus == ReleaseApprovalStatus.Approved)
+        if (oldStatus == ReleaseApprovalStatus.Approved || request.ApprovalStatus == ReleaseApprovalStatus.Approved)
         {
-            return await _publishingService.ReleaseChanged(releasePublishingKey,
-                immediate: request.PublishMethod == PublishMethod.Immediate);
+            return await _publishingService.ReleaseChanged(
+                releasePublishingKey,
+                immediate: request.PublishMethod == PublishMethod.Immediate
+            );
         }
 
         return Unit.Instance;
@@ -168,10 +170,13 @@ public class ReleaseApprovalService : IReleaseApprovalService
 
     private async Task<Either<ActionResult, Unit>> SendEmailNotificationsAndInvites(
         ReleaseStatusCreateRequest request,
-        ReleaseVersion releaseVersion)
+        ReleaseVersion releaseVersion
+    )
     {
-        if (request.ApprovalStatus == ReleaseApprovalStatus.Approved
-            && request.PublishMethod == PublishMethod.Scheduled)
+        if (
+            request.ApprovalStatus == ReleaseApprovalStatus.Approved
+            && request.PublishMethod == PublishMethod.Scheduled
+        )
         {
             return await SendPreReleaseUserInviteEmails(releaseVersion);
         }
@@ -185,19 +190,17 @@ public class ReleaseApprovalService : IReleaseApprovalService
     }
 
     private async Task<Either<ActionResult, Unit>> SendHigherLevelReviewNotificationEmails(
-        ReleaseVersion releaseVersion)
+        ReleaseVersion releaseVersion
+    )
     {
-        var userReleaseRoles =
-            await _userReleaseRoleService.ListUserReleaseRolesByPublication(
-                ReleaseRole.Approver,
-                releaseVersion.Publication.Id);
+        var userReleaseRoles = await _userReleaseRoleService.ListUserReleaseRolesByPublication(
+            ReleaseRole.Approver,
+            releaseVersion.Publication.Id
+        );
 
         var userPublicationRoles = await _context
-            .UserPublicationRoles
-            .Include(upr => upr.User)
-            .Where(upr =>
-                upr.PublicationId == releaseVersion.PublicationId
-                && upr.Role == PublicationRole.Allower)
+            .UserPublicationRoles.Include(upr => upr.User)
+            .Where(upr => upr.PublicationId == releaseVersion.PublicationId && upr.Role == PublicationRole.Allower)
             .ToListAsync();
 
         var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();
@@ -218,22 +221,18 @@ public class ReleaseApprovalService : IReleaseApprovalService
     private async Task<Either<ActionResult, Unit>> SendPreReleaseUserInviteEmails(ReleaseVersion releaseVersion)
     {
         var unsentUserReleaseInvites = await _context
-            .UserReleaseInvites
-            .Where(i =>
-                i.ReleaseVersionId == releaseVersion.Id
-                && i.Role == ReleaseRole.PrereleaseViewer
-                && !i.EmailSent)
+            .UserReleaseInvites.Where(i =>
+                i.ReleaseVersionId == releaseVersion.Id && i.Role == ReleaseRole.PrereleaseViewer && !i.EmailSent
+            )
             .ToListAsync();
 
         var emailResults = await unsentUserReleaseInvites
             .ToAsyncEnumerable()
             .SelectAwait(async invite =>
             {
-                var user = await _userRepository.FindByEmail(invite.Email);
-                return await _preReleaseUserService.SendPreReleaseInviteEmail(
-                        releaseVersion.Id,
-                        invite.Email.ToLower(),
-                        isNewUser: user == null)
+                var activeUser = await _userRepository.FindActiveUserByEmail(invite.Email);
+                return await _preReleaseUserService
+                    .SendPreReleaseInviteEmail(releaseVersion.Id, invite.Email.ToLower(), isNewUser: activeUser is null)
                     .OnSuccessDo(() => _preReleaseUserService.MarkInviteEmailAsSent(invite));
             })
             .ToListAsync();
@@ -247,12 +246,11 @@ public class ReleaseApprovalService : IReleaseApprovalService
             .GetContentBlocks<HtmlBlock>(releaseVersionId)
             .OnSuccess(async contentBlocks =>
             {
-                var contentImageIds = contentBlocks.SelectMany(contentBlock =>
-                        HtmlImageUtil.GetReleaseImages(contentBlock.Body))
+                var contentImageIds = contentBlocks
+                    .SelectMany(contentBlock => HtmlImageUtil.GetReleaseImages(contentBlock.Body))
                     .Distinct();
 
-                var imageFiles = await _releaseFileRepository
-                    .GetByFileType(releaseVersionId, types: FileType.Image);
+                var imageFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, types: FileType.Image);
 
                 var unusedImages = imageFiles
                     .Where(file => !contentImageIds.Contains(file.File.Id))
@@ -264,7 +262,8 @@ public class ReleaseApprovalService : IReleaseApprovalService
                     return await _releaseFileService.Delete(
                         releaseVersionId: releaseVersionId,
                         fileIds: unusedImages,
-                        forceDelete: true);
+                        forceDelete: true
+                    );
                 }
 
                 return Unit.Instance;
@@ -273,8 +272,10 @@ public class ReleaseApprovalService : IReleaseApprovalService
 
     private Either<ActionResult, Unit> ValidatePublishDate(ReleaseStatusCreateRequest request)
     {
-        if (request.ApprovalStatus == ReleaseApprovalStatus.Approved
-            && request.PublishMethod == PublishMethod.Scheduled)
+        if (
+            request.ApprovalStatus == ReleaseApprovalStatus.Approved
+            && request.PublishMethod == PublishMethod.Scheduled
+        )
         {
             // Publish date must be set
             if (string.IsNullOrEmpty(request.PublishScheduled))
@@ -282,10 +283,12 @@ public class ReleaseApprovalService : IReleaseApprovalService
                 return ValidationActionResult(PublishDateCannotBeEmpty);
             }
 
-            var publishDate = DateTime.ParseExact(request.PublishScheduled,
+            var publishDate = DateTime.ParseExact(
+                request.PublishScheduled,
                 "yyyy-MM-dd",
                 CultureInfo.InvariantCulture,
-                DateTimeStyles.None);
+                DateTimeStyles.None
+            );
 
             // Check if publishing will occur on the publish date as there may be no scheduled occurrences
             // of the two Azure Functions which perform publishing.
@@ -337,7 +340,8 @@ public class ReleaseApprovalService : IReleaseApprovalService
             cronExpression: _options.StageScheduledReleasesFunctionCronSchedule,
             fromUtc: fromUtc,
             toUtc: toUtc,
-            timeZone: ukTimeZone);
+            timeZone: ukTimeZone
+        );
 
         if (nextOccurrenceUtc.HasValue)
         {
@@ -346,7 +350,8 @@ public class ReleaseApprovalService : IReleaseApprovalService
                 cronExpression: _options.PublishScheduledReleasesFunctionCronSchedule,
                 fromUtc: nextOccurrenceUtc.Value,
                 toUtc: toUtc,
-                timeZone: ukTimeZone).HasValue;
+                timeZone: ukTimeZone
+            ).HasValue;
         }
 
         return false;
@@ -358,15 +363,17 @@ public class ReleaseApprovalService : IReleaseApprovalService
         DateTime toUtc,
         TimeZoneInfo timeZone,
         bool fromInclusive = true,
-        bool toInclusive = true)
+        bool toInclusive = true
+    )
     {
         // Azure functions use a sixth field at the beginning of cron expressions for time precision in seconds
         // so we need to allow for this when parsing them.
-        var expression = CronExpression.Parse(cronExpression,
-            CronExpressionHasSecondPrecision(cronExpression) ? CronFormat.IncludeSeconds : CronFormat.Standard);
+        var expression = CronExpression.Parse(
+            cronExpression,
+            CronExpressionHasSecondPrecision(cronExpression) ? CronFormat.IncludeSeconds : CronFormat.Standard
+        );
 
-        var occurrences = expression.GetOccurrences(fromUtc, toUtc, timeZone, fromInclusive, toInclusive)
-            .ToList();
+        var occurrences = expression.GetOccurrences(fromUtc, toUtc, timeZone, fromInclusive, toInclusive).ToList();
         return occurrences.Any() ? occurrences[0] : null;
     }
 
@@ -377,9 +384,7 @@ public class ReleaseApprovalService : IReleaseApprovalService
             return Unit.Instance;
         }
 
-        var errors = (await _releaseChecklistService.GetErrors(releaseVersion))
-            .Select(error => error.Code)
-            .ToList();
+        var errors = (await _releaseChecklistService.GetErrors(releaseVersion)).Select(error => error.Code).ToList();
 
         if (!errors.Any())
         {

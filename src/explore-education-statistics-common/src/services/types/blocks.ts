@@ -3,7 +3,6 @@ import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 
 export interface Table {
-  indicators: string[];
   tableHeaders: UnmappedTableHeadersConfig;
 }
 
@@ -11,7 +10,7 @@ export type BlockType = 'HtmlBlock' | 'DataBlock' | 'EmbedBlockLink';
 
 export interface BaseBlock {
   id: string;
-  order: number;
+  order?: number;
   type: BlockType;
 }
 
@@ -26,7 +25,7 @@ export interface DataBlock extends BaseBlock {
   type: 'DataBlock';
   name: string;
   dataSetName?: string;
-  dataSetId: string;
+  dataSetId?: string;
   highlightName?: string;
   highlightDescription?: string;
   heading: string;

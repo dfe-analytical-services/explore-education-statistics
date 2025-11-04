@@ -293,7 +293,6 @@ const DataBlockPageTabs = ({
           dataSetName: dataBlock?.dataSetName ?? '',
           table: {
             tableHeaders: mapUnmappedTableHeaders(tableHeaders),
-            indicators: [],
           },
         });
 
@@ -340,7 +339,6 @@ const DataBlockPageTabs = ({
         ...dataBlock,
         table: {
           tableHeaders: mapUnmappedTableHeaders(tableHeaders),
-          indicators: [],
         },
       });
     },

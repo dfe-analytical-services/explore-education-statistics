@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -12,18 +13,23 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class EducationInNumbersService(
+    IOptions<AppOptions> appOptions,
     ContentDbContext contentDbContext,
-    IUserService userService) : IEducationInNumbersService
+    IUserService userService
+) : IEducationInNumbersService
 {
+    private readonly bool _publishedPageDeletionAllowed = appOptions.Value.EnableEinPublishedPageDeletion;
+
     public async Task<Either<ActionResult, EinSummaryViewModel>> GetPage(Guid id)
     {
-        return await contentDbContext.EducationInNumbersPages
-            .Where(page => page.Id == id)
+        return await contentDbContext
+            .EducationInNumbersPages.Where(page => page.Id == id)
             .OrderByDescending(page => page.Version)
             .FirstOrNotFoundAsync()
             .OnSuccess(page => page.ToSummaryViewModel());
@@ -31,58 +37,49 @@ public class EducationInNumbersService(
 
     public async Task<Either<ActionResult, List<EinSummaryWithPrevVersionViewModel>>> ListLatestPages()
     {
-        var uniqueSlugs = await contentDbContext.EducationInNumbersPages
-            .Select(p => p.Slug)
-            .Distinct()
-            .ToListAsync();
+        var uniqueSlugs = await contentDbContext.EducationInNumbersPages.Select(p => p.Slug).Distinct().ToListAsync();
 
         var viewModels = new List<EinSummaryWithPrevVersionViewModel>();
 
         foreach (var slug in uniqueSlugs)
         {
-            var latestTwoPages = await contentDbContext.EducationInNumbersPages
-                .AsNoTracking()
+            var latestTwoPages = await contentDbContext
+                .EducationInNumbersPages.AsNoTracking()
                 .Where(page => page.Slug == slug)
                 .OrderByDescending(page => page.Version)
                 .Take(2)
                 .ToListAsync();
 
             var latestPage = latestTwoPages[0];
-            var previousVersionId = latestTwoPages.Count > 1
-                ? (Guid?)latestTwoPages[1].Id
-                : null;
+            var previousVersionId = latestTwoPages.Count > 1 ? (Guid?)latestTwoPages[1].Id : null;
 
             var viewModel = latestPage.ToViewModel(previousVersionId);
             viewModels.Add(viewModel);
         }
 
-        return viewModels
-            .OrderBy(vm => vm.Order)
-            .ToList();
+        return viewModels.OrderBy(vm => vm.Order).ToList();
     }
 
-    public async Task<Either<ActionResult, EinSummaryViewModel>> CreatePage(
-        CreateEducationInNumbersPageRequest request)
+    public async Task<Either<ActionResult, EinSummaryViewModel>> CreatePage(CreateEducationInNumbersPageRequest request)
     {
-        var pageWithTitleAlreadyExists = contentDbContext.EducationInNumbersPages
-            .Any(page => page.Title == request.Title);
+        var pageWithTitleAlreadyExists = contentDbContext.EducationInNumbersPages.Any(page =>
+            page.Title == request.Title
+        );
         if (pageWithTitleAlreadyExists)
         {
             return new Either<ActionResult, EinSummaryViewModel>(
-                ValidationResult(ValidationErrorMessages.TitleNotUnique));
+                ValidationResult(ValidationErrorMessages.TitleNotUnique)
+            );
         }
 
         var slug = NamingUtils.SlugFromTitle(request.Title);
-        var pageWithSlugAlreadyExists = contentDbContext.EducationInNumbersPages
-            .Any(page => page.Slug == slug);
+        var pageWithSlugAlreadyExists = contentDbContext.EducationInNumbersPages.Any(page => page.Slug == slug);
         if (pageWithSlugAlreadyExists)
         {
             return ValidationResult(ValidationErrorMessages.SlugNotUnique);
         }
 
-        var currentMaxOrder = contentDbContext.EducationInNumbersPages
-            .Select(page => page.Order)
-            .Max();
+        var currentMaxOrder = contentDbContext.EducationInNumbersPages.Select(page => page.Order).Max();
 
         var newPage = new EducationInNumbersPage
         {
@@ -105,12 +102,12 @@ public class EducationInNumbersService(
         return newPage.ToSummaryViewModel();
     }
 
-    public async Task<Either<ActionResult, EinSummaryViewModel>> CreateAmendment(
-        Guid id)
+    public async Task<Either<ActionResult, EinSummaryViewModel>> CreateAmendment(Guid id)
     {
-        return await contentDbContext.EducationInNumbersPages
-            .Include(p => p.Content)
+        return await contentDbContext
+            .EducationInNumbersPages.Include(p => p.Content)
             .ThenInclude(section => section.Content)
+            .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
             .FirstOrNotFoundAsync(page => page.Id == id)
             .OnSuccess(async page =>
             {
@@ -119,10 +116,9 @@ public class EducationInNumbersService(
                     throw new ArgumentException("Can only create amendment of a published page");
                 }
 
-                var amendmentAlreadyExists = contentDbContext.EducationInNumbersPages
-                    .Any(amendment =>
-                        amendment.Slug == page.Slug
-                        && amendment.Version == page.Version + 1);
+                var amendmentAlreadyExists = contentDbContext.EducationInNumbersPages.Any(amendment =>
+                    amendment.Slug == page.Slug && amendment.Version == page.Version + 1
+                );
                 if (amendmentAlreadyExists)
                 {
                     throw new ArgumentException($"Amendment already exists for page {page.Id}");
@@ -143,9 +139,7 @@ public class EducationInNumbersService(
                     UpdatedById = null,
                 };
 
-                var amendmentContent = page.Content
-                    .Select(section => section.Clone(amendment.Id))
-                    .ToList();
+                var amendmentContent = page.Content.Select(section => section.Clone(amendment.Id)).ToList();
 
                 contentDbContext.EducationInNumbersPages.Add(amendment);
                 contentDbContext.EinContentSections.AddRange(amendmentContent); // includes cloned EinContentBlocks
@@ -158,10 +152,11 @@ public class EducationInNumbersService(
 
     public async Task<Either<ActionResult, EinSummaryViewModel>> UpdatePage(
         Guid id,
-        UpdateEducationInNumbersPageRequest request)
+        UpdateEducationInNumbersPageRequest request
+    )
     {
-        return await contentDbContext.EducationInNumbersPages
-            .FirstOrNotFoundAsync(page => page.Id == id)
+        return await contentDbContext
+            .EducationInNumbersPages.FirstOrNotFoundAsync(page => page.Id == id)
             .OnSuccess(async page =>
             {
                 if (page.Published != null)
@@ -172,27 +167,27 @@ public class EducationInNumbersService(
                 if (page.Version > 0)
                 {
                     // To prevent slug from being changed by an amendment, as we have no redirects
-                    throw new Exception(
-                        "Cannot update details for a page amendment");
+                    throw new Exception("Cannot update details for a page amendment");
                 }
 
                 // If the title is being updated, we also update the slug
                 string? newSlug = null;
                 if (request.Title != null && request.Title != page.Title)
                 {
-                    var pageWithTitleAlreadyExists = contentDbContext.EducationInNumbersPages
-                        .Any(p => p.Title == request.Title);
+                    var pageWithTitleAlreadyExists = contentDbContext.EducationInNumbersPages.Any(p =>
+                        p.Title == request.Title
+                    );
                     if (pageWithTitleAlreadyExists)
                     {
                         return new Either<ActionResult, EinSummaryViewModel>(
-                            ValidationResult(ValidationErrorMessages.TitleNotUnique));
+                            ValidationResult(ValidationErrorMessages.TitleNotUnique)
+                        );
                     }
 
                     newSlug = NamingUtils.SlugFromTitle(request.Title);
-                    var newSlugIsNotUnique = contentDbContext.EducationInNumbersPages
-                        .Any(p =>
-                            p.Slug == newSlug
-                            && p.Id != id); // if the slug is for the page we're updating, we don't care
+                    var newSlugIsNotUnique = contentDbContext.EducationInNumbersPages.Any(p =>
+                        p.Slug == newSlug && p.Id != id
+                    ); // if the slug is for the page we're updating, we don't care
                     if (newSlugIsNotUnique)
                     {
                         return ValidationResult(ValidationErrorMessages.SlugNotUnique);
@@ -212,11 +207,10 @@ public class EducationInNumbersService(
             });
     }
 
-    public async Task<Either<ActionResult, EinSummaryViewModel>> PublishPage(
-        Guid id)
+    public async Task<Either<ActionResult, EinSummaryViewModel>> PublishPage(Guid id)
     {
-        return await contentDbContext.EducationInNumbersPages
-            .FirstOrNotFoundAsync(page => page.Id == id)
+        return await contentDbContext
+            .EducationInNumbersPages.FirstOrNotFoundAsync(page => page.Id == id)
             .OnSuccess(async page =>
             {
                 if (page.Published != null)
@@ -235,61 +229,57 @@ public class EducationInNumbersService(
             });
     }
 
-    public async Task<Either<ActionResult, List<EinSummaryViewModel>>> Reorder(
-        List<Guid> newOrder)
+    public async Task<Either<ActionResult, List<EinSummaryViewModel>>> Reorder(List<Guid> newOrder)
     {
-        var pageList = await contentDbContext.EducationInNumbersPages
-            .GroupBy(page => page.Slug)
-            .Select(group => group
-                .OrderByDescending(p => p.Version)
-                .First())
+        var pageList = await contentDbContext
+            .EducationInNumbersPages.GroupBy(page => page.Slug ?? "ROOT PAGE") // needed because GroupBy doesn't like null - doesn't affect the returned page
+            .Select(group => group.OrderByDescending(p => p.Version).First())
             .ToListAsync();
 
-        if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
-                newOrder, pageList.Select(page => page.Id)))
+        if (!ComparerUtils.SequencesAreEqualIgnoringOrder(newOrder, pageList.Select(page => page.Id)))
         {
             return ValidationUtils.ValidationActionResult(
-                ValidationErrorMessages.EinProvidedPageIdsDifferFromActualPageIds);
+                ValidationErrorMessages.EinProvidedPageIdsDifferFromActualPageIds
+            );
         }
 
         var updatingUserId = userService.GetUserId();
 
-        newOrder.ForEach((pageId, order) =>
-        {
-            var matchingPage = pageList.Single(page => page.Id == pageId);
-            matchingPage.Order = order;
-            matchingPage.Updated = DateTime.UtcNow;
-            matchingPage.UpdatedById = updatingUserId;
-
-            if (matchingPage is { Version: > 0, Published: null })
+        newOrder.ForEach(
+            (pageId, order) =>
             {
-                // It is an unpublished amendment, so we must also update the original in case the amendment is cancelled
-                var previousPageVersion = contentDbContext.EducationInNumbersPages
-                    .Single(page => page.Slug == matchingPage.Slug
-                                    && page.Version + 1 == matchingPage.Version);
-                previousPageVersion.Order = order;
-                previousPageVersion.Updated = DateTime.UtcNow;
-                previousPageVersion.UpdatedById = updatingUserId;
+                var matchingPage = pageList.Single(page => page.Id == pageId);
+                matchingPage.Order = order;
+                matchingPage.Updated = DateTime.UtcNow;
+                matchingPage.UpdatedById = updatingUserId;
+
+                if (matchingPage is { Version: > 0, Published: null })
+                {
+                    // It is an unpublished amendment, so we must also update the original in case the amendment is cancelled
+                    var previousPageVersion = contentDbContext.EducationInNumbersPages.Single(page =>
+                        page.Slug == matchingPage.Slug && page.Version + 1 == matchingPage.Version
+                    );
+                    previousPageVersion.Order = order;
+                    previousPageVersion.Updated = DateTime.UtcNow;
+                    previousPageVersion.UpdatedById = updatingUserId;
+                }
             }
-        });
+        );
 
         await contentDbContext.SaveChangesAsync();
 
-        return pageList
-            .Select(page => page.ToSummaryViewModel())
-            .ToList();
+        return pageList.Select(page => page.ToSummaryViewModel()).ToList();
     }
 
     public async Task<Either<ActionResult, Unit>> Delete(Guid id)
     {
-        return await contentDbContext.EducationInNumbersPages
-            .SingleOrNotFoundAsync(page => page.Id == id)
+        return await contentDbContext
+            .EducationInNumbersPages.SingleOrNotFoundAsync(page => page.Id == id)
             .OnSuccessVoid(async page =>
             {
                 if (page.Published != null)
                 {
-                    // we currently only allow the cancellation of unpublished amendments
-                    throw new ArgumentException("Cannot delete published page");
+                    throw new ArgumentException("Can only delete unpublished amendments");
                 }
 
                 contentDbContext.EducationInNumbersPages.Remove(page);
@@ -298,5 +288,22 @@ public class EducationInNumbersService(
 
                 await contentDbContext.SaveChangesAsync();
             });
+    }
+
+    public async Task<Either<ActionResult, Unit>> FullDelete(string slug)
+    {
+        if (!_publishedPageDeletionAllowed)
+        {
+            throw new Exception("Full delete not enabled");
+        }
+
+        var pagesToRemove = contentDbContext.EducationInNumbersPages.Where(page => page.Slug == slug).ToList();
+        contentDbContext.EducationInNumbersPages.RemoveRange(pagesToRemove);
+
+        // NOTE: Sections and blocks are cascade deleted by the database, so no worries
+
+        await contentDbContext.SaveChangesAsync();
+
+        return Unit.Instance;
     }
 }

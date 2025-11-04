@@ -25,8 +25,7 @@ public class FileRepository : IFileRepository
 
     public async Task<File> Get(Guid id)
     {
-        return await _contentDbContext.Files
-            .SingleAsync(f => f.Id == id);
+        return await _contentDbContext.Files.SingleAsync(f => f.Id == id);
     }
 
     public async Task<File> Create(
@@ -36,7 +35,8 @@ public class FileRepository : IFileRepository
         string contentType,
         FileType type,
         Guid createdById,
-        Guid? newFileId = null)
+        Guid? newFileId = null
+    )
     {
         var file = new File
         {

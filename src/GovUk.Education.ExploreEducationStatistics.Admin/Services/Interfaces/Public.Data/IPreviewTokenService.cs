@@ -10,17 +10,23 @@ public interface IPreviewTokenService
     Task<Either<ActionResult, PreviewTokenViewModel>> CreatePreviewToken(
         Guid dataSetVersionId,
         string label,
-        CancellationToken cancellationToken = default);
+        DateTimeOffset? activates,
+        DateTimeOffset? expires,
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, PreviewTokenViewModel>> GetPreviewToken(
         Guid previewTokenId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, IReadOnlyList<PreviewTokenViewModel>>> ListPreviewTokens(
         Guid dataSetVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, PreviewTokenViewModel>> RevokePreviewToken(
         Guid previewTokenId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

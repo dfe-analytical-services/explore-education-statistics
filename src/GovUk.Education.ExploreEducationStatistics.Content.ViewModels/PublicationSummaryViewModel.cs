@@ -15,12 +15,10 @@ public record PublicationSummaryViewModel
     public string? LatestReleaseSlug { get; init; }
 
     public bool? Owner { get; init; }
-    
+
     public ContactViewModel? Contact { get; init; }
 
-    public PublicationSummaryViewModel()
-    {
-    }
+    public PublicationSummaryViewModel() { }
 
     [SetsRequiredMembers]
     public PublicationSummaryViewModel(PublicationCacheViewModel publicationCache)
@@ -31,9 +29,8 @@ public record PublicationSummaryViewModel
     }
 
     [SetsRequiredMembers]
-    public PublicationSummaryViewModel(Publication publication) : this(publication, hasContact: false)
-    {
-    }
+    public PublicationSummaryViewModel(Publication publication)
+        : this(publication, hasContact: false) { }
 
     [SetsRequiredMembers]
     public PublicationSummaryViewModel(Publication publication, bool hasContact = false)

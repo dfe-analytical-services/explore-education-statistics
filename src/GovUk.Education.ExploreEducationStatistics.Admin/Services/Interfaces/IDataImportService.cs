@@ -11,8 +11,7 @@ public interface IDataImportService
 {
     Task<DataImport?> GetImport(Guid fileId);
 
-    Task<Either<ActionResult, Unit>> CancelImport(Guid releaseVersionId,
-        Guid fileId);
+    Task<Either<ActionResult, Unit>> CancelImport(Guid releaseVersionId, Guid fileId);
 
     Task DeleteImport(Guid fileId);
 
@@ -20,5 +19,5 @@ public interface IDataImportService
 
     Task<DataImportStatusViewModel> GetImportStatus(Guid fileId);
 
-    Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile, File? sourceZipFile = null);
+    Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile);
 }

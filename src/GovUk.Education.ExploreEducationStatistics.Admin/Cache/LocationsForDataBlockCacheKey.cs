@@ -12,17 +12,14 @@ public record LocationsForDataBlockCacheKey : IBlobCacheKey
     private Guid DataBlockId { get; }
     private long BoundaryLevelId { get; }
 
-    public LocationsForDataBlockCacheKey(DataBlockVersion dataBlockVersion, long boundaryLevelId) : this(
-        releaseVersionId: dataBlockVersion.ReleaseVersionId,
-        dataBlockId: dataBlockVersion.DataBlockParentId,
-        boundaryLevelId: boundaryLevelId)
-    {
-    }
+    public LocationsForDataBlockCacheKey(DataBlockVersion dataBlockVersion, long boundaryLevelId)
+        : this(
+            releaseVersionId: dataBlockVersion.ReleaseVersionId,
+            dataBlockId: dataBlockVersion.DataBlockParentId,
+            boundaryLevelId: boundaryLevelId
+        ) { }
 
-    public LocationsForDataBlockCacheKey(
-        Guid releaseVersionId,
-        Guid dataBlockId,
-        long boundaryLevelId)
+    public LocationsForDataBlockCacheKey(Guid releaseVersionId, Guid dataBlockId, long boundaryLevelId)
     {
         ReleaseVersionId = releaseVersionId;
         DataBlockId = dataBlockId;
@@ -31,9 +28,5 @@ public record LocationsForDataBlockCacheKey : IBlobCacheKey
 
     public IBlobContainer Container => BlobContainers.PrivateContent;
 
-    public string Key => PrivateContentDataBlockLocationsPath(
-        ReleaseVersionId,
-        DataBlockId,
-        BoundaryLevelId
-    );
+    public string Key => PrivateContentDataBlockLocationsPath(ReleaseVersionId, DataBlockId, BoundaryLevelId);
 }

@@ -37,32 +37,52 @@
     },
     {
       "matchDatasources": ["nuget"],
-      "groupName": "Minor backend dependencies",
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "matchDatasources": ["nuget"],
+      "groupName": "Backend packages (minor)",
+      "matchUpdateTypes": ["minor"],
       "schedule": ["every month"]
     },
     {
       "matchDatasources": ["nuget"],
-      "groupName": "Major backend dependencies",
+      "groupName": "Backend packages (major)",
       "matchUpdateTypes": ["major"],
       "schedule": ["every 3 months"]
     },
     {
-      "description": "Exclude AspectInjector to pin it to version 2.8.1 for macOS compatibility",
+      "description": "Disable MicroElements.Swashbuckle.FluentValidation which requires major update to Swashbuckle",
       "matchDatasources": ["nuget"],
-      "matchPackageNames": ["AspectInjector"],
+      "matchPackageNames": ["MicroElements.Swashbuckle.FluentValidation"],
+      "matchCurrentVersion": "6.1.0",
       "enabled": false
     },
     {
-      "description": "Exclude packages which need their major versions to be in sync with the .NET version or the EF Core version",
+      "description": "Disable DuckDB.NET.Data.Full and InterpolatedSql.Dapper related to issue EES-6079",
+      "matchDatasources": ["nuget"],
+      "matchPackageNames": ["DuckDB.NET.Data.Full", "InterpolatedSql.Dapper"],
+      "enabled": false
+    },
+    {
+      "description": "Disable AutoMapper as v15 requires a license - EES-6647 to remove AutoMapper",
+      "matchDatasources": ["nuget"],
+      "matchPackageNames": ["AutoMapper"],
+      "enabled": false
+    },
+    {
+      "description": "Disable packages which need their major versions to be in sync with the .NET version or the EF Core version",
       "matchDatasources": ["nuget"],
       "matchPackagePrefixes": [
         "Microsoft.AspNetCore",
         "Microsoft.EntityFrameworkCore",
         "Microsoft.Extensions",
         "Moq.EntityFrameworkCore",
+        "MockQueryable.Moq",
         "Npgsql.EntityFrameworkCore.PostgreSQL",
-        "Thinktecture.EntityFrameworkCore"
+        "Thinktecture.EntityFrameworkCore",
+        "linq2db.EntityFrameworkCore"
       ],
       "matchUpdateTypes": ["major"],
       "enabled": false
@@ -101,6 +121,12 @@
       "groupName": "Azure Bicep resources",
       "description": "Prevent unofficial resource versions being suggested",
       "enabled": false
+    },
+    {
+    "description": "Disable AspectInjector and Aspects.Universal due to an issue with AspectInjector 2.9.0. See https://github.com/pamidur/aspect-injector/issues/244",
+    "matchDatasources": ["nuget"],
+    "matchPackageNames": ["AspectInjector", "Aspects.Universal"],
+    "enabled": false
     }
   ]
 }

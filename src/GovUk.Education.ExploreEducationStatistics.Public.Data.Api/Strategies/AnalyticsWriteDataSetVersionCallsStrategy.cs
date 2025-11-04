@@ -6,26 +6,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
 
 public class AnalyticsWriteDataSetVersionCallsStrategy(
     IAnalyticsPathResolver analyticsPathResolver,
-    ICommonAnalyticsWriteStrategyWorkflow<CaptureDataSetVersionCallRequest> workflow 
-    ) : IAnalyticsWriteStrategy
+    ICommonAnalyticsWriteStrategyWorkflow<CaptureDataSetVersionCallRequest> workflow
+) : IAnalyticsWriteStrategy
 {
     public static readonly string[] OutputSubPaths = ["public-api", "data-set-versions"];
-    
-    private readonly IWorkflowActor<CaptureDataSetVersionCallRequest> _workflowActor =
-        new WorkflowActor(analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths));
-        
+
+    private readonly IWorkflowActor<CaptureDataSetVersionCallRequest> _workflowActor = new WorkflowActor(
+        analyticsPath: analyticsPathResolver.BuildOutputDirectory(OutputSubPaths)
+    );
+
     public Type RequestType => typeof(CaptureDataSetVersionCallRequest);
 
     public async Task Report(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
     {
         if (request is not CaptureDataSetVersionCallRequest captureRequest)
         {
-            throw new ArgumentException($"Request must be of type {nameof(CaptureDataSetVersionCallRequest)}. It is {request.GetType().FullName}", nameof(request));
+            throw new ArgumentException(
+                $"Request must be of type {nameof(CaptureDataSetVersionCallRequest)}. It is {request.GetType().FullName}",
+                nameof(request)
+            );
         }
         await workflow.Report(_workflowActor, captureRequest, cancellationToken);
     }
 
-    private class WorkflowActor(string analyticsPath) 
+    private class WorkflowActor(string analyticsPath)
         : WorkflowActorBase<CaptureDataSetVersionCallRequest>(analyticsPath)
     {
         public override string GetFilenamePart(CaptureDataSetVersionCallRequest request)

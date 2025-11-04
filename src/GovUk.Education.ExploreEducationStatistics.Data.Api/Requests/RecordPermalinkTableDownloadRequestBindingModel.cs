@@ -26,7 +26,7 @@ public record RecordPermalinkTableDownloadRequestBindingModel
         {
             PermalinkTitle = PermalinkTitle,
             PermalinkId = PermalinkId!.Value,
-            DownloadFormat = DownloadFormat!.Value
+            DownloadFormat = DownloadFormat!.Value,
         };
     }
 }

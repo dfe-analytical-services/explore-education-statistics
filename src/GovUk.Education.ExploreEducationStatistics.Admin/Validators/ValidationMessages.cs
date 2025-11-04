@@ -223,18 +223,11 @@ public static class ValidationMessages
         };
     }
 
-    public static readonly LocalizableMessage FileIsNull = new(
-        Code: nameof(FileIsNull),
-        Message: "No file provided."
-    );
+    public static readonly LocalizableMessage FileIsNull = new(Code: nameof(FileIsNull), Message: "No file provided.");
 
     public static ErrorViewModel GenerateErrorFileIsNull()
     {
-        return new ErrorViewModel
-        {
-            Code = FileIsNull.Code,
-            Message = FileIsNull.Message,
-        };
+        return new ErrorViewModel { Code = FileIsNull.Code, Message = FileIsNull.Message };
     }
 
     public static readonly LocalizableMessage DataReplacementAlreadyInProgress = new(
@@ -256,9 +249,7 @@ public static class ValidationMessages
         Message: "Title '{0}' must be {1} characters or fewer"
     );
 
-    public static ErrorViewModel GenerateErrorDataSetTitleTooLong(
-        string title,
-        int maxLength)
+    public static ErrorViewModel GenerateErrorDataSetTitleTooLong(string title, int maxLength)
     {
         return new ErrorViewModel
         {
@@ -426,12 +417,12 @@ public static class ValidationMessages
             Message = string.Format(CannotReplaceDraftApiDataSet.Message, title),
         };
     }
-    
+
     public static readonly LocalizableMessage CannotCreateMultipleDraftApiDataSet = new(
         Code: nameof(CannotCreateMultipleDraftApiDataSet),
-        Message: "Data set with title '{0}' cannot be replaced as this would result in creating a new patch draft API data set." +
-                 " There is a draft API version which is not published. Multiple draft API versions at the same time are not permitted in the system." +
-                 " Please contact the explore statistics team at explore.statistics@education.gov.uk for support on completing this action."
+        Message: "Data set with title '{0}' cannot be replaced as this would result in creating a new patch draft API data set."
+            + " There is a draft API version which is not published. Multiple draft API versions at the same time are not permitted in the system."
+            + " Please contact the explore statistics team at explore.statistics@education.gov.uk for support on completing this action."
     );
 
     public static ErrorViewModel GenerateErrorCannotCreateMultipleDraftApiDataSet(string title)
@@ -464,11 +455,7 @@ public static class ValidationMessages
 
     public static ErrorViewModel GenerateErrorDataSetUploadNotFound()
     {
-        return new ErrorViewModel
-        {
-            Code = DataSetUploadNotFound.Code,
-            Message = DataSetUploadNotFound.Message,
-        };
+        return new ErrorViewModel { Code = DataSetUploadNotFound.Code, Message = DataSetUploadNotFound.Message };
     }
 
     public static readonly LocalizableMessage TemporaryFilesNotFound = new(
@@ -478,11 +465,7 @@ public static class ValidationMessages
 
     public static ErrorViewModel GenerateErrorTemporaryFilesNotFound()
     {
-        return new ErrorViewModel
-        {
-            Code = TemporaryFilesNotFound.Code,
-            Message = TemporaryFilesNotFound.Message,
-        };
+        return new ErrorViewModel { Code = TemporaryFilesNotFound.Code, Message = TemporaryFilesNotFound.Message };
     }
 
     public static readonly LocalizableMessage OrganisationNotFound = new(

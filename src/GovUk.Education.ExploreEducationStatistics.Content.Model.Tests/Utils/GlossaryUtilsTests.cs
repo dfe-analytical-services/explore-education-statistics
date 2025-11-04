@@ -19,20 +19,20 @@ public class GlossaryUtilsTests
             {
                 Title = "Exclusions",
                 Slug = "exclusions-slug",
-                Body = "Exclusions body"
+                Body = "Exclusions body",
             },
             new()
             {
                 Title = "Absence",
                 Slug = "absence-slug",
-                Body = "Absence body"
+                Body = "Absence body",
             },
             new()
             {
                 Title = "expedient", // lowercase first letter
                 Slug = "expedient-slug",
-                Body = "Expedient body"
-            }
+                Body = "Expedient body",
+            },
         };
 
         var result = GlossaryUtils.BuildGlossary(entries);
@@ -40,15 +40,18 @@ public class GlossaryUtilsTests
         Assert.Equal(26, result.Count);
 
         var expectedHeadingWithEntries = new[] { 'A', 'E' };
-        Assert.All(result.WithIndex(), tuple =>
-        {
-            var (category, index) = tuple;
-            Assert.Equal(AzCharArray[index], category.Heading);
-            if (!expectedHeadingWithEntries.Contains(category.Heading))
+        Assert.All(
+            result.WithIndex(),
+            tuple =>
             {
-                Assert.Empty(category.Entries);
+                var (category, index) = tuple;
+                Assert.Equal(AzCharArray[index], category.Heading);
+                if (!expectedHeadingWithEntries.Contains(category.Heading))
+                {
+                    Assert.Empty(category.Entries);
+                }
             }
-        });
+        );
 
         var categoryA = result[0];
         Assert.Single(categoryA.Entries);
@@ -69,12 +72,15 @@ public class GlossaryUtilsTests
 
         Assert.Equal(26, result.Count);
 
-        Assert.All(result.WithIndex(), tuple =>
-        {
-            var (category, index) = tuple;
-            Assert.Equal(AzCharArray[index], category.Heading);
-            Assert.Empty(category.Entries);
-        });
+        Assert.All(
+            result.WithIndex(),
+            tuple =>
+            {
+                var (category, index) = tuple;
+                Assert.Equal(AzCharArray[index], category.Heading);
+                Assert.Empty(category.Entries);
+            }
+        );
     }
 
     private static void AssertGlossaryEntry(GlossaryEntry glossaryEntry, GlossaryEntryViewModel viewModel)

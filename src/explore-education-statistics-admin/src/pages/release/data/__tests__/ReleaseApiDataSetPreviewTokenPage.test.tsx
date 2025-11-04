@@ -54,10 +54,10 @@ describe('ReleaseApiDataSetPreviewTokenPage', () => {
     id: 'token-id',
     label: 'Test label',
     status: 'Active',
-    created: now.toISOString(),
+    activates: now.toISOString(),
     createdByEmail: 'test@gov.uk',
     updated: '',
-    expiry: addHours(now, 24).toISOString(),
+    expires: addHours(now, 24).toISOString(),
   };
 
   test('renders correctly with an active token', async () => {

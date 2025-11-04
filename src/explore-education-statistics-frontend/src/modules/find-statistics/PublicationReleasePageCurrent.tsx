@@ -536,25 +536,19 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
             });
           }}
         >
-          {releaseVersion.content.map(
-            ({ heading, caption, order, content }) => {
-              return (
-                <AccordionSection
-                  heading={heading}
-                  caption={caption}
-                  key={order}
-                >
-                  {({ open }) => (
-                    <PublicationSectionBlocks
-                      blocks={content}
-                      releaseVersion={releaseVersion}
-                      visible={open}
-                    />
-                  )}
-                </AccordionSection>
-              );
-            },
-          )}
+          {releaseVersion.content.map(({ heading, order, content }) => {
+            return (
+              <AccordionSection heading={heading} key={order}>
+                {({ open }) => (
+                  <PublicationSectionBlocks
+                    blocks={content}
+                    releaseVersionId={releaseVersion.id}
+                    visible={open}
+                  />
+                )}
+              </AccordionSection>
+            );
+          })}
         </Accordion>
       )}
 

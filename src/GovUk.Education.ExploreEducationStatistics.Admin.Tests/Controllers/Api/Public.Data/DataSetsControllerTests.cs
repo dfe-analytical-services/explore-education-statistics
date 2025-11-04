@@ -28,13 +28,11 @@ using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-public abstract class DataSetsControllerTests(
-    TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "api/public-data/data-sets";
 
-    public class ListDataSetsTests(
-        TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class ListDataSetsTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         [Fact]
         public async Task PublicationHasSingleDataSet_Success_CorrectViewModel()
@@ -46,26 +44,21 @@ public abstract class DataSetsControllerTests(
             // of having extra ReleaseVersions present on the Publication.
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    DataFixture
-                        .DefaultRelease(publishedVersions: 1, draftVersion: true)
-                        .Generate(4)
-                );
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true).Generate(4));
 
-            var releaseIds = publication
-                .ReleaseVersions
-                .Select(rv => rv.ReleaseId)
-                .Distinct()
-                .ToList();
+            var releaseIds = publication.ReleaseVersions.Select(rv => rv.ReleaseId).Distinct().ToList();
 
             var oldPublishedReleaseVersion = publication.ReleaseVersions.First(rv =>
-                rv.Published is not null && rv.ReleaseId == releaseIds[0]);
+                rv.Published is not null && rv.ReleaseId == releaseIds[0]
+            );
 
             var liveReleaseVersion = publication.ReleaseVersions.First(rv =>
-                rv.Published is not null && rv.ReleaseId == releaseIds[1]);
+                rv.Published is not null && rv.ReleaseId == releaseIds[1]
+            );
 
             var draftReleaseVersion = publication.ReleaseVersions.First(rv =>
-                rv.Published is null && rv.ReleaseId == releaseIds[2]);
+                rv.Published is null && rv.ReleaseId == releaseIds[2]
+            );
 
             ReleaseFile oldPublishedReleaseFile = DataFixture
                 .DefaultReleaseFile()
@@ -88,10 +81,7 @@ public abstract class DataSetsControllerTests(
                 context.ReleaseFiles.AddRange(oldPublishedReleaseFile, liveReleaseFile, draftReleaseFile);
             });
 
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished()
-                .WithPublicationId(publication.Id);
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
@@ -99,16 +89,14 @@ public abstract class DataSetsControllerTests(
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(oldPublishedReleaseFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(oldPublishedReleaseFile.Id))
                 .WithVersionNumber(major: 1, minor: 0);
 
             DataSetVersion liveDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(liveReleaseFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(liveReleaseFile.Id))
                 .WithVersionNumber(major: 2, minor: 0)
                 .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
@@ -117,15 +105,13 @@ public abstract class DataSetsControllerTests(
                 .WithVersionNumber(1, 1)
                 .WithStatusDraft()
                 .WithDataSet(dataSet)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(draftReleaseFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(draftReleaseFile.Id))
                 .WithVersionNumber(major: 2, minor: 1)
                 .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
-                context.DataSetVersions.AddRange(
-                    oldPublishedDataSetVersion, draftDataSetVersion, liveDataSetVersion);
+                context.DataSetVersions.AddRange(oldPublishedDataSetVersion, draftDataSetVersion, liveDataSetVersion);
                 context.DataSets.Update(dataSet);
             });
 
@@ -151,22 +137,33 @@ public abstract class DataSetsControllerTests(
                 () => Assert.Equal(draftDataSetVersion.Status, dataSetViewModel.DraftVersion.Status),
                 () => Assert.Equal(draftDataSetVersion.VersionType, dataSetViewModel.DraftVersion.Type),
                 () => Assert.Equal(draftReleaseVersion.Id, dataSetViewModel.DraftVersion.ReleaseVersion.Id),
-                () => Assert.Equal(draftReleaseVersion.Release.Title, dataSetViewModel.DraftVersion.ReleaseVersion.Title),
+                () =>
+                    Assert.Equal(draftReleaseVersion.Release.Title, dataSetViewModel.DraftVersion.ReleaseVersion.Title),
                 () => Assert.Equal(liveDataSetVersion.Id, dataSetViewModel.LatestLiveVersion.Id),
                 () => Assert.Equal(liveDataSetVersion.PublicVersion, dataSetViewModel.LatestLiveVersion.Version),
                 () => Assert.Equal(liveDataSetVersion.Status, dataSetViewModel.LatestLiveVersion.Status),
                 () => Assert.Equal(liveDataSetVersion.VersionType, dataSetViewModel.LatestLiveVersion.Type),
                 () => Assert.Equal(liveReleaseVersion.Id, dataSetViewModel.LatestLiveVersion.ReleaseVersion.Id),
-                () => Assert.Equal(liveReleaseVersion.Release.Title, dataSetViewModel.LatestLiveVersion.ReleaseVersion.Title),
-                () => Assert.Equal(liveDataSetVersion.Published.TruncateNanoseconds(),
-                    dataSetViewModel.LatestLiveVersion?.Published),
-                () => Assert.Equal(new[]
-                    {
-                        oldPublishedReleaseVersion.ReleaseId,
-                        liveReleaseVersion.ReleaseId,
-                        draftReleaseVersion.ReleaseId
-                    }.Order(),
-                    dataSetViewModel.PreviousReleaseIds.Order())
+                () =>
+                    Assert.Equal(
+                        liveReleaseVersion.Release.Title,
+                        dataSetViewModel.LatestLiveVersion.ReleaseVersion.Title
+                    ),
+                () =>
+                    Assert.Equal(
+                        liveDataSetVersion.Published.TruncateNanoseconds(),
+                        dataSetViewModel.LatestLiveVersion?.Published
+                    ),
+                () =>
+                    Assert.Equal(
+                        new[]
+                        {
+                            oldPublishedReleaseVersion.ReleaseId,
+                            liveReleaseVersion.ReleaseId,
+                            draftReleaseVersion.ReleaseId,
+                        }.Order(),
+                        dataSetViewModel.PreviousReleaseIds.Order()
+                    )
             );
         }
 
@@ -177,15 +174,22 @@ public abstract class DataSetsControllerTests(
         public async Task PublicationHasMultipleDataSets_Success_CorrectPaging(
             int page,
             int pageSize,
-            int numberOfAvailableDataSets)
+            int numberOfAvailableDataSets
+        )
         {
             Publication publication = DataFixture.DefaultPublication();
 
-            var releaseFiles = DataFixture.DefaultReleaseFile()
-                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () => 
-                    DataFixture.DefaultReleaseVersion()
-                        .WithRelease(DataFixture.DefaultRelease()
-                            .WithPublication(publication))))
+            var releaseFiles = DataFixture
+                .DefaultReleaseFile()
+                .ForInstance(s =>
+                    s.Set(
+                        rf => rf.ReleaseVersion,
+                        () =>
+                            DataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(DataFixture.DefaultRelease().WithPublication(publication))
+                    )
+                )
                 .ForInstance(s => s.Set(rf => rf.File, () => DataFixture.DefaultFile(FileType.Data)))
                 .GenerateList(numberOfAvailableDataSets);
 
@@ -204,14 +208,18 @@ public abstract class DataSetsControllerTests(
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSets));
 
             var dataSetVersions = dataSets
-                .Select((ds, index) => DataFixture
-                    .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                    .WithStatusPublished()
-                    .WithDataSet(ds)
-                    .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                        .WithReleaseFileId(releaseFiles[index].Id))
-                    .FinishWith(dsv => ds.LatestLiveVersion = dsv)
-                    .Generate())
+                .Select(
+                    (ds, index) =>
+                        DataFixture
+                            .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                            .WithStatusPublished()
+                            .WithDataSet(ds)
+                            .WithRelease(
+                                DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFiles[index].Id)
+                            )
+                            .FinishWith(dsv => ds.LatestLiveVersion = dsv)
+                            .Generate()
+                )
                 .ToList();
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
@@ -227,16 +235,15 @@ public abstract class DataSetsControllerTests(
                 .Take(pageSize)
                 .ToList();
 
-            var response = await ListPublicationDataSets(
-                publicationId: publication.Id,
-                page: page,
-                pageSize: pageSize);
+            var response = await ListPublicationDataSets(publicationId: publication.Id, page: page, pageSize: pageSize);
 
             var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetSummaryViewModel>>();
 
-            pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: numberOfAvailableDataSets,
+            pagedResult.AssertHasExpectedPagingAndResultCount(
+                expectedTotalResults: numberOfAvailableDataSets,
                 expectedPage: page,
-                expectedPageSize: pageSize);
+                expectedPageSize: pageSize
+            );
 
             Assert.Equal(expectedDataSetIds.Count, pagedResult.Results.Count);
             Assert.Equal(expectedDataSetIds, pagedResult.Results.Select(ds => ds.Id));
@@ -247,11 +254,17 @@ public abstract class DataSetsControllerTests(
         {
             Publication publication = DataFixture.DefaultPublication();
 
-            var releaseFiles = DataFixture.DefaultReleaseFile()
-                .ForInstance(s => s.Set(rf => rf.ReleaseVersion, () => 
-                    DataFixture.DefaultReleaseVersion()
-                        .WithRelease(DataFixture.DefaultRelease()
-                            .WithPublication(publication))))
+            var releaseFiles = DataFixture
+                .DefaultReleaseFile()
+                .ForInstance(s =>
+                    s.Set(
+                        rf => rf.ReleaseVersion,
+                        () =>
+                            DataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(DataFixture.DefaultRelease().WithPublication(publication))
+                    )
+                )
                 .ForInstance(s => s.Set(rf => rf.File, () => DataFixture.DefaultFile(FileType.Data)))
                 .GenerateList(7);
 
@@ -273,73 +286,80 @@ public abstract class DataSetsControllerTests(
 
             var dataSetVersions = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
-                .ForIndex(0,
+                .ForIndex(
+                    0,
                     s =>
                     {
                         // Associate data set 0 with a live version published 3 days ago
                         s.SetDataSet(dataSets[0]);
                         s.SetStatus(DataSetVersionStatus.Deprecated);
                         s.SetPublished(DateTimeOffset.UtcNow.AddDays(-3));
-                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease()
-                            .WithReleaseFileId(releaseFiles[0].Id));
-                    })
-                .ForIndex(1,
+                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFiles[0].Id));
+                    }
+                )
+                .ForIndex(
+                    1,
                     s =>
                     {
                         // Associate data set 1 with a live version published 4 days ago
                         s.SetDataSet(dataSets[1]);
                         s.SetStatus(DataSetVersionStatus.Published);
                         s.SetPublished(DateTimeOffset.UtcNow.AddDays(-4));
-                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease()
-                            .WithReleaseFileId(releaseFiles[1].Id));
-                    })
-                .ForIndex(2,
+                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFiles[1].Id));
+                    }
+                )
+                .ForIndex(
+                    2,
                     s =>
                     {
                         // Also associate data set 1 with a draft version that should have no bearing on the ordering
                         s.SetDataSet(dataSets[1]);
                         s.SetStatusDraft();
-                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease()
-                            .WithReleaseFileId(releaseFiles[2].Id));
-                    })
-                .ForIndex(3,
+                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFiles[2].Id));
+                    }
+                )
+                .ForIndex(
+                    3,
                     s =>
                     {
                         // Associate dataset 2 with a live version published 1 day ago
                         s.SetDataSet(dataSets[2]);
                         s.SetStatus(DataSetVersionStatus.Deprecated);
                         s.SetPublished(DateTimeOffset.UtcNow.AddDays(-1));
-                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease()
-                            .WithReleaseFileId(releaseFiles[3].Id));
-                    })
-                .ForIndex(4,
+                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFiles[3].Id));
+                    }
+                )
+                .ForIndex(
+                    4,
                     s =>
                     {
                         // Associate dataset 3 with a draft version that should have no bearing on the ordering
                         s.SetDataSet(dataSets[3]);
                         s.SetStatusDraft();
-                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease()
-                            .WithReleaseFileId(releaseFiles[4].Id));
-                    })
-                .ForIndex(5,
+                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFiles[4].Id));
+                    }
+                )
+                .ForIndex(
+                    5,
                     s =>
                     {
                         // Associate dataset 4 with a live version published 2 days ago
                         s.SetDataSet(dataSets[4]);
                         s.SetStatus(DataSetVersionStatus.Published);
                         s.SetPublished(DateTimeOffset.UtcNow.AddDays(-2));
-                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease()
-                            .WithReleaseFileId(releaseFiles[5].Id));
-                    })
-                .ForIndex(6,
+                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFiles[5].Id));
+                    }
+                )
+                .ForIndex(
+                    6,
                     s =>
                     {
                         // Associate dataset 5 with a draft version that should have no bearing on the ordering
                         s.SetDataSet(dataSets[5]);
                         s.SetStatusDraft();
-                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease()
-                            .WithReleaseFileId(releaseFiles[6].Id));
-                    })
+                        s.SetRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFiles[6].Id));
+                    }
+                )
                 .FinishWith(dsv =>
                 {
                     switch (dsv.Status)
@@ -380,15 +400,21 @@ public abstract class DataSetsControllerTests(
         }
 
         [Theory]
-        [MemberData(nameof(DataSetVersionStatusTheoryData.UnavailableStatuses),
-            MemberType = typeof(DataSetVersionStatusTheoryData))]
+        [MemberData(
+            nameof(DataSetVersionStatusTheoryData.UnavailableStatuses),
+            MemberType = typeof(DataSetVersionStatusTheoryData)
+        )]
         public async Task PublicationHasSingleDataSetWithoutLiveVersion_LatestLiveVersionIsEmpty(
-            DataSetVersionStatus dataSetVersionStatus)
+            DataSetVersionStatus dataSetVersionStatus
+        )
         {
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
-                    .WithRelease(DataFixture.DefaultRelease()
-                        .WithPublication(DataFixture.DefaultPublication())))
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                )
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -407,8 +433,7 @@ public abstract class DataSetsControllerTests(
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithStatus(dataSetVersionStatus)
                 .WithDataSet(dataSet)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(releaseFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
                 .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
@@ -432,12 +457,16 @@ public abstract class DataSetsControllerTests(
         [InlineData(DataSetVersionStatus.Deprecated)]
         [InlineData(DataSetVersionStatus.Published)]
         public async Task PublicationHasSingleDataSetWithoutDraftVersion_DraftVersionIsEmpty(
-            DataSetVersionStatus dataSetVersionStatus)
+            DataSetVersionStatus dataSetVersionStatus
+        )
         {
-            ReleaseFile releaseFile = DataFixture.DefaultReleaseFile()
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
-                    .WithRelease(DataFixture.DefaultRelease()
-                        .WithPublication(DataFixture.DefaultPublication())))
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                )
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             await TestApp.AddTestData<ContentDbContext>(context =>
@@ -457,8 +486,7 @@ public abstract class DataSetsControllerTests(
                 .WithPublished(DateTimeOffset.UtcNow)
                 .WithStatus(dataSetVersionStatus)
                 .WithDataSet(dataSet)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(releaseFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
                 .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
@@ -509,9 +537,7 @@ public abstract class DataSetsControllerTests(
 
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
-            var client = TestApp
-                .SetUser(DataFixture.AuthenticatedUser())
-                .CreateClient();
+            var client = TestApp.SetUser(DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await ListPublicationDataSets(publication.Id, client: client);
 
@@ -583,15 +609,12 @@ public abstract class DataSetsControllerTests(
             Guid publicationId,
             int? page = null,
             int? pageSize = null,
-            HttpClient? client = null)
+            HttpClient? client = null
+        )
         {
-            var user = DataFixture
-                .AuthenticatedUser()
-                .WithClaim(SecurityClaimTypes.AccessAllPublications.ToString());
+            var user = DataFixture.AuthenticatedUser().WithClaim(SecurityClaimTypes.AccessAllPublications.ToString());
 
-            client ??= TestApp
-                .SetUser(user)
-                .CreateClient();
+            client ??= TestApp.SetUser(user).CreateClient();
 
             var queryParams = new Dictionary<string, string?>
             {
@@ -606,25 +629,20 @@ public abstract class DataSetsControllerTests(
         }
     }
 
-    public class GetDataSetTests(
-        TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class GetDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
         {
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    DataFixture
-                        .DefaultRelease(publishedVersions: 1, draftVersion: true)
-                        .Generate(3)
-                );
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true).Generate(3));
 
             var liveReleaseVersion = publication.ReleaseVersions.First(rv => rv.Published is not null);
 
             var draftReleaseVersion = publication.ReleaseVersions.First(rv =>
-                rv.Published is null
-                && rv.ReleaseId != liveReleaseVersion.ReleaseId);
+                rv.Published is null && rv.ReleaseId != liveReleaseVersion.ReleaseId
+            );
 
             ReleaseFile liveReleaseFile = DataFixture
                 .DefaultReleaseFile()
@@ -642,10 +660,7 @@ public abstract class DataSetsControllerTests(
                 context.ReleaseFiles.AddRange(liveReleaseFile, draftReleaseFile);
             });
 
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished()
-                .WithPublicationId(publication.Id);
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
@@ -654,8 +669,7 @@ public abstract class DataSetsControllerTests(
                 .WithStatusPublished()
                 .WithTotalResults(5000)
                 .WithDataSet(dataSet)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(liveReleaseFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(liveReleaseFile.Id))
                 .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
 
             DataSetVersion draftDataSetVersion = DataFixture
@@ -664,8 +678,7 @@ public abstract class DataSetsControllerTests(
                 .WithVersionNumber(1, 1)
                 .WithTotalResults(6000)
                 .WithDataSet(dataSet)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(draftReleaseFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(draftReleaseFile.Id))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
             var mappings = new DataSetVersionMapping
@@ -675,7 +688,7 @@ public abstract class DataSetsControllerTests(
                 LocationMappingPlan = new LocationMappingPlan(),
                 FilterMappingPlan = new FilterMappingPlan(),
                 LocationMappingsComplete = false,
-                FilterMappingsComplete = true
+                FilterMappingsComplete = true,
             };
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
@@ -705,16 +718,14 @@ public abstract class DataSetsControllerTests(
 
             Assert.Equal(
                 liveDataSetVersion.MetaSummary!.GeographicLevels.Select(l => l.GetEnumLabel()),
-                viewModel.LatestLiveVersion.GeographicLevels);
-            Assert.Equal(
-                liveDataSetVersion.MetaSummary!.Filters,
-                viewModel.LatestLiveVersion.Filters);
+                viewModel.LatestLiveVersion.GeographicLevels
+            );
+            Assert.Equal(liveDataSetVersion.MetaSummary!.Filters, viewModel.LatestLiveVersion.Filters);
             Assert.Equal(
                 TimePeriodRangeViewModel.Create(liveDataSetVersion.MetaSummary!.TimePeriodRange),
-                viewModel.LatestLiveVersion.TimePeriods);
-            Assert.Equal(
-                liveDataSetVersion.MetaSummary!.Indicators,
-                viewModel.LatestLiveVersion.Indicators);
+                viewModel.LatestLiveVersion.TimePeriods
+            );
+            Assert.Equal(liveDataSetVersion.MetaSummary!.Indicators, viewModel.LatestLiveVersion.Indicators);
 
             Assert.Equal(liveReleaseVersion.Id, viewModel.LatestLiveVersion.ReleaseVersion.Id);
             Assert.Equal(liveReleaseVersion.Release.Title, viewModel.LatestLiveVersion.ReleaseVersion.Title);
@@ -731,19 +742,19 @@ public abstract class DataSetsControllerTests(
             Assert.Equal(draftReleaseVersion.Release.Title, viewModel.DraftVersion.ReleaseVersion.Title);
             Assert.Equal(
                 draftDataSetVersion.MetaSummary!.GeographicLevels.Select(l => l.GetEnumLabel()),
-                viewModel.DraftVersion.GeographicLevels);
-            Assert.Equal(
-                draftDataSetVersion.MetaSummary!.Filters,
-                viewModel.DraftVersion.Filters);
+                viewModel.DraftVersion.GeographicLevels
+            );
+            Assert.Equal(draftDataSetVersion.MetaSummary!.Filters, viewModel.DraftVersion.Filters);
             Assert.Equal(
                 TimePeriodRangeViewModel.Create(draftDataSetVersion.MetaSummary!.TimePeriodRange),
-                viewModel.DraftVersion.TimePeriods);
-            Assert.Equal(
-                draftDataSetVersion.MetaSummary!.Indicators,
-                viewModel.DraftVersion.Indicators);
+                viewModel.DraftVersion.TimePeriods
+            );
+            Assert.Equal(draftDataSetVersion.MetaSummary!.Indicators, viewModel.DraftVersion.Indicators);
 
-            Assert.Equal(new[] { draftReleaseVersion.ReleaseId, liveReleaseVersion.ReleaseId }.Order(),
-                viewModel.PreviousReleaseIds.Order());
+            Assert.Equal(
+                new[] { draftReleaseVersion.ReleaseId, liveReleaseVersion.ReleaseId }.Order(),
+                viewModel.PreviousReleaseIds.Order()
+            );
 
             Assert.NotNull(viewModel.DraftVersion.MappingStatus);
             Assert.False(viewModel.DraftVersion.MappingStatus.LocationsComplete);
@@ -755,11 +766,7 @@ public abstract class DataSetsControllerTests(
         {
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    DataFixture
-                        .DefaultRelease(publishedVersions: 1, draftVersion: true)
-                        .Generate(1)
-                );
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true).Generate(1));
 
             File file = DataFixture.DefaultFile(FileType.Data);
 
@@ -783,10 +790,7 @@ public abstract class DataSetsControllerTests(
                 context.ReleaseFiles.AddRange(liveReleaseFile, draftReleaseFile);
             });
 
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished()
-                .WithPublicationId(publication.Id);
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
@@ -794,8 +798,7 @@ public abstract class DataSetsControllerTests(
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(liveReleaseFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(liveReleaseFile.Id))
                 .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
 
             DataSetVersion draftDataSetVersion = DataFixture
@@ -803,8 +806,7 @@ public abstract class DataSetsControllerTests(
                 .WithStatusDraft()
                 .WithVersionNumber(1, 1)
                 .WithDataSet(dataSet)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(draftReleaseFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(draftReleaseFile.Id))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
@@ -829,11 +831,7 @@ public abstract class DataSetsControllerTests(
         {
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    DataFixture
-                        .DefaultRelease(publishedVersions: 1)
-                        .Generate(1)
-                );
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -848,10 +846,7 @@ public abstract class DataSetsControllerTests(
                 context.ReleaseFiles.Add(releaseFile);
             });
 
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished()
-                .WithPublicationId(publication.Id);
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
@@ -859,8 +854,7 @@ public abstract class DataSetsControllerTests(
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(releaseFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
                 .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
@@ -894,11 +888,7 @@ public abstract class DataSetsControllerTests(
         {
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    DataFixture
-                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                        .Generate(1)
-                );
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -913,10 +903,7 @@ public abstract class DataSetsControllerTests(
                 context.ReleaseFiles.Add(releaseFile);
             });
 
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished()
-                .WithPublicationId(publication.Id);
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
@@ -924,8 +911,7 @@ public abstract class DataSetsControllerTests(
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
                 .WithStatusDraft()
                 .WithDataSet(dataSet)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                    .WithReleaseFileId(releaseFile.Id))
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
@@ -962,10 +948,7 @@ public abstract class DataSetsControllerTests(
 
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished()
-                .WithPublicationId(publication.Id);
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
@@ -990,16 +973,11 @@ public abstract class DataSetsControllerTests(
 
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished()
-                .WithPublicationId(publication.Id);
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var client = TestApp
-                .SetUser(DataFixture.AuthenticatedUser())
-                .CreateClient();
+            var client = TestApp.SetUser(DataFixture.AuthenticatedUser()).CreateClient();
 
             var response = await GetDataSet(dataSetId: dataSet.Id, client: client);
 
@@ -1011,11 +989,7 @@ public abstract class DataSetsControllerTests(
         {
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    DataFixture
-                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                        .Generate(1)
-                );
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
 
@@ -1040,11 +1014,7 @@ public abstract class DataSetsControllerTests(
         {
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    DataFixture
-                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                        .Generate(1)
-                );
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
 
             File file = DataFixture.DefaultFile(FileType.Data);
 
@@ -1057,10 +1027,7 @@ public abstract class DataSetsControllerTests(
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
 
-            DataSet dataSet = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished()
-                .WithPublicationId(Guid.NewGuid());
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(Guid.NewGuid());
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
@@ -1071,13 +1038,9 @@ public abstract class DataSetsControllerTests(
 
         private async Task<HttpResponseMessage> GetDataSet(Guid dataSetId, HttpClient? client = null)
         {
-            var user = DataFixture
-                .AuthenticatedUser()
-                .WithClaim(SecurityClaimTypes.AccessAllPublications.ToString());
+            var user = DataFixture.AuthenticatedUser().WithClaim(SecurityClaimTypes.AccessAllPublications.ToString());
 
-            client ??= TestApp
-                .SetUser(user)
-                .CreateClient();
+            client ??= TestApp.SetUser(user).CreateClient();
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}", UriKind.Relative);
 
@@ -1085,19 +1048,14 @@ public abstract class DataSetsControllerTests(
         }
     }
 
-    public class CreateDataSetTests(
-        TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class CreateDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
         {
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    DataFixture
-                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                        .Generate(1)
-                );
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
 
             var draftReleaseVersion = publication.ReleaseVersions.Single();
 
@@ -1118,23 +1076,17 @@ public abstract class DataSetsControllerTests(
             var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
 
             processorClient
-                .Setup(c => c.CreateDataSet(
-                    releaseFile.Id,
-                    It.IsAny<CancellationToken>()))
+                .Setup(c => c.CreateDataSet(releaseFile.Id, It.IsAny<CancellationToken>()))
                 .Returns(async () =>
                 {
-                    dataSet = DataFixture
-                        .DefaultDataSet()
-                        .WithStatusPublished()
-                        .WithPublicationId(publication.Id);
+                    dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
 
                     await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
                     dataSetVersion = DataFixture
                         .DefaultDataSetVersion()
                         .WithStatusProcessing()
-                        .WithRelease(DataFixture.DefaultDataSetVersionRelease()
-                            .WithReleaseFileId(releaseFile.Id))
+                        .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
                         .WithDataSet(dataSet)
                         .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
@@ -1148,7 +1100,7 @@ public abstract class DataSetsControllerTests(
                     {
                         DataSetId = dataSet.Id,
                         DataSetVersionId = dataSetVersion.Id,
-                        InstanceId = Guid.NewGuid()
+                        InstanceId = Guid.NewGuid(),
                     };
                 });
 
@@ -1202,14 +1154,14 @@ public abstract class DataSetsControllerTests(
                 {
                     Code = "TestError1",
                     Message = "Test message 1",
-                    Path = "releaseFileId"
+                    Path = "releaseFileId",
                 },
                 new ErrorViewModel
                 {
                     Code = "TestError2",
                     Message = "Test message 2",
-                    Path = "releaseFileId"
-                }
+                    Path = "releaseFileId",
+                },
             ];
 
             processorClient
@@ -1228,17 +1180,18 @@ public abstract class DataSetsControllerTests(
 
         private WebApplicationFactory<TestStartup> BuildApp(
             IProcessorClient? processorClient = null,
-            ClaimsPrincipal? user = null)
+            ClaimsPrincipal? user = null
+        )
         {
-            return TestApp.ConfigureServices(
-                    services => { services.ReplaceService(processorClient ?? Mock.Of<IProcessorClient>()); }
-                )
+            return TestApp
+                .ConfigureServices(services =>
+                {
+                    services.ReplaceService(processorClient ?? Mock.Of<IProcessorClient>());
+                })
                 .SetUser(user ?? DataFixture.BauUser());
         }
 
-        private async Task<HttpResponseMessage> CreateDataSet(
-            Guid releaseFileId,
-            HttpClient? client = null)
+        private async Task<HttpResponseMessage> CreateDataSet(Guid releaseFileId, HttpClient? client = null)
         {
             client ??= BuildApp().CreateClient();
 

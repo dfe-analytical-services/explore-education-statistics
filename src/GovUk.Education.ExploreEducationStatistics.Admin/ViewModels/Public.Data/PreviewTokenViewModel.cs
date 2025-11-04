@@ -19,7 +19,9 @@ public record PreviewTokenViewModel
 
     public required DateTimeOffset Created { get; set; }
 
-    public required DateTimeOffset Expiry { get; set; }
+    public required DateTimeOffset Expires { get; set; }
 
     public required DateTimeOffset? Updated { get; set; }
+
+    public required DateTimeOffset Activates { get; set; }
 }

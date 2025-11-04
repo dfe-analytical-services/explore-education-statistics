@@ -10,9 +10,11 @@ public class Methodology
 
     public List<PublicationMethodology> Publications { get; set; } = new();
 
-    [Required] public string OwningPublicationTitle { get; set; } = null!;
+    [Required]
+    public string OwningPublicationTitle { get; set; } = null!;
 
-    [Required] public string OwningPublicationSlug { get; set; } = null!;
+    [Required]
+    public string OwningPublicationSlug { get; set; } = null!;
 
     public List<MethodologyVersion> Versions { get; set; } = new();
 
@@ -27,8 +29,7 @@ public class Methodology
             throw new ArgumentException("Methodology must be hydrated with Publications to get the owning publication");
         }
 
-        return Publications
-            .Single(pm => pm.Owner);
+        return Publications.Single(pm => pm.Owner);
     }
 
     public MethodologyVersion LatestVersion()
@@ -49,6 +50,6 @@ public class Methodology
         }
 
         return Versions.Exists(mv => mv.Id == methodologyVersionId)
-               && Versions.All(mv => mv.PreviousVersionId != methodologyVersionId);
+            && Versions.All(mv => mv.PreviousVersionId != methodologyVersionId);
     }
 }

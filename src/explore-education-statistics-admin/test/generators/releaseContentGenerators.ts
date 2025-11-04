@@ -107,9 +107,7 @@ const defaultPublication: Publication = {
 
 const defaultKeyStatistics: KeyStatistic[] = [
   {
-    created: '2020-01-01',
     id: 'key-statistic-id',
-    order: 0,
     statistic: 'Statistic',
     title: 'Key statistic',
     type: 'KeyStatisticText',

@@ -6,13 +6,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 [ExcludeFromCodeCoverage]
+// ReSharper disable once InconsistentNaming
 public partial class EES3964_DropPublicationLegacyPublicationUrl : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "LegacyPublicationUrl",
-            table: "Publications");
+        migrationBuilder.DropColumn(name: "LegacyPublicationUrl", table: "Publications");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -21,6 +20,7 @@ public partial class EES3964_DropPublicationLegacyPublicationUrl : Migration
             name: "LegacyPublicationUrl",
             table: "Publications",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
     }
 }

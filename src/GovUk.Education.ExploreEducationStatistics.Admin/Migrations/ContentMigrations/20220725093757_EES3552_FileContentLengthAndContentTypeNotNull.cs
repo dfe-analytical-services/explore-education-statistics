@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES3552_FileContentLengthAndContentTypeNotNull : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,7 +19,8 @@ public partial class EES3552_FileContentLengthAndContentTypeNotNull : Migration
             oldClrType: typeof(string),
             oldType: "nvarchar(255)",
             oldMaxLength: 255,
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.AlterColumn<long>(
             name: "ContentLength",
@@ -28,7 +30,8 @@ public partial class EES3552_FileContentLengthAndContentTypeNotNull : Migration
             defaultValue: 0L,
             oldClrType: typeof(long),
             oldType: "bigint",
-            oldNullable: true);
+            oldNullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -41,7 +44,8 @@ public partial class EES3552_FileContentLengthAndContentTypeNotNull : Migration
             nullable: true,
             oldClrType: typeof(string),
             oldType: "nvarchar(255)",
-            oldMaxLength: 255);
+            oldMaxLength: 255
+        );
 
         migrationBuilder.AlterColumn<long>(
             name: "ContentLength",
@@ -49,6 +53,7 @@ public partial class EES3552_FileContentLengthAndContentTypeNotNull : Migration
             type: "bigint",
             nullable: true,
             oldClrType: typeof(long),
-            oldType: "bigint");
+            oldType: "bigint"
+        );
     }
 }

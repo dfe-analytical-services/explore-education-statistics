@@ -8,10 +8,7 @@ public class MethodologyVersionTests
     [Fact]
     public void ScheduledForPublishingImmediately_TrueWhenPublishingStrategyIsImmediately()
     {
-        var methodology = new MethodologyVersion
-        {
-            PublishingStrategy = Immediately
-        };
+        var methodology = new MethodologyVersion { PublishingStrategy = Immediately };
 
         Assert.True(methodology.ScheduledForPublishingImmediately);
     }
@@ -19,16 +16,13 @@ public class MethodologyVersionTests
     [Fact]
     public void ScheduledForPublishingImmediately_FalseWhenPublishingStrategyIsWithRelease()
     {
-        var releaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid()
-        };
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 
         var methodology = new MethodologyVersion
         {
             PublishingStrategy = WithRelease,
             ScheduledWithReleaseVersionId = releaseVersion.Id,
-            ScheduledWithReleaseVersion = releaseVersion
+            ScheduledWithReleaseVersion = releaseVersion,
         };
 
         Assert.False(methodology.ScheduledForPublishingImmediately);
@@ -37,10 +31,7 @@ public class MethodologyVersionTests
     [Fact]
     public void ScheduledForPublishingWithRelease_FalseWhenPublishingStrategyIsImmediately()
     {
-        var methodology = new MethodologyVersion
-        {
-            PublishingStrategy = Immediately
-        };
+        var methodology = new MethodologyVersion { PublishingStrategy = Immediately };
 
         Assert.False(methodology.ScheduledForPublishingWithRelease);
     }
@@ -48,16 +39,13 @@ public class MethodologyVersionTests
     [Fact]
     public void ScheduledForPublishingWithRelease_TrueWhenPublishingStrategyIsWithRelease()
     {
-        var releaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid()
-        };
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 
         var methodology = new MethodologyVersion
         {
             PublishingStrategy = WithRelease,
             ScheduledWithReleaseVersionId = releaseVersion.Id,
-            ScheduledWithReleaseVersion = releaseVersion
+            ScheduledWithReleaseVersion = releaseVersion,
         };
 
         Assert.True(methodology.ScheduledForPublishingWithRelease);
@@ -66,17 +54,13 @@ public class MethodologyVersionTests
     [Fact]
     public void ScheduledForPublishingWithPublishedRelease_TrueWhenScheduledWithLiveRelease()
     {
-        var liveReleaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow
-        };
+        var liveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Published = DateTime.UtcNow };
 
         var methodology = new MethodologyVersion
         {
             PublishingStrategy = WithRelease,
             ScheduledWithReleaseVersion = liveReleaseVersion,
-            ScheduledWithReleaseVersionId = liveReleaseVersion.Id
+            ScheduledWithReleaseVersionId = liveReleaseVersion.Id,
         };
 
         Assert.True(methodology.ScheduledForPublishingWithPublishedRelease);
@@ -85,16 +69,13 @@ public class MethodologyVersionTests
     [Fact]
     public void ScheduledForPublishingWithPublishedRelease_FalseWhenScheduledWithNonLiveRelease()
     {
-        var nonLiveReleaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid()
-        };
+        var nonLiveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 
         var methodology = new MethodologyVersion
         {
             PublishingStrategy = WithRelease,
             ScheduledWithReleaseVersion = nonLiveReleaseVersion,
-            ScheduledWithReleaseVersionId = nonLiveReleaseVersion.Id
+            ScheduledWithReleaseVersionId = nonLiveReleaseVersion.Id,
         };
 
         Assert.False(methodology.ScheduledForPublishingWithPublishedRelease);
@@ -103,10 +84,7 @@ public class MethodologyVersionTests
     [Fact]
     public void ScheduledForPublishingWithPublishedRelease_FalseWhenPublishingStrategyIsImmediately()
     {
-        var methodology = new MethodologyVersion
-        {
-            PublishingStrategy = Immediately
-        };
+        var methodology = new MethodologyVersion { PublishingStrategy = Immediately };
 
         Assert.False(methodology.ScheduledForPublishingWithPublishedRelease);
     }
@@ -117,7 +95,7 @@ public class MethodologyVersionTests
         var methodology = new MethodologyVersion
         {
             PublishingStrategy = WithRelease,
-            ScheduledWithReleaseVersionId = Guid.NewGuid()
+            ScheduledWithReleaseVersionId = Guid.NewGuid(),
         };
 
         Assert.Throws<InvalidOperationException>(() => methodology.ScheduledForPublishingWithPublishedRelease);
@@ -128,10 +106,7 @@ public class MethodologyVersionTests
     {
         var methodology = new MethodologyVersion
         {
-            Methodology = new Methodology
-            {
-                OwningPublicationTitle = "Owning Publication Title"
-            }
+            Methodology = new Methodology { OwningPublicationTitle = "Owning Publication Title" },
         };
 
         Assert.Equal(methodology.Methodology.OwningPublicationTitle, methodology.Title);
@@ -142,11 +117,8 @@ public class MethodologyVersionTests
     {
         var methodology = new MethodologyVersion
         {
-            Methodology = new Methodology
-            {
-                OwningPublicationTitle = "Owning Publication Title"
-            },
-            AlternativeTitle = "Alternative Title"
+            Methodology = new Methodology { OwningPublicationTitle = "Owning Publication Title" },
+            AlternativeTitle = "Alternative Title",
         };
 
         Assert.Equal(methodology.AlternativeTitle, methodology.Title);
@@ -158,10 +130,7 @@ public class MethodologyVersionTests
         var methodologyVersion = new MethodologyVersion
         {
             AlternativeSlug = null,
-            Methodology = new Methodology
-            {
-                OwningPublicationSlug = "owning-publication-slug",
-            },
+            Methodology = new Methodology { OwningPublicationSlug = "owning-publication-slug" },
         };
 
         Assert.Equal(methodologyVersion.Methodology.OwningPublicationSlug, methodologyVersion.Slug);
@@ -173,10 +142,7 @@ public class MethodologyVersionTests
         var methodologyVersion = new MethodologyVersion
         {
             AlternativeSlug = "alternativeSlug",
-            Methodology = new Methodology
-            {
-                OwningPublicationSlug = "owning-publication-slug",
-            },
+            Methodology = new Methodology { OwningPublicationSlug = "owning-publication-slug" },
         };
 
         Assert.Equal(methodologyVersion.AlternativeSlug, methodologyVersion.Slug);
@@ -185,11 +151,7 @@ public class MethodologyVersionTests
     [Fact]
     public void AmendmentFlag_NotAmendment_FirstUnpublishedVersion()
     {
-        var methodology = new MethodologyVersion
-        {
-            PreviousVersionId = null,
-            Published = null
-        };
+        var methodology = new MethodologyVersion { PreviousVersionId = null, Published = null };
 
         Assert.False(methodology.Amendment);
     }
@@ -197,11 +159,7 @@ public class MethodologyVersionTests
     [Fact]
     public void AmendmentFlag_NotAmendment_FirstPublishedVersion()
     {
-        var methodology = new MethodologyVersion
-        {
-            PreviousVersionId = null,
-            Published = DateTime.Now
-        };
+        var methodology = new MethodologyVersion { PreviousVersionId = null, Published = DateTime.Now };
 
         Assert.False(methodology.Amendment);
     }
@@ -209,11 +167,7 @@ public class MethodologyVersionTests
     [Fact]
     public void AmendmentFlag_Amendment_UnpublishedNewVersion()
     {
-        var methodology = new MethodologyVersion
-        {
-            PreviousVersionId = Guid.NewGuid(),
-            Published = null
-        };
+        var methodology = new MethodologyVersion { PreviousVersionId = Guid.NewGuid(), Published = null };
 
         Assert.True(methodology.Amendment);
     }
@@ -221,11 +175,7 @@ public class MethodologyVersionTests
     [Fact]
     public void AmendmentFlag_NotAmendment_PublishedNewVersion()
     {
-        var methodology = new MethodologyVersion
-        {
-            PreviousVersionId = Guid.NewGuid(),
-            Published = DateTime.Now
-        };
+        var methodology = new MethodologyVersion { PreviousVersionId = Guid.NewGuid(), Published = DateTime.Now };
 
         Assert.False(methodology.Amendment);
     }

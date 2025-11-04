@@ -27,34 +27,42 @@ public abstract class DataReplacementControllerTests
 
             var dataReplacementPlan = new DataReplacementPlanViewModel
             {
-                DataBlocks = [
+                DataBlocks =
+                [
                     new DataBlockReplacementPlanViewModel(
                         id: Guid.NewGuid(),
                         name: "my data block",
-                        originalFilters: new Dictionary<Guid, FilterReplacementViewModel> {
-                            { 
-                                Guid.NewGuid(), 
+                        originalFilters: new Dictionary<Guid, FilterReplacementViewModel>
+                        {
+                            {
+                                Guid.NewGuid(),
                                 new FilterReplacementViewModel(
                                     id: Guid.NewGuid(), // original filterId
                                     target: Guid.NewGuid(), // replacement filterId
                                     label: "filter replacement lebel",
                                     name: "filter replacement name",
-                                    groups: new Dictionary<Guid, FilterGroupReplacementViewModel> {
+                                    groups: new Dictionary<Guid, FilterGroupReplacementViewModel>
+                                    {
                                         {
                                             Guid.NewGuid(),
                                             new FilterGroupReplacementViewModel(
                                                 id: Guid.NewGuid(),
                                                 label: "filter group replacement label",
-                                                filters: [
+                                                filters:
+                                                [
                                                     new FilterItemReplacementViewModel(
                                                         id: Guid.NewGuid(),
                                                         label: "filter item replacement label",
-                                                        target: Guid.NewGuid())
-                                                ])
-                                        }
-                                    })
-                            }
-                        })
+                                                        target: Guid.NewGuid()
+                                                    ),
+                                                ]
+                                            )
+                                        },
+                                    }
+                                )
+                            },
+                        }
+                    ),
                 ],
                 Footnotes = [],
                 ApiDataSetVersionPlan = new ReplaceApiDataSetVersionPlanViewModel
@@ -66,21 +74,19 @@ public abstract class DataReplacementControllerTests
                     Status = DataSetVersionStatus.Draft,
                 },
                 OriginalSubjectId = Guid.NewGuid(),
-                ReplacementSubjectId = Guid.NewGuid()
+                ReplacementSubjectId = Guid.NewGuid(),
             };
 
             replacementPlanService
-                .Setup(s => s.GetReplacementPlan(
-                    releaseVersionId, 
-                    originalFileId, 
-                    It.IsAny<CancellationToken>()))
+                .Setup(s => s.GetReplacementPlan(releaseVersionId, originalFileId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dataReplacementPlan);
 
             var controller = BuildController(replacementPlanService: replacementPlanService.Object);
 
             var result = await controller.GetReplacementPlan(
                 releaseVersionId: releaseVersionId,
-                originalFileId: originalFileId);
+                originalFileId: originalFileId
+            );
 
             MockUtils.VerifyAllMocks(replacementPlanService);
 
@@ -88,9 +94,7 @@ public abstract class DataReplacementControllerTests
 
             var originalPlan = dataReplacementPlan.ToSummary();
 
-            Assert.Equal(
-                JsonConvert.SerializeObject(originalPlan),
-                JsonConvert.SerializeObject(returnedPlan));
+            Assert.Equal(JsonConvert.SerializeObject(originalPlan), JsonConvert.SerializeObject(returnedPlan));
         }
     }
 
@@ -105,17 +109,17 @@ public abstract class DataReplacementControllerTests
             var originalFileId = Guid.NewGuid();
 
             replacementBatchService
-                .Setup(service => service.Replace(
-                    releaseVersionId,
-                    new List<Guid> { originalFileId },
-                    It.IsAny<CancellationToken>()))
+                .Setup(service =>
+                    service.Replace(releaseVersionId, new List<Guid> { originalFileId }, It.IsAny<CancellationToken>())
+                )
                 .ReturnsAsync(Unit.Instance);
 
             var controller = BuildController(replacementBatchService: replacementBatchService.Object);
 
             var result = await controller.Replace(
                 releaseVersionId: releaseVersionId,
-                new ReplacementRequest { OriginalFileIds = [originalFileId] });
+                new ReplacementRequest { OriginalFileIds = [originalFileId] }
+            );
 
             MockUtils.VerifyAllMocks(replacementBatchService);
 
@@ -131,17 +135,17 @@ public abstract class DataReplacementControllerTests
             var originalFileId = Guid.NewGuid();
 
             replacementBatchService
-                .Setup(service => service.Replace(
-                    releaseVersionId,
-                    new List<Guid> { originalFileId },
-                    It.IsAny<CancellationToken>()))
+                .Setup(service =>
+                    service.Replace(releaseVersionId, new List<Guid> { originalFileId }, It.IsAny<CancellationToken>())
+                )
                 .ReturnsAsync(ValidationUtils.ValidationActionResult(ValidationErrorMessages.ReplacementMustBeValid));
 
             var controller = BuildController(replacementBatchService: replacementBatchService.Object);
 
             var result = await controller.Replace(
                 releaseVersionId: releaseVersionId,
-                new ReplacementRequest { OriginalFileIds = [originalFileId] });
+                new ReplacementRequest { OriginalFileIds = [originalFileId] }
+            );
 
             MockUtils.VerifyAllMocks(replacementBatchService);
 
@@ -151,10 +155,12 @@ public abstract class DataReplacementControllerTests
 
     private static DataReplacementController BuildController(
         IReplacementPlanService? replacementPlanService = null,
-        IReplacementBatchService? replacementBatchService = null)
+        IReplacementBatchService? replacementBatchService = null
+    )
     {
         return new DataReplacementController(
             replacementPlanService ?? Mock.Of<IReplacementPlanService>(MockBehavior.Strict),
-            replacementBatchService ?? Mock.Of<IReplacementBatchService>(MockBehavior.Strict));
+            replacementBatchService ?? Mock.Of<IReplacementBatchService>(MockBehavior.Strict)
+        );
     }
 }

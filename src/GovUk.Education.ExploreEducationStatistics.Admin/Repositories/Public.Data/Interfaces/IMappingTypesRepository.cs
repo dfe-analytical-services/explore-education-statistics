@@ -6,9 +6,11 @@ public interface IMappingTypesRepository
 {
     public Task<List<LocationMappingTypes>> GetLocationOptionMappingTypes(
         Guid targetDataSetVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     public Task<List<FilterMappingTypes>> GetFilterOptionMappingTypes(
         Guid targetDataSetVersionId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

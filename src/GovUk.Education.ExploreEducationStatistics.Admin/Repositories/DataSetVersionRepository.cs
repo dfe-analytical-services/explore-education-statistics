@@ -6,21 +6,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
 
-public class DataSetVersionRepository(
-    ContentDbContext contentDbContext,
-    PublicDataDbContext publicDataDbContext) : IDataSetVersionRepository
+public class DataSetVersionRepository(ContentDbContext contentDbContext, PublicDataDbContext publicDataDbContext)
+    : IDataSetVersionRepository
 {
     public async Task<List<DataSetVersion>> GetDataSetVersions(Guid releaseVersionId)
     {
         var releaseFileIds = await contentDbContext
-            .ReleaseFiles
-            .Where(rf => rf.ReleaseVersionId == releaseVersionId)
+            .ReleaseFiles.Where(rf => rf.ReleaseVersionId == releaseVersionId)
             .Select(rf => rf.Id)
             .ToListAsync();
 
         return await publicDataDbContext
-            .DataSetVersions
-            .Where(dsv => releaseFileIds.Contains(dsv.Release.ReleaseFileId))
+            .DataSetVersions.Where(dsv => releaseFileIds.Contains(dsv.Release.ReleaseFileId))
             .ToListAsync();
     }
 }

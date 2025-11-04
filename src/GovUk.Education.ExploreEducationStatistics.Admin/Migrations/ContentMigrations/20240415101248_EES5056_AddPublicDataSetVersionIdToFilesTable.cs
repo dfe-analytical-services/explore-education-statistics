@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 /// <inheritdoc />
+// ReSharper disable once InconsistentNaming
 public partial class EES5056_AddPublicDataSetVersionIdToFilesTable : Migration
 {
     /// <inheritdoc />
@@ -14,23 +15,21 @@ public partial class EES5056_AddPublicDataSetVersionIdToFilesTable : Migration
             name: "PublicDataSetVersionId",
             table: "Files",
             type: "uniqueidentifier",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_Files_PublicDataSetVersionId",
             table: "Files",
-            column: "PublicDataSetVersionId");
+            column: "PublicDataSetVersionId"
+        );
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropIndex(
-            name: "IX_Files_PublicDataSetVersionId",
-            table: "Files");
+        migrationBuilder.DropIndex(name: "IX_Files_PublicDataSetVersionId", table: "Files");
 
-        migrationBuilder.DropColumn(
-            name: "PublicDataSetVersionId",
-            table: "Files");
+        migrationBuilder.DropColumn(name: "PublicDataSetVersionId", table: "Files");
     }
 }

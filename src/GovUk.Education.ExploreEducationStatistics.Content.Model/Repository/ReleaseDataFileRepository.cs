@@ -11,11 +11,7 @@ public class ReleaseDataFileRepository : IReleaseDataFileRepository
 {
     private readonly ContentDbContext _contentDbContext;
 
-    private static readonly List<FileType> SupportedFileTypes = new()
-    {
-        Data,
-        Metadata
-    };
+    private static readonly List<FileType> SupportedFileTypes = new() { Data, Metadata };
 
     public ReleaseDataFileRepository(ContentDbContext contentDbContext)
     {
@@ -31,8 +27,8 @@ public class ReleaseDataFileRepository : IReleaseDataFileRepository
         Guid createdById,
         string? name = null,
         File? replacingDataFile = null,
-        File? source = null,
-        int order = 0)
+        int order = 0
+    )
     {
         if (!SupportedFileTypes.Contains(type))
         {
@@ -54,19 +50,14 @@ public class ReleaseDataFileRepository : IReleaseDataFileRepository
                 CreatedById = createdById,
                 RootPath = releaseVersionId,
                 SubjectId = subjectId,
-                DataSetFileId = type != Data
-                    ? null
-                    : replacingDataFile?.DataSetFileId ?? Guid.NewGuid(),
-                DataSetFileVersion = type != Data
-                    ? null
-                    : replacingDataFile?.DataSetFileVersion + 1 ?? 0,
+                DataSetFileId = type != Data ? null : replacingDataFile?.DataSetFileId ?? Guid.NewGuid(),
+                DataSetFileVersion = type != Data ? null : replacingDataFile?.DataSetFileVersion + 1 ?? 0,
                 DataSetFileMeta = null, // If FileType.Data, this is set by Data.Processor when import is complete
                 Filename = filename,
                 ContentLength = contentLength,
                 ContentType = "text/csv",
                 Type = type,
                 Replacing = replacingDataFile,
-                Source = source,
             },
         };
         var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
@@ -93,13 +84,12 @@ public class ReleaseDataFileRepository : IReleaseDataFileRepository
     public async Task<IList<File>> ListReplacementDataFiles(Guid releaseVersionId)
     {
         return await _contentDbContext
-            .ReleaseFiles
-            .Include(rf => rf.File)
-            .Where(
-                rf => rf.ReleaseVersionId == releaseVersionId
-                      && rf.File.Type == Data
-                      && rf.File.ReplacingId != null
-                      && rf.File.SubjectId.HasValue
+            .ReleaseFiles.Include(rf => rf.File)
+            .Where(rf =>
+                rf.ReleaseVersionId == releaseVersionId
+                && rf.File.Type == Data
+                && rf.File.ReplacingId != null
+                && rf.File.SubjectId.HasValue
             )
             .Select(rf => rf.File)
             .ToListAsync();
@@ -108,24 +98,17 @@ public class ReleaseDataFileRepository : IReleaseDataFileRepository
     public async Task<ReleaseFile> GetBySubject(Guid releaseVersionId, Guid subjectId)
     {
         return await _contentDbContext
-            .ReleaseFiles
-            .Include(rf => rf.File)
+            .ReleaseFiles.Include(rf => rf.File)
             .SingleAsync(rf =>
-                rf.ReleaseVersionId == releaseVersionId
-                && rf.File.SubjectId == subjectId
-                && rf.File.Type == Data);
+                rf.ReleaseVersionId == releaseVersionId && rf.File.SubjectId == subjectId && rf.File.Type == Data
+            );
     }
 
     private IQueryable<File> ListDataFilesQuery(Guid releaseVersionId)
     {
         return _contentDbContext
-            .ReleaseFiles
-            .Include(rf => rf.File)
-            .Where(
-                rf => rf.ReleaseVersionId == releaseVersionId
-                      && rf.File.Type == Data
-                      && rf.File.ReplacingId == null
-            )
+            .ReleaseFiles.Include(rf => rf.File)
+            .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == Data && rf.File.ReplacingId == null)
             .OrderBy(rf => rf.Order)
             .ThenBy(rf => rf.Name) // For data sets existing before ordering was added
             .Select(rf => rf.File);

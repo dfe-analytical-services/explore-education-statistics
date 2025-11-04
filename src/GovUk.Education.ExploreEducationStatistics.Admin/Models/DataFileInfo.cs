@@ -28,6 +28,12 @@ public record DataFileInfo : FileInfo
 
     public DataFilePermissions Permissions { get; set; } = new();
 
+    /// <summary>
+    /// Identifies if the data file is compatible for use as a public API data set.
+    /// </summary>
+    /// <remarks>A null value indicates that the file has not been screened. This occurs when the data set existed prior to the integrated screener being introduced.</remarks>
+    public bool? PublicApiCompatible { get; set; }
+
     public Guid? PublicApiDataSetId { get; set; }
 
     public string? PublicApiDataSetVersion { get; set; }
@@ -35,10 +41,7 @@ public record DataFileInfo : FileInfo
     public DataFileInfo() { }
 
     [SetsRequiredMembers]
-    public DataFileInfo(
-        ReleaseFile releaseFile,
-        DataImport dataImport,
-        DataFilePermissions permissions)
+    public DataFileInfo(ReleaseFile releaseFile, DataImport dataImport, DataFilePermissions permissions)
     {
         Id = releaseFile.FileId;
         FileName = releaseFile.File.Filename;
@@ -53,6 +56,7 @@ public record DataFileInfo : FileInfo
         Status = dataImport.Status;
         Created = releaseFile.File.Created;
         Permissions = permissions;
+        PublicApiCompatible = releaseFile.PublicApiCompatible;
         PublicApiDataSetId = releaseFile.PublicApiDataSetId;
         PublicApiDataSetVersion = releaseFile.PublicApiDataSetVersionString;
     }
@@ -67,7 +71,9 @@ public record ReplacementDataFileInfo : DataFileInfo
         ReleaseFile releaseFile,
         DataImport dataImport,
         DataFilePermissions permissions,
-        bool hasValidReplacementPlan) : base(releaseFile, dataImport, permissions)
+        bool hasValidReplacementPlan
+    )
+        : base(releaseFile, dataImport, permissions)
     {
         HasValidReplacementPlan = hasValidReplacementPlan;
     }

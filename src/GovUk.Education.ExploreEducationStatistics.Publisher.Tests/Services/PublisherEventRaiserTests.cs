@@ -19,7 +19,7 @@ public class PublisherEventRaiserTests
 {
     private readonly EventRaiserMockBuilder _eventRaiserMockBuilder = new();
 
-    private IPublisherEventRaiser GetSut(IEventRaiser? eventRaiser = null) => 
+    private IPublisherEventRaiser GetSut(IEventRaiser? eventRaiser = null) =>
         new PublisherEventRaiser(eventRaiser ?? _eventRaiserMockBuilder.Build());
 
     public class BasicTests : PublisherEventRaiserTests
@@ -41,16 +41,10 @@ public class PublisherEventRaiserTests
             var sut = GetSut();
 
             // ACT
-            await sut.OnPublicationArchived(
-                publicationId,
-                publicationSlug,
-                supersededByPublicationId);
+            await sut.OnPublicationArchived(publicationId, publicationSlug, supersededByPublicationId);
 
             // ASSERT
-            var expectedEvent = new PublicationArchivedEvent(
-                publicationId,
-                publicationSlug,
-                supersededByPublicationId);
+            var expectedEvent = new PublicationArchivedEvent(publicationId, publicationSlug, supersededByPublicationId);
             _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
         }
     }
@@ -73,16 +67,17 @@ public class PublisherEventRaiserTests
                 PreviousLatestPublishedReleaseVersionId = Guid.NewGuid(),
                 LatestPublishedReleaseId = Guid.NewGuid(),
                 LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                PublishedReleaseVersions = [
+                PublishedReleaseVersions =
+                [
                     new PublishedReleaseVersionInfo
                     {
                         ReleaseId = Guid.NewGuid(),
                         ReleaseSlug = "test-release-slug",
                         ReleaseVersionId = Guid.NewGuid(),
-                        PublicationId = publicationId
-                    }
+                        PublicationId = publicationId,
+                    },
                 ],
-                IsPublicationArchived = isPublicationArchived
+                IsPublicationArchived = isPublicationArchived,
             };
 
             // ACT
@@ -101,8 +96,9 @@ public class PublisherEventRaiserTests
                     PreviousLatestPublishedReleaseVersionId = info.PreviousLatestPublishedReleaseVersionId,
                     LatestPublishedReleaseId = info.LatestPublishedReleaseId,
                     LatestPublishedReleaseVersionId = info.LatestPublishedReleaseVersionId,
-                    IsPublicationArchived = isPublicationArchived
-                });
+                    IsPublicationArchived = isPublicationArchived,
+                }
+            );
             _eventRaiserMockBuilder.Assert.EventsRaised([expectedEvent]);
         }
 
@@ -132,17 +128,17 @@ public class PublisherEventRaiserTests
                             ReleaseId = Guid.NewGuid(),
                             ReleaseSlug = "test-release-slug-1",
                             ReleaseVersionId = Guid.NewGuid(),
-                            PublicationId = publication1Id
+                            PublicationId = publication1Id,
                         },
                         new PublishedReleaseVersionInfo
                         {
                             ReleaseId = Guid.NewGuid(),
                             ReleaseSlug = "test-release-slug-2",
                             ReleaseVersionId = Guid.NewGuid(),
-                            PublicationId = publication1Id
-                        }
+                            PublicationId = publication1Id,
+                        },
                     ],
-                    IsPublicationArchived = isPublicationArchived
+                    IsPublicationArchived = isPublicationArchived,
                 },
                 new PublishedPublicationInfo
                 {
@@ -159,27 +155,27 @@ public class PublisherEventRaiserTests
                             ReleaseId = Guid.NewGuid(),
                             ReleaseSlug = "test-release-slug-3",
                             ReleaseVersionId = Guid.NewGuid(),
-                            PublicationId = publication2Id
+                            PublicationId = publication2Id,
                         },
                         new PublishedReleaseVersionInfo
                         {
                             ReleaseId = Guid.NewGuid(),
                             ReleaseSlug = "test-release-slug-4",
                             ReleaseVersionId = Guid.NewGuid(),
-                            PublicationId = publication2Id
-                        }
+                            PublicationId = publication2Id,
+                        },
                     ],
-                    IsPublicationArchived = isPublicationArchived
-                }
+                    IsPublicationArchived = isPublicationArchived,
+                },
             };
 
             // ACT
             await sut.OnReleaseVersionsPublished(infos);
 
             // ASSERT
-            var expectedEvents = infos.SelectMany(info =>
-                info.PublishedReleaseVersions.Select(version =>
-                    new ReleaseVersionPublishedEvent(
+            var expectedEvents = infos
+                .SelectMany(info =>
+                    info.PublishedReleaseVersions.Select(version => new ReleaseVersionPublishedEvent(
                         new ReleaseVersionPublishedEvent.ReleaseVersionPublishedEventInfo
                         {
                             PublicationId = info.PublicationId,
@@ -191,8 +187,11 @@ public class PublisherEventRaiserTests
                             PreviousLatestPublishedReleaseVersionId = info.PreviousLatestPublishedReleaseVersionId,
                             LatestPublishedReleaseId = info.LatestPublishedReleaseId,
                             LatestPublishedReleaseVersionId = info.LatestPublishedReleaseVersionId,
-                            IsPublicationArchived = isPublicationArchived
-                        }))).ToList();
+                            IsPublicationArchived = isPublicationArchived,
+                        }
+                    ))
+                )
+                .ToList();
 
             _eventRaiserMockBuilder.Assert.EventsRaised(expectedEvents);
         }
@@ -204,10 +203,7 @@ public class PublisherEventRaiserTests
         public void WhenResolvedFromContainer_ThenEventRaiserIsReturned()
         {
             // ARRANGE
-            var host = new HostBuilder()
-                .ConfigureTestAppConfiguration()
-                .ConfigureServices()
-                .Build();
+            var host = new HostBuilder().ConfigureTestAppConfiguration().ConfigureServices().Build();
 
             // ACT
             var eventRaiser = host.Services.GetRequiredService<IPublisherEventRaiser>();
@@ -231,17 +227,14 @@ public class PublisherEventRaiserTests
         {
             // ARRANGE
             var eventGridOptions = new EventGridOptionsBuilder()
-                .AddTopicConfig(
-                    ReleaseVersionPublishedEvent.EventTopicOptionsKey,
-                    TestTopicEndpoint,
-                    TopicAccessKey)
+                .AddTopicConfig(ReleaseVersionPublishedEvent.EventTopicOptionsKey, TestTopicEndpoint, TopicAccessKey)
                 .Build();
 
             var realEventGridClientFactory = new ConfiguredEventGridClientFactory(
-                new EventGridClientFactory(
-                    () => new UnitTestOutputLoggerBuilder<SafeEventGridClient>().Build(output)),
+                new EventGridClientFactory(() => new UnitTestOutputLoggerBuilder<SafeEventGridClient>().Build(output)),
                 eventGridOptions,
-                new UnitTestOutputLoggerBuilder<ConfiguredEventGridClientFactory>().Build(output));
+                new UnitTestOutputLoggerBuilder<ConfiguredEventGridClientFactory>().Build(output)
+            );
 
             var sut = GetSut(new EventRaiser(realEventGridClientFactory));
 
@@ -254,16 +247,17 @@ public class PublisherEventRaiserTests
                 PreviousLatestPublishedReleaseVersionId = Guid.NewGuid(),
                 LatestPublishedReleaseId = Guid.NewGuid(),
                 LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                PublishedReleaseVersions = [
+                PublishedReleaseVersions =
+                [
                     new PublishedReleaseVersionInfo
                     {
                         ReleaseId = Guid.NewGuid(),
                         ReleaseSlug = "test-release-slug",
                         ReleaseVersionId = Guid.NewGuid(),
-                        PublicationId = publicationId
-                    }
+                        PublicationId = publicationId,
+                    },
                 ],
-                IsPublicationArchived = false
+                IsPublicationArchived = false,
             };
 
             // ACT
@@ -281,24 +275,24 @@ public class PublisherEventRaiserTests
         public void Ensure_config_is_read_in()
         {
             var configJson = """
-                             {
-                               "EventGrid":
-                               {
-                                 "EventTopics":
-                                 [
-                                    {
-                                        "Key":"Event topic options key 1",
-                                        "TopicEndpoint":"event topic endpoint 1",
-                                        "TopicAccessKey":"event topic access key"
-                                    },
-                                    {
-                                        "Key":"Event topic options key 2",
-                                        "TopicEndpoint":"event topic endpoint 2"
-                                    }
-                                 ]
-                               }
-                             }
-                             """;
+                {
+                  "EventGrid":
+                  {
+                    "EventTopics":
+                    [
+                       {
+                           "Key":"Event topic options key 1",
+                           "TopicEndpoint":"event topic endpoint 1",
+                           "TopicAccessKey":"event topic access key"
+                       },
+                       {
+                           "Key":"Event topic options key 2",
+                           "TopicEndpoint":"event topic endpoint 2"
+                       }
+                    ]
+                  }
+                }
+                """;
 
             var config = new ConfigurationBuilder().AddJsonStream(configJson.ToStream()).Build();
 

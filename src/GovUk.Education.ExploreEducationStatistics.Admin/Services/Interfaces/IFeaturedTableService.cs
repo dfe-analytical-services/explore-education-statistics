@@ -9,23 +9,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IFeaturedTableService
 {
-    public Task<Either<ActionResult, FeaturedTableViewModel>> Get(Guid releaseVersionId,
-        Guid dataBlockId);
+    public Task<Either<ActionResult, FeaturedTableViewModel>> Get(Guid releaseVersionId, Guid dataBlockId);
 
     public Task<Either<ActionResult, List<FeaturedTableViewModel>>> List(Guid releaseVersionId);
 
-    public Task<Either<ActionResult, FeaturedTableViewModel>> Create(Guid releaseVersionId,
-        FeaturedTableCreateRequest featuredTableCreateRequest);
+    public Task<Either<ActionResult, FeaturedTableViewModel>> Create(
+        Guid releaseVersionId,
+        FeaturedTableCreateRequest featuredTableCreateRequest
+    );
 
     public Task<Either<ActionResult, FeaturedTableViewModel>> Update(
         Guid releaseVersionId,
         Guid dataBlockId,
-        FeaturedTableUpdateRequest request);
+        FeaturedTableUpdateRequest request
+    );
 
-    public Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
-        Guid dataBlockId);
+    public Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId, Guid dataBlockId);
 
-    public Task<Either<ActionResult, List<FeaturedTableViewModel>>> Reorder(
-        Guid releaseVersionId,
-        List<Guid> newOrder);
+    public Task<Either<ActionResult, List<FeaturedTableViewModel>>> Reorder(Guid releaseVersionId, List<Guid> newOrder);
 }

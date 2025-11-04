@@ -24,14 +24,15 @@ public class ReleaseChecklistPermissionServiceTests
     [Fact]
     public async Task GetChecklist()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         await PolicyCheckBuilder<ContentSecurityPolicies>()
             .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
                 rv => rv.Id == releaseVersion.Id,
-                ContentSecurityPolicies.CanViewSpecificReleaseVersion)
+                ContentSecurityPolicies.CanViewSpecificReleaseVersion
+            )
             .AssertForbidden(async userService =>
             {
                 var contentDbContextId = Guid.NewGuid().ToString();
@@ -45,7 +46,8 @@ public class ReleaseChecklistPermissionServiceTests
                 {
                     var service = BuildReleaseChecklistService(
                         contentDbContext: contentDbContext,
-                        userService: userService.Object);
+                        userService: userService.Object
+                    );
                     return await service.GetChecklist(releaseVersion.Id);
                 }
             });
@@ -60,7 +62,8 @@ public class ReleaseChecklistPermissionServiceTests
         IMethodologyVersionRepository? methodologyVersionRepository = null,
         IFootnoteRepository? footnoteRepository = null,
         IDataBlockService? dataBlockService = null,
-        IDataSetVersionService? dataSetVersionService = null)
+        IDataSetVersionService? dataSetVersionService = null
+    )
     {
         return new(
             contentDbContext ?? new Mock<ContentDbContext>().Object,

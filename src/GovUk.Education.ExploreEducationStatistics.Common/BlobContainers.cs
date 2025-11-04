@@ -6,17 +6,40 @@ public interface IBlobContainer
     public string EmulatedName { get; }
 }
 
+///
+/// Note that if adding new containers here, we should also consider whether or not they need
+/// to be added to the Blob Storage backup policies configured in the ARM template.
+///
+/// These are maintained per Storage Account as a list of containers to backup, referenced in
+/// the "backupDatasourceParametersList" parameter.
+///
 public static class BlobContainers
 {
-    public static readonly IBlobContainer PrivateReleaseFiles = new BlobContainer(Constants.ContainerNames.PrivateReleaseFiles);
-    public static readonly IBlobContainer PrivateReleaseTempFiles = new BlobContainer(Constants.ContainerNames.PrivateReleaseTempFiles);
-    public static readonly IBlobContainer PublicReleaseFiles = new BlobContainer(Constants.ContainerNames.PublicReleaseFiles);
-    public static readonly IBlobContainer PrivateContent = new PrivateBlobContainer(Constants.ContainerNames.PrivateContent);
-    public static readonly IBlobContainer PublicContent = new PublicBlobContainer(Constants.ContainerNames.PublicContent);
-    public static readonly IBlobContainer PermalinkSnapshots = new BlobContainer(Constants.ContainerNames.PermalinkSnapshots);
+    public static readonly IBlobContainer PrivateReleaseFiles = new BlobContainer(
+        Constants.ContainerNames.PrivateReleaseFiles
+    );
+    public static readonly IBlobContainer PrivateReleaseTempFiles = new BlobContainer(
+        Constants.ContainerNames.PrivateReleaseTempFiles
+    );
+    public static readonly IBlobContainer PublicReleaseFiles = new BlobContainer(
+        Constants.ContainerNames.PublicReleaseFiles
+    );
+    public static readonly IBlobContainer PrivateContent = new PrivateBlobContainer(
+        Constants.ContainerNames.PrivateContent
+    );
+    public static readonly IBlobContainer PublicContent = new PublicBlobContainer(
+        Constants.ContainerNames.PublicContent
+    );
+    public static readonly IBlobContainer PermalinkSnapshots = new BlobContainer(
+        Constants.ContainerNames.PermalinkSnapshots
+    );
     public static readonly IBlobContainer PublisherLeases = new BlobContainer(Constants.ContainerNames.PublisherLeases);
-    public static readonly IBlobContainer PrivateMethodologyFiles = new PrivateBlobContainer(Constants.ContainerNames.PrivateMethodologyFiles);
-    public static readonly IBlobContainer PublicMethodologyFiles = new PublicBlobContainer(Constants.ContainerNames.PublicMethodologyFiles);
+    public static readonly IBlobContainer PrivateMethodologyFiles = new PrivateBlobContainer(
+        Constants.ContainerNames.PrivateMethodologyFiles
+    );
+    public static readonly IBlobContainer PublicMethodologyFiles = new PublicBlobContainer(
+        Constants.ContainerNames.PublicMethodologyFiles
+    );
 }
 
 /// <summary>

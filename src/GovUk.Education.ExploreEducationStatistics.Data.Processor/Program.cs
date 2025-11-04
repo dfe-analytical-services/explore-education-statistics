@@ -34,39 +34,44 @@ var host = new HostBuilder()
         // TODO EES-5013 Why can't this be controlled through application settings?
         logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
     })
-    .ConfigureServices((hostContext, services) =>
-    {
-        services
-            .AddApplicationInsightsTelemetryWorkerService()
-            .ConfigureFunctionsApplicationInsights()
-            .AddDbContext<ContentDbContext>(options =>
-                options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
-                    providerOptions => providerOptions.EnableCustomRetryOnFailure()))
-            .AddSingleton<IBlobSasService, BlobSasService>()
-            .AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>(provider =>
-                new PrivateBlobStorageService(
-                    connectionString: provider
-                        .GetRequiredService<IOptions<AppOptions>>()
-                        .Value
-                        .PrivateStorageConnectionString,
-                    logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
-                    sasService: provider.GetRequiredService<IBlobSasService>())
-            )
-            .AddTransient<IFileImportService, FileImportService>()
-            .AddTransient<IImporterService, ImporterService>()
-            .AddTransient<ImporterLocationService>()
-            .AddTransient<IImporterMetaService, ImporterMetaService>()
-            .AddTransient<IDataImportService, DataImportService>()
-            .AddTransient<IValidatorService, ValidatorService>()
-            .AddSingleton<IFileTypeService, FileTypeService>()
-            .AddSingleton<IGuidGenerator, SequentialGuidGenerator>()
-            .AddTransient<IProcessorService, ProcessorService>()
-            .AddSingleton<IDatabaseHelper, DatabaseHelper>()
-            .AddSingleton<IImporterLocationCache, ImporterLocationCache>()
-            .AddSingleton<IDbContextSupplier, DbContextSupplier>()
-            .AddSingleton<DateTimeProvider>()
-            .Configure<AppOptions>(hostContext.Configuration.GetSection(AppOptions.Section));
-    })
+    .ConfigureServices(
+        (hostContext, services) =>
+        {
+            services
+                .AddApplicationInsightsTelemetryWorkerService()
+                .ConfigureFunctionsApplicationInsights()
+                .AddDbContext<ContentDbContext>(options =>
+                    options.UseSqlServer(
+                        ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
+                        providerOptions => providerOptions.EnableCustomRetryOnFailure()
+                    )
+                )
+                .AddSingleton<IBlobSasService, BlobSasService>()
+                .AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>(
+                    provider => new PrivateBlobStorageService(
+                        connectionString: provider
+                            .GetRequiredService<IOptions<AppOptions>>()
+                            .Value.PrivateStorageConnectionString,
+                        logger: provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                        sasService: provider.GetRequiredService<IBlobSasService>()
+                    )
+                )
+                .AddTransient<IFileImportService, FileImportService>()
+                .AddTransient<IImporterService, ImporterService>()
+                .AddTransient<ImporterLocationService>()
+                .AddTransient<IImporterMetaService, ImporterMetaService>()
+                .AddTransient<IDataImportService, DataImportService>()
+                .AddTransient<IValidatorService, ValidatorService>()
+                .AddSingleton<IFileTypeService, FileTypeService>()
+                .AddSingleton<IGuidGenerator, SequentialGuidGenerator>()
+                .AddTransient<IProcessorService, ProcessorService>()
+                .AddSingleton<IDatabaseHelper, DatabaseHelper>()
+                .AddSingleton<IImporterLocationCache, ImporterLocationCache>()
+                .AddSingleton<IDbContextSupplier, DbContextSupplier>()
+                .AddSingleton<DateTimeProvider>()
+                .Configure<AppOptions>(hostContext.Configuration.GetSection(AppOptions.Section));
+        }
+    )
     .Build();
 
 LoadLocationCache();
@@ -102,8 +107,7 @@ async Task RestartImports()
     var config = host.Services.GetRequiredService<IOptions<AppOptions>>().Value;
     var connectionString = config.PrivateStorageConnectionString;
 
-    QueueClientOptions queueOptions =
-        new() { MessageEncoding = QueueMessageEncoding.Base64 };
+    QueueClientOptions queueOptions = new() { MessageEncoding = QueueMessageEncoding.Base64 };
 
     var restartImportsQueueClient = new QueueClient(connectionString, queueName: RestartImportsQueue, queueOptions);
     await restartImportsQueueClient.SendMessageAsync(JsonSerializer.Serialize(new RestartImportsMessage()));

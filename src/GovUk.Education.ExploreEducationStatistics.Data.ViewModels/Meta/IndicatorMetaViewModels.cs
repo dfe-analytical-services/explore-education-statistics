@@ -19,9 +19,7 @@ public record IndicatorGroupMetaViewModel
         Order = order;
     }
 
-    public IndicatorGroupMetaViewModel()
-    {
-    }
+    public IndicatorGroupMetaViewModel() { }
 }
 
 public record IndicatorMetaViewModel
@@ -46,9 +44,7 @@ public record IndicatorMetaViewModel
         Value = indicator.Id;
     }
 
-    public IndicatorMetaViewModel()
-    {
-    }
+    public IndicatorMetaViewModel() { }
 }
 
 public record IndicatorGroupUpdateViewModel

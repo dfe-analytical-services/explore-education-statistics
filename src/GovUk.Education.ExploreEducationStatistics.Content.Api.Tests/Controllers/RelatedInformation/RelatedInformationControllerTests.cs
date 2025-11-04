@@ -16,7 +16,7 @@ public abstract class RelatedInformationControllerTests
     public class GetRelatedInformationForReleaseTests : RelatedInformationControllerTests
     {
         [Fact]
-        public async Task GetRelatedInformationForRelease_WhenServiceReturnsRelatedInformation_ReturnsOk()
+        public async Task WhenServiceReturnsRelatedInformation_ReturnsOk()
         {
             // Arrange
             RelatedInformationDto[] relatedInformation =
@@ -25,14 +25,14 @@ public abstract class RelatedInformationControllerTests
                 {
                     Id = Guid.NewGuid(),
                     Title = "Related information 1",
-                    Url = "https://example.com/related-1"
+                    Url = "https://example.com/related-1",
                 },
                 new()
                 {
                     Id = Guid.NewGuid(),
                     Title = "Related information 2",
-                    Url = "https://example.com/related-2"
-                }
+                    Url = "https://example.com/related-2",
+                },
             ];
             _relatedInformationService.WhereHasRelatedInformation(relatedInformation);
 
@@ -41,34 +41,39 @@ public abstract class RelatedInformationControllerTests
             // Act
             var result = await sut.GetRelatedInformationForRelease(
                 publicationSlug: PublicationSlug,
-                releaseSlug: ReleaseSlug);
+                releaseSlug: ReleaseSlug
+            );
 
             // Assert
             _relatedInformationService.Assert.GetRelatedInformationForReleaseWasCalled(
                 publicationSlug: PublicationSlug,
-                releaseSlug: ReleaseSlug);
+                releaseSlug: ReleaseSlug
+            );
             result.AssertOkResult(relatedInformation);
         }
 
         [Fact]
-        public async Task GetRelatedInformationForRelease_WhenServiceReturnsNotFound_ReturnsNotFound()
+        public async Task WhenServiceReturnsNotFound_ReturnsNotFound()
         {
             // Arrange
             _relatedInformationService.WhereGetRelatedInformationForReleaseReturnsNotFound(
                 publicationSlug: PublicationSlug,
-                releaseSlug: ReleaseSlug);
+                releaseSlug: ReleaseSlug
+            );
 
             var sut = BuildController();
 
             // Act
             var result = await sut.GetRelatedInformationForRelease(
                 publicationSlug: PublicationSlug,
-                releaseSlug: ReleaseSlug);
+                releaseSlug: ReleaseSlug
+            );
 
             // Assert
             _relatedInformationService.Assert.GetRelatedInformationForReleaseWasCalled(
                 publicationSlug: PublicationSlug,
-                releaseSlug: ReleaseSlug);
+                releaseSlug: ReleaseSlug
+            );
             result.AssertNotFoundResult();
         }
     }

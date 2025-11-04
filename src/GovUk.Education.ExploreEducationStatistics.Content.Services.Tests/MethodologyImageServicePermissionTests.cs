@@ -15,20 +15,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests;
 
 public class MethodologyImageServicePermissionTests
 {
-    private static readonly MethodologyVersion MethodologyVersion = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private static readonly MethodologyVersion MethodologyVersion = new() { Id = Guid.NewGuid() };
 
-    private static readonly File File = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private static readonly File File = new() { Id = Guid.NewGuid() };
 
     private static readonly MethodologyFile MethodologyFile = new()
     {
         MethodologyVersion = MethodologyVersion,
-        File = File
+        File = File,
     };
 
     [Fact]
@@ -36,24 +30,23 @@ public class MethodologyImageServicePermissionTests
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
             .SetupResourceCheckToFail(MethodologyVersion, CanViewSpecificMethodologyVersion)
-            .AssertForbidden(
-                userService =>
-                {
-                    var persistenceHelper = MockPersistenceHelper<ContentDbContext, MethodologyFile>(MethodologyFile);
+            .AssertForbidden(userService =>
+            {
+                var persistenceHelper = MockPersistenceHelper<ContentDbContext, MethodologyFile>(MethodologyFile);
 
-                    var service = BuildService(
-                        userService: userService.Object,
-                        persistenceHelper: persistenceHelper.Object
-                    );
-                    return service.Stream(MethodologyVersion.Id, File.Id);
-                }
-            );
+                var service = BuildService(
+                    userService: userService.Object,
+                    persistenceHelper: persistenceHelper.Object
+                );
+                return service.Stream(MethodologyVersion.Id, File.Id);
+            });
     }
 
     private MethodologyImageService BuildService(
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IPublicBlobStorageService? publicBlobStorageService = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new(
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,

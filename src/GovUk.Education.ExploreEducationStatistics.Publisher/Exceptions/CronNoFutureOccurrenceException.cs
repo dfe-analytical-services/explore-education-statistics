@@ -6,8 +6,7 @@
 /// <param name="cronExpression">The Cron expression which was evaluated.</param>
 /// <param name="from">The starting point in time which the next occurrence was calculated from.</param>
 /// <param name="timeZone">The time zone which the next occurrence was evaluated in.</param>
-public class CronNoFutureOccurrenceException(
-    string cronExpression,
-    DateTimeOffset from,
-    TimeZoneInfo timeZone) : Exception(
-    $"No next occurrence for Cron expression: '{cronExpression}' from: '{from}' evaluated in time zone: '${timeZone.Id}'");
+public class CronNoFutureOccurrenceException(string cronExpression, DateTimeOffset from, TimeZoneInfo timeZone)
+    : Exception(
+        $"No next occurrence for Cron expression: '{cronExpression}' from: '{from}' evaluated in time zone: '${timeZone.Id}'"
+    );

@@ -10,12 +10,15 @@ public class MetaService : IMetaService
 {
     public List<TimeIdentifierCategoryModel> GetTimeIdentifiersByCategory()
     {
-        var all = (TimeIdentifierCategory[]) Enum.GetValues(typeof(TimeIdentifierCategory));
+        var all = (TimeIdentifierCategory[])Enum.GetValues(typeof(TimeIdentifierCategory));
         return all.Select(category => new TimeIdentifierCategoryModel
-        {
-            Category = category,
-            TimeIdentifiers = category.GetTimeIdentifiers()
-                .Select(identifier => new TimeIdentifierModel {Identifier = identifier}).ToList()
-        }).ToList();
+            {
+                Category = category,
+                TimeIdentifiers = category
+                    .GetTimeIdentifiers()
+                    .Select(identifier => new TimeIdentifierModel { Identifier = identifier })
+                    .ToList(),
+            })
+            .ToList();
     }
 }

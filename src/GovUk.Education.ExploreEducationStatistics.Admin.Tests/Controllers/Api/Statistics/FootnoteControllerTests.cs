@@ -36,7 +36,7 @@ public class FootnoteControllerTests
             FilterGroups = new List<FilterGroupFootnote>(),
             FilterItems = new List<FilterItemFootnote>(),
             Indicators = new List<IndicatorFootnote>(),
-            Subjects = new List<SubjectFootnote>()
+            Subjects = new List<SubjectFootnote>(),
         };
 
         var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
@@ -45,71 +45,77 @@ public class FootnoteControllerTests
         var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
         var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
-        footnoteService.Setup(s => s.CreateFootnote(
-                ReleaseVersionId,
-                "Sample footnote",
-                It.IsAny<IReadOnlySet<Guid>>(),
-                It.IsAny<IReadOnlySet<Guid>>(),
-                It.IsAny<IReadOnlySet<Guid>>(),
-                It.IsAny<IReadOnlySet<Guid>>(),
-                It.IsAny<IReadOnlySet<Guid>>()))
+        footnoteService
+            .Setup(s =>
+                s.CreateFootnote(
+                    ReleaseVersionId,
+                    "Sample footnote",
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>()
+                )
+            )
             .ReturnsAsync(footnote);
 
-        footnoteService.Setup(s => s.UpdateFootnote(
-                ReleaseVersionId,
-                FootnoteId,
-                "Updated sample footnote",
-                It.IsAny<IReadOnlySet<Guid>>(),
-                It.IsAny<IReadOnlySet<Guid>>(),
-                It.IsAny<IReadOnlySet<Guid>>(),
-                It.IsAny<IReadOnlySet<Guid>>(),
-                It.IsAny<IReadOnlySet<Guid>>()))
-            .ReturnsAsync(new Footnote
-            {
-                Id = FootnoteId,
-                Content = "Updated sample footnote",
-                Filters = new List<FilterFootnote>(),
-                FilterGroups = new List<FilterGroupFootnote>(),
-                FilterItems = new List<FilterItemFootnote>(),
-                Indicators = new List<IndicatorFootnote>(),
-                Subjects = new List<SubjectFootnote>()
-            });
+        footnoteService
+            .Setup(s =>
+                s.UpdateFootnote(
+                    ReleaseVersionId,
+                    FootnoteId,
+                    "Updated sample footnote",
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>()
+                )
+            )
+            .ReturnsAsync(
+                new Footnote
+                {
+                    Id = FootnoteId,
+                    Content = "Updated sample footnote",
+                    Filters = new List<FilterFootnote>(),
+                    FilterGroups = new List<FilterGroupFootnote>(),
+                    FilterItems = new List<FilterItemFootnote>(),
+                    Indicators = new List<IndicatorFootnote>(),
+                    Subjects = new List<SubjectFootnote>(),
+                }
+            );
 
-        footnoteService.Setup(s => s.GetFootnotes(ReleaseVersionId))
-            .ReturnsAsync(new List<Footnote>
-            {
-                footnote
-            });
+        footnoteService.Setup(s => s.GetFootnotes(ReleaseVersionId)).ReturnsAsync(new List<Footnote> { footnote });
 
         footnoteService.Setup(s => s.DeleteFootnote(ReleaseVersionId, FootnoteId)).ReturnsAsync(Unit.Instance);
 
-        releaseService.Setup(s => s.ListSubjects(ReleaseVersionId))
+        releaseService
+            .Setup(s => s.ListSubjects(ReleaseVersionId))
             .ReturnsAsync(
                 subjectIds
-                    .Select(
-                        id => new SubjectViewModel(
-                            id: id,
-                            name: $"Subject {id}",
-                            order: 0,
-                            content: "Test content",
-                            timePeriods: new TimePeriodLabels(),
-                            geographicLevels: new List<string>(),
-                            filters: new List<string>(),
-                            indicators: new List<string>(),
-                            file: new FileInfo
-                            {
-                                Id = Guid.NewGuid(),
-                                Name = "Test file",
-                                FileName = "test.csv",
-                                Size = "1 Mb",
-                            },
-                            lastUpdated: DateTime.Now
-                        )
-                    )
+                    .Select(id => new SubjectViewModel(
+                        id: id,
+                        name: $"Subject {id}",
+                        order: 0,
+                        content: "Test content",
+                        timePeriods: new TimePeriodLabels(),
+                        geographicLevels: new List<string>(),
+                        filters: new List<string>(),
+                        indicators: new List<string>(),
+                        file: new FileInfo
+                        {
+                            Id = Guid.NewGuid(),
+                            Name = "Test file",
+                            FileName = "test.csv",
+                            Size = "1 Mb",
+                        },
+                        lastUpdated: DateTime.Now
+                    ))
                     .ToList()
             );
 
-        filterRepository.Setup(s => s.GetFiltersIncludingItems(It.IsIn(subjectIds)))
+        filterRepository
+            .Setup(s => s.GetFiltersIncludingItems(It.IsIn(subjectIds)))
             .ReturnsAsync(
                 new List<Filter>
                 {
@@ -127,19 +133,16 @@ public class FootnoteControllerTests
                                 Label = "Filter group",
                                 FilterItems = new List<FilterItem>
                                 {
-                                    new()
-                                    {
-                                        Id = Guid.NewGuid(),
-                                        Label = "Filter item",
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                    new() { Id = Guid.NewGuid(), Label = "Filter item" },
+                                },
+                            },
+                        },
+                    },
                 }
             );
 
-        indicatorGroupRepository.Setup(s => s.GetIndicatorGroups(It.IsIn(subjectIds)))
+        indicatorGroupRepository
+            .Setup(s => s.GetIndicatorGroups(It.IsIn(subjectIds)))
             .ReturnsAsync(
                 new List<IndicatorGroup>
                 {
@@ -155,23 +158,27 @@ public class FootnoteControllerTests
                                 Label = "Indicator label",
                                 Name = "Indicator name",
                                 Unit = IndicatorUnit.Percent,
-                                DecimalPlaces = 2
-                            }
-                        }
-                    }
-                });
+                                DecimalPlaces = 2,
+                            },
+                        },
+                    },
+                }
+            );
 
-        _controller = new FootnoteController(filterRepository.Object,
+        _controller = new FootnoteController(
+            filterRepository.Object,
             footnoteService.Object,
             indicatorGroupRepository.Object,
             releaseService.Object,
-            releaseDataFileRepository.Object);
+            releaseDataFileRepository.Object
+        );
     }
 
     [Fact]
     public async Task CreateFootnote()
     {
-        var result = await _controller.CreateFootnote(ReleaseVersionId,
+        var result = await _controller.CreateFootnote(
+            ReleaseVersionId,
             new FootnoteCreateRequest
             {
                 Content = "Sample footnote",
@@ -179,8 +186,9 @@ public class FootnoteControllerTests
                 FilterGroups = SetOf<Guid>(),
                 FilterItems = SetOf<Guid>(),
                 Indicators = SetOf<Guid>(),
-                Subjects = SetOf<Guid>()
-            });
+                Subjects = SetOf<Guid>(),
+            }
+        );
 
         result.AssertOkResult();
     }
@@ -196,7 +204,8 @@ public class FootnoteControllerTests
     [Fact]
     public async Task UpdateFootnote()
     {
-        var result = await _controller.UpdateFootnote(releaseVersionId: ReleaseVersionId,
+        var result = await _controller.UpdateFootnote(
+            releaseVersionId: ReleaseVersionId,
             footnoteId: FootnoteId,
             new FootnoteUpdateRequest
             {
@@ -205,8 +214,9 @@ public class FootnoteControllerTests
                 FilterGroups = SetOf<Guid>(),
                 FilterItems = SetOf<Guid>(),
                 Indicators = SetOf<Guid>(),
-                Subjects = SetOf<Guid>()
-            });
+                Subjects = SetOf<Guid>(),
+            }
+        );
 
         result.AssertOkResult();
     }

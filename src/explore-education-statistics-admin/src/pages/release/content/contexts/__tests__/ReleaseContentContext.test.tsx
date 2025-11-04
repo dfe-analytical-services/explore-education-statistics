@@ -26,7 +26,6 @@ import { Table } from '@common/services/types/blocks';
 import { produce } from 'immer';
 
 const emptyTable: Table = {
-  indicators: [],
   tableHeaders: {
     columnGroups: [],
     columns: [],
@@ -37,8 +36,7 @@ const emptyTable: Table = {
 
 const testCommentUser: CommentUser = {
   id: 'user-1',
-  firstName: 'Jane',
-  lastName: 'Doe',
+  displayName: 'Jane Doe',
   email: 'jane@test.com',
 };
 
@@ -350,8 +348,7 @@ describe('ReleaseContentContext', () => {
             content: 'A comment',
             createdBy: {
               id: 'user-1',
-              firstName: 'Bau1',
-              lastName: '',
+              displayName: 'Bau1',
               email: 'bau1@test.com',
             },
             created: '2020-03-09T09:39:53.736',
@@ -361,8 +358,7 @@ describe('ReleaseContentContext', () => {
             content: 'another comment',
             createdBy: {
               id: 'user-1',
-              firstName: 'Bau1',
-              lastName: '',
+              displayName: 'Bau1',
               email: 'bau1@test.com',
             },
             created: '2020-03-09T09:40:16.534',
@@ -678,8 +674,6 @@ describe('ReleaseContentContext', () => {
       trend: 'keyStat-4 trend',
       guidanceTitle: 'keyStat-4 guidanceTitle',
       guidanceText: 'keyStat-4 guidanceText',
-      order: 1,
-      created: '2022-02-01T12:00:00Z',
     };
 
     const { release } = releaseReducer(

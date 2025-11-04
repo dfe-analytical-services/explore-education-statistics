@@ -15,5 +15,5 @@ public enum PublicationsSortBy
     /// <summary>
     /// Sort by the title of the publication.
     /// </summary>
-    Title
+    Title,
 }

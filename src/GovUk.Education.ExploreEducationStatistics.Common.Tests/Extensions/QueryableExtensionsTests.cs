@@ -12,9 +12,7 @@ public static class QueryableExtensions
         [Fact]
         public async Task NotFound_Empty()
         {
-            var result = await new List<string>()
-                .AsQueryable()
-                .FirstOrNotFound();
+            var result = await new List<string>().AsQueryable().FirstOrNotFound();
 
             result.AssertNotFound();
         }
@@ -22,9 +20,7 @@ public static class QueryableExtensions
         [Fact]
         public async Task NotFound_Predicate()
         {
-            var result = await ListOf("me")
-                .AsQueryable()
-                .FirstOrNotFound(s => s == "you");
+            var result = await ListOf("me").AsQueryable().FirstOrNotFound(s => s == "you");
 
             result.AssertNotFound();
         }
@@ -32,9 +28,7 @@ public static class QueryableExtensions
         [Fact]
         public async Task Found_First()
         {
-            var result = await ListOf("me")
-                .AsQueryable()
-                .FirstOrNotFound();
+            var result = await ListOf("me").AsQueryable().FirstOrNotFound();
 
             result.AssertRight(expected: "me");
         }
@@ -42,9 +36,7 @@ public static class QueryableExtensions
         [Fact]
         public async Task Found_First_Multiple()
         {
-            var result = await ListOf("me", "you")
-                .AsQueryable()
-                .FirstOrNotFound();
+            var result = await ListOf("me", "you").AsQueryable().FirstOrNotFound();
 
             result.AssertRight(expected: "me");
         }
@@ -52,9 +44,7 @@ public static class QueryableExtensions
         [Fact]
         public async Task Found_Predicate()
         {
-            var result = await ListOf("you", "me")
-                .AsQueryable()
-                .FirstOrNotFound(s => s == "me");
+            var result = await ListOf("you", "me").AsQueryable().FirstOrNotFound(s => s == "me");
 
             result.AssertRight(expected: "me");
         }
@@ -65,9 +55,7 @@ public static class QueryableExtensions
         [Fact]
         public async Task NotFound_Empty()
         {
-            var result = await new List<string>()
-                .AsQueryable()
-                .SingleOrNotFound();
+            var result = await new List<string>().AsQueryable().SingleOrNotFound();
 
             result.AssertNotFound();
         }
@@ -75,9 +63,7 @@ public static class QueryableExtensions
         [Fact]
         public async Task NotFound_Predicate()
         {
-            var result = await ListOf("me")
-                .AsQueryable()
-                .SingleOrNotFound(s => s == "you");
+            var result = await ListOf("me").AsQueryable().SingleOrNotFound(s => s == "you");
 
             result.AssertNotFound();
         }
@@ -85,9 +71,7 @@ public static class QueryableExtensions
         [Fact]
         public async Task Found_First()
         {
-            var result = await ListOf("me")
-                .AsQueryable()
-                .SingleOrNotFound();
+            var result = await ListOf("me").AsQueryable().SingleOrNotFound();
 
             result.AssertRight(expected: "me");
         }
@@ -95,19 +79,15 @@ public static class QueryableExtensions
         [Fact]
         public async Task Found_Multiple_Throws()
         {
-            await Assert.ThrowsAsync<InvalidOperationException>(
-                () => ListOf("me", "you")
-                    .AsQueryable()
-                    .SingleOrNotFound()
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                ListOf("me", "you").AsQueryable().SingleOrNotFound()
             );
         }
 
         [Fact]
         public async Task Found_Predicate()
         {
-            var result = await ListOf("you", "me")
-                .AsQueryable()
-                .SingleOrNotFound(s => s == "me");
+            var result = await ListOf("you", "me").AsQueryable().SingleOrNotFound(s => s == "me");
 
             result.AssertRight(expected: "me");
         }
@@ -115,10 +95,8 @@ public static class QueryableExtensions
         [Fact]
         public async Task Found_Predicate_Duplicates_Throws()
         {
-            await Assert.ThrowsAsync<InvalidOperationException>(
-                () => ListOf("you", "me", "you", "me")
-                    .AsQueryable()
-                    .SingleOrNotFound(s => s == "me")
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                ListOf("you", "me", "you", "me").AsQueryable().SingleOrNotFound(s => s == "me")
             );
         }
     }

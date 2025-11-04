@@ -18,9 +18,7 @@ public record IndicatorCsvMetaViewModel
 
     public int? DecimalPlaces { get; init; }
 
-    public IndicatorCsvMetaViewModel()
-    {
-    }
+    public IndicatorCsvMetaViewModel() { }
 
     public IndicatorCsvMetaViewModel(Indicator indicator)
     {

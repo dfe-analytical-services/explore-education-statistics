@@ -16,4 +16,3 @@ public record PublishTaxonomyMessage;
 public record RetryReleasePublishingMessage(Guid ReleaseVersionId);
 
 public record StageReleaseContentMessage(IReadOnlyList<ReleasePublishingKey> ReleasePublishingKeys);
-

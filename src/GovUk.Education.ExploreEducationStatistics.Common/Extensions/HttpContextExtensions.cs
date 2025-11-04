@@ -1,4 +1,3 @@
-#nullable enable
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 
@@ -9,7 +8,8 @@ public static class HttpContextExtensions
     public static bool TryGetRequestHeader(
         this HttpContext? httpContext,
         string headerName,
-        out StringValues headerValues)
+        out StringValues headerValues
+    )
     {
         if (httpContext == null)
         {

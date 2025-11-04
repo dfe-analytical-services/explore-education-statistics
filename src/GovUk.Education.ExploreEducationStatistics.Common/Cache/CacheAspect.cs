@@ -1,4 +1,3 @@
-#nullable enable
 using System.Reflection;
 using AspectInjector.Broker;
 using Aspects.Universal.Aspects;
@@ -9,8 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache;
 public class CacheAspect : BaseUniversalWrapperAspect
 {
     private const BindingFlags ConstructorBindingFlags =
-        BindingFlags.Instance | BindingFlags.Public | BindingFlags.CreateInstance |
-        BindingFlags.OptionalParamBinding;
+        BindingFlags.Instance | BindingFlags.Public | BindingFlags.CreateInstance | BindingFlags.OptionalParamBinding;
 
     /// <summary>
     /// Enables cache attribute processing.
@@ -32,7 +30,8 @@ public class CacheAspect : BaseUniversalWrapperAspect
         [Argument(Source.Name)] string name,
         [Argument(Source.Arguments)] object[] args,
         [Argument(Source.ReturnType)] Type returnType,
-        [Argument(Source.Triggers)] Attribute[] triggers)
+        [Argument(Source.Triggers)] Attribute[] triggers
+    )
     {
         if (!Enabled)
         {

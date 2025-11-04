@@ -1,20 +1,18 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using InterpolatedSql.Dapper;
+using JetBrains.Annotations;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Tests.Services;
 
 public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
 {
-    protected override string ResourcesPath => Path.Combine(
-        Assembly.GetExecutingAssembly().GetDirectoryPath(),
-        "Resources",
-        "PublicApi",
-        "DataSetCalls");
-
+    protected override string ResourcesPath =>
+        Path.Combine(Assembly.GetExecutingAssembly().GetDirectoryPath(), "Resources", "PublicApi", "DataSetCalls");
 
     public class ProcessTests : PublicApiDataSetCallsProcessorTests
     {
@@ -28,18 +26,18 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
 
             // The root processing folder is safe to leave behind.
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
-            
+
             // The temporary processing folder that was set up for this run of the processor
             // should have been cleared away.
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
 
             var queryReportFile = Assert.Single(reports);
 
             var duckDbConnection = new DuckDbConnection();
-            
+
             duckDbConnection.Open();
 
             var reportRows = await ReadReport(duckDbConnection, queryReportFile);
@@ -54,9 +52,10 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
                 expectedType: "GetDataSetSummary",
                 expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-24T02:07:44.850Z"),
-                expectedParameters: null);
+                expectedParameters: null
+            );
         }
-        
+
         [Fact]
         public async Task WithPreviewTokens_CapturedInReport()
         {
@@ -68,7 +67,7 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var queryReportFile = Assert.Single(reports);
 
@@ -87,9 +86,10 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
                 expectedType: "GetDataSetSummary",
                 expectPreviewToken: true,
                 expectedStartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
-                expectedParameters: null);
+                expectedParameters: null
+            );
         }
-        
+
         [Fact]
         public async Task WithParameters_CapturedInReport()
         {
@@ -101,7 +101,7 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var queryReportFile = Assert.Single(reports);
 
@@ -120,9 +120,10 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
                 expectedType: "ListVersions",
                 expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
-                expectedParameters: """{"page":1,"pageSize":10}""");
+                expectedParameters: """{"page":1,"pageSize":10}"""
+            );
         }
-        
+
         [Fact]
         public async Task MultipleCalls_CapturedInReport()
         {
@@ -136,7 +137,7 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
             Assert.True(Directory.Exists(ProcessingDirectoryPath(service)));
             Assert.False(Directory.Exists(TemporaryProcessingDirectoryPath(service)));
             Assert.True(Directory.Exists(service.ReportsDirectory));
-            
+
             var reports = Directory.GetFiles(service.ReportsDirectory);
             var queryReportFile = Assert.Single(reports);
 
@@ -148,45 +149,55 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
             // Check that the 3 recorded queries have resulted in 3 lines in the query report
             // and the order is in ascending date order.
             Assert.Equal(3, reportRows.Count);
-            
+
             AssertReportRowOk(
                 reportRows[0],
                 expectedType: "GetDataSetSummary",
                 expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-24T02:07:44.850Z"),
-                expectedParameters: null);
-            
+                expectedParameters: null
+            );
+
             AssertReportRowOk(
                 reportRows[1],
                 expectedType: "ListVersions",
                 expectPreviewToken: false,
                 expectedStartTime: DateTime.Parse("2025-02-24T03:07:44.850Z"),
-                expectedParameters: """{"page":1,"pageSize":10}""");
-            
+                expectedParameters: """{"page":1,"pageSize":10}"""
+            );
+
             AssertReportRowOk(
                 reportRows[2],
                 expectedType: "GetDataSetSummary",
                 expectPreviewToken: true,
                 expectedStartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
-                expectedParameters: null);
+                expectedParameters: null
+            );
         }
 
-        private static async Task<List<QueryReportLine>> ReadReport(DuckDbConnection duckDbConnection, string queryReportFile)
+        private static async Task<List<QueryReportLine>> ReadReport(
+            DuckDbConnection duckDbConnection,
+            string queryReportFile
+        )
         {
-            return (await duckDbConnection
+            return (
+                await duckDbConnection
                     .SqlBuilder($"SELECT * FROM read_parquet('{queryReportFile:raw}')")
-                    .QueryAsync<QueryReportLine>())
+                    .QueryAsync<QueryReportLine>()
+            )
                 .OrderBy(row => row.DataSetTitle)
                 .ToList();
         }
     }
-    
+
+    [UsedImplicitly]
     private static void AssertReportRowOk(
         QueryReportLine queryReportRow,
         string expectedType,
         DateTime expectedStartTime,
         bool expectPreviewToken,
-        string? expectedParameters)
+        string? expectedParameters
+    )
     {
         Assert.Equal(expectedType, queryReportRow.Type);
         Assert.Equal(Guid.Parse("01d29401-7274-a871-a8db-d4bc4e98c324"), queryReportRow.DataSetId);
@@ -207,7 +218,10 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
             Assert.Equal("Preview token content", queryReportRow.PreviewTokenLabel);
             Assert.Equal(DateTime.Parse("2025-02-23T11:02:44.850Z"), queryReportRow.PreviewTokenCreated);
             Assert.Equal(DateTime.Parse("2025-02-24T11:02:44.850Z"), queryReportRow.PreviewTokenExpiry);
-            Assert.Equal(Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"), queryReportRow.PreviewTokenDataSetVersionId);
+            Assert.Equal(
+                Guid.Parse("01d29401-7974-1276-a06b-b28a6a5385c6"),
+                queryReportRow.PreviewTokenDataSetVersionId
+            );
         }
         else
         {
@@ -220,12 +234,11 @@ public abstract class PublicApiDataSetCallsProcessorTests : ProcessorTestsBase
 
     private PublicApiDataSetCallsProcessor BuildService()
     {
-        return new PublicApiDataSetCallsProcessor(
-            pathResolver: PathResolver,
-            workflow: Workflow);
+        return new PublicApiDataSetCallsProcessor(pathResolver: PathResolver, workflow: Workflow);
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local
+    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
     private record QueryReportLine
     {
         public Guid DataSetId { get; init; }

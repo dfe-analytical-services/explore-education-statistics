@@ -1,0 +1,128 @@
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Releases;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Releases;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.MockBuilders;
+using Xunit;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers.Releases;
+
+public abstract class ReleaseVersionsControllerTests
+{
+    private readonly ReleaseContentServiceMockBuilder _releaseContentService = new();
+    private readonly ReleaseDataContentServiceMockBuilder _releaseDataContentService = new();
+    private readonly ReleaseVersionsServiceMockBuilder _releaseVersionsService = new();
+
+    private const string PublicationSlug = "test-publication";
+    private const string ReleaseSlug = "test-release";
+
+    public class GetReleaseContentTests : ReleaseVersionsControllerTests
+    {
+        [Fact]
+        public async Task WhenServiceReturnsReleaseContent_ReturnsOk()
+        {
+            // Arrange
+            var releaseContent = new ReleaseContentDtoBuilder().Build();
+            _releaseContentService.WhereHasReleaseContent(releaseContent);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetReleaseContent(PublicationSlug, ReleaseSlug);
+
+            // Assert
+            _releaseContentService.Assert.GetReleaseContentWasCalled(PublicationSlug, ReleaseSlug);
+            result.AssertOkResult(releaseContent);
+        }
+
+        [Fact]
+        public async Task WhenServiceReturnsNotFound_ReturnsNotFound()
+        {
+            // Arrange
+            _releaseContentService.WhereGetReleaseContentReturnsNotFound(PublicationSlug, ReleaseSlug);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetReleaseContent(PublicationSlug, ReleaseSlug);
+
+            // Assert
+            _releaseContentService.Assert.GetReleaseContentWasCalled(PublicationSlug, ReleaseSlug);
+            result.AssertNotFoundResult();
+        }
+    }
+
+    public class GetReleaseDataContentTests : ReleaseVersionsControllerTests
+    {
+        [Fact]
+        public async Task WhenServiceReturnsReleaseDataContent_ReturnsOk()
+        {
+            // Arrange
+            var releaseDataContent = new ReleaseDataContentDtoBuilder().Build();
+            _releaseDataContentService.WhereHasReleaseDataContent(releaseDataContent);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetReleaseDataContent(PublicationSlug, ReleaseSlug);
+
+            // Assert
+            _releaseDataContentService.Assert.GetReleaseDataContentWasCalled(PublicationSlug, ReleaseSlug);
+            result.AssertOkResult(releaseDataContent);
+        }
+
+        [Fact]
+        public async Task WhenServiceReturnsNotFound_ReturnsNotFound()
+        {
+            // Arrange
+            _releaseDataContentService.WhereGetReleaseDataContentReturnsNotFound(PublicationSlug, ReleaseSlug);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetReleaseDataContent(PublicationSlug, ReleaseSlug);
+
+            // Assert
+            _releaseDataContentService.Assert.GetReleaseDataContentWasCalled(PublicationSlug, ReleaseSlug);
+            result.AssertNotFoundResult();
+        }
+    }
+
+    public class GetReleaseVersionSummaryTests : ReleaseVersionsControllerTests
+    {
+        [Fact]
+        public async Task WhenServiceReturnsReleaseVersion_ReturnsOk()
+        {
+            // Arrange
+            var releaseVersionSummary = new ReleaseVersionSummaryDtoBuilder().Build();
+            _releaseVersionsService.WhereHasReleaseVersionSummary(releaseVersionSummary);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetReleaseVersionSummary(PublicationSlug, ReleaseSlug);
+
+            // Assert
+            _releaseVersionsService.Assert.GetReleaseVersionSummaryWasCalled(PublicationSlug, ReleaseSlug);
+            result.AssertOkResult(releaseVersionSummary);
+        }
+
+        [Fact]
+        public async Task WhenServiceReturnsNotFound_ReturnsNotFound()
+        {
+            // Arrange
+            _releaseVersionsService.WhereGetReleaseVersionSummaryReturnsNotFound(PublicationSlug, ReleaseSlug);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetReleaseVersionSummary(PublicationSlug, ReleaseSlug);
+
+            // Assert
+            _releaseVersionsService.Assert.GetReleaseVersionSummaryWasCalled(PublicationSlug, ReleaseSlug);
+            result.AssertNotFoundResult();
+        }
+    }
+
+    private ReleaseVersionsController BuildController() =>
+        new(_releaseContentService.Build(), _releaseDataContentService.Build(), _releaseVersionsService.Build());
+}

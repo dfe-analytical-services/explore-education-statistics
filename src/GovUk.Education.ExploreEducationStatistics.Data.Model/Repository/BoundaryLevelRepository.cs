@@ -8,13 +8,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 
-public class BoundaryLevelRepository(
-    StatisticsDbContext context) : IBoundaryLevelRepository
+public class BoundaryLevelRepository(StatisticsDbContext context) : IBoundaryLevelRepository
 {
     public IEnumerable<BoundaryLevel> FindByGeographicLevels(IEnumerable<GeographicLevel> geographicLevels)
     {
-        return context.BoundaryLevel
-            .Where(level => geographicLevels.Contains(level.Level))
+        return context
+            .BoundaryLevel.Where(level => geographicLevels.Contains(level.Level))
             .OrderByDescending(level => level.Published);
     }
 
@@ -23,16 +22,19 @@ public class BoundaryLevelRepository(
         string label,
         DateTime published,
         FeatureCollection featureCollection,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await context.RequireTransaction(async () =>
         {
-            var entry = await context.BoundaryLevel.AddAsync(new()
-            {
-                Level = level,
-                Label = label,
-                Published = published,
-            });
+            var entry = await context.BoundaryLevel.AddAsync(
+                new()
+                {
+                    Level = level,
+                    Label = label,
+                    Published = published,
+                }
+            );
 
             var boundaryLevel = entry.Entity;
             var boundaryData = MapBoundaryDataFromCollection(featureCollection, boundaryLevel);
@@ -46,15 +48,17 @@ public class BoundaryLevelRepository(
 
     private static List<BoundaryData> MapBoundaryDataFromCollection(
         FeatureCollection featureCollection,
-        BoundaryLevel boundaryLevel)
+        BoundaryLevel boundaryLevel
+    )
     {
-        return featureCollection.Features
-            .Select(feature => new BoundaryData
+        return featureCollection
+            .Features.Select(feature => new BoundaryData
             {
                 BoundaryLevel = boundaryLevel,
                 Code = BoundaryDataUtils.GetCode(feature.Properties),
                 Name = BoundaryDataUtils.GetName(feature.Properties),
-                GeoJson = feature
-            }).ToList();
+                GeoJson = feature,
+            })
+            .ToList();
     }
 }

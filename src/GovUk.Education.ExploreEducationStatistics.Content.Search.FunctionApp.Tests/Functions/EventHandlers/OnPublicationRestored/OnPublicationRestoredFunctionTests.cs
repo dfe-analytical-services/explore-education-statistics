@@ -10,8 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class OnPublicationRestoredFunctionTests
 {
-    private OnPublicationRestoredFunction GetSut() => new(
-        new EventGridEventHandler(new NullLogger<EventGridEventHandler>()));
+    private OnPublicationRestoredFunction GetSut() =>
+        new(new EventGridEventHandler(new NullLogger<EventGridEventHandler>()));
 
     [Fact]
     public void CanInstantiateSut() => Assert.NotNull(GetSut());

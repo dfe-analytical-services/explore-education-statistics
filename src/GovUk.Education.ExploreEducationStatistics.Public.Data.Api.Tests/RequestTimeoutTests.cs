@@ -109,11 +109,18 @@ public class RequestTimeoutTests(TestApplicationFactory testApp) : IntegrationTe
             .WithWebHostBuilder(builder =>
             {
                 builder.WithAdditionalControllers(typeof(TestController));
-                builder.ConfigureAppConfiguration((_, config) =>
-                    config.AddInMemoryCollection(new Dictionary<string, string?>
-                    {
-                        { $"{RequestTimeoutOptions.Section}:{nameof(RequestTimeoutOptions.TimeoutMilliseconds)}", "100" }
-                    }));
+                builder.ConfigureAppConfiguration(
+                    (_, config) =>
+                        config.AddInMemoryCollection(
+                            new Dictionary<string, string?>
+                            {
+                                {
+                                    $"{RequestTimeoutOptions.Section}:{nameof(RequestTimeoutOptions.TimeoutMilliseconds)}",
+                                    "100"
+                                },
+                            }
+                        )
+                );
             })
             .ConfigureServices(s =>
             {

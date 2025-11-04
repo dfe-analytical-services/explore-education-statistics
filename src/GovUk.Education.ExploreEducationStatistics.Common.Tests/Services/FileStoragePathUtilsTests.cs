@@ -9,79 +9,85 @@ public class FileStoragePathUtilsTests
 {
     public class PublicPathTests
     {
-        public static TheoryData<string> PublicationData =
-            new()
-            {
-                "publication-slug",
-                "  publication-SLUG  "
-            };
+        public static TheoryData<string> PublicationData = new() { "publication-slug", "  publication-SLUG  " };
 
-        public static TheoryData<string, string> PublicationAndReleaseData =
-            new()
-            {
-                { "publication-slug", "release-slug" },
-                { "  publication-SLUG  ", "  release-SLUG  " }
-            };
+        public static TheoryData<string, string> PublicationAndReleaseData = new()
+        {
+            { "publication-slug", "release-slug" },
+            { "  publication-SLUG  ", "  release-SLUG  " },
+        };
 
-        public static TheoryData<string, string, Guid> PublicationReleaseAndIdData =
-            new()
-            {
-                { "publication-slug", "release-slug", Guid.NewGuid() },
-                { "  publication-SLUG  ", "  release-SLUG  ", Guid.NewGuid() }
-            };
+        public static TheoryData<string, string, Guid> PublicationReleaseAndIdData = new()
+        {
+            { "publication-slug", "release-slug", Guid.NewGuid() },
+            { "  publication-SLUG  ", "  release-SLUG  ", Guid.NewGuid() },
+        };
 
-        public static TheoryData<string, string, Guid, long> PublicationReleaseIdAndBoundaryLevelData =
-            new()
-            {
-                { "publication-slug", "release-slug", Guid.NewGuid(), 1 },
-                { "  publication-SLUG  ", "  release-SLUG  ", Guid.NewGuid(), 1 }
-            };
+        public static TheoryData<string, string, Guid, long> PublicationReleaseIdAndBoundaryLevelData = new()
+        {
+            { "publication-slug", "release-slug", Guid.NewGuid(), 1 },
+            { "  publication-SLUG  ", "  release-SLUG  ", Guid.NewGuid(), 1 },
+        };
 
         [Theory]
         [MemberData(nameof(PublicationData))]
         public void PublicContentPublicationPath(string publicationSlug)
         {
-            Assert.Equal("publications/publication-slug/publication.json",
-                FileStoragePathUtils.PublicContentPublicationPath(publicationSlug: publicationSlug));
+            Assert.Equal(
+                "publications/publication-slug/publication.json",
+                FileStoragePathUtils.PublicContentPublicationPath(publicationSlug: publicationSlug)
+            );
         }
 
         [Theory]
         [MemberData(nameof(PublicationData))]
         public void PublicContentLatestReleasePath(string publicationSlug)
         {
-            Assert.Equal("publications/publication-slug/latest-release.json",
-                FileStoragePathUtils.PublicContentLatestReleasePath(publicationSlug: publicationSlug));
+            Assert.Equal(
+                "publications/publication-slug/latest-release.json",
+                FileStoragePathUtils.PublicContentLatestReleasePath(publicationSlug: publicationSlug)
+            );
 
-            Assert.Equal("staging/publications/publication-slug/latest-release.json",
-                FileStoragePathUtils.PublicContentLatestReleasePath(publicationSlug: publicationSlug,
-                    staging: true));
+            Assert.Equal(
+                "staging/publications/publication-slug/latest-release.json",
+                FileStoragePathUtils.PublicContentLatestReleasePath(publicationSlug: publicationSlug, staging: true)
+            );
         }
 
         [Theory]
         [MemberData(nameof(PublicationAndReleaseData))]
-        public void PublicContentReleasePath(string publicationSlug,
-            string releaseSlug)
+        public void PublicContentReleasePath(string publicationSlug, string releaseSlug)
         {
-            Assert.Equal("publications/publication-slug/releases/release-slug.json",
-                FileStoragePathUtils.PublicContentReleasePath(publicationSlug: publicationSlug,
-                    releaseSlug: releaseSlug));
+            Assert.Equal(
+                "publications/publication-slug/releases/release-slug.json",
+                FileStoragePathUtils.PublicContentReleasePath(
+                    publicationSlug: publicationSlug,
+                    releaseSlug: releaseSlug
+                )
+            );
 
-            Assert.Equal("staging/publications/publication-slug/releases/release-slug.json",
-                FileStoragePathUtils.PublicContentReleasePath(publicationSlug: publicationSlug,
+            Assert.Equal(
+                "staging/publications/publication-slug/releases/release-slug.json",
+                FileStoragePathUtils.PublicContentReleasePath(
+                    publicationSlug: publicationSlug,
                     releaseSlug: releaseSlug,
-                    staging: true));
+                    staging: true
+                )
+            );
         }
 
         [Theory]
         [MemberData(nameof(PublicationReleaseAndIdData))]
-        public void PublicContentDataBlockPath(string publicationSlug,
-            string releaseSlug,
-            Guid dataBlockId)
+        public void PublicContentDataBlockPath(string publicationSlug, string releaseSlug, Guid dataBlockId)
         {
-            Assert.Equal($"publications/publication-slug/releases/release-slug/data-blocks/{dataBlockId}.json",
-                FileStoragePathUtils.PublicContentDataBlockPath(publicationSlug: publicationSlug,
+            Assert.Equal(
+                $"publications/publication-slug/releases/release-slug/data-blocks/{dataBlockId}.json",
+                FileStoragePathUtils.PublicContentDataBlockPath(
+                    publicationSlug: publicationSlug,
                     releaseSlug: releaseSlug,
-                    dataBlockId));
+                    dataBlockId
+                )
+            );
         }
 
         [Theory]
@@ -90,56 +96,71 @@ public class FileStoragePathUtilsTests
             string publicationSlug,
             string releaseSlug,
             Guid dataBlockId,
-            long boundaryLevelId)
+            long boundaryLevelId
+        )
         {
-            Assert.Equal($"publications/publication-slug/releases/release-slug/data-blocks/{dataBlockId}-boundary-levels/{dataBlockId}-{boundaryLevelId}.json",
+            Assert.Equal(
+                $"publications/publication-slug/releases/release-slug/data-blocks/{dataBlockId}-boundary-levels/{dataBlockId}-{boundaryLevelId}.json",
                 FileStoragePathUtils.PublicContentDataBlockLocationsPath(
                     publicationSlug: publicationSlug,
                     releaseSlug: releaseSlug,
                     dataBlockId,
-                    boundaryLevelId));
+                    boundaryLevelId
+                )
+            );
         }
 
         [Theory]
         [MemberData(nameof(PublicationAndReleaseData))]
-        public void PublicContentDataBlockParentPath(string publicationSlug,
-            string releaseSlug)
+        public void PublicContentDataBlockParentPath(string publicationSlug, string releaseSlug)
         {
-            Assert.Equal($"publications/publication-slug/releases/release-slug/data-blocks",
-                FileStoragePathUtils.PublicContentDataBlockParentPath(publicationSlug: publicationSlug,
-                    releaseSlug: releaseSlug));
+            Assert.Equal(
+                $"publications/publication-slug/releases/release-slug/data-blocks",
+                FileStoragePathUtils.PublicContentDataBlockParentPath(
+                    publicationSlug: publicationSlug,
+                    releaseSlug: releaseSlug
+                )
+            );
         }
 
         [Theory]
         [MemberData(nameof(PublicationAndReleaseData))]
-        public void PublicContentReleaseSubjectsPath(string publicationSlug,
-            string releaseSlug)
+        public void PublicContentReleaseSubjectsPath(string publicationSlug, string releaseSlug)
         {
-            Assert.Equal($"publications/publication-slug/releases/release-slug/subjects.json",
-                FileStoragePathUtils.PublicContentReleaseSubjectsPath(publicationSlug: publicationSlug,
-                    releaseSlug: releaseSlug));
+            Assert.Equal(
+                $"publications/publication-slug/releases/release-slug/subjects.json",
+                FileStoragePathUtils.PublicContentReleaseSubjectsPath(
+                    publicationSlug: publicationSlug,
+                    releaseSlug: releaseSlug
+                )
+            );
         }
 
         [Theory]
         [MemberData(nameof(PublicationReleaseAndIdData))]
-        public void PublicContentSubjectMetaPath(string publicationSlug,
-            string releaseSlug,
-            Guid subjectId)
+        public void PublicContentSubjectMetaPath(string publicationSlug, string releaseSlug, Guid subjectId)
         {
-            Assert.Equal($"publications/publication-slug/releases/release-slug/subject-meta/{subjectId}.json",
-                FileStoragePathUtils.PublicContentSubjectMetaPath(publicationSlug: publicationSlug,
+            Assert.Equal(
+                $"publications/publication-slug/releases/release-slug/subject-meta/{subjectId}.json",
+                FileStoragePathUtils.PublicContentSubjectMetaPath(
+                    publicationSlug: publicationSlug,
                     releaseSlug: releaseSlug,
-                    subjectId));
+                    subjectId
+                )
+            );
         }
 
         [Theory]
         [MemberData(nameof(PublicationAndReleaseData))]
-        public void PublicContentSubjectMetaParentPath(string publicationSlug,
-            string releaseSlug)
+        public void PublicContentSubjectMetaParentPath(string publicationSlug, string releaseSlug)
         {
-            Assert.Equal($"publications/publication-slug/releases/release-slug/subject-meta",
-                FileStoragePathUtils.PublicContentSubjectMetaParentPath(publicationSlug: publicationSlug,
-                    releaseSlug: releaseSlug));
+            Assert.Equal(
+                $"publications/publication-slug/releases/release-slug/subject-meta",
+                FileStoragePathUtils.PublicContentSubjectMetaParentPath(
+                    publicationSlug: publicationSlug,
+                    releaseSlug: releaseSlug
+                )
+            );
         }
     }
 
@@ -163,36 +184,42 @@ public class FileStoragePathUtilsTests
 
         [Theory]
         [ClassData(typeof(TestData))]
-        public void PrivateContentDataBlockPath(Guid releaseVersionId,
-            Guid dataBlockId)
+        public void PrivateContentDataBlockPath(Guid releaseVersionId, Guid dataBlockId)
         {
-            Assert.Equal($"releases/{releaseVersionId}/data-blocks/{dataBlockId}.json",
-                FileStoragePathUtils.PrivateContentDataBlockPath(releaseVersionId: releaseVersionId,
-                    dataBlockId: dataBlockId));
+            Assert.Equal(
+                $"releases/{releaseVersionId}/data-blocks/{dataBlockId}.json",
+                FileStoragePathUtils.PrivateContentDataBlockPath(
+                    releaseVersionId: releaseVersionId,
+                    dataBlockId: dataBlockId
+                )
+            );
         }
 
         [Theory]
         [ClassData(typeof(TestDataWithBoundaryLevelId))]
-        public void PrivateContentDataBlockLocationsPath(
-            Guid releaseVersionId,
-            Guid dataBlockId,
-            long boundaryLevelId)
+        public void PrivateContentDataBlockLocationsPath(Guid releaseVersionId, Guid dataBlockId, long boundaryLevelId)
         {
-            Assert.Equal($"releases/{releaseVersionId}/data-blocks/{dataBlockId}-boundary-levels/{dataBlockId}-{boundaryLevelId}.json",
+            Assert.Equal(
+                $"releases/{releaseVersionId}/data-blocks/{dataBlockId}-boundary-levels/{dataBlockId}-{boundaryLevelId}.json",
                 FileStoragePathUtils.PrivateContentDataBlockLocationsPath(
                     releaseVersionId,
                     dataBlockId,
-                    boundaryLevelId));
+                    boundaryLevelId
+                )
+            );
         }
 
         [Theory]
         [ClassData(typeof(TestData))]
-        public void PrivateContentSubjectMetaPath(Guid releaseVersionId,
-            Guid subjectId)
+        public void PrivateContentSubjectMetaPath(Guid releaseVersionId, Guid subjectId)
         {
-            Assert.Equal($"releases/{releaseVersionId}/subject-meta/{subjectId}.json",
-                FileStoragePathUtils.PrivateContentSubjectMetaPath(releaseVersionId: releaseVersionId,
-                    subjectId: subjectId));
+            Assert.Equal(
+                $"releases/{releaseVersionId}/subject-meta/{subjectId}.json",
+                FileStoragePathUtils.PrivateContentSubjectMetaPath(
+                    releaseVersionId: releaseVersionId,
+                    subjectId: subjectId
+                )
+            );
         }
     }
 
@@ -203,8 +230,6 @@ public class FileStoragePathUtilsTests
         Assert.Equal($"{rootPath}/ancillary/", FileStoragePathUtils.FilesPath(rootPath, FileType.Ancillary));
         Assert.Equal($"{rootPath}/chart/", FileStoragePathUtils.FilesPath(rootPath, FileType.Chart));
         Assert.Equal($"{rootPath}/data/", FileStoragePathUtils.FilesPath(rootPath, FileType.Data));
-        Assert.Equal($"{rootPath}/data-zip/", FileStoragePathUtils.FilesPath(rootPath, FileType.DataZip));
-        Assert.Equal($"{rootPath}/bulk-data-zip/", FileStoragePathUtils.FilesPath(rootPath, FileType.BulkDataZip));
         Assert.Equal($"{rootPath}/image/", FileStoragePathUtils.FilesPath(rootPath, FileType.Image));
         Assert.Equal($"{rootPath}/data/", FileStoragePathUtils.FilesPath(rootPath, FileType.Metadata));
         Assert.Equal($"{rootPath}/zip/", FileStoragePathUtils.FilesPath(rootPath, FileType.AllFilesZip));

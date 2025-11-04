@@ -27,15 +27,16 @@ public class OrganisationsValidator(ContentDbContext context) : IOrganisationsVa
     public async Task<Either<ActionResult, Organisation[]>> ValidateOrganisations(
         Guid[]? organisationIds,
         string? path = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         if (organisationIds.IsNullOrEmpty())
         {
             return Array.Empty<Organisation>();
         }
 
-        var organisations = await context.Organisations
-            .Where(o => organisationIds.Contains(o.Id))
+        var organisations = await context
+            .Organisations.Where(o => organisationIds.Contains(o.Id))
             .Distinct()
             .ToArrayAsync(cancellationToken: cancellationToken);
 
@@ -46,7 +47,7 @@ public class OrganisationsValidator(ContentDbContext context) : IOrganisationsVa
                 Code = ValidationMessages.OrganisationNotFound.Code,
                 Message = ValidationMessages.OrganisationNotFound.Message,
                 Path = path,
-                Detail = new InvalidErrorDetail<Guid>(organisationId)
+                Detail = new InvalidErrorDetail<Guid>(organisationId),
             })
             .ToArray();
 

@@ -6,6 +6,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Migrati
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES4467_RemoveOrphanedContentBlocksAndContentSections : Migration
 {
     private const string MigrationId = "20230926093503";
@@ -13,12 +14,10 @@ public partial class EES4467_RemoveOrphanedContentBlocksAndContentSections : Mig
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.SqlFromFile(
-            ContentMigrationsPath, 
-            $"{MigrationId}_{nameof(EES4467_RemoveOrphanedContentBlocksAndContentSections)}.sql");
+            ContentMigrationsPath,
+            $"{MigrationId}_{nameof(EES4467_RemoveOrphanedContentBlocksAndContentSections)}.sql"
+        );
     }
 
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

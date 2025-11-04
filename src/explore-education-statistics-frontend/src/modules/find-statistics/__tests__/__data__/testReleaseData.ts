@@ -1,7 +1,10 @@
 import {
+  DataSetItem,
   Publication,
   PublicationSummaryRedesign,
   ReleaseVersion,
+  ReleaseVersionDataContent,
+  ReleaseVersionHomeContent,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 
@@ -97,7 +100,6 @@ export const testRelease: ReleaseVersion = {
       id: '24c6e9a3-1415-4ca5-9f21-b6b51cb7ba94',
       order: 1,
       heading: 'About these statistics',
-      caption: '',
       content: [
         {
           id: '7eeb1478-ab26-4b70-9128-b976429efa2f',
@@ -111,7 +113,6 @@ export const testRelease: ReleaseVersion = {
       id: '8965ef44-5ad7-4ab0-a142-78453d6f40af',
       order: 2,
       heading: 'Pupil absence rates',
-      caption: '',
       content: [
         {
           id: '2c369594-3bbc-40b4-ad19-196c923f5c7f',
@@ -131,7 +132,6 @@ export const testRelease: ReleaseVersion = {
       id: '6f493eee-443a-4403-9069-fef82e2f5788',
       order: 3,
       heading: 'Persistent absence',
-      caption: '',
       content: [
         {
           id: '8a8add13-368c-4067-9210-166bb19a00c1',
@@ -151,7 +151,6 @@ export const testRelease: ReleaseVersion = {
       id: 'fbf99442-3b72-46bc-836d-8866c552c53d',
       order: 4,
       heading: 'Reasons for absence',
-      caption: '',
       content: [
         {
           id: '2ef5f84f-e151-425d-8906-2921712f9157',
@@ -166,7 +165,6 @@ export const testRelease: ReleaseVersion = {
     id: '4f30b382-ce28-4a3e-801a-ce76004f5eb4',
     order: 1,
     heading: '',
-    caption: '',
     content: [
       {
         id: 'a0b85d7d-a9bd-48b5-82c6-a119adc74ca2',
@@ -180,7 +178,6 @@ export const testRelease: ReleaseVersion = {
     id: 'headlines-id',
     order: 1,
     heading: '',
-    caption: '',
     content: [
       {
         id: 'b9732ba9-8dc3-4fbc-9c9b-e504e4b58fb9',
@@ -195,14 +192,12 @@ export const testRelease: ReleaseVersion = {
     id: 'key-stats-secondary-id',
     order: 1,
     heading: '',
-    caption: '',
     content: [],
   },
   relatedDashboardsSection: {
     id: 'related-dashboards-id',
     order: 0,
     heading: '',
-    caption: '',
     content: [
       {
         id: 'related-dashboards-content-block-id',
@@ -229,7 +224,7 @@ export const testPublicationSummary: PublicationSummaryRedesign = {
   },
   nextReleaseDate: { year: 2026, month: 3 },
   theme: {
-    id: '323e4567-e89b-12d3-a456-426614174000',
+    id: 'test-theme-id',
     title: 'Pupils and schools',
     summary:
       'Including absence, application and offers, capacity, exclusion and special educational needs (SEN) statistics',
@@ -255,4 +250,328 @@ export const testReleaseVersionSummary: ReleaseVersionSummary = {
   lastUpdated: '2025-08-11T14:30:00+01:00',
   isLatestRelease: true,
   updateCount: 5,
+};
+
+export const testReleaseHomeContent: ReleaseVersionHomeContent = {
+  releaseId: 'test-release-id',
+  releaseVersionId: 'test-release-version-id',
+  content: [
+    {
+      id: 'test-section-1-id',
+      heading: 'Section 1 heading',
+      content: [
+        {
+          type: 'HtmlBlock',
+          body: '<p>Section 1 block 1 text</p>',
+          id: 'test-section-1-block-1-id',
+        },
+        {
+          type: 'DataBlock',
+          dataBlockVersion: {
+            dataBlockVersionId: 'test-section-1-block-2-data-block-version-id',
+            dataBlockParentId: 'test-section-1-block-2-data-block-parent-id',
+            charts: [
+              {
+                type: 'infographic',
+                fileId: 'test-chart-file-id',
+                title: 'Chart title',
+                subtitle: 'Chart subtitle',
+                alt: 'Alt text',
+                height: 600,
+                includeNonNumericData: false,
+                axes: {},
+                legend: {
+                  items: [],
+                },
+              },
+            ],
+            heading: 'Data block heading',
+            name: 'Data block name',
+            query: {
+              subjectId: 'test-subject-id',
+              locationIds: ['test-location-id'],
+              timePeriod: {
+                startYear: 2025,
+                startCode: 'AY',
+                endYear: 2025,
+                endCode: 'AY',
+              },
+              filters: ['test-filter-id'],
+              indicators: ['test-indicator-id'],
+            },
+            source: 'Source',
+            table: {
+              tableHeaders: {
+                columnGroups: [],
+                columns: [
+                  {
+                    value: '2025_AY',
+                    type: 'TimePeriod',
+                  },
+                ],
+                rowGroups: [
+                  [
+                    {
+                      value: 'filter-id',
+                      type: 'Filter',
+                    },
+                  ],
+                  [
+                    {
+                      level: 'localAuthority',
+                      value: 'location-id',
+                      type: 'Location',
+                    },
+                  ],
+                ],
+                rows: [
+                  {
+                    value: 'indicator-id',
+                    type: 'Indicator',
+                  },
+                ],
+              },
+            },
+          },
+          id: 'test-section-1-block-2-id',
+        },
+        {
+          type: 'HtmlBlock',
+          body: '<p>Section 1 block 3 text</p>',
+          id: 'test-section-1-block-3-id',
+        },
+      ],
+    },
+    {
+      id: 'test-section-2-id',
+      heading: 'Section 2 heading',
+      content: [
+        {
+          type: 'HtmlBlock',
+          body: '<h3>Section 2 subheading</h3><p>Section 2 block 1 text</p>',
+          id: 'test-section-2-block-1-id',
+        },
+      ],
+    },
+    {
+      id: 'test-section-3-id',
+      heading: 'Section 3 heading',
+      content: [
+        {
+          type: 'EmbedBlock',
+          embedBlock: {
+            embedBlockId: 'test-embed-block-id',
+            title: 'Embedded dashboard title',
+            url: 'https://department-for-education.shinyapps.io/test-dashboard',
+          },
+          id: 'test-section-3-block-1-id',
+        },
+      ],
+    },
+  ],
+  headlinesSection: {
+    id: 'test-headlines-section-id',
+    content: [
+      {
+        type: 'HtmlBlock',
+        body: '<p>Headlines section text</p>',
+        id: 'test-headlines-section-block-1-id',
+      },
+    ],
+  },
+  keyStatistics: [
+    {
+      type: 'KeyStatisticText',
+      statistic: '999',
+      title: 'Key statistic 1 title',
+      id: 'test-key-statistic-1-id',
+      guidanceText: 'Guidance text',
+      guidanceTitle: 'Guidance title 1',
+      trend: 'Trend',
+    },
+    {
+      type: 'KeyStatisticDataBlock',
+      dataBlockVersionId: 'test-key-statistic-2-data-block-version-id',
+      dataBlockParentId: 'test-key-statistic-2-data-block-parent-id',
+      id: 'test-key-statistic-2-id',
+    },
+    {
+      type: 'KeyStatisticText',
+      statistic: '999',
+      title: 'Key statistic 2 title',
+      id: 'test-key-statistic-3-id',
+      guidanceText: 'Guidance text',
+      guidanceTitle: 'Guidance title 2',
+      trend: 'Trend',
+    },
+  ],
+  keyStatisticsSecondarySection: {
+    id: 'test-key-statistics-secondary-section-id',
+    content: [
+      {
+        type: 'DataBlock',
+        dataBlockVersion: {
+          dataBlockVersionId:
+            'test-key-statistics-secondary-data-block-version-id',
+          dataBlockParentId:
+            'test-key-statistics-secondary-data-block-parent-id',
+          charts: [
+            {
+              type: 'infographic',
+              fileId: 'test-key-statistics-secondary-chart-file-id',
+              title: 'Test chart title',
+              subtitle: 'Test chart subtitle',
+              alt: 'Alt text',
+              height: 600,
+              includeNonNumericData: false,
+              axes: {},
+            },
+          ],
+          heading: 'Test data block heading',
+          name: 'Test data block name',
+          query: {
+            subjectId: 'test-subject-id',
+            locationIds: ['test-location-id'],
+            timePeriod: {
+              startYear: 2025,
+              startCode: 'AY',
+              endYear: 2025,
+              endCode: 'AY',
+            },
+            filters: ['test-filter-id'],
+            indicators: ['test-indicator-id'],
+          },
+          source: 'Source',
+          table: {
+            tableHeaders: {
+              columnGroups: [],
+              columns: [
+                {
+                  value: '2025_AY',
+                  type: 'TimePeriod',
+                },
+              ],
+              rowGroups: [
+                [
+                  {
+                    value: 'filter-id',
+                    type: 'Filter',
+                  },
+                ],
+                [
+                  {
+                    level: 'localAuthority',
+                    value: 'location-id',
+                    type: 'Location',
+                  },
+                ],
+              ],
+              rows: [
+                {
+                  value: 'indicator-id',
+                  type: 'Indicator',
+                },
+              ],
+            },
+          },
+        },
+        id: 'test-key-statistics-secondary-block-1-id',
+      },
+    ],
+  },
+  summarySection: {
+    id: 'test-summary-section-id',
+    content: [
+      {
+        type: 'HtmlBlock',
+        body: '<p>Summary section text</p>',
+        id: 'test-summary-section-block-1-id',
+      },
+    ],
+  },
+};
+
+export const testDataSetItems: DataSetItem[] = [
+  {
+    dataSetFileId: 'test-dataset-1-datasetfileid',
+    fileId: 'test-dataset-1-fileid',
+    subjectId: 'test-dataset-1-subjectid',
+    meta: {
+      filters: ['Characteristic', 'School type'],
+      geographicLevels: [
+        'Local authority',
+        'Local authority district',
+        'National',
+      ],
+      indicators: ['Authorised absence rate', 'Authorised absence rate exact'],
+      numDataFileRows: 1000,
+      timePeriodRange: {
+        start: '2012/13',
+        end: '2016/17',
+      },
+    },
+    title: 'Test dataset 1',
+    summary: '<p>Test dataset 1 summary</p>',
+  },
+  {
+    dataSetFileId: 'test-dataset-2-datasetfileid',
+    fileId: 'test-dataset-2-fileid',
+    subjectId: 'test-dataset-2-subjectid',
+    meta: {
+      filters: ['Characteristic', 'School type'],
+      geographicLevels: ['Local authority', 'National', 'Regional'],
+      indicators: [
+        'Authorised absence rate',
+        'Number of authorised absence sessions',
+      ],
+      numDataFileRows: 2000,
+      timePeriodRange: {
+        start: '2013/14',
+        end: '2016/17',
+      },
+    },
+    title: 'Test dataset 2',
+    summary: '<p>Test dataset 2 summary</p>',
+  },
+];
+
+export const testReleaseDataContent: ReleaseVersionDataContent = {
+  releaseId: 'test-release-id',
+  releaseVersionId: 'test-release-version-id',
+  dataDashboards: '<h3>Data dashboard text</h3>',
+  dataGuidance:
+    '<h3>Description</h3><p>---</p><h3>Coverage</h3><p>---</p><h3>File formats and conventions</h3><p>---</p>',
+  dataSets: testDataSetItems,
+  featuredTables: [
+    {
+      featuredTableId: 'featured-table-1-id',
+      dataBlockParentId: 'featured-table-1-data-block-parent-id',
+      title: 'Featured table 1',
+      summary: 'Featured table 1 description',
+    },
+    {
+      featuredTableId: 'featured-table-2-id',
+      dataBlockParentId: 'featured-table-2-data-block-parent-id',
+      title: 'Featured table 2',
+      summary: 'Featured table 2 description',
+    },
+  ],
+  supportingFiles: [
+    {
+      fileId: 'supporting-file-1-file-id',
+      extension: 'pdf',
+      filename: 'file1.pdf',
+      title: 'Supporting file 1',
+      summary: 'Supporting file 1 description',
+      size: '10 Mb',
+    },
+    {
+      fileId: 'supporting-file-2-file-id',
+      extension: 'pdf',
+      filename: 'file2.pdf',
+      title: 'Supporting file 2',
+      summary: 'Supporting file 2 description',
+      size: '20 Mb',
+    },
+  ],
 };

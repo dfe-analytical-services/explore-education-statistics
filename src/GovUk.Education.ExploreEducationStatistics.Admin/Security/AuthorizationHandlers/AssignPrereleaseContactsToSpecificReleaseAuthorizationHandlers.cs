@@ -7,9 +7,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class AssignPrereleaseContactsToSpecificReleaseRequirement : IAuthorizationRequirement
-{
-}
+public class AssignPrereleaseContactsToSpecificReleaseRequirement : IAuthorizationRequirement { }
 
 public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler
     : AuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, ReleaseVersion>
@@ -17,7 +15,8 @@ public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
     public AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
-        AuthorizationHandlerService authorizationHandlerService)
+        AuthorizationHandlerService authorizationHandlerService
+    )
     {
         _authorizationHandlerService = authorizationHandlerService;
     }
@@ -25,21 +24,24 @@ public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         AssignPrereleaseContactsToSpecificReleaseRequirement requirement,
-        ReleaseVersion releaseVersion)
+        ReleaseVersion releaseVersion
+    )
     {
         if (SecurityUtils.HasClaim(context.User, UpdateAllReleases))
         {
             context.Succeed(requirement);
             return;
         }
-        
-        if (await _authorizationHandlerService
-                .HasRolesOnPublicationOrReleaseVersion(
-                    context.User.GetUserId(),
-                    releaseVersion.PublicationId,
-                    releaseVersion.Id,
-                    ListOf(PublicationRole.Owner, PublicationRole.Allower),
-                    ReleaseEditorAndApproverRoles))
+
+        if (
+            await _authorizationHandlerService.HasRolesOnPublicationOrReleaseVersion(
+                context.User.GetUserId(),
+                releaseVersion.PublicationId,
+                releaseVersion.Id,
+                ListOf(PublicationRole.Owner, PublicationRole.Allower),
+                ReleaseEditorAndApproverRoles
+            )
+        )
         {
             context.Succeed(requirement);
         }

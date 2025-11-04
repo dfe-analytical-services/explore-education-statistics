@@ -1,4 +1,3 @@
-#nullable enable
 using System.Net.Mime;
 using System.Text;
 using Newtonsoft.Json;
@@ -23,10 +22,10 @@ public class JsonNetContent : StringContent
     private static readonly Encoding DefaultEncoding = Encoding.UTF8;
     private const string MediaType = MediaTypeNames.Application.Json;
 
-    public JsonNetContent(object content, JsonSerializerSettings? settings = null, Encoding? encoding = null) : base(
-        content: JsonConvert.SerializeObject(content, settings),
-        encoding: encoding ?? DefaultEncoding,
-        mediaType: MediaType)
-    {
-    }
+    public JsonNetContent(object content, JsonSerializerSettings? settings = null, Encoding? encoding = null)
+        : base(
+            content: JsonConvert.SerializeObject(content, settings),
+            encoding: encoding ?? DefaultEncoding,
+            mediaType: MediaType
+        ) { }
 }

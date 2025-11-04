@@ -7,6 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
 /// <inheritdoc />
 [ExcludeFromCodeCoverage]
+// ReSharper disable once InconsistentNaming
 public partial class EES5784_GrantAccessToReleasesTable : Migration
 {
     /// <inheritdoc />
@@ -17,8 +18,5 @@ public partial class EES5784_GrantAccessToReleasesTable : Migration
     }
 
     /// <inheritdoc />
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

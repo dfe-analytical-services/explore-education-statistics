@@ -88,18 +88,14 @@ const prototypeReleaseContent: ReleaseContent = {
     id: 'Release-title-id',
     keyStatistics: [
       {
-        created: '2020-01-01',
         id: 'key-statistic-id',
-        order: 0,
         statistic: '26,955',
         title: 'Total new entrants to ITT',
         trend: '(down 5% from 28,463 in 2022/23)',
         type: 'KeyStatisticText',
       },
       {
-        created: '2020-01-01',
         id: 'key-statistic-id-2',
-        order: 0,
         statistic: '21,946',
         title: 'Postgraduate total new entrants to ITT',
         trend: '(down 3% from 22,673 in 2022/23)',

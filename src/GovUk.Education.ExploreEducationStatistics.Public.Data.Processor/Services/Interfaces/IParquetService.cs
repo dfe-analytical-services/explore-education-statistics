@@ -2,7 +2,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Servi
 
 public interface IParquetService
 {
-    Task WriteDataFiles(
-        Guid dataSetVersionId,
-        CancellationToken cancellationToken = default);
+    Task WriteDataFiles(Guid dataSetVersionId, CancellationToken cancellationToken = default);
 }

@@ -57,21 +57,11 @@ user checks chart height
     [Arguments]    ${locator}    ${height}
     user waits until parent contains element    ${locator}    css:.recharts-surface[height="${height}"]
 
-user checks chart width
-    [Arguments]    ${locator}    ${width}
-    user waits until parent contains element    ${locator}    css:.recharts-surface[width="${width}"]
-
 user checks map chart height
     [Arguments]    ${locator}    ${height}    ${unit}=px
     user waits until parent contains element    ${locator}    css:.leaflet-container
     ${element}=    get child element    ${locator}    css:.leaflet-container
     user checks css property value    ${element}    height    ${height}${unit}
-
-user checks map chart width
-    [Arguments]    ${locator}    ${width}    ${unit}=px
-    user waits until parent contains element    ${locator}    css:.leaflet-container
-    ${element}=    get child element    ${locator}    css:.leaflet-container
-    user checks css property value    ${element}    width    ${width}${unit}
 
 user checks chart legend item contains
     [Arguments]    ${locator}    ${item}    ${text}
@@ -198,7 +188,6 @@ user configures basic chart
     [Arguments]
     ...    ${CHART_TYPE}
     ...    ${CHART_HEIGHT}
-    ...    ${CHART_WIDTH}
     ...    ${CHART_ALT_TEXT}=${EMPTY}
     ...    ${CHART_SUBTITLE}=${EMPTY}
     user clicks link    Chart
@@ -211,7 +200,6 @@ user configures basic chart
 
     user waits until page finishes loading
     user enters text into element    id:chartConfigurationForm-height    ${CHART_HEIGHT}
-    user enters text into element    id:chartConfigurationForm-width    ${CHART_WIDTH}
 
     IF    "${CHART_ALT_TEXT}" != "${EMPTY}"
         user enters text into element    label:Alt text    ${CHART_ALT_TEXT}

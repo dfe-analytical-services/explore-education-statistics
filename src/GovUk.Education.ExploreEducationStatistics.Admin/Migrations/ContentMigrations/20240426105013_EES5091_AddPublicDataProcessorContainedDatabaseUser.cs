@@ -8,6 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
 /// <inheritdoc />
 [ExcludeFromCodeCoverage]
+// ReSharper disable once InconsistentNaming
 public partial class EES5091_AddPublicDataProcessorContainedDatabaseUser : Migration
 {
     private const string MigrationId = "20240426105013";
@@ -15,12 +16,12 @@ public partial class EES5091_AddPublicDataProcessorContainedDatabaseUser : Migra
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.SqlFromFile(MigrationConstants.ContentMigrationsPath,
-            $"{MigrationId}_EES5091_AddPublicDataProcessorContainedDatabaseUser.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationConstants.ContentMigrationsPath,
+            $"{MigrationId}_EES5091_AddPublicDataProcessorContainedDatabaseUser.sql"
+        );
     }
 
     /// <inheritdoc />
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

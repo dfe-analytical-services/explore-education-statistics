@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,31 +13,33 @@ public class PublicationsService(ContentDbContext contentDbContext) : IPublicati
 {
     public async Task<Either<ActionResult, PublicationDto>> GetPublication(
         string publicationSlug,
-        CancellationToken cancellationToken = default)
-    {
-        return await GetPublicationBySlug(publicationSlug,
+        CancellationToken cancellationToken = default
+    ) =>
+        await GetPublicationBySlug(
+                publicationSlug,
                 includeContact: true,
                 includeLatestPublishedRelease: true,
                 includeTheme: true,
-                cancellationToken)
+                cancellationToken
+            )
             .OnSuccess(async publication =>
             {
                 var supersededByPublication = await GetSupersededByPublication(publication.Id, cancellationToken);
                 return PublicationDto.FromPublication(
                     publication: publication,
-                    supersededByPublication: supersededByPublication);
+                    supersededByPublication: supersededByPublication
+                );
             });
-    }
 
     private async Task<Either<ActionResult, Publication>> GetPublicationBySlug(
         string publicationSlug,
         bool includeContact = false,
         bool includeLatestPublishedRelease = false,
         bool includeTheme = false,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        var query = contentDbContext.Publications
-            .Where(p => p.Slug == publicationSlug && p.LatestPublishedReleaseVersionId.HasValue);
+        var query = contentDbContext.Publications.AsNoTracking().WhereHasPublishedRelease();
 
         if (includeContact)
         {
@@ -53,18 +56,20 @@ public class PublicationsService(ContentDbContext contentDbContext) : IPublicati
             query = query.Include(p => p.Theme);
         }
 
-        return await query.SingleOrNotFoundAsync(cancellationToken);
+        return await query.SingleOrNotFoundAsync(p => p.Slug == publicationSlug, cancellationToken);
     }
 
     private async Task<Publication?> GetSupersededByPublication(
         Guid publicationId,
-        CancellationToken cancellationToken = default)
-    {
-        return await contentDbContext.Publications
-            .Where(p => p.Id == publicationId &&
-                        p.SupersededBy != null &&
-                        p.SupersededBy.LatestPublishedReleaseVersionId.HasValue)
+        CancellationToken cancellationToken
+    ) =>
+        await contentDbContext
+            .Publications.AsNoTracking()
+            .Where(p =>
+                p.Id == publicationId
+                && p.SupersededBy != null
+                && p.SupersededBy.LatestPublishedReleaseVersionId.HasValue
+            )
             .Select(p => p.SupersededBy)
             .SingleOrDefaultAsync(cancellationToken);
-    }
 }

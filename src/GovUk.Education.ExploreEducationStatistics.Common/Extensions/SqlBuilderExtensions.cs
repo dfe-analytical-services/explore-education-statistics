@@ -1,4 +1,3 @@
-#nullable enable
 using InterpolatedSql;
 using InterpolatedSql.SqlBuilders;
 
@@ -16,13 +15,11 @@ public static class SqlBuilderExtensions
     public static TBuilder AppendRange<TBuilder>(
         this TBuilder builder,
         IEnumerable<string> literals,
-        string? joinString = null) where TBuilder : InterpolatedSqlBuilderBase
+        string? joinString = null
+    )
+        where TBuilder : InterpolatedSqlBuilderBase
     {
-        return builder.AppendRange(
-            items: literals,
-            append: builder.AppendLiteral,
-            joinString: joinString
-        );
+        return builder.AppendRange(items: literals, append: builder.AppendLiteral, joinString: joinString);
     }
 
     /// <summary>
@@ -35,13 +32,11 @@ public static class SqlBuilderExtensions
     public static TBuilder AppendRange<TBuilder>(
         this TBuilder builder,
         IEnumerable<FormattableString> fragments,
-        string? joinString = null) where TBuilder : InterpolatedSqlBuilderBase
+        string? joinString = null
+    )
+        where TBuilder : InterpolatedSqlBuilderBase
     {
-        return builder.AppendRange(
-            items: fragments,
-            append: builder.AppendFormattableString,
-            joinString: joinString
-        );
+        return builder.AppendRange(items: fragments, append: builder.AppendFormattableString, joinString: joinString);
     }
 
     /// <summary>
@@ -53,13 +48,11 @@ public static class SqlBuilderExtensions
     public static TBuilder AppendRange<TBuilder>(
         this TBuilder builder,
         IEnumerable<IBuildable<IInterpolatedSql>> builders,
-        string? joinString = null) where TBuilder : InterpolatedSqlBuilderBase
+        string? joinString = null
+    )
+        where TBuilder : InterpolatedSqlBuilderBase
     {
-        return builder.AppendRange(
-            items: builders,
-            append: b => builder.Append(b.Build()),
-            joinString: joinString
-        );
+        return builder.AppendRange(items: builders, append: b => builder.Append(b.Build()), joinString: joinString);
     }
 
     /// <summary>
@@ -71,20 +64,20 @@ public static class SqlBuilderExtensions
     public static TBuilder AppendRange<TBuilder>(
         this TBuilder builder,
         IEnumerable<IInterpolatedSql> fragments,
-        string? joinString = null) where TBuilder : InterpolatedSqlBuilderBase
+        string? joinString = null
+    )
+        where TBuilder : InterpolatedSqlBuilderBase
     {
-        return builder.AppendRange(
-            items: fragments,
-            append: builder.Append,
-            joinString: joinString
-        );
+        return builder.AppendRange(items: fragments, append: builder.Append, joinString: joinString);
     }
 
     private static TBuilder AppendRange<TBuilder, TItem>(
         this TBuilder builder,
         IEnumerable<TItem> items,
         Action<TItem> append,
-        string? joinString) where TBuilder : InterpolatedSqlBuilderBase
+        string? joinString
+    )
+        where TBuilder : InterpolatedSqlBuilderBase
     {
         var itemsList = items.ToList();
 

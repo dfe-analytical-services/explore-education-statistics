@@ -1,4 +1,5 @@
 #nullable enable
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Xunit;
 
@@ -16,7 +17,7 @@ public static class ObjectExtensionsTests
                 String = "Test",
                 Int = 123,
                 Bool = true,
-                Null = (object?)null
+                Null = (object?)null,
             };
 
             var dictionary = obj.ToDictionary();
@@ -31,24 +32,17 @@ public static class ObjectExtensionsTests
         [Fact]
         public void AnonymousObjectWithComplexTypes()
         {
-            var anonymousObj = new
-            {
-                Field = "Test 1"
-            };
+            var anonymousObj = new { Field = "Test 1" };
 
             var classObj = new TestClassWithPrimitives();
 
-            var list = new List<object>
-            {
-                "Test 2",
-                new { Field = "Test 3" }
-            };
+            var list = new List<object> { "Test 2", new { Field = "Test 3" } };
 
             var obj = new
             {
                 Anonymous = anonymousObj,
                 Class = classObj,
-                List = list
+                List = list,
             };
 
             var dictionary = obj.ToDictionary();
@@ -67,7 +61,7 @@ public static class ObjectExtensionsTests
                 String = "Test",
                 Int = 123,
                 Bool = true,
-                Null = null
+                Null = null,
             };
 
             var dictionary = obj.ToDictionary();
@@ -82,10 +76,7 @@ public static class ObjectExtensionsTests
         [Fact]
         public void TestClassWithHiddenPropertiesObject()
         {
-            var obj = new TestClassWithHiddenProperties
-            {
-                Field = "Test",
-            };
+            var obj = new TestClassWithHiddenProperties { Field = "Test" };
 
             var dictionary = obj.ToDictionary();
 
@@ -96,24 +87,17 @@ public static class ObjectExtensionsTests
         [Fact]
         public void TestClassWithComplexTypesObject()
         {
-            var anonymousObj = new
-            {
-                Field = "Test 1"
-            };
+            var anonymousObj = new { Field = "Test 1" };
 
             var classObj = new TestClassWithPrimitives();
 
-            var list = new List<object>
-            {
-                "Test 2",
-                new { Field = "Test 3" }
-            };
+            var list = new List<object> { "Test 2", new { Field = "Test 3" } };
 
             var obj = new TestClassWithComplexTypes
             {
                 Anonymous = anonymousObj,
                 Class = classObj,
-                List = list
+                List = list,
             };
 
             var dictionary = obj.ToDictionary();
@@ -124,6 +108,7 @@ public static class ObjectExtensionsTests
             Assert.Equal(list, dictionary["List"]);
         }
 
+        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
         private class TestClassWithPrimitives
         {
             public string String { get; init; } = string.Empty;
@@ -135,6 +120,8 @@ public static class ObjectExtensionsTests
             public object? Null { get; init; }
         }
 
+        [SuppressMessage("ReSharper", "UnusedMember.Local")]
+        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
         private class TestClassWithHiddenProperties
         {
             public string Field { get; init; } = string.Empty;
@@ -149,6 +136,7 @@ public static class ObjectExtensionsTests
             }
         }
 
+        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
         private class TestClassWithComplexTypes
         {
             public object? Anonymous { get; init; }

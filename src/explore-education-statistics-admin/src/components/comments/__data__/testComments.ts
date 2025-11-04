@@ -2,15 +2,13 @@ import { Comment, CommentUser } from '@admin/services/types/content';
 
 export const testCommentUser1: CommentUser = {
   id: 'user-1',
-  firstName: 'User',
-  lastName: 'One',
+  displayName: 'User One',
   email: 'user.one@test.com',
 };
 
 export const testCommentUser2: CommentUser = {
   id: 'user-2',
-  firstName: 'User',
-  lastName: 'Two',
+  displayName: 'User Two',
   email: 'user.two@test.com',
 };
 

@@ -16,42 +16,40 @@ public class MethodologyRepository : IMethodologyRepository
 
     public async Task<List<Methodology>> GetByPublication(Guid publicationId)
     {
-        return await _contentDbContext.PublicationMethodologies
-            .Where(pm => pm.PublicationId == publicationId)
+        return await _contentDbContext
+            .PublicationMethodologies.Where(pm => pm.PublicationId == publicationId)
             .Select(pm => pm.Methodology)
             .ToListAsync();
     }
 
     public async Task<Publication> GetOwningPublication(Guid methodologyId)
     {
-        var methodology = await _contentDbContext.Methodologies
-            .Include(mp => mp.Publications)
+        var methodology = await _contentDbContext
+            .Methodologies.Include(mp => mp.Publications)
             .SingleAsync(mp => mp.Id == methodologyId);
 
         var owningPublicationLink = methodology.OwningPublication();
 
-        await _contentDbContext.Entry(owningPublicationLink)
-            .Reference(pm => pm.Publication)
-            .LoadAsync();
+        await _contentDbContext.Entry(owningPublicationLink).Reference(pm => pm.Publication).LoadAsync();
 
         return owningPublicationLink.Publication;
     }
 
     public Task<List<Guid>> GetAllPublicationIds(Guid methodologyId)
     {
-        return _contentDbContext.PublicationMethodologies
-            .Where(pm => pm.MethodologyId == methodologyId)
+        return _contentDbContext
+            .PublicationMethodologies.Where(pm => pm.MethodologyId == methodologyId)
             .Select(pm => pm.PublicationId)
             .ToListAsync();
     }
 
     public async Task<List<Methodology>> GetPublishedMethodologiesUnrelatedToPublication(Guid publicationId)
     {
-        return await _contentDbContext.Methodologies
-            .Include(m => m.Publications)
+        return await _contentDbContext
+            .Methodologies.Include(m => m.Publications)
             .Where(m =>
-                m.Publications.All(pm => pm.PublicationId != publicationId)
-                && m.LatestPublishedVersionId != null)
+                m.Publications.All(pm => pm.PublicationId != publicationId) && m.LatestPublishedVersionId != null
+            )
             .ToListAsync();
     }
 }

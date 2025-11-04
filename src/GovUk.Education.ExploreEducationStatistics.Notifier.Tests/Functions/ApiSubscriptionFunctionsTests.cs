@@ -33,33 +33,43 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         public async Task Success()
         {
             string? verificationUrl = null;
-            fixture.NotificationClient
-                .Setup(mock => mock.SendEmail(
-                    Email,
-                    GetGovUkNotifyOptions().EmailTemplates.ApiSubscriptionVerificationId,
-                    It.Is<Dictionary<string, dynamic>>(personalisation =>
-                        AssertEmailTemplateValues(
-                            personalisation,
-                            DataSetTitle,
-                            $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-subscription/")
-                    ),
-                    null,
-                    null,
-                    null))
+            fixture
+                .NotificationClient.Setup(mock =>
+                    mock.SendEmail(
+                        Email,
+                        GetGovUkNotifyOptions().EmailTemplates.ApiSubscriptionVerificationId,
+                        It.Is<Dictionary<string, dynamic>>(personalisation =>
+                            AssertEmailTemplateValues(
+                                personalisation,
+                                DataSetTitle,
+                                $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-subscription/"
+                            )
+                        ),
+                        null,
+                        null,
+                        null
+                    )
+                )
                 .Returns(It.IsAny<EmailNotificationResponse>())
-                .Callback((
+                .Callback(
+                    (
+                        // ReSharper disable UnusedParameter.Local
                         string email,
                         string templateId,
                         Dictionary<string, dynamic> personalisation,
                         string clientReference,
                         string emailReplyToId,
-                        string oneClickUnsubscribeUrl)
-                    => verificationUrl = personalisation[NotifierEmailTemplateFields.VerificationUrl]);
+                        string oneClickUnsubscribeUrl
+                    )
+                    // ReSharper restore UnusedParameter.Local
+                    => verificationUrl = personalisation[NotifierEmailTemplateFields.VerificationUrl]
+                );
 
             var result = await RequestPendingSubscription(
                 dataSetId: _dataSetId,
                 dataSetTitle: DataSetTitle,
-                email: Email);
+                email: Email
+            );
 
             var response = result.AssertOkObjectResult<ApiSubscriptionViewModel>();
 
@@ -72,9 +82,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var extractedEmail = ExtractEmailFromSubscriptionLinkToken(verificationUrl);
             Assert.Equal(Email, extractedEmail);
 
-            var subscription = await GetApiSubscriptionIfExists(
-                dataSetId: _dataSetId,
-                email: Email);
+            var subscription = await GetApiSubscriptionIfExists(dataSetId: _dataSetId, email: Email);
 
             MockUtils.VerifyAllMocks(fixture.NotificationClient);
 
@@ -104,13 +112,15 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var result = await RequestPendingSubscription(
                 dataSetId: _dataSetId,
                 dataSetTitle: DataSetTitle,
-                email: Email);
+                email: Email
+            );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
                 expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst(),
-                expectedCode: ValidationMessages.ApiPendingSubscriptionAlreadyExists.Code);
+                expectedCode: ValidationMessages.ApiPendingSubscriptionAlreadyExists.Code
+            );
         }
 
         [Fact]
@@ -122,7 +132,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 RowKey = Email,
                 DataSetTitle = DataSetTitle,
                 Status = ApiSubscriptionStatus.Subscribed,
-                Expiry = null
+                Expiry = null,
             };
 
             await CreateApiSubscription(subscription);
@@ -130,13 +140,15 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var result = await RequestPendingSubscription(
                 dataSetId: _dataSetId,
                 dataSetTitle: DataSetTitle,
-                email: Email);
+                email: Email
+            );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
                 expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst(),
-                expectedCode: ValidationMessages.ApiVerifiedSubscriptionAlreadyExists.Code);
+                expectedCode: ValidationMessages.ApiVerifiedSubscriptionAlreadyExists.Code
+            );
         }
 
         [Theory]
@@ -147,12 +159,14 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var result = await RequestPendingSubscription(
                 dataSetId: _dataSetId,
                 dataSetTitle: DataSetTitle,
-                email: email!);
+                email: email!
+            );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasNotEmptyError(
-                expectedPath: nameof(PendingApiSubscriptionCreateRequest.Email).ToLowerFirst());
+                expectedPath: nameof(PendingApiSubscriptionCreateRequest.Email).ToLowerFirst()
+            );
         }
 
         [Theory]
@@ -165,12 +179,14 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var result = await RequestPendingSubscription(
                 dataSetId: _dataSetId,
                 dataSetTitle: DataSetTitle,
-                email: email);
+                email: email
+            );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasEmailError(
-                expectedPath: nameof(PendingApiSubscriptionCreateRequest.Email).ToLowerFirst());
+                expectedPath: nameof(PendingApiSubscriptionCreateRequest.Email).ToLowerFirst()
+            );
         }
 
         [Fact]
@@ -179,12 +195,14 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var result = await RequestPendingSubscription(
                 dataSetId: Guid.Empty,
                 dataSetTitle: DataSetTitle,
-                email: Email);
+                email: Email
+            );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasNotEmptyError(
-                expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst());
+                expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetId).ToLowerFirst()
+            );
         }
 
         [Theory]
@@ -195,37 +213,38 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var result = await RequestPendingSubscription(
                 dataSetId: _dataSetId,
                 dataSetTitle: dataSetTitle!,
-                email: Email);
+                email: Email
+            );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasNotEmptyError(
-                expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetTitle).ToLowerFirst());
+                expectedPath: nameof(PendingApiSubscriptionCreateRequest.DataSetTitle).ToLowerFirst()
+            );
         }
 
-        private async Task<IActionResult> RequestPendingSubscription(
-            Guid dataSetId,
-            string dataSetTitle,
-            string email)
+        private async Task<IActionResult> RequestPendingSubscription(Guid dataSetId, string dataSetTitle, string email)
         {
             var request = new PendingApiSubscriptionCreateRequest
             {
                 DataSetId = dataSetId,
                 DataSetTitle = dataSetTitle,
-                Email = email
+                Email = email,
             };
 
             var functions = GetRequiredService<ApiSubscriptionFunctions>();
 
             return await functions.RequestPendingSubscription(
                 request: request,
-                cancellationToken: CancellationToken.None);
+                cancellationToken: CancellationToken.None
+            );
         }
 
         private static bool AssertEmailTemplateValues(
             Dictionary<string, dynamic> personalisation,
             string dataSetTitle,
-            string verificationUrlPrefix)
+            string verificationUrlPrefix
+        )
         {
             Assert.Equal(dataSetTitle, personalisation[NotifierEmailTemplateFields.DataSetTitle]);
             Assert.StartsWith(verificationUrlPrefix, personalisation[NotifierEmailTemplateFields.VerificationUrl]);
@@ -251,36 +270,45 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             await CreateApiSubscription(pendingSubscription);
 
             string? unsubscribeUrl = null;
-            fixture.NotificationClient
-                .Setup(mock => mock.SendEmail(
-                    Email,
-                    GetGovUkNotifyOptions().EmailTemplates.ApiSubscriptionConfirmationId,
-                    It.Is<Dictionary<string, dynamic>>(personalisation =>
-                        AssertEmailTemplateValues(
-                            personalisation,
-                            DataSetTitle,
-                            $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription/")
-                    ),
-                    null,
-                    null,
-                    null))
+            fixture
+                .NotificationClient.Setup(mock =>
+                    mock.SendEmail(
+                        Email,
+                        GetGovUkNotifyOptions().EmailTemplates.ApiSubscriptionConfirmationId,
+                        It.Is<Dictionary<string, dynamic>>(personalisation =>
+                            AssertEmailTemplateValues(
+                                personalisation,
+                                DataSetTitle,
+                                $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription/"
+                            )
+                        ),
+                        null,
+                        null,
+                        null
+                    )
+                )
                 .Returns(It.IsAny<EmailNotificationResponse>())
-                .Callback((
+                .Callback(
+                    (
+                        // ReSharper disable UnusedParameter.Local
                         string email,
                         string templateId,
                         Dictionary<string, dynamic> personalisation,
                         string clientReference,
                         string emailReplyToId,
-                        string oneClickUnsubscribeUrl)
-                    => unsubscribeUrl = personalisation[NotifierEmailTemplateFields.UnsubscribeUrl]);
+                        string oneClickUnsubscribeUrl
+                    )
+                    // ReSharper restore UnusedParameter.Local
+                    => unsubscribeUrl = personalisation[NotifierEmailTemplateFields.UnsubscribeUrl]
+                );
 
             var tokenService = GetRequiredService<ITokenService>();
-            var subscribeToken = tokenService.GenerateToken(pendingSubscription.RowKey,
-                pendingSubscription.Expiry.Value.UtcDateTime);
+            var subscribeToken = tokenService.GenerateToken(
+                pendingSubscription.RowKey,
+                pendingSubscription.Expiry.Value.UtcDateTime
+            );
 
-            var result = await VerifySubscription(
-                dataSetId: _dataSetId,
-                token: subscribeToken);
+            var result = await VerifySubscription(dataSetId: _dataSetId, token: subscribeToken);
 
             MockUtils.VerifyAllMocks(fixture.NotificationClient);
 
@@ -295,9 +323,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var extractedEmail = ExtractEmailFromSubscriptionLinkToken(unsubscribeUrl);
             Assert.Equal(Email, extractedEmail);
 
-            var verifiedSubscription = await GetApiSubscriptionIfExists(
-                dataSetId: _dataSetId,
-                email: Email);
+            var verifiedSubscription = await GetApiSubscriptionIfExists(dataSetId: _dataSetId, email: Email);
 
             Assert.NotNull(verifiedSubscription);
             Assert.Equal(Email, verifiedSubscription.RowKey);
@@ -314,9 +340,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var tokenService = GetRequiredService<ITokenService>();
             var subscribeToken = tokenService.GenerateToken(Email, DateTime.UtcNow);
 
-            var result = await VerifySubscription(
-                dataSetId: _dataSetId,
-                token: subscribeToken);
+            var result = await VerifySubscription(dataSetId: _dataSetId, token: subscribeToken);
 
             result.AssertNotFoundResult();
         }
@@ -330,7 +354,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 RowKey = Email,
                 DataSetTitle = DataSetTitle,
                 Status = ApiSubscriptionStatus.Subscribed,
-                Expiry = null
+                Expiry = null,
             };
 
             await CreateApiSubscription(verifiedSubscription);
@@ -338,15 +362,14 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var tokenService = GetRequiredService<ITokenService>();
             var subscribeToken = tokenService.GenerateToken(verifiedSubscription.RowKey, DateTime.UtcNow);
 
-            var result = await VerifySubscription(
-                dataSetId: _dataSetId,
-                token: subscribeToken);
+            var result = await VerifySubscription(dataSetId: _dataSetId, token: subscribeToken);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
                 expectedPath: "dataSetId",
-                expectedCode: ValidationMessages.ApiVerifiedSubscriptionAlreadyExists.Code);
+                expectedCode: ValidationMessages.ApiVerifiedSubscriptionAlreadyExists.Code
+            );
         }
 
         [Fact]
@@ -358,7 +381,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 RowKey = Email,
                 DataSetTitle = DataSetTitle,
                 Status = ApiSubscriptionStatus.Pending,
-                Expiry = DateTimeOffset.UtcNow.AddHours(-1)
+                Expiry = DateTimeOffset.UtcNow.AddHours(-1),
             };
 
             await CreateApiSubscription(verifiedSubscription);
@@ -366,34 +389,30 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var tokenService = GetRequiredService<ITokenService>();
             var subscribeToken = tokenService.GenerateToken(verifiedSubscription.RowKey, DateTime.UtcNow);
 
-            var result = await VerifySubscription(
-                dataSetId: _dataSetId,
-                token: subscribeToken);
+            var result = await VerifySubscription(dataSetId: _dataSetId, token: subscribeToken);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
                 expectedPath: "dataSetId",
-                expectedCode: ValidationMessages.ApiPendingSubscriptionAlreadyExpired.Code);
+                expectedCode: ValidationMessages.ApiPendingSubscriptionAlreadyExpired.Code
+            );
         }
 
         [Fact]
         public async Task SubscribeTokenInvalid_400()
         {
-            var result = await VerifySubscription(
-                dataSetId: _dataSetId,
-                token: "");
+            var result = await VerifySubscription(dataSetId: _dataSetId, token: "");
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
                 expectedPath: "token",
-                expectedCode: ValidationMessages.AuthorizationTokenInvalid.Code);
+                expectedCode: ValidationMessages.AuthorizationTokenInvalid.Code
+            );
         }
 
-        private async Task<IActionResult> VerifySubscription(
-            Guid dataSetId,
-            string token)
+        private async Task<IActionResult> VerifySubscription(Guid dataSetId, string token)
         {
             var functions = GetRequiredService<ApiSubscriptionFunctions>();
 
@@ -401,13 +420,15 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 request: null!,
                 dataSetId: dataSetId,
                 token: token,
-                cancellationToken: CancellationToken.None);
+                cancellationToken: CancellationToken.None
+            );
         }
 
         private static bool AssertEmailTemplateValues(
             Dictionary<string, dynamic> personalisation,
             string dataSetTitle,
-            string unsubscribeUrlPrefix)
+            string unsubscribeUrlPrefix
+        )
         {
             Assert.Equal(dataSetTitle, personalisation[NotifierEmailTemplateFields.DataSetTitle]);
             Assert.StartsWith(unsubscribeUrlPrefix, personalisation[NotifierEmailTemplateFields.UnsubscribeUrl]);
@@ -427,24 +448,22 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 RowKey = Email,
                 DataSetTitle = DataSetTitle,
                 Status = ApiSubscriptionStatus.Subscribed,
-                Expiry = null
+                Expiry = null,
             };
 
             await CreateApiSubscription(subscription);
 
             var tokenService = GetRequiredService<ITokenService>();
-            var unsubscribeToken =
-                tokenService.GenerateToken(subscription.RowKey, expiryDateTime: DateTime.UtcNow.AddYears(1));
+            var unsubscribeToken = tokenService.GenerateToken(
+                subscription.RowKey,
+                expiryDateTime: DateTime.UtcNow.AddYears(1)
+            );
 
-            var result = await Unsubscribe(
-                dataSetId: _dataSetId,
-                token: unsubscribeToken);
+            var result = await Unsubscribe(dataSetId: _dataSetId, token: unsubscribeToken);
 
             result.AssertNoContent();
 
-            var deletedSubscription = await GetApiSubscriptionIfExists(
-                dataSetId: _dataSetId,
-                email: Email);
+            var deletedSubscription = await GetApiSubscriptionIfExists(dataSetId: _dataSetId, email: Email);
 
             Assert.Null(deletedSubscription);
         }
@@ -455,9 +474,7 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var tokenService = GetRequiredService<ITokenService>();
             var unsubscribeToken = tokenService.GenerateToken(Email, DateTime.UtcNow.AddYears(1));
 
-            var result = await Unsubscribe(
-                dataSetId: _dataSetId,
-                token: unsubscribeToken);
+            var result = await Unsubscribe(dataSetId: _dataSetId, token: unsubscribeToken);
 
             result.AssertNotFoundResult();
         }
@@ -477,32 +494,32 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             await CreateApiSubscription(subscription);
 
             var tokenService = GetRequiredService<ITokenService>();
-            var unsubscribeToken =
-                tokenService.GenerateToken(subscription.RowKey, subscription.Expiry.Value.UtcDateTime);
+            var unsubscribeToken = tokenService.GenerateToken(
+                subscription.RowKey,
+                subscription.Expiry.Value.UtcDateTime
+            );
 
-            var result = await Unsubscribe(
-                dataSetId: _dataSetId,
-                token: unsubscribeToken);
+            var result = await Unsubscribe(dataSetId: _dataSetId, token: unsubscribeToken);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
                 expectedPath: "dataSetId",
-                expectedCode: ValidationMessages.ApiSubscriptionHasNotBeenVerified.Code);
+                expectedCode: ValidationMessages.ApiSubscriptionHasNotBeenVerified.Code
+            );
         }
 
         [Fact]
         public async Task UnsubscribeTokenInvalid_400()
         {
-            var result = await Unsubscribe(
-                dataSetId: _dataSetId,
-                token: "");
+            var result = await Unsubscribe(dataSetId: _dataSetId, token: "");
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
                 expectedPath: "token",
-                expectedCode: ValidationMessages.AuthorizationTokenInvalid.Code);
+                expectedCode: ValidationMessages.AuthorizationTokenInvalid.Code
+            );
         }
 
         [Fact]
@@ -511,20 +528,17 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             var tokenService = GetRequiredService<ITokenService>();
             var unsubscribeToken = tokenService.GenerateToken(Email, DateTime.UtcNow.AddYears(-1));
 
-            var result = await Unsubscribe(
-                dataSetId: _dataSetId,
-                token: unsubscribeToken);
+            var result = await Unsubscribe(dataSetId: _dataSetId, token: unsubscribeToken);
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
 
             validationProblem.AssertHasError(
                 expectedPath: "token",
-                expectedCode: ValidationMessages.AuthorizationTokenInvalid.Code);
+                expectedCode: ValidationMessages.AuthorizationTokenInvalid.Code
+            );
         }
 
-        private async Task<IActionResult> Unsubscribe(
-            Guid dataSetId,
-            string token)
+        private async Task<IActionResult> Unsubscribe(Guid dataSetId, string token)
         {
             var functions = GetRequiredService<ApiSubscriptionFunctions>();
 
@@ -532,7 +546,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 request: null!,
                 dataSetId: dataSetId,
                 token: token,
-                cancellationToken: CancellationToken.None);
+                cancellationToken: CancellationToken.None
+            );
         }
     }
 
@@ -561,39 +576,45 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 RowKey = Email,
                 DataSetTitle = DataSetTitle,
                 Status = ApiSubscriptionStatus.Subscribed,
-                Expiry = null
+                Expiry = null,
             };
             await CreateApiSubscription(subscription);
             string? unsubscribeUrl = null;
-            fixture.NotificationClient
-                .Setup(mock => mock.SendEmail(
-                    Email,
-                    templateId,
-                    It.Is<Dictionary<string, dynamic>>(personalisation =>
-                        AssertEmailTemplateValues(
-                            personalisation,
-                            DataSetTitle,
-                            $"{GetAppOptions().PublicAppUrl}/data-catalogue/data-set/{_dataSetFileId}",
-                            version,
-                            $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription/")
-                    ),
-                    null,
-                    null,
-                    null))
+            fixture
+                .NotificationClient.Setup(mock =>
+                    mock.SendEmail(
+                        Email,
+                        templateId,
+                        It.Is<Dictionary<string, dynamic>>(personalisation =>
+                            AssertEmailTemplateValues(
+                                personalisation,
+                                DataSetTitle,
+                                $"{GetAppOptions().PublicAppUrl}/data-catalogue/data-set/{_dataSetFileId}",
+                                version,
+                                $"{GetAppOptions().PublicAppUrl}/api-subscriptions/{_dataSetId}/confirm-unsubscription/"
+                            )
+                        ),
+                        null,
+                        null,
+                        null
+                    )
+                )
                 .Returns(It.IsAny<EmailNotificationResponse>())
-                .Callback((
+                .Callback(
+                    (
+                        // ReSharper disable UnusedParameter.Local
                         string email,
-                        string templateId,
+                        string templateIdArg,
                         Dictionary<string, dynamic> personalisation,
                         string clientReference,
                         string emailReplyToId,
-                        string oneClickUnsubscribeUrl)
-                    => unsubscribeUrl = personalisation[NotifierEmailTemplateFields.UnsubscribeUrl]);
+                        string oneClickUnsubscribeUrl
+                    )
+                    // ReSharper restore UnusedParameter.Local
+                    => unsubscribeUrl = personalisation[NotifierEmailTemplateFields.UnsubscribeUrl]
+                );
 
-            await NotifyApiSubscribers(
-                dataSetId: _dataSetId,
-                dataSetFileId: _dataSetFileId,
-                version: version);
+            await NotifyApiSubscribers(dataSetId: _dataSetId, dataSetFileId: _dataSetFileId, version: version);
 
             MockUtils.VerifyAllMocks(fixture.NotificationClient);
 
@@ -611,15 +632,12 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 RowKey = Email,
                 DataSetTitle = DataSetTitle,
                 Status = ApiSubscriptionStatus.Pending,
-                Expiry = DateTime.UtcNow.AddHours(1)
+                Expiry = DateTime.UtcNow.AddHours(1),
             };
 
             await CreateApiSubscription(subscription);
 
-            await NotifyApiSubscribers(
-                dataSetId: _dataSetId,
-                dataSetFileId: _dataSetFileId,
-                version: Version);
+            await NotifyApiSubscribers(dataSetId: _dataSetId, dataSetFileId: _dataSetFileId, version: Version);
 
             // Expect no interactions with NotificationClient
         }
@@ -628,26 +646,26 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         public async Task DataSetIdEmpty_ThrowsValidationException()
         {
             var exception = await Assert.ThrowsAsync<ValidationException>(() =>
-                NotifyApiSubscribers(
-                    dataSetId: Guid.Empty,
-                    dataSetFileId: _dataSetFileId,
-                    version: Version));
+                NotifyApiSubscribers(dataSetId: Guid.Empty, dataSetFileId: _dataSetFileId, version: Version)
+            );
 
-            Assert.Equal("Validation failed:  -- DataSetId: Must not be empty. Severity: Error",
-                exception.Message.StripLines());
+            Assert.Equal(
+                "Validation failed:  -- DataSetId: Must not be empty. Severity: Error",
+                exception.Message.StripLines()
+            );
         }
 
         [Fact]
         public async Task DataSetFileIdEmpty_ThrowsValidationException()
         {
             var exception = await Assert.ThrowsAsync<ValidationException>(() =>
-                NotifyApiSubscribers(
-                    dataSetId: _dataSetId,
-                    dataSetFileId: Guid.Empty,
-                    version: Version));
+                NotifyApiSubscribers(dataSetId: _dataSetId, dataSetFileId: Guid.Empty, version: Version)
+            );
 
-            Assert.Equal("Validation failed:  -- DataSetFileId: Must not be empty. Severity: Error",
-                exception.Message.StripLines());
+            Assert.Equal(
+                "Validation failed:  -- DataSetFileId: Must not be empty. Severity: Error",
+                exception.Message.StripLines()
+            );
         }
 
         [Theory]
@@ -656,32 +674,27 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
         public async Task VersionEmpty_ThrowsValidationException(string? version)
         {
             var exception = await Assert.ThrowsAsync<ValidationException>(() =>
-                NotifyApiSubscribers(
-                    dataSetId: _dataSetId,
-                    dataSetFileId: _dataSetFileId,
-                    version: version!));
+                NotifyApiSubscribers(dataSetId: _dataSetId, dataSetFileId: _dataSetFileId, version: version!)
+            );
 
-            Assert.Equal("Validation failed:  -- Version: Must not be empty. Severity: Error",
-                exception.Message.StripLines());
+            Assert.Equal(
+                "Validation failed:  -- Version: Must not be empty. Severity: Error",
+                exception.Message.StripLines()
+            );
         }
 
-        private async Task NotifyApiSubscribers(
-            Guid dataSetId,
-            Guid dataSetFileId,
-            string version)
+        private async Task NotifyApiSubscribers(Guid dataSetId, Guid dataSetFileId, string version)
         {
             var message = new ApiNotificationMessage
             {
                 DataSetId = dataSetId,
                 DataSetFileId = dataSetFileId,
-                Version = version
+                Version = version,
             };
 
             var functions = GetRequiredService<ApiSubscriptionFunctions>();
 
-            await functions.NotifySubscribers(
-                message: message,
-                cancellationToken: CancellationToken.None);
+            await functions.NotifySubscribers(message: message, cancellationToken: CancellationToken.None);
         }
 
         private static bool AssertEmailTemplateValues(
@@ -689,7 +702,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
             string dataSetTitle,
             string dataSetUrl,
             string dataSetVersion,
-            string unsubscribeUrlPrefix)
+            string unsubscribeUrlPrefix
+        )
         {
             Assert.Equal(dataSetTitle, personalisation[NotifierEmailTemplateFields.DataSetTitle]);
             Assert.Equal(dataSetUrl, personalisation[NotifierEmailTemplateFields.DataSetUrl]);
@@ -750,7 +764,8 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
 
             await functions.RemoveExpiredSubscriptions(
                 timerInfo: timerInfo ?? new TimerInfo(),
-                cancellationToken: CancellationToken.None);
+                cancellationToken: CancellationToken.None
+            );
         }
     }
 
@@ -777,9 +792,9 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 EmailTemplates = new GovUkNotifyOptions.EmailTemplateOptions
                 {
                     ApiSubscriptionMajorDataSetVersionPublishedId = "breaking-change-template-id",
-                    ApiSubscriptionDataSetVersionPublishedId = "non-breaking-change-template-id"
-                }
-            }; 
+                    ApiSubscriptionDataSetVersionPublishedId = "non-breaking-change-template-id",
+                },
+            };
             var templateId = govUkNotifyOptions.EmailTemplates.SelectDataSetPublishedTemplateId(version);
             Assert.Equal(expectedTemplateId, templateId);
         }
@@ -796,10 +811,12 @@ public abstract class ApiSubscriptionFunctionsTests(NotifierFunctionsIntegration
                 EmailTemplates = new GovUkNotifyOptions.EmailTemplateOptions
                 {
                     ApiSubscriptionMajorDataSetVersionPublishedId = "breaking-change-template-id",
-                    ApiSubscriptionDataSetVersionPublishedId = "non-breaking-change-template-id"
-                }
+                    ApiSubscriptionDataSetVersionPublishedId = "non-breaking-change-template-id",
+                },
             };
-            var exception = Assert.Throws<ArgumentException>(() => govUkNotifyOptions.EmailTemplates.SelectDataSetPublishedTemplateId(version));
+            var exception = Assert.Throws<ArgumentException>(() =>
+                govUkNotifyOptions.EmailTemplates.SelectDataSetPublishedTemplateId(version)
+            );
             Assert.Equal(ValidationMessages.InvalidDataSetVersion.Message, exception.Message);
         }
     }

@@ -22,16 +22,24 @@ public class FootnoteRepositoryTests
         var releaseSubjects = _fixture
             .DefaultReleaseSubject()
             .WithReleaseVersion(releaseVersion)
-            .WithSubjects(_fixture
-                .DefaultSubject()
-                .ForIndex(0, s => s
-                    .SetFilters(_fixture
-                        .DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(3))
-                    .SetIndicatorGroups(_fixture
-                        .DefaultIndicatorGroup()
-                        .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                        .GenerateList(1)))
-                .GenerateList(2))
+            .WithSubjects(
+                _fixture
+                    .DefaultSubject()
+                    .ForIndex(
+                        0,
+                        s =>
+                            s.SetFilters(
+                                    _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(3)
+                                )
+                                .SetIndicatorGroups(
+                                    _fixture
+                                        .DefaultIndicatorGroup()
+                                        .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                                        .GenerateList(1)
+                                )
+                    )
+                    .GenerateList(2)
+            )
             .GenerateList();
 
         var subject1 = releaseSubjects[0].Subject;
@@ -40,38 +48,48 @@ public class FootnoteRepositoryTests
         var releaseFootnotes = _fixture
             .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture
-                .DefaultFootnote()
-                .ForIndex(0, s => s
-                    .SetContent("Applies to subject 1")
-                    .SetSubjects(ListOf(subject1)))
-                .ForIndex(1, s => s
-                    .SetContent("Applies to subject 1 filter 1")
-                    .SetFilters(ListOf(subject1.Filters[0])))
-                .ForIndex(2, s => s
-                    .SetContent("Applies to subject 1 filter 2 group 1")
-                    .SetFilterGroups(ListOf(subject1.Filters[1].FilterGroups[0])))
-                .ForIndex(3, s => s
-                    .SetContent("Applies to subject 1 filter 3 group 1 item 1")
-                    .SetFilterItems(ListOf(subject1.Filters[2].FilterGroups[0].FilterItems[0])))
-                .ForIndex(4, s => s
-                    .SetContent("Applies to subject 1 indicator 1")
-                    .SetIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0])))
-
-                // Footnote applies to subject 1 filter 1
-                // and subject 1 filter 2 group 1
-                // and subject 1 filter 3 group 1 item 1
-                // and subject 1 indicator 1
-                .ForIndex(5, s => s
-                    .SetContent("Applies to multiple attributes of subject 1")
-                    .SetFilters(ListOf(subject1.Filters[0]))
-                    .SetFilterGroups(ListOf(subject1.Filters[1].FilterGroups[0]))
-                    .SetFilterItems(ListOf(subject1.Filters[2].FilterGroups[0].FilterItems[0]))
-                    .SetIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0])))
-                .ForIndex(6, s => s
-                    .SetContent("Applies to subject 2")
-                    .SetSubjects(ListOf(subject2)))
-                .GenerateList())
+            .WithFootnotes(
+                _fixture
+                    .DefaultFootnote()
+                    .ForIndex(0, s => s.SetContent("Applies to subject 1").SetSubjects(ListOf(subject1)))
+                    .ForIndex(
+                        1,
+                        s => s.SetContent("Applies to subject 1 filter 1").SetFilters(ListOf(subject1.Filters[0]))
+                    )
+                    .ForIndex(
+                        2,
+                        s =>
+                            s.SetContent("Applies to subject 1 filter 2 group 1")
+                                .SetFilterGroups(ListOf(subject1.Filters[1].FilterGroups[0]))
+                    )
+                    .ForIndex(
+                        3,
+                        s =>
+                            s.SetContent("Applies to subject 1 filter 3 group 1 item 1")
+                                .SetFilterItems(ListOf(subject1.Filters[2].FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        4,
+                        s =>
+                            s.SetContent("Applies to subject 1 indicator 1")
+                                .SetIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0]))
+                    )
+                    // Footnote applies to subject 1 filter 1
+                    // and subject 1 filter 2 group 1
+                    // and subject 1 filter 3 group 1 item 1
+                    // and subject 1 indicator 1
+                    .ForIndex(
+                        5,
+                        s =>
+                            s.SetContent("Applies to multiple attributes of subject 1")
+                                .SetFilters(ListOf(subject1.Filters[0]))
+                                .SetFilterGroups(ListOf(subject1.Filters[1].FilterGroups[0]))
+                                .SetFilterItems(ListOf(subject1.Filters[2].FilterGroups[0].FilterItems[0]))
+                                .SetIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0]))
+                    )
+                    .ForIndex(6, s => s.SetContent("Applies to subject 2").SetSubjects(ListOf(subject2)))
+                    .GenerateList()
+            )
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -100,7 +118,8 @@ public class FootnoteRepositoryTests
                 releaseVersionId: releaseVersion.Id,
                 subjectId: subject1.Id,
                 filterItemIds: ListOf(filter1Group1Item1Id, filter2Group1Item1Id, filter3Group1Item1Id),
-                indicatorIds: ListOf(indicatorGroup1Item1Id));
+                indicatorIds: ListOf(indicatorGroup1Item1Id)
+            );
 
             // Check that only footnotes applying to subject 1 or any of its filter items or indicators are returned
             Assert.Equal(6, results.Count);
@@ -121,7 +140,7 @@ public class FootnoteRepositoryTests
             Assert.Equal(releaseFootnotes[3].FootnoteId, results[3].Id);
             Assert.Equal("Applies to subject 1 filter 3 group 1 item 1", results[3].Content);
 
-            // Footnote applies to a requested indicator 
+            // Footnote applies to a requested indicator
             Assert.Equal(releaseFootnotes[4].FootnoteId, results[4].Id);
             Assert.Equal("Applies to subject 1 indicator 1", results[4].Content);
 
@@ -139,16 +158,18 @@ public class FootnoteRepositoryTests
         var releaseSubjects = _fixture
             .DefaultReleaseSubject()
             .WithReleaseVersion(releaseVersion)
-            .WithSubjects(_fixture
-                .DefaultSubject()
-                .WithFilters(_ => _fixture
-                    .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
-                    .Generate(1))
-                .WithIndicatorGroups(_ => _fixture
-                    .DefaultIndicatorGroup()
-                    .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                    .GenerateList(1))
-                .GenerateList(2))
+            .WithSubjects(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(1))
+                    .WithIndicatorGroups(_ =>
+                        _fixture
+                            .DefaultIndicatorGroup()
+                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                            .GenerateList(1)
+                    )
+                    .GenerateList(2)
+            )
             .GenerateList();
 
         var (subject1, subject2) = GetSubjectsTuple2(releaseSubjects);
@@ -157,39 +178,51 @@ public class FootnoteRepositoryTests
         var releaseFootnotes = _fixture
             .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture
-                .DefaultFootnote()
-                .ForIndex(0, s => s
-                    .SetContent("Applies to subject 1")
-                    .SetSubjects(ListOf(subject1)))
-                .ForIndex(1, s => s
-                    .SetContent("Applies to subject 2")
-                    .SetSubjects(ListOf(subject2)))
-                .ForIndex(2, s => s
-                    .SetContent("Applies to subject 1 filter 1")
-                    .SetFilters(subject1.Filters))
-                .ForIndex(3, s => s
-                    .SetContent("Applies to subject 2 filter 1")
-                    .SetFilters(subject2.Filters))
-                .ForIndex(4, s => s
-                    .SetContent("Applies to subject 1 filter 1 group 1")
-                    .SetFilterGroups(ListOf(subject1.Filters[0].FilterGroups[0])))
-                .ForIndex(5, s => s
-                    .SetContent("Applies to subject 2 filter 1 group 1")
-                    .SetFilterGroups(ListOf(subject2.Filters[0].FilterGroups[0])))
-                .ForIndex(6, s => s
-                    .SetContent("Applies to subject 1 filter 1 group 1 item 1")
-                    .SetFilterItems(ListOf(subject1.Filters[0].FilterGroups[0].FilterItems[0])))
-                .ForIndex(7, s => s
-                    .SetContent("Applies to subject 2 filter 1 group 1 item 1")
-                    .SetFilterItems(ListOf(subject2.Filters[0].FilterGroups[0].FilterItems[0])))
-                .ForIndex(8, s => s
-                    .SetContent("Applies to subject 1 indicator 1")
-                    .SetIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0])))
-                .ForIndex(9, s => s
-                    .SetContent("Applies to subject 2 indicator 1")
-                    .SetIndicators(ListOf(subject2.IndicatorGroups[0].Indicators[0])))
-                .GenerateList())
+            .WithFootnotes(
+                _fixture
+                    .DefaultFootnote()
+                    .ForIndex(0, s => s.SetContent("Applies to subject 1").SetSubjects(ListOf(subject1)))
+                    .ForIndex(1, s => s.SetContent("Applies to subject 2").SetSubjects(ListOf(subject2)))
+                    .ForIndex(2, s => s.SetContent("Applies to subject 1 filter 1").SetFilters(subject1.Filters))
+                    .ForIndex(3, s => s.SetContent("Applies to subject 2 filter 1").SetFilters(subject2.Filters))
+                    .ForIndex(
+                        4,
+                        s =>
+                            s.SetContent("Applies to subject 1 filter 1 group 1")
+                                .SetFilterGroups(ListOf(subject1.Filters[0].FilterGroups[0]))
+                    )
+                    .ForIndex(
+                        5,
+                        s =>
+                            s.SetContent("Applies to subject 2 filter 1 group 1")
+                                .SetFilterGroups(ListOf(subject2.Filters[0].FilterGroups[0]))
+                    )
+                    .ForIndex(
+                        6,
+                        s =>
+                            s.SetContent("Applies to subject 1 filter 1 group 1 item 1")
+                                .SetFilterItems(ListOf(subject1.Filters[0].FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        7,
+                        s =>
+                            s.SetContent("Applies to subject 2 filter 1 group 1 item 1")
+                                .SetFilterItems(ListOf(subject2.Filters[0].FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        8,
+                        s =>
+                            s.SetContent("Applies to subject 1 indicator 1")
+                                .SetIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0]))
+                    )
+                    .ForIndex(
+                        9,
+                        s =>
+                            s.SetContent("Applies to subject 2 indicator 1")
+                                .SetIndicators(ListOf(subject2.IndicatorGroups[0].Indicators[0]))
+                    )
+                    .GenerateList()
+            )
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -216,7 +249,8 @@ public class FootnoteRepositoryTests
                 releaseVersionId: releaseVersion.Id,
                 subjectId: subject1.Id,
                 filterItemIds: ListOf(subject1.Filters[0].FilterGroups[0].FilterItems[0].Id),
-                indicatorIds: ListOf(subject1.IndicatorGroups[0].Indicators[0].Id));
+                indicatorIds: ListOf(subject1.IndicatorGroups[0].Indicators[0].Id)
+            );
 
             // Check that only footnotes applying to subject 1 or any of its filter items or indicators are returned
             // and that all footnotes applying to subject 2 are excluded
@@ -246,68 +280,100 @@ public class FootnoteRepositoryTests
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
-        var releaseSubject = _fixture.DefaultReleaseSubject()
+        var releaseSubject = _fixture
+            .DefaultReleaseSubject()
             .WithReleaseVersion(releaseVersion)
-            .WithSubject(_fixture.DefaultSubject()
-                .WithFilters(_fixture
-                    .DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
-                    .GenerateList(1))
-                .WithIndicatorGroups(_fixture
-                    .DefaultIndicatorGroup()
-                    .WithIndicators(_fixture.DefaultIndicator().Generate(2))
-                    .GenerateList(1)))
+            .WithSubject(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2).GenerateList(1))
+                    .WithIndicatorGroups(
+                        _fixture
+                            .DefaultIndicatorGroup()
+                            .WithIndicators(_fixture.DefaultIndicator().Generate(2))
+                            .GenerateList(1)
+                    )
+            )
             .Generate();
 
         var filter = releaseSubject.Subject.Filters[0];
         var indicatorGroup = releaseSubject.Subject.IndicatorGroups[0];
 
-        var releaseFootnotes = _fixture.DefaultReleaseFootnote()
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture
-                .DefaultFootnote()
-                .ForIndex(0, s => s
-                    .SetContent("Applies to filter 1")
-                    .SetFilters(ListOf(filter)))
-                .ForIndex(1, s => s
-                    .SetContent("Applies to filter 1 group 1")
-                    .SetFilterGroups(ListOf(filter.FilterGroups[0])))
-                .ForIndex(2, s => s
-                    .SetContent("Applies to filter item 1")
-                    .SetFilterItems(ListOf(filter.FilterGroups[0].FilterItems[0])))
-                .ForIndex(3, s => s
-                    .SetContent("Applies to filter item 2")
-                    .SetFilterItems(ListOf(filter.FilterGroups[0].FilterItems[1])))
-                .ForIndex(4, s => s
-                    .SetContent("Applies to indicator 1")
-                    .SetIndicators(ListOf(indicatorGroup.Indicators[0])))
-                .ForIndex(5, s => s
-                    .SetContent("Applies to indicator 2")
-                    .SetIndicators(ListOf(indicatorGroup.Indicators[1])))
-                .ForIndex(6, s => s
-                    .SetContent("Applies to filter 1 and indicator 1")
-                    .SetFilters(ListOf(filter))
-                    .SetIndicators(ListOf(indicatorGroup.Indicators[0])))
-                .ForIndex(7, s => s
-                    .SetContent("Applies to filter 1 and indicator 2")
-                    .SetFilters(ListOf(filter))
-                    .SetIndicators(ListOf(indicatorGroup.Indicators[1])))
-                .ForIndex(8, s => s
-                    .SetContent("Applies to filter 1 group 1 and indicator 1")
-                    .SetFilterGroups(ListOf(filter.FilterGroups[0]))
-                    .SetIndicators(ListOf(indicatorGroup.Indicators[0])))
-                .ForIndex(9, s => s
-                    .SetContent("Applies to filter 1 group 1 and indicator 2")
-                    .SetFilterGroups(ListOf(filter.FilterGroups[0]))
-                    .SetIndicators(ListOf(indicatorGroup.Indicators[1])))
-                .ForIndex(10, s => s
-                    .SetContent("Applies to filter item 1 and indicator 1")
-                    .SetFilterItems(ListOf(filter.FilterGroups[0].FilterItems[0]))
-                    .SetIndicators(ListOf(indicatorGroup.Indicators[0])))
-                .ForIndex(11, s => s
-                    .SetContent("Applies to filter item 1 and indicator 2")
-                    .SetFilterItems(ListOf(filter.FilterGroups[0].FilterItems[0]))
-                    .SetIndicators(ListOf(indicatorGroup.Indicators[1])))
-                .GenerateList())
+            .WithFootnotes(
+                _fixture
+                    .DefaultFootnote()
+                    .ForIndex(0, s => s.SetContent("Applies to filter 1").SetFilters(ListOf(filter)))
+                    .ForIndex(
+                        1,
+                        s => s.SetContent("Applies to filter 1 group 1").SetFilterGroups(ListOf(filter.FilterGroups[0]))
+                    )
+                    .ForIndex(
+                        2,
+                        s =>
+                            s.SetContent("Applies to filter item 1")
+                                .SetFilterItems(ListOf(filter.FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        3,
+                        s =>
+                            s.SetContent("Applies to filter item 2")
+                                .SetFilterItems(ListOf(filter.FilterGroups[0].FilterItems[1]))
+                    )
+                    .ForIndex(
+                        4,
+                        s => s.SetContent("Applies to indicator 1").SetIndicators(ListOf(indicatorGroup.Indicators[0]))
+                    )
+                    .ForIndex(
+                        5,
+                        s => s.SetContent("Applies to indicator 2").SetIndicators(ListOf(indicatorGroup.Indicators[1]))
+                    )
+                    .ForIndex(
+                        6,
+                        s =>
+                            s.SetContent("Applies to filter 1 and indicator 1")
+                                .SetFilters(ListOf(filter))
+                                .SetIndicators(ListOf(indicatorGroup.Indicators[0]))
+                    )
+                    .ForIndex(
+                        7,
+                        s =>
+                            s.SetContent("Applies to filter 1 and indicator 2")
+                                .SetFilters(ListOf(filter))
+                                .SetIndicators(ListOf(indicatorGroup.Indicators[1]))
+                    )
+                    .ForIndex(
+                        8,
+                        s =>
+                            s.SetContent("Applies to filter 1 group 1 and indicator 1")
+                                .SetFilterGroups(ListOf(filter.FilterGroups[0]))
+                                .SetIndicators(ListOf(indicatorGroup.Indicators[0]))
+                    )
+                    .ForIndex(
+                        9,
+                        s =>
+                            s.SetContent("Applies to filter 1 group 1 and indicator 2")
+                                .SetFilterGroups(ListOf(filter.FilterGroups[0]))
+                                .SetIndicators(ListOf(indicatorGroup.Indicators[1]))
+                    )
+                    .ForIndex(
+                        10,
+                        s =>
+                            s.SetContent("Applies to filter item 1 and indicator 1")
+                                .SetFilterItems(ListOf(filter.FilterGroups[0].FilterItems[0]))
+                                .SetIndicators(ListOf(indicatorGroup.Indicators[0]))
+                    )
+                    .ForIndex(
+                        11,
+                        s =>
+                            s.SetContent("Applies to filter item 1 and indicator 2")
+                                .SetFilterItems(ListOf(filter.FilterGroups[0].FilterItems[0]))
+                                .SetIndicators(ListOf(indicatorGroup.Indicators[1]))
+                    )
+                    .GenerateList()
+            )
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -331,7 +397,8 @@ public class FootnoteRepositoryTests
                 releaseVersionId: releaseVersion.Id,
                 subjectId: releaseSubject.SubjectId,
                 filterItemIds: ListOf(filter.FilterGroups[0].FilterItems[0].Id),
-                indicatorIds: ListOf(indicatorGroup.Indicators[0].Id));
+                indicatorIds: ListOf(indicatorGroup.Indicators[0].Id)
+            );
 
             // Check that only footnotes applying to filter item 1, or indicator 1
             // are returned.
@@ -370,78 +437,124 @@ public class FootnoteRepositoryTests
         var releaseSubject = _fixture
             .DefaultReleaseSubject()
             .WithReleaseVersion(releaseVersion)
-            .WithSubject(_fixture.DefaultSubject()
-                .WithFilters(_fixture
-                    .DefaultFilter(filterGroupCount: 1, filterItemCount: 3)
-                    .GenerateList(3)))
+            .WithSubject(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 3).GenerateList(3))
+            )
             .Generate();
 
         var (filter1, filter2, filter3) = releaseSubject.Subject.Filters.ToTuple3();
 
-        var releaseFootnotes = _fixture.DefaultReleaseFootnote()
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture
-                .DefaultFootnote()
-                .ForIndex(0, s => s
-                    .SetContent("Applies to filter 1")
-                    .SetFilters(ListOf(filter1)))
-                .ForIndex(1, s => s
-                    .SetContent("Applies to filter 3")
-                    .SetFilters(ListOf(filter3)))
-                .ForIndex(2, s => s
-                    .SetContent("Applies to filter 1 and filter 3")
-                    .SetFilters(ListOf(filter1, filter3)))
-                .ForIndex(3, s => s
-                    .SetContent("Applies to filter 1 and filter 3 group 1")
-                    .SetFilters(ListOf(filter1))
-                    .SetFilterGroups(ListOf(filter3.FilterGroups[0])))
-                .ForIndex(4, s => s
-                    .SetContent("Applies to filter 3 and filter 1 group 1")
-                    .SetFilters(ListOf(filter3))
-                    .SetFilterGroups(ListOf(filter1.FilterGroups[0])))
-                .ForIndex(5, s => s
-                    .SetContent("Applies to filter 1 and filter 3 group item 1")
-                    .SetFilters(ListOf(filter1))
-                    .SetFilterItems(ListOf(filter3.FilterGroups[0].FilterItems[0])))
-                .ForIndex(6, s => s
-                    .SetContent("Applies to filter 3 and filter 1 group item 1")
-                    .SetFilters(ListOf(filter3))
-                    .SetFilterItems(ListOf(filter1.FilterGroups[0].FilterItems[0])))
-                .ForIndex(7, s => s
-                    .SetContent("Applies to filter 1 group 1")
-                    .SetFilterGroups(ListOf(filter1.FilterGroups[0])))
-                .ForIndex(8, s => s
-                    .SetContent("Applies to filter 3 group 1")
-                    .SetFilterGroups(ListOf(filter3.FilterGroups[0])))
-                .ForIndex(9, s => s
-                    .SetContent("Applies to filter 1 group 1 and filter 1 group 1 item 1")
-                    .SetFilterGroups(ListOf(filter1.FilterGroups[0]))
-                    .SetFilterItems(ListOf(filter1.FilterGroups[0].FilterItems[0])))
-                .ForIndex(10, s => s
-                    .SetContent("Applies to filter 1 group 1 and filter 3 group 1 item 1")
-                    .SetFilterGroups(ListOf(filter1.FilterGroups[0]))
-                    .SetFilterItems(ListOf(filter3.FilterGroups[0].FilterItems[0])))
-                .ForIndex(11, s => s
-                    .SetContent("Applies to filter 3 group 1 and filter 1 group 1 item 1")
-                    .SetFilterGroups(ListOf(filter3.FilterGroups[0]))
-                    .SetFilterItems(ListOf(filter1.FilterGroups[0].FilterItems[0])))
-                .ForIndex(12, s => s
-                    .SetContent("Applies to filter 3 group 1 and filter 3 group 1 item 1")
-                    .SetFilterGroups(ListOf(filter3.FilterGroups[0]))
-                    .SetFilterItems(ListOf(filter3.FilterGroups[0].FilterItems[0])))
-                .ForIndex(13, s => s
-                    .SetContent("Applies to filter 1 group 1 item 1")
-                    .SetFilterItems(ListOf(filter1.FilterGroups[0].FilterItems[0])))
-                .ForIndex(14, s => s
-                    .SetContent("Applies to filter 1 group 1 item 3")
-                    .SetFilterItems(ListOf(filter1.FilterGroups[0].FilterItems[2])))
-                .ForIndex(15, s => s
-                    .SetContent("Applies to filter 3 group 1 item 1")
-                    .SetFilterItems(ListOf(filter3.FilterGroups[0].FilterItems[0])))
-                .ForIndex(16, s => s
-                    .SetContent("Applies to filter 1 group 1 item 1 and filter 1 group 1 item 3")
-                    .SetFilterItems(ListOf(filter1.FilterGroups[0].FilterItems[0], filter1.FilterGroups[0].FilterItems[2])))
-                .GenerateList())
+            .WithFootnotes(
+                _fixture
+                    .DefaultFootnote()
+                    .ForIndex(0, s => s.SetContent("Applies to filter 1").SetFilters(ListOf(filter1)))
+                    .ForIndex(1, s => s.SetContent("Applies to filter 3").SetFilters(ListOf(filter3)))
+                    .ForIndex(
+                        2,
+                        s => s.SetContent("Applies to filter 1 and filter 3").SetFilters(ListOf(filter1, filter3))
+                    )
+                    .ForIndex(
+                        3,
+                        s =>
+                            s.SetContent("Applies to filter 1 and filter 3 group 1")
+                                .SetFilters(ListOf(filter1))
+                                .SetFilterGroups(ListOf(filter3.FilterGroups[0]))
+                    )
+                    .ForIndex(
+                        4,
+                        s =>
+                            s.SetContent("Applies to filter 3 and filter 1 group 1")
+                                .SetFilters(ListOf(filter3))
+                                .SetFilterGroups(ListOf(filter1.FilterGroups[0]))
+                    )
+                    .ForIndex(
+                        5,
+                        s =>
+                            s.SetContent("Applies to filter 1 and filter 3 group item 1")
+                                .SetFilters(ListOf(filter1))
+                                .SetFilterItems(ListOf(filter3.FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        6,
+                        s =>
+                            s.SetContent("Applies to filter 3 and filter 1 group item 1")
+                                .SetFilters(ListOf(filter3))
+                                .SetFilterItems(ListOf(filter1.FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        7,
+                        s =>
+                            s.SetContent("Applies to filter 1 group 1").SetFilterGroups(ListOf(filter1.FilterGroups[0]))
+                    )
+                    .ForIndex(
+                        8,
+                        s =>
+                            s.SetContent("Applies to filter 3 group 1").SetFilterGroups(ListOf(filter3.FilterGroups[0]))
+                    )
+                    .ForIndex(
+                        9,
+                        s =>
+                            s.SetContent("Applies to filter 1 group 1 and filter 1 group 1 item 1")
+                                .SetFilterGroups(ListOf(filter1.FilterGroups[0]))
+                                .SetFilterItems(ListOf(filter1.FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        10,
+                        s =>
+                            s.SetContent("Applies to filter 1 group 1 and filter 3 group 1 item 1")
+                                .SetFilterGroups(ListOf(filter1.FilterGroups[0]))
+                                .SetFilterItems(ListOf(filter3.FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        11,
+                        s =>
+                            s.SetContent("Applies to filter 3 group 1 and filter 1 group 1 item 1")
+                                .SetFilterGroups(ListOf(filter3.FilterGroups[0]))
+                                .SetFilterItems(ListOf(filter1.FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        12,
+                        s =>
+                            s.SetContent("Applies to filter 3 group 1 and filter 3 group 1 item 1")
+                                .SetFilterGroups(ListOf(filter3.FilterGroups[0]))
+                                .SetFilterItems(ListOf(filter3.FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        13,
+                        s =>
+                            s.SetContent("Applies to filter 1 group 1 item 1")
+                                .SetFilterItems(ListOf(filter1.FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        14,
+                        s =>
+                            s.SetContent("Applies to filter 1 group 1 item 3")
+                                .SetFilterItems(ListOf(filter1.FilterGroups[0].FilterItems[2]))
+                    )
+                    .ForIndex(
+                        15,
+                        s =>
+                            s.SetContent("Applies to filter 3 group 1 item 1")
+                                .SetFilterItems(ListOf(filter3.FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        16,
+                        s =>
+                            s.SetContent("Applies to filter 1 group 1 item 1 and filter 1 group 1 item 3")
+                                .SetFilterItems(
+                                    ListOf(
+                                        filter1.FilterGroups[0].FilterItems[0],
+                                        filter1.FilterGroups[0].FilterItems[2]
+                                    )
+                                )
+                    )
+                    .GenerateList()
+            )
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -464,10 +577,12 @@ public class FootnoteRepositoryTests
             var results = await repository.GetFilteredFootnotes(
                 releaseVersionId: releaseVersion.Id,
                 subjectId: releaseSubject.SubjectId,
-                filterItemIds: ListOf(filter1.FilterGroups[0].FilterItems[0].Id,
+                filterItemIds: ListOf(
+                    filter1.FilterGroups[0].FilterItems[0].Id,
                     filter1.FilterGroups[0].FilterItems[1].Id,
                     filter2.FilterGroups[0].FilterItems[0].Id,
-                    filter2.FilterGroups[0].FilterItems[1].Id),
+                    filter2.FilterGroups[0].FilterItems[1].Id
+                ),
                 indicatorIds: ListOf<Guid>()
             );
 
@@ -523,32 +638,45 @@ public class FootnoteRepositoryTests
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
-        var releaseSubject = _fixture.DefaultReleaseSubject()
+        var releaseSubject = _fixture
+            .DefaultReleaseSubject()
             .WithReleaseVersion(releaseVersion)
-            .WithSubject(_fixture
-                .DefaultSubject()
-                .WithIndicatorGroups(_fixture
-                    .DefaultIndicatorGroup()
-                    .WithIndicators(_fixture.DefaultIndicator().Generate(3))
-                    .GenerateList(1)))
+            .WithSubject(
+                _fixture
+                    .DefaultSubject()
+                    .WithIndicatorGroups(
+                        _fixture
+                            .DefaultIndicatorGroup()
+                            .WithIndicators(_fixture.DefaultIndicator().Generate(3))
+                            .GenerateList(1)
+                    )
+            )
             .Generate();
 
         var indicatorGroup = releaseSubject.Subject.IndicatorGroups[0];
 
-        var releaseFootnotes = _fixture.DefaultReleaseFootnote()
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture
-                .DefaultFootnote()
-                .ForIndex(0, s => s
-                    .SetContent("Applies to indicator 1")
-                    .SetIndicators(ListOf(indicatorGroup.Indicators[0])))
-                .ForIndex(1, s => s
-                    .SetContent("Applies to indicator 3")
-                    .SetIndicators(ListOf(indicatorGroup.Indicators[2])))
-                .ForIndex(2, s => s
-                    .SetContent("Applies to indicator 1 and indicator 3")
-                    .SetIndicators(ListOf(indicatorGroup.Indicators[0], indicatorGroup.Indicators[2])))
-                .GenerateList())
+            .WithFootnotes(
+                _fixture
+                    .DefaultFootnote()
+                    .ForIndex(
+                        0,
+                        s => s.SetContent("Applies to indicator 1").SetIndicators(ListOf(indicatorGroup.Indicators[0]))
+                    )
+                    .ForIndex(
+                        1,
+                        s => s.SetContent("Applies to indicator 3").SetIndicators(ListOf(indicatorGroup.Indicators[2]))
+                    )
+                    .ForIndex(
+                        2,
+                        s =>
+                            s.SetContent("Applies to indicator 1 and indicator 3")
+                                .SetIndicators(ListOf(indicatorGroup.Indicators[0], indicatorGroup.Indicators[2]))
+                    )
+                    .GenerateList()
+            )
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -571,8 +699,7 @@ public class FootnoteRepositoryTests
                 releaseVersionId: releaseVersion.Id,
                 subjectId: releaseSubject.SubjectId,
                 filterItemIds: ListOf<Guid>(),
-                indicatorIds: ListOf(indicatorGroup.Indicators[0].Id,
-                    indicatorGroup.Indicators[1].Id)
+                indicatorIds: ListOf(indicatorGroup.Indicators[0].Id, indicatorGroup.Indicators[1].Id)
             );
 
             // Check that only footnotes applying to indicator 1 are returned.
@@ -593,52 +720,75 @@ public class FootnoteRepositoryTests
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
-        var releaseSubjects = _fixture.DefaultReleaseSubject()
+        var releaseSubjects = _fixture
+            .DefaultReleaseSubject()
             .WithReleaseVersion(releaseVersion)
-            .WithSubjects(_fixture
-                .DefaultSubject()
-                .WithFilters(_ => _fixture
-                    .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
-                    .GenerateList(3))
-                .WithIndicatorGroups(_ => _fixture
-                    .DefaultIndicatorGroup()
-                    .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                    .GenerateList(1))
-                .GenerateList(2))
+            .WithSubjects(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(3))
+                    .WithIndicatorGroups(_ =>
+                        _fixture
+                            .DefaultIndicatorGroup()
+                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                            .GenerateList(1)
+                    )
+                    .GenerateList(2)
+            )
             .GenerateList();
 
         var (subject1, subject2) = GetSubjectsTuple2(releaseSubjects);
 
         // Set up a release with footnotes that apply to both subject 1 and subject 2
-        var releaseFootnotes = _fixture.DefaultReleaseFootnote()
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture
-                .DefaultFootnote()
-                .ForIndex(0, s => s
-                    .SetContent("Applies to subject 1 and subject 2")
-                    .SetSubjects(ListOf(subject1, subject2)))
-
-                // Footnote applies to subject 1 filter 1
-                // and subject 2 filter 1
-                // and subject 2 filter 2 group 1
-                // and subject 2 filter 3 group 1 item 1
-                .ForIndex(1, s => s
-                    .SetContent("Applies to s1f1 s2f1 s2f2g1 s2f3g1i1")
-                    .SetFilters(ListOf(subject1.Filters[0], subject2.Filters[0]))
-                    .SetFilterGroups(ListOf(subject2.Filters[1].FilterGroups[0]))
-                    .SetFilterItems(ListOf(subject2.Filters[2].FilterGroups[0].FilterItems[0])))
-                .ForIndex(2, s => s
-                    .SetContent("Applies to subject 1 indicator 1 and subject 2 filter 1")
-                    .SetFilters(ListOf(subject2.Filters[0]))
-                    .SetIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0])))
-                .ForIndex(3, s => s
-                    .SetContent("Applies to subject 1 filter 1 and subject 2 indicator 1")
-                    .SetFilters(ListOf(subject1.Filters[0]))
-                    .SetIndicators(ListOf(subject2.IndicatorGroups[0].Indicators[0])))
-                .ForIndex(4, s => s
-                    .SetContent("Applies to subject 1 indicator 1 and subject 2 indicator 1")
-                    .SetIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0], subject2.IndicatorGroups[0].Indicators[0])))
-                .GenerateList())
+            .WithFootnotes(
+                _fixture
+                    .DefaultFootnote()
+                    .ForIndex(
+                        0,
+                        s => s.SetContent("Applies to subject 1 and subject 2").SetSubjects(ListOf(subject1, subject2))
+                    )
+                    // Footnote applies to subject 1 filter 1
+                    // and subject 2 filter 1
+                    // and subject 2 filter 2 group 1
+                    // and subject 2 filter 3 group 1 item 1
+                    .ForIndex(
+                        1,
+                        s =>
+                            s.SetContent("Applies to s1f1 s2f1 s2f2g1 s2f3g1i1")
+                                .SetFilters(ListOf(subject1.Filters[0], subject2.Filters[0]))
+                                .SetFilterGroups(ListOf(subject2.Filters[1].FilterGroups[0]))
+                                .SetFilterItems(ListOf(subject2.Filters[2].FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        2,
+                        s =>
+                            s.SetContent("Applies to subject 1 indicator 1 and subject 2 filter 1")
+                                .SetFilters(ListOf(subject2.Filters[0]))
+                                .SetIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0]))
+                    )
+                    .ForIndex(
+                        3,
+                        s =>
+                            s.SetContent("Applies to subject 1 filter 1 and subject 2 indicator 1")
+                                .SetFilters(ListOf(subject1.Filters[0]))
+                                .SetIndicators(ListOf(subject2.IndicatorGroups[0].Indicators[0]))
+                    )
+                    .ForIndex(
+                        4,
+                        s =>
+                            s.SetContent("Applies to subject 1 indicator 1 and subject 2 indicator 1")
+                                .SetIndicators(
+                                    ListOf(
+                                        subject1.IndicatorGroups[0].Indicators[0],
+                                        subject2.IndicatorGroups[0].Indicators[0]
+                                    )
+                                )
+                    )
+                    .GenerateList()
+            )
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -664,7 +814,8 @@ public class FootnoteRepositoryTests
                 releaseVersionId: releaseVersion.Id,
                 subjectId: subject1.Id,
                 filterItemIds: ListOf(subject1.Filters[0].FilterGroups[0].FilterItems[0].Id),
-                indicatorIds: ListOf(subject1.IndicatorGroups[0].Indicators[0].Id));
+                indicatorIds: ListOf(subject1.IndicatorGroups[0].Indicators[0].Id)
+            );
 
             // Check that all of the footnotes are returned even though they have also been applied to subject 2
             Assert.Equal(5, results.Count);
@@ -697,45 +848,63 @@ public class FootnoteRepositoryTests
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
-        var releaseSubjects = _fixture.DefaultReleaseSubject()
+        var releaseSubjects = _fixture
+            .DefaultReleaseSubject()
             .WithReleaseVersion(releaseVersion)
-            .WithSubjects(_fixture
-                .DefaultSubject()
-                .ForIndex(0, s => s
-                    .SetFilters(_fixture
-                        .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
-                        .GenerateList(3))
-                    .SetIndicatorGroups(_fixture.DefaultIndicatorGroup()
-                        .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                        .GenerateList(1)))
-                .GenerateList(2))
+            .WithSubjects(
+                _fixture
+                    .DefaultSubject()
+                    .ForIndex(
+                        0,
+                        s =>
+                            s.SetFilters(
+                                    _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(3)
+                                )
+                                .SetIndicatorGroups(
+                                    _fixture
+                                        .DefaultIndicatorGroup()
+                                        .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                                        .GenerateList(1)
+                                )
+                    )
+                    .GenerateList(2)
+            )
             .GenerateList();
 
         var (subject1, subject2) = GetSubjectsTuple2(releaseSubjects);
 
-        var releaseFootnotes = _fixture.DefaultReleaseFootnote()
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture
-                .DefaultFootnote()
-                .ForIndex(0, s => s
-                    .SetContent("Applies to subject 1")
-                    .SetSubjects(ListOf(subject1)))
-                .ForIndex(1, s => s
-                    .SetContent("Applies to subject 1 filter 1")
-                    .SetFilters(ListOf(subject1.Filters[0])))
-                .ForIndex(2, s => s
-                    .SetContent("Applies to subject 1 filter 2 group 1")
-                    .SetFilterGroups(ListOf(subject1.Filters[1].FilterGroups[0])))
-                .ForIndex(3, s => s
-                    .SetContent("Applies to subject 1 filter 3 group 1 item 1")
-                    .SetFilterItems(ListOf(subject1.Filters[2].FilterGroups[0].FilterItems[0])))
-                .ForIndex(4, s => s
-                    .SetContent("Applies to subject 1 indicator 1")
-                    .SetIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0])))
-                .ForIndex(5, s => s
-                    .SetContent("Applies to subject 2")
-                    .SetSubjects(ListOf(subject2)))
-                .GenerateList())
+            .WithFootnotes(
+                _fixture
+                    .DefaultFootnote()
+                    .ForIndex(0, s => s.SetContent("Applies to subject 1").SetSubjects(ListOf(subject1)))
+                    .ForIndex(
+                        1,
+                        s => s.SetContent("Applies to subject 1 filter 1").SetFilters(ListOf(subject1.Filters[0]))
+                    )
+                    .ForIndex(
+                        2,
+                        s =>
+                            s.SetContent("Applies to subject 1 filter 2 group 1")
+                                .SetFilterGroups(ListOf(subject1.Filters[1].FilterGroups[0]))
+                    )
+                    .ForIndex(
+                        3,
+                        s =>
+                            s.SetContent("Applies to subject 1 filter 3 group 1 item 1")
+                                .SetFilterItems(ListOf(subject1.Filters[2].FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        4,
+                        s =>
+                            s.SetContent("Applies to subject 1 indicator 1")
+                                .SetIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0]))
+                    )
+                    .ForIndex(5, s => s.SetContent("Applies to subject 2").SetSubjects(ListOf(subject2)))
+                    .GenerateList()
+            )
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -760,7 +929,8 @@ public class FootnoteRepositoryTests
                 releaseVersionId: releaseVersion.Id,
                 subjectId: subject1.Id,
                 filterItemIds: ListOf<Guid>(),
-                indicatorIds: ListOf<Guid>());
+                indicatorIds: ListOf<Guid>()
+            );
 
             // Check that only the footnotes which apply directly to subject 1 are returned
             // Other footnotes related to subject 1 should be ignored as no filter items or indicators were requested
@@ -780,39 +950,58 @@ public class FootnoteRepositoryTests
         var releaseSubjects = _fixture
             .DefaultReleaseSubject()
             .WithReleaseVersions(releaseVersions)
-            .ForIndex(0, s => s.SetSubject(_fixture
-                .DefaultSubject()
-                .WithFilters(_fixture
-                    .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
-                    .GenerateList(3))
-                .WithIndicatorGroups(_fixture
-                    .DefaultIndicatorGroup()
-                    .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                    .GenerateList(1))))
+            .ForIndex(
+                0,
+                s =>
+                    s.SetSubject(
+                        _fixture
+                            .DefaultSubject()
+                            .WithFilters(
+                                _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(3)
+                            )
+                            .WithIndicatorGroups(
+                                _fixture
+                                    .DefaultIndicatorGroup()
+                                    .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                                    .GenerateList(1)
+                            )
+                    )
+            )
             .GenerateList();
 
         var subject = releaseSubjects[0].Subject;
 
-        var releaseFootnotes = _fixture.DefaultReleaseFootnote()
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersions[0])
-            .WithFootnotes(_fixture
-                .DefaultFootnote()
-                .ForIndex(0, s => s
-                    .SetContent("Applies to subject 1")
-                    .SetSubjects(ListOf(subject)))
-                .ForIndex(1, s => s
-                    .SetContent("Applies to subject 1 filter 1")
-                    .SetFilters(ListOf(subject.Filters[0])))
-                .ForIndex(2, s => s
-                    .SetContent("Applies to subject 1 filter 2 group 1")
-                    .SetFilterGroups(ListOf(subject.Filters[1].FilterGroups[0])))
-                .ForIndex(3, s => s
-                    .SetContent("Applies to subject 1 filter 3 group 1 item 1")
-                    .SetFilterItems(ListOf(subject.Filters[2].FilterGroups[0].FilterItems[0])))
-                .ForIndex(4, s => s
-                    .SetContent("Applies to subject 1 indicator 1")
-                    .SetIndicators(ListOf(subject.IndicatorGroups[0].Indicators[0])))
-                .GenerateList())
+            .WithFootnotes(
+                _fixture
+                    .DefaultFootnote()
+                    .ForIndex(0, s => s.SetContent("Applies to subject 1").SetSubjects(ListOf(subject)))
+                    .ForIndex(
+                        1,
+                        s => s.SetContent("Applies to subject 1 filter 1").SetFilters(ListOf(subject.Filters[0]))
+                    )
+                    .ForIndex(
+                        2,
+                        s =>
+                            s.SetContent("Applies to subject 1 filter 2 group 1")
+                                .SetFilterGroups(ListOf(subject.Filters[1].FilterGroups[0]))
+                    )
+                    .ForIndex(
+                        3,
+                        s =>
+                            s.SetContent("Applies to subject 1 filter 3 group 1 item 1")
+                                .SetFilterItems(ListOf(subject.Filters[2].FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        4,
+                        s =>
+                            s.SetContent("Applies to subject 1 indicator 1")
+                                .SetIndicators(ListOf(subject.IndicatorGroups[0].Indicators[0]))
+                    )
+                    .GenerateList()
+            )
             .GenerateList();
         var contextId = Guid.NewGuid().ToString();
 
@@ -841,7 +1030,8 @@ public class FootnoteRepositoryTests
                 releaseVersionId: releaseVersions[1].Id, // release 2 has no footnotes
                 subjectId: subject.Id,
                 filterItemIds: ListOf(filter1Group1Item1Id, filter2Group1Item1Id, filter3Group1Item1Id),
-                indicatorIds: ListOf(indicatorGroup1Item1Id));
+                indicatorIds: ListOf(indicatorGroup1Item1Id)
+            );
 
             // Check that no footnotes are returned even though subject 1 has footnotes for a different release
             Assert.Empty(results);
@@ -853,48 +1043,69 @@ public class FootnoteRepositoryTests
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
-        var releaseSubjects = _fixture.DefaultReleaseSubject()
+        var releaseSubjects = _fixture
+            .DefaultReleaseSubject()
             .WithReleaseVersion(releaseVersion)
-            .WithSubjects(_fixture
-                .DefaultSubject()
-                .ForIndex(0, s => s
-                    .SetFilters(_fixture
-                        .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
-                        .GenerateList(3)))
-                .WithIndicatorGroups(_ => _fixture.DefaultIndicatorGroup()
-                    .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                    .GenerateList(1))
-                .Generate(2))
+            .WithSubjects(
+                _fixture
+                    .DefaultSubject()
+                    .ForIndex(
+                        0,
+                        s =>
+                            s.SetFilters(
+                                _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(3)
+                            )
+                    )
+                    .WithIndicatorGroups(_ =>
+                        _fixture
+                            .DefaultIndicatorGroup()
+                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                            .GenerateList(1)
+                    )
+                    .Generate(2)
+            )
             .GenerateList();
 
         var (subject1, subject2) = GetSubjectsTuple2(releaseSubjects);
 
-        var releaseFootnotes = _fixture.DefaultReleaseFootnote()
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture
-                .DefaultFootnote()
-                .ForIndex(0, s => s
-                    .SetContent("Applies to subject 1")
-                    .SetSubjects(ListOf(subject1)))
-                .ForIndex(1, s => s
-                    .SetContent("Applies to subject 1 filter 1")
-                    .SetFilters(ListOf(subject1.Filters[0])))
-                .ForIndex(2, s => s
-                    .SetContent("Applies to subject 1 filter 2 group 1")
-                    .SetFilterGroups(ListOf(subject1.Filters[1].FilterGroups[0])))
-                .ForIndex(3, s => s
-                    .SetContent("Applies to subject 1 filter 3 group 1 item 1")
-                    .SetFilterItems(ListOf(subject1.Filters[2].FilterGroups[0].FilterItems[0])))
-                .ForIndex(4, s => s
-                    .SetContent("Applies to subject 1 indicator 1")
-                    .SetIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0])))
-                .ForIndex(5, s => s
-                    .SetContent("Applies to subject 2")
-                    .SetSubjects(ListOf(subject2)))
-                .ForIndex(6, s => s
-                    .SetContent("Applies to subject 2 indicator 1")
-                    .SetIndicators(ListOf(subject2.IndicatorGroups[0].Indicators[0])))
-                .GenerateList())
+            .WithFootnotes(
+                _fixture
+                    .DefaultFootnote()
+                    .ForIndex(0, s => s.SetContent("Applies to subject 1").SetSubjects(ListOf(subject1)))
+                    .ForIndex(
+                        1,
+                        s => s.SetContent("Applies to subject 1 filter 1").SetFilters(ListOf(subject1.Filters[0]))
+                    )
+                    .ForIndex(
+                        2,
+                        s =>
+                            s.SetContent("Applies to subject 1 filter 2 group 1")
+                                .SetFilterGroups(ListOf(subject1.Filters[1].FilterGroups[0]))
+                    )
+                    .ForIndex(
+                        3,
+                        s =>
+                            s.SetContent("Applies to subject 1 filter 3 group 1 item 1")
+                                .SetFilterItems(ListOf(subject1.Filters[2].FilterGroups[0].FilterItems[0]))
+                    )
+                    .ForIndex(
+                        4,
+                        s =>
+                            s.SetContent("Applies to subject 1 indicator 1")
+                                .SetIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0]))
+                    )
+                    .ForIndex(5, s => s.SetContent("Applies to subject 2").SetSubjects(ListOf(subject2)))
+                    .ForIndex(
+                        6,
+                        s =>
+                            s.SetContent("Applies to subject 2 indicator 1")
+                                .SetIndicators(ListOf(subject2.IndicatorGroups[0].Indicators[0]))
+                    )
+                    .GenerateList()
+            )
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -927,7 +1138,8 @@ public class FootnoteRepositoryTests
                 indicatorIds: ListOf(
                     subject1.IndicatorGroups[0].Indicators[0].Id, // subject 1
                     subject2.IndicatorGroups[0].Indicators[0].Id // subject 2
-                ));
+                )
+            );
 
             // Check that only the footnotes which apply to subject 2 are returned
             // The filter item and indicator id's related to subject 1 should have been ignored
@@ -947,31 +1159,45 @@ public class FootnoteRepositoryTests
     {
         var releaseVersions = _fixture.DefaultStatsReleaseVersion().GenerateList(2);
 
-        var releaseSubjects = _fixture.DefaultReleaseSubject()
+        var releaseSubjects = _fixture
+            .DefaultReleaseSubject()
             .WithReleaseVersion(releaseVersions[0])
-            .WithSubjects(_fixture
-                .DefaultSubject()
-                .WithFilters(_ => _fixture
-                    .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
-                    .Generate(3))
-                .WithIndicatorGroups(_ => _fixture
-                    .DefaultIndicatorGroup()
-                    .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                    .Generate(1))
-                .Generate(2))
+            .WithSubjects(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
+                    .WithIndicatorGroups(_ =>
+                        _fixture
+                            .DefaultIndicatorGroup()
+                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                            .Generate(1)
+                    )
+                    .Generate(2)
+            )
             .GenerateList();
 
         var (subject1, subject2) = GetSubjectsTuple2(releaseSubjects);
 
-        var releaseFootnote = _fixture.DefaultReleaseFootnote()
+        var releaseFootnote = _fixture
+            .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersions[0])
-            .WithFootnote(_fixture.DefaultFootnote()
-                .WithContent("Applies to all criteria")
-                .WithSubjects(ListOf(subject1, subject2))
-                .WithFilters(ListOf(subject1.Filters[0], subject2.Filters[0]))
-                .WithFilterGroups(ListOf(subject1.Filters[1].FilterGroups[0], subject2.Filters[1].FilterGroups[0]))
-                .WithFilterItems(ListOf(subject1.Filters[2].FilterGroups[0].FilterItems[0], subject2.Filters[2].FilterGroups[0].FilterItems[0]))
-                .WithIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0], subject2.IndicatorGroups[0].Indicators[0])))
+            .WithFootnote(
+                _fixture
+                    .DefaultFootnote()
+                    .WithContent("Applies to all criteria")
+                    .WithSubjects(ListOf(subject1, subject2))
+                    .WithFilters(ListOf(subject1.Filters[0], subject2.Filters[0]))
+                    .WithFilterGroups(ListOf(subject1.Filters[1].FilterGroups[0], subject2.Filters[1].FilterGroups[0]))
+                    .WithFilterItems(
+                        ListOf(
+                            subject1.Filters[2].FilterGroups[0].FilterItems[0],
+                            subject2.Filters[2].FilterGroups[0].FilterItems[0]
+                        )
+                    )
+                    .WithIndicators(
+                        ListOf(subject1.IndicatorGroups[0].Indicators[0], subject2.IndicatorGroups[0].Indicators[0])
+                    )
+            )
             .Generate();
 
         var contextId = Guid.NewGuid().ToString();
@@ -1033,43 +1259,65 @@ public class FootnoteRepositoryTests
     [Fact]
     public async Task GetFootnotes_FiltersByRelease()
     {
-        var (releaseVersion1, releaseVersion2) = _fixture.DefaultStatsReleaseVersion()
-            .GenerateTuple2();
+        var (releaseVersion1, releaseVersion2) = _fixture.DefaultStatsReleaseVersion().GenerateTuple2();
 
-        var releaseSubjects = _fixture.DefaultReleaseSubject()
+        var releaseSubjects = _fixture
+            .DefaultReleaseSubject()
             .ForRange(..2, s => s.SetReleaseVersion(releaseVersion1))
             .ForIndex(2, s => s.SetReleaseVersion(releaseVersion2))
-            .WithSubjects(_fixture
-                .DefaultSubject()
-                .WithFilters(_ => _fixture
-                    .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
-                    .Generate(3))
-                .WithIndicatorGroups(_ => _fixture.DefaultIndicatorGroup()
-                    .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                    .Generate(1))
-                .Generate(3))
+            .WithSubjects(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
+                    .WithIndicatorGroups(_ =>
+                        _fixture
+                            .DefaultIndicatorGroup()
+                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                            .Generate(1)
+                    )
+                    .Generate(3)
+            )
             .GenerateList();
 
         var (release1Subject1, release1Subject2, release2Subject) = GetSubjectsTuple3(releaseSubjects);
 
-        var releaseFootnotes = _fixture.DefaultReleaseFootnote()
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
             .ForIndex(0, s => s.SetReleaseVersion(releaseVersion1))
-            .ForIndex(0, s => s.SetFootnote(_fixture
-                .DefaultFootnote()
-                .WithOrder(0)
-                .WithContent("Applied to release 1 subject 1")
-                .WithSubjects(ListOf(release1Subject1))))
+            .ForIndex(
+                0,
+                s =>
+                    s.SetFootnote(
+                        _fixture
+                            .DefaultFootnote()
+                            .WithOrder(0)
+                            .WithContent("Applied to release 1 subject 1")
+                            .WithSubjects(ListOf(release1Subject1))
+                    )
+            )
             .ForIndex(1, s => s.SetReleaseVersion(releaseVersion1))
-            .ForIndex(1, s => s.SetFootnote(_fixture
-                .DefaultFootnote()
-                .WithOrder(1)
-                .WithContent("Applied to release 1 subject 2")
-                .WithSubjects(ListOf(release1Subject2))))
+            .ForIndex(
+                1,
+                s =>
+                    s.SetFootnote(
+                        _fixture
+                            .DefaultFootnote()
+                            .WithOrder(1)
+                            .WithContent("Applied to release 1 subject 2")
+                            .WithSubjects(ListOf(release1Subject2))
+                    )
+            )
             .ForIndex(2, s => s.SetReleaseVersion(releaseVersion2))
-            .ForIndex(2, s => s.SetFootnote(_fixture
-                .DefaultFootnote()
-                .WithContent("Applied to release 2 subject")
-                .WithSubjects(ListOf(release2Subject))))
+            .ForIndex(
+                2,
+                s =>
+                    s.SetFootnote(
+                        _fixture
+                            .DefaultFootnote()
+                            .WithContent("Applied to release 2 subject")
+                            .WithSubjects(ListOf(release2Subject))
+                    )
+            )
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -1119,24 +1367,24 @@ public class FootnoteRepositoryTests
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
-        var releaseSubjects = _fixture.DefaultReleaseSubject()
+        var releaseSubjects = _fixture
+            .DefaultReleaseSubject()
             .WithReleaseVersion(releaseVersion)
             .WithSubjects(_fixture.DefaultSubject().Generate(2))
             .GenerateList();
 
         var (subject1, subject2) = GetSubjectsTuple2(releaseSubjects);
 
-        var releaseFootnotes = _fixture.DefaultReleaseFootnote()
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture
-                .DefaultFootnote()
-                .ForIndex(0, s => s
-                    .SetContent("Applied to subject 1")
-                    .SetSubjects(ListOf(subject1)))
-                .ForIndex(1, s => s
-                    .SetContent("Applied to subject 2")
-                    .SetSubjects(ListOf(subject2)))
-                .GenerateList())
+            .WithFootnotes(
+                _fixture
+                    .DefaultFootnote()
+                    .ForIndex(0, s => s.SetContent("Applied to subject 1").SetSubjects(ListOf(subject1)))
+                    .ForIndex(1, s => s.SetContent("Applied to subject 2").SetSubjects(ListOf(subject2)))
+                    .GenerateList()
+            )
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -1168,30 +1416,42 @@ public class FootnoteRepositoryTests
         var releaseSubjects = _fixture
             .DefaultReleaseSubject()
             .WithReleaseVersion(releaseVersions[0])
-            .WithSubjects(_fixture
-                .DefaultSubject()
-                .WithFilters(_ => _fixture
-                    .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
-                    .GenerateList(3))
-                .WithIndicatorGroups(_ => _fixture
-                    .DefaultIndicatorGroup()
-                    .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                    .Generate(1))
-                .Generate(2))
+            .WithSubjects(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(3))
+                    .WithIndicatorGroups(_ =>
+                        _fixture
+                            .DefaultIndicatorGroup()
+                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                            .Generate(1)
+                    )
+                    .Generate(2)
+            )
             .GenerateList();
 
         var (subject1, subject2) = GetSubjectsTuple2(releaseSubjects);
 
-        var releaseFootnote = _fixture.DefaultReleaseFootnote()
+        var releaseFootnote = _fixture
+            .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersions[0])
-            .WithFootnote(_fixture
-                .DefaultFootnote()
-                .WithContent("Applies to all types of element")
-                .WithSubjects(ListOf(subject1, subject2))
-                .WithFilters(ListOf(subject1.Filters[0], subject2.Filters[0]))
-                .WithFilterGroups(ListOf(subject1.Filters[1].FilterGroups[0], subject2.Filters[1].FilterGroups[0]))
-                .WithFilterItems(ListOf(subject1.Filters[2].FilterGroups[0].FilterItems[0], subject2.Filters[2].FilterGroups[0].FilterItems[0]))
-                .WithIndicators(ListOf(subject1.IndicatorGroups[0].Indicators[0], subject2.IndicatorGroups[0].Indicators[0])))
+            .WithFootnote(
+                _fixture
+                    .DefaultFootnote()
+                    .WithContent("Applies to all types of element")
+                    .WithSubjects(ListOf(subject1, subject2))
+                    .WithFilters(ListOf(subject1.Filters[0], subject2.Filters[0]))
+                    .WithFilterGroups(ListOf(subject1.Filters[1].FilterGroups[0], subject2.Filters[1].FilterGroups[0]))
+                    .WithFilterItems(
+                        ListOf(
+                            subject1.Filters[2].FilterGroups[0].FilterItems[0],
+                            subject2.Filters[2].FilterGroups[0].FilterItems[0]
+                        )
+                    )
+                    .WithIndicators(
+                        ListOf(subject1.IndicatorGroups[0].Indicators[0], subject2.IndicatorGroups[0].Indicators[0])
+                    )
+            )
             .Generate();
 
         var contextId = Guid.NewGuid().ToString();
@@ -1258,23 +1518,26 @@ public class FootnoteRepositoryTests
             .WithSubject(_fixture.DefaultSubject())
             .Generate();
 
-        var releaseFootnotes = _fixture.DefaultReleaseFootnote()
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture
-                .DefaultFootnote()
-                .ForIndex(0, s => s
-                    .SetContent("Footnote 3")
-                    .Set(f => f.Order, 2)
-                    .SetSubjects(ListOf(releaseSubject.Subject)))
-                .ForIndex(1, s => s
-                    .SetContent("Footnote 1")
-                    .Set(f => f.Order, 0)
-                    .SetSubjects(ListOf(releaseSubject.Subject)))
-                .ForIndex(2, s => s
-                    .SetContent("Footnote 2")
-                    .Set(f => f.Order, 1)
-                    .SetSubjects(ListOf(releaseSubject.Subject)))
-                .GenerateList())
+            .WithFootnotes(
+                _fixture
+                    .DefaultFootnote()
+                    .ForIndex(
+                        0,
+                        s => s.SetContent("Footnote 3").Set(f => f.Order, 2).SetSubjects(ListOf(releaseSubject.Subject))
+                    )
+                    .ForIndex(
+                        1,
+                        s => s.SetContent("Footnote 1").Set(f => f.Order, 0).SetSubjects(ListOf(releaseSubject.Subject))
+                    )
+                    .ForIndex(
+                        2,
+                        s => s.SetContent("Footnote 2").Set(f => f.Order, 1).SetSubjects(ListOf(releaseSubject.Subject))
+                    )
+                    .GenerateList()
+            )
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -1310,36 +1573,51 @@ public class FootnoteRepositoryTests
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
-        var releaseSubjects = _fixture.DefaultReleaseSubject()
+        var releaseSubjects = _fixture
+            .DefaultReleaseSubject()
             .WithReleaseVersion(releaseVersion)
-            .WithSubjects(_fixture
-                .DefaultSubject()
-                .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
-                .ForIndex(4, s => s
-                    .SetIndicatorGroups(_fixture
-                        .DefaultIndicatorGroup()
-                        .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                        .GenerateList(1)))
-                .GenerateList(6))
+            .WithSubjects(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
+                    .ForIndex(
+                        4,
+                        s =>
+                            s.SetIndicatorGroups(
+                                _fixture
+                                    .DefaultIndicatorGroup()
+                                    .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                                    .GenerateList(1)
+                            )
+                    )
+                    .GenerateList(6)
+            )
             .GenerateList();
 
         var subjectWithNoFootnotes = releaseSubjects[5].Subject;
 
-        var releaseFootnotes = _fixture.DefaultReleaseFootnote()
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture
-                .DefaultFootnote()
-                .ForIndex(0, s => s
-                    .SetSubjects(ListOf(releaseSubjects[0].Subject)))
-                .ForIndex(1, s => s
-                    .SetFilters(ListOf(releaseSubjects[1].Subject.Filters[0])))
-                .ForIndex(2, s => s
-                    .SetFilterGroups(ListOf(releaseSubjects[2].Subject.Filters[1].FilterGroups[0])))
-                .ForIndex(3, s => s
-                    .SetFilterItems(ListOf(releaseSubjects[3].Subject.Filters[2].FilterGroups[0].FilterItems[0])))
-                .ForIndex(4, s => s
-                    .SetIndicators(ListOf(releaseSubjects[4].Subject.IndicatorGroups[0].Indicators[0])))
-                .GenerateList())
+            .WithFootnotes(
+                _fixture
+                    .DefaultFootnote()
+                    .ForIndex(0, s => s.SetSubjects(ListOf(releaseSubjects[0].Subject)))
+                    .ForIndex(1, s => s.SetFilters(ListOf(releaseSubjects[1].Subject.Filters[0])))
+                    .ForIndex(2, s => s.SetFilterGroups(ListOf(releaseSubjects[2].Subject.Filters[1].FilterGroups[0])))
+                    .ForIndex(
+                        3,
+                        s =>
+                            s.SetFilterItems(
+                                ListOf(releaseSubjects[3].Subject.Filters[2].FilterGroups[0].FilterItems[0])
+                            )
+                    )
+                    .ForIndex(
+                        4,
+                        s => s.SetIndicators(ListOf(releaseSubjects[4].Subject.IndicatorGroups[0].Indicators[0]))
+                    )
+                    .GenerateList()
+            )
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -1370,28 +1648,34 @@ public class FootnoteRepositoryTests
         var releaseSubjects = _fixture
             .DefaultReleaseSubject()
             .WithReleaseVersion(releaseVersion)
-            .WithSubjects(_fixture
-                .DefaultSubject()
-                .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
-                .Generate(2))
+            .WithSubjects(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
+                    .Generate(2)
+            )
             .GenerateList();
 
         var (subjectWithFootnotes, subjectWithNoFootnotes) = GetSubjectsTuple2(releaseSubjects);
 
-        var subjectWithFootnotesIndicatorGroup = _fixture.DefaultIndicatorGroup()
+        var subjectWithFootnotesIndicatorGroup = _fixture
+            .DefaultIndicatorGroup()
             .WithSubject(subjectWithFootnotes)
             .WithIndicators(_fixture.DefaultIndicator().Generate(1))
             .Generate();
 
-        var releaseFootnote = _fixture.DefaultReleaseFootnote()
+        var releaseFootnote = _fixture
+            .DefaultReleaseFootnote()
             .WithReleaseVersion(releaseVersion)
-            .WithFootnote(_fixture
-                .DefaultFootnote()
-                .WithSubjects(ListOf(subjectWithFootnotes))
-                .WithFilters(ListOf(subjectWithFootnotes.Filters[0]))
-                .WithFilterGroups(ListOf(subjectWithFootnotes.Filters[1].FilterGroups[0]))
-                .WithFilterItems(ListOf(subjectWithFootnotes.Filters[2].FilterGroups[0].FilterItems[0]))
-                .WithIndicators(ListOf(subjectWithFootnotesIndicatorGroup.Indicators[0])))
+            .WithFootnote(
+                _fixture
+                    .DefaultFootnote()
+                    .WithSubjects(ListOf(subjectWithFootnotes))
+                    .WithFilters(ListOf(subjectWithFootnotes.Filters[0]))
+                    .WithFilterGroups(ListOf(subjectWithFootnotes.Filters[1].FilterGroups[0]))
+                    .WithFilterItems(ListOf(subjectWithFootnotes.Filters[2].FilterGroups[0].FilterItems[0]))
+                    .WithIndicators(ListOf(subjectWithFootnotesIndicatorGroup.Indicators[0]))
+            )
             .Generate();
 
         var contextId = Guid.NewGuid().ToString();

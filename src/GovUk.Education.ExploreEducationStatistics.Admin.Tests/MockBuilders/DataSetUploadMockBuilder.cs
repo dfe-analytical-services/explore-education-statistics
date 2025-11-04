@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 public class DataSetUploadMockBuilder
 {
     private Guid? _releaseVersionId;
-    private ScreenerResult? _screenerResult;
+    private string? _screenerResult;
     private List<DataScreenerTestResult>? _testResults;
 
     public DataSetUpload BuildEntity()
@@ -23,32 +23,34 @@ public class DataSetUploadMockBuilder
             MetaFileId = Guid.NewGuid(),
             MetaFileName = "meta.data.csv",
             MetaFileSizeInBytes = 157,
-            Status = _screenerResult == ScreenerResult.Failed
-                ? DataSetUploadStatus.FAILED_SCREENING
-                : DataSetUploadStatus.PENDING_IMPORT,
+            Status =
+                _screenerResult == "Failed" ? DataSetUploadStatus.FAILED_SCREENING : DataSetUploadStatus.PENDING_IMPORT,
             UploadedBy = "test@test.com",
             Created = DateTime.UtcNow,
             ScreenerResult = new DataSetScreenerResponse
             {
-                OverallResult = _screenerResult ?? ScreenerResult.Passed,
-                Message = "Screening complete",
-                TestResults = _testResults ??
-                [
-                    new()
-                    {
-                        TestFunctionName = "TestFunction1",
-                        Notes = "Test 1 passed",
-                        Stage = Stage.Passed,
-                        Result = TestResult.PASS,
-                    },
-                    new()
-                    {
-                        TestFunctionName = "TestFunction2",
-                        Notes = "Test 2 passed",
-                        Stage = Stage.Passed,
-                        Result = TestResult.PASS,
-                    },
-                ]
+                OverallResult = _screenerResult ?? "Passed",
+                TestResults =
+                    _testResults
+                    ??
+                    [
+                        new()
+                        {
+                            TestFunctionName = "TestFunction1",
+                            Notes = "Test 1 passed",
+                            Stage = "Passed",
+                            Result = TestResult.PASS,
+                            GuidanceUrl = "http://example.com/guidance1",
+                        },
+                        new()
+                        {
+                            TestFunctionName = "TestFunction2",
+                            Notes = "Test 2 passed",
+                            Stage = "Passed",
+                            Result = TestResult.PASS,
+                            GuidanceUrl = "http://example.com/guidance2",
+                        },
+                    ],
             },
             ReplacingFileId = null,
         };
@@ -71,7 +73,7 @@ public class DataSetUploadMockBuilder
             ScreenerResult = new()
             {
                 Message = "Screener result message",
-                OverallResult = ScreenerResult.Passed.ToString(),
+                OverallResult = "Passed",
                 TestResults =
                 [
                     new()
@@ -88,8 +90,9 @@ public class DataSetUploadMockBuilder
                         Stage = "2",
                         Result = TestResult.PASS.ToString(),
                     },
-                ]
-            }
+                ],
+            },
+            PublicApiCompatible = true,
         };
     }
 
@@ -101,22 +104,24 @@ public class DataSetUploadMockBuilder
 
     public DataSetUploadMockBuilder WithFailingTests()
     {
-        _screenerResult = ScreenerResult.Failed;
+        _screenerResult = "Failed";
         _testResults =
         [
             new()
             {
                 TestFunctionName = "TestFunction1",
                 Notes = "Test 1 failed",
-                Stage = Stage.PreScreening1,
+                Stage = "PreScreening1",
                 Result = TestResult.FAIL,
+                GuidanceUrl = "http://example.com/guidance1",
             },
             new()
             {
                 TestFunctionName = "TestFunction2",
                 Notes = "Test 2 failed",
-                Stage = Stage.PreScreening1,
+                Stage = "PreScreening1",
                 Result = TestResult.FAIL,
+                GuidanceUrl = "http://example.com/guidance2",
             },
         ];
 
@@ -125,22 +130,24 @@ public class DataSetUploadMockBuilder
 
     public DataSetUploadMockBuilder WithWarningTests()
     {
-        _screenerResult = ScreenerResult.Passed;
+        _screenerResult = "Passed";
         _testResults =
         [
             new()
             {
                 TestFunctionName = "TestFunction1",
                 Notes = "Test 1 passed with a warning",
-                Stage = Stage.Passed,
+                Stage = "Passed",
                 Result = TestResult.WARNING,
+                GuidanceUrl = "http://example.com/guidance1",
             },
             new()
             {
                 TestFunctionName = "TestFunction2",
                 Notes = "Test 2 passed with a warning",
-                Stage = Stage.Passed,
+                Stage = "Passed",
                 Result = TestResult.WARNING,
+                GuidanceUrl = "http://example.com/guidance2",
             },
         ];
 

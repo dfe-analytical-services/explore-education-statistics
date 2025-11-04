@@ -29,7 +29,7 @@ public record DataSetGetQueryFilters : DataSetQueryCriteriaFilters
             Eq = Eq,
             NotEq = NotEq,
             In = In,
-            NotIn = NotIn
+            NotIn = NotIn,
         };
     }
 

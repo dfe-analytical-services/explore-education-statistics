@@ -30,26 +30,25 @@ public abstract class ReleaseFileControllerTests
                 ContainerName: "a-container",
                 Path: "a-path",
                 Filename: "a-filename.csv",
-                ContentType: MediaTypeNames.Text.Csv);
-            
+                ContentType: MediaTypeNames.Text.Csv
+            );
+
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
             releaseFileService
-                .Setup(s => s.GetBlobDownloadToken(
-                    releaseVersionId,
-                    fileId,
-                    default))
+                .Setup(s => s.GetBlobDownloadToken(releaseVersionId, fileId, default))
                 .ReturnsAsync(downloadToken);
-            
+
             var controller = BuildController(releaseFileService: releaseFileService.Object);
 
             var result = await controller.GetDownloadToken(
                 releaseVersionId: releaseVersionId,
                 fileId: fileId,
-                cancellationToken: default);
+                cancellationToken: default
+            );
 
             var encodedToken = result.AssertOkResult();
-            
+
             var expectedEncodedToken = JsonSerializer.Serialize(downloadToken).ToBase64String();
             Assert.Equal(expectedEncodedToken, encodedToken);
         }
@@ -58,7 +57,8 @@ public abstract class ReleaseFileControllerTests
     private ReleaseFileController BuildController(
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IDataBlockService? dataBlockService = null,
-        IReleaseFileService? releaseFileService = null)
+        IReleaseFileService? releaseFileService = null
+    )
     {
         return new ReleaseFileController(
             persistenceHelper: persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext>().Object,

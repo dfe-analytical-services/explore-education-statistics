@@ -2,6 +2,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES2171_AddMethodologyNotes : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +18,7 @@ public partial class EES2171_AddMethodologyNotes : Migration
                 Created = table.Column<DateTime>(nullable: false),
                 CreatedById = table.Column<Guid>(nullable: false),
                 Updated = table.Column<DateTime>(nullable: true),
-                UpdatedById = table.Column<Guid>(nullable: true)
+                UpdatedById = table.Column<Guid>(nullable: true),
             },
             constraints: table =>
             {
@@ -26,39 +27,45 @@ public partial class EES2171_AddMethodologyNotes : Migration
                     name: "FK_MethodologyNotes_Users_CreatedById",
                     column: x => x.CreatedById,
                     principalTable: "Users",
-                    principalColumn: "Id");
+                    principalColumn: "Id"
+                );
                 table.ForeignKey(
                     name: "FK_MethodologyNotes_MethodologyVersions_MethodologyVersionId",
                     column: x => x.MethodologyVersionId,
                     principalTable: "MethodologyVersions",
                     principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.Cascade
+                );
                 table.ForeignKey(
                     name: "FK_MethodologyNotes_Users_UpdatedById",
                     column: x => x.UpdatedById,
                     principalTable: "Users",
-                    principalColumn: "Id");
-            });
+                    principalColumn: "Id"
+                );
+            }
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_MethodologyNotes_CreatedById",
             table: "MethodologyNotes",
-            column: "CreatedById");
+            column: "CreatedById"
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_MethodologyNotes_MethodologyVersionId",
             table: "MethodologyNotes",
-            column: "MethodologyVersionId");
+            column: "MethodologyVersionId"
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_MethodologyNotes_UpdatedById",
             table: "MethodologyNotes",
-            column: "UpdatedById");
+            column: "UpdatedById"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropTable(
-            name: "MethodologyNotes");
+        migrationBuilder.DropTable(name: "MethodologyNotes");
     }
 }

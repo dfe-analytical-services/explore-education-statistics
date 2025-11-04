@@ -1,4 +1,3 @@
-#nullable enable
 using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -28,9 +27,7 @@ public class SeparatedQueryStringValueProvider : QueryStringValueProvider
         if (result.Values.Any(x => x.IndexOf(_separator, StringComparison.OrdinalIgnoreCase) > 0))
         {
             var splitValues = new StringValues(
-                result.Values
-                    .SelectMany(x => x.Split(_separator, StringSplitOptions.RemoveEmptyEntries))
-                    .ToArray()
+                result.Values.SelectMany(x => x.Split(_separator, StringSplitOptions.RemoveEmptyEntries)).ToArray()
             );
 
             return new ValueProviderResult(splitValues, result.Culture);

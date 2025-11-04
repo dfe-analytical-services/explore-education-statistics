@@ -6,17 +6,11 @@ public partial class EES2400RenameReleasesTableStatusToApprovalStatus : Migratio
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.RenameColumn(
-            name: "Status",
-            newName: "ApprovalStatus",
-            table: "Releases");
+        migrationBuilder.RenameColumn(name: "Status", newName: "ApprovalStatus", table: "Releases");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.RenameColumn(
-            name: "ApprovalStatus",
-            newName: "Status",
-            table: "Releases");
+        migrationBuilder.RenameColumn(name: "ApprovalStatus", newName: "Status", table: "Releases");
     }
 }

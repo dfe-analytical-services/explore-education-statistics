@@ -1,5 +1,4 @@
-﻿#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
@@ -14,8 +13,9 @@ public static class MvcOptionsExtensions
 
     public static void AddTrimStringBinderProvider(this MvcOptions option)
     {
-        var simpleTypeModelBinderProvider = option.ModelBinderProviders
-            .FirstOrDefault(x => x.GetType() == typeof(SimpleTypeModelBinderProvider));
+        var simpleTypeModelBinderProvider = option.ModelBinderProviders.FirstOrDefault(x =>
+            x.GetType() == typeof(SimpleTypeModelBinderProvider)
+        );
 
         if (simpleTypeModelBinderProvider == null)
         {

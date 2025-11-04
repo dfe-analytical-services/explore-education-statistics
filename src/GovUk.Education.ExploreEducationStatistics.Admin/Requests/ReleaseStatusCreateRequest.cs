@@ -45,7 +45,8 @@ public record ReleaseStatusCreateRequest
         }
     }
 
-    [PartialDateValidator] public PartialDate? NextReleaseDate { get; init; }
+    [PartialDateValidator]
+    public PartialDate? NextReleaseDate { get; init; }
 
     public bool? UpdatePublishedDate { get; init; }
 }

@@ -18,10 +18,13 @@ public class CacheKeyServiceTests
     [Fact]
     public async Task CreateCacheKeyForReleaseSubjects()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()
-                    .WithSlug("publication-slug")));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(
+                _dataFixture
+                    .DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication().WithSlug("publication-slug"))
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -42,7 +45,8 @@ public class CacheKeyServiceTests
             Assert.Equal(releaseVersion.Id, cacheKey.ReleaseVersionId);
             Assert.Equal(
                 $"publications/{releaseVersion.Release.Publication.Slug}/releases/{releaseVersion.Release.Slug}/subjects.json",
-                cacheKey.Key);
+                cacheKey.Key
+            );
         }
     }
 

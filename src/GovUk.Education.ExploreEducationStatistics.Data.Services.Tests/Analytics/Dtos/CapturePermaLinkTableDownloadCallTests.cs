@@ -15,9 +15,9 @@ public class CapturePermaLinkTableDownloadCallTests
         {
             PermalinkTitle = "the permalinkTitle",
             PermalinkId = Guid.NewGuid(),
-            DownloadFormat = TableDownloadFormat.ODS
+            DownloadFormat = TableDownloadFormat.ODS,
         };
-        
+
         // ACT
         var actual = AnalyticsRequestSerialiser.SerialiseRequest(sut);
 
@@ -39,9 +39,9 @@ public class CapturePermaLinkTableDownloadCallTests
         {
             PermalinkTitle = "the permalinkTitle",
             PermalinkId = Guid.Parse("75e0dbb6-4348-47f2-905b-cf4c67f9c249"),
-            DownloadFormat = TableDownloadFormat.ODS
+            DownloadFormat = TableDownloadFormat.ODS,
         };
-        
+
         // ACT
         var actual = AnalyticsRequestSerialiser.SerialiseRequest(sut);
 

@@ -24,7 +24,7 @@ interface MethodologyAccordionSectionProps {
 
 const MethodologyAccordionSection = ({
   sectionKey,
-  section: { id: sectionId, caption, heading, content: sectionContent = [] },
+  section: { id: sectionId, heading, content: sectionContent = [] },
   methodologyId,
   methodologySlug,
   onRemoveSection,
@@ -141,7 +141,6 @@ const MethodologyAccordionSection = ({
           : undefined
       }
       heading={heading}
-      caption={caption}
       headerButtons={
         <Button
           variant={!isReordering ? 'secondary' : undefined}

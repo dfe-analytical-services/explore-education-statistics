@@ -36,6 +36,6 @@ internal record ReleaseSearchViewModelDto
             TypeBoost = TypeBoost,
             PublicationSlug = PublicationSlug,
             ReleaseSlug = ReleaseSlug,
-            HtmlContent = HtmlContent
+            HtmlContent = HtmlContent,
         };
 }

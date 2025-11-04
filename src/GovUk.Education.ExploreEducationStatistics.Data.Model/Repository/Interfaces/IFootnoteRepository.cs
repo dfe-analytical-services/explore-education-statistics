@@ -11,7 +11,8 @@ public interface IFootnoteRepository
         IReadOnlySet<Guid> filterItemIds,
         IReadOnlySet<Guid> indicatorIds,
         IReadOnlySet<Guid> subjectIds,
-        int order);
+        int order
+    );
 
     Task<List<Footnote>> GetFilteredFootnotes(
         Guid releaseVersionId,

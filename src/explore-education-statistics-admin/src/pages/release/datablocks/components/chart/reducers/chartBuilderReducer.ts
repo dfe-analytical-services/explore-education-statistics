@@ -12,6 +12,7 @@ import {
   ChartDefinitionAxis,
   ChartDefinitionOptions,
   chartDefinitions,
+  MapCategoricalDataConfig,
   MapConfig,
   MapDataSetConfig,
 } from '@common/modules/charts/types/chart';
@@ -72,6 +73,10 @@ export type ChartBuilderActions =
       payload: MapDataGroupingConfig;
     }
   | {
+      type: 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG';
+      payload: MapCategoricalDataConfig[];
+    }
+  | {
       type: 'UPDATE_CHART_AXIS';
       payload: AxisConfiguration;
     }
@@ -86,7 +91,6 @@ const defaultOptions: ChartOptions = {
   subtitle: '',
   title: '',
   titleType: 'default',
-  width: undefined,
 };
 
 const defaultLegend: LegendConfiguration = {
@@ -226,6 +230,7 @@ function getInitialMapState({
       meta,
       options,
     }),
+    categoricalDataConfig: map?.categoricalDataConfig,
   };
 }
 
@@ -250,6 +255,7 @@ function getMapDataSetConfigs({
       groupBy: 'locations',
     },
     data,
+    includeNonNumericData: true,
     meta,
   });
 
@@ -285,13 +291,12 @@ export function chartBuilderReducer(
           ...defaultOptions,
           ...(action.payload.options.defaults ?? {}),
           ...draft.options,
-          // Set height/width to definition defaults
+          // Set height to definition defaults
           // as this seems to surprise users the least.
           height:
             action.payload.options.defaults?.height ??
             draft.options?.height ??
             defaultOptions.height,
-          width: action.payload.options.defaults?.width ?? draft.options?.width,
         };
 
         if (action.payload.capabilities.hasLegend) {
@@ -392,6 +397,15 @@ export function chartBuilderReducer(
 
         break;
       }
+      case 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG': {
+        if (!draft.map) {
+          throw new Error('Map config has not been initialised');
+        }
+
+        draft.map.categoricalDataConfig = action.payload;
+
+        break;
+      }
       case 'UPDATE_CHART_OPTIONS': {
         draft.options = {
           ...defaultOptions,
@@ -416,6 +430,7 @@ export function chartBuilderReducer(
             meta,
             options: draft.options,
           });
+          draft.map.categoricalDataConfig = [];
         }
 
         break;
@@ -496,6 +511,16 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
     [dispatch],
   );
 
+  const updateMapCategoricalDataConfig = useCallback(
+    (categoricalDataConfig: MapCategoricalDataConfig[]) => {
+      dispatch({
+        type: 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG',
+        payload: categoricalDataConfig,
+      });
+    },
+    [dispatch],
+  );
+
   const updateChartAxis = useCallback(
     (axisConfiguration: AxisConfiguration) => {
       dispatch({
@@ -519,6 +544,7 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
       updateChartLegend,
       updateMapBoundaryLevels,
       updateMapDataGroupings,
+      updateMapCategoricalDataConfig,
       updateChartOptions,
       updateChartAxis,
       resetState,
@@ -529,6 +555,7 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
       updateChartLegend,
       updateMapBoundaryLevels,
       updateMapDataGroupings,
+      updateMapCategoricalDataConfig,
       updateChartOptions,
       updateChartAxis,
       resetState,

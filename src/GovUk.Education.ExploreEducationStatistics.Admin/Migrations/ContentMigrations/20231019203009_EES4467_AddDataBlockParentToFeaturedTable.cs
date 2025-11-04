@@ -6,6 +6,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Migrati
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES4467_AddDataBlockParentToFeaturedTable : Migration
 {
     private const string MigrationId = "20231019203009";
@@ -16,12 +17,14 @@ public partial class EES4467_AddDataBlockParentToFeaturedTable : Migration
             name: "DataBlockParentId",
             table: "FeaturedTables",
             type: "uniqueidentifier",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_FeaturedTables_DataBlockParentId",
             table: "FeaturedTables",
-            column: "DataBlockParentId");
+            column: "DataBlockParentId"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_FeaturedTables_DataBlocks_DataBlockParentId",
@@ -29,11 +32,13 @@ public partial class EES4467_AddDataBlockParentToFeaturedTable : Migration
             column: "DataBlockParentId",
             principalTable: "DataBlocks",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
 
         migrationBuilder.SqlFromFile(
             ContentMigrationsPath,
-            $"{MigrationId}_{nameof(EES4467_AddDataBlockParentToFeaturedTable)}.sql");
+            $"{MigrationId}_{nameof(EES4467_AddDataBlockParentToFeaturedTable)}.sql"
+        );
 
         migrationBuilder.AlterColumn<Guid>(
             name: "DataBlockParentId",
@@ -41,21 +46,19 @@ public partial class EES4467_AddDataBlockParentToFeaturedTable : Migration
             nullable: false,
             oldClrType: typeof(Guid),
             oldType: "uniqueidentifier",
-            oldNullable: true);
+            oldNullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropForeignKey(
             name: "FK_FeaturedTables_DataBlocks_DataBlockParentId",
-            table: "FeaturedTables");
+            table: "FeaturedTables"
+        );
 
-        migrationBuilder.DropIndex(
-            name: "IX_FeaturedTables_DataBlockParentId",
-            table: "FeaturedTables");
+        migrationBuilder.DropIndex(name: "IX_FeaturedTables_DataBlockParentId", table: "FeaturedTables");
 
-        migrationBuilder.DropColumn(
-            name: "DataBlockParentId",
-            table: "FeaturedTables");
+        migrationBuilder.DropColumn(name: "DataBlockParentId", table: "FeaturedTables");
     }
 }

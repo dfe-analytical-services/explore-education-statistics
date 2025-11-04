@@ -90,9 +90,9 @@ Search for "pupil"
     user clicks element    id:pageSearchForm-option-0
 
     user verifies accordion is open    1. Overview of absence statistics
-    user waits until element is visible    id:content-section-0-content-1
+    user waits until page contains    1.1 Pupil attendance requirements for schools
     user waits until page contains    The data used to publish absence statistics is collected via the school census
-    user waits until element is visible    id:content-section-0-content-2
+    user waits until page contains    1.2 Uses and users
     user waits until page contains    All maintained schools are required to provide 2 possible sessions per day
 
 Search for "specific enquiry"

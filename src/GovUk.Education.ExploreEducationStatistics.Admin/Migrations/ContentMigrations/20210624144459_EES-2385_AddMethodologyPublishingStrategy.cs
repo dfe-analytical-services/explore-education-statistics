@@ -3,6 +3,7 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Methodolog
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES2385_AddMethodologyPublishingStrategy : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
@@ -11,7 +12,8 @@ public partial class EES2385_AddMethodologyPublishingStrategy : Migration
             name: "PublishingStrategy",
             table: "Methodologies",
             nullable: false,
-            defaultValue: "");
+            defaultValue: ""
+        );
 
         // Set all existing Methodologies to have Immediately as their publishing strategy
         migrationBuilder.Sql($"Update Methodologies SET PublishingStrategy='{Immediately.ToString()}'");
@@ -19,8 +21,6 @@ public partial class EES2385_AddMethodologyPublishingStrategy : Migration
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "PublishingStrategy",
-            table: "Methodologies");
+        migrationBuilder.DropColumn(name: "PublishingStrategy", table: "Methodologies");
     }
 }

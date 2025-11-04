@@ -9,6 +9,7 @@ Library     utilities.py
 Library     visual.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
+Library     admin_api.py
 
 
 *** Variables ***
@@ -53,6 +54,8 @@ user opens the browser
     # then can continue using the site as per usual without any more need to interact
     # with authentication.
     ${authenticated_url}=    get url with basic auth    %{PUBLIC_URL}
+    log to console    Loading page in browser: ${authenticated_url}
+    # if the tests fail for you here, update chrome/chromedriver and ensure the public site is running
     go to    ${authenticated_url}
     user waits until page finishes loading
 
@@ -187,8 +190,10 @@ user waits until page finishes loading
     # waiting for user interaction prior to loading their content.
     user waits until page does not contain element    //*[@class!="lazyload-wrapper"]/*[@data-testid="loadingSpinner"]
     ...    ${spinner_timeout}
-    # Wait to ensure network activity attribute is updated in DOM
+
     sleep    0.5
+
+    # Wait to ensure network activity attribute is updated in DOM
     user waits until page does not contain element    css:body[data-network-activity="active"]    ${network_timeout}
 
 user waits until parent contains element
@@ -198,14 +203,12 @@ user waits until parent contains element
     ...    ${timeout}=${timeout}
     ...    ${error}=${NONE}
     ...    ${count}=${NONE}
-    ...    ${retries}=5
     wait until parent contains element
     ...    ${parent_element_or_selector}
     ...    ${child_selector}
     ...    timeout=${timeout}
     ...    error=${error}
     ...    count=${count}
-    ...    retries=${retries}
 
 user waits until parent does not contain element
     [Arguments]
@@ -213,13 +216,11 @@ user waits until parent does not contain element
     ...    ${child_selector}
     ...    ${timeout}=${timeout}
     ...    ${error}=${NONE}
-    ...    ${retries}=5
     wait until parent does not contain element
     ...    ${parent_element_or_selector}
     ...    ${child_selector}
     ...    timeout=${timeout}
     ...    error=${error}
-    ...    retries=${retries}
 
 user sets focus to element
     [Arguments]    ${selector}    ${parent}=css:body
@@ -981,6 +982,15 @@ user checks list has x items
     # parent list and ignore any nested lists and their children.
     # CSS selector shouldn't be used here as child selector `>` doesn't seem to work.
     user waits until parent contains element    ${list}    xpath:./li    count=${count}
+
+user checks definition list has x items
+    [Arguments]    ${locator}    ${count}    ${parent}=css:body
+    user waits until parent contains element    ${parent}    ${locator}
+    ${list}=    get child element    ${parent}    ${locator}
+    # Use xpath to more precisely get the direct child items underneath the
+    # parent list and ignore any nested lists and their children.
+    # CSS selector shouldn't be used here as child selector `>` doesn't seem to work.
+    user waits until parent contains element    ${list}    xpath:./div    count=${count}
 
 user gets list item element
     [Arguments]    ${locator}    ${item_num}    ${parent}=css:body

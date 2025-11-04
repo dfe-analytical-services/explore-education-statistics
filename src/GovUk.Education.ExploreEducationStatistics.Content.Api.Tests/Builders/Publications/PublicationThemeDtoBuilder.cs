@@ -8,12 +8,13 @@ public class PublicationThemeDtoBuilder
     private string _summary = "Summary";
     private string _title = "Title";
 
-    public PublicationThemeDto Build() => new()
-    {
-        Id = _id,
-        Summary = _summary,
-        Title = _title
-    };
+    public PublicationThemeDto Build() =>
+        new()
+        {
+            Id = _id,
+            Summary = _summary,
+            Title = _title,
+        };
 
     public PublicationThemeDtoBuilder WithId(Guid id)
     {

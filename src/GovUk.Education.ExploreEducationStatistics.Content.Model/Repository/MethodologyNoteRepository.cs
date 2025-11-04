@@ -17,16 +17,21 @@ public class MethodologyNoteRepository : IMethodologyNoteRepository
         Guid methodologyVersionId,
         Guid createdByUserId,
         string content,
-        DateTime displayDate)
+        DateTime displayDate
+    )
     {
-        var added = (await _contentDbContext.MethodologyNotes.AddAsync(new MethodologyNote
-        {
-            Content = content,
-            Created = DateTime.UtcNow,
-            CreatedById = createdByUserId,
-            DisplayDate = displayDate,
-            MethodologyVersionId = methodologyVersionId
-        })).Entity;
+        var added = (
+            await _contentDbContext.MethodologyNotes.AddAsync(
+                new MethodologyNote
+                {
+                    Content = content,
+                    Created = DateTime.UtcNow,
+                    CreatedById = createdByUserId,
+                    DisplayDate = displayDate,
+                    MethodologyVersionId = methodologyVersionId,
+                }
+            )
+        ).Entity;
         await _contentDbContext.SaveChangesAsync();
 
         return added;
@@ -43,7 +48,8 @@ public class MethodologyNoteRepository : IMethodologyNoteRepository
         Guid methodologyNoteId,
         Guid updatedByUserId,
         string content,
-        DateTime displayDate)
+        DateTime displayDate
+    )
     {
         var methodologyNote = await _contentDbContext.MethodologyNotes.FindAsync(methodologyNoteId);
         _contentDbContext.Update(methodologyNote);

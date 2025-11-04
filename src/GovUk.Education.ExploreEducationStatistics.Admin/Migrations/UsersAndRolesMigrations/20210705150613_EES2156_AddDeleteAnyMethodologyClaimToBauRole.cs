@@ -2,6 +2,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRolesMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES2156_AddDeleteAnyMethodologyAmendmentClaimToBauRole : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
@@ -9,14 +10,12 @@ public partial class EES2156_AddDeleteAnyMethodologyAmendmentClaimToBauRole : Mi
         migrationBuilder.InsertData(
             table: "AspNetRoleClaims",
             columns: new[] { "Id", "ClaimType", "ClaimValue", "RoleId" },
-            values: new object[] { -39, "DeleteAllMethodologies", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" });
+            values: new object[] { -39, "DeleteAllMethodologies", "", "cf67b697-bddd-41bd-86e0-11b7e11d99b3" }
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DeleteData(
-            table: "AspNetRoleClaims",
-            keyColumn: "Id",
-            keyValue: -39);
+        migrationBuilder.DeleteData(table: "AspNetRoleClaims", keyColumn: "Id", keyValue: -39);
     }
 }

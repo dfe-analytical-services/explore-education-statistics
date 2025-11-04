@@ -1,7 +1,5 @@
 import DataFilesReorderableList from '@admin/pages/release/data/components/DataFilesReorderableList';
-import DataFileUploadForm, {
-  DataFileUploadFormValues,
-} from '@admin/pages/release/data/components/DataFileUploadForm';
+import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {

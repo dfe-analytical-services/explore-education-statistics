@@ -15,19 +15,22 @@ public partial class EES5779_AddDataSetVersionToReplaceToDataSetVersionImport : 
             name: "DataSetVersionToReplaceId",
             table: "DataSetVersionImports",
             type: "uuid",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_DataSetVersionImports_DataSetVersionToReplaceId",
             table: "DataSetVersionImports",
-            column: "DataSetVersionToReplaceId");
+            column: "DataSetVersionToReplaceId"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_DataSetVersionImports_DataSetVersions_DataSetVersionToRepla~",
             table: "DataSetVersionImports",
             column: "DataSetVersionToReplaceId",
             principalTable: "DataSetVersions",
-            principalColumn: "Id");
+            principalColumn: "Id"
+        );
     }
 
     /// <inheritdoc />
@@ -35,14 +38,14 @@ public partial class EES5779_AddDataSetVersionToReplaceToDataSetVersionImport : 
     {
         migrationBuilder.DropForeignKey(
             name: "FK_DataSetVersionImports_DataSetVersions_DataSetVersionToRepla~",
-            table: "DataSetVersionImports");
+            table: "DataSetVersionImports"
+        );
 
         migrationBuilder.DropIndex(
             name: "IX_DataSetVersionImports_DataSetVersionToReplaceId",
-            table: "DataSetVersionImports");
+            table: "DataSetVersionImports"
+        );
 
-        migrationBuilder.DropColumn(
-            name: "DataSetVersionToReplaceId",
-            table: "DataSetVersionImports");
+        migrationBuilder.DropColumn(name: "DataSetVersionToReplaceId", table: "DataSetVersionImports");
     }
 }

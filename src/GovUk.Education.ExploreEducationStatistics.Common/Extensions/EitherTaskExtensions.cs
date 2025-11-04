@@ -1,4 +1,3 @@
-#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,17 +33,18 @@ public static class EitherTaskExtensions
         return result is not null ? result : new NotFoundResult();
     }
 
-    public static async Task<Either<ActionResult, TRight>> OrNotFound<TRight>(this Task<Either<ActionResult, TRight?>> task)
+    public static async Task<Either<ActionResult, TRight>> OrNotFound<TRight>(
+        this Task<Either<ActionResult, TRight?>> task
+    )
         where TRight : class?
     {
         var prev = await task;
 
-        return prev.OnSuccess(result => 
-            result ?? new Either<ActionResult, TRight>(new NotFoundResult()));
+        return prev.OnSuccess(result => result ?? new Either<ActionResult, TRight>(new NotFoundResult()));
     }
 
-    public static async Task<ActionResult> HandleFailures<TRight>(
-        this Task<Either<ActionResult, TRight>> task) where TRight : ActionResult
+    public static async Task<ActionResult> HandleFailures<TRight>(this Task<Either<ActionResult, TRight>> task)
+        where TRight : ActionResult
     {
         var result = await task;
 
@@ -53,15 +53,25 @@ public static class EitherTaskExtensions
 
     public static async Task<ActionResult> HandleFailuresOr<T>(
         this Task<Either<ActionResult, T>> task,
-        Func<T, ActionResult> successFn)
+        Func<T, ActionResult> successFn
+    )
     {
         var result = await task;
 
         return result.IsRight ? successFn.Invoke(result.Right) : result.Left;
     }
 
-    public static async Task<ActionResult<T>> HandleFailuresOrOk<T>(
-        this Task<Either<ActionResult, T>> task)
+    public static async Task<ActionResult<T>> HandleFailuresOr<T>(
+        this Task<Either<ActionResult, T>> task,
+        Func<T, ActionResult<T>> successFn
+    )
+    {
+        var result = await task;
+
+        return result.IsRight ? successFn.Invoke(result.Right) : result.Left;
+    }
+
+    public static async Task<ActionResult<T>> HandleFailuresOrOk<T>(this Task<Either<ActionResult, T>> task)
     {
         var result = await task;
 
@@ -70,7 +80,8 @@ public static class EitherTaskExtensions
 
     public static async Task<ActionResult> HandleFailuresOrNoContent<T>(
         this Task<Either<ActionResult, T>> validationErrorsRaisingAction,
-        bool convertNotFoundToNoContent = true)
+        bool convertNotFoundToNoContent = true
+    )
     {
         var result = await validationErrorsRaisingAction;
 
@@ -87,16 +98,15 @@ public static class EitherTaskExtensions
         return result.Left;
     }
 
-    public static async Task<ActionResult> HandleFailuresOrNoOp(
-        this Task<Either<ActionResult, Unit>> task)
+    public static async Task<ActionResult> HandleFailuresOrNoOp(this Task<Either<ActionResult, Unit>> task)
     {
         var result = await task;
 
         return result.IsRight ? new NoOpResult() : result.Left;
     }
 
-    public static async Task<HubResult<T>> HandleFailuresOrHubResult<T>(
-        this Task<Either<ActionResult, T>> task) where T : class
+    public static async Task<HubResult<T>> HandleFailuresOrHubResult<T>(this Task<Either<ActionResult, T>> task)
+        where T : class
     {
         var result = await task;
 

@@ -1,32 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <RootNamespace>GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts</RootNamespace>
-        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    </PropertyGroup>
-
-
-    <ItemGroup>
-        <CompilerVisibleProperty Include="RootNamespace" />
-        <CompilerVisibleProperty Include="ProjectDir" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="CliFx" Version="2.3.5" />
-      <PackageReference Include="CliWrap" Version="3.8.2" />
-      <PackageReference Include="Dapper" Version="2.1.66" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.csproj" />
-      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None CopyToOutputDirectory="PreserveNewest" Include="SeedFiles\*" />
-    </ItemGroup>
-    
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts</RootNamespace>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="RootNamespace" />
+    <CompilerVisibleProperty Include="ProjectDir" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CliFx" Version="2.3.6" />
+    <PackageReference Include="CliWrap" Version="3.9.0" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None CopyToOutputDirectory="PreserveNewest" Include="SeedFiles\*" />
+  </ItemGroup>
 </Project>

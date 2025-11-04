@@ -10,9 +10,7 @@ public partial class EES4661_DropReleaseSubjectDataGuidance : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "DataGuidance",
-            table: "ReleaseSubject");
+        migrationBuilder.DropColumn(name: "DataGuidance", table: "ReleaseSubject");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -21,6 +19,7 @@ public partial class EES4661_DropReleaseSubjectDataGuidance : Migration
             name: "DataGuidance",
             table: "ReleaseSubject",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
     }
 }

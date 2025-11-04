@@ -12,12 +12,9 @@ public record ApiNotificationMessage
     {
         public Validator()
         {
-            RuleFor(request => request.DataSetId)
-                .NotEmpty();
-            RuleFor(request => request.DataSetFileId)
-                .NotEmpty();
-            RuleFor(request => request.Version)
-                .NotEmpty();
+            RuleFor(request => request.DataSetId).NotEmpty();
+            RuleFor(request => request.DataSetFileId).NotEmpty();
+            RuleFor(request => request.Version).NotEmpty();
         }
     }
 }

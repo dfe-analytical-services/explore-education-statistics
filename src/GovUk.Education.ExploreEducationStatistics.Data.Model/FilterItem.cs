@@ -9,9 +9,7 @@ public class FilterItem : IEquatable<FilterItem>
     public Guid FilterGroupId { get; set; }
     public List<FilterItemFootnote> Footnotes { get; set; } = new();
 
-    public FilterItem()
-    {
-    }
+    public FilterItem() { }
 
     public FilterItem(string label, Guid filterGroupId)
     {
@@ -35,10 +33,13 @@ public class FilterItem : IEquatable<FilterItem>
 
     public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
-        return Equals((FilterItem) obj);
+        if (ReferenceEquals(null, obj))
+            return false;
+        if (ReferenceEquals(this, obj))
+            return true;
+        if (obj.GetType() != this.GetType())
+            return false;
+        return Equals((FilterItem)obj);
     }
 
     public override int GetHashCode()

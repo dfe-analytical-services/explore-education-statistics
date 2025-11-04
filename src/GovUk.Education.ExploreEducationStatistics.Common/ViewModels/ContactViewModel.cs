@@ -1,5 +1,3 @@
-#nullable enable
-
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -14,9 +12,7 @@ public record ContactViewModel
 
     public string ContactTelNo { get; init; } = string.Empty;
 
-    public ContactViewModel()
-    {
-    }
+    public ContactViewModel() { }
 
     public ContactViewModel(Contact contact)
     {

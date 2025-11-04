@@ -1,4 +1,3 @@
-#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 public record IdTitleViewModel
@@ -7,9 +6,7 @@ public record IdTitleViewModel
 
     public string Title { get; init; } = string.Empty;
 
-    public IdTitleViewModel()
-    {
-    }
+    public IdTitleViewModel() { }
 
     public IdTitleViewModel(Guid id, string title)
     {

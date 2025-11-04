@@ -12,7 +12,8 @@ public record PublicationSaveRequest
 
     public string Summary { get; set; } = Empty;
 
-    [Required] public Guid ThemeId { get; set; }
+    [Required]
+    public Guid ThemeId { get; set; }
 
     private string _slug = Empty;
 
@@ -28,13 +29,9 @@ public record PublicationSaveRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Title)
-                .NotEmpty()
-                .MaximumLength(65);
+            RuleFor(request => request.Title).NotEmpty().MaximumLength(65);
 
-            RuleFor(request => request.Summary)
-                .NotEmpty()
-                .MaximumLength(160);
+            RuleFor(request => request.Summary).NotEmpty().MaximumLength(160);
         }
     }
 }

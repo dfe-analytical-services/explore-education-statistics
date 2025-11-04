@@ -4,24 +4,22 @@ using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 
-public class PublicApiQueriesProcessor(
-    IAnalyticsPathResolver pathResolver,
-    IProcessRequestFilesWorkflow workflow) : IRequestFileProcessor
+public class PublicApiQueriesProcessor(IAnalyticsPathResolver pathResolver, IProcessRequestFilesWorkflow workflow)
+    : IRequestFileProcessor
 {
     private static readonly string[] PublicApiQueriesSubPath = ["public-api", "queries"];
-    
+
     public string SourceDirectory => pathResolver.BuildSourceDirectory(PublicApiQueriesSubPath);
     public string ReportsDirectory => pathResolver.BuildReportsDirectory(PublicApiQueriesSubPath);
-    
+
     public Task Process()
     {
-        return workflow.Process(new WorkflowActor(
-            sourceDirectory: SourceDirectory,
-            reportsDirectory: ReportsDirectory));;
+        return workflow.Process(
+            new WorkflowActor(sourceDirectory: SourceDirectory, reportsDirectory: ReportsDirectory)
+        );
     }
 
-    private class WorkflowActor(string sourceDirectory, string reportsDirectory) 
-        : IWorkflowActor
+    private class WorkflowActor(string sourceDirectory, string reportsDirectory) : IWorkflowActor
     {
         public string GetSourceDirectory()
         {
@@ -32,10 +30,11 @@ public class PublicApiQueriesProcessor(
         {
             return reportsDirectory;
         }
-        
+
         public async Task InitialiseDuckDb(DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync(@"
+            await connection.ExecuteNonQueryAsync(
+                @"
                 CREATE TABLE sourceTable (
                     queryVersionHash VARCHAR,
                     queryHash VARCHAR,
@@ -51,12 +50,14 @@ public class PublicApiQueriesProcessor(
                     endTime DATETIME,
                     query JSON
                 );
-            ");
+            "
+            );
         }
 
         public async Task ProcessSourceFiles(string sourceFilesDirectory, DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync($@"
+            await connection.ExecuteNonQueryAsync(
+                $@"
                 INSERT INTO sourceTable BY NAME (
                     SELECT
                         MD5(CONCAT(query, dataSetVersionId)) AS queryVersionHash,
@@ -78,12 +79,14 @@ public class PublicApiQueriesProcessor(
                             query: JSON
                         }})
                    )
-            ");
+            "
+            );
         }
 
         public async Task CreateParquetReports(string reportsFolderPathAndFilenamePrefix, DuckDbConnection connection)
         {
-            await connection.ExecuteNonQueryAsync(@"
+            await connection.ExecuteNonQueryAsync(
+                @"
                 CREATE TABLE queryReport AS 
                 SELECT
                     queryVersionHash ,
@@ -98,9 +101,11 @@ public class PublicApiQueriesProcessor(
                     CAST(COUNT(queryHash) AS INT) AS queryExecutions
                 FROM sourceTable
                 GROUP BY queryVersionHash
-                ORDER BY queryVersionHash");
-    
-            await connection.ExecuteNonQueryAsync(@"
+                ORDER BY queryVersionHash"
+            );
+
+            await connection.ExecuteNonQueryAsync(
+                @"
                 CREATE TABLE queryAccessReport AS 
                 SELECT 
                     queryVersionHash,
@@ -115,21 +120,24 @@ public class PublicApiQueriesProcessor(
                     requestedDataSetVersion
                 FROM sourceTable
                 ORDER BY queryHash, startTime
-            ");
+            "
+            );
 
-            var queryReportFilePath = 
-                $"{reportsFolderPathAndFilenamePrefix}_public-api-queries.parquet";
-    
-            await connection.ExecuteNonQueryAsync($@"
+            var queryReportFilePath = $"{reportsFolderPathAndFilenamePrefix}_public-api-queries.parquet";
+
+            await connection.ExecuteNonQueryAsync(
+                $@"
                 COPY (SELECT * FROM queryReport)
-                TO '{queryReportFilePath}' (FORMAT 'parquet', CODEC 'zstd')");
+                TO '{queryReportFilePath}' (FORMAT 'parquet', CODEC 'zstd')"
+            );
 
-            var queryAccessReportFilePath = 
-                $"{reportsFolderPathAndFilenamePrefix}_public-api-query-access.parquet";
+            var queryAccessReportFilePath = $"{reportsFolderPathAndFilenamePrefix}_public-api-query-access.parquet";
 
-            await connection.ExecuteNonQueryAsync($@"
+            await connection.ExecuteNonQueryAsync(
+                $@"
                 COPY (SELECT * FROM queryAccessReport)
-                TO '{queryAccessReportFilePath}' (FORMAT 'parquet', CODEC 'zstd')");
+                TO '{queryAccessReportFilePath}' (FORMAT 'parquet', CODEC 'zstd')"
+            );
         }
     }
 }

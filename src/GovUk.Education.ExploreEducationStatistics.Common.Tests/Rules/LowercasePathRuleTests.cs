@@ -30,9 +30,9 @@ public class LowercasePathRuleTests
                     Host = new HostString("localhost"),
                     PathBase = new PathString("/base"),
                     Path = new PathString("/path"),
-                    QueryString = new QueryString("?query=query")
-                }
-            }
+                    QueryString = new QueryString("?query=query"),
+                },
+            },
         };
 
         _rule.ApplyRule(rewriteContext);
@@ -61,9 +61,9 @@ public class LowercasePathRuleTests
                     Host = new HostString("localhost"),
                     PathBase = new PathString("/base"),
                     Path = new PathString(path),
-                    QueryString = new QueryString("?query=query")
-                }
-            }
+                    QueryString = new QueryString("?query=query"),
+                },
+            },
         };
 
         _rule.ApplyRule(rewriteContext);
@@ -89,9 +89,9 @@ public class LowercasePathRuleTests
                     Host = new HostString("localhost"),
                     PathBase = new PathString("/base"),
                     Path = new PathString("/Path"),
-                    QueryString = new QueryString("?query=query")
-                }
-            }
+                    QueryString = new QueryString("?query=query"),
+                },
+            },
         };
 
         _rule.ApplyRule(rewriteContext);
@@ -119,9 +119,9 @@ public class LowercasePathRuleTests
                     Host = new HostString("localhost"),
                     PathBase = new PathString("/base"),
                     Path = new PathString("/Path"),
-                    QueryString = new QueryString("?query=Query")
-                }
-            }
+                    QueryString = new QueryString("?query=Query"),
+                },
+            },
         };
 
         _rule.ApplyRule(rewriteContext);

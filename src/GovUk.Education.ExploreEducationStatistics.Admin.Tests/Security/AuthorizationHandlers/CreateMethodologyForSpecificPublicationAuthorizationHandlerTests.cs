@@ -10,8 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -28,33 +27,25 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
     private static readonly Publication Publication = new()
     {
         Id = Guid.NewGuid(),
-        Methodologies = new List<PublicationMethodology>()
+        Methodologies = new List<PublicationMethodology>(),
     };
 
     private static readonly Publication PublicationArchived = new()
     {
         Id = Guid.NewGuid(),
-        SupersededById = Guid.NewGuid()
+        SupersededById = Guid.NewGuid(),
     };
 
     private static readonly Publication PublicationWithOwnedMethodology = new()
     {
         Id = Guid.NewGuid(),
-        Methodologies = ListOf(new PublicationMethodology
-        {
-            Owner = true,
-            MethodologyId = Guid.NewGuid(),
-        })
+        Methodologies = ListOf(new PublicationMethodology { Owner = true, MethodologyId = Guid.NewGuid() }),
     };
 
     private static readonly Publication PublicationWithAdoptedMethodology = new()
     {
         Id = Guid.NewGuid(),
-        Methodologies = ListOf(new PublicationMethodology
-        {
-            Owner = false,
-            MethodologyId = Guid.NewGuid(),
-        })
+        Methodologies = ListOf(new PublicationMethodology { Owner = false, MethodologyId = Guid.NewGuid() }),
     };
 
     private static readonly DataFixture DataFixture = new();
@@ -68,8 +59,7 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
         }
 
         [Fact]
-        public async Task
-            UserWithCorrectClaimCanCreateMethodologyForAnyPublication_AdoptedAnotherMethodologyButNotOwned()
+        public async Task UserWithCorrectClaimCanCreateMethodologyForAnyPublication_AdoptedAnotherMethodologyButNotOwned()
         {
             await AssertUserWithCorrectClaimCanCreateMethodology(PublicationWithAdoptedMethodology);
         }
@@ -95,9 +85,7 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
 
                 var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
 
-                var user = DataFixture
-                    .AuthenticatedUser(userId: UserId)
-                    .WithClaim(claim.ToString());
+                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
                 var authContext = CreateAuthContext(user, publication);
 
@@ -119,8 +107,7 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
             });
         }
 
-        private static async Task AssertUserWithCorrectClaimCannotCreateMethodology(
-            Publication publication)
+        private static async Task AssertUserWithCorrectClaimCannotCreateMethodology(Publication publication)
         {
             await ForEachSecurityClaimAsync(async claim =>
             {
@@ -130,9 +117,7 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
 
                 var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies(context);
 
-                var user = DataFixture
-                    .AuthenticatedUser(userId: UserId)
-                    .WithClaim(claim.ToString());
+                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
                 var authContext = CreateAuthContext(user, publication);
 
@@ -153,8 +138,7 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
         }
 
         [Fact]
-        public async Task
-            UserCanCreateMethodologyForPublicationWithPublicationOwnerRole_AdoptedAnotherMethodologyButNotOwned()
+        public async Task UserCanCreateMethodologyForPublicationWithPublicationOwnerRole_AdoptedAnotherMethodologyButNotOwned()
         {
             await AssertPublicationOwnerCanCreateMethodology(PublicationWithAdoptedMethodology);
         }
@@ -244,13 +228,16 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
 
     private static AuthorizationHandlerContext CreateAuthContext(ClaimsPrincipal user, Publication publication)
     {
-        return CreateAuthorizationHandlerContext<CreateMethodologyForSpecificPublicationRequirement, Publication>
-            (user, publication);
+        return CreateAuthorizationHandlerContext<CreateMethodologyForSpecificPublicationRequirement, Publication>(
+            user,
+            publication
+        );
     }
 
-    private static (CreateMethodologyForSpecificPublicationAuthorizationHandler,
-        Mock<IUserPublicationRoleRepository>)
-        CreateHandlerAndDependencies(ContentDbContext contentDbContext)
+    private static (
+        CreateMethodologyForSpecificPublicationAuthorizationHandler,
+        Mock<IUserPublicationRoleRepository>
+    ) CreateHandlerAndDependencies(ContentDbContext contentDbContext)
     {
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
 
@@ -260,7 +247,9 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
                 new ReleaseVersionRepository(contentDbContext),
                 Mock.Of<IUserReleaseRoleRepository>(Strict),
                 userPublicationRoleRepository.Object,
-                Mock.Of<IPreReleaseService>(Strict)));
+                Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
 
         return (handler, userPublicationRoleRepository);
     }

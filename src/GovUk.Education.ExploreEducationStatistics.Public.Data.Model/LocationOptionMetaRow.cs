@@ -29,24 +29,30 @@ public class LocationOptionMetaRow
     public string? Ukprn { get; set; }
 
     public string GetRowKey() =>
-        Type + ',' +
-        Label + ',' +
-        (Code ?? "null") + ',' +
-        (OldCode ?? "null") + ',' +
-        (Urn ?? "null") + ',' +
-        (LaEstab ?? "null") + ',' +
-        (Ukprn ?? "null");
+        Type
+        + ','
+        + Label
+        + ','
+        + (Code ?? "null")
+        + ','
+        + (OldCode ?? "null")
+        + ','
+        + (Urn ?? "null")
+        + ','
+        + (LaEstab ?? "null")
+        + ','
+        + (Ukprn ?? "null");
 
     public string GetRowKeyPretty()
     {
-        var rowKey = 
-            $"{nameof(Type)}:{Type}," +
-            $"{nameof(Label)}:{Label}," +
-            (Code is not null ? $"{nameof(Code)}:{Code}," : "") +
-            (OldCode is not null ? $"{nameof(OldCode)}:{OldCode}," : "") +
-            (Urn is not null ? $"{nameof(Urn)}:{Urn}," : "") +
-            (LaEstab is not null ? $"{nameof(LaEstab)}:{LaEstab}," : "") +
-            (Ukprn is not null ? $"{nameof(Ukprn)}:{Ukprn}," : "");
+        var rowKey =
+            $"{nameof(Type)}:{Type},"
+            + $"{nameof(Label)}:{Label},"
+            + (Code is not null ? $"{nameof(Code)}:{Code}," : "")
+            + (OldCode is not null ? $"{nameof(OldCode)}:{OldCode}," : "")
+            + (Urn is not null ? $"{nameof(Urn)}:{Urn}," : "")
+            + (LaEstab is not null ? $"{nameof(LaEstab)}:{LaEstab}," : "")
+            + (Ukprn is not null ? $"{nameof(Ukprn)}:{Ukprn}," : "");
 
         return rowKey[..^1];
     }

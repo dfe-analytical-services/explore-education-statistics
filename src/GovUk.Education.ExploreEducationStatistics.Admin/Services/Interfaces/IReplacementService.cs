@@ -9,5 +9,6 @@ public interface IReplacementService
     Task<Either<ActionResult, Unit>> Replace(
         Guid releaseVersionId,
         Guid originalFileId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

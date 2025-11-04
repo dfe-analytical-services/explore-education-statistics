@@ -18,11 +18,11 @@ public class PublisherEventRaiser(IEventRaiser eventRaiser) : IPublisherEventRai
     public async Task OnPublicationArchived(
         Guid publicationId,
         string publicationSlug,
-        Guid supersededByPublicationId) =>
-        await eventRaiser.RaiseEvent(new PublicationArchivedEvent(
-            publicationId,
-            publicationSlug,
-            supersededByPublicationId));
+        Guid supersededByPublicationId
+    ) =>
+        await eventRaiser.RaiseEvent(
+            new PublicationArchivedEvent(publicationId, publicationSlug, supersededByPublicationId)
+        );
 
     /// <summary>
     /// Publishes events for release versions that have been published.
@@ -30,12 +30,11 @@ public class PublisherEventRaiser(IEventRaiser eventRaiser) : IPublisherEventRai
     /// <param name="publishedPublications">A list of publications, each containing information about the publication
     /// and its associated release versions that have been published.
     /// </param>
-    public async Task OnReleaseVersionsPublished(
-        IReadOnlyList<PublishedPublicationInfo> publishedPublications)
+    public async Task OnReleaseVersionsPublished(IReadOnlyList<PublishedPublicationInfo> publishedPublications)
     {
-        var events = publishedPublications.SelectMany(publication =>
-            publication.PublishedReleaseVersions.Select(releaseVersion =>
-                new ReleaseVersionPublishedEvent(
+        var events = publishedPublications
+            .SelectMany(publication =>
+                publication.PublishedReleaseVersions.Select(releaseVersion => new ReleaseVersionPublishedEvent(
                     new ReleaseVersionPublishedEvent.ReleaseVersionPublishedEventInfo
                     {
                         ReleaseId = releaseVersion.ReleaseId,
@@ -47,8 +46,10 @@ public class PublisherEventRaiser(IEventRaiser eventRaiser) : IPublisherEventRai
                         PreviousLatestPublishedReleaseVersionId = publication.PreviousLatestPublishedReleaseVersionId,
                         LatestPublishedReleaseId = publication.LatestPublishedReleaseId,
                         LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersionId,
-                        IsPublicationArchived = publication.IsPublicationArchived
-                    })))
+                        IsPublicationArchived = publication.IsPublicationArchived,
+                    }
+                ))
+            )
             .ToList();
 
         await eventRaiser.RaiseEvents(events);

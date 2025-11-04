@@ -22,39 +22,49 @@ public record UploadDataSetRequest
     {
         public Validator()
         {
-            RuleFor(request => request.ReleaseVersionId)
-                .NotEmpty();
+            RuleFor(request => request.ReleaseVersionId).NotEmpty();
 
             RuleFor(request => request.Title)
                 .NotEmpty()
-                    .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
+                .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
                 .MaximumLength(120)
-                    .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "{MaxLength}");
+                .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "{MaxLength}");
 
             RuleFor(request => request.DataFile)
                 .Cascade(CascadeMode.Stop)
                 .MustBeValidCsvFile()
-                .Must((request, file, context) =>
-                {
-                    context.MessageFormatter.AppendArgument("FileName", request.DataFile.FileName);
+                .Must(
+                    (request, file, context) =>
+                    {
+                        context.MessageFormatter.AppendArgument("FileName", request.DataFile.FileName);
 
-                    var fileName = file.FileName.ToLower();
+                        var fileName = file.FileName.ToLower();
 
-                    return
-                        fileName.EndsWith(Constants.DataSet.DataFileExtension) &&
-                        !fileName.EndsWith(Constants.DataSet.MetaFileExtension);
-                })
-                    .WithMessage(ValidationMessages.FileNameMustEndDotCsv, "{FileName}", Constants.DataSet.DataFileExtension);
+                        return fileName.EndsWith(Constants.DataSet.DataFileExtension)
+                            && !fileName.EndsWith(Constants.DataSet.MetaFileExtension);
+                    }
+                )
+                .WithMessage(
+                    ValidationMessages.FileNameMustEndDotCsv,
+                    "{FileName}",
+                    Constants.DataSet.DataFileExtension
+                );
 
             RuleFor(request => request.MetaFile)
                 .Cascade(CascadeMode.Stop)
                 .MustBeValidCsvFile()
-                .Must((request, file, context) =>
-                {
-                    context.MessageFormatter.AppendArgument("FileName", request.MetaFile.FileName);
-                    return file.FileName.ToLower().EndsWith(Constants.DataSet.MetaFileExtension);
-                })
-                    .WithMessage(ValidationMessages.MetaFileNameMustEndDotMetaDotCsv, "{FileName}", Constants.DataSet.MetaFileExtension);
+                .Must(
+                    (request, file, context) =>
+                    {
+                        context.MessageFormatter.AppendArgument("FileName", request.MetaFile.FileName);
+                        return file.FileName.ToLower().EndsWith(Constants.DataSet.MetaFileExtension);
+                    }
+                )
+                .WithMessage(
+                    ValidationMessages.MetaFileNameMustEndDotMetaDotCsv,
+                    "{FileName}",
+                    Constants.DataSet.MetaFileExtension
+                );
         }
     }
 }
@@ -72,21 +82,18 @@ public record UploadDataSetAsZipRequest
     {
         public Validator()
         {
-            RuleFor(request => request.ReleaseVersionId)
-                .NotEmpty();
+            RuleFor(request => request.ReleaseVersionId).NotEmpty();
 
             RuleFor(request => request.Title)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()
-                    .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
+                .WithMessage(ValidationMessages.DataSetTitleCannotBeEmpty)
                 .MaximumLength(120)
-                    .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "{MaxLength}")
+                .WithMessage(ValidationMessages.DataSetTitleTooLong, "{PropertyValue}", "{MaxLength}")
                 .Must(title => !FileNameValidators.ContainsSpecialChars(title))
-                    .WithMessage(ValidationMessages.DataSetTitleShouldNotContainSpecialCharacters, "{PropertyValue}");
+                .WithMessage(ValidationMessages.DataSetTitleShouldNotContainSpecialCharacters, "{PropertyValue}");
 
-            RuleFor(request => request.ZipFile)
-                .Cascade(CascadeMode.Stop)
-                .MustBeValidZipFile();
+            RuleFor(request => request.ZipFile).Cascade(CascadeMode.Stop).MustBeValidZipFile();
         }
     }
 }
@@ -102,12 +109,9 @@ public record UploadDataSetAsBulkZipRequest
     {
         public Validator()
         {
-            RuleFor(request => request.ReleaseVersionId)
-                .NotEmpty();
+            RuleFor(request => request.ReleaseVersionId).NotEmpty();
 
-            RuleFor(request => request.ZipFile)
-                .Cascade(CascadeMode.Stop)
-                .MustBeValidZipFile();
+            RuleFor(request => request.ZipFile).Cascade(CascadeMode.Stop).MustBeValidZipFile();
         }
     }
 }

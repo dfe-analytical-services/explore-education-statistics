@@ -33,11 +33,14 @@ public class PublicationsSitemapService(ContentDbContext contentDbContext) : IPu
             .ToArray();
     }
 
-    private Task<ReleaseVersion[]> GetLatestPublishedReleaseVersions(CancellationToken cancellationToken = default) =>
-        contentDbContext.ReleaseVersions
+    private Task<ReleaseVersion[]> GetLatestPublishedReleaseVersions(CancellationToken cancellationToken) =>
+        contentDbContext
+            .ReleaseVersions.AsNoTracking()
             .Include(rv => rv.Release.Publication)
             .LatestReleaseVersions(publishedOnly: true)
-            .Where(rv => rv.Release.Publication.SupersededBy == null
-                         || rv.Release.Publication.SupersededBy.LatestPublishedReleaseVersionId == null)
+            .Where(rv =>
+                rv.Release.Publication.SupersededBy == null
+                || rv.Release.Publication.SupersededBy.LatestPublishedReleaseVersionId == null
+            )
             .ToArrayAsync(cancellationToken);
 }

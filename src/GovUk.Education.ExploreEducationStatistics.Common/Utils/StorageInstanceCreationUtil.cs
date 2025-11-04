@@ -1,4 +1,3 @@
-#nullable enable
 using System.Collections.Concurrent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
@@ -13,7 +12,8 @@ public class StorageInstanceCreationUtil : IStorageInstanceCreationUtil
         string connectionString,
         AzureStorageType storageType,
         string instance,
-        Func<Task> createIfNotExists)
+        Func<Task> createIfNotExists
+    )
     {
         var identifyingString = $"{instance}{storageType}{connectionString}";
         if (!CreatedInstances.ContainsKey(identifyingString))
@@ -27,7 +27,8 @@ public class StorageInstanceCreationUtil : IStorageInstanceCreationUtil
         string connectionString,
         AzureStorageType storageType,
         string instance,
-        Action createIfNotExists)
+        Action createIfNotExists
+    )
     {
         var identifyingString = $"{instance}{storageType}{connectionString}";
         if (!CreatedInstances.ContainsKey(identifyingString))

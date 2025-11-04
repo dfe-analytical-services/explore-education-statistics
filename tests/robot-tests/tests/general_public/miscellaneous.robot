@@ -23,8 +23,8 @@ Verify can accept cookie banner
 
     cookie should have value    ees_banner_seen    true
     cookie should have value    ees_disable_google_analytics    false
-    user clicks button    Hide this message
-    user checks page does not contain button    Hide this message
+    user clicks button    Hide cookie message
+    user checks page does not contain button    Hide cookie message
 
 Validate homepage
     user checks page contains element    link:Explore
@@ -40,7 +40,7 @@ Validate homepage
     user checks page contains link    Get information about schools (opens in new tab)
     user checks page contains link    Financial Benchmarking and Insights Tool (opens in new tab)
 
-    user checks page contains element    xpath://h2[text()="Contact us"]
+    user checks page contains element    xpath://h2[text()="Contact us for help and support"]
 
     user checks page contains link with text and url    explore.statistics@education.gov.uk
     ...    mailto:explore.statistics@education.gov.uk
@@ -98,7 +98,7 @@ Validate Cookies Details page
 Validate Contact page
     user clicks link    Contact us
     user waits until page contains    Contact Explore education statistics
-    user waits until page contains    General enquiries
+    user waits until page contains    Need help using this service or have a question about the data?
     user waits until page contains    explore.statistics@education.gov.uk
     user waits until page contains    DfE Head of Profession for Statistics
     user waits until page contains    hop.statistics@education.gov.uk

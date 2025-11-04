@@ -15,53 +15,51 @@ public class ReleasePermissionsController : ControllerBase
 {
     private readonly IReleasePermissionService _releasePermissionService;
 
-    public ReleasePermissionsController(
-        IReleasePermissionService releasePermissionService)
+    public ReleasePermissionsController(IReleasePermissionService releasePermissionService)
     {
         _releasePermissionService = releasePermissionService;
     }
 
     [HttpGet("releases/{releaseVersionId:guid}/roles")]
-    public async Task<ActionResult<List<UserReleaseRoleSummaryViewModel>>> ListReleaseRoles(
-        Guid releaseVersionId)
+    public async Task<ActionResult<List<UserReleaseRoleSummaryViewModel>>> ListReleaseRoles(Guid releaseVersionId)
     {
         return await _releasePermissionService
-            .ListReleaseRoles(releaseVersionId, new [] { ReleaseRole.Contributor, ReleaseRole.Approver })
+            .ListReleaseRoles(releaseVersionId, new[] { ReleaseRole.Contributor, ReleaseRole.Approver })
             .HandleFailuresOrOk();
     }
 
     [HttpGet("releases/{releaseVersionId:guid}/invites")]
-    public async Task<ActionResult<List<UserReleaseInviteViewModel>>> ListReleaseInvites(
-        Guid releaseVersionId)
+    public async Task<ActionResult<List<UserReleaseInviteViewModel>>> ListReleaseInvites(Guid releaseVersionId)
     {
         return await _releasePermissionService
-            .ListReleaseInvites(releaseVersionId, new [] { ReleaseRole.Contributor, ReleaseRole.Approver })
+            .ListReleaseInvites(releaseVersionId, new[] { ReleaseRole.Contributor, ReleaseRole.Approver })
             .HandleFailuresOrOk();
     }
 
     [HttpGet("publications/{publicationId:guid}/contributors")]
     public async Task<ActionResult<List<UserReleaseRoleSummaryViewModel>>> ListPublicationContributors(
-        Guid publicationId)
+        Guid publicationId
+    )
     {
-        return await _releasePermissionService
-            .ListPublicationContributors(publicationId)
-            .HandleFailuresOrOk();
+        return await _releasePermissionService.ListPublicationContributors(publicationId).HandleFailuresOrOk();
     }
 
     [HttpPut("releases/{releaseVersionId:guid}/contributors")]
-    public async Task<ActionResult> UpdateReleaseContributors(Guid releaseVersionId, UpdateReleaseContributorsViewModel request)
+    public async Task<ActionResult> UpdateReleaseContributors(
+        Guid releaseVersionId,
+        UpdateReleaseContributorsViewModel request
+    )
     {
         return await _releasePermissionService
             .UpdateReleaseContributors(releaseVersionId, request.UserIds)
-            .HandleFailuresOr(result => new AcceptedResult());
+            .HandleFailuresOr(_ => new AcceptedResult());
     }
 
     [HttpDelete("publications/{publicationId:guid}/users/{userId:guid}/contributors")]
-    public async Task<ActionResult> RemoveAllUserContributorPermissionsForPublication(
-        Guid publicationId, Guid userId)
+    public async Task<ActionResult> RemoveAllUserContributorPermissionsForPublication(Guid publicationId, Guid userId)
     {
         return await _releasePermissionService
             .RemoveAllUserContributorPermissionsForPublication(publicationId, userId)
-            .HandleFailuresOr(result => new AcceptedResult());
+            .HandleFailuresOr(_ => new AcceptedResult());
     }
 }

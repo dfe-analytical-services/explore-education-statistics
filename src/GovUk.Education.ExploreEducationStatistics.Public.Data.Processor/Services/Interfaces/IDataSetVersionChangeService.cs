@@ -2,7 +2,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Servi
 
 public interface IDataSetVersionChangeService
 {
-    Task CreateChanges(
-        Guid nextDataSetVersionId,
-        CancellationToken cancellationToken = default);
+    Task CreateChanges(Guid nextDataSetVersionId, CancellationToken cancellationToken = default);
 }

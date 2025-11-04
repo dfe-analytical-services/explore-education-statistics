@@ -9,21 +9,24 @@ public static class UserServiceExtensions
 {
     public static Task<Either<ActionResult, DataSet>> CheckCanViewDataSet(
         this IUserService userService,
-        DataSet dataSet)
+        DataSet dataSet
+    )
     {
         return userService.CheckPolicy(dataSet, PublicDataSecurityPolicies.CanViewDataSet);
     }
-    
+
     public static Task<Either<ActionResult, DataSetVersion>> CheckCanQueryDataSetVersion(
         this IUserService userService,
-        DataSetVersion dataSetVersion)
+        DataSetVersion dataSetVersion
+    )
     {
         return userService.CheckPolicy(dataSetVersion, PublicDataSecurityPolicies.CanQueryDataSetVersion);
     }
 
     public static Task<Either<ActionResult, DataSetVersion>> CheckCanViewDataSetVersion(
         this IUserService userService,
-        DataSetVersion dataSetVersion)
+        DataSetVersion dataSetVersion
+    )
     {
         return userService.CheckPolicy(dataSetVersion, PublicDataSecurityPolicies.CanViewDataSetVersion);
     }

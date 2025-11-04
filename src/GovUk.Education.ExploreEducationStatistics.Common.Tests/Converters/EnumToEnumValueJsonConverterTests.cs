@@ -11,11 +11,12 @@ public class EnumToEnumValueJsonConverterTests
     private enum SampleEnum
     {
         [EnumLabelValue("SampleLabel", "SampleValue")]
-        Sample
+        Sample,
     }
 
     private record SampleClass
     {
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local - It's being used by the serialiser
         [JsonConverter(typeof(EnumToEnumValueJsonConverter<SampleEnum>))]
         public SampleEnum SampleField { get; init; }
     }
@@ -23,10 +24,7 @@ public class EnumToEnumValueJsonConverterTests
     [Fact]
     public void SerializeObject()
     {
-        var objectToSerialize = new SampleClass
-        {
-            SampleField = SampleEnum.Sample
-        };
+        var objectToSerialize = new SampleClass { SampleField = SampleEnum.Sample };
 
         Assert.Equal("{\"SampleField\":\"SampleValue\"}", JsonConvert.SerializeObject(objectToSerialize));
     }
@@ -36,10 +34,7 @@ public class EnumToEnumValueJsonConverterTests
     {
         const string jsonText = "{\"SampleField\":\"SampleValue\"}";
 
-        var expected = new SampleClass
-        {
-            SampleField = SampleEnum.Sample
-        };
+        var expected = new SampleClass { SampleField = SampleEnum.Sample };
 
         Assert.Equal(expected, JsonConvert.DeserializeObject<SampleClass>(jsonText));
     }

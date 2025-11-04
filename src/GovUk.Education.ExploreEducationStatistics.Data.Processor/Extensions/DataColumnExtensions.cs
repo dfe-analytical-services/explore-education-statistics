@@ -17,7 +17,7 @@ public static class DataColumnExtensions
             DefaultValue = column.DefaultValue,
             MaxLength = column.MaxLength,
             ReadOnly = column.ReadOnly,
-            Unique = column.Unique
+            Unique = column.Unique,
         };
 
         table.Columns.Add(newColumn);

@@ -16,9 +16,9 @@ public class CaptureTableToolDownloadCallBuilder
             SubjectId = Guid.NewGuid(),
             DataSetName = "the data set name",
             DownloadFormat = TableDownloadFormat.ODS,
-            Query = _fullTableQuery ?? new FullTableQueryBuilder().Build() 
+            Query = _fullTableQuery ?? new FullTableQueryBuilder().Build(),
         };
-    
+
     public CaptureTableToolDownloadCallBuilder WhereQueryIs(FullTableQuery query)
     {
         _fullTableQuery = query;

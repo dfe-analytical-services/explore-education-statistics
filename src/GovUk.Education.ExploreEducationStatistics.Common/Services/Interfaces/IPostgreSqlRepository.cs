@@ -1,4 +1,3 @@
-#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +14,8 @@ public interface IPostgreSqlRepository
         TDbContext context,
         JsonbPathRequest<TRowId> request,
         string keyValue,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TDbContext : DbContext;
 
     /// <summary>
@@ -25,7 +25,8 @@ public interface IPostgreSqlRepository
     Task<TResponse?> GetJsonbFromPath<TDbContext, TRowId, TResponse>(
         TDbContext context,
         JsonbPathRequest<TRowId> request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TDbContext : DbContext
         where TResponse : class;
 
@@ -37,7 +38,8 @@ public interface IPostgreSqlRepository
         TDbContext context,
         JsonbPathRequest<TRowId> request,
         TValue? value,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TDbContext : DbContext
         where TValue : class;
 
@@ -53,7 +55,8 @@ public interface IPostgreSqlRepository
         TDbContext context,
         JsonbPathRequest<TRowId> request,
         Func<TValue?, Task<Either<TFailure, TValue?>>> updateValueFn,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TDbContext : DbContext
         where TValue : class;
 }

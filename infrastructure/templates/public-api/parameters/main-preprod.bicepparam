@@ -38,6 +38,7 @@ param postgreSqlServerConfig = {
 param recoveryVaultImmutable = true
 
 param enableThemeDeletion = false
+
 param enableSwagger = true
 
 param enableReplacementOfPublicApiDataSets = true

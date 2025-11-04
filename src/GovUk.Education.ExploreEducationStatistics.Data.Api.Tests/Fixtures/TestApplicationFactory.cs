@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures;
 public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
 {
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
-        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.34.0")
+        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.35.0")
         .WithInMemoryPersistence()
         .Build();
 
@@ -60,36 +60,40 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
         if (_azuriteContainer.State != TestcontainersStates.Running)
         {
             throw new InvalidOperationException(
-                $"Azurite container must be started via '{nameof(StartAzurite)}' method first");
+                $"Azurite container must be started via '{nameof(StartAzurite)}' method first"
+            );
         }
 
         return WithWebHostBuilder(builder =>
         {
             builder
-                .ConfigureAppConfiguration((_, config) =>
-                {
-                    config.AddInMemoryCollection(
-                    [
-                        new KeyValuePair<string, string?>("PublicStorage", _azuriteContainer.GetConnectionString())
-                    ]);
-                })
+                .ConfigureAppConfiguration(
+                    (_, config) =>
+                    {
+                        config.AddInMemoryCollection(
+                            [
+                                new KeyValuePair<string, string?>(
+                                    "PublicStorage",
+                                    _azuriteContainer.GetConnectionString()
+                                ),
+                            ]
+                        );
+                    }
+                )
                 .ConfigureServices(services =>
                 {
-                    services.ReplaceService<IPublicBlobStorageService>(sp =>
-                        new PublicBlobStorageService(
-                            connectionString: _azuriteContainer.GetConnectionString(),
-                            logger: sp.GetRequiredService<ILogger<IBlobStorageService>>(),
-                            sasService: sp.GetRequiredService<IBlobSasService>()
-                        )
-                    );
+                    services.ReplaceService<IPublicBlobStorageService>(sp => new PublicBlobStorageService(
+                        connectionString: _azuriteContainer.GetConnectionString(),
+                        logger: sp.GetRequiredService<ILogger<IBlobStorageService>>(),
+                        sasService: sp.GetRequiredService<IBlobSasService>()
+                    ));
                 });
         });
     }
 
     protected override IHostBuilder CreateHostBuilder()
     {
-        return base
-            .CreateHostBuilder()
+        return base.CreateHostBuilder()
             .ConfigureServices(services =>
             {
                 services

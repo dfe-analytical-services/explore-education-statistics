@@ -1,8 +1,12 @@
 import educationInNumbersContentService, {
   EinContentBlockAddRequest,
-  EinEditableContentBlock,
 } from '@admin/services/educationInNumbersContentService';
+import {
+  EinBlockType,
+  EinFreeTextStatTile,
+} from '@common/services/types/einBlocks';
 import { useEducationInNumbersPageContentDispatch } from './EducationInNumbersPageContentContext';
+import { FreeTextStatTileFormValues } from '../components/EditableFreeTextStatTileForm';
 
 export default function useEducationInNumbersPageContentActions() {
   const dispatch = useEducationInNumbersPageContentDispatch();
@@ -36,20 +40,31 @@ export default function useEducationInNumbersPageContentActions() {
     educationInNumbersPageId,
     sectionId,
     blockId,
-    bodyContent,
+    content,
+    type,
   }: {
     educationInNumbersPageId: string;
     sectionId: string;
     blockId: string;
-    bodyContent: string;
+    content: string;
+    type: EinBlockType;
   }) {
     const updateBlock =
-      await educationInNumbersContentService.updateContentSectionHtmlBlock({
-        educationInNumbersPageId,
-        sectionId,
-        blockId,
-        block: { body: bodyContent },
-      });
+      type === 'HtmlBlock'
+        ? await educationInNumbersContentService.updateContentSectionHtmlBlock({
+            educationInNumbersPageId,
+            sectionId,
+            blockId,
+            block: { body: content },
+          })
+        : await educationInNumbersContentService.updateContentSectionGroupBlock(
+            {
+              educationInNumbersPageId,
+              sectionId,
+              blockId,
+              block: { title: content },
+            },
+          );
     dispatch({
       type: 'UPDATE_BLOCK_FROM_SECTION',
       payload: {
@@ -57,7 +72,7 @@ export default function useEducationInNumbersPageContentActions() {
           sectionId,
           blockId,
         },
-        block: updateBlock as EinEditableContentBlock,
+        block: updateBlock,
       },
     });
   }
@@ -85,7 +100,7 @@ export default function useEducationInNumbersPageContentActions() {
       type: 'ADD_BLOCK_TO_SECTION',
       payload: {
         meta: { sectionId },
-        block: newBlock as EinEditableContentBlock,
+        block: newBlock,
       },
     });
     return newBlock;
@@ -110,7 +125,7 @@ export default function useEducationInNumbersPageContentActions() {
       type: 'UPDATE_SECTION_CONTENT',
       payload: {
         meta: { sectionId },
-        sectionContent: sectionBlocks as EinEditableContentBlock[],
+        sectionContent: sectionBlocks,
       },
     });
   }
@@ -209,7 +224,113 @@ export default function useEducationInNumbersPageContentActions() {
     });
   }
 
+  async function addFreeTextStatTile({
+    educationInNumbersPageId,
+    blockId,
+    sectionId,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+    sectionId: string;
+  }) {
+    const newTile = await educationInNumbersContentService.addFreeTextStatTile({
+      educationInNumbersPageId,
+      blockId,
+    });
+    dispatch({
+      type: 'ADD_FREE_TEXT_STAT_TILE_TO_BLOCK',
+      payload: {
+        meta: { blockId, sectionId },
+        tile: newTile,
+      },
+    });
+    return newTile;
+  }
+
+  async function updateFreeTextStatTile({
+    educationInNumbersPageId,
+    blockId,
+    sectionId,
+    tileId,
+    values,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+    sectionId: string;
+    tileId: string;
+    values: FreeTextStatTileFormValues;
+  }) {
+    const newTile =
+      await educationInNumbersContentService.updateFreeTextStatTile({
+        educationInNumbersPageId,
+        tileId,
+        values,
+      });
+    dispatch({
+      type: 'UPDATE_FREE_TEXT_STAT_TILE_IN_BLOCK',
+      payload: {
+        meta: { blockId, sectionId, tileId },
+        tile: newTile,
+      },
+    });
+    return newTile;
+  }
+
+  async function reorderFreeTextStatTiles({
+    educationInNumbersPageId,
+    blockId,
+    sectionId,
+    tiles,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+    sectionId: string;
+    tiles: EinFreeTextStatTile[];
+  }) {
+    const newTiles =
+      await educationInNumbersContentService.reorderFreeTextStatTiles({
+        educationInNumbersPageId,
+        blockId,
+        order: tiles.map(tile => tile.id),
+      });
+    dispatch({
+      type: 'REORDER_FREE_TEXT_STAT_TILES_IN_BLOCK',
+      payload: {
+        meta: { blockId, sectionId },
+        tiles: newTiles,
+      },
+    });
+  }
+
+  async function deleteFreeTextStatTile({
+    educationInNumbersPageId,
+    blockId,
+    sectionId,
+    tileId,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+    sectionId: string;
+    tileId: string;
+  }) {
+    await educationInNumbersContentService.deleteFreeTextStatTile({
+      educationInNumbersPageId,
+      blockId,
+      tileId,
+    });
+    dispatch({
+      type: 'DELETE_FREE_TEXT_STAT_TILE_FROM_BLOCK',
+      payload: {
+        meta: { blockId, sectionId, tileId },
+      },
+    });
+  }
+
   return {
+    addFreeTextStatTile,
+    updateFreeTextStatTile,
+    deleteFreeTextStatTile,
+    reorderFreeTextStatTiles,
     deleteContentSectionBlock,
     updateContentSectionBlock,
     addContentSectionBlock,

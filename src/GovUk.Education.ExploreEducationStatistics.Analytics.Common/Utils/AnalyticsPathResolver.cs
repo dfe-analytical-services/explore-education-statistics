@@ -23,5 +23,5 @@ public class AnalyticsPathResolver : IAnalyticsPathResolver
         _basePath = options.Value.BasePath;
     }
 
-    public string BuildOutputDirectory(string[] subPaths) => Path.Combine([_basePath, ..subPaths]);
+    public string BuildOutputDirectory(string[] subPaths) => Path.Combine([_basePath, .. subPaths]);
 }

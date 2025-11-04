@@ -1,4 +1,3 @@
-#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +21,8 @@ public static class UserServiceExtensions
     public static async Task<Either<ActionResult, TResource>> CheckPolicy<TResource, TPolicy>(
         this IUserService userService,
         TResource resource,
-        TPolicy policy)
+        TPolicy policy
+    )
         where TPolicy : Enum
     {
         var result = await userService.MatchesPolicy(resource, policy);
@@ -37,7 +37,8 @@ public static class UserServiceExtensions
 
     public static async Task<Either<ActionResult, Unit>> CheckPolicy<TPolicy>(
         this IUserService userService,
-        TPolicy policy)
+        TPolicy policy
+    )
         where TPolicy : Enum
     {
         var result = await userService.MatchesPolicy(policy);

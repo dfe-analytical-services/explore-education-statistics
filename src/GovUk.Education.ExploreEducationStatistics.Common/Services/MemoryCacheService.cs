@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Text;
+﻿using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -9,22 +8,20 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
-    
+
 public class MemoryCacheService : IMemoryCacheService
 {
     private readonly JsonSerializerSettings _jsonSerializerSettings = new()
     {
         ContractResolver = new DefaultContractResolver(),
         NullValueHandling = NullValueHandling.Ignore,
-        TypeNameHandling = TypeNameHandling.Auto
+        TypeNameHandling = TypeNameHandling.Auto,
     };
-    
+
     private readonly IMemoryCache _cache;
     private readonly ILogger<MemoryCacheService> _logger;
-    
-    public MemoryCacheService(
-        IMemoryCache cache,
-        ILogger<MemoryCacheService> logger)
+
+    public MemoryCacheService(IMemoryCache cache, ILogger<MemoryCacheService> logger)
     {
         _cache = cache;
         _logger = logger;
@@ -43,33 +40,34 @@ public class MemoryCacheService : IMemoryCacheService
             _logger.LogError(
                 e,
                 "Error whilst retrieving cached item for key {CacheKey} - returning null",
-                GetCacheKeyDescription(cacheKey));
+                GetCacheKeyDescription(cacheKey)
+            );
             return null;
         }
 
         if (cachedItem == null)
         {
-            _logger.LogInformation(
-                "Cache miss for cache key {CacheKeyDescription}",
-                GetCacheKeyDescription(cacheKey));
+            _logger.LogInformation("Cache miss for cache key {CacheKeyDescription}", GetCacheKeyDescription(cacheKey));
             return null;
         }
 
         if (!targetType.IsInstanceOfType(cachedItem))
         {
             _logger.LogError(
-                "Cached type {CachedItemType} is not an instance of " +
-                "{TargetType} for cache key {CacheKey} - returning null",
+                "Cached type {CachedItemType} is not an instance of "
+                    + "{TargetType} for cache key {CacheKey} - returning null",
                 cachedItem.GetType(),
                 nameof(targetType),
-                GetCacheKeyDescription(cacheKey));
+                GetCacheKeyDescription(cacheKey)
+            );
 
             return null;
         }
 
         _logger.LogInformation(
             "Returning cached result for cache key {CacheKeyDescription}",
-            GetCacheKeyDescription(cacheKey));
+            GetCacheKeyDescription(cacheKey)
+        );
 
         return cachedItem;
     }
@@ -78,7 +76,8 @@ public class MemoryCacheService : IMemoryCacheService
         IMemoryCacheKey cacheKey,
         TItem item,
         MemoryCacheConfiguration configuration,
-        DateTime? nowUtc = null)
+        DateTime? nowUtc = null
+    )
     {
         try
         {
@@ -95,9 +94,8 @@ public class MemoryCacheService : IMemoryCacheService
             {
                 var nextExpiryTime = configuration.ExpirySchedule.GetNextOccurrence(now);
 
-                absoluteExpiryTime = targetAbsoluteExpiryDateTime < nextExpiryTime
-                    ? targetAbsoluteExpiryDateTime
-                    : nextExpiryTime;
+                absoluteExpiryTime =
+                    targetAbsoluteExpiryDateTime < nextExpiryTime ? targetAbsoluteExpiryDateTime : nextExpiryTime;
             }
 
             // Calculate an approximate size in bytes for this object. As there is no built-in mechanism
@@ -107,21 +105,27 @@ public class MemoryCacheService : IMemoryCacheService
 
             var expiryTime = new DateTimeOffset(absoluteExpiryTime);
 
-            _cache.Set(cacheKey, item, new MemoryCacheEntryOptions
-            {
-                Size = approximateSizeInBytes,
-                AbsoluteExpiration = expiryTime
-            });
+            _cache.Set(
+                cacheKey,
+                item,
+                new MemoryCacheEntryOptions { Size = approximateSizeInBytes, AbsoluteExpiration = expiryTime }
+            );
 
-            _logger.LogInformation("Setting cached item with cache key {CacheKeyDescription}, " +
-                                   "approx size {Size} bytes, expiry time {ExpiryTime}",
-                GetCacheKeyDescription(cacheKey), approximateSizeInBytes, expiryTime);
+            _logger.LogInformation(
+                "Setting cached item with cache key {CacheKeyDescription}, "
+                    + "approx size {Size} bytes, expiry time {ExpiryTime}",
+                GetCacheKeyDescription(cacheKey),
+                approximateSizeInBytes,
+                expiryTime
+            );
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Exception thrown when caching item with cache key {CacheKeyDescription}.  " +
-                                "Returning gracefully.",
-                GetCacheKeyDescription(cacheKey));
+            _logger.LogError(
+                e,
+                "Exception thrown when caching item with cache key {CacheKeyDescription}.  " + "Returning gracefully.",
+                GetCacheKeyDescription(cacheKey)
+            );
         }
     }
 

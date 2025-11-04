@@ -29,58 +29,45 @@ public class ReleaseServicePermissionTests
         Publication publication = _dataFixture.DefaultPublication();
 
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFailWithMatcher<Publication>(p => p.Id == publication.Id,
-                CanCreateReleaseForSpecificPublication)
-            .AssertForbidden(
-                async userService =>
-                {
-                    await using var contextDbContext = InMemoryApplicationDbContext();
-                    contextDbContext.Publications.Add(publication);
-                    await contextDbContext.SaveChangesAsync();
+            .SetupResourceCheckToFailWithMatcher<Publication>(
+                p => p.Id == publication.Id,
+                CanCreateReleaseForSpecificPublication
+            )
+            .AssertForbidden(async userService =>
+            {
+                await using var contextDbContext = InMemoryApplicationDbContext();
+                contextDbContext.Publications.Add(publication);
+                await contextDbContext.SaveChangesAsync();
 
-                    var service = BuildService(
-                        context: contextDbContext,
-                        userService: userService.Object);
+                var service = BuildService(context: contextDbContext, userService: userService.Object);
 
-                    return await service.CreateRelease(
-                        new ReleaseCreateRequest
-                        {
-                            PublicationId = publication.Id,
-                        }
-                    );
-                }
-            );
+                return await service.CreateRelease(new ReleaseCreateRequest { PublicationId = publication.Id });
+            });
     }
 
     [Fact]
     public async Task UpdateRelease()
     {
-        Release release = _dataFixture.DefaultRelease()
-            .WithPublication(_dataFixture.DefaultPublication());
+        Release release = _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication());
 
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFailWithMatcher<Release>(r => r.PublicationId == release.PublicationId,
-                CanUpdateSpecificRelease)
-            .AssertForbidden(
-                async userService =>
-                {
-                    await using var contextDbContext = InMemoryApplicationDbContext();
-                    contextDbContext.Releases.Add(release);
-                    await contextDbContext.SaveChangesAsync();
+            .SetupResourceCheckToFailWithMatcher<Release>(
+                r => r.PublicationId == release.PublicationId,
+                CanUpdateSpecificRelease
+            )
+            .AssertForbidden(async userService =>
+            {
+                await using var contextDbContext = InMemoryApplicationDbContext();
+                contextDbContext.Releases.Add(release);
+                await contextDbContext.SaveChangesAsync();
 
-                    var service = BuildService(
-                        context: contextDbContext,
-                        userService: userService.Object);
+                var service = BuildService(context: contextDbContext, userService: userService.Object);
 
-                    return await service.UpdateRelease(
-                        releaseId: release.Id,
-                        new ReleaseUpdateRequest
-                        {
-                            Label = "initial",
-                        }
-                    );
-                }
-            );
+                return await service.UpdateRelease(
+                    releaseId: release.Id,
+                    new ReleaseUpdateRequest { Label = "initial" }
+                );
+            });
     }
 
     private static ReleaseService BuildService(
@@ -91,7 +78,8 @@ public class ReleaseServicePermissionTests
         IPublicationCacheService? publicationCacheService = null,
         IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
         IRedirectsCacheService? redirectsCacheService = null,
-        IReleaseSlugValidator? releaseSlugValidator = null)
+        IReleaseSlugValidator? releaseSlugValidator = null
+    )
     {
         return new ReleaseService(
             context: context ?? Mock.Of<ContentDbContext>(),
@@ -99,7 +87,8 @@ public class ReleaseServicePermissionTests
             releaseVersionService: releaseVersionService ?? Mock.Of<IReleaseVersionService>(),
             releaseCacheService: releaseCacheService ?? Mock.Of<IReleaseCacheService>(),
             publicationCacheService: publicationCacheService ?? Mock.Of<IPublicationCacheService>(),
-            releasePublishingStatusRepository: releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(),
+            releasePublishingStatusRepository: releasePublishingStatusRepository
+                ?? Mock.Of<IReleasePublishingStatusRepository>(),
             redirectsCacheService: redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(),
             adminEventRaiser: new AdminEventRaiserMockBuilder().Build(),
             guidGenerator: new SequentialGuidGenerator(),

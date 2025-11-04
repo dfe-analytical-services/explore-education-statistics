@@ -1,4 +1,3 @@
-#nullable enable
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -20,9 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Config;
 /// </summary>
 public class FluentValidationActionFilter : IAsyncActionFilter
 {
-    public async Task OnActionExecutionAsync(
-        ActionExecutingContext context,
-        ActionExecutionDelegate next)
+    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         if (context.Controller is not ControllerBase controllerBase)
         {
@@ -52,10 +49,7 @@ public class FluentValidationActionFilter : IAsyncActionFilter
 
             var validationContext = new ValidationContext<object>(subject);
 
-            var validationResult = await validator.ValidateAsync(
-                validationContext,
-                context.HttpContext.RequestAborted
-            );
+            var validationResult = await validator.ValidateAsync(validationContext, context.HttpContext.RequestAborted);
 
             if (validationResult.IsValid)
             {
@@ -91,13 +85,13 @@ public class FluentValidationActionFilter : IAsyncActionFilter
         var bindingSource = parameter.BindingInfo?.BindingSource;
 
         return type is { IsClass: true, IsPrimitive: false, IsEnum: false, IsValueType: false }
-               && HasValidBindingSource(bindingSource);
+            && HasValidBindingSource(bindingSource);
     }
 
     private static bool HasValidBindingSource(BindingSource? bindingSource)
     {
-        return bindingSource == BindingSource.Body ||
-               bindingSource == BindingSource.Form ||
-               bindingSource == BindingSource.Query;
+        return bindingSource == BindingSource.Body
+            || bindingSource == BindingSource.Form
+            || bindingSource == BindingSource.Query;
     }
 }

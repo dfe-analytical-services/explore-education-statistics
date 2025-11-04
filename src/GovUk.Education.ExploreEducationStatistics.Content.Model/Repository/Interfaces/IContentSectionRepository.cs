@@ -3,5 +3,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 
 public interface IContentSectionRepository
 {
-    public Task<List<T>> GetAllContentBlocks<T>(Guid releaseVersionId) where T : ContentBlock;
+    public Task<List<T>> GetAllContentBlocks<T>(Guid releaseVersionId)
+        where T : ContentBlock;
 }

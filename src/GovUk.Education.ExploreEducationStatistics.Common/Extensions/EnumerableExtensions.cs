@@ -1,4 +1,3 @@
-#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using NaturalSort.Extension;
 
@@ -33,12 +32,18 @@ public static class EnumerableExtensions
     /// <remarks>
     /// This operator uses deferred execution and streams its results (buckets and bucket content).
     /// </remarks>
-    public static IEnumerable<TResult> Batch<TSource, TResult>(this IEnumerable<TSource> source, int size,
-        Func<IEnumerable<TSource>, TResult> resultSelector)
+    public static IEnumerable<TResult> Batch<TSource, TResult>(
+        this IEnumerable<TSource> source,
+        int size,
+        Func<IEnumerable<TSource>, TResult> resultSelector
+    )
     {
-        if (source == null) throw new ArgumentNullException(nameof(source));
-        if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
-        if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
+        if (source == null)
+            throw new ArgumentNullException(nameof(source));
+        if (size <= 0)
+            throw new ArgumentOutOfRangeException(nameof(size));
+        if (resultSelector == null)
+            throw new ArgumentNullException(nameof(resultSelector));
 
         return _();
 
@@ -113,8 +118,10 @@ public static class EnumerableExtensions
         return -1;
     }
 
-    public static async Task<Either<TLeft, List<TRight>>> ForEachAsync<T, TLeft, TRight>(this IEnumerable<T> source,
-        Func<T, Task<Either<TLeft, TRight>>> func)
+    public static async Task<Either<TLeft, List<TRight>>> ForEachAsync<T, TLeft, TRight>(
+        this IEnumerable<T> source,
+        Func<T, Task<Either<TLeft, TRight>>> func
+    )
     {
         var rightResults = new List<TRight>();
 
@@ -136,12 +143,19 @@ public static class EnumerableExtensions
     public static Dictionary<TKey, TElement> ToDictionaryIndexed<TSource, TKey, TElement>(
         this IEnumerable<TSource> source,
         Func<TSource, TKey> keySelector,
-        Func<TSource, int, TElement> elementSelector) where TKey : notnull
+        Func<TSource, int, TElement> elementSelector
+    )
+        where TKey : notnull
     {
         var sourceList = source.ToList();
 
         var result = new Dictionary<TKey, TElement>(sourceList.Count);
-        sourceList.ForEach((value, index) => { result.Add(keySelector(value), elementSelector(value, index)); });
+        sourceList.ForEach(
+            (value, index) =>
+            {
+                result.Add(keySelector(value), elementSelector(value, index));
+            }
+        );
         return result;
     }
 
@@ -170,8 +184,29 @@ public static class EnumerableExtensions
         return string.Join(delimiter, source);
     }
 
+    /// <summary>
+    /// Apply offset pagination to <see cref="IEnumerable{T}"/> collections in-memory.
+    /// </summary>
+    /// <remarks>
+    /// This method uses deferred execution and does not enumerate the source sequence
+    /// until the returned sequence is enumerated.
+    /// </remarks>
+    /// <typeparam name="T">The type of elements in the source sequence</typeparam>
+    /// <param name="source">The source sequence to paginate</param>
+    /// <param name="page">The page number to return</param>
+    /// <param name="pageSize">The number of elements that should be returned</param>
+    /// <returns>
+    /// A sequence containing the elements of the specified page.
+    /// </returns>
+    public static IEnumerable<T> Paginate<T>(this IEnumerable<T> source, int page, int pageSize)
+    {
+        return source.Skip((page - 1) * pageSize).Take(pageSize);
+    }
+
     public static IEnumerable<TResult> SelectNullSafe<TSource, TResult>(
-        this IEnumerable<TSource>? source, Func<TSource, TResult> selector)
+        this IEnumerable<TSource>? source,
+        Func<TSource, TResult> selector
+    )
     {
         if (source == null)
         {
@@ -182,7 +217,9 @@ public static class EnumerableExtensions
     }
 
     public static async Task<IEnumerable<TResult>> SelectAsync<TSource, TResult>(
-        this IEnumerable<TSource> source, Func<TSource, Task<TResult>> asyncSelector)
+        this IEnumerable<TSource> source,
+        Func<TSource, Task<TResult>> asyncSelector
+    )
     {
         var result = new List<TResult>();
 
@@ -193,14 +230,16 @@ public static class EnumerableExtensions
 
         return result;
     }
-    
+
     public static async Task<IEnumerable<TResult>> SelectAsyncWithIndex<TSource, TResult>(
-        this IEnumerable<TSource> source, Func<TSource, int, Task<TResult>> asyncSelector)
+        this IEnumerable<TSource> source,
+        Func<TSource, int, Task<TResult>> asyncSelector
+    )
     {
         var result = new List<TResult>();
 
         var index = 0;
-        
+
         foreach (var item in source)
         {
             result.Add(await asyncSelector(item, index++));
@@ -210,7 +249,9 @@ public static class EnumerableExtensions
     }
 
     public static async Task<TSource?> FirstOrDefaultAsync<TSource>(
-        this IEnumerable<TSource> source, Func<TSource, Task<bool>> predicate)
+        this IEnumerable<TSource> source,
+        Func<TSource, Task<bool>> predicate
+    )
         where TSource : class
     {
         foreach (var item in source)
@@ -257,8 +298,7 @@ public static class EnumerableExtensions
 
         if (list.Count != 2)
         {
-            throw new ArgumentException(
-                $"Expected 2 list items when constructing a 2-tuple, but found {list.Count}");
+            throw new ArgumentException($"Expected 2 list items when constructing a 2-tuple, but found {list.Count}");
         }
 
         return new Tuple<T, T>(list[0], list[1]);
@@ -271,8 +311,7 @@ public static class EnumerableExtensions
 
         if (list.Count != 3)
         {
-            throw new ArgumentException(
-                $"Expected 3 list items when constructing a 3-tuple, but found {list.Count}");
+            throw new ArgumentException($"Expected 3 list items when constructing a 3-tuple, but found {list.Count}");
         }
 
         return new Tuple<T, T, T>(list[0], list[1], list[2]);
@@ -289,7 +328,8 @@ public static class EnumerableExtensions
     public static IOrderedEnumerable<T> NaturalOrderBy<T>(
         this IEnumerable<T> source,
         Func<T, string> keySelector,
-        StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        StringComparison comparison = StringComparison.OrdinalIgnoreCase
+    )
     {
         return source.OrderBy(keySelector, comparison.WithNaturalSort());
     }
@@ -300,33 +340,28 @@ public static class EnumerableExtensions
     public static IOrderedEnumerable<T> NaturalThenBy<T>(
         this IOrderedEnumerable<T> source,
         Func<T, string> keySelector,
-        StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        StringComparison comparison = StringComparison.OrdinalIgnoreCase
+    )
     {
         return source.ThenBy(keySelector, comparison.WithNaturalSort());
     }
 
-    public static List<(T1, T2)> Cartesian<T1, T2>(
-        this IEnumerable<T1> list1,
-        IEnumerable<T2>? list2)
+    public static List<(T1, T2)> Cartesian<T1, T2>(this IEnumerable<T1> list1, IEnumerable<T2>? list2)
     {
-        return list2 == null
-            ? []
-            : list1
-                .Join(list2, _ => true, _ => true, (t1, t2) => (t1, t2))
-                .ToList();
+        return list2 == null ? [] : list1.Join(list2, _ => true, _ => true, (t1, t2) => (t1, t2)).ToList();
     }
 
     public static List<(T1, T2, T3)> Cartesian<T1, T2, T3>(
         this IEnumerable<T1> list1,
         IEnumerable<T2>? list2,
-        IEnumerable<T3>? list3)
+        IEnumerable<T3>? list3
+    )
     {
         return list2 == null || list3 == null
             ? []
             : list1
                 .Join(list2, _ => true, _ => true, (t1, t2) => (t1, t2))
-                .Join(list3, _ => true, _ => true,
-                    (tuple, t3) => (tuple.t1, tuple.t2, t3))
+                .Join(list3, _ => true, _ => true, (tuple, t3) => (tuple.t1, tuple.t2, t3))
                 .ToList();
     }
 }

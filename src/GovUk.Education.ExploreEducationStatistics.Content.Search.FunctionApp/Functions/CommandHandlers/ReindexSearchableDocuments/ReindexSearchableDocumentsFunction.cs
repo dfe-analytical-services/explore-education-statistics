@@ -8,14 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class ReindexSearchableDocumentsFunction(
     ISearchIndexerClient searchIndexerClient,
-    ICommandHandler commandHandler)
+    ICommandHandler commandHandler
+)
 {
     [Function(nameof(ReindexSearchableDocuments))]
     public async Task ReindexSearchableDocuments(
-        [QueueTrigger("%SearchableDocumentCreatedQueueName%")]
-        SearchableDocumentCreatedMessageDto ignored, //  The binding name _ is invalid 
-        FunctionContext context) =>
-        await commandHandler.Handle(
-            searchIndexerClient.RunIndexer, 
-            context.CancellationToken);
+        [QueueTrigger("%SearchableDocumentCreatedQueueName%")] SearchableDocumentCreatedMessageDto ignored, //  The binding name _ is invalid
+        FunctionContext context
+    ) => await commandHandler.Handle(searchIndexerClient.RunIndexer, context.CancellationToken);
 }

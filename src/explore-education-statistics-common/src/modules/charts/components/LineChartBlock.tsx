@@ -71,7 +71,6 @@ const LineChartBlock = ({
   height,
   axes,
   legend,
-  width,
   includeNonNumericData,
   showDataLabels,
   dataLabelColour = 'inherit',
@@ -137,11 +136,10 @@ const LineChartBlock = ({
       xAxisHeight={xAxisHeight}
       xAxisLabel={axes.major.label}
     >
-      <ResponsiveContainer width={width || '100%'} height={height || 300}>
+      <ResponsiveContainer height={height || 300}>
         <LineChart
-          aria-label={alt}
-          role="img"
-          focusable={false}
+          accessibilityLayer
+          aria-label={`${alt}. Use the left and right arrow keys to browse data points.`}
           data={chartData}
           margin={{
             left: 30,
@@ -159,17 +157,14 @@ const LineChartBlock = ({
             }
             wrapperStyle={{ zIndex: 1000 }}
           />
-
           {legend.position !== 'none' && legend.position !== 'inline' && (
             <Legend content={renderLegend} align="left" layout="vertical" />
           )}
-
           <CartesianGrid
             strokeDasharray="3 3"
             horizontal={axes.minor.showGrid !== false}
             vertical={axes.major.showGrid !== false}
           />
-
           <YAxis
             {...minorDomainTicks}
             hide={!axes.minor.visible}
@@ -180,7 +175,6 @@ const LineChartBlock = ({
             type="number"
             width={yAxisWidth}
           />
-
           <XAxis
             {...majorDomainTicks}
             axisLine={!chartHasNegativeValues}
@@ -194,7 +188,6 @@ const LineChartBlock = ({
             type="category"
             unit={axes.major.unit}
           />
-
           {dataSetCategoryConfigs.map(({ config, dataKey, dataSet }) => (
             <Line
               key={dataKey}
@@ -233,9 +226,7 @@ const LineChartBlock = ({
               )}
             />
           ))}
-
           {chartHasNegativeValues && <ReferenceLine y={0} stroke="#666" />}
-
           {axes.major.referenceLines?.map(referenceLine =>
             createReferenceLine({
               axis: 'x',
@@ -250,7 +241,6 @@ const LineChartBlock = ({
               x: referenceLine.position,
             }),
           )}
-
           {axes.minor.referenceLines?.map(referenceLine =>
             createReferenceLine({
               axis: 'y',

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 /// <inheritdoc />
+// ReSharper disable once InconsistentNaming
 public partial class EES4662_AddDataSetFileMetaColumnToFilesTable : Migration
 {
     /// <inheritdoc />
@@ -14,14 +15,13 @@ public partial class EES4662_AddDataSetFileMetaColumnToFilesTable : Migration
             name: "DataSetFileMeta",
             table: "Files",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "DataSetFileMeta",
-            table: "Files");
+        migrationBuilder.DropColumn(name: "DataSetFileMeta", table: "Files");
     }
 }

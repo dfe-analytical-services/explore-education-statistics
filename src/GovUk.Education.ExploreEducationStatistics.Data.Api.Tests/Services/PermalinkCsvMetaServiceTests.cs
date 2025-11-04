@@ -35,9 +35,7 @@ public class PermalinkCsvMetaServiceTests
 
     private readonly Dictionary<GeographicLevel, List<string>> _regionLocalAuthorityHierarchy = new()
     {
-        {
-            GeographicLevel.LocalAuthority, ListOf(GeographicLevel.Region.ToString())
-        }
+        { GeographicLevel.LocalAuthority, ListOf(GeographicLevel.Region.ToString()) },
     };
 
     [Fact]
@@ -45,32 +43,22 @@ public class PermalinkCsvMetaServiceTests
     {
         var subject = _fixture.DefaultSubject().Generate();
 
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
             .WithSubject(subject)
             .GenerateList(2);
 
-        var filter0Items = filters[0].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
+        var filter0Items = filters[0].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var filter1Items = filters[1].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
+        var filter1Items = filters[1].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var indicators = _fixture.DefaultIndicator()
-            .ForIndex(0, i => i
-                .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
-                    .WithSubject(subject))
-            )
-            .ForRange(1..3, i => i
-                .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
-                    .WithSubject(subject))
-            )
+        var indicators = _fixture
+            .DefaultIndicator()
+            .ForIndex(0, i => i.SetIndicatorGroup(_fixture.DefaultIndicatorGroup().WithSubject(subject)))
+            .ForRange(1..3, i => i.SetIndicatorGroup(_fixture.DefaultIndicatorGroup().WithSubject(subject)))
             .GenerateList();
 
-        var locations = _fixture.DefaultLocation()
-            .WithGeographicLevel(GeographicLevel.Country)
-            .GenerateList(1);
+        var locations = _fixture.DefaultLocation().WithGeographicLevel(GeographicLevel.Country).GenerateList(1);
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -89,7 +77,7 @@ public class PermalinkCsvMetaServiceTests
 
             releaseSubjectService
                 .Setup(s => s.FindForLatestPublishedVersion(subjectId))
-                .ReturnsAsync((ReleaseSubject?) null);
+                .ReturnsAsync((ReleaseSubject?)null);
 
             var service = BuildService(
                 contentDbContext: contentDbContext,
@@ -103,9 +91,7 @@ public class PermalinkCsvMetaServiceTests
                 Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
                 Locations = LocationViewModelBuilder
                     .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                    .ToDictionary(
-                        level => level.Key.ToString().CamelCase(),
-                        level => level.Value)
+                    .ToDictionary(level => level.Key.ToString().CamelCase(), level => level.Value),
             };
 
             var result = await service.GetCsvMeta(subjectId, tableResultMeta);
@@ -165,24 +151,23 @@ public class PermalinkCsvMetaServiceTests
     {
         var subject = _fixture.DefaultSubject().Generate();
 
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
             .WithSubject(subject)
             .GenerateList(1);
 
-        var indicators = _fixture.DefaultIndicator()
-            .ForInstance(i => i
-                .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
-                    .WithSubject(subject))
-            )
+        var indicators = _fixture
+            .DefaultIndicator()
+            .ForInstance(i => i.SetIndicatorGroup(_fixture.DefaultIndicatorGroup().WithSubject(subject)))
             .GenerateList(1);
 
-        var locations = _fixture.DefaultLocation()
-            .ForRange(..2, l => l
-                .SetPresetRegion()
-                .SetGeographicLevel(GeographicLevel.Region))
-            .ForRange(2..4, l => l
-                .SetPresetRegionAndLocalAuthority()
-                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+        var locations = _fixture
+            .DefaultLocation()
+            .ForRange(..2, l => l.SetPresetRegion().SetGeographicLevel(GeographicLevel.Region))
+            .ForRange(
+                2..4,
+                l => l.SetPresetRegionAndLocalAuthority().SetGeographicLevel(GeographicLevel.LocalAuthority)
+            )
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -202,7 +187,7 @@ public class PermalinkCsvMetaServiceTests
 
             releaseSubjectService
                 .Setup(s => s.FindForLatestPublishedVersion(subjectId))
-                .ReturnsAsync((ReleaseSubject?) null);
+                .ReturnsAsync((ReleaseSubject?)null);
 
             var service = BuildService(
                 contentDbContext: contentDbContext,
@@ -216,9 +201,7 @@ public class PermalinkCsvMetaServiceTests
                 Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
                 Locations = LocationViewModelBuilder
                     .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                    .ToDictionary(
-                        level => level.Key.ToString().CamelCase(),
-                        level => level.Value)
+                    .ToDictionary(level => level.Key.ToString().CamelCase(), level => level.Value),
             };
 
             var result = await service.GetCsvMeta(subjectId, tableResultMeta);
@@ -258,24 +241,23 @@ public class PermalinkCsvMetaServiceTests
     {
         var subject = _fixture.DefaultSubject().Generate();
 
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
             .WithSubject(subject)
             .GenerateList(1);
 
-        var indicators = _fixture.DefaultIndicator()
-            .ForInstance(i => i
-                .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
-                    .WithSubject(subject))
-            )
+        var indicators = _fixture
+            .DefaultIndicator()
+            .ForInstance(i => i.SetIndicatorGroup(_fixture.DefaultIndicatorGroup().WithSubject(subject)))
             .GenerateList(1);
 
-        var locations = _fixture.DefaultLocation()
-            .ForRange(..2, l => l
-                .SetPresetRegion()
-                .SetGeographicLevel(GeographicLevel.Region))
-            .ForRange(2..3, l => l
-                .SetPresetRegionAndLocalAuthority()
-                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+        var locations = _fixture
+            .DefaultLocation()
+            .ForRange(..2, l => l.SetPresetRegion().SetGeographicLevel(GeographicLevel.Region))
+            .ForRange(
+                2..3,
+                l => l.SetPresetRegionAndLocalAuthority().SetGeographicLevel(GeographicLevel.LocalAuthority)
+            )
             .GenerateArray();
 
         var contextId = Guid.NewGuid().ToString();
@@ -296,7 +278,7 @@ public class PermalinkCsvMetaServiceTests
 
             releaseSubjectService
                 .Setup(s => s.FindForLatestPublishedVersion(subjectId))
-                .ReturnsAsync((ReleaseSubject?) null);
+                .ReturnsAsync((ReleaseSubject?)null);
 
             var service = BuildService(
                 contentDbContext: contentDbContext,
@@ -310,9 +292,7 @@ public class PermalinkCsvMetaServiceTests
                 Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
                 Locations = LocationViewModelBuilder
                     .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                    .ToDictionary(
-                        level => level.Key.ToString().CamelCase(),
-                        level => level.Value)
+                    .ToDictionary(level => level.Key.ToString().CamelCase(), level => level.Value),
             };
 
             var result = await service.GetCsvMeta(subjectId, tableResultMeta);
@@ -368,58 +348,36 @@ public class PermalinkCsvMetaServiceTests
     [Fact]
     public async Task GetCsvMeta_SubjectExists_DataFileExists()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
-            .GenerateList(2);
+        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(2);
 
-        var filter0Items = filters[0].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
+        var filter0Items = filters[0].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var filter1Items = filters[1].FilterGroups
-            .SelectMany(fg => fg.FilterItems)
-            .ToList();
+        var filter1Items = filters[1].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup()
-            .ForIndex(0, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(1))
-            )
-            .ForIndex(1, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(2))
-            )
+        var indicatorGroups = _fixture
+            .DefaultIndicatorGroup()
+            .ForIndex(0, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
+            .ForIndex(1, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
             .GenerateList();
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToList();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
 
-        var locations = _fixture.DefaultLocation()
-            .ForIndex(0, l => l
-                .SetPresetRegion()
-                .SetGeographicLevel(GeographicLevel.Region))
-            .ForIndex(1, l => l
-                .SetPresetRegionAndLocalAuthority()
-                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+        var locations = _fixture
+            .DefaultLocation()
+            .ForIndex(0, l => l.SetPresetRegion().SetGeographicLevel(GeographicLevel.Region))
+            .ForIndex(1, l => l.SetPresetRegionAndLocalAuthority().SetGeographicLevel(GeographicLevel.LocalAuthority))
             .GenerateList();
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
+            Subject = _fixture.DefaultSubject().WithFilters(filters).WithIndicatorGroups(indicatorGroups),
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -467,11 +425,14 @@ public class PermalinkCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(s => s.GetDownloadStream(
-                    It.Is<ReleaseFile>(rf =>
-                        rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId),
-                    default
-                ))
+                .Setup(s =>
+                    s.GetDownloadStream(
+                        It.Is<ReleaseFile>(rf =>
+                            rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                        ),
+                        default
+                    )
+                )
                 .ReturnsAsync(csv.ToStream());
 
             var service = BuildService(
@@ -487,9 +448,7 @@ public class PermalinkCsvMetaServiceTests
                 Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
                 Locations = LocationViewModelBuilder
                     .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                    .ToDictionary(
-                        level => level.Key.ToString().CamelCase(),
-                        level => level.Value)
+                    .ToDictionary(level => level.Key.ToString().CamelCase(), level => level.Value),
             };
 
             var result = await service.GetCsvMeta(releaseSubject.SubjectId, tableResultMeta);
@@ -552,77 +511,48 @@ public class PermalinkCsvMetaServiceTests
     [Fact]
     public async Task GetCsvMeta_SubjectExists_MultipleReleaseFilesExist()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
-            .GenerateList(2);
+        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(2);
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup()
-            .ForIndex(0, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(1))
-            )
-            .ForIndex(1, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(2))
-            )
+        var indicatorGroups = _fixture
+            .DefaultIndicatorGroup()
+            .ForIndex(0, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
+            .ForIndex(1, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
             .GenerateList();
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToList();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
 
-        var locations = _fixture.DefaultLocation()
-            .ForIndex(0, l => l
-                .SetPresetRegion()
-                .SetGeographicLevel(GeographicLevel.Region))
-            .ForIndex(1, l => l
-                .SetPresetRegionAndLocalAuthority()
-                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+        var locations = _fixture
+            .DefaultLocation()
+            .ForIndex(0, l => l.SetPresetRegion().SetGeographicLevel(GeographicLevel.Region))
+            .ForIndex(1, l => l.SetPresetRegionAndLocalAuthority().SetGeographicLevel(GeographicLevel.LocalAuthority))
             .GenerateList();
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
+            Subject = _fixture.DefaultSubject().WithFilters(filters).WithIndicatorGroups(indicatorGroups),
         };
 
-        var releaseVersion = new ReleaseVersion
-        {
-            Id = releaseSubject.ReleaseVersion.Id
-        };
+        var releaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id };
 
         var releaseDataFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         // Create a file for the subject and release which is not a data file
         var releaseMetadataFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Metadata
-            }
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Metadata },
         };
 
         // Create a data file for the subject but for a different release
         var releaseDataFileOtherRelease = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid()
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -631,9 +561,7 @@ public class PermalinkCsvMetaServiceTests
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
-            contentDbContext.ReleaseFiles.AddRange(releaseDataFile,
-                releaseMetadataFile,
-                releaseDataFileOtherRelease);
+            contentDbContext.ReleaseFiles.AddRange(releaseDataFile, releaseMetadataFile, releaseDataFileOtherRelease);
             await contentDbContext.SaveChangesAsync();
 
             await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
@@ -673,11 +601,15 @@ public class PermalinkCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(s => s.GetDownloadStream(
-                    It.Is<ReleaseFile>(rf =>
-                        rf.FileId == releaseDataFile.FileId && rf.ReleaseVersionId == releaseDataFile.ReleaseVersionId),
-                    default
-                ))
+                .Setup(s =>
+                    s.GetDownloadStream(
+                        It.Is<ReleaseFile>(rf =>
+                            rf.FileId == releaseDataFile.FileId
+                            && rf.ReleaseVersionId == releaseDataFile.ReleaseVersionId
+                        ),
+                        default
+                    )
+                )
                 .ReturnsAsync(csv.ToStream());
 
             var service = BuildService(
@@ -693,9 +625,7 @@ public class PermalinkCsvMetaServiceTests
                 Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
                 Locations = LocationViewModelBuilder
                     .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                    .ToDictionary(
-                        level => level.Key.ToString().CamelCase(),
-                        level => level.Value)
+                    .ToDictionary(level => level.Key.ToString().CamelCase(), level => level.Value),
             };
 
             var result = await service.GetCsvMeta(releaseSubject.SubjectId, tableResultMeta);
@@ -731,37 +661,26 @@ public class PermalinkCsvMetaServiceTests
     [Fact]
     public async Task GetCsvMeta_SubjectExists_ReleaseFileNotFound_HeadersInDefaultOrder()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
-            .GenerateList(2);
+        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(2);
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup()
-            .ForIndex(0, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(1))
-            )
-            .ForIndex(1, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(2))
-            )
+        var indicatorGroups = _fixture
+            .DefaultIndicatorGroup()
+            .ForIndex(0, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
+            .ForIndex(1, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
             .GenerateList();
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToList();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
 
-        var locations = _fixture.DefaultLocation()
-            .ForIndex(0, l => l
-                .SetPresetRegion()
-                .SetGeographicLevel(GeographicLevel.Region))
-            .ForIndex(1, l => l
-                .SetPresetRegionAndLocalAuthority()
-                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+        var locations = _fixture
+            .DefaultLocation()
+            .ForIndex(0, l => l.SetPresetRegion().SetGeographicLevel(GeographicLevel.Region))
+            .ForIndex(1, l => l.SetPresetRegionAndLocalAuthority().SetGeographicLevel(GeographicLevel.LocalAuthority))
             .GenerateList();
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
+            Subject = _fixture.DefaultSubject().WithFilters(filters).WithIndicatorGroups(indicatorGroups),
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -794,9 +713,7 @@ public class PermalinkCsvMetaServiceTests
                 Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
                 Locations = LocationViewModelBuilder
                     .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                    .ToDictionary(
-                        level => level.Key.ToString().CamelCase(),
-                        level => level.Value)
+                    .ToDictionary(level => level.Key.ToString().CamelCase(), level => level.Value),
             };
 
             var result = await service.GetCsvMeta(releaseSubject.SubjectId, tableResultMeta);
@@ -832,50 +749,32 @@ public class PermalinkCsvMetaServiceTests
     [Fact]
     public async Task GetCsvMeta_SubjectExists_BlobNotFound_HeadersInDefaultOrder()
     {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
-            .GenerateList(2);
+        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(2);
 
-        var indicatorGroups = _fixture.DefaultIndicatorGroup()
-            .ForIndex(0, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(1))
-            )
-            .ForIndex(1, ig => ig
-                .SetIndicators(_fixture.DefaultIndicator().Generate(2))
-            )
+        var indicatorGroups = _fixture
+            .DefaultIndicatorGroup()
+            .ForIndex(0, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
+            .ForIndex(1, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
             .GenerateList();
 
-        var indicators = indicatorGroups
-            .SelectMany(ig => ig.Indicators)
-            .ToList();
+        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
 
-        var locations = _fixture.DefaultLocation()
-            .ForIndex(0, l => l
-                .SetPresetRegion()
-                .SetGeographicLevel(GeographicLevel.Region))
-            .ForIndex(1, l => l
-                .SetPresetRegionAndLocalAuthority()
-                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+        var locations = _fixture
+            .DefaultLocation()
+            .ForIndex(0, l => l.SetPresetRegion().SetGeographicLevel(GeographicLevel.Region))
+            .ForIndex(1, l => l.SetPresetRegionAndLocalAuthority().SetGeographicLevel(GeographicLevel.LocalAuthority))
             .GenerateList();
 
         var releaseSubject = new ReleaseSubject
         {
             ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
+            Subject = _fixture.DefaultSubject().WithFilters(filters).WithIndicatorGroups(indicatorGroups),
         };
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.Subject.Id,
-                Type = FileType.Data
-            }
+            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -903,11 +802,14 @@ public class PermalinkCsvMetaServiceTests
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(s => s.GetDownloadStream(
-                    It.Is<ReleaseFile>(rf =>
-                        rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId),
-                    default
-                ))
+                .Setup(s =>
+                    s.GetDownloadStream(
+                        It.Is<ReleaseFile>(rf =>
+                            rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                        ),
+                        default
+                    )
+                )
                 .ThrowsAsync(new FileNotFoundException("File not found"));
 
             var service = BuildService(
@@ -923,9 +825,7 @@ public class PermalinkCsvMetaServiceTests
                 Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
                 Locations = LocationViewModelBuilder
                     .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                    .ToDictionary(
-                        level => level.Key.ToString().CamelCase(),
-                        level => level.Value)
+                    .ToDictionary(level => level.Key.ToString().CamelCase(), level => level.Value),
             };
 
             var result = await service.GetCsvMeta(releaseSubject.SubjectId, tableResultMeta);
@@ -985,7 +885,8 @@ public class PermalinkCsvMetaServiceTests
         ContentDbContext contentDbContext,
         StatisticsDbContext statisticsDbContext,
         IReleaseSubjectService? releaseSubjectService = null,
-        IReleaseFileBlobService? releaseFileBlobService = null)
+        IReleaseFileBlobService? releaseFileBlobService = null
+    )
     {
         return new(
             logger: Mock.Of<ILogger<PermalinkCsvMetaService>>(),

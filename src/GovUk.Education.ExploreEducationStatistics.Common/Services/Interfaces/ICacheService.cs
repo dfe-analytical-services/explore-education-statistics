@@ -1,9 +1,9 @@
-#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
-public interface ICacheService<in TKey> where TKey : ICacheKey
+public interface ICacheService<in TKey>
+    where TKey : ICacheKey
 {
     object? GetItem(TKey cacheKey, Type targetType);
 

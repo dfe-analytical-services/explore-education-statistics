@@ -27,29 +27,38 @@ public class ReleaseVersionRepositoryTests
         [InlineData(ReleaseApprovalStatus.Draft)]
         public async Task ListReleasesForUser_Success(ReleaseApprovalStatus releaseApprovalStatus)
         {
-            var user = new User { Id = Guid.NewGuid() };
+            User user = _fixture.DefaultUser();
 
-            var userReleaseRoles = _fixture.DefaultUserReleaseRole()
+            var userReleaseRoles = _fixture
+                .DefaultUserReleaseRole()
                 .WithUser(user)
-                .WithReleaseVersion(_fixture.DefaultReleaseVersion()
-                    .WithApprovalStatus(releaseApprovalStatus)
-                    .WithRelease(_fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication())))
+                .WithReleaseVersion(
+                    _fixture
+                        .DefaultReleaseVersion()
+                        .WithApprovalStatus(releaseApprovalStatus)
+                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
+                )
                 .ForIndex(0, s => s.SetRole(ReleaseRole.Contributor))
                 .ForIndex(1, s => s.SetRole(ReleaseRole.PrereleaseViewer))
                 .GenerateList(2);
 
-            UserPublicationRole userPublicationRole = _fixture.DefaultUserPublicationRole()
+            UserPublicationRole userPublicationRole = _fixture
+                .DefaultUserPublicationRole()
                 .WithUser(user)
                 .WithRole(PublicationRole.Owner)
-                .WithPublication(_fixture.DefaultPublication()
-                    .WithReleases([
-                        _fixture.DefaultRelease()
-                            .WithVersions([
-                                _fixture.DefaultReleaseVersion()
-                                    .WithApprovalStatus(releaseApprovalStatus)
-                            ])
-                    ]));
+                .WithPublication(
+                    _fixture
+                        .DefaultPublication()
+                        .WithReleases(
+                            [
+                                _fixture
+                                    .DefaultRelease()
+                                    .WithVersions(
+                                        [_fixture.DefaultReleaseVersion().WithApprovalStatus(releaseApprovalStatus)]
+                                    ),
+                            ]
+                        )
+                );
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -62,13 +71,11 @@ public class ReleaseVersionRepositoryTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = BuildRepository(contentDbContext);
-                var result = await repository.ListReleasesForUser(userId: user.Id,
-                    releaseApprovalStatus);
-                Assert.Equal([
-                        userReleaseRoles[0].ReleaseVersionId,
-                        userPublicationRole.Publication.Releases[0].Versions[0].Id
-                    ],
-                    result.Select(rv => rv.Id));
+                var result = await repository.ListReleasesForUser(userId: user.Id, releaseApprovalStatus);
+                Assert.Equal(
+                    [userReleaseRoles[0].ReleaseVersionId, userPublicationRole.Publication.Releases[0].Versions[0].Id],
+                    result.Select(rv => rv.Id)
+                );
             }
         }
 
@@ -77,40 +84,52 @@ public class ReleaseVersionRepositoryTests
         [InlineData(ReleaseApprovalStatus.HigherLevelReview)]
         [InlineData(ReleaseApprovalStatus.Draft)]
         public async Task ListReleasesForUser_ExcludesOtherReleaseApprovalStatuses(
-            ReleaseApprovalStatus releaseApprovalStatus)
+            ReleaseApprovalStatus releaseApprovalStatus
+        )
         {
-            var user = new User { Id = Guid.NewGuid() };
+            User user = _fixture.DefaultUser();
 
             var otherReleaseApprovalStatus = Enum.GetValues<ReleaseApprovalStatus>()
                 .Except([releaseApprovalStatus])
                 .ToList();
 
             var userReleaseRoles = otherReleaseApprovalStatus
-                .Select(status => _fixture.DefaultUserReleaseRole()
-                    .WithUser(user)
-                    .WithReleaseVersion(_fixture.DefaultReleaseVersion()
-                        .WithApprovalStatus(status)
-                        .WithRelease(_fixture.DefaultRelease()
-                            .WithPublication(_fixture.DefaultPublication())))
-                    .WithRole(ReleaseRole.Contributor)
-                    .Generate())
+                .Select(status =>
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithUser(user)
+                        .WithReleaseVersion(
+                            _fixture
+                                .DefaultReleaseVersion()
+                                .WithApprovalStatus(status)
+                                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
+                        )
+                        .WithRole(ReleaseRole.Contributor)
+                        .Generate()
+                )
                 .ToList();
 
             var userPublicationRoles = otherReleaseApprovalStatus
-                .Select(status => _fixture.DefaultUserPublicationRole()
-                    .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
-                    .WithPublication(_fixture.DefaultPublication()
-                        .WithReleases(_ =>
-                        [
-                            _fixture.DefaultRelease()
-                                .WithVersions(_ =>
-                                [
-                                    _fixture.DefaultReleaseVersion()
-                                        .WithApprovalStatus(status)
-                                ])
-                        ]))
-                    .Generate())
+                .Select(status =>
+                    _fixture
+                        .DefaultUserPublicationRole()
+                        .WithUser(user)
+                        .WithRole(PublicationRole.Owner)
+                        .WithPublication(
+                            _fixture
+                                .DefaultPublication()
+                                .WithReleases(_ =>
+                                    [
+                                        _fixture
+                                            .DefaultRelease()
+                                            .WithVersions(_ =>
+                                                [_fixture.DefaultReleaseVersion().WithApprovalStatus(status)]
+                                            ),
+                                    ]
+                                )
+                        )
+                        .Generate()
+                )
                 .ToList();
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -124,8 +143,7 @@ public class ReleaseVersionRepositoryTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = BuildRepository(contentDbContext);
-                var result = await repository.ListReleasesForUser(userId: user.Id,
-                    releaseApprovalStatus);
+                var result = await repository.ListReleasesForUser(userId: user.Id, releaseApprovalStatus);
                 Assert.Empty(result);
             }
         }
@@ -133,27 +151,40 @@ public class ReleaseVersionRepositoryTests
         [Fact]
         public async Task ListReleasesForUser_ExcludesOtherUsers()
         {
-            var user = new User { Id = Guid.NewGuid() };
+            User user = _fixture.DefaultUser();
 
-            UserReleaseRole userReleaseRole = _fixture.DefaultUserReleaseRole()
+            UserReleaseRole userReleaseRole = _fixture
+                .DefaultUserReleaseRole()
                 .WithUser(user)
-                .WithReleaseVersion(_fixture.DefaultReleaseVersion()
-                    .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-                    .WithRelease(_fixture.DefaultRelease()
-                        .WithPublication(_fixture.DefaultPublication())))
+                .WithReleaseVersion(
+                    _fixture
+                        .DefaultReleaseVersion()
+                        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
+                )
                 .WithRole(ReleaseRole.Contributor);
 
-            UserPublicationRole userPublicationRole = _fixture.DefaultUserPublicationRole()
+            UserPublicationRole userPublicationRole = _fixture
+                .DefaultUserPublicationRole()
                 .WithUser(user)
                 .WithRole(PublicationRole.Owner)
-                .WithPublication(_fixture.DefaultPublication()
-                    .WithReleases([
-                        _fixture.DefaultRelease()
-                            .WithVersions([
-                                _fixture.DefaultReleaseVersion()
-                                    .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-                            ])
-                    ]));
+                .WithPublication(
+                    _fixture
+                        .DefaultPublication()
+                        .WithReleases(
+                            [
+                                _fixture
+                                    .DefaultRelease()
+                                    .WithVersions(
+                                        [
+                                            _fixture
+                                                .DefaultReleaseVersion()
+                                                .WithApprovalStatus(ReleaseApprovalStatus.Approved),
+                                        ]
+                                    ),
+                            ]
+                        )
+                );
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -166,8 +197,10 @@ public class ReleaseVersionRepositoryTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = BuildRepository(contentDbContext);
-                var result = await repository.ListReleasesForUser(userId: Guid.NewGuid(),
-                    ReleaseApprovalStatus.Approved);
+                var result = await repository.ListReleasesForUser(
+                    userId: Guid.NewGuid(),
+                    ReleaseApprovalStatus.Approved
+                );
                 Assert.Empty(result);
             }
         }
@@ -180,9 +213,7 @@ public class ReleaseVersionRepositoryTests
         {
             ReleaseVersion releaseVersion = _fixture
                 .DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease()
-                    .WithPublication(_fixture
-                        .DefaultPublication()));
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -219,9 +250,7 @@ public class ReleaseVersionRepositoryTests
         {
             ReleaseVersion releaseVersion = _fixture
                 .DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease()
-                    .WithPublication(_fixture
-                        .DefaultPublication()));
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
             Data.Model.ReleaseVersion existingStatsReleaseVersion = _fixture
                 .DefaultStatsReleaseVersion()
@@ -231,8 +260,7 @@ public class ReleaseVersionRepositoryTests
             ReleaseSubject existingReleaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithReleaseVersion(existingStatsReleaseVersion)
-                .WithSubject(_fixture
-                    .DefaultSubject());
+                .WithSubject(_fixture.DefaultSubject());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -266,13 +294,17 @@ public class ReleaseVersionRepositoryTests
 
                 Assert.Equal(2, await statisticsDbContext.ReleaseSubject.CountAsync());
 
-                Assert.True(await statisticsDbContext.ReleaseSubject
-                    .AnyAsync(rs => rs.ReleaseVersionId == releaseVersion.Id
-                                    && rs.SubjectId == existingReleaseSubject.SubjectId));
+                Assert.True(
+                    await statisticsDbContext.ReleaseSubject.AnyAsync(rs =>
+                        rs.ReleaseVersionId == releaseVersion.Id && rs.SubjectId == existingReleaseSubject.SubjectId
+                    )
+                );
 
-                Assert.True(await statisticsDbContext.ReleaseSubject
-                    .AnyAsync(rs => rs.ReleaseVersionId == releaseVersion.Id
-                                    && rs.SubjectId == createdSubjectId));
+                Assert.True(
+                    await statisticsDbContext.ReleaseSubject.AnyAsync(rs =>
+                        rs.ReleaseVersionId == releaseVersion.Id && rs.SubjectId == createdSubjectId
+                    )
+                );
             }
         }
     }
@@ -284,6 +316,7 @@ public class ReleaseVersionRepositoryTests
     {
         return new ReleaseVersionRepository(
             contentDbContext ?? Mock.Of<ContentDbContext>(),
-            statisticsDbContext ?? Mock.Of<StatisticsDbContext>());
+            statisticsDbContext ?? Mock.Of<StatisticsDbContext>()
+        );
     }
 }

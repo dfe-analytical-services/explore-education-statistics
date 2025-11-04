@@ -21,15 +21,18 @@ public class ReleaseFile
 
     public int Order { get; set; }
 
+    public bool? PublicApiCompatible { get; set; }
+
     public Guid? PublicApiDataSetId { get; set; }
 
     public SemVersion? PublicApiDataSetVersion { get; set; }
 
-    public string? PublicApiDataSetVersionString => PublicApiDataSetVersion is not null 
-        ? PublicApiDataSetVersion.Patch > 0 
-            ? $"{PublicApiDataSetVersion.Major}.{PublicApiDataSetVersion.Minor}.{PublicApiDataSetVersion.Patch}" 
-            : $"{PublicApiDataSetVersion.Major}.{PublicApiDataSetVersion.Minor}" 
-        : null;
+    public string? PublicApiDataSetVersionString =>
+        PublicApiDataSetVersion is not null
+            ? PublicApiDataSetVersion.Patch > 0
+                ? $"{PublicApiDataSetVersion.Major}.{PublicApiDataSetVersion.Minor}.{PublicApiDataSetVersion.Patch}"
+                : $"{PublicApiDataSetVersion.Major}.{PublicApiDataSetVersion.Minor}"
+            : null;
 
     public List<FilterSequenceEntry>? FilterSequence { get; set; }
 
@@ -40,11 +43,11 @@ public class ReleaseFile
 
 public abstract record SequenceEntry<TEntry, TChild>(TEntry Id, List<TChild> ChildSequence);
 
-public record FilterSequenceEntry(Guid Id, List<FilterGroupSequenceEntry> ChildSequence) :
-    SequenceEntry<Guid, FilterGroupSequenceEntry>(Id, ChildSequence);
+public record FilterSequenceEntry(Guid Id, List<FilterGroupSequenceEntry> ChildSequence)
+    : SequenceEntry<Guid, FilterGroupSequenceEntry>(Id, ChildSequence);
 
-public record FilterGroupSequenceEntry(Guid Id, List<Guid> ChildSequence) :
-    SequenceEntry<Guid, Guid>(Id, ChildSequence);
+public record FilterGroupSequenceEntry(Guid Id, List<Guid> ChildSequence)
+    : SequenceEntry<Guid, Guid>(Id, ChildSequence);
 
-public record IndicatorGroupSequenceEntry(Guid Id, List<Guid> ChildSequence) :
-    SequenceEntry<Guid, Guid>(Id, ChildSequence);
+public record IndicatorGroupSequenceEntry(Guid Id, List<Guid> ChildSequence)
+    : SequenceEntry<Guid, Guid>(Id, ChildSequence);

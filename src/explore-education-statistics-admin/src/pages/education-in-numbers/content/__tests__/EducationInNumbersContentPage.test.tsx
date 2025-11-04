@@ -47,7 +47,6 @@ describe('EducationInNumbersContentPage', () => {
             type: 'HtmlBlock',
             order: 0,
             body: '<p>Section 1 content</p>',
-            comments: [],
           },
         ],
       },
@@ -59,9 +58,8 @@ describe('EducationInNumbersContentPage', () => {
           {
             id: 'block-2',
             type: 'HtmlBlock',
-            order: 0,
+            order: 1,
             body: '<p>Section 2 content</p>',
-            comments: [],
           },
         ],
       },

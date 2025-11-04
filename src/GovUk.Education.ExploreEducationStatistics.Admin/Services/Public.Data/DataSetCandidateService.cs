@@ -12,14 +12,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
-internal class DataSetCandidateService(
-    ContentDbContext contentDbContext,
-    IUserService userService)
+internal class DataSetCandidateService(ContentDbContext contentDbContext, IUserService userService)
     : IDataSetCandidateService
 {
     public async Task<Either<ActionResult, IReadOnlyList<DataSetCandidateViewModel>>> ListCandidates(
         Guid releaseVersionId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await CheckReleaseVersionExists(releaseVersionId, cancellationToken)
             .OnSuccess(userService.CheckCanViewReleaseVersion)
@@ -28,21 +27,24 @@ internal class DataSetCandidateService(
 
     private async Task<Either<ActionResult, ReleaseVersion>> CheckReleaseVersionExists(
         Guid releaseVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await contentDbContext.ReleaseVersions
-            .AsNoTracking()
+        return await contentDbContext
+            .ReleaseVersions.AsNoTracking()
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken);
     }
 
     private async Task<Either<ActionResult, IReadOnlyList<DataSetCandidateViewModel>>> DoListCandidates(
         Guid releaseVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await contentDbContext.ReleaseFiles
-            .AsNoTracking()
+        return await contentDbContext
+            .ReleaseFiles.AsNoTracking()
             .Where(rf => rf.ReleaseVersionId == releaseVersionId)
             .Where(rf => rf.File.Type == FileType.Data)
+            .Where(rf => rf.PublicApiCompatible == true || rf.PublicApiCompatible == null)
             .Where(rf => rf.PublicApiDataSetId == null)
             .Where(rf => rf.File.ReplacedById == null)
             .Where(rf => rf.File.ReplacingId == null)
@@ -54,11 +56,7 @@ internal class DataSetCandidateService(
             )
             .Where(tuple => tuple.DataImport.Status == DataImportStatus.COMPLETE)
             .Select(tuple => tuple.ReleaseFile)
-            .Select(rf => new DataSetCandidateViewModel
-            {
-                ReleaseFileId = rf.Id,
-                Title = rf.Name!,
-            })
+            .Select(rf => new DataSetCandidateViewModel { ReleaseFileId = rf.Id, Title = rf.Name! })
             .OrderBy(rf => rf.Title)
             .ToListAsync(cancellationToken: cancellationToken);
     }

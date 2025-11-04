@@ -1,7 +1,6 @@
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
@@ -11,7 +10,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
@@ -19,44 +17,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Funct
 public class CreateNextDataSetVersionMappingsFunction(
     ILogger<CreateNextDataSetVersionMappingsFunction> logger,
     IDataSetVersionService dataSetVersionService,
-    IValidator<NextDataSetVersionMappingsCreateRequest> requestValidator,
-    IOptions<FeatureFlagsOptions> featureFlags)
+    IValidator<NextDataSetVersionMappingsCreateRequest> requestValidator
+)
 {
     [Function(nameof(CreateNextDataSetVersionMappings))]
     public async Task<IActionResult> CreateNextDataSetVersionMappings(
-        [HttpTrigger(
-            AuthorizationLevel.Anonymous, "post",
-            Route = nameof(CreateNextDataSetVersionMappings))]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(CreateNextDataSetVersionMappings))]
         [FromBody]
-        NextDataSetVersionMappingsCreateRequest request,
+            NextDataSetVersionMappingsCreateRequest request,
         [DurableClient] DurableTaskClient client,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         // Identifier of the scheduled processing orchestration instance
         var instanceId = Guid.NewGuid();
-        
-        return await requestValidator.Validate(request, cancellationToken)
+
+        return await requestValidator
+            .Validate(request, cancellationToken)
             .OnSuccess(() =>
-                 dataSetVersionService.CreateNextVersion(
+                dataSetVersionService.CreateNextVersion(
                     dataSetId: request.DataSetId,
                     releaseFileId: request.ReleaseFileId,
                     instanceId,
                     request.DataSetVersionToReplaceId,
                     cancellationToken: cancellationToken
-                ))
+                )
+            )
             .OnSuccess(async dataSetVersionId =>
             {
                 await ProcessNextDataSetVersion(
                     client,
                     dataSetVersionId: dataSetVersionId,
                     instanceId: instanceId,
-                    cancellationToken);
+                    cancellationToken
+                );
 
                 return new ProcessDataSetVersionResponseViewModel
                 {
                     DataSetId = request.DataSetId,
                     DataSetVersionId = dataSetVersionId,
-                    InstanceId = instanceId
+                    InstanceId = instanceId,
                 };
             })
             .HandleFailuresOr(result => new OkObjectResult(result));
@@ -66,10 +66,12 @@ public class CreateNextDataSetVersionMappingsFunction(
         DurableTaskClient client,
         Guid dataSetVersionId,
         Guid instanceId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        const string orchestratorName =
-            nameof(ProcessNextDataSetVersionMappingsFunctionOrchestration.ProcessNextDataSetVersionMappings);
+        const string orchestratorName = nameof(
+            ProcessNextDataSetVersionMappingsFunctionOrchestration.ProcessNextDataSetVersionMappings
+        );
 
         var input = new ProcessDataSetVersionContext { DataSetVersionId = dataSetVersionId };
 
@@ -79,12 +81,9 @@ public class CreateNextDataSetVersionMappingsFunction(
             "Scheduling '{OrchestratorName}' (InstanceId={InstanceId}, DataSetVersionId={DataSetVersionId})",
             orchestratorName,
             instanceId,
-            dataSetVersionId);
+            dataSetVersionId
+        );
 
-        await client.ScheduleNewOrchestrationInstanceAsync(
-            orchestratorName,
-            input,
-            options,
-            cancellationToken);
+        await client.ScheduleNewOrchestrationInstanceAsync(orchestratorName, input, options, cancellationToken);
     }
 }

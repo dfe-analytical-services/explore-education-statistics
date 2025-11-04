@@ -1,4 +1,3 @@
-#nullable enable
 using FluentValidation;
 using FluentValidation.Results;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -13,7 +12,8 @@ public static class FluentValidationRuleExtensions
     public static async Task<Either<ActionResult, T>> Validate<T>(
         this IValidator<T> validator,
         T instance,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var result = await validator.ValidateAsync(instance, cancellationToken);
 
@@ -27,20 +27,19 @@ public static class FluentValidationRuleExtensions
 
     public static IRuleBuilderOptions<T, TProperty> WithMessage<T, TProperty>(
         this IRuleBuilderOptions<T, TProperty> rule,
-        LocalizableMessage localizableMessage)
+        LocalizableMessage localizableMessage
+    )
     {
-        return rule
-            .WithErrorCode(localizableMessage.Code)
-            .WithMessage(localizableMessage.Message);
+        return rule.WithErrorCode(localizableMessage.Code).WithMessage(localizableMessage.Message);
     }
 
     public static IRuleBuilderOptions<T, TProperty> WithMessage<T, TProperty>(
         this IRuleBuilderOptions<T, TProperty> rule,
         LocalizableMessage localizableMessage,
-        params object[] value)
+        params object[] value
+    )
     {
-        return rule
-            .WithErrorCode(localizableMessage.Code)
+        return rule.WithErrorCode(localizableMessage.Code)
             .WithMessage(string.Format(localizableMessage.Message, value));
     }
 
@@ -48,15 +47,19 @@ public static class FluentValidationRuleExtensions
         this ValidationContext<T> context,
         LocalizableMessage message,
         TDetail? detail,
-        Dictionary<string, object>? messagePlaceholders = null) where TDetail : class
+        Dictionary<string, object>? messagePlaceholders = null
+    )
+        where TDetail : class
     {
-        context.AddFailure(new ValidationFailure
-        {
-            PropertyName = context.PropertyPath,
-            ErrorCode = message.Code,
-            ErrorMessage = message.Message,
-            CustomState = detail,
-            FormattedMessagePlaceholderValues = messagePlaceholders
-        });
+        context.AddFailure(
+            new ValidationFailure
+            {
+                PropertyName = context.PropertyPath,
+                ErrorCode = message.Code,
+                ErrorMessage = message.Message,
+                CustomState = detail,
+                FormattedMessagePlaceholderValues = messagePlaceholders,
+            }
+        );
     }
 }

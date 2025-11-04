@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -25,10 +25,7 @@ public class DataImportServiceTests
     [Fact]
     public async Task GetImportStatus()
     {
-        var import = new DataImport
-        {
-            Status = STAGE_1
-        };
+        var import = new DataImport { Status = STAGE_1 };
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -59,8 +56,7 @@ public class DataImportServiceTests
         {
             File = new File(),
             MetaFile = new File(),
-            ZipFile = new File(),
-            Status = STAGE_1
+            Status = STAGE_1,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -82,9 +78,6 @@ public class DataImportServiceTests
 
         Assert.NotNull(import.MetaFile);
         Assert.Equal(import.MetaFile.Id, result.MetaFile.Id);
-
-        Assert.NotNull(import.ZipFile);
-        Assert.Equal(import.ZipFile.Id, result.ZipFile!.Id);
     }
 
     [Fact]
@@ -92,15 +85,10 @@ public class DataImportServiceTests
     {
         var import = new DataImport
         {
-            Errors = new List<DataImportError>
-            {
-                new("error 1"),
-                new("error 2")
-            },
+            Errors = new List<DataImportError> { new("error 1"), new("error 2") },
             File = new File(),
             MetaFile = new File(),
-            ZipFile = new File(),
-            Status = STAGE_1
+            Status = STAGE_1,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -128,7 +116,7 @@ public class DataImportServiceTests
         {
             ExpectedImportedRows = 1,
             ImportedRows = 1,
-            TotalRows = 1
+            TotalRows = 1,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -138,7 +126,6 @@ public class DataImportServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-
         var service = BuildDataImportService(contentDbContextId);
 
         await service.Update(
@@ -146,11 +133,8 @@ public class DataImportServiceTests
             expectedImportedRows: 3000,
             importedRows: 5000,
             totalRows: 10000,
-            geographicLevels: new HashSet<GeographicLevel>
-            {
-                GeographicLevel.Country,
-                GeographicLevel.Region
-            });
+            geographicLevels: new HashSet<GeographicLevel> { GeographicLevel.Country, GeographicLevel.Region }
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -165,7 +149,7 @@ public class DataImportServiceTests
             Assert.Contains(GeographicLevel.Region, updated.GeographicLevels);
         }
     }
-    
+
     [Fact]
     public async Task Update_Partial()
     {
@@ -173,7 +157,7 @@ public class DataImportServiceTests
         {
             ExpectedImportedRows = 1,
             ImportedRows = 1,
-            TotalRows = 1
+            TotalRows = 1,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -188,11 +172,8 @@ public class DataImportServiceTests
         await service.Update(
             import.Id,
             importedRows: 5000,
-            geographicLevels: new HashSet<GeographicLevel>
-            {
-                GeographicLevel.Country,
-                GeographicLevel.Region
-            });
+            geographicLevels: new HashSet<GeographicLevel> { GeographicLevel.Country, GeographicLevel.Region }
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -213,30 +194,33 @@ public class DataImportServiceTests
     {
         var totalRows = 9393;
 
-        var subject = _fixture.DefaultSubject()
-            .Generate();
+        var subject = _fixture.DefaultSubject().Generate();
 
-        var file = _fixture.DefaultFile(FileType.Data)
+        var file = _fixture
+            .DefaultFile(FileType.Data)
             .WithDataSetFileMeta(null)
             .WithDataSetFileVersionGeographicLevels([])
             .WithSubjectId(subject.Id)
             .Generate();
 
-        var observation1 = _fixture.DefaultObservation()
+        var observation1 = _fixture
+            .DefaultObservation()
             .WithSubject(subject)
             .WithLocation(new Location { GeographicLevel = GeographicLevel.Country })
             .WithTimePeriod(2000, TimeIdentifier.April)
             .Generate();
 
-        var observation2 = _fixture.DefaultObservation()
+        var observation2 = _fixture
+            .DefaultObservation()
             .WithSubject(subject)
-            .WithLocation(new Location { GeographicLevel = GeographicLevel.LocalAuthority, })
+            .WithLocation(new Location { GeographicLevel = GeographicLevel.LocalAuthority })
             .WithTimePeriod(2001, TimeIdentifier.May)
             .Generate();
 
-        var observation3 = _fixture.DefaultObservation()
+        var observation3 = _fixture
+            .DefaultObservation()
             .WithSubject(subject)
-            .WithLocation(new Location { GeographicLevel = GeographicLevel.Region, })
+            .WithLocation(new Location { GeographicLevel = GeographicLevel.Region })
             .WithTimePeriod(2002, TimeIdentifier.June)
             .Generate();
 
@@ -279,21 +263,17 @@ public class DataImportServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var service = BuildDataImportService(
-            contentDbContextId,
-            statisticsDbContextId);
+        var service = BuildDataImportService(contentDbContextId, statisticsDbContextId);
 
         await service.WriteDataSetFileMeta(file.Id, subject.Id, totalRows);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var updatedFile = contentDbContext.Files
-                .Include(f => f.DataSetFileVersionGeographicLevels)
+            var updatedFile = contentDbContext
+                .Files.Include(f => f.DataSetFileVersionGeographicLevels)
                 .Single(f => f.SubjectId == subject.Id);
 
-            var geogLvls = updatedFile.DataSetFileVersionGeographicLevels
-                .Select(gl => gl.GeographicLevel)
-                .ToList();
+            var geogLvls = updatedFile.DataSetFileVersionGeographicLevels.Select(gl => gl.GeographicLevel).ToList();
             Assert.Equal(3, geogLvls.Count);
             Assert.Contains(GeographicLevel.Country, geogLvls);
             Assert.Contains(GeographicLevel.LocalAuthority, geogLvls);
@@ -335,13 +315,15 @@ public class DataImportServiceTests
             {
                 SubjectId = subject.Id,
                 Name = "root_filter",
-                FilterGroups = [
+                FilterGroups =
+                [
                     new FilterGroup
                     {
-                        Label  = "Root filter group",
-                        FilterItems = [
-                            new FilterItem { Label = "RootFilterItem0", },
-                            new FilterItem { Label = "RootFilterItem1", },
+                        Label = "Root filter group",
+                        FilterItems =
+                        [
+                            new FilterItem { Label = "RootFilterItem0" },
+                            new FilterItem { Label = "RootFilterItem1" },
                         ],
                     },
                 ],
@@ -351,14 +333,16 @@ public class DataImportServiceTests
             {
                 SubjectId = subject.Id,
                 Name = "child_filter1",
-                FilterGroups = [
+                FilterGroups =
+                [
                     new FilterGroup
                     {
-                        Label  = "Child filter 1 group",
-                        FilterItems = [
-                            new FilterItem { Label = "ChildFilter1Item0", },
-                            new FilterItem { Label = "ChildFilter1Item1", },
-                            new FilterItem { Label = "ChildFilter1Item2", },
+                        Label = "Child filter 1 group",
+                        FilterItems =
+                        [
+                            new FilterItem { Label = "ChildFilter1Item0" },
+                            new FilterItem { Label = "ChildFilter1Item1" },
+                            new FilterItem { Label = "ChildFilter1Item2" },
                         ],
                     },
                 ],
@@ -368,22 +352,24 @@ public class DataImportServiceTests
             {
                 SubjectId = subject.Id,
                 Name = "child_filter2",
-                FilterGroups = [
+                FilterGroups =
+                [
                     new FilterGroup
                     {
-                        Label  = "Child filter 2 group",
-                        FilterItems = [
-                            new FilterItem { Label = "ChildFilter2Item0", },
-                            new FilterItem { Label = "ChildFilter2Item1", },
-                            new FilterItem { Label = "ChildFilter2Item2", },
-                            new FilterItem { Label = "ChildFilter2Item3", },
-                            new FilterItem { Label = "ChildFilter2Item4", },
-                            new FilterItem { Label = "ChildFilter2Item5", },
+                        Label = "Child filter 2 group",
+                        FilterItems =
+                        [
+                            new FilterItem { Label = "ChildFilter2Item0" },
+                            new FilterItem { Label = "ChildFilter2Item1" },
+                            new FilterItem { Label = "ChildFilter2Item2" },
+                            new FilterItem { Label = "ChildFilter2Item3" },
+                            new FilterItem { Label = "ChildFilter2Item4" },
+                            new FilterItem { Label = "ChildFilter2Item5" },
                         ],
                     },
                 ],
                 ParentFilter = "child_filter1",
-            }
+            },
         };
 
         var rootFilterItem0 = filters[0].FilterGroups[0].FilterItems[0];
@@ -398,60 +384,48 @@ public class DataImportServiceTests
         var childFilter2Item4 = filters[2].FilterGroups[0].FilterItems[4];
         var childFilter2Item5 = filters[2].FilterGroups[0].FilterItems[5];
 
-        var observation0 = _fixture.DefaultObservation()
+        var observation0 = _fixture
+            .DefaultObservation()
             .WithSubject(subject)
-            .WithFilterItems([
-                rootFilterItem0,
-                childFilter1Item0,
-                childFilter2Item0,
-            ]);
+            .WithFilterItems([rootFilterItem0, childFilter1Item0, childFilter2Item0]);
 
-        var observation1 = _fixture.DefaultObservation()
+        var observation1 = _fixture
+            .DefaultObservation()
             .WithSubject(subject)
-            .WithFilterItems([
-                rootFilterItem1,
-                childFilter1Item1,
-                childFilter2Item1,
-            ]);
+            .WithFilterItems([rootFilterItem1, childFilter1Item1, childFilter2Item1]);
 
-        var observation2 = _fixture.DefaultObservation()
+        var observation2 = _fixture
+            .DefaultObservation()
             .WithSubject(subject)
-            .WithFilterItems([
-                rootFilterItem1,
-                childFilter1Item1,
-                childFilter2Item2,
-            ]);
+            .WithFilterItems([rootFilterItem1, childFilter1Item1, childFilter2Item2]);
 
-        var observation3 = _fixture.DefaultObservation()
+        var observation3 = _fixture
+            .DefaultObservation()
             .WithSubject(subject)
-            .WithFilterItems([
-                rootFilterItem1,
-                childFilter1Item2,
-                childFilter2Item3,
-            ]);
+            .WithFilterItems([rootFilterItem1, childFilter1Item2, childFilter2Item3]);
 
-        var observation4 = _fixture.DefaultObservation()
+        var observation4 = _fixture
+            .DefaultObservation()
             .WithSubject(subject)
-            .WithFilterItems([
-                rootFilterItem1,
-                childFilter1Item2,
-                childFilter2Item4,
-            ]);
+            .WithFilterItems([rootFilterItem1, childFilter1Item2, childFilter2Item4]);
 
-        var observation5 = _fixture.DefaultObservation()
+        var observation5 = _fixture
+            .DefaultObservation()
             .WithSubject(subject)
-            .WithFilterItems([
-                rootFilterItem1,
-                childFilter1Item2,
-                childFilter2Item5,
-            ]);
+            .WithFilterItems([rootFilterItem1, childFilter1Item2, childFilter2Item5]);
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             statisticsDbContext.Filter.AddRange(filters);
             statisticsDbContext.Observation.AddRange(
-                observation0, observation1, observation2, observation3, observation4, observation5);
+                observation0,
+                observation1,
+                observation2,
+                observation3,
+                observation4,
+                observation5
+            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -459,14 +433,17 @@ public class DataImportServiceTests
         {
             var results = await DataImportService.GenerateFilterHierarchies(
                 statisticsDbContext,
-                filters.Select(f => new FilterMeta
-                {
-                    Id = f.Id,
-                    Label = f.Label,
-                    Hint = f.Hint,
-                    ColumnName = f.Name,
-                    ParentFilter = f.ParentFilter,
-                }).ToList());
+                filters
+                    .Select(f => new FilterMeta
+                    {
+                        Id = f.Id,
+                        Label = f.Label,
+                        Hint = f.Hint,
+                        ColumnName = f.Name,
+                        ParentFilter = f.ParentFilter,
+                    })
+                    .ToList()
+            );
 
             var hierarchy = Assert.Single(results);
             Assert.Equal([filters[0].Id, filters[1].Id, filters[2].Id], hierarchy.FilterIds);
@@ -483,11 +460,14 @@ public class DataImportServiceTests
             Assert.Equal(3, hierarchy.Tiers[1].Count); // three child filter 1 items
             Assert.Equal(
                 [childFilter1Item0.Id, childFilter1Item1.Id, childFilter1Item2.Id],
-                hierarchy.Tiers[1].Keys.ToList());
+                hierarchy.Tiers[1].Keys.ToList()
+            );
             Assert.Equal([childFilter2Item0.Id], hierarchy.Tiers[1][childFilter1Item0.Id]);
             Assert.Equal([childFilter2Item1.Id, childFilter2Item2.Id], hierarchy.Tiers[1][childFilter1Item1.Id]);
-            Assert.Equal([childFilter2Item3.Id, childFilter2Item4.Id, childFilter2Item5.Id],
-                hierarchy.Tiers[1][childFilter1Item2.Id]);
+            Assert.Equal(
+                [childFilter2Item3.Id, childFilter2Item4.Id, childFilter2Item5.Id],
+                hierarchy.Tiers[1][childFilter1Item2.Id]
+            );
         }
     }
 
@@ -502,13 +482,12 @@ public class DataImportServiceTests
             {
                 SubjectId = subject.Id,
                 Name = "root_filter0",
-                FilterGroups = [
+                FilterGroups =
+                [
                     new FilterGroup
                     {
-                        Label  = "Root filter 0 group",
-                        FilterItems = [
-                            new FilterItem { Label = "RootFilter0Item0", },
-                        ],
+                        Label = "Root filter 0 group",
+                        FilterItems = [new FilterItem { Label = "RootFilter0Item0" }],
                     },
                 ],
                 ParentFilter = null,
@@ -517,13 +496,12 @@ public class DataImportServiceTests
             {
                 SubjectId = subject.Id,
                 Name = "child_filter0",
-                FilterGroups = [
+                FilterGroups =
+                [
                     new FilterGroup
                     {
-                        Label  = "Child filter 0 group",
-                        FilterItems = [
-                            new FilterItem { Label = "ChildFilter0Item0", },
-                        ],
+                        Label = "Child filter 0 group",
+                        FilterItems = [new FilterItem { Label = "ChildFilter0Item0" }],
                     },
                 ],
                 ParentFilter = "root_filter0",
@@ -532,13 +510,12 @@ public class DataImportServiceTests
             {
                 SubjectId = subject.Id,
                 Name = "root_filter1",
-                FilterGroups = [
+                FilterGroups =
+                [
                     new FilterGroup
                     {
-                        Label  = "Root filter 1 group",
-                        FilterItems = [
-                            new FilterItem { Label = "RootFilter1Item0", },
-                        ],
+                        Label = "Root filter 1 group",
+                        FilterItems = [new FilterItem { Label = "RootFilter1Item0" }],
                     },
                 ],
                 ParentFilter = null,
@@ -547,13 +524,12 @@ public class DataImportServiceTests
             {
                 SubjectId = subject.Id,
                 Name = "child_filter1",
-                FilterGroups = [
+                FilterGroups =
+                [
                     new FilterGroup
                     {
-                        Label  = "Child filter 1 group",
-                        FilterItems = [
-                            new FilterItem { Label = "ChildFilter1Item0", },
-                        ],
+                        Label = "Child filter 1 group",
+                        FilterItems = [new FilterItem { Label = "ChildFilter1Item0" }],
                     },
                 ],
                 ParentFilter = "root_filter1",
@@ -565,19 +541,15 @@ public class DataImportServiceTests
         var rootFilter1Item0 = filters[2].FilterGroups[0].FilterItems[0];
         var childFilter1Item0 = filters[3].FilterGroups[0].FilterItems[0];
 
-        var observation0 = _fixture.DefaultObservation()
+        var observation0 = _fixture
+            .DefaultObservation()
             .WithSubject(subject)
-            .WithFilterItems([
-                rootFilter0Item0,
-                childFilter0Item0,
-            ]);
+            .WithFilterItems([rootFilter0Item0, childFilter0Item0]);
 
-        var observation1 = _fixture.DefaultObservation()
+        var observation1 = _fixture
+            .DefaultObservation()
             .WithSubject(subject)
-            .WithFilterItems([
-                rootFilter1Item0,
-                childFilter1Item0,
-            ]);
+            .WithFilterItems([rootFilter1Item0, childFilter1Item0]);
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -591,14 +563,17 @@ public class DataImportServiceTests
         {
             var results = await DataImportService.GenerateFilterHierarchies(
                 statisticsDbContext,
-                filters.Select(f => new FilterMeta
-                {
-                    Id = f.Id,
-                    Label = f.Label,
-                    Hint = f.Hint,
-                    ColumnName = f.Name,
-                    ParentFilter = f.ParentFilter,
-                }).ToList());
+                filters
+                    .Select(f => new FilterMeta
+                    {
+                        Id = f.Id,
+                        Label = f.Label,
+                        Hint = f.Hint,
+                        ColumnName = f.Name,
+                        ParentFilter = f.ParentFilter,
+                    })
+                    .ToList()
+            );
 
             Assert.Equal(2, results.Count);
 
@@ -628,14 +603,14 @@ public class DataImportServiceTests
 
     private static DataImportService BuildDataImportService(
         string? contentDbContextId = null,
-        string? statisticsDbContextId = null)
+        string? statisticsDbContextId = null
+    )
     {
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId ?? Guid.NewGuid().ToString(),
-            statisticsDbContextId ?? Guid.NewGuid().ToString());
+            statisticsDbContextId ?? Guid.NewGuid().ToString()
+        );
 
-        return new DataImportService(
-            dbContextSupplier,
-            Mock.Of<ILogger<DataImportService>>(MockBehavior.Strict));
+        return new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>(MockBehavior.Strict));
     }
 }

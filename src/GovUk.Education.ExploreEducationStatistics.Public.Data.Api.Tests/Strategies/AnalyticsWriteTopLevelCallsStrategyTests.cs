@@ -14,73 +14,93 @@ public abstract class AnalyticsWriteTopLevelCallsStrategyTests
 {
     public class ReportTests : AnalyticsWriteTopLevelCallsStrategyTests
     {
-        private const string SnapshotPrefix = $"{nameof(AnalyticsWriteTopLevelCallsStrategyTests)}.{nameof(ReportTests)}";
-        
+        private const string SnapshotPrefix =
+            $"{nameof(AnalyticsWriteTopLevelCallsStrategyTests)}.{nameof(ReportTests)}";
+
         [Fact]
         public async Task CallWrittenSuccessfully_WithCoreTopLevelDetails()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            
+
             var strategy = BuildStrategy(
                 pathResolver: pathResolver,
-                dateTimeProvider: new DateTimeProvider(DateTime.Parse("2025-03-16T12:01:02Z")));
-            
-            await strategy.Report(new CaptureTopLevelCallRequest(
-                StartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
-                Type: TopLevelCallType.GetPublications), default);
-            
-            var files = Directory
-                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths));
-            
+                dateTimeProvider: new DateTimeProvider(DateTime.Parse("2025-03-16T12:01:02Z"))
+            );
+
+            await strategy.Report(
+                new CaptureTopLevelCallRequest(
+                    StartTime: DateTime.Parse("2025-02-28T03:07:44.850Z"),
+                    Type: TopLevelCallType.GetPublications
+                ),
+                default
+            );
+
+            var files = Directory.GetFiles(
+                pathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths)
+            );
+
             var filePath = Assert.Single(files);
 
-            var filename = filePath
-                .Split($"{pathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths)}{Path.DirectorySeparatorChar}")[1];
+            var filename = filePath.Split(
+                $"{pathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths)}{Path.DirectorySeparatorChar}"
+            )[1];
             Assert.StartsWith("20250316-120102_", filename);
 
             Snapshot.Match(
                 currentResult: await File.ReadAllTextAsync(filePath),
-                snapshotName: $"{SnapshotPrefix}.{nameof(CallWrittenSuccessfully_WithCoreTopLevelDetails)}");
+                snapshotName: $"{SnapshotPrefix}.{nameof(CallWrittenSuccessfully_WithCoreTopLevelDetails)}"
+            );
         }
-        
+
         [Fact]
         public async Task CallWrittenSuccessfully_WithParameters()
         {
             using var pathResolver = new TestAnalyticsPathResolver();
-            
+
             var strategy = BuildStrategy(
                 pathResolver: pathResolver,
-                dateTimeProvider: new DateTimeProvider(DateTime.Parse("2025-03-16T12:01:02Z")));
-            
-            await strategy.Report(new CaptureTopLevelCallRequest(
-                StartTime: DateTime.Parse("2025-02-26T03:07:44.850Z"),
-                Parameters: new PaginationParameters(Page: 1, PageSize: 10),
-                Type: TopLevelCallType.GetPublications), default);
-            
-            var files = Directory
-                .GetFiles(pathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths));
-            
+                dateTimeProvider: new DateTimeProvider(DateTime.Parse("2025-03-16T12:01:02Z"))
+            );
+
+            await strategy.Report(
+                new CaptureTopLevelCallRequest(
+                    StartTime: DateTime.Parse("2025-02-26T03:07:44.850Z"),
+                    Parameters: new PaginationParameters(Page: 1, PageSize: 10),
+                    Type: TopLevelCallType.GetPublications
+                ),
+                default
+            );
+
+            var files = Directory.GetFiles(
+                pathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths)
+            );
+
             var filePath = Assert.Single(files);
 
-            var filename = filePath
-                .Split($"{pathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths)}{Path.DirectorySeparatorChar}")[1];
+            var filename = filePath.Split(
+                $"{pathResolver.BuildOutputDirectory(AnalyticsWriteTopLevelCallsStrategy.OutputSubPaths)}{Path.DirectorySeparatorChar}"
+            )[1];
             Assert.StartsWith("20250316-120102_", filename);
             Assert.StartsWith("20250316-120102_", filename);
 
             Snapshot.Match(
                 currentResult: await File.ReadAllTextAsync(filePath),
-                snapshotName: $"{SnapshotPrefix}.{nameof(CallWrittenSuccessfully_WithParameters)}");
+                snapshotName: $"{SnapshotPrefix}.{nameof(CallWrittenSuccessfully_WithParameters)}"
+            );
         }
-        
+
         private static AnalyticsWriteTopLevelCallsStrategy BuildStrategy(
             IAnalyticsPathResolver pathResolver,
-            DateTimeProvider? dateTimeProvider = null)
+            DateTimeProvider? dateTimeProvider = null
+        )
         {
             return new AnalyticsWriteTopLevelCallsStrategy(
                 pathResolver,
                 new CommonAnalyticsWriteStrategyWorkflow<CaptureTopLevelCallRequest>(
                     dateTimeProvider: dateTimeProvider ?? new DateTimeProvider(),
-                    Mock.Of<ILogger<CommonAnalyticsWriteStrategyWorkflow<CaptureTopLevelCallRequest>>>()));
+                    Mock.Of<ILogger<CommonAnalyticsWriteStrategyWorkflow<CaptureTopLevelCallRequest>>>()
+                )
+            );
         }
     }
 }

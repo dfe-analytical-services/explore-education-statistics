@@ -9,7 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class DataSetScreenerClient(
     HttpClient httpClient,
-    IHttpClientAzureAuthenticationManager<DataScreenerClientOptions> authenticationManager) : IDataSetScreenerClient
+    IHttpClientAzureAuthenticationManager<DataScreenerClientOptions> authenticationManager
+) : IDataSetScreenerClient
 {
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
@@ -18,13 +19,15 @@ public class DataSetScreenerClient(
 
     public async Task<DataSetScreenerResponse> ScreenDataSet(
         DataSetScreenerRequest dataSetRequest,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         // TODO (EES-6341): Re-enable screening once fully implemented.
         return new DataSetScreenerResponse
         {
-            OverallResult = ScreenerResult.Passed,
-            Message = "Screening has been bypassed awaiting full implementation.",
+            OverallResult = "Passed",
+            Passed = true,
+            PublicApiCompatible = true,
         };
         //await authenticationManager.AddAuthentication(httpClient, cancellationToken);
 

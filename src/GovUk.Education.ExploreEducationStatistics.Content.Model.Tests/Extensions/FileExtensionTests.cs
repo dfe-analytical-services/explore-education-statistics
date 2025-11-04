@@ -16,7 +16,7 @@ public class FileExtensionTests
             Id = Guid.NewGuid(),
             RootPath = Guid.NewGuid(),
             Filename = "ancillary.pdf",
-            Type = Ancillary
+            Type = Ancillary,
         };
 
         var chartFile = new File
@@ -24,7 +24,7 @@ public class FileExtensionTests
             Id = Guid.NewGuid(),
             RootPath = Guid.NewGuid(),
             Filename = "chart.png",
-            Type = Chart
+            Type = Chart,
         };
 
         var dataFile = new File
@@ -32,7 +32,7 @@ public class FileExtensionTests
             Id = Guid.NewGuid(),
             RootPath = Guid.NewGuid(),
             Filename = "data.csv",
-            Type = Data
+            Type = Data,
         };
 
         var imageFile = new File
@@ -40,7 +40,7 @@ public class FileExtensionTests
             Id = Guid.NewGuid(),
             RootPath = Guid.NewGuid(),
             Filename = "image.png",
-            Type = Image
+            Type = Image,
         };
 
         var metaFile = new File
@@ -48,15 +48,7 @@ public class FileExtensionTests
             Id = Guid.NewGuid(),
             RootPath = Guid.NewGuid(),
             Filename = "data.meta.csv",
-            Type = Metadata
-        };
-
-        var dataZipFile = new File
-        {
-            Id = Guid.NewGuid(),
-            RootPath = Guid.NewGuid(),
-            Filename = "data.zip",
-            Type = DataZip
+            Type = Metadata,
         };
 
         Assert.Equal($"{ancillaryFile.RootPath}/ancillary/{ancillaryFile.Id}", ancillaryFile.Path());
@@ -64,7 +56,6 @@ public class FileExtensionTests
         Assert.Equal($"{dataFile.RootPath}/data/{dataFile.Id}", dataFile.Path());
         Assert.Equal($"{imageFile.RootPath}/image/{imageFile.Id}", imageFile.Path());
         Assert.Equal($"{metaFile.RootPath}/data/{metaFile.Id}", metaFile.Path());
-        Assert.Equal($"{dataZipFile.RootPath}/data-zip/{dataZipFile.Id}", dataZipFile.Path());
     }
 
     [Fact]
@@ -77,7 +68,7 @@ public class FileExtensionTests
             Id = Guid.NewGuid(),
             RootPath = Guid.NewGuid(),
             Filename = "ancillary.pdf",
-            Type = Ancillary
+            Type = Ancillary,
         };
 
         var chartFile = new File
@@ -85,7 +76,7 @@ public class FileExtensionTests
             Id = Guid.NewGuid(),
             RootPath = Guid.NewGuid(),
             Filename = "chart.png",
-            Type = Chart
+            Type = Chart,
         };
 
         var dataFile = new File
@@ -93,7 +84,7 @@ public class FileExtensionTests
             Id = Guid.NewGuid(),
             RootPath = Guid.NewGuid(),
             Filename = "data.csv",
-            Type = Data
+            Type = Data,
         };
 
         var imageFile = new File
@@ -101,36 +92,40 @@ public class FileExtensionTests
             Id = Guid.NewGuid(),
             RootPath = Guid.NewGuid(),
             Filename = "image.png",
-            Type = Image
+            Type = Image,
         };
 
-        Assert.Equal($"{releaseVersionId}/ancillary/{ancillaryFile.Id}",
-            ancillaryFile.PublicPath(releaseVersionId: releaseVersionId));
+        Assert.Equal(
+            $"{releaseVersionId}/ancillary/{ancillaryFile.Id}",
+            ancillaryFile.PublicPath(releaseVersionId: releaseVersionId)
+        );
 
-        Assert.Equal($"{releaseVersionId}/chart/{chartFile.Id}",
-            chartFile.PublicPath(releaseVersionId: releaseVersionId));
+        Assert.Equal(
+            $"{releaseVersionId}/chart/{chartFile.Id}",
+            chartFile.PublicPath(releaseVersionId: releaseVersionId)
+        );
 
-        Assert.Equal($"{releaseVersionId}/data/{dataFile.Id}",
-            dataFile.PublicPath(releaseVersionId: releaseVersionId));
+        Assert.Equal($"{releaseVersionId}/data/{dataFile.Id}", dataFile.PublicPath(releaseVersionId: releaseVersionId));
 
-        Assert.Equal($"{releaseVersionId}/image/{imageFile.Id}",
-            imageFile.PublicPath(releaseVersionId: releaseVersionId));
+        Assert.Equal(
+            $"{releaseVersionId}/image/{imageFile.Id}",
+            imageFile.PublicPath(releaseVersionId: releaseVersionId)
+        );
     }
 
     [Fact]
     public void PublicPath_FileTypeIsNotAPublicFileType()
     {
-        EnumUtil.GetEnums<FileType>().ForEach(type =>
-        {
-            if (!PublicFileTypes.Contains(type))
+        EnumUtil
+            .GetEnums<FileType>()
+            .ForEach(type =>
             {
-                var file = new File
+                if (!PublicFileTypes.Contains(type))
                 {
-                    Type = type
-                };
-                Assert.Throws<ArgumentOutOfRangeException>(() => file.PublicPath(releaseVersionId: Guid.NewGuid()));
-            }
-        });
+                    var file = new File { Type = type };
+                    Assert.Throws<ArgumentOutOfRangeException>(() => file.PublicPath(releaseVersionId: Guid.NewGuid()));
+                }
+            });
     }
 
     [Theory]
@@ -139,14 +134,9 @@ public class FileExtensionTests
     [InlineData(1048576, "1 Mb")]
     [InlineData(1073741824, "1 Gb")]
     [InlineData(1099511627776, "1 Tb")]
-    public void DisplaySize_FromFile_ReturnsStringOfCorrectSizeAndUnit(
-        long contentLength,
-        string expectedDisplaySize)
+    public void DisplaySize_FromFile_ReturnsStringOfCorrectSizeAndUnit(long contentLength, string expectedDisplaySize)
     {
-        var file = new File
-        {
-            ContentLength = contentLength
-        };
+        var file = new File { ContentLength = contentLength };
 
         Assert.Equal(expectedDisplaySize, file.DisplaySize());
     }
@@ -157,9 +147,7 @@ public class FileExtensionTests
     [InlineData(1048576, "1 Mb")]
     [InlineData(1073741824, "1 Gb")]
     [InlineData(1099511627776, "1 Tb")]
-    public void DisplaySize_FromNumber_ReturnsStringOfCorrectSizeAndUnit(
-        long contentLength,
-        string expectedDisplaySize)
+    public void DisplaySize_FromNumber_ReturnsStringOfCorrectSizeAndUnit(long contentLength, string expectedDisplaySize)
     {
         Assert.Equal(expectedDisplaySize, contentLength.DisplaySize());
     }
@@ -168,11 +156,7 @@ public class FileExtensionTests
     public void ZipFileEntryName_DataFile_ReturnsExpectedFileName()
     {
         // Arrange
-        var file = new File
-        {
-            Type = Data,
-            Filename = "data.csv",
-        };
+        var file = new File { Type = Data, Filename = "data.csv" };
 
         // Act
         var fileName = file.ZipFileEntryName();
@@ -185,11 +169,7 @@ public class FileExtensionTests
     public void ZipFileEntryName_AncillaryFile_ReturnsExpectedFileName()
     {
         // Arrange
-        var file = new File
-        {
-            Type = Ancillary,
-            Filename = "test.jpg",
-        };
+        var file = new File { Type = Ancillary, Filename = "test.jpg" };
 
         // Act
         var fileName = file.ZipFileEntryName();
@@ -202,11 +182,7 @@ public class FileExtensionTests
     public void ZipFileEntryName_InvalidType_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var file = new File
-        {
-            Type = Chart,
-            Filename = "chart.png",
-        };
+        var file = new File { Type = Chart, Filename = "chart.png" };
 
         // Act & Assert
         var exception = Assert.Throws<ArgumentOutOfRangeException>(file.ZipFileEntryName);

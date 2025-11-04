@@ -34,29 +34,16 @@ public class ReleaseServiceTests
     {
         Id = DataBlock1Id,
         ReleaseVersionId = Release1Version1Id,
-        ContentBlock = new DataBlock
-        {
-            Id = DataBlock1Id
-        },
-        DataBlockParent = new DataBlockParent
-        {
-            Id = Guid.NewGuid()
-        }
+        ContentBlock = new DataBlock { Id = DataBlock1Id },
+        DataBlockParent = new DataBlockParent { Id = Guid.NewGuid() },
     };
 
     private static readonly DataBlockVersion Release1DataBlockVersion2 = new()
     {
         Id = DataBlock2Id,
         ReleaseVersionId = Release1Version1Id,
-        ContentBlock = new DataBlock
-        {
-            Id = DataBlock2Id,
-            Order = 3
-        },
-        DataBlockParent = new DataBlockParent
-        {
-            Id = Guid.NewGuid()
-        }
+        ContentBlock = new DataBlock { Id = DataBlock2Id, Order = 3 },
+        DataBlockParent = new DataBlockParent { Id = Guid.NewGuid() },
     };
 
     private static readonly Release Release1 = new()
@@ -65,7 +52,7 @@ public class ReleaseServiceTests
         PublicationId = Guid.NewGuid(),
         Year = 2018,
         TimePeriodCoverage = AcademicYearQ1,
-        Slug = "2018-19-q1"
+        Slug = "2018-19-q1",
     };
 
     private static readonly ReleaseVersion Release1V1 = new()
@@ -79,8 +66,8 @@ public class ReleaseServiceTests
             {
                 Id = Guid.NewGuid(),
                 Description = "Related Information",
-                Url = "https://example.com"
-            }
+                Url = "https://example.com",
+            },
         },
         ApprovalStatus = Approved,
         Published = new DateTime(2019, 2, 1),
@@ -90,8 +77,8 @@ public class ReleaseServiceTests
             {
                 Id = Guid.NewGuid(),
                 On = new DateTime(2020, 1, 1),
-                Reason = "First update"
-            }
+                Reason = "First update",
+            },
         },
         Version = 0,
         PreviousVersionId = null,
@@ -101,7 +88,7 @@ public class ReleaseServiceTests
             {
                 Order = 1,
                 DataBlock = Release1DataBlockVersion1.ContentBlock,
-                DataBlockParentId = Release1DataBlockVersion1.DataBlockParent.Id
+                DataBlockParentId = Release1DataBlockVersion1.DataBlockParent.Id,
             },
             new KeyStatisticText { Order = 0 },
         },
@@ -117,7 +104,7 @@ public class ReleaseServiceTests
         Published = null,
         Version = 1,
         PreviousVersionId = Release1V1.Id,
-        SoftDeleted = true
+        SoftDeleted = true,
     };
 
     private static readonly ReleaseVersion Release1V3NotPublished = new()
@@ -134,24 +121,24 @@ public class ReleaseServiceTests
             {
                 Id = Guid.NewGuid(),
                 On = new DateTime(2020, 1, 1),
-                Reason = "First update"
+                Reason = "First update",
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 On = new DateTime(2020, 2, 1),
-                Reason = "Second update"
-            }
+                Reason = "Second update",
+            },
         },
         Version = 2,
-        PreviousVersionId = Release1V1.Id
+        PreviousVersionId = Release1V1.Id,
     };
 
     private static readonly List<ReleaseVersion> ReleaseVersions = new()
     {
         Release1V1,
         Release1V2Deleted,
-        Release1V3NotPublished
+        Release1V3NotPublished,
     };
 
     private static readonly ContentBlock Release1SummarySectionHtmlContentBlock1 = new HtmlBlock
@@ -201,7 +188,6 @@ public class ReleaseServiceTests
         Id = Guid.NewGuid(),
         Order = 1,
         Heading = "Release 1 summary section",
-        Caption = "",
         Type = ContentSectionType.ReleaseSummary,
         Content = new List<ContentBlock>
         {
@@ -209,7 +195,7 @@ public class ReleaseServiceTests
             Release1SummarySectionHtmlContentBlock2,
             Release1SummarySectionHtmlContentBlock3,
         },
-        ReleaseVersion = Release1V1
+        ReleaseVersion = Release1V1,
     };
 
     private static readonly ContentSection Release1RelatedDashboardsSection = new()
@@ -217,28 +203,25 @@ public class ReleaseServiceTests
         Id = Guid.NewGuid(),
         Order = 0,
         Heading = "Release 1 related dashboards section",
-        Caption = "",
         Type = ContentSectionType.RelatedDashboards,
         Content = new List<ContentBlock>(),
-        ReleaseVersion = Release1V1
+        ReleaseVersion = Release1V1,
     };
-
 
     private static readonly ContentSection Release1Section1 = new()
     {
         Id = Guid.NewGuid(),
         Order = 2,
         Heading = "Release 1 section 1 order 2",
-        Caption = "",
         Type = ContentSectionType.Generic,
         Content = new List<ContentBlock>
         {
             Release1Section1HtmlContentBlock1,
             Release1Section1HtmlContentBlock2,
             Release1Section1HtmlContentBlock3,
-            Release1DataBlockVersion2.ContentBlock
+            Release1DataBlockVersion2.ContentBlock,
         },
-        ReleaseVersion = Release1V1
+        ReleaseVersion = Release1V1,
     };
 
     private static readonly ContentSection Release1Section2 = new()
@@ -246,9 +229,8 @@ public class ReleaseServiceTests
         Id = Guid.NewGuid(),
         Order = 0,
         Heading = "Release 1 section 2 order 0",
-        Caption = "",
         Type = ContentSectionType.Generic,
-        ReleaseVersion = Release1V1
+        ReleaseVersion = Release1V1,
     };
 
     private static readonly ContentSection Release1Section3 = new()
@@ -256,18 +238,17 @@ public class ReleaseServiceTests
         Id = Guid.NewGuid(),
         Order = 1,
         Heading = "Release 1 section 3 order 1",
-        Caption = "",
         Type = ContentSectionType.Generic,
-        ReleaseVersion = Release1V1
+        ReleaseVersion = Release1V1,
     };
 
-    private static readonly List<ContentSection> ContentSections =
-        ListOf(
-            Release1SummarySection,
-            Release1RelatedDashboardsSection,
-            Release1Section1,
-            Release1Section2,
-            Release1Section3);
+    private static readonly List<ContentSection> ContentSections = ListOf(
+        Release1SummarySection,
+        Release1RelatedDashboardsSection,
+        Release1Section1,
+        Release1Section2,
+        Release1Section3
+    );
 
     [Fact]
     public async Task GetRelease()
@@ -282,8 +263,8 @@ public class ReleaseServiceTests
                 {
                     Filename = "ancillary.pdf",
                     ContentLength = 10240,
-                    Type = Ancillary
-                }
+                    Type = Ancillary,
+                },
             },
             new()
             {
@@ -293,27 +274,19 @@ public class ReleaseServiceTests
                 {
                     Filename = "data.csv",
                     ContentLength = 20480,
-                    Type = FileType.Data
-                }
+                    Type = FileType.Data,
+                },
             },
             new()
             {
                 ReleaseVersion = Release1V1,
-                File = new File
-                {
-                    Filename = "chart.png",
-                    Type = Chart
-                }
+                File = new File { Filename = "chart.png", Type = Chart },
             },
             new()
             {
                 ReleaseVersion = Release1V1,
-                File = new File
-                {
-                    Filename = "data.meta.csv",
-                    Type = Metadata
-                }
-            }
+                File = new File { Filename = "data.meta.csv", Type = Metadata },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -348,8 +321,8 @@ public class ReleaseServiceTests
             Assert.Equal(Release1V1.KeyStatistics[0].Id, viewModel.KeyStatistics[1].Id);
             Assert.Equal(1, viewModel.KeyStatistics[1].Order);
             var keyStatDataBlockViewModel = Assert.IsType<KeyStatisticDataBlockViewModel>(viewModel.KeyStatistics[1]);
-            Assert.Equal(Release1DataBlockVersion1.Id ,keyStatDataBlockViewModel.DataBlockId);
-            Assert.Equal(Release1DataBlockVersion1.DataBlockParent.Id ,keyStatDataBlockViewModel.DataBlockParentId);
+            Assert.Equal(Release1DataBlockVersion1.Id, keyStatDataBlockViewModel.DataBlockId);
+            Assert.Equal(Release1DataBlockVersion1.DataBlockParent.Id, keyStatDataBlockViewModel.DataBlockParentId);
 
             var summarySection = viewModel.SummarySection;
             Assert.NotNull(summarySection);
@@ -358,14 +331,11 @@ public class ReleaseServiceTests
             Assert.NotNull(summarySectionContent);
             Assert.Equal(3, summarySectionContent.Count);
             Assert.Equal(Release1SummarySectionHtmlContentBlock2.Id, summarySectionContent[0].Id);
-            Assert.Equal("<p>Release 1 summary 2 order 0</p>",
-                (summarySectionContent[0] as HtmlBlockViewModel)?.Body);
+            Assert.Equal("<p>Release 1 summary 2 order 0</p>", (summarySectionContent[0] as HtmlBlockViewModel)?.Body);
             Assert.Equal(Release1SummarySectionHtmlContentBlock3.Id, summarySectionContent[1].Id);
-            Assert.Equal("<p>Release 1 summary 3 order 1</p>",
-                (summarySectionContent[1] as HtmlBlockViewModel)?.Body);
+            Assert.Equal("<p>Release 1 summary 3 order 1</p>", (summarySectionContent[1] as HtmlBlockViewModel)?.Body);
             Assert.Equal(Release1SummarySectionHtmlContentBlock1.Id, summarySectionContent[2].Id);
-            Assert.Equal("<p>Release 1 summary 1 order 2</p>",
-                (summarySectionContent[2] as HtmlBlockViewModel)?.Body);
+            Assert.Equal("<p>Release 1 summary 1 order 2</p>", (summarySectionContent[2] as HtmlBlockViewModel)?.Body);
 
             var relatedDashboardsSection = viewModel.RelatedDashboardsSection;
             Assert.NotNull(relatedDashboardsSection);
@@ -394,7 +364,10 @@ public class ReleaseServiceTests
             Assert.Equal(Release1Section1HtmlContentBlock1.Id, content[2].Content[2].Id);
             Assert.Equal("<p>Release 1 section 1 order 2</p>", (content[2].Content[2] as HtmlBlockViewModel)?.Body);
             Assert.Equal(Release1DataBlockVersion2.Id, content[2].Content[3].Id);
-            Assert.Equal(Release1DataBlockVersion2.DataBlockParent.Id, (content[2].Content[3] as DataBlockViewModel)?.DataBlockParentId);
+            Assert.Equal(
+                Release1DataBlockVersion2.DataBlockParent.Id,
+                (content[2].Content[3] as DataBlockViewModel)?.DataBlockParentId
+            );
 
             Assert.Single(viewModel.Updates);
             Assert.Equal(new DateTime(2020, 1, 1), viewModel.Updates[0].On);
@@ -426,8 +399,7 @@ public class ReleaseServiceTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
-                .Generate(1));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
 
         var releaseVersion = publication.ReleaseVersions[0];
 
@@ -446,47 +418,23 @@ public class ReleaseServiceTests
             new()
             {
                 Type = ContentSectionType.ReleaseSummary,
-                Content = new List<ContentBlock>
-                {
-                    new HtmlBlock
-                    {
-                        Body = originalContent
-                    }
-                }
+                Content = new List<ContentBlock> { new HtmlBlock { Body = originalContent } },
             },
             new()
             {
                 Type = ContentSectionType.RelatedDashboards,
-                Content = new List<ContentBlock>
-                {
-                    new HtmlBlock
-                    {
-                        Body = originalContent
-                    }
-                }
+                Content = new List<ContentBlock> { new HtmlBlock { Body = originalContent } },
             },
             new()
             {
                 Type = ContentSectionType.Headlines,
-                Content = new List<ContentBlock>
-                {
-                    new HtmlBlock
-                    {
-                        Body = originalContent
-                    }
-                }
+                Content = new List<ContentBlock> { new HtmlBlock { Body = originalContent } },
             },
             new()
             {
                 Type = ContentSectionType.Generic,
-                Content = new List<ContentBlock>
-                {
-                    new HtmlBlock
-                    {
-                        Body = originalContent
-                    }
-                }
-            }
+                Content = new List<ContentBlock> { new HtmlBlock { Body = originalContent } },
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -542,8 +490,7 @@ public class ReleaseServiceTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
-                .Generate(1));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
 
         var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null });
 
@@ -575,8 +522,7 @@ public class ReleaseServiceTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
-                .Generate(1));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
 
         var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null });
 
@@ -593,8 +539,7 @@ public class ReleaseServiceTests
 
             // Test scenario of the publisher getting an unpublished release to cache it in advance of publishing it
             // immediately.
-            var result = await service.GetRelease(releaseVersion.Id,
-                expectedPublishDate: null);
+            var result = await service.GetRelease(releaseVersion.Id, expectedPublishDate: null);
 
             var viewModel = result.AssertRight();
 
@@ -608,8 +553,7 @@ public class ReleaseServiceTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true)
-                .Generate(1));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true).Generate(1));
 
         var (previousReleaseVersion, releaseVersion) = publication.ReleaseVersions.ToTuple2();
         releaseVersion.UpdatePublishedDate = false;
@@ -644,8 +588,7 @@ public class ReleaseServiceTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true)
-                .Generate(1));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true).Generate(1));
 
         var releaseVersion = publication.ReleaseVersions[1];
         releaseVersion.UpdatePublishedDate = true;
@@ -710,9 +653,7 @@ public class ReleaseServiceTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture
-                .DefaultRelease(publishedVersions: 1)
-                .Generate(2));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(2));
 
         var release1Version1 = publication.Releases[0].Versions[0];
         var release2Version1 = publication.Releases[1].Versions[0];
@@ -762,9 +703,7 @@ public class ReleaseServiceTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture
-                .DefaultRelease(publishedVersions: 3)
-                .Generate(1));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 3).Generate(1));
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -782,10 +721,10 @@ public class ReleaseServiceTests
 
             var releases = result.AssertRight();
 
-            Assert.Equal(new[]
-            {
-                publication.Releases[0].Versions.Single(rv => rv is { Version: 2 }).Id
-            }, releases.Select(r => r.Id).ToArray());
+            Assert.Equal(
+                new[] { publication.Releases[0].Versions.Single(rv => rv is { Version: 2 }).Id },
+                releases.Select(r => r.Id).ToArray()
+            );
         }
     }
 
@@ -794,9 +733,7 @@ public class ReleaseServiceTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(_dataFixture
-                .DefaultRelease(publishedVersions: 1, draftVersion: true)
-                .Generate(2));
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true).Generate(2));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -813,11 +750,20 @@ public class ReleaseServiceTests
 
             var releases = result.AssertRight();
 
-            Assert.Equal(new[]
-            {
-                publication.Releases.Single(r => r.Year == 2001).Versions.Single(rv => rv is { Published: not null }).Id,
-                publication.Releases.Single(r => r.Year == 2000).Versions.Single(rv => rv is { Published: not null }).Id
-            }, releases.Select(r => r.Id).ToArray());
+            Assert.Equal(
+                new[]
+                {
+                    publication
+                        .Releases.Single(r => r.Year == 2001)
+                        .Versions.Single(rv => rv is { Published: not null })
+                        .Id,
+                    publication
+                        .Releases.Single(r => r.Year == 2000)
+                        .Versions.Single(rv => rv is { Published: not null })
+                        .Id,
+                },
+                releases.Select(r => r.Id).ToArray()
+            );
         }
     }
 
@@ -836,7 +782,8 @@ public class ReleaseServiceTests
         ContentDbContext contentDbContext,
         IReleaseFileRepository? releaseFileRepository = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
-        IUserService? userService = null)
+        IUserService? userService = null
+    )
     {
         return new(
             contentDbContext,

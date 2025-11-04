@@ -52,26 +52,30 @@ public class ReleaseVersionsControllerUnitTests
 
         var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
         releaseDataFileService
-            .Setup(service => service.Upload(
-                _releaseVersionId,
-                ItIsFileMatch(dataFile),
-                ItIsFileMatch(metaFile),
-                "Data set title",
-                default))
+            .Setup(service =>
+                service.Upload(
+                    _releaseVersionId,
+                    ItIsFileMatch(dataFile),
+                    ItIsFileMatch(metaFile),
+                    "Data set title",
+                    default
+                )
+            )
             .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
 
         // Act
         var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-            var response = await controller.UploadDataSet(
-                new()
-                {
-                    ReleaseVersionId = _releaseVersionId,
-                    Title = "Data set title",
-                    DataFile = dataFile,
-                    MetaFile = metaFile,
-                },
-                cancellationToken: default);
+        var response = await controller.UploadDataSet(
+            new()
+            {
+                ReleaseVersionId = _releaseVersionId,
+                Title = "Data set title",
+                DataFile = dataFile,
+                MetaFile = metaFile,
+            },
+            cancellationToken: default
+        );
 
         // Assert
         VerifyAllMocks(releaseDataFileService);
@@ -90,26 +94,30 @@ public class ReleaseVersionsControllerUnitTests
 
         var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
         releaseDataFileService
-            .Setup(service => service.Upload(
-                _releaseVersionId,
-                ItIsFileMatch(dataFile),
-                ItIsFileMatch(metaFile),
-                "Data set title",
-                default))
+            .Setup(service =>
+                service.Upload(
+                    _releaseVersionId,
+                    ItIsFileMatch(dataFile),
+                    ItIsFileMatch(metaFile),
+                    "Data set title",
+                    default
+                )
+            )
             .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
 
         var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-            // Act
-            var result = await controller.UploadDataSet(
-                new()
-                {
-                    ReleaseVersionId = _releaseVersionId,
-                    Title = "Data set title",
-                    DataFile = dataFile,
-                    MetaFile = metaFile,
-                },
-                cancellationToken: default);
+        // Act
+        var result = await controller.UploadDataSet(
+            new()
+            {
+                ReleaseVersionId = _releaseVersionId,
+                Title = "Data set title",
+                DataFile = dataFile,
+                MetaFile = metaFile,
+            },
+            cancellationToken: default
+        );
 
         // Assert
         VerifyAllMocks(releaseDataFileService);
@@ -127,24 +135,23 @@ public class ReleaseVersionsControllerUnitTests
 
         var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
         releaseDataFileService
-            .Setup(service => service.UploadFromZip(
-                _releaseVersionId,
-                It.IsAny<IManagedStreamZipFile>(),
-                "Data set title",
-                default))
+            .Setup(service =>
+                service.UploadFromZip(_releaseVersionId, It.IsAny<IManagedStreamZipFile>(), "Data set title", default)
+            )
             .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
 
         // Act
         var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
-            var response = await controller.UploadDataSetAsZip(
-                new()
-                {
-                    ReleaseVersionId = _releaseVersionId,
-                    Title = "Data set title",
-                    ZipFile = dataSetZipFile,
-                },
-                cancellationToken: default);
+        var response = await controller.UploadDataSetAsZip(
+            new()
+            {
+                ReleaseVersionId = _releaseVersionId,
+                Title = "Data set title",
+                ZipFile = dataSetZipFile,
+            },
+            cancellationToken: default
+        );
 
         // Assert
         VerifyAllMocks(releaseDataFileService);
@@ -164,22 +171,16 @@ public class ReleaseVersionsControllerUnitTests
 
         var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
         releaseDataFileService
-            .Setup(service => service.UploadFromBulkZip(
-                _releaseVersionId,
-                It.IsAny<IManagedStreamZipFile>(),
-                default))
+            .Setup(service => service.UploadFromBulkZip(_releaseVersionId, It.IsAny<IManagedStreamZipFile>(), default))
             .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
 
         // Act
         var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
         var response = await controller.UploadDataSetAsBulkZip(
-            new()
-            {
-                ReleaseVersionId = _releaseVersionId,
-                ZipFile = dataSetBulkZipFile,
-            },
-            cancellationToken: default);
+            new() { ReleaseVersionId = _releaseVersionId, ZipFile = dataSetBulkZipFile },
+            cancellationToken: default
+        );
 
         // Assert
         VerifyAllMocks(releaseDataFileService);
@@ -207,7 +208,8 @@ public class ReleaseVersionsControllerUnitTests
         var response = await controller.DeleteDataSetUpload(
             _releaseVersionId,
             dataSetUploadId,
-            cancellationToken: default);
+            cancellationToken: default
+        );
 
         // Assert
         VerifyAllMocks(dataSetUploadRepository);
@@ -224,10 +226,13 @@ public class ReleaseVersionsControllerUnitTests
 
         var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
         releaseDataFileService
-            .Setup(service => service.SaveDataSetsFromTemporaryBlobStorage(
-                _releaseVersionId,
-                new List<Guid> { expectedVm1.Id, expectedVm2.Id, expectedVm3.Id },
-                default))
+            .Setup(service =>
+                service.SaveDataSetsFromTemporaryBlobStorage(
+                    _releaseVersionId,
+                    new List<Guid> { expectedVm1.Id, expectedVm2.Id, expectedVm3.Id },
+                    default
+                )
+            )
             .ReturnsAsync(Unit.Instance);
 
         // Act
@@ -236,7 +241,8 @@ public class ReleaseVersionsControllerUnitTests
         var response = await controller.ImportDataSetsFromTempStorage(
             _releaseVersionId,
             [expectedVm1.Id, expectedVm2.Id, expectedVm3.Id],
-            cancellationToken: default);
+            cancellationToken: default
+        );
 
         // Assert
         VerifyAllMocks(releaseDataFileService);
@@ -260,14 +266,12 @@ public class ReleaseVersionsControllerUnitTests
                 FileName = "file2.csv",
                 Name = "Release a file 2",
                 Size = "1 Kb",
-            }
+            },
         };
 
         var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
 
-        releaseDataFileService
-            .Setup(s => s.ListAll(_releaseVersionId))
-            .ReturnsAsync(testFiles);
+        releaseDataFileService.Setup(s => s.ListAll(_releaseVersionId)).ReturnsAsync(testFiles);
 
         var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
@@ -297,8 +301,7 @@ public class ReleaseVersionsControllerUnitTests
         var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
         // Act
-        var result = await controller.DeleteDataFiles(releaseVersionId: _releaseVersionId,
-            fileId: fileId);
+        var result = await controller.DeleteDataFiles(releaseVersionId: _releaseVersionId, fileId: fileId);
 
         // Assert
         VerifyAllMocks(releaseVersionService);
@@ -321,8 +324,7 @@ public class ReleaseVersionsControllerUnitTests
         var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
         // Act
-        var result = await controller.DeleteDataFiles(releaseVersionId: _releaseVersionId,
-            fileId: fileId);
+        var result = await controller.DeleteDataFiles(releaseVersionId: _releaseVersionId, fileId: fileId);
 
         // Assert
         VerifyAllMocks(releaseVersionService);
@@ -337,9 +339,11 @@ public class ReleaseVersionsControllerUnitTests
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
         releaseVersionService
-            .Setup(s => s.UpdateReleaseVersion(
-                It.Is<Guid>(id => id.Equals(_releaseVersionId)),
-                It.IsAny<ReleaseVersionUpdateRequest>())
+            .Setup(s =>
+                s.UpdateReleaseVersion(
+                    It.Is<Guid>(id => id.Equals(_releaseVersionId)),
+                    It.IsAny<ReleaseVersionUpdateRequest>()
+                )
             )
             .ReturnsAsync(new ReleaseVersionViewModel { Id = _releaseVersionId });
 
@@ -361,8 +365,7 @@ public class ReleaseVersionsControllerUnitTests
         // Arrange
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
-        var templateReleaseResult =
-            new Either<ActionResult, IdTitleViewModel>(new IdTitleViewModel());
+        var templateReleaseResult = new Either<ActionResult, IdTitleViewModel>(new IdTitleViewModel());
 
         releaseVersionService
             .Setup(s => s.GetLatestPublishedRelease(It.Is<Guid>(id => id == _releaseVersionId)))
@@ -387,15 +390,12 @@ public class ReleaseVersionsControllerUnitTests
 
         var fileId = Guid.NewGuid();
 
-        importService
-            .Setup(s => s.CancelImport(_releaseVersionId, fileId))
-            .ReturnsAsync(Unit.Instance);
+        importService.Setup(s => s.CancelImport(_releaseVersionId, fileId)).ReturnsAsync(Unit.Instance);
 
         var controller = BuildController(importService: importService.Object);
 
         // Act
-        var result = await controller.CancelFileImport(releaseVersionId: _releaseVersionId,
-            fileId: fileId);
+        var result = await controller.CancelFileImport(releaseVersionId: _releaseVersionId, fileId: fileId);
 
         // Assert
         VerifyAllMocks(importService);
@@ -411,16 +411,12 @@ public class ReleaseVersionsControllerUnitTests
 
         var fileId = Guid.NewGuid();
 
-        importService
-            .Setup(s => s.CancelImport(_releaseVersionId, fileId))
-            .ReturnsAsync(new ForbidResult());
+        importService.Setup(s => s.CancelImport(_releaseVersionId, fileId)).ReturnsAsync(new ForbidResult());
 
         var controller = BuildController(importService: importService.Object);
 
         // Act
-        var result = await controller.CancelFileImport(
-            releaseVersionId: _releaseVersionId,
-            fileId: fileId);
+        var result = await controller.CancelFileImport(releaseVersionId: _releaseVersionId, fileId: fileId);
 
         // Assert
         VerifyAllMocks(importService);
@@ -445,9 +441,7 @@ public class ReleaseVersionsControllerUnitTests
         var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
         // Act
-        var result = await controller.GetDeleteDataFilePlan(
-            releaseVersionId: _releaseVersionId,
-            fileId: fileId);
+        var result = await controller.GetDeleteDataFilePlan(releaseVersionId: _releaseVersionId, fileId: fileId);
 
         // Assert
         VerifyAllMocks(releaseVersionService);
@@ -528,11 +522,9 @@ public class ReleaseVersionsControllerUnitTests
 
         releaseVersionService
             .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, default))
-            .ReturnsAsync(ValidationUtils.ValidationResult(new ErrorViewModel
-            {
-                Code = "error code",
-                Path = "error path"
-            }));
+            .ReturnsAsync(
+                ValidationUtils.ValidationResult(new ErrorViewModel { Code = "error code", Path = "error path" })
+            );
 
         var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
@@ -544,9 +536,7 @@ public class ReleaseVersionsControllerUnitTests
 
         var validationProblem = result.AssertBadRequestWithValidationProblem();
 
-        validationProblem.AssertHasError(
-            expectedPath: "error path",
-            expectedCode: "error code");
+        validationProblem.AssertHasError(expectedPath: "error path", expectedCode: "error code");
     }
 
     [Fact]
@@ -563,13 +553,12 @@ public class ReleaseVersionsControllerUnitTests
             .Setup(s => s.CreateReleaseStatus(_releaseVersionId, request))
             .ReturnsAsync(Unit.Instance);
 
-        releaseVersionService
-            .Setup(s => s.GetRelease(_releaseVersionId))
-            .ReturnsAsync(returnedReleaseViewModel);
+        releaseVersionService.Setup(s => s.GetRelease(_releaseVersionId)).ReturnsAsync(returnedReleaseViewModel);
 
         var controller = BuildController(
             releaseApprovalService: releaseApprovalService.Object,
-            releaseVersionService: releaseVersionService.Object);
+            releaseVersionService: releaseVersionService.Object
+        );
 
         // Act
         var result = await controller.CreateReleaseStatus(request, _releaseVersionId);
@@ -584,19 +573,13 @@ public class ReleaseVersionsControllerUnitTests
     public async Task ListReleasesForApproval()
     {
         // Arrange
-        var releases = ListOf(new ReleaseVersionSummaryViewModel
-        {
-            Id = Guid.NewGuid()
-        });
+        var releases = ListOf(new ReleaseVersionSummaryViewModel { Id = Guid.NewGuid() });
 
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
-        releaseVersionService
-            .Setup(s => s.ListUsersReleasesForApproval())
-            .ReturnsAsync(releases);
+        releaseVersionService.Setup(s => s.ListUsersReleasesForApproval()).ReturnsAsync(releases);
 
-        var controller = BuildController(
-            releaseVersionService: releaseVersionService.Object);
+        var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
         // Act
         var result = await controller.ListUsersReleasesForApproval();
@@ -621,8 +604,7 @@ public class ReleaseVersionsControllerUnitTests
             .Setup(s => s.CreateReleaseAmendment(originalReleaseVersionId))
             .ReturnsAsync(amendmentCreatedResponse);
 
-        var controller = BuildController(
-            releaseAmendmentService: releaseAmendmentService.Object);
+        var controller = BuildController(releaseAmendmentService: releaseAmendmentService.Object);
 
         // Act
         var result = await controller.CreateReleaseAmendment(originalReleaseVersionId);
@@ -653,7 +635,7 @@ public class ReleaseVersionsControllerUnitTests
         {
             stream = "test content".ToStream();
         }
-        
+
         fileMock.Setup(formFile => formFile.OpenReadStream()).Returns(stream);
         fileMock.Setup(formFile => formFile.FileName).Returns(fileName);
         fileMock.Setup(formFile => formFile.Name).Returns(fileName);
@@ -670,7 +652,8 @@ public class ReleaseVersionsControllerUnitTests
         IReleaseChecklistService? releaseChecklistService = null,
         IDataImportService? importService = null,
         IDataSetUploadRepository? dataSetUploadRepository = null,
-        IDataSetFileStorage? dataSetFileStorage = null)
+        IDataSetFileStorage? dataSetFileStorage = null
+    )
     {
         return new ReleaseVersionsController(
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
@@ -681,27 +664,24 @@ public class ReleaseVersionsControllerUnitTests
             releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(Strict),
             importService ?? Mock.Of<IDataImportService>(Strict),
             dataSetUploadRepository ?? Mock.Of<IDataSetUploadRepository>(Strict),
-            dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict));
+            dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict)
+        );
     }
 
     private static IManagedStreamFile ItIsFileMatch(IFormFile dataFile)
     {
-        return It.Is<IManagedStreamFile>(
-            file => file.Name == dataFile.Name
-                    && file.Length == dataFile.Length);
+        return It.Is<IManagedStreamFile>(file => file.Name == dataFile.Name && file.Length == dataFile.Length);
     }
 }
 
-public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationFactory testApp)
+    : IntegrationTestFixture(testApp)
 {
     public override async Task InitializeAsync() => await InitializeWithAzurite();
 
-    private WebApplicationFactory<TestStartup> BuildApp(
-            ClaimsPrincipal? user = null)
+    private WebApplicationFactory<TestStartup> BuildApp(ClaimsPrincipal? user = null)
     {
-        return WithAzurite(
-            testApp: TestApp.SetUser(user ?? DataFixture.BauUser()),
-            enabled: true);
+        return WithAzurite(testApp: TestApp.SetUser(user ?? DataFixture.BauUser()), enabled: true);
     }
 
     public class UpdateReleaseTests(TestApplicationFactory testApp) : ReleaseVersionsControllerIntegrationTests(testApp)
@@ -710,17 +690,18 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task Success()
         {
             // Arrange
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases(
                     [
                         DataFixture
                             .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
                             .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                            .WithLabel(null)
-                    ]);
+                            .WithLabel(null),
+                    ]
+                );
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             var newYear = 2021;
             var newTimePeriodCoverage = TimeIdentifier.AcademicYearQ1;
@@ -734,15 +715,16 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 year: newYear,
                 timePeriodCoverage: newTimePeriodCoverage,
                 label: newLabel,
-                preReleaseAccessList: newPreReleaseAccessList);
+                preReleaseAccessList: newPreReleaseAccessList
+            );
 
             // Assert
             var viewModel = response.AssertOk<ReleaseVersionViewModel>();
 
             var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
-            var updatedPublication = await contentDbContext.Publications
-                .Include(p => p.Releases)
+            var updatedPublication = await contentDbContext
+                .Publications.Include(p => p.Releases)
                 .ThenInclude(r => r.Versions)
                 .SingleAsync(p => p.Id == publication.Id);
 
@@ -777,38 +759,37 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         [InlineData(" ", null, "2020-21")]
         [InlineData("  ", null, "2020-21")]
         [InlineData(null, null, "2020-21")]
-        public async Task LabelAndSlugChanged(
-            string? newLabel,
-            string? expectedNewLabel,
-            string expectedNewSlug)
+        public async Task LabelAndSlugChanged(string? newLabel, string? expectedNewLabel, string expectedNewSlug)
         {
             // Arrange
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases(
                     [
                         DataFixture
                             .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
                             .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                            .WithLabel(null)
-                    ]);
+                            .WithLabel(null),
+                    ]
+                );
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
                 releaseVersionId: publication.Releases[0].Versions[0].Id,
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
-                label: newLabel);
+                label: newLabel
+            );
 
             // Assert
             var viewModel = response.AssertOk<ReleaseVersionViewModel>();
 
             var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
 
-            var updatedPublication = await contentDbContext.Publications
-                .Include(p => p.Releases)
+            var updatedPublication = await contentDbContext
+                .Publications.Include(p => p.Releases)
                 .ThenInclude(r => r.Versions)
                 .SingleAsync(p => p.Id == publication.Id);
 
@@ -823,24 +804,25 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task ReleaseVersionNotFirstVersion_YearChanged()
         {
             // Arrange
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases(
                     DataFixture
                         .DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2020)
                         .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                         .WithLabel(null)
                         .GenerateList(2)
-                    );
+                );
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
                 releaseVersionId: publication.Releases[0].Versions[1].Id,
                 year: 2021,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
-                label: null);
+                label: null
+            );
 
             // Assert
             var validationProblem = response.AssertValidationProblem();
@@ -854,24 +836,25 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task ReleaseVersionNotFirstVersion_TimePeriodCoverageChanged()
         {
             // Arrange
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases(
                     DataFixture
                         .DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2020)
                         .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                         .WithLabel(null)
                         .GenerateList(2)
-                    );
+                );
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
                 releaseVersionId: publication.Releases[0].Versions[1].Id,
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYearQ1,
-                label: null);
+                label: null
+            );
 
             // Assert
             var validationProblem = response.AssertValidationProblem();
@@ -885,24 +868,25 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task ReleaseVersionNotFirstVersion_LabelChanged()
         {
             // Arrange
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases(
                     DataFixture
                         .DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2020)
                         .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                         .WithLabel(null)
                         .GenerateList(2)
-                    );
+                );
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
                 releaseVersionId: publication.Releases[0].Versions[1].Id,
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
-                label: "initial");
+                label: "initial"
+            );
 
             // Assert
             var validationProblem = response.AssertValidationProblem();
@@ -916,21 +900,19 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task ReleaseVersionIsPublished()
         {
             // Arrange
-            Publication publication = DataFixture.DefaultPublication()
-                .WithReleases([
-                    DataFixture
-                        .DefaultRelease(publishedVersions: 1)
-                    ]);
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)]);
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
                 releaseVersionId: publication.Releases[0].Versions[0].Id,
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
-                label: null);
+                label: null
+            );
 
             // Assert
             response.AssertForbidden();
@@ -944,7 +926,8 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 releaseVersionId: Guid.NewGuid(),
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
-                label: null);
+                label: null
+            );
 
             // Assert
             response.AssertNotFound();
@@ -954,14 +937,11 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task UserDoesNotHavePermission()
         {
             // Arrange
-            Publication publication = DataFixture.DefaultPublication()
-                .WithReleases([
-                    DataFixture
-                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    ]);
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
 
@@ -971,7 +951,8 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
                 label: null,
-                client: client);
+                client: client
+            );
 
             // Assert
             response.AssertForbidden();
@@ -981,14 +962,11 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task ReleaseTypeInvalid()
         {
             // Arrange
-            Publication publication = DataFixture.DefaultPublication()
-                .WithReleases([
-                    DataFixture
-                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    ]);
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
@@ -996,7 +974,8 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
                 label: null,
-                type: ReleaseType.ExperimentalStatistics);
+                type: ReleaseType.ExperimentalStatistics
+            );
 
             // Assert
             var validationProblem = response.AssertValidationProblem();
@@ -1019,26 +998,28 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             int year,
             TimeIdentifier timePeriodCoverage,
             string? label,
-            string existingReleaseSlug)
+            string existingReleaseSlug
+        )
         {
             // Arrange
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases(
                     DataFixture
                         .DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .WithSlug(existingReleaseSlug)
                         .GenerateList(2)
-                    );
+                );
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
                 releaseVersionId: publication.Releases[0].Versions[0].Id,
                 year: year,
                 timePeriodCoverage: timePeriodCoverage,
-                label: label);
+                label: label
+            );
 
             // Assert
             var validationProblem = response.AssertValidationProblem();
@@ -1053,30 +1034,33 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         {
             Publication publication = DataFixture.DefaultPublication();
 
-            Release targetRelease = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+            Release targetRelease = DataFixture
+                .DefaultRelease(publishedVersions: 0, draftVersion: true)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel("initial")
                 .WithSlug("2020-21-initial")
                 .WithPublication(publication);
 
-            Release otherRelease = DataFixture.DefaultRelease(publishedVersions: 1)
+            Release otherRelease = DataFixture
+                .DefaultRelease(publishedVersions: 1)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel("intermediate")
                 .WithSlug("2020-21-intermediate")
-                .WithRedirects([DataFixture.DefaultReleaseRedirect()
-                    .WithSlug("2020-21-final")])
+                .WithRedirects([DataFixture.DefaultReleaseRedirect().WithSlug("2020-21-final")])
                 .WithPublication(publication);
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.AddRange(targetRelease, otherRelease));
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.Releases.AddRange(targetRelease, otherRelease)
+            );
 
             var response = await UpdateRelease(
                 releaseVersionId: targetRelease.Versions[0].Id,
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
-                label: "final");
+                label: "final"
+            );
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -1089,7 +1073,8 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task ReleaseRedirectExistsForNewSlugForReleaseInDifferentPublication()
         {
             Publication targetPublication = DataFixture.DefaultPublication();
-            Release targetRelease = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
+            Release targetRelease = DataFixture
+                .DefaultRelease(publishedVersions: 0, draftVersion: true)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel("initial")
@@ -1097,23 +1082,25 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 .WithPublication(targetPublication);
 
             Publication otherPublication = DataFixture.DefaultPublication();
-            Release otherRelease = DataFixture.DefaultRelease(publishedVersions: 1)
+            Release otherRelease = DataFixture
+                .DefaultRelease(publishedVersions: 1)
                 .WithYear(2020)
                 .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
                 .WithLabel("intermediate")
                 .WithSlug("2020-21-intermediate")
-                .WithRedirects([DataFixture.DefaultReleaseRedirect()
-                    .WithSlug("2020-21-final")])
+                .WithRedirects([DataFixture.DefaultReleaseRedirect().WithSlug("2020-21-final")])
                 .WithPublication(otherPublication);
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Releases.AddRange(targetRelease, otherRelease));
+            await TestApp.AddTestData<ContentDbContext>(context =>
+                context.Releases.AddRange(targetRelease, otherRelease)
+            );
 
             var response = await UpdateRelease(
                 releaseVersionId: targetRelease.Versions[0].Id,
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
-                label: "final");
+                label: "final"
+            );
 
             response.AssertOk();
         }
@@ -1122,28 +1109,29 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task LabelOver50Characters()
         {
             // Arrange
-            Publication publication = DataFixture.DefaultPublication()
-                .WithReleases([
-                        DataFixture
-                            .DefaultRelease(publishedVersions: 0, draftVersion: true)
-                    ]);
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
-            await TestApp.AddTestData<ContentDbContext>(
-                context => context.Publications.Add(publication));
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
                 releaseVersionId: publication.Releases[0].Versions[0].Id,
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
-                label: new string('a', 51));
+                label: new string('a', 51)
+            );
 
             // Assert
             var validationProblem = response.AssertValidationProblem();
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal($"The field {nameof(ReleaseCreateRequest.Label)} must be a string or array type with a maximum length of '50'.", error.Message);
+            Assert.Equal(
+                $"The field {nameof(ReleaseCreateRequest.Label)} must be a string or array type with a maximum length of '50'.",
+                error.Message
+            );
             Assert.Equal(nameof(ReleaseCreateRequest.Label), error.Path);
         }
 
@@ -1154,7 +1142,8 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             string? label = null,
             ReleaseType? type = ReleaseType.OfficialStatistics,
             string? preReleaseAccessList = "",
-            HttpClient? client = null)
+            HttpClient? client = null
+        )
         {
             client ??= BuildApp().CreateClient();
 
@@ -1164,7 +1153,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 Year = year,
                 TimePeriodCoverage = new { Value = timePeriodCoverage.GetEnumValue() },
                 Label = label,
-                PreReleaseAccessList = preReleaseAccessList
+                PreReleaseAccessList = preReleaseAccessList,
             };
 
             return await client.PatchAsJsonAsync($"api/releaseVersions/{releaseVersionId}", request);
@@ -1181,7 +1170,8 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 releaseVersionId: Guid.Empty,
                 dataSetTitle: "",
                 dataFileName: "",
-                metaFileName: "");
+                metaFileName: ""
+            );
 
             // Assert
             var validationProblem = response.AssertValidationProblem();
@@ -1196,14 +1186,16 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task UploadDataSet_ValidRequest_ReturnsViewModel()
         {
             // Arrange
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases(
                     [
                         DataFixture
                             .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
                             .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                            .WithLabel(null)
-                    ]);
+                            .WithLabel(null),
+                    ]
+                );
 
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
@@ -1212,7 +1204,8 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 releaseVersionId: publication.Releases[0].Versions[0].Id,
                 dataSetTitle: "Test title",
                 dataFileName: "test-data.csv",
-                metaFileName: "test-data.meta.csv");
+                metaFileName: "test-data.meta.csv"
+            );
 
             // Assert
             var uploadResult = response.AssertOk<List<DataSetUploadViewModel>>();
@@ -1227,6 +1220,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             Assert.Equal("Pending import", dataSet.Status);
             Assert.Equal("", dataSet.UploadedBy);
             Assert.Equal("Passed", dataSet.ScreenerResult?.OverallResult);
+            Assert.True(dataSet.PublicApiCompatible);
             Assert.Null(dataSet.ReplacingFileId);
         }
 
@@ -1234,14 +1228,16 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task UploadDataSetAsZip_ValidRequest_ReturnsDataFileInfo()
         {
             // Arrange
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases(
                     [
                         DataFixture
                             .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
                             .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                            .WithLabel(null)
-                    ]);
+                            .WithLabel(null),
+                    ]
+                );
 
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
@@ -1249,7 +1245,8 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             var response = await UploadDataSetAsZip(
                 releaseVersionId: publication.Releases[0].Versions[0].Id,
                 dataSetTitle: "Test title",
-                fileName: "data-zip-valid.zip");
+                fileName: "data-zip-valid.zip"
+            );
 
             // Assert
             var uploadResult = response.AssertOk<List<DataSetUploadViewModel>>();
@@ -1264,6 +1261,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             Assert.Equal("Pending import", dataSet.Status);
             Assert.Equal("", dataSet.UploadedBy);
             Assert.Equal("Passed", dataSet.ScreenerResult?.OverallResult);
+            Assert.True(dataSet.PublicApiCompatible);
             Assert.Null(dataSet.ReplacingFileId);
         }
 
@@ -1271,10 +1269,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task UploadDataSetAsZip_InvalidRequest_ReturnsValidationProblems()
         {
             // Act
-            var response = await UploadDataSetAsZip(
-                releaseVersionId: Guid.Empty,
-                dataSetTitle: "",
-                fileName: "");
+            var response = await UploadDataSetAsZip(releaseVersionId: Guid.Empty, dataSetTitle: "", fileName: "");
 
             // Assert
             var validationProblem = response.AssertValidationProblem();
@@ -1288,21 +1283,24 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task UploadDataSetAsBulkZip_ValidRequest_ReturnsViewModel()
         {
             // Arrange
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases(
                     [
                         DataFixture
                             .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
                             .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                            .WithLabel(null)
-                    ]);
+                            .WithLabel(null),
+                    ]
+                );
 
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             // Act
             var response = await UploadDataSetAsBulkZip(
                 releaseVersionId: publication.Releases[0].Versions[0].Id,
-                fileName: "bulk-data-zip-valid.zip");
+                fileName: "bulk-data-zip-valid.zip"
+            );
 
             // Assert
             var uploadResultVms = response.AssertOk<List<DataSetUploadViewModel>>();
@@ -1318,6 +1316,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             Assert.Equal("Pending import", dataSet1.Status);
             Assert.Equal("", dataSet1.UploadedBy);
             Assert.Equal("Passed", dataSet1.ScreenerResult?.OverallResult);
+            Assert.True(dataSet1.PublicApiCompatible);
             Assert.Null(dataSet1.ReplacingFileId);
 
             Assert.NotEqual(Guid.Empty, dataSet2.Id);
@@ -1329,6 +1328,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             Assert.Equal("Pending import", dataSet2.Status);
             Assert.Equal("", dataSet2.UploadedBy);
             Assert.Equal("Passed", dataSet2.ScreenerResult?.OverallResult);
+            Assert.True(dataSet2.PublicApiCompatible);
             Assert.Null(dataSet2.ReplacingFileId);
         }
 
@@ -1336,12 +1336,15 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task UploadDataSetAsBulkZip_ValidRequestWithReplacement_ReturnsViewModelWithReplacementId()
         {
             // Arrange
-            var releaseFileToBeReplaced = DataFixture.DefaultReleaseFile()
+            var releaseFileToBeReplaced = DataFixture
+                .DefaultReleaseFile()
                 .WithName("First data set")
-                .WithReleaseVersion(DataFixture.DefaultReleaseVersion()
-                    .WithRelease(DataFixture.DefaultRelease()
-                        .WithPublication(DataFixture.DefaultPublication())))
-                    .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .Generate();
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFileToBeReplaced));
@@ -1349,7 +1352,8 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             // Act
             var response = await UploadDataSetAsBulkZip(
                 releaseVersionId: releaseFileToBeReplaced.ReleaseVersionId,
-                fileName: "bulk-data-zip-valid.zip");
+                fileName: "bulk-data-zip-valid.zip"
+            );
 
             // Assert
             var uploadResultVms = response.AssertOk<List<DataSetUploadViewModel>>();
@@ -1365,6 +1369,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             Assert.Equal("Pending import", dataSet1.Status);
             Assert.Equal("", dataSet1.UploadedBy);
             Assert.Equal("Passed", dataSet1.ScreenerResult?.OverallResult);
+            Assert.True(dataSet1.PublicApiCompatible);
             Assert.NotNull(dataSet1.ReplacingFileId);
 
             Assert.NotEqual(Guid.Empty, dataSet2.Id);
@@ -1375,6 +1380,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             Assert.Equal("318 Kb", dataSet2.MetaFileSize);
             Assert.Equal("Pending import", dataSet2.Status);
             Assert.Equal("", dataSet2.UploadedBy);
+            Assert.True(dataSet2.PublicApiCompatible);
             Assert.Equal("Passed", dataSet1.ScreenerResult?.OverallResult);
             Assert.Null(dataSet2.ReplacingFileId);
         }
@@ -1383,9 +1389,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task UploadDataSetAsBulkZip_InvalidRequest_ReturnsValidationProblems()
         {
             // Act
-            var response = await UploadDataSetAsBulkZip(
-                releaseVersionId: Guid.Empty,
-                fileName: "");
+            var response = await UploadDataSetAsBulkZip(releaseVersionId: Guid.Empty, fileName: "");
 
             // Assert
             var validationProblem = response.AssertValidationProblem();
@@ -1398,35 +1402,39 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         public async Task UploadDataSetAsBulkZip_IndexFileMissing_ReturnsValidationProblems()
         {
             // Arrange
-            Publication publication = DataFixture.DefaultPublication()
+            Publication publication = DataFixture
+                .DefaultPublication()
                 .WithReleases(
                     [
                         DataFixture
                             .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
                             .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                            .WithLabel(null)
-                    ]);
+                            .WithLabel(null),
+                    ]
+                );
 
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
             // Act
             var response = await UploadDataSetAsBulkZip(
                 releaseVersionId: publication.Releases[0].Versions[0].Id,
-                fileName: "bulk-data-zip-invalid-no-datasetnames-csv.zip");
+                fileName: "bulk-data-zip-invalid-no-datasetnames-csv.zip"
+            );
 
             // Assert
             var validationProblem = response.AssertValidationProblem();
 
-            Assert.Equal("For bulk imports, the ZIP must include dataset_names.csv", validationProblem.Errors[0].Message);
+            Assert.Equal(
+                "For bulk imports, the ZIP must include dataset_names.csv",
+                validationProblem.Errors[0].Message
+            );
         }
 
         [Fact]
         public async Task ImportBulkZipDataSetsFromTempStorage_InvalidRequest_ReturnsValidationProblems()
         {
             // Act
-            var response = await ImportBulkZipDataSetsFromTempStorage(
-                releaseVersionId: Guid.Empty,
-                dataSetFiles: []);
+            var response = await ImportBulkZipDataSetsFromTempStorage(releaseVersionId: Guid.Empty, dataSetFiles: []);
 
             // Assert
             response.AssertNotFound();
@@ -1437,17 +1445,22 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             string dataSetTitle,
             string dataFileName,
             string metaFileName,
-            HttpClient? client = null)
+            HttpClient? client = null
+        )
         {
             client ??= BuildApp().CreateClient();
 
             var dataFilePath = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                "Resources", dataFileName);
+                "Resources",
+                dataFileName
+            );
 
             var metaFilePath = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                "Resources", metaFileName);
+                "Resources",
+                metaFileName
+            );
 
             var multipartContent = new MultipartFormDataContent
             {
@@ -1478,13 +1491,16 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             Guid releaseVersionId,
             string dataSetTitle,
             string fileName,
-            HttpClient? client = null)
+            HttpClient? client = null
+        )
         {
             client ??= BuildApp().CreateClient();
 
             var filePath = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                "Resources", fileName);
+                "Resources",
+                fileName
+            );
 
             var multipartContent = new MultipartFormDataContent
             {
@@ -1509,13 +1525,16 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         private async Task<HttpResponseMessage> UploadDataSetAsBulkZip(
             Guid releaseVersionId,
             string fileName,
-            HttpClient? client = null)
+            HttpClient? client = null
+        )
         {
             client ??= BuildApp().CreateClient();
 
             var filePath = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                "Resources", fileName);
+                "Resources",
+                fileName
+            );
 
             var multipartContent = new MultipartFormDataContent
             {
@@ -1539,7 +1558,8 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         private async Task<HttpResponseMessage> ImportBulkZipDataSetsFromTempStorage(
             Guid releaseVersionId,
             List<DataSetUploadViewModel> dataSetFiles,
-            HttpClient? client = null)
+            HttpClient? client = null
+        )
         {
             client ??= BuildApp().CreateClient();
 

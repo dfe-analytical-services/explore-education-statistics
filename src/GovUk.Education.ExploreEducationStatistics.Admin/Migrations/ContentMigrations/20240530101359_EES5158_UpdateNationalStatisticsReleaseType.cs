@@ -7,20 +7,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
 /// <inheritdoc />
 [ExcludeFromCodeCoverage]
+// ReSharper disable once InconsistentNaming
 public partial class EES5158_UpdateNationalStatisticsReleaseType : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.Sql(
-            "UPDATE ReleaseVersions SET Type = 'AccreditedOfficialStatistics' WHERE Type = 'NationalStatistics'");
+            "UPDATE ReleaseVersions SET Type = 'AccreditedOfficialStatistics' WHERE Type = 'NationalStatistics'"
+        );
     }
 
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.Sql(
-            "UPDATE ReleaseVersions SET Type = 'NationalStatistics' WHERE Type = 'AccreditedOfficialStatistics'");
-
+            "UPDATE ReleaseVersions SET Type = 'NationalStatistics' WHERE Type = 'AccreditedOfficialStatistics'"
+        );
     }
 }

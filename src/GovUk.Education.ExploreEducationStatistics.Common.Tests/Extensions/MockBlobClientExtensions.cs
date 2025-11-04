@@ -15,7 +15,8 @@ public static class MockBlobClientExtensions
         this Mock<BlobClient> blobClient,
         string content,
         string? contentEncoding = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var downloadDetails = BlobsModelFactory.BlobDownloadDetails(
             lastModified: default,
@@ -50,28 +51,30 @@ public static class MockBlobClientExtensions
 
         var blobDownloadResult = BlobsModelFactory.BlobDownloadResult(
             content: BinaryData.FromString(content),
-            details: downloadDetails);
+            details: downloadDetails
+        );
 
         var response = new Mock<Response<BlobDownloadResult>>(MockBehavior.Strict);
-        response.SetupGet(r => r.Value)
-            .Returns(blobDownloadResult);
+        response.SetupGet(r => r.Value).Returns(blobDownloadResult);
 
-        return blobClient.Setup(client => client.DownloadContentAsync(cancellationToken))
-            .ReturnsAsync(response.Object);
+        return blobClient.Setup(client => client.DownloadContentAsync(cancellationToken)).ReturnsAsync(response.Object);
     }
 
     public static IReturnsResult<BlobClient> SetupDownloadContentAsyncNotFound(
         this Mock<BlobClient> blobClient,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return blobClient.Setup(client => client.DownloadContentAsync(cancellationToken))
+        return blobClient
+            .Setup(client => client.DownloadContentAsync(cancellationToken))
             .ThrowsAsync(new RequestFailedException(status: 404, message: "Blob not found"));
     }
 
     public static IReturnsResult<BlobClient> SetupDownloadToAsync(
         this Mock<BlobClient> blobClient,
         string content,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return blobClient.SetupDownloadToAsync(content.ToStream(), cancellationToken);
     }
@@ -79,52 +82,49 @@ public static class MockBlobClientExtensions
     public static IReturnsResult<BlobClient> SetupDownloadToAsync(
         this Mock<BlobClient> blobClient,
         Stream sourceStream,
-        CancellationToken cancellationToken = default)
-    {
-        return blobClient.Setup(client =>
-                client.DownloadToAsync(It.IsAny<Stream>(), cancellationToken))
-            .Callback<Stream, CancellationToken>(
-                (destinationStream, token) =>
-                    sourceStream.CopyToAsync(destinationStream, token))
-            .ReturnsAsync(new Mock<Response>().Object);
-    }
-    
-    public static IReturnsResult<BlobClient> SetupCanGenerateSasUri(
-        this Mock<BlobClient> blobClient,
-        bool canGenerate)
+        CancellationToken cancellationToken = default
+    )
     {
         return blobClient
-            .Setup(c => c.CanGenerateSasUri)
-            .Returns(canGenerate);
+            .Setup(client => client.DownloadToAsync(It.IsAny<Stream>(), cancellationToken))
+            .Callback<Stream, CancellationToken>(
+                (destinationStream, token) => sourceStream.CopyToAsync(destinationStream, token)
+            )
+            .ReturnsAsync(new Mock<Response>().Object);
     }
-    
+
+    public static IReturnsResult<BlobClient> SetupCanGenerateSasUri(this Mock<BlobClient> blobClient, bool canGenerate)
+    {
+        return blobClient.Setup(c => c.CanGenerateSasUri).Returns(canGenerate);
+    }
+
     public static IReturnsResult<BlobClient> SetupGenerateReadonlySasUri(
         this Mock<BlobClient> blobClient,
         DateTimeOffset expectedExpiry,
         string expectedContainerName,
-        string uriToReturn)
+        string uriToReturn
+    )
     {
         return blobClient
-            .Setup(c => c.GenerateSasUri(
-                It.Is<BlobSasBuilder>(builder => 
-                    builder.BlobContainerName == expectedContainerName &&
-                    builder.Permissions == "r" &&
-                    builder.Resource == "c" &&
-                    builder.ExpiresOn == expectedExpiry)))
+            .Setup(c =>
+                c.GenerateSasUri(
+                    It.Is<BlobSasBuilder>(builder =>
+                        builder.BlobContainerName == expectedContainerName
+                        && builder.Permissions == "r"
+                        && builder.Resource == "c"
+                        && builder.ExpiresOn == expectedExpiry
+                    )
+                )
+            )
             .Returns(new Uri(uriToReturn));
     }
-    
+
     public static IReturnsResult<BlobClient> SetupGetDownloadStreamAsync(
         this Mock<BlobClient> blobClient,
         string content,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return blobClient.
-            Setup(c => c.OpenReadAsync(
-                0,
-                null,
-                null,
-                cancellationToken))
-            .ReturnsAsync(content.ToStream);
+        return blobClient.Setup(c => c.OpenReadAsync(0, null, null, cancellationToken)).ReturnsAsync(content.ToStream);
     }
 }

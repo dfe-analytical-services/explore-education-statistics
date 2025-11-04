@@ -49,19 +49,12 @@ public class ThemeServiceTests
 
         var publishingService = new Mock<IPublishingService>(Strict);
 
-        publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
-            .ReturnsAsync(Unit.Instance);
+        publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
-        var service = SetupThemeService(
-            contentDbContext: context,
-            publishingService: publishingService.Object);
+        var service = SetupThemeService(contentDbContext: context, publishingService: publishingService.Object);
 
         var result = await service.CreateTheme(
-            new ThemeSaveViewModel
-            {
-                Title = "Test theme",
-                Summary = "Test summary"
-            }
+            new ThemeSaveViewModel { Title = "Test theme", Summary = "Test summary" }
         );
 
         VerifyAllMocks(publishingService);
@@ -92,7 +85,7 @@ public class ThemeServiceTests
                 {
                     Title = "Test theme",
                     Slug = "test-theme",
-                    Summary = "Test summary"
+                    Summary = "Test summary",
                 }
             );
 
@@ -103,11 +96,7 @@ public class ThemeServiceTests
         {
             var service = SetupThemeService(context);
             var result = await service.CreateTheme(
-                new ThemeSaveViewModel
-                {
-                    Title = "Test theme",
-                    Summary = "Test summary"
-                }
+                new ThemeSaveViewModel { Title = "Test theme", Summary = "Test summary" }
             );
 
             result.AssertBadRequest(SlugNotUnique);
@@ -124,11 +113,10 @@ public class ThemeServiceTests
             Slug = "test-theme",
             Summary = "Test summary",
             Publications = expectedPublicationSlugs
-                .Select(publicationSlug => new Publication{ Slug = publicationSlug })
-                .ToList()
-             
+                .Select(publicationSlug => new Publication { Slug = publicationSlug })
+                .ToList(),
         };
-        
+
         var contextId = Guid.NewGuid().ToString();
 
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -141,9 +129,7 @@ public class ThemeServiceTests
         {
             // Arrange
             var publishingService = new Mock<IPublishingService>(Strict);
-            publishingService
-                .Setup(s => s.TaxonomyChanged(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Unit.Instance);
+            publishingService.Setup(s => s.TaxonomyChanged(It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Instance);
 
             var adminEventRaiser = new AdminEventRaiserMockBuilder();
             var publicationCacheService = new PublicationCacheServiceMockBuilder();
@@ -152,16 +138,13 @@ public class ThemeServiceTests
                 contentDbContext: context,
                 publishingService: publishingService.Object,
                 adminEventRaiser: adminEventRaiser.Build(),
-                publicationCacheService: publicationCacheService.Build());
+                publicationCacheService: publicationCacheService.Build()
+            );
 
             // Act
             var result = await service.UpdateTheme(
                 theme.Id,
-                new ThemeSaveViewModel
-                {
-                    Title = "Updated theme",
-                    Summary = "Updated summary"
-                }
+                new ThemeSaveViewModel { Title = "Updated theme", Summary = "Updated summary" }
             );
 
             // Assert
@@ -182,9 +165,7 @@ public class ThemeServiceTests
 
             adminEventRaiser.Assert.OnThemeUpdatedWasRaised(actual => actual == savedTheme);
 
-            Assert.All(
-                expectedPublicationSlugs,
-                publicationCacheService.Assert.CacheInvalidatedForPublicationEntry);
+            Assert.All(expectedPublicationSlugs, publicationCacheService.Assert.CacheInvalidatedForPublicationEntry);
         }
     }
 
@@ -195,7 +176,7 @@ public class ThemeServiceTests
         {
             Title = "Test theme",
             Slug = "test-theme",
-            Summary = "Test summary"
+            Summary = "Test summary",
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -208,7 +189,7 @@ public class ThemeServiceTests
                 {
                     Title = "Other theme",
                     Slug = "other-theme",
-                    Summary = "Other summary"
+                    Summary = "Other summary",
                 }
             );
 
@@ -220,11 +201,7 @@ public class ThemeServiceTests
             var service = SetupThemeService(context);
             var result = await service.UpdateTheme(
                 theme.Id,
-                new ThemeSaveViewModel
-                {
-                    Title = "Other theme",
-                    Summary = "Updated summary"
-                }
+                new ThemeSaveViewModel { Title = "Other theme", Summary = "Updated summary" }
             );
 
             result.AssertBadRequest(SlugNotUnique);
@@ -238,7 +215,7 @@ public class ThemeServiceTests
         {
             Title = "Test theme",
             Slug = "test-theme",
-            Summary = "Test summary"
+            Summary = "Test summary",
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -267,11 +244,7 @@ public class ThemeServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
 
-        var theme = new Theme
-        {
-            Title = "Theme A",
-            Summary = "Test summary"
-        };
+        var theme = new Theme { Title = "Theme A", Summary = "Test summary" };
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
@@ -298,33 +271,25 @@ public class ThemeServiceTests
     [Fact]
     public async Task DeleteTheme()
     {
-        Theme theme = _fixture.DefaultTheme()
-            .WithTitle("UI test theme to delete");
+        Theme theme = _fixture.DefaultTheme().WithTitle("UI test theme to delete");
 
-        Publication publication1 = _fixture.DefaultPublication()
-            .WithReleases([
-                _fixture.DefaultRelease(publishedVersions: 1),
-                _fixture.DefaultRelease(publishedVersions: 1)
-            ])
+        Publication publication1 = _fixture
+            .DefaultPublication()
+            .WithReleases(
+                [_fixture.DefaultRelease(publishedVersions: 1), _fixture.DefaultRelease(publishedVersions: 1)]
+            )
             .WithTheme(theme);
 
-        Publication publication2 = _fixture.DefaultPublication()
+        Publication publication2 = _fixture
+            .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
             .WithTheme(theme);
-        
-        Publication publication3 = _fixture.DefaultPublication()
-            .WithTheme(theme);
 
-        Publication[] publications =
-        [
-            publication1,
-            publication2,
-            publication3
-        ];
+        Publication publication3 = _fixture.DefaultPublication().WithTheme(theme);
 
-        Methodology methodology = _fixture
-            .DefaultMethodology()
-            .WithOwningPublication(publication1);
+        Publication[] publications = [publication1, publication2, publication3];
+
+        Methodology methodology = _fixture.DefaultMethodology().WithOwningPublication(publication1);
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -357,20 +322,16 @@ public class ThemeServiceTests
                 adminEventRaiser: adminEventRaiser.Build(),
                 methodologyService: methodologyService.Object,
                 publishingService: publishingService.Object,
-                releaseVersionService: new TestReleaseVersionService(contentContext));
+                releaseVersionService: new TestReleaseVersionService(contentContext)
+            );
 
-            methodologyService
-                .Setup(s => s.DeleteMethodology(methodology.Id, true))
-                .ReturnsAsync(Unit.Instance);
+            methodologyService.Setup(s => s.DeleteMethodology(methodology.Id, true)).ReturnsAsync(Unit.Instance);
 
-            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
-                .ReturnsAsync(Unit.Instance);
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
             var result = await service.DeleteTheme(theme.Id);
 
-            VerifyAllMocks(
-                methodologyService,
-                publishingService);
+            VerifyAllMocks(methodologyService, publishingService);
 
             result.AssertRight();
 
@@ -383,7 +344,7 @@ public class ThemeServiceTests
                         ? new LatestPublishedReleaseInfo
                         {
                             LatestPublishedReleaseId = publication.LatestPublishedReleaseVersion.ReleaseId,
-                            LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersion.Id
+                            LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersion.Id,
                         }
                         : null
                 );
@@ -402,57 +363,54 @@ public class ThemeServiceTests
     [Fact]
     public async Task DeleteTheme_ReleaseVersionsDeletedByDataSetVersionOrder()
     {
-        var theme = new Theme
-        {
-            Id = Guid.NewGuid(),
-            Title = "UI test theme to delete"
-        };
+        var theme = new Theme { Id = Guid.NewGuid(), Title = "UI test theme to delete" };
 
-        Publication publication = _fixture
-            .DefaultPublication()
-            .WithTheme(theme);
+        Publication publication = _fixture.DefaultPublication().WithTheme(theme);
 
         ReleaseVersion releaseVersion1 = _fixture
             .DefaultReleaseVersion()
-            .WithRelease(_fixture.DefaultRelease()
-                .WithPublication(publication));
+            .WithRelease(_fixture.DefaultRelease().WithPublication(publication));
 
-        ReleaseFile releaseVersion1ReleaseFile = _fixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(releaseVersion1);
+        ReleaseFile releaseVersion1ReleaseFile = _fixture.DefaultReleaseFile().WithReleaseVersion(releaseVersion1);
 
         ReleaseVersion releaseVersion2 = _fixture
             .DefaultReleaseVersion()
-            .WithRelease(_fixture.DefaultRelease()
-                .WithPublication(publication));
+            .WithRelease(_fixture.DefaultRelease().WithPublication(publication));
 
-        ReleaseFile releaseVersion2ReleaseFile = _fixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(releaseVersion2);
+        ReleaseFile releaseVersion2ReleaseFile = _fixture.DefaultReleaseFile().WithReleaseVersion(releaseVersion2);
 
         ReleaseVersion releaseVersion3 = _fixture
             .DefaultReleaseVersion()
-            .WithRelease(_fixture.DefaultRelease()
-                .WithPublication(publication));
+            .WithRelease(_fixture.DefaultRelease().WithPublication(publication));
 
-        ReleaseFile releaseVersion3ReleaseFile = _fixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(releaseVersion3);
+        ReleaseFile releaseVersion3ReleaseFile = _fixture.DefaultReleaseFile().WithReleaseVersion(releaseVersion3);
 
         DataSet dataSet = _fixture.DefaultDataSet();
 
         var dataSetVersions = _fixture
             .DefaultDataSetVersion()
             .WithDataSet(dataSet)
-            .ForIndex(0, s => s.SetRelease(_fixture
-                .DefaultDataSetVersionRelease()
-                .WithReleaseFileId(releaseVersion1ReleaseFile.Id)))
-            .ForIndex(1, s => s.SetRelease(_fixture
-                .DefaultDataSetVersionRelease()
-                .WithReleaseFileId(releaseVersion3ReleaseFile.Id)))
-            .ForIndex(2, s => s.SetRelease(_fixture
-                .DefaultDataSetVersionRelease()
-                .WithReleaseFileId(releaseVersion2ReleaseFile.Id)))
+            .ForIndex(
+                0,
+                s =>
+                    s.SetRelease(
+                        _fixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseVersion1ReleaseFile.Id)
+                    )
+            )
+            .ForIndex(
+                1,
+                s =>
+                    s.SetRelease(
+                        _fixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseVersion3ReleaseFile.Id)
+                    )
+            )
+            .ForIndex(
+                2,
+                s =>
+                    s.SetRelease(
+                        _fixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseVersion2ReleaseFile.Id)
+                    )
+            )
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -460,8 +418,11 @@ public class ThemeServiceTests
         await using (var contentContext = InMemoryApplicationDbContext(contextId))
         {
             contentContext.ReleaseVersions.AddRange(releaseVersion1, releaseVersion2, releaseVersion3);
-            contentContext.ReleaseFiles.AddRange(releaseVersion1ReleaseFile, releaseVersion2ReleaseFile,
-                releaseVersion3ReleaseFile);
+            contentContext.ReleaseFiles.AddRange(
+                releaseVersion1ReleaseFile,
+                releaseVersion2ReleaseFile,
+                releaseVersion3ReleaseFile
+            );
             await contentContext.SaveChangesAsync();
         }
 
@@ -478,32 +439,30 @@ public class ThemeServiceTests
                 contentDbContext: contentContext,
                 publicDataDbContext: publicDataDbContext.Object,
                 publishingService: publishingService.Object,
-                releaseVersionService: releaseVersionService.Object);
+                releaseVersionService: releaseVersionService.Object
+            );
 
             var releaseVersionDeleteSequence = new MockSequence();
 
-            var releaseVersionIdsInExpectedDeleteOrder =
-                new List<Guid>
-                {
-                    releaseVersion2.Id,
-                    releaseVersion3.Id,
-                    releaseVersion1.Id
-                };
+            var releaseVersionIdsInExpectedDeleteOrder = new List<Guid>
+            {
+                releaseVersion2.Id,
+                releaseVersion3.Id,
+                releaseVersion1.Id,
+            };
 
             releaseVersionIdsInExpectedDeleteOrder.ForEach(releaseVersionId =>
                 releaseVersionService
                     .InSequence(releaseVersionDeleteSequence)
                     .Setup(s => s.DeleteTestReleaseVersion(releaseVersionId, CancellationToken.None))
-                    .ReturnsAsync(Unit.Instance));
+                    .ReturnsAsync(Unit.Instance)
+            );
 
-            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
-                .ReturnsAsync(Unit.Instance);
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
             var result = await service.DeleteTheme(theme.Id);
 
-            VerifyAllMocks(releaseDataFileService,
-                publishingService,
-                releaseVersionService);
+            VerifyAllMocks(releaseDataFileService, publishingService, releaseVersionService);
 
             result.AssertRight();
         }
@@ -512,15 +471,9 @@ public class ThemeServiceTests
     [Fact]
     public async Task DeleteTheme_ReleaseVersionsDeletedByVersionOrder()
     {
-        var theme = new Theme
-        {
-            Id = Guid.NewGuid(),
-            Title = "UI test theme to delete"
-        };
+        var theme = new Theme { Id = Guid.NewGuid(), Title = "UI test theme to delete" };
 
-        Publication publication = _fixture
-            .DefaultPublication()
-            .WithTheme(theme);
+        Publication publication = _fixture.DefaultPublication().WithTheme(theme);
 
         Release release1 = _fixture
             .DefaultRelease()
@@ -532,15 +485,9 @@ public class ThemeServiceTests
             .WithPublication(publication)
             .WithCreated(DateTime.UtcNow.AddDays(-2));
 
-        ReleaseVersion release1Version1 = _fixture
-            .DefaultReleaseVersion()
-            .WithVersion(0)
-            .WithRelease(release1);
+        ReleaseVersion release1Version1 = _fixture.DefaultReleaseVersion().WithVersion(0).WithRelease(release1);
 
-        ReleaseVersion release1Version2 = _fixture
-            .DefaultReleaseVersion()
-            .WithVersion(1)
-            .WithRelease(release1);
+        ReleaseVersion release1Version2 = _fixture.DefaultReleaseVersion().WithVersion(1).WithRelease(release1);
 
         ReleaseVersion release1Version2Cancelled = _fixture
             .DefaultReleaseVersion()
@@ -548,28 +495,24 @@ public class ThemeServiceTests
             .WithSoftDeleted()
             .WithRelease(release1);
 
-        ReleaseVersion release1Version3 = _fixture
-            .DefaultReleaseVersion()
-            .WithVersion(2)
-            .WithRelease(release1);
+        ReleaseVersion release1Version3 = _fixture.DefaultReleaseVersion().WithVersion(2).WithRelease(release1);
 
-        ReleaseVersion release2Version1 = _fixture
-            .DefaultReleaseVersion()
-            .WithVersion(0)
-            .WithRelease(release2);
+        ReleaseVersion release2Version1 = _fixture.DefaultReleaseVersion().WithVersion(0).WithRelease(release2);
 
-        ReleaseVersion release2Version2 = _fixture
-            .DefaultReleaseVersion()
-            .WithVersion(1)
-            .WithRelease(release2);
+        ReleaseVersion release2Version2 = _fixture.DefaultReleaseVersion().WithVersion(1).WithRelease(release2);
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var contentContext = InMemoryApplicationDbContext(contextId))
         {
             contentContext.ReleaseVersions.AddRange(
-                release1Version1, release1Version3, release1Version2Cancelled, release1Version2,
-                release2Version1, release2Version2);
+                release1Version1,
+                release1Version3,
+                release1Version2Cancelled,
+                release1Version2,
+                release2Version1,
+                release2Version2
+            );
 
             await contentContext.SaveChangesAsync();
         }
@@ -583,36 +526,34 @@ public class ThemeServiceTests
             var service = SetupThemeService(
                 contentDbContext: contentContext,
                 publishingService: publishingService.Object,
-                releaseVersionService: releaseVersionService.Object);
+                releaseVersionService: releaseVersionService.Object
+            );
 
             var releaseVersionDeleteSequence = new MockSequence();
 
-            var releaseVersionIdsInExpectedDeleteOrder =
-                new List<Guid>
-                {
-                    // Expect the ReleaseVersions from the more recent Release to be deleted first. 
-                    release1Version3.Id,
-                    release1Version2.Id,
-                    release1Version2Cancelled.Id,
-                    release1Version1.Id,
-                    release2Version2.Id,
-                    release2Version1.Id,
-                };
+            var releaseVersionIdsInExpectedDeleteOrder = new List<Guid>
+            {
+                // Expect the ReleaseVersions from the more recent Release to be deleted first.
+                release1Version3.Id,
+                release1Version2.Id,
+                release1Version2Cancelled.Id,
+                release1Version1.Id,
+                release2Version2.Id,
+                release2Version1.Id,
+            };
 
             releaseVersionIdsInExpectedDeleteOrder.ForEach(releaseVersionId =>
                 releaseVersionService
                     .InSequence(releaseVersionDeleteSequence)
                     .Setup(s => s.DeleteTestReleaseVersion(releaseVersionId, CancellationToken.None))
-                    .ReturnsAsync(Unit.Instance));
+                    .ReturnsAsync(Unit.Instance)
+            );
 
-            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
-                .ReturnsAsync(Unit.Instance);
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
             var result = await service.DeleteTheme(theme.Id);
 
-            VerifyAllMocks(releaseDataFileService,
-                publishingService,
-                releaseVersionService);
+            VerifyAllMocks(releaseDataFileService, publishingService, releaseVersionService);
 
             result.AssertRight();
         }
@@ -629,14 +570,14 @@ public class ThemeServiceTests
         var releaseVersion3Id = Guid.NewGuid();
         var releaseVersion4Id = Guid.NewGuid();
 
-        var releaseVersionIdsInExpectedDeleteOrder =
-            AsList(releaseVersion4Id, releaseVersion3Id, releaseVersion2Id, releaseVersion1Id);
+        var releaseVersionIdsInExpectedDeleteOrder = AsList(
+            releaseVersion4Id,
+            releaseVersion3Id,
+            releaseVersion2Id,
+            releaseVersion1Id
+        );
 
-        var theme = new Theme
-        {
-            Id = themeId,
-            Title = "UI test theme"
-        };
+        var theme = new Theme { Id = themeId, Title = "UI test theme" };
 
         var publication = new Publication
         {
@@ -644,24 +585,12 @@ public class ThemeServiceTests
             Theme = theme,
             ReleaseVersions =
             [
-                new ReleaseVersion
-                {
-                    Id = releaseVersion2Id,
-                    PreviousVersionId = releaseVersion1Id
-                },
+                new ReleaseVersion { Id = releaseVersion2Id, PreviousVersionId = releaseVersion1Id },
                 new ReleaseVersion { Id = releaseVersion1Id },
-                new ReleaseVersion
-                {
-                    Id = releaseVersion4Id,
-                    PreviousVersionId = releaseVersion3Id
-                },
-                new ReleaseVersion
-                {
-                    Id = releaseVersion3Id,
-                    PreviousVersionId = releaseVersion2Id
-                }
+                new ReleaseVersion { Id = releaseVersion4Id, PreviousVersionId = releaseVersion3Id },
+                new ReleaseVersion { Id = releaseVersion3Id, PreviousVersionId = releaseVersion2Id },
             ],
-            Contact = new Contact()
+            Contact = new Contact(),
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -685,7 +614,8 @@ public class ThemeServiceTests
             var service = SetupThemeService(
                 contentContext,
                 publishingService: publishingService.Object,
-                releaseVersionService: releaseVersionService.Object);
+                releaseVersionService: releaseVersionService.Object
+            );
 
             var releaseVersionDeleteSequence = new MockSequence();
 
@@ -693,16 +623,14 @@ public class ThemeServiceTests
                 releaseVersionService
                     .InSequence(releaseVersionDeleteSequence)
                     .Setup(s => s.DeleteTestReleaseVersion(releaseVersionId, CancellationToken.None))
-                    .ReturnsAsync(Unit.Instance));
+                    .ReturnsAsync(Unit.Instance)
+            );
 
-            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
-                .ReturnsAsync(Unit.Instance);
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
             var result = await service.DeleteTheme(themeId);
 
-            VerifyAllMocks(
-                publishingService,
-                releaseVersionService);
+            VerifyAllMocks(publishingService, releaseVersionService);
 
             result.AssertRight();
 
@@ -717,11 +645,7 @@ public class ThemeServiceTests
         var theme = new Theme
         {
             Title = "Non-conforming title",
-            Publications =
-            [
-                new() { Title = "UI test publication 1" },
-                new() { Title = "UI test publication 2" }
-            ]
+            Publications = [new() { Title = "UI test publication 1" }, new() { Title = "UI test publication 2" }],
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -748,11 +672,7 @@ public class ThemeServiceTests
         var theme = new Theme
         {
             Title = "UI test theme",
-            Publications =
-            [
-                new() { Title = "UI test publication 1" },
-                new() { Title = "UI test publication 2" }
-            ]
+            Publications = [new() { Title = "UI test publication 1" }, new() { Title = "UI test publication 2" }],
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -779,19 +699,12 @@ public class ThemeServiceTests
     {
         var releaseVersionId = Guid.NewGuid();
 
-        var theme = new Theme
-        {
-            Id = Guid.NewGuid(),
-            Title = "UI test theme to delete"
-        };
+        var theme = new Theme { Id = Guid.NewGuid(), Title = "UI test theme to delete" };
 
         ReleaseVersion releaseVersion = _fixture
             .DefaultReleaseVersion()
             .WithId(releaseVersionId)
-            .WithRelease(_fixture.DefaultRelease()
-                .WithPublication(_fixture
-                    .DefaultPublication()
-                    .WithTheme(theme)));
+            .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication().WithTheme(theme)));
 
         Methodology methodology = _fixture
             .DefaultMethodology()
@@ -799,19 +712,14 @@ public class ThemeServiceTests
 
         var otherReleaseVersionId = Guid.NewGuid();
 
-        var otherTheme = new Theme
-        {
-            Id = Guid.NewGuid(),
-            Title = "UI test theme to retain"
-        };
+        var otherTheme = new Theme { Id = Guid.NewGuid(), Title = "UI test theme to retain" };
 
         ReleaseVersion otherReleaseVersion = _fixture
             .DefaultReleaseVersion()
             .WithId(otherReleaseVersionId)
-            .WithRelease(_fixture.DefaultRelease()
-                .WithPublication(_fixture
-                    .DefaultPublication()
-                    .WithTheme(otherTheme)));
+            .WithRelease(
+                _fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication().WithTheme(otherTheme))
+            );
 
         Methodology otherMethodology = _fixture
             .DefaultMethodology()
@@ -844,14 +752,12 @@ public class ThemeServiceTests
                 contentContext,
                 methodologyService: methodologyService.Object,
                 publishingService: publishingService.Object,
-                releaseVersionService: releaseVersionService.Object);
+                releaseVersionService: releaseVersionService.Object
+            );
 
-            methodologyService
-                .Setup(s => s.DeleteMethodology(methodology.Id, true))
-                .ReturnsAsync(Unit.Instance);
+            methodologyService.Setup(s => s.DeleteMethodology(methodology.Id, true)).ReturnsAsync(Unit.Instance);
 
-            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
-                .ReturnsAsync(Unit.Instance);
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
             releaseVersionService
                 .Setup(s => s.DeleteTestReleaseVersion(releaseVersionId, CancellationToken.None))
@@ -859,10 +765,7 @@ public class ThemeServiceTests
 
             var result = await service.DeleteTheme(theme.Id);
 
-            VerifyAllMocks(releaseDataFileService,
-                methodologyService,
-                publishingService,
-                releaseVersionService);
+            VerifyAllMocks(releaseDataFileService, methodologyService, publishingService, releaseVersionService);
 
             result.AssertRight();
 
@@ -882,7 +785,7 @@ public class ThemeServiceTests
         {
             ThemeId = uiTestTheme1Id,
             Title = "UI test theme",
-            Contact = new Contact()
+            Contact = new Contact(),
         };
 
         var standardTitleThemePublication = new Publication
@@ -895,22 +798,26 @@ public class ThemeServiceTests
         {
             Id = uiTestTheme1Id,
             Title = "UI test theme",
-            Publications = [uiTestThemePublication]
+            Publications = [uiTestThemePublication],
         };
 
         var standardTitleTheme = new Theme
         {
             Id = standardTitleThemeId,
             Title = "Standard title",
-            Publications = [standardTitleThemePublication]
+            Publications = [standardTitleThemePublication],
         };
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            await context.AddRangeAsync(uiTestTheme, uiTestThemePublication, standardTitleTheme,
-                standardTitleThemePublication);
+            await context.AddRangeAsync(
+                uiTestTheme,
+                uiTestThemePublication,
+                standardTitleTheme,
+                standardTitleThemePublication
+            );
             await context.SaveChangesAsync();
         }
 
@@ -918,13 +825,10 @@ public class ThemeServiceTests
         {
             var publishingService = new Mock<IPublishingService>(Strict);
 
-            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None))
-                .ReturnsAsync(Unit.Instance);
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
             // Arrange
-            var service = SetupThemeService(
-                contentDbContext: context,
-                publishingService: publishingService.Object);
+            var service = SetupThemeService(contentDbContext: context, publishingService: publishingService.Object);
 
             // Act
             await service.DeleteUITestThemes();
@@ -947,11 +851,7 @@ public class ThemeServiceTests
         var theme = new Theme
         {
             Title = "UI test theme",
-            Publications =
-            [
-                new() { Title = "UI test publication 1" },
-                new() { Title = "UI test publication 2" }
-            ]
+            Publications = [new() { Title = "UI test publication 1" }, new() { Title = "UI test publication 2" }],
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -976,20 +876,24 @@ public class ThemeServiceTests
     public class CacheInvalidationTests
     {
         [Fact]
-        public async Task
-            GivenPublicationsForTheme_WhenInvalidatePublicationsCacheByThemeIsCalled_ThenPublicationsForThemeAreInvalidated()
+        public async Task GivenPublicationsForTheme_WhenInvalidatePublicationsCacheByThemeIsCalled_ThenPublicationsForThemeAreInvalidated()
         {
             // ARRANGE
             var themeId = Guid.NewGuid();
             Publication[] publications =
             [
                 new() { Slug = "publication-slug-1", ThemeId = themeId },
-                new() { Slug = "publication-slug-2", ThemeId = themeId, SupersededById = Guid.NewGuid() }, // Archived Publication
+                new()
+                {
+                    Slug = "publication-slug-2",
+                    ThemeId = themeId,
+                    SupersededById = Guid.NewGuid(),
+                }, // Archived Publication
                 new() { Slug = "publication-slug-3", ThemeId = themeId },
                 new() { Slug = "different-theme-publication-slug-A", ThemeId = Guid.NewGuid() },
                 new() { Slug = "different-theme-publication-slug-B", ThemeId = Guid.NewGuid() },
             ];
-            
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1003,7 +907,8 @@ public class ThemeServiceTests
             {
                 var sut = SetupThemeService(
                     contentDbContext: context,
-                    publicationCacheService: publicationCacheService.Build());
+                    publicationCacheService: publicationCacheService.Build()
+                );
 
                 // ACT
                 await sut.InvalidatePublicationsCacheByTheme(themeId);
@@ -1021,10 +926,9 @@ public class ThemeServiceTests
                 publicationCacheService.Assert.CacheNotInvalidatedForPublicationEntry(notExpected.Slug);
             }
         }
-        
+
         [Fact]
-        public async Task
-            GivenPublicationsForTheme_WhenInvalidatingPublicationThrows_ThenOtherPublicationsAreStillInvalidated()
+        public async Task GivenPublicationsForTheme_WhenInvalidatingPublicationThrows_ThenOtherPublicationsAreStillInvalidated()
         {
             // ARRANGE
             var themeId = Guid.NewGuid();
@@ -1032,9 +936,9 @@ public class ThemeServiceTests
             [
                 new() { Slug = "publication-slug-1", ThemeId = themeId },
                 new() { Slug = "publication-slug-2", ThemeId = themeId },
-                new() { Slug = "publication-slug-3", ThemeId = themeId }
+                new() { Slug = "publication-slug-3", ThemeId = themeId },
             ];
-            
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1043,14 +947,16 @@ public class ThemeServiceTests
             }
 
             // Setup publication-slug-2 to throw
-            var publicationCacheService = new PublicationCacheServiceMockBuilder()
-                .WhereInvalidatingPublicationThrows(publications[1].Slug);
+            var publicationCacheService = new PublicationCacheServiceMockBuilder().WhereInvalidatingPublicationThrows(
+                publications[1].Slug
+            );
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var sut = SetupThemeService(
                     contentDbContext: context,
-                    publicationCacheService: publicationCacheService.Build());
+                    publicationCacheService: publicationCacheService.Build()
+                );
 
                 // ACT
                 await sut.InvalidatePublicationsCacheByTheme(themeId);
@@ -1061,10 +967,9 @@ public class ThemeServiceTests
             publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-2");
             publicationCacheService.Assert.CacheInvalidatedForPublicationEntry("publication-slug-3");
         }
-        
+
         [Fact]
-        public async Task
-            GivenPublicationsForTheme_WhenInvalidatingPublicationFails_ThenOtherPublicationsAreStillInvalidated()
+        public async Task GivenPublicationsForTheme_WhenInvalidatingPublicationFails_ThenOtherPublicationsAreStillInvalidated()
         {
             // ARRANGE
             var themeId = Guid.NewGuid();
@@ -1072,9 +977,9 @@ public class ThemeServiceTests
             [
                 new() { Slug = "publication-slug-1", ThemeId = themeId },
                 new() { Slug = "publication-slug-2", ThemeId = themeId },
-                new() { Slug = "publication-slug-3", ThemeId = themeId }
+                new() { Slug = "publication-slug-3", ThemeId = themeId },
             ];
-            
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1083,14 +988,16 @@ public class ThemeServiceTests
             }
 
             // Setup publication-slug-2 to throw
-            var publicationCacheService = new PublicationCacheServiceMockBuilder()
-                .WhereInvalidatingPublicationFails(publications[1].Slug);
+            var publicationCacheService = new PublicationCacheServiceMockBuilder().WhereInvalidatingPublicationFails(
+                publications[1].Slug
+            );
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var sut = SetupThemeService(
                     contentDbContext: context,
-                    publicationCacheService: publicationCacheService.Build());
+                    publicationCacheService: publicationCacheService.Build()
+                );
 
                 // ACT
                 await sut.InvalidatePublicationsCacheByTheme(themeId);
@@ -1113,7 +1020,8 @@ public class ThemeServiceTests
         IReleaseVersionService? releaseVersionService = null,
         IAdminEventRaiser? adminEventRaiser = null,
         IPublicationCacheService? publicationCacheService = null,
-        bool enableThemeDeletion = true)
+        bool enableThemeDeletion = true
+    )
     {
         contentDbContext ??= new Mock<ContentDbContext>().Object;
 
@@ -1129,7 +1037,8 @@ public class ThemeServiceTests
             contentDbContext: contentDbContext,
             dataSetVersionRepository: new DataSetVersionRepository(
                 contentDbContext: contentDbContext,
-                publicDataDbContext: publicDataDbContext),
+                publicDataDbContext: publicDataDbContext
+            ),
             mapper ?? AdminMapper(),
             new PersistenceHelper<ContentDbContext>(contentDbContext),
             userService ?? AlwaysTrueUserService().Object,
@@ -1144,40 +1053,53 @@ public class ThemeServiceTests
 
     private class TestReleaseVersionService(ContentDbContext context) : IReleaseVersionService
     {
-        public async Task<Either<ActionResult, Unit>> DeleteTestReleaseVersion(Guid releaseVersionId, CancellationToken cancellationToken)
+        public async Task<Either<ActionResult, Unit>> DeleteTestReleaseVersion(
+            Guid releaseVersionId,
+            CancellationToken cancellationToken
+        )
         {
-            var releaseVersion = await context.ReleaseVersions
-                .FirstAsync(rv => rv.Id == releaseVersionId, cancellationToken);
+            var releaseVersion = await context.ReleaseVersions.FirstAsync(
+                rv => rv.Id == releaseVersionId,
+                cancellationToken
+            );
             context.ReleaseVersions.Remove(releaseVersion);
             await context.SaveChangesAsync(cancellationToken);
             return Unit.Instance;
         }
 
         public Task<Either<ActionResult, DeleteReleasePlanViewModel>> GetDeleteReleaseVersionPlan(
-            Guid releaseVersionId, CancellationToken cancellationToken = default)
-            => throw new NotImplementedException();
+            Guid releaseVersionId,
+            CancellationToken cancellationToken = default
+        ) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, Unit>> DeleteReleaseVersion(
-            Guid releaseVersionId, CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            Guid releaseVersionId,
+            CancellationToken cancellationToken = default
+        ) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, ReleaseVersionViewModel>> GetRelease(Guid releaseVersionId) =>
             throw new NotImplementedException();
 
         public Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(
-            Guid releaseVersionId) => throw new NotImplementedException();
+            Guid releaseVersionId
+        ) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, ReleaseVersionViewModel>> UpdateReleaseVersion(
-            Guid releaseVersionId, ReleaseVersionUpdateRequest request) => throw new NotImplementedException();
+            Guid releaseVersionId,
+            ReleaseVersionUpdateRequest request
+        ) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, Unit>> UpdateReleasePublished(
-            Guid releaseVersionId, ReleasePublishedUpdateRequest request) => throw new NotImplementedException();
+            Guid releaseVersionId,
+            ReleasePublishedUpdateRequest request
+        ) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, IdTitleViewModel>> GetLatestPublishedRelease(Guid publicationId) =>
             throw new NotImplementedException();
 
         public Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListReleasesWithStatuses(
-            params ReleaseApprovalStatus[] releaseApprovalStatues) => throw new NotImplementedException();
+            params ReleaseApprovalStatus[] releaseApprovalStatues
+        ) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, List<ReleaseVersionSummaryViewModel>>> ListUsersReleasesForApproval() =>
             throw new NotImplementedException();
@@ -1186,13 +1108,17 @@ public class ThemeServiceTests
             throw new NotImplementedException();
 
         public Task<Either<ActionResult, DeleteDataFilePlanViewModel>> GetDeleteDataFilePlan(
-            Guid releaseVersionId, Guid fileId, CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
+            Guid releaseVersionId,
+            Guid fileId,
+            CancellationToken cancellationToken = default
+        ) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId) =>
             throw new NotImplementedException();
 
         public Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(
-            Guid releaseVersionId, Guid fileId) => throw new NotImplementedException();
+            Guid releaseVersionId,
+            Guid fileId
+        ) => throw new NotImplementedException();
     }
 }

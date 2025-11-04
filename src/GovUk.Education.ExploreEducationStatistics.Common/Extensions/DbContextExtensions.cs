@@ -1,4 +1,3 @@
-#nullable enable
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Thinktecture.Internal;
@@ -11,7 +10,8 @@ public static class DbContextExtensions
     /// Ensure that an entity is not detached from the database context, reloading it if necessary before returning.
     /// Throws an exception if the entity cannot be reloaded.
     /// </summary>
-    public static T AssertEntityLoaded<T>(this DbContext context, T entity) where T : class
+    public static T AssertEntityLoaded<T>(this DbContext context, T entity)
+        where T : class
     {
         var reloaded = context.ReloadEntity(entity);
 
@@ -37,7 +37,8 @@ public static class DbContextExtensions
     /// ensure that it is not stale and has not been deleted.
     /// </para>
     /// </remarks>
-    public static T? ReloadEntity<T>(this DbContext context, T entity) where T : class
+    public static T? ReloadEntity<T>(this DbContext context, T entity)
+        where T : class
     {
         var entry = context.Entry(entity);
 
@@ -84,18 +85,19 @@ public static class DbContextExtensions
         return true;
     }
 
-    public static DbSet<TEntity> TempTableSet<TEntity>(this DbContext dbContext) where TEntity : class
+    public static DbSet<TEntity> TempTableSet<TEntity>(this DbContext dbContext)
+        where TEntity : class
     {
         return dbContext.Set<TEntity>(EntityNameProvider.GetTempTableName(typeof(TEntity)));
-    } 
+    }
 
     private static string GetDisplayString(this DbContext context, object entity)
     {
         var entry = context.Entry(entity);
         var primaryKey = entry.Metadata.FindPrimaryKey();
         var typeName = entity.GetType().ShortDisplayName();
-        var primaryKeyValues = primaryKey.Properties
-            .Select(property => $"{property.Name}: '{property.PropertyInfo.GetValue(entity)}'")
+        var primaryKeyValues = primaryKey
+            .Properties.Select(property => $"{property.Name}: '{property.PropertyInfo.GetValue(entity)}'")
             .JoinToString(", ");
 
         return $"{typeName} {{{primaryKeyValues}}}";

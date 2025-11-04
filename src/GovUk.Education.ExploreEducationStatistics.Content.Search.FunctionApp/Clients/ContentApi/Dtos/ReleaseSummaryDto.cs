@@ -30,7 +30,7 @@ public record ReleaseSummaryDto
             IsLatestRelease = LatestRelease,
             PublicationId = Publication?.Id,
             PublicationTitle = Publication?.Title,
-            PublicationSlug = Publication?.Slug
+            PublicationSlug = Publication?.Slug,
         };
 }
 

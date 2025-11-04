@@ -5,12 +5,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 public class UserInviteCreateRequest
 {
-    [EmailAddress] public string Email { get; set; } = string.Empty;
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
 
     [Required(AllowEmptyStrings = false)]
     public string RoleId { get; set; } = string.Empty;
 
-    public DateTime? CreatedDate { get; set; } = null;
+    public DateTimeOffset? CreatedDate { get; set; }
 
     public List<UserReleaseRoleCreateRequest> UserReleaseRoles { get; set; } = new();
 

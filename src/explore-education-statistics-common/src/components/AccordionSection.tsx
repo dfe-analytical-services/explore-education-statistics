@@ -95,6 +95,9 @@ const AccordionSection = ({
               <button
                 aria-controls={contentId}
                 aria-expanded={open}
+                aria-label={`${heading}, ${
+                  open ? 'hide' : 'show'
+                } this section`}
                 className={classes.sectionButton}
                 data-scroll={trackScroll ? true : undefined}
                 id={headingId}
@@ -104,6 +107,9 @@ const AccordionSection = ({
                 }}
               >
                 <HeadingContent caption={caption} heading={heading} />
+                <span className="govuk-visually-hidden govuk-accordion__section-heading-divider">
+                  ,{' '}
+                </span>
                 <span className="govuk-accordion__section-toggle">
                   <span className="govuk-accordion__section-toggle-focus">
                     <span

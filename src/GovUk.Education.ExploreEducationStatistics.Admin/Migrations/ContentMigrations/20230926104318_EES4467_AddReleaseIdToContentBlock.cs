@@ -6,6 +6,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Migrati
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES4467_AddReleaseIdToContentBlock : Migration
 {
     private const string MigrationId = "20230926104318";
@@ -16,16 +17,15 @@ public partial class EES4467_AddReleaseIdToContentBlock : Migration
             name: "ReleaseId",
             table: "ContentBlock",
             type: "uniqueidentifier",
-            nullable: true);
+            nullable: true
+        );
 
-        migrationBuilder.CreateIndex(
-            name: "IX_ContentBlock_ReleaseId",
-            table: "ContentBlock",
-            column: "ReleaseId");
+        migrationBuilder.CreateIndex(name: "IX_ContentBlock_ReleaseId", table: "ContentBlock", column: "ReleaseId");
 
         migrationBuilder.SqlFromFile(
             ContentMigrationsPath,
-            $"{MigrationId}_{nameof(EES4467_AddReleaseIdToContentBlock)}.sql");
+            $"{MigrationId}_{nameof(EES4467_AddReleaseIdToContentBlock)}.sql"
+        );
 
         // Initially create this foreign key with "Restrict" delete cascade behaviour. This is so as to not
         // cause potential cyclical delete cascades with the existing cascade delete behaviour from
@@ -36,7 +36,8 @@ public partial class EES4467_AddReleaseIdToContentBlock : Migration
             column: "ReleaseId",
             principalTable: "Releases",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Restrict);
+            onDelete: ReferentialAction.Restrict
+        );
 
         migrationBuilder.AlterColumn<Guid>(
             name: "ReleaseId",
@@ -44,21 +45,16 @@ public partial class EES4467_AddReleaseIdToContentBlock : Migration
             nullable: false,
             oldClrType: typeof(Guid),
             oldType: "uniqueidentifier",
-            oldNullable: true);
+            oldNullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropForeignKey(
-            name: "FK_ContentBlock_Releases_ReleaseId",
-            table: "ContentBlock");
+        migrationBuilder.DropForeignKey(name: "FK_ContentBlock_Releases_ReleaseId", table: "ContentBlock");
 
-        migrationBuilder.DropIndex(
-            name: "IX_ContentBlock_ReleaseId",
-            table: "ContentBlock");
+        migrationBuilder.DropIndex(name: "IX_ContentBlock_ReleaseId", table: "ContentBlock");
 
-        migrationBuilder.DropColumn(
-            name: "ReleaseId",
-            table: "ContentBlock");
+        migrationBuilder.DropColumn(name: "ReleaseId", table: "ContentBlock");
     }
 }

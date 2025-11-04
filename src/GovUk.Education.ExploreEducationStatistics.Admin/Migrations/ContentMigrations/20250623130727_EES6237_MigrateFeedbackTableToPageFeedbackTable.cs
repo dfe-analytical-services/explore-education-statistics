@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 /// <inheritdoc />
+// ReSharper disable once InconsistentNaming
 public partial class EES6237_MigrateFeedbackTableToPageFeedbackTable : Migration
 {
     /// <inheritdoc />
@@ -22,14 +23,16 @@ public partial class EES6237_MigrateFeedbackTableToPageFeedbackTable : Migration
                 Context = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                 Issue = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                 Intent = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                Read = table.Column<bool>(type: "bit", nullable: false)
+                Read = table.Column<bool>(type: "bit", nullable: false),
             },
             constraints: table =>
             {
                 table.PrimaryKey("PK_PageFeedback", x => x.Id);
-            });
+            }
+        );
 
-        migrationBuilder.Sql(@"
+        migrationBuilder.Sql(
+            @"
                 INSERT INTO PageFeedback(
                     Id,
                     Created,
@@ -51,12 +54,12 @@ public partial class EES6237_MigrateFeedbackTableToPageFeedbackTable : Migration
                     Issue,
                     Intent,
                     [Read]
-                FROM Feedback");
-        
+                FROM Feedback"
+        );
+
         migrationBuilder.Sql("GRANT INSERT ON dbo.PageFeedback TO [content];");
-        
-        migrationBuilder.DropTable(
-            name: "Feedback");
+
+        migrationBuilder.DropTable(name: "Feedback");
     }
 
     /// <inheritdoc />
@@ -74,14 +77,16 @@ public partial class EES6237_MigrateFeedbackTableToPageFeedbackTable : Migration
                 Read = table.Column<bool>(type: "bit", nullable: false),
                 Response = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                 Url = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
-                UserAgent = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true)
+                UserAgent = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
             },
             constraints: table =>
             {
                 table.PrimaryKey("PK_Feedback", x => x.Id);
-            });
-        
-        migrationBuilder.Sql(@"
+            }
+        );
+
+        migrationBuilder.Sql(
+            @"
                 INSERT INTO Feedback(
                     Id,
                     Created,
@@ -103,11 +108,11 @@ public partial class EES6237_MigrateFeedbackTableToPageFeedbackTable : Migration
                     Issue,
                     Intent,
                     [Read]
-                FROM PageFeedback");
-        
+                FROM PageFeedback"
+        );
+
         migrationBuilder.Sql("GRANT INSERT ON dbo.Feedback TO [content];");
-        
-        migrationBuilder.DropTable(
-            name: "PageFeedback");
+
+        migrationBuilder.DropTable(name: "PageFeedback");
     }
 }

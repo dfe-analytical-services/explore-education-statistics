@@ -16,41 +16,46 @@ public class PreviewTokenController(IPreviewTokenService previewTokenService) : 
     [HttpPost]
     public async Task<ActionResult<PreviewTokenViewModel>> CreatePreviewToken(
         [FromBody] PreviewTokenCreateRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         return await previewTokenService
-            .CreatePreviewToken(request.DataSetVersionId, request.Label, cancellationToken)
+            .CreatePreviewToken(
+                request.DataSetVersionId,
+                request.Label,
+                request.Activates,
+                request.Expires,
+                cancellationToken
+            )
             .HandleFailuresOr(previewToken =>
-                CreatedAtAction(nameof(GetPreviewToken), new { previewTokenId = previewToken.Id }, previewToken));
+                CreatedAtAction(nameof(GetPreviewToken), new { previewTokenId = previewToken.Id }, previewToken)
+            );
     }
 
     [HttpGet("{previewTokenId:guid}")]
     public async Task<ActionResult<PreviewTokenViewModel>> GetPreviewToken(
         Guid previewTokenId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await previewTokenService
-            .GetPreviewToken(previewTokenId, cancellationToken)
-            .HandleFailuresOrOk();
+        return await previewTokenService.GetPreviewToken(previewTokenId, cancellationToken).HandleFailuresOrOk();
     }
 
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<PreviewTokenViewModel>>> ListPreviewTokens(
         [FromQuery] Guid dataSetVersionId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await previewTokenService
-            .ListPreviewTokens(dataSetVersionId, cancellationToken)
-            .HandleFailuresOrOk();
+        return await previewTokenService.ListPreviewTokens(dataSetVersionId, cancellationToken).HandleFailuresOrOk();
     }
 
     [HttpPost("{previewTokenId:guid}/revoke")]
     public async Task<ActionResult<PreviewTokenViewModel>> RevokePreviewToken(
         Guid previewTokenId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return await previewTokenService
-            .RevokePreviewToken(previewTokenId, cancellationToken)
-            .HandleFailuresOrOk();
+        return await previewTokenService.RevokePreviewToken(previewTokenId, cancellationToken).HandleFailuresOrOk();
     }
 }

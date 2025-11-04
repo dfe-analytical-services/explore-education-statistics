@@ -15,11 +15,7 @@ builder.WebHost.ConfigureKestrel(options =>
     options.AddServerHeader = false;
 });
 
-builder.Configuration.AddJsonFile(
-    path: "appsettings.Local.json",
-    optional: true,
-    reloadOnChange: false);
-
+builder.Configuration.AddJsonFile(path: "appsettings.Local.json", optional: true, reloadOnChange: false);
 
 // Logging
 

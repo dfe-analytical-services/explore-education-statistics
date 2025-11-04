@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 public record GlossaryEntryViewModel(string Title, string Slug, string Body);
 
@@ -12,9 +11,7 @@ public record GlossaryCategoryViewModel(char Heading, List<GlossaryEntryViewMode
     {
         return AzCharArray.ToDictionary(
             c => c,
-            c => new GlossaryCategoryViewModel(
-                Heading: c,
-                Entries: new List<GlossaryEntryViewModel>()
-            ));
+            c => new GlossaryCategoryViewModel(Heading: c, Entries: new List<GlossaryEntryViewModel>())
+        );
     }
 }

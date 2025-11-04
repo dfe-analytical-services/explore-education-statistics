@@ -7,6 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
 /// <inheritdoc />
 [ExcludeFromCodeCoverage]
+// ReSharper disable once InconsistentNaming
 public partial class EES4975_AddKeyStatisticsCascadeDeletes : Migration
 {
     /// <inheritdoc />
@@ -23,11 +24,10 @@ public partial class EES4975_AddKeyStatisticsCascadeDeletes : Migration
         // Remove the non-cascading foreign key constraints
         migrationBuilder.DropForeignKey(
             name: "FK_KeyStatisticsDataBlock_KeyStatistics_Id",
-            table: "KeyStatisticsDataBlock");
+            table: "KeyStatisticsDataBlock"
+        );
 
-        migrationBuilder.DropForeignKey(
-            name: "FK_KeyStatisticsText_KeyStatistics_Id",
-            table: "KeyStatisticsText");
+        migrationBuilder.DropForeignKey(name: "FK_KeyStatisticsText_KeyStatistics_Id", table: "KeyStatisticsText");
 
         // Add the cascading foreign key constraints
         migrationBuilder.AddForeignKey(
@@ -36,7 +36,8 @@ public partial class EES4975_AddKeyStatisticsCascadeDeletes : Migration
             column: "Id",
             principalTable: "KeyStatistics",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_KeyStatisticsText_KeyStatistics_Id",
@@ -44,7 +45,8 @@ public partial class EES4975_AddKeyStatisticsCascadeDeletes : Migration
             column: "Id",
             principalTable: "KeyStatistics",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
     }
 
     /// <inheritdoc />
@@ -52,24 +54,25 @@ public partial class EES4975_AddKeyStatisticsCascadeDeletes : Migration
     {
         migrationBuilder.DropForeignKey(
             name: "FK_KeyStatisticsDataBlock_KeyStatistics_Id",
-            table: "KeyStatisticsDataBlock");
+            table: "KeyStatisticsDataBlock"
+        );
 
-        migrationBuilder.DropForeignKey(
-            name: "FK_KeyStatisticsText_KeyStatistics_Id",
-            table: "KeyStatisticsText");
+        migrationBuilder.DropForeignKey(name: "FK_KeyStatisticsText_KeyStatistics_Id", table: "KeyStatisticsText");
 
         migrationBuilder.AddForeignKey(
             name: "FK_KeyStatisticsDataBlock_KeyStatistics_Id",
             table: "KeyStatisticsDataBlock",
             column: "Id",
             principalTable: "KeyStatistics",
-            principalColumn: "Id");
+            principalColumn: "Id"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_KeyStatisticsText_KeyStatistics_Id",
             table: "KeyStatisticsText",
             column: "Id",
             principalTable: "KeyStatistics",
-            principalColumn: "Id");
+            principalColumn: "Id"
+        );
     }
 }

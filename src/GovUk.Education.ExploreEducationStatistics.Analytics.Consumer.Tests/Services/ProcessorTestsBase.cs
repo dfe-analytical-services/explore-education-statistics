@@ -19,11 +19,12 @@ public abstract class ProcessorTestsBase : IDisposable
             logger: Mock.Of<ILogger<ProcessRequestFilesWorkflow>>(),
             fileAccessor: _filesystemFileAccessor,
             dateTimeProvider: _dateTimeProvider,
-            temporaryProcessingFolderNameGenerator: () => "temp-processing-folder");
+            temporaryProcessingFolderNameGenerator: () => "temp-processing-folder"
+        );
     }
 
     protected abstract string ResourcesPath { get; }
-    
+
     protected void SetupRequestFile(IRequestFileProcessor processor, string filename)
     {
         Directory.CreateDirectory(processor.SourceDirectory);
@@ -31,10 +32,12 @@ public abstract class ProcessorTestsBase : IDisposable
         var sourceFilePath = Path.Combine(ResourcesPath, filename);
         File.Copy(sourceFilePath, Path.Combine(processor.SourceDirectory, filename));
     }
-    
-    protected string ProcessingDirectoryPath(IRequestFileProcessor processor) => Path.Combine(processor.SourceDirectory, "processing");
 
-    protected string TemporaryProcessingDirectoryPath(IRequestFileProcessor processor) => Path.Combine(ProcessingDirectoryPath(processor), "temp-processing-folder");
+    protected string ProcessingDirectoryPath(IRequestFileProcessor processor) =>
+        Path.Combine(processor.SourceDirectory, "processing");
+
+    protected string TemporaryProcessingDirectoryPath(IRequestFileProcessor processor) =>
+        Path.Combine(ProcessingDirectoryPath(processor), "temp-processing-folder");
 
     public virtual void Dispose()
     {

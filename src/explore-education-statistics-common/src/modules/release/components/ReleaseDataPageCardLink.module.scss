@@ -1,0 +1,51 @@
+@import '~govuk-frontend/dist/govuk/base';
+@import '@common/styles/variables';
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: govuk-spacing(2);
+  margin: 0 0 govuk-spacing(8);
+  list-style: none;
+  padding: 0;
+
+  @include govuk-media-query($until: desktop) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: govuk-spacing(2);
+  padding: govuk-spacing(4);
+  position: relative;
+  background-color: $_govuk-rebrand-light-blue-background-colour;
+
+  > * {
+    margin-bottom: 0;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  // Make the whole card clickable, keeping the actual link content short
+  a::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  a:hover::before {
+    box-shadow: 0 0 0 1px $_govuk-rebrand-border-colour-on-blue-tint-95 inset;
+  }
+}
+
+.highlight {
+  background-color: govuk-colour('light-grey');
+  grid-column: 1 / -1;
+  justify-content: center;
+  text-align: center;
+}

@@ -14,7 +14,8 @@ public static class DuckDbConnectionExtensions
     public static DuckDbDapperSqlBuilder SqlBuilder(
         this IDuckDbConnection connection,
         FormattableString command,
-        InterpolatedSqlBuilderOptions? options = null)
+        InterpolatedSqlBuilderOptions? options = null
+    )
     {
         return new DuckDbDapperSqlBuilder(connection, command, options);
     }
@@ -22,21 +23,24 @@ public static class DuckDbConnectionExtensions
     public static DuckDbDapperSqlBuilder SqlBuilder(
         this IDuckDbConnection connection,
         string command,
-        InterpolatedSqlBuilderOptions? options = null)
+        InterpolatedSqlBuilderOptions? options = null
+    )
     {
         return new DuckDbDapperSqlBuilder(connection, command, options);
     }
 
     public static DuckDbDapperSqlBuilder SqlBuilder(
         this IDuckDbConnection connection,
-        InterpolatedSqlBuilderOptions options)
+        InterpolatedSqlBuilderOptions options
+    )
     {
         return new DuckDbDapperSqlBuilder(connection, options);
     }
 
     public static DuckDbDapperSqlBuilder SqlBuilder(
         this IDuckDbConnection connection,
-        ref InterpolatedSqlHandler command)
+        ref InterpolatedSqlHandler command
+    )
     {
         if (command.InterpolatedSqlBuilder.Options.AutoAdjustMultilineString)
         {
@@ -49,8 +53,8 @@ public static class DuckDbConnectionExtensions
     public static DuckDbDapperSqlBuilder SqlBuilder(
         this IDuckDbConnection connection,
         InterpolatedSqlBuilderOptions options,
-        [InterpolatedStringHandlerArgument("options")]
-        ref InterpolatedSqlHandler command)
+        [InterpolatedStringHandlerArgument("options")] ref InterpolatedSqlHandler command
+    )
     {
         if (command.InterpolatedSqlBuilder.Options.AutoAdjustMultilineString)
         {

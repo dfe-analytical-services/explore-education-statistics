@@ -7,7 +7,7 @@ import { testPublication, testRelease } from './__data__/testReleaseData';
 
 describe('PublicationReleasePageCurrent', () => {
   test('renders latest data tag', () => {
-    render(<PublicationReleasePage releaseVersion={testRelease} />);
+    render(<PublicationReleasePage page="old" releaseVersion={testRelease} />);
 
     expect(
       screen.queryByText('This is the latest release'),
@@ -23,7 +23,12 @@ describe('PublicationReleasePageCurrent', () => {
       ...testRelease,
       publication: { ...testPublication, isSuperseded: true },
     };
-    render(<PublicationReleasePage releaseVersion={testReleaseSuperseded} />);
+    render(
+      <PublicationReleasePage
+        page="old"
+        releaseVersion={testReleaseSuperseded}
+      />,
+    );
 
     expect(
       screen.queryByText('This is the latest release'),
@@ -35,7 +40,12 @@ describe('PublicationReleasePageCurrent', () => {
       ...testRelease,
       latestRelease: false,
     };
-    render(<PublicationReleasePage releaseVersion={testReleaseNotLatest} />);
+    render(
+      <PublicationReleasePage
+        page="old"
+        releaseVersion={testReleaseNotLatest}
+      />,
+    );
 
     expect(
       screen.getByText('This is not the latest release'),
@@ -65,7 +75,12 @@ describe('PublicationReleasePageCurrent', () => {
       },
     };
 
-    render(<PublicationReleasePage releaseVersion={testReleaseSuperseded} />);
+    render(
+      <PublicationReleasePage
+        page="old"
+        releaseVersion={testReleaseSuperseded}
+      />,
+    );
 
     const supersededWarningLink = within(
       screen.getByTestId('superseded-warning'),
@@ -88,7 +103,12 @@ describe('PublicationReleasePageCurrent', () => {
       },
     };
 
-    render(<PublicationReleasePage releaseVersion={testReleaseSuperseded} />);
+    render(
+      <PublicationReleasePage
+        page="old"
+        releaseVersion={testReleaseSuperseded}
+      />,
+    );
 
     expect(screen.queryByTestId('superseded-warning')).not.toBeInTheDocument();
   });
@@ -96,6 +116,7 @@ describe('PublicationReleasePageCurrent', () => {
   test('renders quick links', async () => {
     render(
       <PublicationReleasePage
+        page="old"
         releaseVersion={{
           ...testRelease,
           relatedDashboardsSection: undefined,
@@ -128,6 +149,7 @@ describe('PublicationReleasePageCurrent', () => {
   test(`renders 'Download all data (zip)' as a link when files present`, async () => {
     render(
       <PublicationReleasePage
+        page="old"
         releaseVersion={{
           ...testRelease,
           relatedDashboardsSection: undefined,
@@ -164,6 +186,7 @@ describe('PublicationReleasePageCurrent', () => {
   test('does not render release contents link when there is no content', async () => {
     render(
       <PublicationReleasePage
+        page="old"
         releaseVersion={{
           ...testRelease,
           content: [],
@@ -183,6 +206,7 @@ describe('PublicationReleasePageCurrent', () => {
   test(`renders quick link to view related dashboard(s) when section exists`, async () => {
     render(
       <PublicationReleasePage
+        page="old"
         releaseVersion={{
           ...testRelease,
           relatedDashboardsSection: {
@@ -228,7 +252,7 @@ describe('PublicationReleasePageCurrent', () => {
   });
 
   test(`renders other releases including legacy links`, async () => {
-    render(<PublicationReleasePage releaseVersion={testRelease} />);
+    render(<PublicationReleasePage page="old" releaseVersion={testRelease} />);
 
     const usefulInfo = within(screen.getByTestId('useful-information'));
 
@@ -281,7 +305,7 @@ describe('PublicationReleasePageCurrent', () => {
 
   test('renders accredited official statistics image', () => {
     const { container } = render(
-      <PublicationReleasePage releaseVersion={testRelease} />,
+      <PublicationReleasePage page="old" releaseVersion={testRelease} />,
     );
 
     expect(
@@ -292,7 +316,7 @@ describe('PublicationReleasePageCurrent', () => {
   });
 
   test('renders accredited official statistics section', () => {
-    render(<PublicationReleasePage releaseVersion={testRelease} />);
+    render(<PublicationReleasePage page="old" releaseVersion={testRelease} />);
 
     expect(
       screen.getByRole('heading', { name: 'Accredited official statistics' }),
@@ -305,6 +329,7 @@ describe('PublicationReleasePageCurrent', () => {
   test('does not render image for official statistics', () => {
     const { container } = render(
       <PublicationReleasePage
+        page="old"
         releaseVersion={{
           ...testRelease,
           type: 'OfficialStatistics',
@@ -322,6 +347,7 @@ describe('PublicationReleasePageCurrent', () => {
   test('renders official statistics section', () => {
     render(
       <PublicationReleasePage
+        page="old"
         releaseVersion={{
           ...testRelease,
           type: 'OfficialStatistics',
@@ -341,6 +367,7 @@ describe('PublicationReleasePageCurrent', () => {
   test('renders "Next update" section if this is the latest Release for a Publication and there is a valid partial date', () => {
     render(
       <PublicationReleasePage
+        page="old"
         releaseVersion={{
           ...testRelease,
           latestRelease: true,
@@ -359,6 +386,7 @@ describe('PublicationReleasePageCurrent', () => {
   test(`doesn't render "Next update" section if there is no valid partial date`, () => {
     render(
       <PublicationReleasePage
+        page="old"
         releaseVersion={{
           ...testRelease,
           latestRelease: true,
@@ -375,6 +403,7 @@ describe('PublicationReleasePageCurrent', () => {
   test(`doesn't render "Next update" section if the Release is not the latest Release for the Publication`, () => {
     render(
       <PublicationReleasePage
+        page="old"
         releaseVersion={{
           ...testRelease,
           latestRelease: false,
@@ -392,7 +421,7 @@ describe('PublicationReleasePageCurrent', () => {
   });
 
   test('renders "Last Updated" section correctly with updates in correct order', async () => {
-    render(<PublicationReleasePage releaseVersion={testRelease} />);
+    render(<PublicationReleasePage page="old" releaseVersion={testRelease} />);
 
     expect(screen.getByTestId('Last updated')).toHaveTextContent(
       '19 April 2018',
@@ -422,7 +451,7 @@ describe('PublicationReleasePageCurrent', () => {
   });
 
   test('renders link to a methodology', () => {
-    render(<PublicationReleasePage releaseVersion={testRelease} />);
+    render(<PublicationReleasePage page="old" releaseVersion={testRelease} />);
     const usefulInfo = screen.getByTestId('useful-information');
 
     expect(
@@ -453,6 +482,7 @@ describe('PublicationReleasePageCurrent', () => {
     };
     render(
       <PublicationReleasePage
+        page="old"
         releaseVersion={testReleaseWithExternalMethodology}
       />,
     );
@@ -482,6 +512,7 @@ describe('PublicationReleasePageCurrent', () => {
     };
     render(
       <PublicationReleasePage
+        page="old"
         releaseVersion={testReleaseWithInternalAndExternalMethodologies}
       />,
     );
@@ -508,7 +539,7 @@ describe('PublicationReleasePageCurrent', () => {
   });
 
   test('renders default publishing organisation text', () => {
-    render(<PublicationReleasePage releaseVersion={testRelease} />);
+    render(<PublicationReleasePage page="old" releaseVersion={testRelease} />);
     const producedBy = screen.getByTestId('Produced by-value');
 
     expect(screen.getByTestId('Produced by-value')).toHaveTextContent(
@@ -528,6 +559,7 @@ describe('PublicationReleasePageCurrent', () => {
   test('renders custom publishing organisation text correctly if set', () => {
     render(
       <PublicationReleasePage
+        page="old"
         releaseVersion={{
           ...testRelease,
           publishingOrganisations: [

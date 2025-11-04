@@ -8,6 +8,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Migrati
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 [ExcludeFromCodeCoverage]
+// ReSharper disable once InconsistentNaming
 public partial class EES3661_AddPublicationsFullTextCatalogAndIndex : Migration
 {
     private const string MigrationId = "20221108151034";
@@ -15,8 +16,11 @@ public partial class EES3661_AddPublicationsFullTextCatalogAndIndex : Migration
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         // Add a full-text catalog with an index on the Publications Summary and Title columns
-        migrationBuilder.SqlFromFile(ContentMigrationsPath, $"{MigrationId}_PublicationsFullTextCatalogAndIndex.sql",
-            suppressTransaction: true);
+        migrationBuilder.SqlFromFile(
+            ContentMigrationsPath,
+            $"{MigrationId}_PublicationsFullTextCatalogAndIndex.sql",
+            suppressTransaction: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)

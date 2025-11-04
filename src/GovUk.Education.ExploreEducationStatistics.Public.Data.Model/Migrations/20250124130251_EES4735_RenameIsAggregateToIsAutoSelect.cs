@@ -15,7 +15,8 @@ public partial class EES4735_RenameIsAggregateToIsAutoSelect : Migration
             table: "FilterMetas",
             type: "character varying(120)",
             maxLength: 120,
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.Sql(
             """
@@ -28,12 +29,10 @@ public partial class EES4735_RenameIsAggregateToIsAutoSelect : Migration
                 JOIN "FilterOptionMetaLinks" FOML ON FM."Id" = FOML."MetaId"
                 WHERE FOML."OptionId" = FOM."Id" 
                   AND FOM."Label" = 'Total');
-            """);
+            """
+        );
 
-        migrationBuilder.DropColumn(
-            name: "IsAggregate",
-            table: "FilterOptionMetas");
-
+        migrationBuilder.DropColumn(name: "IsAggregate", table: "FilterOptionMetas");
     }
 
     /// <inheritdoc />
@@ -43,17 +42,17 @@ public partial class EES4735_RenameIsAggregateToIsAutoSelect : Migration
             name: "IsAggregate",
             table: "FilterOptionMetas",
             type: "boolean",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.Sql(
             """
             UPDATE "FilterOptionMetas" FOM
             SET "IsAggregate" = true
             WHERE FOM."Label" = 'Total'
-            """);
+            """
+        );
 
-        migrationBuilder.DropColumn(
-            name: "AutoSelectLabel",
-            table: "FilterMetas");
+        migrationBuilder.DropColumn(name: "AutoSelectLabel", table: "FilterMetas");
     }
 }

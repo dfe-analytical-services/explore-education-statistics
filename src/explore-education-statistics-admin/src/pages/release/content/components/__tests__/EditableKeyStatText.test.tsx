@@ -12,8 +12,6 @@ describe('EditableKeyStatText', () => {
     trend: 'Text trend',
     guidanceTitle: 'Text guidance title',
     guidanceText: 'Text guidance text',
-    order: 0,
-    created: '2023-01-01',
     title: 'Text title',
     statistic: 'Over 9000',
   };

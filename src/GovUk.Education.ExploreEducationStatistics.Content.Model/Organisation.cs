@@ -23,14 +23,11 @@ public partial class Organisation : ICreatedUpdatedTimestamps<DateTimeOffset, Da
     {
         public void Configure(EntityTypeBuilder<Organisation> builder)
         {
-            builder.Property(o => o.Title)
-                .HasMaxLength(100);
+            builder.Property(o => o.Title).HasMaxLength(100);
 
-            builder.Property(o => o.Url)
-                .HasMaxLength(1024);
+            builder.Property(o => o.Url).HasMaxLength(1024);
 
-            builder.HasIndex(o => o.Title)
-                .IsUnique();
+            builder.HasIndex(o => o.Title).IsUnique();
         }
     }
 }

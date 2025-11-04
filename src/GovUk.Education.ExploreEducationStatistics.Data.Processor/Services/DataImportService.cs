@@ -17,9 +17,7 @@ public class DataImportService : IDataImportService
     private readonly IDbContextSupplier _dbContextSupplier;
     private readonly ILogger<DataImportService> _logger;
 
-    public DataImportService(
-        IDbContextSupplier dbContextSupplier,
-        ILogger<DataImportService> logger)
+    public DataImportService(IDbContextSupplier dbContextSupplier, ILogger<DataImportService> logger)
     {
         _dbContextSupplier = dbContextSupplier;
         _logger = logger;
@@ -28,44 +26,39 @@ public class DataImportService : IDataImportService
     public async Task FailImport(Guid id, List<DataImportError> errors)
     {
         await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
-        
+
         var import = await contentDbContext.DataImports.SingleAsync(d => d.Id == id);
-        
+
         if (import.Status != COMPLETE && import.Status != FAILED)
         {
             contentDbContext.Update(import);
             import.Status = FAILED;
-            import.Errors.AddRange(errors);                    
-            
+            import.Errors.AddRange(errors);
+
             await contentDbContext.SaveChangesAsync();
         }
     }
 
     public async Task FailImport(Guid id, params string[] errors)
     {
-        await FailImport(id, errors
-            .Select(error => new DataImportError(error))
-            .ToList());
+        await FailImport(id, errors.Select(error => new DataImportError(error)).ToList());
     }
 
     public async Task<DataImport> GetImport(Guid id)
     {
         await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
-        return await contentDbContext.DataImports
-            .AsNoTracking()
+        return await contentDbContext
+            .DataImports.AsNoTracking()
             .Include(import => import.Errors)
             .Include(import => import.File)
             .Include(import => import.MetaFile)
-            .Include(import => import.ZipFile)
             .SingleAsync(import => import.Id == id);
     }
 
     public async Task<DataImportStatus> GetImportStatus(Guid id)
     {
         await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
-        var import = await contentDbContext.DataImports
-            .AsNoTracking()
-            .SingleOrDefaultAsync(i => i.Id == id);
+        var import = await contentDbContext.DataImports.AsNoTracking().SingleOrDefaultAsync(i => i.Id == id);
 
         if (import == null)
         {
@@ -81,7 +74,8 @@ public class DataImportService : IDataImportService
         int? totalRows = null,
         HashSet<GeographicLevel>? geographicLevels = null,
         int? importedRows = null,
-        int? lastProcessedRowIndex = null)
+        int? lastProcessedRowIndex = null
+    )
     {
         await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
         var import = await contentDbContext.DataImports.SingleAsync(import => import.Id == id);
@@ -99,31 +93,30 @@ public class DataImportService : IDataImportService
     public async Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete)
     {
         await using var context = _dbContextSupplier.CreateDbContext<ContentDbContext>();
-        
-        var import = await context.DataImports
-            .Include(i => i.File)
-            .SingleAsync(i => i.Id == id);
+
+        var import = await context.DataImports.Include(i => i.File).SingleAsync(i => i.Id == id);
 
         var filename = import.File.Filename;
 
         var percentageCompleteBefore = import.StagePercentageComplete;
-        var percentageCompleteAfter = (int) Math.Clamp(percentageComplete, 0, 100);
+        var percentageCompleteAfter = (int)Math.Clamp(percentageComplete, 0, 100);
 
         // Ignore updating if already finished, or in the process of aborting and this status update isn't a
-        // finishing status update. 
+        // finishing status update.
         if (import.Status.IsFinished() || (import.Status.IsAborting() && !newStatus.IsFinished()))
         {
             _logger.LogWarning(
-                "Update: {Filename} {ImportStatus} ({PercentageCompleteBefore}%) -> " +
-                "{NewStatus} ({PercentageCompleteAfter}%) ignored as this import is already in finished or " +
-                "completed state state {FinishedImportStatus}",
+                "Update: {Filename} {ImportStatus} ({PercentageCompleteBefore}%) -> "
+                    + "{NewStatus} ({PercentageCompleteAfter}%) ignored as this import is already in finished or "
+                    + "completed state state {FinishedImportStatus}",
                 filename,
                 import.Status,
                 percentageCompleteBefore,
                 newStatus,
                 percentageCompleteAfter,
-                import.Status);
-            
+                import.Status
+            );
+
             return;
         }
 
@@ -139,7 +132,8 @@ public class DataImportService : IDataImportService
             import.Status,
             percentageCompleteBefore,
             newStatus,
-            percentageCompleteAfter);
+            percentageCompleteAfter
+        );
 
         import.StagePercentageComplete = percentageCompleteAfter;
         import.Status = newStatus;
@@ -152,9 +146,7 @@ public class DataImportService : IDataImportService
         await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
         await using var statisticsDbContext = _dbContextSupplier.CreateDbContext<StatisticsDbContext>();
 
-        var observations = statisticsDbContext.Observation
-            .AsNoTracking()
-            .Where(o => o.SubjectId == subjectId);
+        var observations = statisticsDbContext.Observation.AsNoTracking().Where(o => o.SubjectId == subjectId);
 
         var geographicLevels = observations
             .Select(o => o.Location.GeographicLevel)
@@ -163,7 +155,7 @@ public class DataImportService : IDataImportService
             .ToList();
 
         var timePeriods = observations
-            .Select(o => new { o.Year, o.TimeIdentifier, })
+            .Select(o => new { o.Year, o.TimeIdentifier })
             .Distinct()
             .OrderBy(o => o.Year)
             .ThenBy(o => o.TimeIdentifier)
@@ -175,8 +167,8 @@ public class DataImportService : IDataImportService
             })
             .ToList();
 
-        var filters = await statisticsDbContext.Filter
-            .AsNoTracking()
+        var filters = await statisticsDbContext
+            .Filter.AsNoTracking()
             .Where(f => f.SubjectId == subjectId)
             .OrderBy(f => f.Label)
             .Select(f => new FilterMeta
@@ -189,8 +181,8 @@ public class DataImportService : IDataImportService
             })
             .ToListAsync();
 
-        var indicators = await statisticsDbContext.Indicator
-            .AsNoTracking()
+        var indicators = await statisticsDbContext
+            .Indicator.AsNoTracking()
             .Where(i => i.IndicatorGroup.SubjectId == subjectId)
             .Select(i => new IndicatorMeta
             {
@@ -204,28 +196,18 @@ public class DataImportService : IDataImportService
         var dataSetFileMeta = new DataSetFileMeta
         {
             NumDataFileRows = numDataFileRows,
-            TimePeriodRange = new TimePeriodRangeMeta
-            {
-                Start = timePeriods.First(),
-                End = timePeriods.Last(),
-            },
+            TimePeriodRange = new TimePeriodRangeMeta { Start = timePeriods.First(), End = timePeriods.Last() },
             Filters = filters,
             Indicators = indicators,
         };
 
-        var file = contentDbContext.Files
-            .Single(f => f.Type == FileType.Data
-                         && f.SubjectId == subjectId);
+        var file = contentDbContext.Files.Single(f => f.Type == FileType.Data && f.SubjectId == subjectId);
         file.DataSetFileMeta = dataSetFileMeta;
 
         var dataSetFileVersionGeographicLevels = geographicLevels
-            .Select(gl => new DataSetFileVersionGeographicLevel
-            {
-                DataSetFileVersionId = fileId,
-                GeographicLevel = gl,
-            }).ToList();
-        contentDbContext.DataSetFileVersionGeographicLevels.AddRange(
-            dataSetFileVersionGeographicLevels);
+            .Select(gl => new DataSetFileVersionGeographicLevel { DataSetFileVersionId = fileId, GeographicLevel = gl })
+            .ToList();
+        contentDbContext.DataSetFileVersionGeographicLevels.AddRange(dataSetFileVersionGeographicLevels);
 
         file.FilterHierarchies = await GenerateFilterHierarchies(statisticsDbContext, filters);
 
@@ -234,12 +216,13 @@ public class DataImportService : IDataImportService
 
     public static async Task<List<DataSetFileFilterHierarchy>> GenerateFilterHierarchies(
         StatisticsDbContext statisticsDbContext,
-        List<FilterMeta> filters)
+        List<FilterMeta> filters
+    )
     {
-        var rootFilters = filters
-            .Where(parentFilter => parentFilter.ParentFilter == null
-                                   && filters.Any(childFilter =>
-                                       parentFilter.ColumnName == childFilter.ParentFilter));
+        var rootFilters = filters.Where(parentFilter =>
+            parentFilter.ParentFilter == null
+            && filters.Any(childFilter => parentFilter.ColumnName == childFilter.ParentFilter)
+        );
 
         var hierarchies = new List<DataSetFileFilterHierarchy>();
 
@@ -255,10 +238,11 @@ public class DataImportService : IDataImportService
     private static async Task<DataSetFileFilterHierarchy> GenerateFilterHierarchy(
         StatisticsDbContext statisticsDbContext,
         FilterMeta rootFilter,
-        List<FilterMeta> filters)
+        List<FilterMeta> filters
+    )
     {
-        var rootFilterItemIds = statisticsDbContext.FilterItem
-            .AsNoTracking()
+        var rootFilterItemIds = statisticsDbContext
+            .FilterItem.AsNoTracking()
             .Where(fi => fi.FilterGroup.FilterId == rootFilter.Id)
             .Select(fi => fi.Id)
             .ToHashSet();
@@ -268,8 +252,7 @@ public class DataImportService : IDataImportService
 
         var parentFilter = rootFilter;
         var parentFilterItemIds = rootFilterItemIds;
-        var childFilter = filters
-            .Single(f => f.ParentFilter == parentFilter.ColumnName);
+        var childFilter = filters.Single(f => f.ParentFilter == parentFilter.ColumnName);
 
         filterIds.Add(rootFilter.Id);
 
@@ -281,23 +264,26 @@ public class DataImportService : IDataImportService
 
             filterIds.Add(currentChildFilterId);
 
-            var filterItemRelationships = await statisticsDbContext.FilterItem
-                .AsNoTracking()
+            var filterItemRelationships = await statisticsDbContext
+                .FilterItem.AsNoTracking()
                 .Where(fi => fi.FilterGroup.FilterId == currentParentFilterId)
                 .SelectMany(parentFilterItem =>
-                    statisticsDbContext.ObservationFilterItem
-                        .AsNoTracking()
+                    statisticsDbContext
+                        .ObservationFilterItem.AsNoTracking()
                         .Where(childOfi =>
                             childOfi.FilterId == currentChildFilterId
                             && statisticsDbContext.ObservationFilterItem.Any(parentOfi =>
                                 childOfi.ObservationId == parentOfi.ObservationId
-                                && parentOfi.FilterItemId == parentFilterItem.Id))
+                                && parentOfi.FilterItemId == parentFilterItem.Id
+                            )
+                        )
                         .Select(childOfi => new
                         {
                             FilterItemId = childOfi.FilterItem.Id,
                             ParentItemId = parentFilterItem.Id,
                         })
-                        .ToList())
+                        .ToList()
+                )
                 .Distinct()
                 .ToListAsync();
 
@@ -315,8 +301,9 @@ public class DataImportService : IDataImportService
             tiers.Add(tier);
 
             // check whether we're finished
-            var newChildFilter = filters
-                .SingleOrDefault(newChildFilter => newChildFilter.ParentFilter == childFilter.ColumnName);
+            var newChildFilter = filters.SingleOrDefault(newChildFilter =>
+                newChildFilter.ParentFilter == childFilter.ColumnName
+            );
             if (newChildFilter == null)
             {
                 break;
@@ -330,8 +317,6 @@ public class DataImportService : IDataImportService
                 .ToHashSet();
         }
 
-        return new DataSetFileFilterHierarchy(
-            FilterIds: filterIds,
-            Tiers: tiers);
+        return new DataSetFileFilterHierarchy(FilterIds: filterIds, Tiers: tiers);
     }
 }

@@ -9,11 +9,7 @@ public class EventGridEventBuilder
 
     public EventGridEvent Build()
     {
-        return new EventGridEvent(
-            _subject ?? "Event Subject",
-            "Event Type",
-            "1.1",
-            _payload);
+        return new EventGridEvent(_subject ?? "Event Subject", "Event Type", "1.1", _payload);
     }
 
     public EventGridEventBuilder WithPayload(object payload)

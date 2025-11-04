@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES3529_DataImportEnableNullable : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
@@ -14,7 +15,8 @@ public partial class EES3529_DataImportEnableNullable : Migration
             type: "int",
             nullable: true,
             oldClrType: typeof(int),
-            oldType: "int");
+            oldType: "int"
+        );
 
         migrationBuilder.AlterColumn<int>(
             name: "ImportedRows",
@@ -22,7 +24,8 @@ public partial class EES3529_DataImportEnableNullable : Migration
             type: "int",
             nullable: true,
             oldClrType: typeof(int),
-            oldType: "int");
+            oldType: "int"
+        );
 
         migrationBuilder.Sql("UPDATE dbo.DataImports SET GeographicLevels='[]' WHERE GeographicLevels IS NULL");
 
@@ -34,7 +37,8 @@ public partial class EES3529_DataImportEnableNullable : Migration
             defaultValue: "",
             oldClrType: typeof(string),
             oldType: "nvarchar(max)",
-            oldNullable: true);
+            oldNullable: true
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -47,7 +51,8 @@ public partial class EES3529_DataImportEnableNullable : Migration
             defaultValue: 0,
             oldClrType: typeof(int),
             oldType: "int",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.AlterColumn<int>(
             name: "ImportedRows",
@@ -57,7 +62,8 @@ public partial class EES3529_DataImportEnableNullable : Migration
             defaultValue: 0,
             oldClrType: typeof(int),
             oldType: "int",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.Sql("UPDATE dbo.DataImports SET GeographicLevels = NULL WHERE GeographicLevels = '[]'");
 
@@ -67,6 +73,7 @@ public partial class EES3529_DataImportEnableNullable : Migration
             type: "nvarchar(max)",
             nullable: true,
             oldClrType: typeof(string),
-            oldType: "nvarchar(max)");
+            oldType: "nvarchar(max)"
+        );
     }
 }

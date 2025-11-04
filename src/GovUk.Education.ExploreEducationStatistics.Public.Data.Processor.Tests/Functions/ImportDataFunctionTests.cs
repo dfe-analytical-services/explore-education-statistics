@@ -14,23 +14,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class ImportDataFunctionTests(
-    ProcessorFunctionsIntegrationTestFixture fixture)
+public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
     : ProcessorFunctionsIntegrationTest(fixture)
 {
     private const DataSetVersionImportStage Stage = DataSetVersionImportStage.ImportingData;
 
-    public static readonly TheoryData<ProcessorTestData> Data = new()
-    {
+    public static readonly TheoryData<ProcessorTestData> DataSets =
+    [
         ProcessorTestData.AbsenceSchool,
-    };
+        ProcessorTestData.LargeDataSet,
+    ];
 
-    public class ImportDataTests(
-        ProcessorFunctionsIntegrationTestFixture fixture)
-        : ImportDataFunctionTests(fixture)
+    public class ImportDataTests(ProcessorFunctionsIntegrationTestFixture fixture) : ImportDataFunctionTests(fixture)
     {
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(DataSets))]
         public async Task Success(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
@@ -39,23 +37,21 @@ public abstract class ImportDataFunctionTests(
 
             await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
-            var savedImport = await publicDataDbContext.DataSetVersionImports
-                .Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
+            var savedImport = await publicDataDbContext
+                .DataSetVersionImports.Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
 
             Assert.Equal(Stage, savedImport.Stage);
             Assert.Equal(DataSetVersionStatus.Processing, savedImport.DataSetVersion.Status);
 
-            AssertDataSetVersionDirectoryContainsOnlyFiles(dataSetVersion,
-            [
-                DataSetFilenames.CsvDataFile,
-                DataSetFilenames.CsvMetadataFile,
-                DataSetFilenames.DuckDbDatabaseFile
-            ]);
+            AssertDataSetVersionDirectoryContainsOnlyFiles(
+                dataSetVersion,
+                [DataSetFilenames.CsvDataFile, DataSetFilenames.CsvMetadataFile, DataSetFilenames.DuckDbDatabaseFile]
+            );
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectRowCount(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
@@ -64,18 +60,20 @@ public abstract class ImportDataFunctionTests(
 
             await using var duckDbConnection = GetDuckDbConnection(dataSetVersion);
 
-            var actualRowCount = await duckDbConnection.SqlBuilder(
-                $"""
-                 SELECT COUNT(*)
-                 FROM '{DataTable.TableName:raw}'
-                 """
-            ).QuerySingleAsync<int>();
+            var actualRowCount = await duckDbConnection
+                .SqlBuilder(
+                    $"""
+                    SELECT COUNT(*)
+                    FROM '{DataTable.TableName:raw}'
+                    """
+                )
+                .QuerySingleAsync<int>();
 
             Assert.Equal(testData.ExpectedTotalResults, actualRowCount);
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectColumns(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
@@ -84,9 +82,11 @@ public abstract class ImportDataFunctionTests(
 
             await using var duckDbConnection = GetDuckDbConnection(dataSetVersion);
 
-            var actualColumns = (await duckDbConnection.SqlBuilder(
-                        $"DESCRIBE SELECT * FROM '{DataTable.TableName:raw}' LIMIT 1")
-                    .QueryAsync<ParquetColumn>())
+            var actualColumns = (
+                await duckDbConnection
+                    .SqlBuilder($"DESCRIBE SELECT * FROM '{DataTable.TableName:raw}' LIMIT 1")
+                    .QueryAsync<ParquetColumn>()
+            )
                 .Select(col => col.ColumnName)
                 .ToList();
 
@@ -95,16 +95,16 @@ public abstract class ImportDataFunctionTests(
                 DataTable.Cols.Id,
                 DataTable.Cols.GeographicLevel,
                 DataTable.Cols.TimePeriodId,
-                ..testData.ExpectedGeographicLevels.Select(DataTable.Cols.LocationId),
-                ..testData.ExpectedFilters.Select(fm => DataTable.Cols.Filter(fm).Trim('"')),
-                ..testData.ExpectedIndicators.Select(im => DataTable.Cols.Indicator(im).Trim('"')),
+                .. testData.ExpectedGeographicLevels.Select(DataTable.Cols.LocationId),
+                .. testData.ExpectedFilters.Select(fm => DataTable.Cols.Filter(fm).Trim('"')),
+                .. testData.ExpectedIndicators.Select(im => DataTable.Cols.Indicator(im).Trim('"')),
             ];
 
             Assert.Equal(expectedColumns.Order(), actualColumns.Order());
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectDistinctGeographicLevels(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
@@ -115,10 +115,10 @@ public abstract class ImportDataFunctionTests(
 
             var geographicLevelsCommand = duckDbConnection.SqlBuilder(
                 $"""
-                 SELECT DISTINCT {DataTable.Ref().GeographicLevel:raw}
-                 FROM '{DataTable.TableName:raw}'
-                 ORDER BY {DataTable.Ref().GeographicLevel:raw}
-                 """
+                SELECT DISTINCT {DataTable.Ref().GeographicLevel:raw}
+                FROM '{DataTable.TableName:raw}'
+                ORDER BY {DataTable.Ref().GeographicLevel:raw}
+                """
             );
 
             var actualGeographicLevels = (await geographicLevelsCommand.QueryAsync<string>())
@@ -129,7 +129,7 @@ public abstract class ImportDataFunctionTests(
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectDistinctLocationOptions(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
@@ -138,28 +138,34 @@ public abstract class ImportDataFunctionTests(
 
             await using var duckDbConnection = GetDuckDbConnection(dataSetVersion);
 
-            await Assert.AllAsync(testData.ExpectedLocations,
+            await Assert.AllAsync(
+                testData.ExpectedLocations,
                 async expectedLocation =>
                 {
                     var optionsCommand = duckDbConnection.SqlBuilder(
                         $"""
-                         SELECT DISTINCT {LocationOptionsTable.TableName:raw}.*
-                         FROM '{DataTable.TableName:raw}' JOIN '{LocationOptionsTable.TableName:raw}'
-                         ON {DataTable.Ref().LocationId(expectedLocation.Level):raw} = {LocationOptionsTable.Ref().Id:raw}
-                         ORDER BY {LocationOptionsTable.Ref().Label:raw}
-                         """
+                        SELECT DISTINCT {LocationOptionsTable.TableName:raw}.*
+                        FROM '{DataTable.TableName:raw}' JOIN '{LocationOptionsTable.TableName:raw}'
+                        ON {DataTable.Ref().LocationId(
+                            expectedLocation.Level
+                        ):raw} = {LocationOptionsTable.Ref().Id:raw}
+                        ORDER BY {LocationOptionsTable.Ref().Label:raw}
+                        """
                     );
 
                     var actualOptions = (await optionsCommand.QueryAsync<ParquetLocationOption>()).AsList();
 
                     Assert.Equal(expectedLocation.Options.Count, actualOptions.Count);
-                    Assert.All(expectedLocation.Options.OrderBy(o => o.Label),
-                        (expectedOption, index) => expectedOption.AssertEqual(actualOptions[index]));
-                });
+                    Assert.All(
+                        expectedLocation.Options.OrderBy(o => o.Label),
+                        (expectedOption, index) => expectedOption.AssertEqual(actualOptions[index])
+                    );
+                }
+            );
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectDistinctFilterOptions(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
@@ -168,33 +174,37 @@ public abstract class ImportDataFunctionTests(
 
             await using var duckDbConnection = GetDuckDbConnection(dataSetVersion);
 
-            await Assert.AllAsync(testData.ExpectedFilters,
+            await Assert.AllAsync(
+                testData.ExpectedFilters,
                 async expectedFilter =>
                 {
                     var optionsCommand = duckDbConnection.SqlBuilder(
                         $"""
-                         SELECT DISTINCT {FilterOptionsTable.TableName:raw}.*
-                         FROM '{DataTable.TableName:raw}' JOIN '{FilterOptionsTable.TableName:raw}'
-                         ON {DataTable.Ref().Col(expectedFilter.Column):raw} = {FilterOptionsTable.Ref().Id:raw}
-                         ORDER BY {FilterOptionsTable.Ref().Label:raw}
-                         """
+                        SELECT DISTINCT {FilterOptionsTable.TableName:raw}.*
+                        FROM '{DataTable.TableName:raw}' JOIN '{FilterOptionsTable.TableName:raw}'
+                        ON {DataTable.Ref().Col(expectedFilter.Column):raw} = {FilterOptionsTable.Ref().Id:raw}
+                        ORDER BY {FilterOptionsTable.Ref().Label:raw}
+                        """
                     );
 
                     var actualOptions = (await optionsCommand.QueryAsync<ParquetFilterOption>()).AsList();
 
                     Assert.Equal(expectedFilter.Options.Count, actualOptions.Count);
-                    Assert.All(expectedFilter.Options,
+                    Assert.All(
+                        expectedFilter.Options,
                         (expectedOption, index) =>
                         {
                             var actualOption = actualOptions[index];
                             Assert.Equal(expectedOption.Label, actualOption.Label);
                             Assert.Equal(expectedFilter.PublicId, actualOption.FilterId);
-                        });
-                });
+                        }
+                    );
+                }
+            );
         }
 
         [Theory]
-        [MemberData(nameof(Data))]
+        [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectDistinctTimePeriods(ProcessorTestData testData)
         {
             var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
@@ -205,32 +215,31 @@ public abstract class ImportDataFunctionTests(
 
             var timePeriodsCommand = duckDbConnection.SqlBuilder(
                 $"""
-                 SELECT DISTINCT {TimePeriodsTable.TableName:raw}.*
-                 FROM '{DataTable.TableName:raw}' JOIN '{TimePeriodsTable.TableName:raw}'
-                 ON {DataTable.Ref().TimePeriodId:raw} = {TimePeriodsTable.Ref().Id:raw}
-                 ORDER BY {TimePeriodsTable.Ref().Period:raw}
-                 """
+                SELECT DISTINCT {TimePeriodsTable.TableName:raw}.*
+                FROM '{DataTable.TableName:raw}' JOIN '{TimePeriodsTable.TableName:raw}'
+                ON {DataTable.Ref().TimePeriodId:raw} = {TimePeriodsTable.Ref().Id:raw}
+                ORDER BY {TimePeriodsTable.Ref().Period:raw}
+                """
             );
 
-            var actualTimePeriods = (
-                await timePeriodsCommand.QueryAsync<ParquetTimePeriod>()
-            ).AsList();
+            var actualTimePeriods = (await timePeriodsCommand.QueryAsync<ParquetTimePeriod>()).AsList();
 
             Assert.Equal(testData.ExpectedTimePeriods.Count, actualTimePeriods.Count);
-            Assert.All(testData.ExpectedTimePeriods,
+            Assert.All(
+                testData.ExpectedTimePeriods,
                 (expectedTimePeriod, index) =>
                 {
                     var actualTimePeriod = actualTimePeriods[index];
-                    Assert.Equal(expectedTimePeriod.Code,
-                        EnumUtil.GetFromEnumLabel<TimeIdentifier>(actualTimePeriod.Identifier));
+                    Assert.Equal(
+                        expectedTimePeriod.Code,
+                        EnumUtil.GetFromEnumLabel<TimeIdentifier>(actualTimePeriod.Identifier)
+                    );
                     Assert.Equal(expectedTimePeriod.Period, TimePeriodFormatter.FormatFromCsv(actualTimePeriod.Period));
-                });
+                }
+            );
         }
 
-        private async Task ImportData(
-            ProcessorTestData testData,
-            DataSetVersion dataSetVersion,
-            Guid instanceId)
+        private async Task ImportData(ProcessorTestData testData, DataSetVersion dataSetVersion, Guid instanceId)
         {
             SetupCsvDataFilesForDataSetVersion(testData, dataSetVersion);
 

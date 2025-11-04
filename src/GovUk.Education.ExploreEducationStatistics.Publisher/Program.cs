@@ -6,10 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-var host = new HostBuilder()
-    .ConfigureFunctionsWebApplication()
-    .ConfigurePublisherHostBuilder()
-    .Build();
+var host = new HostBuilder().ConfigureFunctionsWebApplication().ConfigurePublisherHostBuilder().Build();
 
 EnableCaching();
 
@@ -20,7 +17,11 @@ void EnableCaching()
 {
     // Enable caching and register any caching services
     CacheAspect.Enabled = true;
-    BlobCacheAttribute.AddService("public", new BlobCacheService(
-        host.Services.GetRequiredService<IPublicBlobStorageService>(),
-        host.Services.GetRequiredService<ILogger<BlobCacheService>>()));
+    BlobCacheAttribute.AddService(
+        "public",
+        new BlobCacheService(
+            host.Services.GetRequiredService<IPublicBlobStorageService>(),
+            host.Services.GetRequiredService<ILogger<BlobCacheService>>()
+        )
+    );
 }

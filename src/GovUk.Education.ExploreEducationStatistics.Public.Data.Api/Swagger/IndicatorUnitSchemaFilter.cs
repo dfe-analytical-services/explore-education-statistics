@@ -13,8 +13,7 @@ public class IndicatorUnitSchemaFilter : ISchemaFilter
         if (context.MemberInfo == null && context.Type == typeof(IndicatorUnit))
         {
             schema.Type = "string";
-            schema.Description =
-                """
+            schema.Description = """
                 The recommended unit to format an indicator with.
 
                 The allowed values are:
@@ -29,7 +28,8 @@ public class IndicatorUnitSchemaFilter : ISchemaFilter
 
             schema.Example = new OpenApiString("%");
 
-            schema.Enum = EnumUtil.GetEnumLabels<IndicatorUnit>()
+            schema.Enum = EnumUtil
+                .GetEnumLabels<IndicatorUnit>()
                 .Select(unit => new OpenApiString(unit))
                 .ToList<IOpenApiAny>();
         }

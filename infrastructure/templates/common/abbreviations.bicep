@@ -1,4 +1,8 @@
-// Originally sourced from https://github.com/Azure-Samples/todo-csharp-sql/blob/main/infra/abbreviations.json.
+// These abbreviations are sourced generally from 
+// https://github.com/Azure-Samples/todo-csharp-sql/blob/main/infra/abbreviations.json and
+// https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations.
+//
+// Non-standard abbreviations are highlighted with comments.
 
 @export()
 var abbreviations = {
@@ -9,6 +13,8 @@ var abbreviations = {
   appContainerApps: 'ca'
   authorizationPolicyDefinitions: 'policy'
   automationAutomationAccounts: 'aa'
+  backupVaults: 'bvault'
+  backupVaultPolicies: 'bkpol'
   blueprintBlueprints: 'bp'
   blueprintBlueprintsArtifacts: 'bpa'
   cacheRedis: 'redis'

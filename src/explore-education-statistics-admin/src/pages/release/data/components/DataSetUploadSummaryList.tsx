@@ -10,6 +10,7 @@ import {
   getDataSetUploadStatusColour,
   getDataSetUploadStatusLabel,
 } from './ImporterStatus';
+import ApiCompatibilityTag from './ApiCompatibilityTag';
 
 interface Props {
   releaseVersionId: string;
@@ -70,6 +71,11 @@ export default function DataSetUploadSummaryList({
         <FormattedDate format="d MMMM yyyy, HH:mm">
           {dataSetUpload.created}
         </FormattedDate>
+      </SummaryListItem>
+      <SummaryListItem term="API compatible">
+        <ApiCompatibilityTag
+          isCompatible={dataSetUpload?.publicApiCompatible}
+        />
       </SummaryListItem>
     </SummaryList>
   );

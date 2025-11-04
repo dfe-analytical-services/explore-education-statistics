@@ -1,25 +1,16 @@
+import { FreeTextStatTileFormValues } from '@admin/pages/education-in-numbers/content/components/EditableFreeTextStatTileForm';
 import client from '@admin/services/utils/service';
 import { ContentSection } from '@common/services/publicationService';
-import { HtmlBlock } from '@common/services/types/blocks';
-import { EditableContentBlock } from '@admin/services/types/content';
+import {
+  EinBlockType,
+  EinContentBlock,
+  EinFreeTextStatTile,
+  EinHtmlBlock,
+  EinTileGroupBlock,
+} from '@common/services/types/einBlocks';
 
-// Generic Ein block types
-export type EinBlockType = 'HtmlBlock';
-export type EinContentBlock = EinHtmlBlock;
-
-// This is a hack to make the EiN stuff work with preexisting block/section
-// content code used for release/methodology pages, while keeping a separate
-// EiN type. We need to use EditableContentBlock rather than just
-// EinContentBlock - despite not needing `comments`, `locked`, etc. - as
-// otherwise we'd need to create an alternate version of `EditableContentBlock`.
-// For now, we're avoiding this.
-export type EinEditableContentBlock = EinContentBlock & EditableContentBlock;
 // ContentSection is shared with release/methodology too
-export type EinContentSection = ContentSection<EinEditableContentBlock>;
-// WARN: Even though they share the same type, data is returned from two different db tables:
-// - HtmlBlock come from the table ContentBlocks (used for releases/methodologies)
-// - EinHtmlBlock comes from EinContentBlocks (used for EiN exclusively)
-type EinHtmlBlock = HtmlBlock;
+export type EinEditableContentSection = ContentSection<EinContentBlock>;
 
 export interface EinContentBlockAddRequest {
   type: EinBlockType;
@@ -30,12 +21,16 @@ export interface EinHtmlBlockUpdateRequest {
   body: string;
 }
 
+export interface EinGroupBlockUpdateRequest {
+  title?: string;
+}
+
 export interface EinContent {
   id: string;
   title: string;
   slug: string;
   published?: string;
-  content: EinContentSection[];
+  content: EinEditableContentSection[];
 }
 
 const educationInNumbersContentService = {
@@ -53,7 +48,7 @@ const educationInNumbersContentService = {
   }: {
     educationInNumbersPageId: string;
     order: number;
-  }): Promise<EinContentSection> {
+  }): Promise<EinEditableContentSection> {
     return client.post(
       `/education-in-numbers/${educationInNumbersPageId}/content/sections/add`,
       {
@@ -70,7 +65,7 @@ const educationInNumbersContentService = {
     educationInNumbersPageId: string;
     sectionId: string;
     heading: string;
-  }): Promise<EinContentSection> {
+  }): Promise<EinEditableContentSection> {
     return client.put(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/heading`,
       { heading },
@@ -83,7 +78,7 @@ const educationInNumbersContentService = {
   }: {
     educationInNumbersPageId: string;
     order: string[];
-  }): Promise<EinContentSection[]> {
+  }): Promise<EinEditableContentSection[]> {
     return client.put(
       `/education-in-numbers/${educationInNumbersPageId}/content/sections/order`,
       order,
@@ -96,7 +91,7 @@ const educationInNumbersContentService = {
   }: {
     educationInNumbersPageId: string;
     sectionId: string;
-  }): Promise<EinContentSection[]> {
+  }): Promise<EinEditableContentSection[]> {
     return client.delete(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}`,
     );
@@ -117,6 +112,63 @@ const educationInNumbersContentService = {
     );
   },
 
+  addFreeTextStatTile({
+    educationInNumbersPageId,
+    blockId,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+  }): Promise<EinFreeTextStatTile> {
+    return client.post(
+      `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tiles/add`,
+      { type: 'FreeTextStatTile' },
+    );
+  },
+
+  updateFreeTextStatTile({
+    educationInNumbersPageId,
+    tileId,
+    values,
+  }: {
+    educationInNumbersPageId: string;
+    tileId: string;
+    values: FreeTextStatTileFormValues;
+  }): Promise<EinFreeTextStatTile> {
+    return client.put(
+      `/education-in-numbers/${educationInNumbersPageId}/content/tile/${tileId}/free-text-stat`,
+      values,
+    );
+  },
+
+  reorderFreeTextStatTiles({
+    educationInNumbersPageId,
+    blockId,
+    order,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+    order: string[];
+  }): Promise<EinFreeTextStatTile[]> {
+    return client.put(
+      `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tiles/order`,
+      order,
+    );
+  },
+
+  deleteFreeTextStatTile({
+    educationInNumbersPageId,
+    blockId,
+    tileId,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+    tileId: string;
+  }): Promise<EinFreeTextStatTile> {
+    return client.delete(
+      `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tile/${tileId}`,
+    );
+  },
+
   updateContentSectionHtmlBlock({
     educationInNumbersPageId,
     sectionId,
@@ -130,6 +182,23 @@ const educationInNumbersContentService = {
   }): Promise<EinHtmlBlock> {
     return client.put(
       `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/block/${blockId}/html`,
+      block,
+    );
+  },
+
+  updateContentSectionGroupBlock({
+    educationInNumbersPageId,
+    sectionId,
+    blockId,
+    block,
+  }: {
+    educationInNumbersPageId: string;
+    sectionId: string;
+    blockId: string;
+    block: EinGroupBlockUpdateRequest;
+  }): Promise<EinTileGroupBlock> {
+    return client.put(
+      `/education-in-numbers/${educationInNumbersPageId}/content/section/${sectionId}/block/${blockId}/tile-group`,
       block,
     );
   },

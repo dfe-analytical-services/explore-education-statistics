@@ -10,14 +10,15 @@ public class PublicationContactDtoBuilder
     private string _teamName = "Team email";
     private string _teamEmail = "Team name";
 
-    public PublicationContactDto Build() => new()
-    {
-        Id = _id,
-        ContactName = _contactName,
-        ContactTelNo = _contactTelNo,
-        TeamEmail = _teamName,
-        TeamName = _teamEmail
-    };
+    public PublicationContactDto Build() =>
+        new()
+        {
+            Id = _id,
+            ContactName = _contactName,
+            ContactTelNo = _contactTelNo,
+            TeamEmail = _teamName,
+            TeamName = _teamEmail,
+        };
 
     public PublicationContactDtoBuilder WithId(Guid id)
     {

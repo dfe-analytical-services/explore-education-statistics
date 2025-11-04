@@ -10,7 +10,8 @@ public static class DataSetQueryPaginatedResultsViewModelTestExtensions
     public static WarningViewModel AssertHasFiltersNotFoundWarning(
         this DataSetQueryPaginatedResultsViewModel viewModel,
         string expectedPath,
-        IEnumerable<string> notFoundItems)
+        IEnumerable<string> notFoundItems
+    )
     {
         var warning = viewModel.AssertHasWarning(
             expectedPath: expectedPath,
@@ -27,7 +28,8 @@ public static class DataSetQueryPaginatedResultsViewModelTestExtensions
     public static WarningViewModel AssertHasGeographicLevelsNotFoundWarning(
         this DataSetQueryPaginatedResultsViewModel viewModel,
         string expectedPath,
-        IEnumerable<string> notFoundItems)
+        IEnumerable<string> notFoundItems
+    )
     {
         var warning = viewModel.AssertHasWarning(
             expectedPath: expectedPath,
@@ -41,11 +43,11 @@ public static class DataSetQueryPaginatedResultsViewModelTestExtensions
         return warning;
     }
 
-
     public static WarningViewModel AssertHasLocationsNotFoundWarning(
         this DataSetQueryPaginatedResultsViewModel viewModel,
         string expectedPath,
-        IEnumerable<string> notFoundItems)
+        IEnumerable<string> notFoundItems
+    )
     {
         var warning = viewModel.AssertHasWarning(
             expectedPath: expectedPath,
@@ -62,7 +64,8 @@ public static class DataSetQueryPaginatedResultsViewModelTestExtensions
     public static WarningViewModel AssertHasLocationsNotFoundWarning(
         this DataSetQueryPaginatedResultsViewModel viewModel,
         string expectedPath,
-        IEnumerable<IDataSetQueryLocation> notFoundItems)
+        IEnumerable<IDataSetQueryLocation> notFoundItems
+    )
     {
         var warning = viewModel.AssertHasWarning(
             expectedPath: expectedPath,
@@ -76,11 +79,11 @@ public static class DataSetQueryPaginatedResultsViewModelTestExtensions
         return warning;
     }
 
-
     public static WarningViewModel AssertHasTimePeriodsNotFoundWarning(
         this DataSetQueryPaginatedResultsViewModel viewModel,
         string expectedPath,
-        IEnumerable<string> notFoundItems)
+        IEnumerable<string> notFoundItems
+    )
     {
         var warning = viewModel.AssertHasWarning(
             expectedPath: expectedPath,
@@ -97,7 +100,8 @@ public static class DataSetQueryPaginatedResultsViewModelTestExtensions
     public static WarningViewModel AssertHasTimePeriodsNotFoundWarning(
         this DataSetQueryPaginatedResultsViewModel viewModel,
         string expectedPath,
-        IEnumerable<DataSetQueryTimePeriod> notFoundItems)
+        IEnumerable<DataSetQueryTimePeriod> notFoundItems
+    )
     {
         var warning = viewModel.AssertHasWarning(
             expectedPath: expectedPath,
@@ -114,7 +118,8 @@ public static class DataSetQueryPaginatedResultsViewModelTestExtensions
     public static WarningViewModel AssertHasWarning(
         this DataSetQueryPaginatedResultsViewModel viewModel,
         string expectedPath,
-        string expectedCode)
+        string expectedCode
+    )
     {
         Predicate<WarningViewModel> predicate = warning => warning.Path == expectedPath && warning.Code == expectedCode;
 

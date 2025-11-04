@@ -12,16 +12,9 @@ public partial class EES2776_AddGeographicLevelToLocation : Migration
 
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.AddColumn<string>(
-            name: "GeographicLevel",
-            table: "Location",
-            maxLength: 6,
-            nullable: true);
+        migrationBuilder.AddColumn<string>(name: "GeographicLevel", table: "Location", maxLength: 6, nullable: true);
 
-        migrationBuilder.CreateIndex(
-            name: "IX_Location_GeographicLevel",
-            table: "Location",
-            column: "GeographicLevel");
+        migrationBuilder.CreateIndex(name: "IX_Location_GeographicLevel", table: "Location", column: "GeographicLevel");
 
         // Update LocationType
         migrationBuilder.Sql("DROP PROCEDURE UpsertLocation");
@@ -47,12 +40,8 @@ public partial class EES2776_AddGeographicLevelToLocation : Migration
         migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousLocationTypeMigrationId}_TableType_LocationType.sql");
         migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousUpsertLocationMigrationId}_Routine_UpsertLocation.sql");
 
-        migrationBuilder.DropIndex(
-            name: "IX_Location_GeographicLevel",
-            table: "Location");
+        migrationBuilder.DropIndex(name: "IX_Location_GeographicLevel", table: "Location");
 
-        migrationBuilder.DropColumn(
-            name: "GeographicLevel",
-            table: "Location");
+        migrationBuilder.DropColumn(name: "GeographicLevel", table: "Location");
     }
 }

@@ -10,8 +10,7 @@ public record DataSetCreateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.ReleaseFileId)
-                .NotEmpty();
+            RuleFor(request => request.ReleaseFileId).NotEmpty();
         }
     }
 }

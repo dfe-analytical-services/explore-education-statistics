@@ -1,19 +1,23 @@
+import { Chart } from '@common/modules/charts/types/chart';
 import {
   ContentBlock,
   DataBlock,
   EmbedBlock,
+  Table,
 } from '@common/services/types/blocks';
 import { FileInfo } from '@common/services/types/file';
-import { ReleaseType } from '@common/services/types/releaseType';
 import {
-  MethodologySummary,
   ExternalMethodology,
+  InternalMethodologySummary,
+  MethodologySummary,
 } from '@common/services/types/methodology';
 import { Organisation } from '@common/services/types/organisation';
-import { PaginatedList } from '@common/services/types/pagination';
+import { ReleaseType } from '@common/services/types/releaseType';
 import { SortDirection } from '@common/services/types/sort';
 import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
+import { TableDataQuery } from './tableBuilderService';
+import { PaginatedList, PaginationRequestParams } from './types/pagination';
 
 export type ReleaseApprovalStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
 
@@ -52,6 +56,7 @@ export interface PublicationSummary {
   contact: Contact;
 }
 
+// TODO EES-6449 - rename to remove 'redesign'
 export interface PublicationSummaryRedesign {
   contact: Contact;
   id: string;
@@ -106,6 +111,12 @@ export interface BasicLink {
   url: string;
 }
 
+export interface RelatedInformationItem {
+  id: string;
+  title: string;
+  url: string;
+}
+
 export interface ReleaseNote {
   id: string;
   on: Date;
@@ -118,9 +129,6 @@ export interface KeyStatisticBase {
   trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;
-  order: number;
-  created: string;
-  updated?: string;
 }
 
 export const KeyStatisticTypes = {
@@ -134,6 +142,7 @@ export type KeyStatisticType =
 export interface KeyStatisticDataBlock extends KeyStatisticBase {
   type: 'KeyStatisticDataBlock';
   dataBlockParentId: string;
+  dataBlockVersionId?: string;
 }
 
 export interface KeyStatisticText extends KeyStatisticBase {
@@ -148,7 +157,6 @@ export interface ContentSection<BlockType> {
   id: string;
   order: number;
   heading: string;
-  caption?: string;
   content: BlockType[];
 }
 
@@ -209,6 +217,135 @@ export interface ReleaseVersionSummary {
   yearTitle: string;
 }
 
+export interface ReleaseVersionHomeSection<BlockType> {
+  id: string;
+  content: BlockType[];
+}
+
+export interface ReleaseVersionHomeContentSection<BlockType>
+  extends ReleaseVersionHomeSection<BlockType> {
+  heading: string;
+}
+
+export interface HtmlBlockViewModel {
+  id: string;
+  type: 'HtmlBlock';
+  body: string;
+}
+
+export interface DataBlockViewModel {
+  id: string;
+  type: 'DataBlock';
+  dataBlockVersion: {
+    charts: Chart[];
+    dataBlockVersionId: string;
+    dataBlockParentId: string;
+    heading: string;
+    highlightDescription?: string;
+    highlightName?: string;
+    name: string;
+    query: TableDataQuery;
+    source?: string;
+    table: Table;
+  };
+}
+
+export interface EmbedBlockViewModel {
+  id: string;
+  type: 'EmbedBlock';
+  embedBlock: {
+    embedBlockId: string;
+    title: string;
+    url: string;
+  };
+}
+
+export type BlockViewModel =
+  | HtmlBlockViewModel
+  | DataBlockViewModel
+  | EmbedBlockViewModel;
+
+export interface ReleaseVersionHomeContent<
+  HtmlBlockType extends HtmlBlockViewModel = HtmlBlockViewModel,
+  DataBlockType extends DataBlockViewModel = DataBlockViewModel,
+  EmbedBlockType extends EmbedBlockViewModel = EmbedBlockViewModel,
+> {
+  content: ReleaseVersionHomeContentSection<
+    HtmlBlockType | DataBlockType | EmbedBlockType
+  >[];
+  headlinesSection: ReleaseVersionHomeSection<HtmlBlockType>;
+  keyStatistics: KeyStatistic[];
+  keyStatisticsSecondarySection: ReleaseVersionHomeSection<DataBlockType>;
+  releaseId: string;
+  releaseVersionId: string;
+  summarySection: ReleaseVersionHomeSection<HtmlBlockType>;
+}
+
+export interface ReleaseVersionDataContent {
+  releaseId: string;
+  releaseVersionId: string;
+  dataDashboards?: string;
+  dataGuidance: string;
+  dataSets: DataSetItem[];
+  featuredTables: FeaturedTableItem[];
+  supportingFiles: SupportingFileItem[];
+}
+
+export interface DataSetItem {
+  dataSetFileId: string;
+  fileId: string;
+  subjectId: string;
+  meta: {
+    filters: string[];
+    geographicLevels: string[];
+    indicators: string[];
+    numDataFileRows: number;
+    timePeriodRange: {
+      start: string;
+      end: string;
+    };
+  };
+  title: string;
+  summary: string;
+}
+
+export interface FeaturedTableItem {
+  featuredTableId: string;
+  dataBlockParentId: string;
+  title: string;
+  summary: string;
+}
+
+export interface SupportingFileItem {
+  fileId: string;
+  extension: string;
+  filename: string;
+  title: string;
+  summary: string;
+  size: string;
+}
+
+export interface PublicationLegacyReleaseListItem {
+  title: string;
+  url: string;
+}
+
+export interface PublicationReleaseListItem {
+  coverageTitle: string;
+  isLatestRelease?: boolean;
+  label?: string;
+  lastUpdated: string;
+  published: string;
+  releaseId: string;
+  slug: string;
+  title: string;
+  yearTitle: string;
+}
+
+export type PublicationReleaseSeriesItem =
+  | PublicationLegacyReleaseListItem
+  | PublicationReleaseListItem;
+
 export interface ReleaseSummary {
   id: string;
   title: string;
@@ -237,6 +374,11 @@ export interface PublicationTreeSummary {
   legacyPublicationUrl?: string;
   isSuperseded: boolean;
   supersededBy?: PublicationSupersededBy;
+}
+
+export interface PublicationMethodologiesList {
+  methodologies: InternalMethodologySummary[];
+  externalMethodology?: ExternalMethodology;
 }
 
 export interface PublicationSupersededBy {
@@ -271,49 +413,7 @@ const publicationService = {
   getPublicationSummaryRedesign(
     publicationSlug: string,
   ): Promise<PublicationSummaryRedesign> {
-    // return contentApi.get(`/publications/${publicationSlug}`);
-    const basePublicationSummary = {
-      id: 'publication-summary-1',
-      title: 'Pupil attendance in schools',
-      slug: 'publication-slug',
-      summary:
-        'Pupil attendance and absence data including termly national statistics and fortnightly statistics in development derived from DfE’s regular attendance data',
-      latestRelease: {
-        slug: 'release-slug',
-        title: 'Calendar year 2024 - Final',
-        id: 'release-version-summary-1',
-      },
-      nextReleaseDate: { year: 2026, month: 3 },
-      theme: {
-        id: '323e4567-e89b-12d3-a456-426614174000',
-        title: 'Pupils and schools',
-        summary:
-          'Including absence, application and offers, capacity, exclusion and special educational needs (SEN) statistics',
-      },
-      contact: {
-        teamName: 'Test team',
-        teamEmail: 'test@test.com',
-        contactName: 'Joe Bloggs',
-        contactTelNo: '01234 567890',
-        id: 'contact-id',
-      },
-    };
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(
-          publicationSlug === 'superseded-publication'
-            ? {
-                ...basePublicationSummary,
-                supersededByPublication: {
-                  id: '223e4567-e89b-12d3-a456-426614174000',
-                  title: 'Superseding publication',
-                  slug: 'superseding-publication',
-                },
-              }
-            : basePublicationSummary,
-        );
-      }, 500);
-    });
+    return contentApi.get(`/publications/${publicationSlug}`);
   },
   getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {
     return contentApi.get(`/publications/${publicationSlug}/title`);
@@ -342,39 +442,43 @@ const publicationService = {
     );
   },
   getReleaseVersionSummary(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     publicationSlug: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     releaseSlug: string,
   ): Promise<ReleaseVersionSummary> {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve({
-          id: 'release-version-summary-1',
-          slug: 'release-slug',
-          type: 'AccreditedOfficialStatistics',
-          title: 'Calendar year 2024 - Final',
-          yearTitle: '2024',
-          coverageTitle: 'Calendar year',
-          label: 'Final',
-          published: '2025-08-10T09:30:00+01:00',
-          lastUpdated: '2025-08-11T14:30:00+01:00',
-          publishingOrganisations: [
-            {
-              id: '5e089801-cf1a-b375-acd3-88e9d8aece66',
-              title: 'Department for Education',
-              url: 'https://www.gov.uk/government/organisations/department-for-education',
-            },
-            {
-              id: '5e089801-ce1a-e274-9915-e83f3e978699',
-              title: 'Skills England',
-              url: 'https://www.gov.uk/government/organisations/skills-england',
-            },
-          ],
-          isLatestRelease: true,
-          updateCount: 5,
-        });
-      }, 500);
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/${releaseSlug}/version-summary`,
+    );
+  },
+  getReleaseVersionHomeContent(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): Promise<ReleaseVersionHomeContent> {
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/${releaseSlug}/content`,
+    );
+  },
+  getReleaseVersionDataContent(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): Promise<ReleaseVersionDataContent> {
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/${releaseSlug}/data-content`,
+    );
+  },
+  getReleaseVersionRelatedInformation(
+    publicationSlug: string,
+    releaseSlug: string,
+  ): Promise<RelatedInformationItem[]> {
+    return contentApi.get(
+      `/publications/${publicationSlug}/releases/${releaseSlug}/related-information`,
+    );
+  },
+  getPublicationReleaseList(
+    publicationSlug: string,
+    params?: PaginationRequestParams,
+  ): Promise<PaginatedList<PublicationReleaseSeriesItem>> {
+    return contentApi.get(`/publications/${publicationSlug}/release-entries`, {
+      params,
     });
   },
   getPublicationReleaseSummary(
@@ -384,6 +488,11 @@ const publicationService = {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/${releaseSlug}/summary`,
     );
+  },
+  getPublicationMethodologies(
+    publicationSlug: string,
+  ): Promise<PublicationMethodologiesList> {
+    return contentApi.get(`/publications/${publicationSlug}/methodologies`);
   },
   getLatestPreReleaseAccessList(
     publicationSlug: string,
@@ -405,13 +514,6 @@ const publicationService = {
   }: PublicationTreeOptions = {}): Promise<Theme[]> {
     return contentApi.get('/publication-tree', {
       params: { publicationFilter },
-    });
-  },
-  listPublications(
-    params: PublicationListRequest,
-  ): Promise<PaginatedList<PublicationListSummary>> {
-    return contentApi.get(`/publications`, {
-      params,
     });
   },
   listSitemapItems(): Promise<PublicationSitemapItem[]> {

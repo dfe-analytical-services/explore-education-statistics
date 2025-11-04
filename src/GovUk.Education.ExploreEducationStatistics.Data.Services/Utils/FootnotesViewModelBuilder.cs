@@ -8,8 +8,6 @@ public static class FootnotesViewModelBuilder
 {
     public static List<FootnoteViewModel> BuildFootnotes(IEnumerable<Footnote> footnotes)
     {
-        return footnotes.Select(
-            footnote => new FootnoteViewModel(footnote.Id, footnote.Content)
-        ).ToList();
+        return footnotes.Select(footnote => new FootnoteViewModel(footnote.Id, footnote.Content)).ToList();
     }
 }

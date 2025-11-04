@@ -53,6 +53,13 @@ def create_argument_parser() -> argparse.ArgumentParser:
         "-t", "--tags", dest="tags", nargs="?", metavar="{tag(s)}", help="specify tests you wish to run by tag"
     )
     parser.add_argument(
+        "--excludetags",
+        dest="exclude_tags",
+        nargs="?",
+        metavar="{tag(s)}",
+        help="specify tests you don't wish to run by tag",
+    )
+    parser.add_argument(
         "-v", "--visual", dest="visual", action="store_true", help="display browser window that the tests run in"
     )
     parser.add_argument(

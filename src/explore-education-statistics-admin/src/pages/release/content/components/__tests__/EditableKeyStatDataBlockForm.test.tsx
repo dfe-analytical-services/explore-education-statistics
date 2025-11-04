@@ -14,31 +14,25 @@ describe('EditableKeyStatDataBlockForm', () => {
   const testKeyStat: KeyStatisticDataBlock = {
     type: 'KeyStatisticDataBlock',
     id: 'keyStat-1',
-    order: 0,
     trend: 'Key stat 1 trend',
     guidanceTitle: 'Key stat 1 guidance title',
     guidanceText: 'Key stat 1 guidance text',
     dataBlockParentId: 'block-1',
-    created: '2025-01-01T12:00:00Z',
   };
 
   const testOtherKeyStats: KeyStatistic[] = [
     {
       id: 'keyStat-2',
       type: 'KeyStatisticDataBlock',
-      order: 1,
       guidanceTitle: 'Key stat 2 guidance title',
       dataBlockParentId: 'block-2',
-      created: '2025-01-01T12:00:00Z',
     },
     {
       id: 'keyStat-3',
       type: 'KeyStatisticText',
-      order: 2,
       title: 'Key stat 3 title',
       guidanceTitle: 'Key stat 3 guidance title',
       statistic: '3000',
-      created: '2025-01-01T12:00:00Z',
     },
   ];
 

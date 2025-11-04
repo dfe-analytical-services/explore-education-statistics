@@ -444,7 +444,6 @@ Configure basic line chart
     user enters text into element    label:Subtitle    Test chart subtitle
     user enters text into element    label:Alt text    Test chart alt
     user enters text into element    label:Height (pixels)    400
-    user enters text into element    label:Width (pixels)    900
 
 Validate changing data sets
     user clicks link    Data sets
@@ -501,7 +500,6 @@ Validate basic line chart preview
     ...    Admission Numbers(Nailsea Youngwood)
 
     user checks chart height    id:chartBuilderPreview    400
-    user checks chart width    id:chartBuilderPreview    900
 
     user checks chart y axis ticks    id:chartBuilderPreview    0    2,500    5,000    7,500    10,000
     user checks chart x axis ticks    id:chartBuilderPreview    2005    2010    2011    2012    2016
@@ -576,7 +574,6 @@ Validate line chart embeds correctly
     user checks chart inline legend item contains    ${datablock}    1    Admission Numbers(Nailsea Youngwood)
 
     user checks chart height    ${datablock}    400
-    user checks chart width    ${datablock}    900
 
     user checks chart y axis ticks    ${datablock}    0    2,500    5,000    7,500    10,000
     user checks chart x axis ticks    ${datablock}    2005    2010    2011    2012    2016
@@ -607,7 +604,7 @@ Configure basic vertical bar chart
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_MEDIUM}
     user waits until page finishes loading
 
-    user configures basic chart    Vertical bar    500    800
+    user configures basic chart    Vertical bar    500
 
 Change vertical bar chart legend
     user clicks link    Legend
@@ -627,7 +624,6 @@ Validate basic vertical bar chart preview
     user checks chart legend item contains    id:chartBuilderPreview    1    Admissions
 
     user checks chart height    id:chartBuilderPreview    500
-    user checks chart width    id:chartBuilderPreview    800
 
     user checks chart y axis ticks    id:chartBuilderPreview    0    2,500    5,000    7,500    10,000
     user checks chart x axis ticks    id:chartBuilderPreview    2005    2010    2011    2012    2016
@@ -671,7 +667,6 @@ Save and validate vertical bar chart embeds correctly
     user checks chart legend item contains    ${datablock}    1    Admissions
 
     user checks chart height    ${datablock}    500
-    user checks chart width    ${datablock}    800
 
     user checks chart y axis ticks    ${datablock}    0    2,500    5,000    7,500    10,000
     user checks chart x axis ticks    ${datablock}    2005    2010    2011    2012    2016
@@ -701,7 +696,7 @@ Configure basic horizontal bar chart
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
     user waits until page finishes loading
 
-    user configures basic chart    Horizontal bar    600    700
+    user configures basic chart    Horizontal bar    600
 
 Validate basic horizontal bar chart preview
     user waits until element contains bar chart    id:chartBuilderPreview
@@ -713,7 +708,6 @@ Validate basic horizontal bar chart preview
     user checks chart y axis ticks    id:chartBuilderPreview    2005    2010    2011    2012    2016
 
     user checks chart height    id:chartBuilderPreview    600
-    user checks chart width    id:chartBuilderPreview    700
 
     user mouses over chart bar    id:chartBuilderPreview    1
     user checks chart tooltip label contains    id:chartBuilderPreview    2005
@@ -756,7 +750,6 @@ Save and validate horizontal bar chart embeds correctly
     user checks chart y axis ticks    ${datablock}    2005    2010    2011    2012    2016
 
     user checks chart height    ${datablock}    600
-    user checks chart width    ${datablock}    700
 
     user mouses over chart bar    ${datablock}    1
     user checks chart tooltip label contains    ${datablock}    2005
@@ -783,7 +776,7 @@ Configure basic geographic chart
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
     user waits until page finishes loading
 
-    user configures basic chart    Geographic    700    600
+    user configures basic chart    Geographic    700
 
     user clicks link    Data sets
     user waits until h3 is visible    Data sets
@@ -824,7 +817,6 @@ Validate basic geographic chart preview
     user waits until element contains map chart    id:chartBuilderPreview
 
     user checks map chart height    id:chartBuilderPreview    700
-    user checks map chart width    id:chartBuilderPreview    600
 
     user chooses select option    id:chartBuilderPreview-map-selectedLocation    Barnsley
 
@@ -836,12 +828,12 @@ Validate basic geographic chart preview
 
     user checks map chart indicator tile contains    id:chartBuilderPreview    Admissions in 2014    9,854
 
-    user checks list has x items    testid:mapBlock-legend    5
-    user checks list item contains    testid:mapBlock-legend    1    1,054 to 2,813
-    user checks list item contains    testid:mapBlock-legend    2    2,814 to 4,573
-    user checks list item contains    testid:mapBlock-legend    3    4,574 to 6,333
-    user checks list item contains    testid:mapBlock-legend    4    6,334 to 8,093
-    user checks list item contains    testid:mapBlock-legend    5    8,094 to 9,854
+    user checks definition list has x items    testid:mapBlock-legend    5
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:first-child dd    1,054 to 2,813
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(2) dd    2,814 to 4,573
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(3) dd    4,574 to 6,333
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(4) dd    6,334 to 8,093
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(5) dd    8,094 to 9,854
 
 Change geographic chart data groupings
     user clicks link    Data groupings
@@ -888,27 +880,28 @@ Change geographic chart data groupings
     user checks table cell contains    4    2    Custom    testid:chart-data-groupings
 
 Validate basic geographic chart preview updates correctly
-    user checks list has x items    testid:mapBlock-legend    2
-    user checks list item contains    testid:mapBlock-legend    1    0 to 3,000
-    user checks list item contains    testid:mapBlock-legend    2    3,001 to 10,000
+    user checks definition list has x items    testid:mapBlock-legend    2
+
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:first-child dd    0 to 3,000
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(2) dd    3,001 to 10,000
 
     user chooses select option    id:chartBuilderPreview-map-selectedDataSet    Admissions in 2015
-    user checks list has x items    testid:mapBlock-legend    4
-    user checks list item contains    testid:mapBlock-legend    1    1,134 to 4,869
-    user checks list item contains    testid:mapBlock-legend    2    4,870 to 7,709
-    user checks list item contains    testid:mapBlock-legend    3    7,710 to 9,425
-    user checks list item contains    testid:mapBlock-legend    4    9,426 to 9,790
+    user checks definition list has x items    testid:mapBlock-legend    4
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:first-child dd    1,134 to 4,869
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(2) dd    4,870 to 7,709
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(3) dd    7,710 to 9,425
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(4) dd    9,426 to 9,790
 
     user chooses select option    id:chartBuilderPreview-map-selectedDataSet    Admissions in 2016
-    user checks list has x items    testid:mapBlock-legend    3
-    user checks list item contains    testid:mapBlock-legend    1    3,548 to 5,317
-    user checks list item contains    testid:mapBlock-legend    2    5,318 to 7,087
-    user checks list item contains    testid:mapBlock-legend    3    7,088 to 8,856
+    user checks definition list has x items    testid:mapBlock-legend    3
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:first-child dd    3,548 to 5,317
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(2) dd    5,318 to 7,087
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(3) dd    7,088 to 8,856
 
     user chooses select option    id:chartBuilderPreview-map-selectedDataSet    Admissions in 2017
-    user checks list has x items    testid:mapBlock-legend    2
-    user checks list item contains    testid:mapBlock-legend    1    0 to 3,000
-    user checks list item contains    testid:mapBlock-legend    2    3,001 to 10,000
+    user checks definition list has x items    testid:mapBlock-legend    2
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:first-child dd    0 to 3,000
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(2) dd    3,001 to 10,000
 
 Save and validate geographic chart embeds correctly
     user scrolls to the bottom of the page
@@ -929,7 +922,6 @@ Save and validate geographic chart embeds correctly
     user waits until element contains map chart    ${datablock}
 
     user checks map chart height    ${datablock}    700
-    user checks map chart width    ${datablock}    600
 
     user chooses select option    ${datablock} >> name:selectedLocation    Barnsley
 

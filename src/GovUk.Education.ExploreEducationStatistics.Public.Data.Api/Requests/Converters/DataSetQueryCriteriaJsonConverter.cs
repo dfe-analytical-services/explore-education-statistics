@@ -14,7 +14,8 @@ public class DataSetQueryCriteriaJsonConverter : JsonConverter<IDataSetQueryCrit
     public override IDataSetQueryCriteria? Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
-        JsonSerializerOptions options)
+        JsonSerializerOptions options
+    )
     {
         if (!JsonDocument.TryParseValue(ref reader, out var doc))
         {
@@ -25,10 +26,7 @@ public class DataSetQueryCriteriaJsonConverter : JsonConverter<IDataSetQueryCrit
         {
             var rootElement = doc.RootElement.GetRawText();
 
-            var propertyNames = doc.RootElement
-                .EnumerateObject()
-                .Select(p => p.Name.ToUpperFirst())
-                .ToHashSet();
+            var propertyNames = doc.RootElement.EnumerateObject().Select(p => p.Name.ToUpperFirst()).ToHashSet();
 
             if (propertyNames.Contains(nameof(DataSetQueryCriteriaAnd.And)))
             {

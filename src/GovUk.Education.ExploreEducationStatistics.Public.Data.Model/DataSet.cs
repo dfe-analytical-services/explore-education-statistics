@@ -43,8 +43,7 @@ public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?
     {
         public void Configure(EntityTypeBuilder<DataSet> builder)
         {
-            builder.Property(ds => ds.Id)
-                .HasValueGenerator<UuidV7ValueGenerator>();
+            builder.Property(ds => ds.Id).HasValueGenerator<UuidV7ValueGenerator>();
 
             builder.Property(ds => ds.Status).HasConversion<string>();
 

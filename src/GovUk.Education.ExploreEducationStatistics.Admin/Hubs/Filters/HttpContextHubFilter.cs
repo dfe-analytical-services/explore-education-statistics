@@ -18,10 +18,11 @@ public class HttpContextHubFilter : IHubFilter
 
     public async ValueTask<object?> InvokeMethodAsync(
         HubInvocationContext invocationContext,
-        Func<HubInvocationContext, ValueTask<object?>> next)
+        Func<HubInvocationContext, ValueTask<object?>> next
+    )
     {
         var contextSet = false;
-        
+
         try
         {
             if (_httpContextAccessor.HttpContext is null)
@@ -29,7 +30,7 @@ public class HttpContextHubFilter : IHubFilter
                 _httpContextAccessor.HttpContext = invocationContext.Context.GetHttpContext();
                 contextSet = true;
             }
-        
+
             return await next(invocationContext);
         }
         finally

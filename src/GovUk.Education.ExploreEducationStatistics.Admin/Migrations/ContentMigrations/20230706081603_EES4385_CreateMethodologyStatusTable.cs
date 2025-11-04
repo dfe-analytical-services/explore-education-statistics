@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES4385_CreateMethodologyStatusTable : Migration
 {
     private const string MigrationId = "20230706081603";
@@ -20,7 +21,7 @@ public partial class EES4385_CreateMethodologyStatusTable : Migration
                 InternalReleaseNote = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 ApprovalStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 Created = table.Column<DateTime>(type: "datetime2", nullable: true),
-                CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
             },
             constraints: table =>
             {
@@ -30,30 +31,37 @@ public partial class EES4385_CreateMethodologyStatusTable : Migration
                     column: x => x.MethodologyVersionId,
                     principalTable: "MethodologyVersions",
                     principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.Cascade
+                );
                 table.ForeignKey(
                     name: "FK_MethodologyStatus_Users_CreatedById",
                     column: x => x.CreatedById,
                     principalTable: "Users",
-                    principalColumn: "Id");
-            });
+                    principalColumn: "Id"
+                );
+            }
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_MethodologyStatus_CreatedById",
             table: "MethodologyStatus",
-            column: "CreatedById");
+            column: "CreatedById"
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_MethodologyStatus_MethodologyVersionId",
             table: "MethodologyStatus",
-            column: "MethodologyVersionId");
+            column: "MethodologyVersionId"
+        );
 
-        migrationBuilder.SqlFromFile(MigrationConstants.ContentMigrationsPath, $"{MigrationId}_MigrateMethodologyInternalReleaseNotes.sql");
+        migrationBuilder.SqlFromFile(
+            MigrationConstants.ContentMigrationsPath,
+            $"{MigrationId}_MigrateMethodologyInternalReleaseNotes.sql"
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropTable(
-            name: "MethodologyStatus");
+        migrationBuilder.DropTable(name: "MethodologyStatus");
     }
 }

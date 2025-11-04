@@ -30,28 +30,28 @@ public class LocationViewModelBuilderTests
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Country,
-                Country = _england
+                Country = _england,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Region,
                 Country = _england,
-                Region = _northEast
+                Region = _northEast,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Region,
                 Country = _england,
-                Region = _northWest
+                Region = _northWest,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Region,
                 Country = _england,
-                Region = _eastMidlands
+                Region = _eastMidlands,
             },
             new()
             {
@@ -59,7 +59,7 @@ public class LocationViewModelBuilderTests
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = _england,
                 Region = _eastMidlands,
-                LocalAuthority = _derby
+                LocalAuthority = _derby,
             },
             new()
             {
@@ -67,13 +67,13 @@ public class LocationViewModelBuilderTests
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = _england,
                 Region = _eastMidlands,
-                LocalAuthority = _nottingham
-            }
+                LocalAuthority = _nottingham,
+            },
         };
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
-                hierarchies: null);
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)
+                BuildLocationAttributeViewModels(locations, hierarchies: null);
 
         Assert.Equal(3, result.Count);
 
@@ -137,28 +137,28 @@ public class LocationViewModelBuilderTests
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Country,
-                Country = _england
+                Country = _england,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Region,
                 Country = _england,
-                Region = _northEast
+                Region = _northEast,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Region,
                 Country = _england,
-                Region = _northWest
+                Region = _northWest,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Region,
                 Country = _england,
-                Region = _eastMidlands
+                Region = _eastMidlands,
             },
             new()
             {
@@ -166,7 +166,7 @@ public class LocationViewModelBuilderTests
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = _england,
                 Region = _northEast,
-                LocalAuthority = _sunderland
+                LocalAuthority = _sunderland,
             },
             new()
             {
@@ -174,7 +174,7 @@ public class LocationViewModelBuilderTests
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = _england,
                 Region = _eastMidlands,
-                LocalAuthority = _derby
+                LocalAuthority = _derby,
             },
             new()
             {
@@ -182,17 +182,16 @@ public class LocationViewModelBuilderTests
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = _england,
                 Region = _eastMidlands,
-                LocalAuthority = _nottingham
-            }
+                LocalAuthority = _nottingham,
+            },
         };
 
         // Provide GeoJson for some but not all of the local authorities and not for any other level
         var boundaryData = BuildBoundaryData(_derby, _sunderland);
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
-                hierarchies: null,
-                boundaryData);
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)
+                BuildLocationAttributeViewModels(locations, hierarchies: null, boundaryData);
 
         Assert.Equal(3, result.Count);
 
@@ -262,28 +261,28 @@ public class LocationViewModelBuilderTests
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Country,
-                Country = _england
+                Country = _england,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Region,
                 Country = _england,
-                Region = _northEast
+                Region = _northEast,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Region,
                 Country = _england,
-                Region = _northWest
+                Region = _northWest,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Region,
                 Country = _england,
-                Region = _eastMidlands
+                Region = _eastMidlands,
             },
             new()
             {
@@ -291,7 +290,7 @@ public class LocationViewModelBuilderTests
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = _england,
                 Region = _eastMidlands,
-                LocalAuthority = _derby
+                LocalAuthority = _derby,
             },
             new()
             {
@@ -299,21 +298,18 @@ public class LocationViewModelBuilderTests
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Country = _england,
                 Region = _eastMidlands,
-                LocalAuthority = _nottingham
-            }
+                LocalAuthority = _nottingham,
+            },
         };
 
         var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
-            {
-                GeographicLevel.LocalAuthority,
-                ListOf("Country", "Region")
-            }
+            { GeographicLevel.LocalAuthority, ListOf("Country", "Region") },
         };
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
-                hierarchies);
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)
+                BuildLocationAttributeViewModels(locations, hierarchies);
 
         Assert.Equal(3, result.Count);
 
@@ -394,39 +390,35 @@ public class LocationViewModelBuilderTests
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Region = _northEast,
-                LocalAuthority = _sunderland
+                LocalAuthority = _sunderland,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Region = _eastMidlands,
-                LocalAuthority = _derby
+                LocalAuthority = _derby,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Region = _eastMidlands,
-                LocalAuthority = _nottingham
-            }
+                LocalAuthority = _nottingham,
+            },
         };
 
         var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
-            {
-                GeographicLevel.LocalAuthority,
-                ListOf("Region")
-            }
+            { GeographicLevel.LocalAuthority, ListOf("Region") },
         };
 
         // Provide GeoJson for some but not all of the local authorities and not for any other level
         var geoJson = BuildBoundaryData(_sunderland, _derby);
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
-                hierarchies,
-                geoJson);
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)
+                BuildLocationAttributeViewModels(locations, hierarchies, geoJson);
 
         Assert.Single(result);
 
@@ -483,13 +475,13 @@ public class LocationViewModelBuilderTests
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.LocalAuthority,
-                LocalAuthority = _cheshireOldCode
-            }
+                LocalAuthority = _cheshireOldCode,
+            },
         };
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
-                hierarchies: null);
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)
+                BuildLocationAttributeViewModels(locations, hierarchies: null);
 
         Assert.Single(result);
 
@@ -516,19 +508,19 @@ public class LocationViewModelBuilderTests
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Region,
-                Region = _northWest
+                Region = _northWest,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Region,
-                Region = _eastMidlands
+                Region = _eastMidlands,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.Region,
-                Region = _northEast
+                Region = _northEast,
             },
             // Hierarchical Region-LA
             new()
@@ -536,35 +528,32 @@ public class LocationViewModelBuilderTests
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Region = _northWest,
-                LocalAuthority = _blackpool
+                LocalAuthority = _blackpool,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Region = _eastMidlands,
-                LocalAuthority = _derby
+                LocalAuthority = _derby,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Region = _northEast,
-                LocalAuthority = _sunderland
-            }
+                LocalAuthority = _sunderland,
+            },
         };
 
         var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
-            {
-                GeographicLevel.LocalAuthority,
-                ListOf("Region")
-            }
+            { GeographicLevel.LocalAuthority, ListOf("Region") },
         };
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
-                hierarchies);
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)
+                BuildLocationAttributeViewModels(locations, hierarchies);
 
         Assert.Equal(2, result.Count);
 
@@ -638,25 +627,25 @@ public class LocationViewModelBuilderTests
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.LocalAuthority,
-                LocalAuthority = _derby
+                LocalAuthority = _derby,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.LocalAuthority,
-                LocalAuthority = _derbyDupe
+                LocalAuthority = _derbyDupe,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.LocalAuthority,
-                LocalAuthority = _nottingham
-            }
+                LocalAuthority = _nottingham,
+            },
         };
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
-                null);
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)
+                BuildLocationAttributeViewModels(locations, null);
 
         Assert.Single(result);
 
@@ -698,35 +687,32 @@ public class LocationViewModelBuilderTests
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Region = _eastMidlands,
-                LocalAuthority = _derby
+                LocalAuthority = _derby,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Region = _eastMidlands,
-                LocalAuthority = _derbyDupe
+                LocalAuthority = _derbyDupe,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 Region = _eastMidlands,
-                LocalAuthority = _nottingham
-            }
+                LocalAuthority = _nottingham,
+            },
         };
 
         var hierarchies = new Dictionary<GeographicLevel, List<string>>
         {
-            {
-                GeographicLevel.LocalAuthority,
-                ListOf("Region")
-            }
+            { GeographicLevel.LocalAuthority, ListOf("Region") },
         };
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
-                hierarchies);
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)
+                BuildLocationAttributeViewModels(locations, hierarchies);
 
         Assert.Single(result);
 
@@ -780,7 +766,7 @@ public class LocationViewModelBuilderTests
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 // Include region
                 Region = _eastMidlands,
-                LocalAuthority = _derby
+                LocalAuthority = _derby,
             },
             new()
             {
@@ -788,13 +774,13 @@ public class LocationViewModelBuilderTests
                 GeographicLevel = GeographicLevel.LocalAuthority,
                 // Omit region
                 Region = null,
-                LocalAuthority = _derby
-            }
+                LocalAuthority = _derby,
+            },
         };
 
         var result =
-            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)BuildLocationAttributeViewModels(locations,
-                hierarchies: null);
+            (IDictionary<GeographicLevel, List<LocationAttributeViewModel>>)
+                BuildLocationAttributeViewModels(locations, hierarchies: null);
 
         Assert.Single(result);
 
@@ -815,9 +801,7 @@ public class LocationViewModelBuilderTests
         Assert.Equal(_derby.Code, la2.Value);
     }
 
-    private static Dictionary<string, object> BuildProperties(
-        string code,
-        string name)
+    private static Dictionary<string, object> BuildProperties(string code, string name)
     {
         return new()
         {
@@ -834,30 +818,47 @@ public class LocationViewModelBuilderTests
     }
 
     private static Dictionary<GeographicLevel, Dictionary<string, BoundaryData>> BuildBoundaryData(
-        params LocationAttribute[] locationAttributes)
+        params LocationAttribute[] locationAttributes
+    )
     {
         return locationAttributes
             .GroupBy(locationAttribute => locationAttribute.GeographicLevel)
-            .ToDictionary(grouping => grouping.Key,
-                grouping => grouping.ToDictionary(locationAttribute => locationAttribute.Code,
-                    locationAttribute => new BoundaryData
-                    {
-                        Name = locationAttribute.Name,
-                        Code = locationAttribute.Code,
-                        BoundaryLevel = new()
+            .ToDictionary(
+                grouping => grouping.Key,
+                grouping =>
+                    grouping.ToDictionary(
+                        locationAttribute => locationAttribute.Code,
+                        locationAttribute => new BoundaryData
                         {
-                            Id = 1,
-                            Label = "Boundary Level 1",
-                            Level = GeographicLevel.Country,
-                            Published = DateTime.Now,
-                        },
-                        GeoJson = new(new MultiPolygon([[[
-                            [-71.17351189255714, 42.350224666504324],
-                            [-71.1677360907197, 42.34671571695422],
-                            [-71.16970919072628, 42.35326835618748],
-                            [-71.14341516047716, 42.36174674733808],
-                            [-71.17559093981981, 42.368232175909064],
-                            [-71.17351189255714, 42.350224666504324]]]]), BuildProperties(locationAttribute.Code, locationAttribute.Name), "1"),
-                    }));
+                            Name = locationAttribute.Name,
+                            Code = locationAttribute.Code,
+                            BoundaryLevel = new()
+                            {
+                                Id = 1,
+                                Label = "Boundary Level 1",
+                                Level = GeographicLevel.Country,
+                                Published = DateTime.Now,
+                            },
+                            GeoJson = new(
+                                new MultiPolygon(
+                                    [
+                                        [
+                                            [
+                                                [-71.17351189255714, 42.350224666504324],
+                                                [-71.1677360907197, 42.34671571695422],
+                                                [-71.16970919072628, 42.35326835618748],
+                                                [-71.14341516047716, 42.36174674733808],
+                                                [-71.17559093981981, 42.368232175909064],
+                                                [-71.17351189255714, 42.350224666504324],
+                                            ],
+                                        ],
+                                    ]
+                                ),
+                                BuildProperties(locationAttribute.Code, locationAttribute.Name),
+                                "1"
+                            ),
+                        }
+                    )
+            );
     }
 }

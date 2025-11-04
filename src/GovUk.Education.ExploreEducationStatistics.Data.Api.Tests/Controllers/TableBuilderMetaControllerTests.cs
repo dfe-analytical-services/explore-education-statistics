@@ -27,23 +27,16 @@ public class TableBuilderMetaControllerTests : CacheServiceTestFixture
     private static readonly Guid ReleaseVersionId = Guid.NewGuid();
     private static readonly Guid SubjectId = Guid.NewGuid();
 
-    private static readonly LocationsOrTimePeriodsQueryRequest QueryRequest = new()
-    {
-        SubjectId = SubjectId
-    };
+    private static readonly LocationsOrTimePeriodsQueryRequest QueryRequest = new() { SubjectId = SubjectId };
 
     [Fact]
     public async Task GetSubjectMeta_LatestRelease()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersionId = ReleaseVersionId,
-            SubjectId = SubjectId
-        };
+        var releaseSubject = new ReleaseSubject { ReleaseVersionId = ReleaseVersionId, SubjectId = SubjectId };
 
         var subjectMetaViewModel = new SubjectMetaViewModel();
 
@@ -53,21 +46,17 @@ public class TableBuilderMetaControllerTests : CacheServiceTestFixture
 
         SetupCall(mocks.contentPersistenceHelper, ReleaseVersionId, releaseVersion);
 
-        mocks.cacheService
-            .Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
+        mocks
+            .cacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
             .ReturnsAsync((object?)null);
 
-        mocks.cacheService
-            .Setup(s => s.SetItemAsync<object>(cacheKey, subjectMetaViewModel))
+        mocks
+            .cacheService.Setup(s => s.SetItemAsync<object>(cacheKey, subjectMetaViewModel))
             .Returns(Task.CompletedTask);
 
-        mocks.releaseSubjectService
-            .Setup(mock => mock.Find(SubjectId, null))
-            .ReturnsAsync(releaseSubject);
+        mocks.releaseSubjectService.Setup(mock => mock.Find(SubjectId, null)).ReturnsAsync(releaseSubject);
 
-        mocks.subjectMetaService
-            .Setup(s => s.GetSubjectMeta(releaseSubject))
-            .ReturnsAsync(subjectMetaViewModel);
+        mocks.subjectMetaService.Setup(s => s.GetSubjectMeta(releaseSubject)).ReturnsAsync(subjectMetaViewModel);
 
         var result = await controller.GetSubjectMeta(SubjectId);
         VerifyAllMocks(mocks);
@@ -78,15 +67,11 @@ public class TableBuilderMetaControllerTests : CacheServiceTestFixture
     [Fact]
     public async Task GetSubjectMeta_SpecificRelease()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersionId = ReleaseVersionId,
-            SubjectId = SubjectId
-        };
+        var releaseSubject = new ReleaseSubject { ReleaseVersionId = ReleaseVersionId, SubjectId = SubjectId };
 
         var subjectMetaViewModel = new SubjectMetaViewModel();
 
@@ -96,24 +81,19 @@ public class TableBuilderMetaControllerTests : CacheServiceTestFixture
 
         SetupCall(mocks.contentPersistenceHelper, ReleaseVersionId, releaseVersion);
 
-        mocks.cacheService
-            .Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
+        mocks
+            .cacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
             .ReturnsAsync((object?)null);
 
-        mocks.cacheService
-            .Setup(s => s.SetItemAsync<object>(cacheKey, subjectMetaViewModel))
+        mocks
+            .cacheService.Setup(s => s.SetItemAsync<object>(cacheKey, subjectMetaViewModel))
             .Returns(Task.CompletedTask);
 
-        mocks.releaseSubjectService
-            .Setup(s => s.Find(SubjectId, ReleaseVersionId))
-            .ReturnsAsync(releaseSubject);
+        mocks.releaseSubjectService.Setup(s => s.Find(SubjectId, ReleaseVersionId)).ReturnsAsync(releaseSubject);
 
-        mocks.subjectMetaService
-            .Setup(s => s.GetSubjectMeta(releaseSubject))
-            .ReturnsAsync(subjectMetaViewModel);
+        mocks.subjectMetaService.Setup(s => s.GetSubjectMeta(releaseSubject)).ReturnsAsync(subjectMetaViewModel);
 
-        var result = await controller.GetSubjectMeta(releaseVersionId: ReleaseVersionId,
-            subjectId: SubjectId);
+        var result = await controller.GetSubjectMeta(releaseVersionId: ReleaseVersionId, subjectId: SubjectId);
         VerifyAllMocks(mocks);
 
         result.AssertOkResult(subjectMetaViewModel);
@@ -124,9 +104,7 @@ public class TableBuilderMetaControllerTests : CacheServiceTestFixture
     {
         var (controller, mocks) = BuildControllerAndMocks();
 
-        mocks.releaseSubjectService
-            .Setup(mock => mock.Find(SubjectId, null))
-            .ReturnsAsync(new NotFoundResult());
+        mocks.releaseSubjectService.Setup(mock => mock.Find(SubjectId, null)).ReturnsAsync(new NotFoundResult());
 
         var result = await controller.GetSubjectMeta(SubjectId);
         VerifyAllMocks(mocks);
@@ -139,12 +117,11 @@ public class TableBuilderMetaControllerTests : CacheServiceTestFixture
     {
         var (controller, mocks) = BuildControllerAndMocks();
 
-        mocks.releaseSubjectService
-            .Setup(mock => mock.Find(SubjectId, ReleaseVersionId))
+        mocks
+            .releaseSubjectService.Setup(mock => mock.Find(SubjectId, ReleaseVersionId))
             .ReturnsAsync(new NotFoundResult());
 
-        var result = await controller.GetSubjectMeta(releaseVersionId: ReleaseVersionId,
-            subjectId: SubjectId);
+        var result = await controller.GetSubjectMeta(releaseVersionId: ReleaseVersionId, subjectId: SubjectId);
         VerifyAllMocks(mocks);
 
         result.AssertNotFoundResult();
@@ -158,8 +135,8 @@ public class TableBuilderMetaControllerTests : CacheServiceTestFixture
 
         var (controller, mocks) = BuildControllerAndMocks();
 
-        mocks.subjectMetaService
-            .Setup(s => s.FilterSubjectMeta(null, QueryRequest, cancellationToken))
+        mocks
+            .subjectMetaService.Setup(s => s.FilterSubjectMeta(null, QueryRequest, cancellationToken))
             .ReturnsAsync(subjectMetaViewModel);
 
         var result = await controller.FilterSubjectMeta(QueryRequest, cancellationToken);
@@ -176,8 +153,8 @@ public class TableBuilderMetaControllerTests : CacheServiceTestFixture
 
         var (controller, mocks) = BuildControllerAndMocks();
 
-        mocks.subjectMetaService
-            .Setup(s => s.FilterSubjectMeta(ReleaseVersionId, QueryRequest, cancellationToken))
+        mocks
+            .subjectMetaService.Setup(s => s.FilterSubjectMeta(ReleaseVersionId, QueryRequest, cancellationToken))
             .ReturnsAsync(subjectMetaViewModel);
 
         var result = await controller.FilterSubjectMeta(ReleaseVersionId, QueryRequest, cancellationToken);
@@ -188,17 +165,22 @@ public class TableBuilderMetaControllerTests : CacheServiceTestFixture
 
     private static SubjectMetaCacheKey GetCacheKey(ReleaseVersion releaseVersion, ReleaseSubject releaseSubject)
     {
-        return new SubjectMetaCacheKey(publicationSlug: releaseVersion.Release.Publication.Slug,
+        return new SubjectMetaCacheKey(
+            publicationSlug: releaseVersion.Release.Publication.Slug,
             releaseSlug: releaseVersion.Release.Slug,
-            releaseSubject.SubjectId);
+            releaseSubject.SubjectId
+        );
     }
 
-    private (TableBuilderMetaController controller, (
-        Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
-        Mock<IReleaseSubjectService> releaseSubjectService,
-        Mock<ISubjectMetaService> subjectMetaService,
-        Mock<IBlobCacheService> cacheService) mocks)
-        BuildControllerAndMocks()
+    private (
+        TableBuilderMetaController controller,
+        (
+            Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
+            Mock<IReleaseSubjectService> releaseSubjectService,
+            Mock<ISubjectMetaService> subjectMetaService,
+            Mock<IBlobCacheService> cacheService
+        ) mocks
+    ) BuildControllerAndMocks()
     {
         var contentPersistenceHelper = MockPersistenceHelper<ContentDbContext>();
         var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
@@ -207,12 +189,9 @@ public class TableBuilderMetaControllerTests : CacheServiceTestFixture
         var controller = new TableBuilderMetaController(
             contentPersistenceHelper.Object,
             releaseSubjectService.Object,
-            subjectMetaService.Object);
+            subjectMetaService.Object
+        );
 
-        return (controller, (
-            contentPersistenceHelper,
-            releaseSubjectService,
-            subjectMetaService,
-            BlobCacheService));
+        return (controller, (contentPersistenceHelper, releaseSubjectService, subjectMetaService, BlobCacheService));
     }
 }

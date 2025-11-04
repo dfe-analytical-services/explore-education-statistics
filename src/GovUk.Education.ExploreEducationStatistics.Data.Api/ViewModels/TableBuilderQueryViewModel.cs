@@ -26,8 +26,7 @@ public record TableBuilderQueryViewModel
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public TableBuilderQueryViewModel() // For Newtonsoft.Json
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    {
-    }
+    { }
 
     public TableBuilderQueryViewModel(Guid publicationId, FullTableQuery query)
     {

@@ -6,6 +6,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Migrati
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES4467_AddDataBlockParentToKeyStatisticDataBlock : Migration
 {
     private const string MigrationId = "20231028190916";
@@ -16,11 +17,13 @@ public partial class EES4467_AddDataBlockParentToKeyStatisticDataBlock : Migrati
             name: "DataBlockParentId",
             table: "KeyStatisticsDataBlock",
             type: "uniqueidentifier",
-            nullable: true);
+            nullable: true
+        );
 
         migrationBuilder.SqlFromFile(
             ContentMigrationsPath,
-            $"{MigrationId}_{nameof(EES4467_AddDataBlockParentToKeyStatisticDataBlock)}.sql");
+            $"{MigrationId}_{nameof(EES4467_AddDataBlockParentToKeyStatisticDataBlock)}.sql"
+        );
 
         migrationBuilder.AlterColumn<Guid>(
             name: "DataBlockParentId",
@@ -28,12 +31,14 @@ public partial class EES4467_AddDataBlockParentToKeyStatisticDataBlock : Migrati
             nullable: false,
             oldClrType: typeof(Guid),
             oldType: "uniqueidentifier",
-            oldNullable: true);
+            oldNullable: true
+        );
 
         migrationBuilder.CreateIndex(
             name: "IX_KeyStatisticsDataBlock_DataBlockParentId",
             table: "KeyStatisticsDataBlock",
-            column: "DataBlockParentId");
+            column: "DataBlockParentId"
+        );
 
         migrationBuilder.AddForeignKey(
             name: "FK_KeyStatisticsDataBlock_DataBlocks_DataBlockParentId",
@@ -41,13 +46,12 @@ public partial class EES4467_AddDataBlockParentToKeyStatisticDataBlock : Migrati
             column: "DataBlockParentId",
             principalTable: "DataBlocks",
             principalColumn: "Id",
-            onDelete: ReferentialAction.Cascade);
+            onDelete: ReferentialAction.Cascade
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "DataBlockParentId",
-            table: "KeyStatisticsDataBlock");
+        migrationBuilder.DropColumn(name: "DataBlockParentId", table: "KeyStatisticsDataBlock");
     }
 }

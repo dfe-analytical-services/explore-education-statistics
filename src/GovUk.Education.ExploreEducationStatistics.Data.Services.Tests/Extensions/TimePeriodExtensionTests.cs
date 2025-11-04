@@ -16,10 +16,7 @@ public class TimePeriodExtensionTests
     [InlineData("2022_AYQ4", 2022, AcademicYearQ4)]
     public void GetTimePeriodTuple(string timePeriod, int expectedYear, TimeIdentifier expectedTimeIdentifier)
     {
-        var observation = new ObservationViewModel
-        {
-            TimePeriod = timePeriod
-        };
+        var observation = new ObservationViewModel { TimePeriod = timePeriod };
 
         var tuple = observation.GetTimePeriodTuple();
 
@@ -36,10 +33,7 @@ public class TimePeriodExtensionTests
     [InlineData("2020_Invalid")]
     public void GetTimePeriodTuple_InvalidTimePeriodThrows(string timePeriod)
     {
-        var observation = new ObservationViewModel
-        {
-            TimePeriod = timePeriod
-        };
+        var observation = new ObservationViewModel { TimePeriod = timePeriod };
 
         Assert.Throws<ArgumentException>(() => observation.GetTimePeriodTuple());
     }

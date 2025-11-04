@@ -13,11 +13,9 @@ public record DataGuidanceUpdateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.Content)
-                .NotEmpty();
+            RuleFor(request => request.Content).NotEmpty();
 
-            RuleFor(request => request.DataSets)
-                .NotEmpty();
+            RuleFor(request => request.DataSets).NotEmpty();
         }
     }
 }
@@ -32,12 +30,9 @@ public record DataGuidanceDataSetUpdateRequest
     {
         public Validator()
         {
-            RuleFor(request => request.FileId)
-                .NotEmpty();
+            RuleFor(request => request.FileId).NotEmpty();
 
-            RuleFor(request => request.Content)
-                .NotEmpty()
-                .MaximumLength(250);
+            RuleFor(request => request.Content).NotEmpty().MaximumLength(250);
         }
     }
 }

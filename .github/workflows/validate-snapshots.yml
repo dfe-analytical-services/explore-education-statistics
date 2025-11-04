@@ -13,7 +13,7 @@ on:
     #
     # March to October - cron: '35 8,11,15 * * 1-5'
     # October to March - cron: '35 9,12,16 * * 1-5'
-    - cron: '35 8,11,15 * * 1-5'
+    - cron: '35 9,12,16 * * 1-5'
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SNAPSHOTS_WEBHOOK_URL }}
@@ -33,10 +33,10 @@ jobs:
         run: sudo ethtool -K eth0 tx off rx off
 
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pipenv'
@@ -85,7 +85,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ env.GH_TOKEN }}
 

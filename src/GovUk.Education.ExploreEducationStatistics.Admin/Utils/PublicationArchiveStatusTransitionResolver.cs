@@ -14,7 +14,7 @@ public class PublicationArchiveStatusTransitionResolver
         NotArchivedToNotArchived,
         NotArchivedToArchived,
         ArchivedToNotArchived,
-        ArchivedToArchived
+        ArchivedToArchived,
     }
 
     /// <summary>
@@ -32,9 +32,8 @@ public class PublicationArchiveStatusTransitionResolver
             (false, false) => PublicationArchiveStatusTransition.NotArchivedToNotArchived,
             (false, true) => PublicationArchiveStatusTransition.NotArchivedToArchived,
             (true, false) => PublicationArchiveStatusTransition.ArchivedToNotArchived,
-            (true, true) => PublicationArchiveStatusTransition.ArchivedToArchived
+            (true, true) => PublicationArchiveStatusTransition.ArchivedToArchived,
         };
 
-    private static bool IsSupersededByLivePublication(Publication? publication) =>
-        publication?.Live ?? false;
+    private static bool IsSupersededByLivePublication(Publication? publication) => publication?.Live ?? false;
 }

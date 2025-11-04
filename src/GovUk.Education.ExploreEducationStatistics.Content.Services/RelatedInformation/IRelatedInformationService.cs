@@ -9,5 +9,6 @@ public interface IRelatedInformationService
     Task<Either<ActionResult, RelatedInformationDto[]>> GetRelatedInformationForRelease(
         string publicationSlug,
         string releaseSlug,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

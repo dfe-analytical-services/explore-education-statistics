@@ -12,20 +12,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repos
 
 public class TimePeriodMetaRepository(
     PublicDataDbContext publicDataDbContext,
-    IDataSetVersionPathResolver dataSetVersionPathResolver) : ITimePeriodMetaRepository
+    IDataSetVersionPathResolver dataSetVersionPathResolver
+) : ITimePeriodMetaRepository
 {
     public Task<List<TimePeriodMeta>> ReadTimePeriodMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default) 
+        CancellationToken cancellationToken = default
+    )
     {
         return GetTimePeriodMetas(duckDbConnection, dataSetVersion, cancellationToken);
     }
-    
+
     public async Task<List<TimePeriodMeta>> CreateTimePeriodMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var metas = await GetTimePeriodMetas(duckDbConnection, dataSetVersion, cancellationToken);
 
@@ -38,22 +41,29 @@ public class TimePeriodMetaRepository(
     private async Task<List<TimePeriodMeta>> GetTimePeriodMetas(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        return (await duckDbConnection.SqlBuilder(
-                $"""
-                 SELECT DISTINCT time_period, time_identifier
-                 FROM read_csv('{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}', ALL_VARCHAR = true)
-                 ORDER BY time_period
-                 """
-            ).QueryAsync<(string TimePeriod, string TimeIdentifier)>(cancellationToken: cancellationToken))
+        return (
+            await duckDbConnection
+                .SqlBuilder(
+                    $"""
+                    SELECT DISTINCT time_period, time_identifier
+                    FROM read_csv(
+                        '{dataSetVersionPathResolver.CsvDataPath(dataSetVersion):raw}',
+                        {DuckDbConstants.ReadCsvOptions:raw}
+                    )
+                    ORDER BY time_period
+                    """
+                )
+                .QueryAsync<(string TimePeriod, string TimeIdentifier)>(cancellationToken: cancellationToken)
+        )
             .Select(tuple => new TimePeriodMeta
-                {
-                    DataSetVersionId = dataSetVersion.Id,
-                    Period = TimePeriodFormatter.FormatFromCsv(tuple.TimePeriod),
-                    Code = EnumToEnumLabelConverter<TimeIdentifier>.FromProvider(tuple.TimeIdentifier)
-                }
-            )
+            {
+                DataSetVersionId = dataSetVersion.Id,
+                Period = TimePeriodFormatter.FormatFromCsv(tuple.TimePeriod),
+                Code = EnumToEnumLabelConverter<TimeIdentifier>.FromProvider(tuple.TimeIdentifier),
+            })
             .OrderBy(meta => meta.Period)
             .ThenBy(meta => meta.Code)
             .ToList();

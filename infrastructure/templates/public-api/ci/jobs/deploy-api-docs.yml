@@ -15,7 +15,7 @@ jobs:
     environment: ${{ parameters.environment }}
     variables:
       docsPath: $(Pipeline.Workspace)/MainBuild/public-api-docs
-      nodeVersion: '20.19.2'
+      nodeVersion: '22.20.0'
       rubyVersion: '3.2'
     strategy:
       runOnce:
@@ -75,4 +75,3 @@ jobs:
                 azure_static_web_apps_api_token: $(docsDeploymentToken)
                 config_file_location: .
                 cwd: $(docsPath)
-

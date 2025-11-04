@@ -7,76 +7,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 
 public static class LocationGeneratorExtensions
 {
-    public static Generator<Location> DefaultLocation(this DataFixture fixture)
-        => fixture.Generator<Location>().WithDefaults();
+    public static Generator<Location> DefaultLocation(this DataFixture fixture) =>
+        fixture.Generator<Location>().WithDefaults();
 
-    public static Generator<Location> WithDefaults(this Generator<Location> generator)
-        => generator.ForInstance(s => s.SetDefaults());
+    public static Generator<Location> WithDefaults(this Generator<Location> generator) =>
+        generator.ForInstance(s => s.SetDefaults());
 
-    public static Generator<Location> WithGeographicLevel(this Generator<Location> generator, GeographicLevel level)
-        => generator.ForInstance(s => s.SetGeographicLevel(level));
+    public static Generator<Location> WithGeographicLevel(this Generator<Location> generator, GeographicLevel level) =>
+        generator.ForInstance(s => s.SetGeographicLevel(level));
 
-    public static Generator<Location> WithCountry(this Generator<Location> generator, Country country)
-        => generator.ForInstance(s => s.SetCountry(country));
+    public static Generator<Location> WithCountry(this Generator<Location> generator, Country country) =>
+        generator.ForInstance(s => s.SetCountry(country));
 
-    public static Generator<Location> WithRegion(this Generator<Location> generator, Region region)
-        => generator.ForInstance(s => s.SetRegion(region));
+    public static Generator<Location> WithRegion(this Generator<Location> generator, Region region) =>
+        generator.ForInstance(s => s.SetRegion(region));
 
-    public static Generator<Location> WithPresetRegion(this Generator<Location> generator)
-        => generator.ForInstance(s => s.SetPresetRegion());
+    public static Generator<Location> WithPresetRegion(this Generator<Location> generator) =>
+        generator.ForInstance(s => s.SetPresetRegion());
 
-    public static Generator<Location> WithLocalAuthority(this Generator<Location> generator, LocalAuthority localAuthority)
-        => generator.ForInstance(s => s.SetLocalAuthority(localAuthority));
+    public static Generator<Location> WithLocalAuthority(
+        this Generator<Location> generator,
+        LocalAuthority localAuthority
+    ) => generator.ForInstance(s => s.SetLocalAuthority(localAuthority));
 
-    public static Generator<Location> WithPresetLocalAuthority(this Generator<Location> generator, Region region)
-        => generator.ForInstance(s => s.SetPresetLocalAuthority(region));
+    public static Generator<Location> WithPresetLocalAuthority(this Generator<Location> generator, Region region) =>
+        generator.ForInstance(s => s.SetPresetLocalAuthority(region));
 
-    public static Generator<Location> WithPresetRegionAndLocalAuthority(this Generator<Location> generator)
-        => generator.ForInstance(s => s.SetPresetRegionAndLocalAuthority());
+    public static Generator<Location> WithPresetRegionAndLocalAuthority(this Generator<Location> generator) =>
+        generator.ForInstance(s => s.SetPresetRegionAndLocalAuthority());
 
-    public static InstanceSetters<Location> SetDefaults(this InstanceSetters<Location> setters)
-        => setters
-            .SetDefault(l => l.Id)
-            .Set(l => l.Country, CountryPresets.England);
+    public static InstanceSetters<Location> SetDefaults(this InstanceSetters<Location> setters) =>
+        setters.SetDefault(l => l.Id).Set(l => l.Country, CountryPresets.England);
 
     public static InstanceSetters<Location> SetGeographicLevel(
         this InstanceSetters<Location> setters,
-        GeographicLevel level)
-        => setters.Set(l => l.GeographicLevel, level);
+        GeographicLevel level
+    ) => setters.Set(l => l.GeographicLevel, level);
 
-    public static InstanceSetters<Location> SetCountry(
-        this InstanceSetters<Location> setters,
-        Country country)
-        => setters.Set(l => l.Country, country);
+    public static InstanceSetters<Location> SetCountry(this InstanceSetters<Location> setters, Country country) =>
+        setters.Set(l => l.Country, country);
 
     public static InstanceSetters<Location> SetLocalAuthority(
         this InstanceSetters<Location> setters,
-        LocalAuthority localAuthority)
-        => setters.Set(l => l.LocalAuthority, localAuthority);
+        LocalAuthority localAuthority
+    ) => setters.Set(l => l.LocalAuthority, localAuthority);
 
     public static InstanceSetters<Location> SetPresetLocalAuthority(
         this InstanceSetters<Location> setters,
-        Region region)
-        => setters.Set(
-            l => l.LocalAuthority,
-            f => f.PickRandom(RegionLocalAuthorities.Value[region])
-        );
+        Region region
+    ) => setters.Set(l => l.LocalAuthority, f => f.PickRandom(RegionLocalAuthorities.Value[region]));
 
-    public static InstanceSetters<Location> SetRegion(
-        this InstanceSetters<Location> setters,
-        Region region)
-        => setters.Set(l => l.Region, region);
+    public static InstanceSetters<Location> SetRegion(this InstanceSetters<Location> setters, Region region) =>
+        setters.Set(l => l.Region, region);
 
-    public static InstanceSetters<Location> SetPresetRegion(
-        this InstanceSetters<Location> setters)
-        => setters.Set(
-            l => l.Region,
-            f => f.PickRandom(RegionLocalAuthorities.Value.Keys.ToList())
-        );
+    public static InstanceSetters<Location> SetPresetRegion(this InstanceSetters<Location> setters) =>
+        setters.Set(l => l.Region, f => f.PickRandom(RegionLocalAuthorities.Value.Keys.ToList()));
 
-    public static InstanceSetters<Location> SetPresetRegionAndLocalAuthority(
-        this InstanceSetters<Location> setters)
-        => setters
+    public static InstanceSetters<Location> SetPresetRegionAndLocalAuthority(this InstanceSetters<Location> setters) =>
+        setters
             .SetPresetRegion()
             .Set(
                 l => l.LocalAuthority,

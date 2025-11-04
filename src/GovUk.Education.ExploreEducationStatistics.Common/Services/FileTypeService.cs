@@ -1,4 +1,3 @@
-#nullable enable
 using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
@@ -75,8 +74,8 @@ public class FileTypeService : IFileTypeService
     }
 
     /// <remarks>Mime Detective is much better at zip files.</remarks>
-    private static async Task<FileType?> GetMimeTypeUsingMimeDetective(Stream stream)
-        => await stream.GetFileTypeAsync();
+    private static async Task<FileType?> GetMimeTypeUsingMimeDetective(Stream stream) =>
+        await stream.GetFileTypeAsync();
 
     private string GuessMagicInfo(IFormFile file, MagicOpenFlags flag)
     {

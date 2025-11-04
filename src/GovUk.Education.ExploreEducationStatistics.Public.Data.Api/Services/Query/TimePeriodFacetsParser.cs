@@ -31,12 +31,7 @@ internal class TimePeriodFacetsParser : IFacetsParser
 
         if (facets.TimePeriods?.Eq is not null)
         {
-            fragments.Add(
-                EqFragment(
-                    timePeriod: facets.TimePeriods.Eq,
-                    path: QueryUtils.Path(path, "timePeriods.eq")
-                )
-            );
+            fragments.Add(EqFragment(timePeriod: facets.TimePeriods.Eq, path: QueryUtils.Path(path, "timePeriods.eq")));
         }
 
         if (facets.TimePeriods?.NotEq is not null)
@@ -53,10 +48,7 @@ internal class TimePeriodFacetsParser : IFacetsParser
         if (facets.TimePeriods?.In is not null && facets.TimePeriods.In.Count != 0)
         {
             fragments.Add(
-                InFragment(
-                    timePeriods: [..facets.TimePeriods.In],
-                    path: QueryUtils.Path(path, "timePeriods.in")
-                )
+                InFragment(timePeriods: [.. facets.TimePeriods.In], path: QueryUtils.Path(path, "timePeriods.in"))
             );
         }
 
@@ -64,7 +56,7 @@ internal class TimePeriodFacetsParser : IFacetsParser
         {
             fragments.Add(
                 InFragment(
-                    timePeriods: [..facets.TimePeriods.NotIn],
+                    timePeriods: [.. facets.TimePeriods.NotIn],
                     path: QueryUtils.Path(path, "timePeriods.notIn"),
                     negate: true
                 )
@@ -115,15 +107,10 @@ internal class TimePeriodFacetsParser : IFacetsParser
             );
         }
 
-        return new DuckDbSqlBuilder()
-            .AppendRange(fragments, "\nAND ")
-            .Build();
+        return new DuckDbSqlBuilder().AppendRange(fragments, "\nAND ").Build();
     }
 
-    private IInterpolatedSql EqFragment(
-        DataSetQueryTimePeriod timePeriod,
-        string path,
-        bool negate = false)
+    private IInterpolatedSql EqFragment(DataSetQueryTimePeriod timePeriod, string path, bool negate = false)
     {
         var builder = new DuckDbSqlBuilder();
 
@@ -131,9 +118,7 @@ internal class TimePeriodFacetsParser : IFacetsParser
         {
             _queryState.Warnings.Add(CreateNotFoundWarning([timePeriod], path));
 
-            return builder
-                .AppendLiteral(negate ? "true" : "false")
-                .Build();
+            return builder.AppendLiteral(negate ? "true" : "false").Build();
         }
 
         builder += $"{DataTable.Ref().TimePeriodId:raw} {(negate ? "!=" : "="):raw} {meta.Id}";
@@ -141,10 +126,7 @@ internal class TimePeriodFacetsParser : IFacetsParser
         return builder.Build();
     }
 
-    private IInterpolatedSql ComparisonFragment(
-        DataSetQueryTimePeriod timePeriod,
-        string comparator,
-        string path)
+    private IInterpolatedSql ComparisonFragment(DataSetQueryTimePeriod timePeriod, string comparator, string path)
     {
         var builder = new DuckDbSqlBuilder();
 
@@ -152,9 +134,7 @@ internal class TimePeriodFacetsParser : IFacetsParser
         {
             _queryState.Warnings.Add(CreateNotFoundWarning([timePeriod], path));
 
-            return builder
-                .AppendLiteral("false")
-                .Build();
+            return builder.AppendLiteral("false").Build();
         }
 
         builder += $"{DataTable.Ref().TimePeriodId:raw} {comparator:raw} {meta.Id}";
@@ -162,10 +142,7 @@ internal class TimePeriodFacetsParser : IFacetsParser
         return builder.Build();
     }
 
-    private IInterpolatedSql InFragment(
-        HashSet<DataSetQueryTimePeriod> timePeriods,
-        string path,
-        bool negate = false)
+    private IInterpolatedSql InFragment(HashSet<DataSetQueryTimePeriod> timePeriods, string path, bool negate = false)
     {
         var builder = new DuckDbSqlBuilder();
 
@@ -182,9 +159,7 @@ internal class TimePeriodFacetsParser : IFacetsParser
 
         if (ids.Count == 0)
         {
-            return builder
-                .AppendLiteral(negate ? "true" : "false")
-                .Build();
+            return builder.AppendLiteral(negate ? "true" : "false").Build();
         }
 
         builder += $"{DataTable.Ref().TimePeriodId:raw} {(negate ? "NOT IN" : "IN"):raw} ({ids})";
@@ -192,15 +167,16 @@ internal class TimePeriodFacetsParser : IFacetsParser
         return builder.Build();
     }
 
-    private WarningViewModel CreateNotFoundWarning(HashSet<DataSetQueryTimePeriod> timePeriods, string path) => new()
-    {
-        Code = ValidationMessages.TimePeriodsNotFound.Code,
-        Message = ValidationMessages.TimePeriodsNotFound.Message,
-        Path = path,
-        Detail = new NotFoundItemsErrorDetail<DataSetQueryTimePeriod>(
-            timePeriods.Where(timePeriod => !_allowedTimePeriods.ContainsKey(new TimePeriodKey(timePeriod)))
-        )
-    };
+    private WarningViewModel CreateNotFoundWarning(HashSet<DataSetQueryTimePeriod> timePeriods, string path) =>
+        new()
+        {
+            Code = ValidationMessages.TimePeriodsNotFound.Code,
+            Message = ValidationMessages.TimePeriodsNotFound.Message,
+            Path = path,
+            Detail = new NotFoundItemsErrorDetail<DataSetQueryTimePeriod>(
+                timePeriods.Where(timePeriod => !_allowedTimePeriods.ContainsKey(new TimePeriodKey(timePeriod)))
+            ),
+        };
 
     private record TimePeriodKey
     {

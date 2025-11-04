@@ -1,4 +1,3 @@
-#nullable enable
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.FilterHierarchiesOptionsUtils;
@@ -28,8 +27,7 @@ public record FullTableQueryRequest
             TimePeriod = this.TimePeriod,
             Filters = this.Filters,
             Indicators = this.Indicators,
-            FilterHierarchiesOptions =
-                CreateFilterHierarchiesOptionsFromDictionary(this.FilterHierarchiesOptions),
+            FilterHierarchiesOptions = CreateFilterHierarchiesOptionsFromDictionary(this.FilterHierarchiesOptions),
         };
     }
 
@@ -37,16 +35,13 @@ public record FullTableQueryRequest
     {
         public Validator()
         {
-            RuleFor(context => context.LocationIds)
-                .NotEmpty();
-            RuleFor(context => context.TimePeriod)
-                .NotNull();
+            RuleFor(context => context.LocationIds).NotEmpty();
+            RuleFor(context => context.TimePeriod).NotNull();
 
             // NOTE: No rule for filters - a data set might have no filters!
             // NOTE: No rule for filterHierarchiesOptions - a data set might not have a filter hierarchy!
 
-            RuleFor(context => context.Indicators)
-                .NotEmpty();
+            RuleFor(context => context.Indicators).NotEmpty();
         }
     }
 }
@@ -79,8 +74,7 @@ public class LocationsOrTimePeriodsQueryRequest
     {
         public Validator()
         {
-            RuleFor(context => context.LocationIds)
-                .NotEmpty();
+            RuleFor(context => context.LocationIds).NotEmpty();
 
             // No TimePeriods check, as it may be null, but also could be set
         }

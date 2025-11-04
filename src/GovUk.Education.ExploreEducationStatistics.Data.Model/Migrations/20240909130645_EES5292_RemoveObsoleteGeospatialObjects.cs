@@ -18,8 +18,5 @@ public partial class EES5292_RemoveObsoleteGeospatialObjects : Migration
     }
 
     /// <inheritdoc />
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-
-    }
+    protected override void Down(MigrationBuilder migrationBuilder) { }
 }

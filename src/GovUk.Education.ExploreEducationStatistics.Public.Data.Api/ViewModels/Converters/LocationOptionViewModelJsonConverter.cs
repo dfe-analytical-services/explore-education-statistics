@@ -13,7 +13,8 @@ public class LocationOptionViewModelJsonConverter : JsonConverter<LocationOption
     public override LocationOptionViewModel Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
-        JsonSerializerOptions options)
+        JsonSerializerOptions options
+    )
     {
         if (!JsonDocument.TryParseValue(ref reader, out var doc))
         {
@@ -24,13 +25,15 @@ public class LocationOptionViewModelJsonConverter : JsonConverter<LocationOption
         {
             var rootElement = doc.RootElement.GetRawText();
 
-            var propertyNames = doc.RootElement
-                .EnumerateObject()
+            var propertyNames = doc
+                .RootElement.EnumerateObject()
                 .Select(p => char.ToUpper(p.Name[0]) + p.Name[1..])
                 .ToHashSet();
 
-            if (propertyNames.Contains(nameof(LocationSchoolOptionViewModel.Urn))
-                && propertyNames.Contains(nameof(LocationSchoolOptionViewModel.LaEstab)))
+            if (
+                propertyNames.Contains(nameof(LocationSchoolOptionViewModel.Urn))
+                && propertyNames.Contains(nameof(LocationSchoolOptionViewModel.LaEstab))
+            )
             {
                 return JsonSerializer.Deserialize<LocationSchoolOptionViewModel>(rootElement, options)!;
             }
@@ -40,8 +43,10 @@ public class LocationOptionViewModelJsonConverter : JsonConverter<LocationOption
                 return JsonSerializer.Deserialize<LocationProviderOptionViewModel>(rootElement, options)!;
             }
 
-            if (propertyNames.Contains(nameof(LocationLocalAuthorityOptionViewModel.Code))
-                && propertyNames.Contains(nameof(LocationLocalAuthorityOptionViewModel.OldCode)))
+            if (
+                propertyNames.Contains(nameof(LocationLocalAuthorityOptionViewModel.Code))
+                && propertyNames.Contains(nameof(LocationLocalAuthorityOptionViewModel.OldCode))
+            )
             {
                 return JsonSerializer.Deserialize<LocationLocalAuthorityOptionViewModel>(rootElement, options)!;
             }

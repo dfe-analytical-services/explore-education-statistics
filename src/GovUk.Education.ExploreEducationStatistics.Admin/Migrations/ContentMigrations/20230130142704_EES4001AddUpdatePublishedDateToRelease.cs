@@ -15,13 +15,12 @@ public partial class EES4001AddUpdatePublishedDateToRelease : Migration
             table: "Releases",
             type: "bit",
             nullable: false,
-            defaultValue: false);
+            defaultValue: false
+        );
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "UpdatePublishedDate",
-            table: "Releases");
+        migrationBuilder.DropColumn(name: "UpdatePublishedDate", table: "Releases");
     }
 }

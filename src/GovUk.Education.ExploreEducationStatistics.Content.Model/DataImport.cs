@@ -9,16 +9,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class DataImport
 {
-    private static readonly Dictionary<DataImportStatus, double> ProcessingRatios =
-        new()
-        {
-            { STAGE_1, .1 },
-            { STAGE_2, .1 },
-            { STAGE_3, .8 },
-            { CANCELLING, 1 },
-            { CANCELLED, 1 },
-            { COMPLETE, 1 },
-        };
+    private static readonly Dictionary<DataImportStatus, double> ProcessingRatios = new()
+    {
+        { STAGE_1, .1 },
+        { STAGE_2, .1 },
+        { STAGE_3, .8 },
+        { CANCELLING, 1 },
+        { CANCELLED, 1 },
+        { COMPLETE, 1 },
+    };
 
     public Guid Id { get; set; }
 
@@ -39,10 +38,6 @@ public class DataImport
 
     public Guid MetaFileId { get; set; }
 
-    public File? ZipFile { get; set; }
-
-    public Guid? ZipFileId { get; set; }
-
     public int? TotalRows { get; set; } // Must be optional for failed imports
 
     /// <summary>
@@ -61,7 +56,7 @@ public class DataImport
     /// <summary>
     /// The index of the last processed row during import.  This is the last row that the Importer considered
     /// importing, so it may also have been excluded from import.  This allows the Importer to pick up from where
-    /// it left off if an ongoing import is interrupted. 
+    /// it left off if an ongoing import is interrupted.
     /// </summary>
     public int? LastProcessedRowIndex { get; set; }
 
@@ -71,18 +66,19 @@ public class DataImport
 
     public int PercentageComplete()
     {
-        return (int)(Status switch
-        {
-            STAGE_1 => StagePercentageComplete * ProcessingRatios[STAGE_1],
-            STAGE_2 => ProcessingRatios[STAGE_1] * 100 +
-                       StagePercentageComplete * ProcessingRatios[STAGE_2],
-            STAGE_3 => ProcessingRatios[STAGE_1] * 100 +
-                       ProcessingRatios[STAGE_2] * 100 +
-                       StagePercentageComplete * ProcessingRatios[STAGE_3],
-            CANCELLED => ProcessingRatios[CANCELLED] * 100,
-            COMPLETE => ProcessingRatios[COMPLETE] * 100,
-            _ => 0
-        });
+        return (int)(
+            Status switch
+            {
+                STAGE_1 => StagePercentageComplete * ProcessingRatios[STAGE_1],
+                STAGE_2 => ProcessingRatios[STAGE_1] * 100 + StagePercentageComplete * ProcessingRatios[STAGE_2],
+                STAGE_3 => ProcessingRatios[STAGE_1] * 100
+                    + ProcessingRatios[STAGE_2] * 100
+                    + StagePercentageComplete * ProcessingRatios[STAGE_3],
+                CANCELLED => ProcessingRatios[CANCELLED] * 100,
+                COMPLETE => ProcessingRatios[COMPLETE] * 100,
+                _ => 0,
+            }
+        );
     }
 
     /// <summary>
@@ -110,36 +106,23 @@ public enum DataImportStatus
     FAILED,
     NOT_FOUND,
     CANCELLING,
-    CANCELLED
+    CANCELLED,
 }
 
 public static class DataImportStatusExtensions
 {
     private static readonly List<DataImportStatus> AbortingStatuses = [CANCELLING];
 
-    private static readonly List<DataImportStatus> FinishedStatuses =
-    [
-        COMPLETE,
-        FAILED,
-        NOT_FOUND,
-        CANCELLED
-    ];
+    private static readonly List<DataImportStatus> FinishedStatuses = [COMPLETE, FAILED, NOT_FOUND, CANCELLED];
 
-    public static readonly List<DataImportStatus> IncompleteStatuses =
-    [
-        QUEUED,
-        STAGE_1,
-        STAGE_2,
-        STAGE_3,
-        CANCELLING
-    ];
+    public static readonly List<DataImportStatus> IncompleteStatuses = [QUEUED, STAGE_1, STAGE_2, STAGE_3, CANCELLING];
 
     public static DataImportStatus GetFinishingStateOfAbortProcess(this DataImportStatus status)
     {
         return status switch
         {
             CANCELLING => CANCELLED,
-            _ => throw new ArgumentOutOfRangeException($"No final abort state exists for state {status}")
+            _ => throw new ArgumentOutOfRangeException($"No final abort state exists for state {status}"),
         };
     }
 

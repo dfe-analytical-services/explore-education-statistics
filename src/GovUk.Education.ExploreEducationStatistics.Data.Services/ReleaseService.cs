@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +33,8 @@ public class ReleaseService : IReleaseService
         StatisticsDbContext statisticsDbContext,
         IUserService userService,
         IDataGuidanceDataSetService dataGuidanceDataSetService,
-        ITimePeriodService timePeriodService)
+        ITimePeriodService timePeriodService
+    )
     {
         _contentDbContext = contentDbContext;
         _contentPersistenceHelper = contentPersistenceHelper;
@@ -63,121 +65,112 @@ public class ReleaseService : IReleaseService
         }
 
         var releaseSubjects = await _statisticsDbContext
-            .ReleaseSubject
-            .AsQueryable()
+            .ReleaseSubject.AsQueryable()
             .Where(rs => rs.ReleaseVersionId == releaseVersionId && subjectsToInclude.Contains(rs.SubjectId))
             .ToListAsync();
 
-        if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
+        if (
+            !ComparerUtils.SequencesAreEqualIgnoringOrder(
                 releaseSubjects.Select(rs => rs.SubjectId).ToList(),
                 subjectsToInclude
-                ))
+            )
+        )
         {
-            throw new DataException($"""
+            throw new DataException(
+                $"""
                 Statistics DB has a different subjects than the Content DB
                 StatsDB subjects: {releaseSubjects.Select(rs => rs.SubjectId).JoinToString(',')}
                 ContentDb subjects: {subjectsToInclude.JoinToString(',')}
-                """);
+                """
+            );
         }
 
         var releaseFiles = await QueryReleaseDataFiles(releaseVersionId)
-            .Where(rf => rf.File.SubjectId.HasValue
-                         && subjectsToInclude.Contains(rf.File.SubjectId.Value))
+            .Where(rf => rf.File.SubjectId.HasValue && subjectsToInclude.Contains(rf.File.SubjectId.Value))
             .ToListAsync();
 
-        return (await releaseSubjects
-                .SelectAsync(
-                    async rs =>
-                    {
-                        var releaseFile = releaseFiles.First(rf => rf.File.SubjectId == rs.SubjectId);
+        return (
+            await releaseSubjects.SelectAsync(async rs =>
+            {
+                var releaseFile = releaseFiles.First(rf => rf.File.SubjectId == rs.SubjectId);
 
-                        return new SubjectViewModel(
-                            id: rs.SubjectId,
-                            name: releaseFile.Name ?? string.Empty,
-                            order: releaseFile.Order,
-                            content: releaseFile.Summary ?? string.Empty,
-                            timePeriods: await _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
-                            geographicLevels: await _dataGuidanceDataSetService.ListGeographicLevels(rs.SubjectId),
-                            filters: await GetFilters(rs.SubjectId, releaseFile.FilterSequence),
-                            indicators: await GetIndicators(rs.SubjectId, releaseFile.IndicatorSequence),
-                            file: releaseFile.ToFileInfo(),
-                            lastUpdated: releaseFile.Published
-                        );
-                    }
-                ))
-            .OrderBy(svm => svm.Order)
-            .ThenBy(svm => svm.Name) // For subjects existing before ordering was added
-            .ToList();
+                return new SubjectViewModel(
+                    id: rs.SubjectId,
+                    name: releaseFile.Name ?? string.Empty,
+                    order: releaseFile.Order,
+                    content: releaseFile.Summary ?? string.Empty,
+                    timePeriods: await _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
+                    geographicLevels: await _dataGuidanceDataSetService.ListGeographicLevels(rs.SubjectId),
+                    filters: await GetFilters(rs.SubjectId, releaseFile.FilterSequence),
+                    indicators: await GetIndicators(rs.SubjectId, releaseFile.IndicatorSequence),
+                    file: releaseFile.ToFileInfo(),
+                    lastUpdated: releaseFile.Published
+                );
+            })
+        ).OrderBy(svm => svm.Order).ThenBy(svm => svm.Name) // For subjects existing before ordering was added
+        .ToList();
     }
 
     private async Task<List<string>> GetFilters(Guid subjectId, List<FilterSequenceEntry>? filterSequence)
     {
-        var unorderedFilterList = await _statisticsDbContext.Filter
+        var filters = await _statisticsDbContext
+            .Filter.AsNoTracking()
             .Where(filter => filter.SubjectId == subjectId)
             .ToListAsync();
 
-        if (filterSequence == null)
-        {
-            return unorderedFilterList
-                .Select(filter => filter.Label)
-                .OrderBy(label => label)
-                .ToList();
-        }
-
-        var filterIdSequence = filterSequence
-            .Select(filter => filter.Id)
-            .ToList();
-
-        return unorderedFilterList
-            .OrderBy(filter => filterIdSequence.IndexOf(filter.Id))
-            .Select(filter => filter.Label)
+        return MetaViewModelBuilderUtils
+            .OrderBySequenceOrLabel(
+                filters,
+                idSelector: value => value.Id,
+                labelSelector: value => value.Label,
+                sequenceIdSelector: sequenceEntry => sequenceEntry.Id,
+                resultSelector: value => value.Value.Label,
+                filterSequence
+            )
             .ToList();
     }
 
     private async Task<List<string>> GetIndicators(
         Guid subjectId,
-        List<IndicatorGroupSequenceEntry>? indicatorGroupSequence)
+        List<IndicatorGroupSequenceEntry>? indicatorGroupSequence
+    )
     {
-        var unorderedIndicators = await _statisticsDbContext.Indicator
+        var indicators = await _statisticsDbContext
+            .Indicator.AsNoTracking()
             .Where(indicator => indicator.IndicatorGroup.SubjectId == subjectId)
             .ToListAsync();
 
-        if (indicatorGroupSequence == null)
-        {
-            return unorderedIndicators
-                .Select(indicator => indicator.Label)
-                .OrderBy(label => label)
-                .ToList();
-        }
-
-        var indicatorIdSequence = indicatorGroupSequence
-            .SelectMany(indicatorGroup => indicatorGroup.ChildSequence)
-            .ToList();
-
-        return unorderedIndicators
-            .OrderBy(indicator => indicatorIdSequence.IndexOf(indicator.Id))
-            .Select(indicator => indicator.Label)
+        var indicatorSequence = indicatorGroupSequence?.SelectMany(seq => seq.ChildSequence);
+        return MetaViewModelBuilderUtils
+            .OrderBySequenceOrLabel(
+                indicators,
+                idSelector: value => value.Id,
+                labelSelector: value => value.Label,
+                sequenceIdSelector: sequenceEntry => sequenceEntry,
+                resultSelector: value => value.Value.Label,
+                indicatorSequence
+            )
             .ToList();
     }
-
 
     public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseVersionId)
     {
         var publishedSubjectIds = GetPublishedSubjectIds(releaseVersionId);
 
-        var releaseDataBlockList = (await _contentDbContext
-                .ContentBlocks
-                .Where(block => block.ReleaseVersionId == releaseVersionId)
+        var releaseDataBlockList = (
+            await _contentDbContext
+                .ContentBlocks.Where(block => block.ReleaseVersionId == releaseVersionId)
                 .OfType<DataBlock>()
                 .Select(db => new { db.Id, db.Query })
-                .ToListAsync()) // we need to materialise the list access `dataBlock.Query.SubjectId` as `Query` is json
+                .ToListAsync()
+        ) // we need to materialise the list access `dataBlock.Query.SubjectId` as `Query` is json
             .Where(dataBlock => publishedSubjectIds.Contains(dataBlock.Query.SubjectId))
             .ToList();
 
         var releaseDataBlockIdList = releaseDataBlockList.Select(db => db.Id).ToList();
 
-        var featuredTables = await _contentDbContext.FeaturedTables
-            .Include(ft => ft.DataBlock)
+        var featuredTables = await _contentDbContext
+            .FeaturedTables.Include(ft => ft.DataBlock)
             .Where(ft => releaseDataBlockIdList.Contains(ft.DataBlockId))
             .OrderBy(ft => ft.Order)
             .ThenBy(ft => ft.Name)
@@ -185,7 +178,14 @@ public class ReleaseService : IReleaseService
 
         return featuredTables
             .Select(ft => new FeaturedTableViewModel(
-                ft.Id, ft.Name, ft.Description, ft.DataBlock.Query.SubjectId, ft.DataBlockId, ft.DataBlockParentId, ft.Order))
+                ft.Id,
+                ft.Name,
+                ft.Description,
+                ft.DataBlock.Query.SubjectId,
+                ft.DataBlockId,
+                ft.DataBlockParentId,
+                ft.Order
+            ))
             .ToList();
     }
 
@@ -196,11 +196,7 @@ public class ReleaseService : IReleaseService
                 _contentDbContext.DataImports,
                 releaseFile => releaseFile.File,
                 import => import.File,
-                (releaseFile, import) => new
-                {
-                    ReleaseFile = releaseFile,
-                    DataImport = import
-                }
+                (releaseFile, import) => new { ReleaseFile = releaseFile, DataImport = import }
             )
             .Where(join => join.DataImport.Status == DataImportStatus.COMPLETE)
             .Select(join => join.ReleaseFile.File.SubjectId!.Value)
@@ -209,14 +205,14 @@ public class ReleaseService : IReleaseService
 
     private IQueryable<ReleaseFile> QueryReleaseDataFiles(Guid releaseVersionId)
     {
-        return _contentDbContext.ReleaseFiles
-            .Include(rf => rf.File)
-            .Where(
-                rf => rf.ReleaseVersionId == releaseVersionId
-                      && rf.File.Type == FileType.Data
-                      // Exclude files that are replacements in progress
-                      && !rf.File.ReplacingId.HasValue
-                      && rf.File.SubjectId.HasValue
+        return _contentDbContext
+            .ReleaseFiles.Include(rf => rf.File)
+            .Where(rf =>
+                rf.ReleaseVersionId == releaseVersionId
+                && rf.File.Type == FileType.Data
+                // Exclude files that are replacements in progress
+                && !rf.File.ReplacingId.HasValue
+                && rf.File.SubjectId.HasValue
             );
     }
 }

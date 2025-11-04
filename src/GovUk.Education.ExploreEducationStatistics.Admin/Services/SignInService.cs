@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +23,8 @@ public class SignInService(
     IUserReleaseRoleRepository userReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IUserReleaseInviteRepository userReleaseInviteRepository,
-    IUserPublicationInviteRepository userPublicationInviteRepository) : ISignInService
+    IUserPublicationInviteRepository userPublicationInviteRepository
+) : ISignInService
 {
     public async Task<Either<ActionResult, SignInResponseViewModel>> RegisterOrSignIn()
     {
@@ -37,151 +39,128 @@ public class SignInService(
         {
             return new SignInResponseViewModel(
                 LoginResult: LoginResult.LoginSuccess,
-                UserProfile: new UserProfile(
-                    Id: Guid.Parse(existingUser.Id),
-                    FirstName: existingUser.FirstName));
+                UserProfile: new UserProfile(Id: Guid.Parse(existingUser.Id), FirstName: existingUser.FirstName)
+            );
         }
 
         // If the email address does not match an existing user in the service, see if they have been invited.
-        var inviteToSystem = await usersAndRolesDbContext
-            .UserInvites
-            .IgnoreQueryFilters() // Retrieve expired invites as well as active ones.
-            .Include(i => i.Role)
-            .FirstOrDefaultAsync(invite =>
-                invite.Email.ToLower() == profile.Email.ToLower() && invite.Accepted == false);
+        var userInvitedToSystem = await contentDbContext
+            .Users.Include(u => u.Role)
+            .Where(u => !u.SoftDeleted.HasValue)
+            .Where(u => u.Email.ToLower() == profile.Email.ToLower())
+            .SingleOrDefaultAsync();
 
         // If the newly logging in User has an unaccepted invite with a matching email address, register them with
-        // the Identity Framework and also create any "internal" User records too if they don't already exist.  If
-        // they *do* exist already, link the new AspNetUsers user with the existing "internal" User via a
-        // one-to-one id mapping.
-        if (inviteToSystem != null)
+        // the Identity Framework.
+        // If the unaccepted invite has expired, soft-delete the 'internal' user.
+        if (userInvitedToSystem != null)
         {
-            return await HandleNewInvitedUser(inviteToSystem, profile);
+            return await HandleNewInvitedUser(userInvitedToSystem, profile);
         }
 
         return new SignInResponseViewModel(LoginResult.NoInvite);
     }
 
     private async Task<Either<ActionResult, SignInResponseViewModel>> HandleNewInvitedUser(
-        UserInvite inviteToSystem,
-        UserProfileFromClaims profile)
+        User userInvitedToSystem,
+        UserProfileFromClaims profile
+    )
     {
-        if (inviteToSystem.Expired)
+        if (userInvitedToSystem.IsInviteExpired())
         {
-            await HandleExpiredInvite(inviteToSystem, profile.Email);
+            await HandleExpiredInvite(profile.Email);
             return new SignInResponseViewModel(LoginResult.ExpiredInvite);
         }
 
-        inviteToSystem.Accepted = true;
-
-        // This will also fetch soft-deleted users
-        var existingInternalUser = await contentDbContext
-            .Users
-            .AsQueryable()
-            .SingleOrDefaultAsync(u => u.Email.ToLower() == profile.Email.ToLower());
-
-        // Create a new set of AspNetUser records for the Identity Framework.
+        // Create Identity user
         var newAspNetUser = new ApplicationUser
         {
-            Id = existingInternalUser?.Id.ToString() ?? Guid.NewGuid().ToString(),
+            Id = userInvitedToSystem.Id.ToString(),
             UserName = profile.Email,
-            Email = profile.Email, // do these need lower-casing?
+            Email = profile.Email,
             FirstName = profile.FirstName,
-            LastName = profile.LastName
+            LastName = profile.LastName,
         };
 
-        await usersAndRolesDbContext.Users.AddAsync(newAspNetUser);
-        await usersAndRolesDbContext.SaveChangesAsync();
-
-        // Add them to their global role.
-        var addedIdentityUserRoles = await userManager.AddToRoleAsync(newAspNetUser, inviteToSystem.Role.Name);
-
-        if (!addedIdentityUserRoles.Succeeded)
+        await contentDbContext.RequireTransaction(async () =>
         {
-            logger.LogError("Error adding role to invited User - unable to log in");
-            return new StatusCodeResult(500);
-        }
+            usersAndRolesDbContext.Users.Add(newAspNetUser);
+            await usersAndRolesDbContext.SaveChangesAsync();
 
-        // Now we have created Identity Framework user records, we can create internal User and Role records
-        // for the application itself.
+            // Add them to their global role.
+            var roleResult = await userManager.AddToRoleAsync(newAspNetUser, userInvitedToSystem.Role!.Name!);
 
-        // If the user was previously soft deleted, we undo it. When a user is soft deleted, all the user's database
-        // entries are removed *except* for the ContentDb's User table entry.
-        if (existingInternalUser?.SoftDeleted != null)
-        {
-            existingInternalUser.FirstName = newAspNetUser.FirstName;
-            existingInternalUser.LastName = newAspNetUser.LastName;
-            existingInternalUser.SoftDeleted = null;
-            await HandleReleaseInvites(existingInternalUser.Id, existingInternalUser.Email);
-            await HandlePublicationInvites(existingInternalUser.Id, existingInternalUser.Email);
-        }
-
-        if (existingInternalUser == null)
-        {
-            var newInternalUser = new User
+            if (!roleResult.Succeeded)
             {
-                Id = Guid.Parse(newAspNetUser.Id),
-                FirstName = newAspNetUser.FirstName,
-                LastName = newAspNetUser.LastName,
-                Email = newAspNetUser.Email
-            };
+                logger.LogError("Error adding role to invited User - unable to log in");
+                throw new InvalidOperationException("Failed to add role to invited user");
+            }
 
-            await contentDbContext.Users.AddAsync(newInternalUser);
-            await HandleReleaseInvites(newInternalUser.Id, newInternalUser.Email);
-            await HandlePublicationInvites(newInternalUser.Id, newInternalUser.Email);
-        }
+            // Now we have created Identity Framework user records, we can create internal Role
+            // for the application itself.
 
-        await contentDbContext.SaveChangesAsync();
-        await usersAndRolesDbContext.SaveChangesAsync();
+            // Update your domain user
+            userInvitedToSystem.FirstName = newAspNetUser.FirstName;
+            userInvitedToSystem.LastName = newAspNetUser.LastName;
+            userInvitedToSystem.Active = true;
+
+            await HandleReleaseInvites(userInvitedToSystem.Id, userInvitedToSystem.Email);
+            await HandlePublicationInvites(userInvitedToSystem.Id, userInvitedToSystem.Email);
+
+            await usersAndRolesDbContext.SaveChangesAsync();
+            await contentDbContext.SaveChangesAsync();
+        });
 
         return new SignInResponseViewModel(
-            LoginResult: LoginResult.RegistrationSuccess,
-            UserProfile: new UserProfile(
-                Id: Guid.Parse(newAspNetUser.Id),
-                FirstName: newAspNetUser.FirstName));
+            LoginResult.RegistrationSuccess,
+            new UserProfile(Guid.Parse(newAspNetUser.Id), newAspNetUser.FirstName)
+        );
     }
 
-    private async Task HandleReleaseInvites(Guid newUserId, string email)
+    private async Task HandleReleaseInvites(Guid userId, string email)
     {
         var releaseInvites = await userReleaseInviteRepository.GetInvitesByEmail(email);
 
         await releaseInvites
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(invite => userReleaseRoleRepository.Create(
-                userId: newUserId,
-                releaseVersionId: invite.ReleaseVersionId,
-                role: invite.Role,
-                createdById: invite.CreatedById));
+            .ForEachAwaitAsync(invite =>
+                userReleaseRoleRepository.Create(
+                    userId: userId,
+                    releaseVersionId: invite.ReleaseVersionId,
+                    role: invite.Role,
+                    createdById: invite.CreatedById
+                )
+            );
 
         await userReleaseInviteRepository.RemoveByUserEmail(email);
     }
 
-    private async Task HandlePublicationInvites(Guid newUserId, string email)
+    private async Task HandlePublicationInvites(Guid userId, string email)
     {
         var publicationInvites = await userPublicationInviteRepository.GetInvitesByEmail(email);
 
         await publicationInvites
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(invite => userPublicationRoleRepository.Create(
-                userId: newUserId,
-                publicationId: invite.PublicationId,
-                role: invite.Role,
-                createdById: invite.CreatedById));
+            .ForEachAwaitAsync(invite =>
+                userPublicationRoleRepository.Create(
+                    userId: userId,
+                    publicationId: invite.PublicationId,
+                    role: invite.Role,
+                    createdById: invite.CreatedById
+                )
+            );
 
         await userPublicationInviteRepository.RemoveByUserEmail(email);
     }
 
-    private async Task HandleExpiredInvite(
-        UserInvite inviteToSystem,
-        string email)
+    private async Task HandleExpiredInvite(string email)
     {
         await contentDbContext.RequireTransaction(async () =>
         {
             await userReleaseInviteRepository.RemoveByUserEmail(email);
             await userPublicationInviteRepository.RemoveByUserEmail(email);
 
-            usersAndRolesDbContext.UserInvites.Remove(inviteToSystem);
-            await usersAndRolesDbContext.SaveChangesAsync();
+            await contentDbContext.SaveChangesAsync();
         });
     }
 }

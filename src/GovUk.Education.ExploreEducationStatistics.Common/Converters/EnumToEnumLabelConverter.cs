@@ -1,22 +1,18 @@
-#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Converters;
 
-public class EnumToEnumLabelConverter<TEnum> : ValueConverter<TEnum, string> where TEnum : Enum
+public class EnumToEnumLabelConverter<TEnum> : ValueConverter<TEnum, string>
+    where TEnum : Enum
 {
-    private static readonly Dictionary<string, TEnum> Lookup =
-        EnumUtil.GetEnums<TEnum>().ToDictionary(value => value.GetEnumLabel().ToLower());
+    private static readonly Dictionary<string, TEnum> Lookup = EnumUtil
+        .GetEnums<TEnum>()
+        .ToDictionary(value => value.GetEnumLabel().ToLower());
 
-    public EnumToEnumLabelConverter(
-        ConverterMappingHints? mappingHints = null) :
-        base(value => ToProvider(value),
-            label => FromProvider(label),
-            mappingHints)
-    {
-    }
+    public EnumToEnumLabelConverter(ConverterMappingHints? mappingHints = null)
+        : base(value => ToProvider(value), label => FromProvider(label), mappingHints) { }
 
     public static string ToProvider(TEnum value)
     {
@@ -29,7 +25,7 @@ public class EnumToEnumLabelConverter<TEnum> : ValueConverter<TEnum, string> whe
         {
             throw new ArgumentOutOfRangeException($"{nameof(label)} cannot be null");
         }
-        
+
         if (Lookup.TryGetValue(label.ToLower(), out var enumValue))
         {
             return enumValue;

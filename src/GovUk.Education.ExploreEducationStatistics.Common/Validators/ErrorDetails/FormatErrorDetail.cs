@@ -1,4 +1,3 @@
-#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 
 /// <summary>
@@ -6,5 +5,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDeta
 /// </summary>
 /// <param name="Value">The invalid value</param>
 /// <param name="ExpectedFormat">The format that was expected</param>
-public record FormatErrorDetail(string Value, string ExpectedFormat)
-    : InvalidErrorDetail<string>(Value);
+public record FormatErrorDetail(string Value, string ExpectedFormat) : InvalidErrorDetail<string>(Value);

@@ -5,7 +5,7 @@ Resource            ../libs/admin/manage-content-common.robot
 Resource            ../libs/public-api-common.robot
 Resource            ../libs/public-common.robot
 
-Force Tags          Admin    Local    Dev    AltersData
+Force Tags          Admin    PublicApi    Local    Dev    AltersData
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
@@ -202,9 +202,9 @@ Verify the 'Active tokens' and 'Expired tokens' on preview token log page
 
     user checks table column heading contains    1    1    Reference
     user checks table column heading contains    1    2    User
-    user checks table column heading contains    1    3    Date generated
+    user checks table column heading contains    1    3    Activates
     user checks table column heading contains    1    4    Status
-    user checks table column heading contains    1    5    Expiry
+    user checks table column heading contains    1    5    Expires
     user checks table column heading contains    1    6    Action
 
     user checks table cell contains    1    4    Active
@@ -253,10 +253,6 @@ Approve release
 Get public release link
     ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
     Set Suite Variable    ${PUBLIC_RELEASE_LINK}
-
-Verify newly published release is on Find Statistics page
-    # TODO EES-6063 - Remove this
-    user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}

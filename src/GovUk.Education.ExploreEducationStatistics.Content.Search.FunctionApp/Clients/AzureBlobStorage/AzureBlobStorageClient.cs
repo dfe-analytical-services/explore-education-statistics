@@ -7,16 +7,16 @@ using Microsoft.Extensions.Logging;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 
 [ExcludeFromCodeCoverage]
-public class AzureBlobStorageClient(
-    BlobServiceClient blobServiceClient,
-    ILogger<AzureBlobStorageClient> logger) : IAzureBlobStorageClient
+public class AzureBlobStorageClient(BlobServiceClient blobServiceClient, ILogger<AzureBlobStorageClient> logger)
+    : IAzureBlobStorageClient
 {
     internal BlobServiceClient BlobServiceClient { get; } = blobServiceClient;
 
     public async Task<bool> DeleteBlobIfExists(
         string containerName,
         string blobName,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
         try
@@ -36,16 +36,13 @@ public class AzureBlobStorageClient(
         Blob blob,
         string contentType,
         string? contentEncoding = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
         var blobClient = blobContainerClient.GetBlobClient(blobName);
 
-        var httpHeaders = new BlobHttpHeaders
-        {
-            ContentEncoding = contentEncoding,
-            ContentType = contentType
-        };
+        var httpHeaders = new BlobHttpHeaders { ContentEncoding = contentEncoding, ContentType = contentType };
 
         await using var stream = blob.Contents.ToStream();
         try
@@ -54,11 +51,18 @@ public class AzureBlobStorageClient(
                 stream,
                 metadata: blob.Metadata,
                 httpHeaders: httpHeaders,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error uploading {ContainerName}/{BlobName}. Blob: {@Blob}", containerName, blobName, blob);
+            logger.LogError(
+                e,
+                "Error uploading {ContainerName}/{BlobName}. Blob: {@Blob}",
+                containerName,
+                blobName,
+                blob
+            );
             throw;
         }
     }
@@ -75,22 +79,25 @@ public class AzureBlobStorageClient(
         var blobNames = await GetAllBlobNames(blobContainerClient, cancellationToken);
 
         await Task.WhenAll(
-            blobNames
-                .Select(blobName => 
-                    blobContainerClient.DeleteBlobIfExistsAsync(blobName, cancellationToken: cancellationToken)));
+            blobNames.Select(blobName =>
+                blobContainerClient.DeleteBlobIfExistsAsync(blobName, cancellationToken: cancellationToken)
+            )
+        );
     }
 
     public async Task<IList<string>> ListBlobsInContainer(
         string containerName,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
         return await GetAllBlobNames(blobContainerClient, cancellationToken);
     }
-    
+
     private static async Task<IList<string>> GetAllBlobNames(
         BlobContainerClient blobContainerClient,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var asyncPageable = blobContainerClient.GetBlobsAsync(cancellationToken: cancellationToken);
         var blobNames = new List<string>();

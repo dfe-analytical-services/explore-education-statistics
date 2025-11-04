@@ -1,4 +1,3 @@
-#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -7,23 +6,25 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.Chart.Chart
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 
-
 [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
 public enum BarChartDataLabelPosition
 {
-    Inside, Outside
+    Inside,
+    Outside,
 }
 
 [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
 public enum LineChartDataLabelPosition
 {
-    Above, Below
+    Above,
+    Below,
 }
 
 [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
 public enum LineChartDataLabelColour
 {
-    Inherit, Black
+    Inherit,
+    Black,
 }
 
 [JsonConverter(typeof(ContentBlockChartConverter))]
@@ -38,7 +39,6 @@ public interface IChart
 
     Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
     public ChartLegend? Legend { get; set; }
-
 }
 
 public abstract class Chart : IChart
@@ -106,6 +106,8 @@ public class MapChart : Chart
 public class MapChartConfig
 {
     public List<ChartDataSetConfig> DataSetConfigs { get; set; } = new();
+
+    public List<ChartCategoricalDataConfig> CategoricalDataConfig { get; set; } = new();
 }
 
 public class InfographicChart : Chart

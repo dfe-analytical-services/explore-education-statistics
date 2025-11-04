@@ -14,8 +14,7 @@ public static class TimePeriodsTable
 
     private static readonly TableRef DefaultRef = new(TableName);
 
-    public static TableRef Ref(string? table = null)
-        => table is not null ? new(table) : DefaultRef;
+    public static TableRef Ref(string? table = null) => table is not null ? new(table) : DefaultRef;
 
     public class TableRef(string table)
     {

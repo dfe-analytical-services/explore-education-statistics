@@ -9,5 +9,6 @@ public interface IPreReleaseSummaryService
 {
     Task<Either<ActionResult, PreReleaseSummaryViewModel>> GetPreReleaseSummaryViewModel(
         Guid releaseVersionId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken
+    );
 }

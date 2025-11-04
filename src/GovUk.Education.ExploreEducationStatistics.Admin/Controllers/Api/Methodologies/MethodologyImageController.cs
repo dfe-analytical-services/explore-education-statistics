@@ -23,9 +23,7 @@ public class MethodologyImageController : ControllerBase
     [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
     public async Task<ActionResult<ImageFileViewModel>> Upload(Guid methodologyId, IFormFile file)
     {
-        return await _methodologyImageService
-            .Upload(methodologyId, file)
-            .HandleFailuresOrOk();
+        return await _methodologyImageService.Upload(methodologyId, file).HandleFailuresOrOk();
     }
 
     /// <summary>
@@ -41,8 +39,6 @@ public class MethodologyImageController : ControllerBase
     [HttpGet("methodologies/{methodologyId:guid}/images/{fileId:guid}")]
     public async Task<ActionResult> Stream(Guid methodologyId, Guid fileId)
     {
-        return await _methodologyImageService
-            .Stream(methodologyId, fileId)
-            .HandleFailures();
+        return await _methodologyImageService.Stream(methodologyId, fileId).HandleFailures();
     }
 }

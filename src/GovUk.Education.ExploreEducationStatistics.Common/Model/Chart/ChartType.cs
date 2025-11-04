@@ -10,7 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 [JsonConverter(typeof(EnumToEnumValueJsonConverter<ChartType>))]
 public enum ChartType
 {
-    [EnumLabelValue("Line", "line")] Line,
+    [EnumLabelValue("Line", "line")]
+    Line,
 
     [EnumLabelValue("Horizontal Bar", "horizontalbar")]
     HorizontalBar,
@@ -18,8 +19,9 @@ public enum ChartType
     [EnumLabelValue("Vertical Bar", "verticalbar")]
     VerticalBar,
 
-    [EnumLabelValue("Map", "map")] Map,
+    [EnumLabelValue("Map", "map")]
+    Map,
 
     [EnumLabelValue("Infographic", "infographic")]
-    Infographic
+    Infographic,
 }

@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Releases.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases;
@@ -12,16 +13,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Rel
 public class ReleaseUpdatesController(IReleaseUpdatesService releaseUpdatesService) : ControllerBase
 {
     [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/updates")]
-    public async Task<ActionResult<PaginatedListViewModel<ReleaseUpdateDto>>> GetPaginatedUpdatesForRelease(
+    public async Task<ActionResult<PaginatedListViewModel<ReleaseUpdateDto>>> GetReleaseUpdates(
         [FromQuery] GetReleaseUpdatesRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        return await releaseUpdatesService.GetPaginatedUpdatesForRelease(
+        CancellationToken cancellationToken = default
+    ) =>
+        await releaseUpdatesService
+            .GetReleaseUpdates(
                 publicationSlug: request.PublicationSlug,
                 releaseSlug: request.ReleaseSlug,
                 page: request.Page,
                 pageSize: request.PageSize,
-                cancellationToken)
+                cancellationToken
+            )
             .HandleFailuresOrOk();
-    }
 }

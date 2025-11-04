@@ -12,10 +12,7 @@ public static class ValidationFailureExtensionsTests
         [Fact]
         public void AttemptedValueIsNull()
         {
-            var failure = new ValidationFailure
-            {
-                AttemptedValue = null,
-            };
+            var failure = new ValidationFailure { AttemptedValue = null };
 
             var detail = failure.GetErrorDetail();
 
@@ -32,8 +29,8 @@ public static class ValidationFailureExtensionsTests
                 FormattedMessagePlaceholderValues = new Dictionary<string, object>
                 {
                     { "MaxLength", 6 },
-                    { "MinLength", 3 }
-                }
+                    { "MinLength", 3 },
+                },
             };
 
             var detail = failure.GetErrorDetail();
@@ -55,8 +52,8 @@ public static class ValidationFailureExtensionsTests
                     { "PropertyName", "test" },
                     { "PropertyPath", "my.test" },
                     { "PropertyValue", "Test value" },
-                    { "CollectionIndex", 0 }
-                }
+                    { "CollectionIndex", 0 },
+                },
             };
 
             var detail = failure.GetErrorDetail();
@@ -68,11 +65,7 @@ public static class ValidationFailureExtensionsTests
         [Fact]
         public void CustomStateIsNull()
         {
-            var failure = new ValidationFailure
-            {
-                AttemptedValue = "Test value",
-                CustomState = null
-            };
+            var failure = new ValidationFailure { AttemptedValue = "Test value", CustomState = null };
 
             var detail = failure.GetErrorDetail();
 
@@ -86,11 +79,7 @@ public static class ValidationFailureExtensionsTests
             var failure = new ValidationFailure
             {
                 AttemptedValue = "Test value",
-                CustomState = new
-                {
-                    Name = "Test name",
-                    Age = 30
-                }
+                CustomState = new { Name = "Test name", Age = 30 },
             };
 
             var detail = failure.GetErrorDetail();
@@ -110,13 +99,9 @@ public static class ValidationFailureExtensionsTests
                 FormattedMessagePlaceholderValues = new Dictionary<string, object>
                 {
                     { "MaxLength", 6 },
-                    { "MinLength", 3 }
+                    { "MinLength", 3 },
                 },
-                CustomState = new
-                {
-                    Name = "Test name",
-                    Age = 30
-                }
+                CustomState = new { Name = "Test name", Age = 30 },
             };
 
             var detail = failure.GetErrorDetail();
@@ -135,11 +120,7 @@ public static class ValidationFailureExtensionsTests
             var failure = new ValidationFailure
             {
                 AttemptedValue = "Test value",
-                CustomState = new TestErrorDetail
-                {
-                    Name = "Test name",
-                    Age = 30
-                }
+                CustomState = new TestErrorDetail { Name = "Test name", Age = 30 },
             };
 
             var detail = failure.GetErrorDetail();
@@ -159,13 +140,9 @@ public static class ValidationFailureExtensionsTests
                 FormattedMessagePlaceholderValues = new Dictionary<string, object>
                 {
                     { "MaxLength", 6 },
-                    { "MinLength", 3 }
+                    { "MinLength", 3 },
                 },
-                CustomState = new TestErrorDetail
-                {
-                    Name = "Test name",
-                    Age = 30
-                }
+                CustomState = new TestErrorDetail { Name = "Test name", Age = 30 },
             };
 
             var detail = failure.GetErrorDetail();
@@ -184,11 +161,7 @@ public static class ValidationFailureExtensionsTests
         [InlineData(TestEnum.Test)]
         public void CustomStateIsPrimitive(object customState)
         {
-            var failure = new ValidationFailure
-            {
-                AttemptedValue = "Test value",
-                CustomState = customState
-            };
+            var failure = new ValidationFailure { AttemptedValue = "Test value", CustomState = customState };
 
             var detail = failure.GetErrorDetail();
 
@@ -209,9 +182,9 @@ public static class ValidationFailureExtensionsTests
                 FormattedMessagePlaceholderValues = new Dictionary<string, object>
                 {
                     { "MaxLength", 6 },
-                    { "MinLength", 3 }
+                    { "MinLength", 3 },
                 },
-                CustomState = customState
+                CustomState = customState,
             };
 
             var detail = failure.GetErrorDetail();
@@ -232,13 +205,9 @@ public static class ValidationFailureExtensionsTests
                 FormattedMessagePlaceholderValues = new Dictionary<string, object>
                 {
                     { "MaxLength", 6 },
-                    { "MinLength", 3 }
+                    { "MinLength", 3 },
                 },
-                CustomState = new
-                {
-                    MaxLength = 10,
-                    MinLength = 5
-                }
+                CustomState = new { MaxLength = 10, MinLength = 5 },
             };
 
             var detail = failure.GetErrorDetail();
@@ -255,10 +224,7 @@ public static class ValidationFailureExtensionsTests
             var failure = new ValidationFailure
             {
                 AttemptedValue = "Test value",
-                CustomState = new
-                {
-                    Value = "Test value override"
-                }
+                CustomState = new { Value = "Test value override" },
             };
 
             var detail = failure.GetErrorDetail();
@@ -269,7 +235,7 @@ public static class ValidationFailureExtensionsTests
 
         private enum TestEnum
         {
-            Test
+            Test,
         }
 
         private record TestErrorDetail

@@ -8,5 +8,6 @@ public interface IFilterOptionsDuckDbRepository
     Task CreateFilterOptionsTable(
         IDuckDbConnection duckDbConnection,
         DataSetVersion dataSetVersion,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

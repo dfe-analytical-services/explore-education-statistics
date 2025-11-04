@@ -1,4 +1,3 @@
-#nullable enable
 using System.Linq.Expressions;
 using Azure;
 using Azure.Data.Tables;
@@ -18,22 +17,21 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
     public AsyncPageable<TableItem> GetTables(
         Expression<Func<TableItem, bool>>? filter = null,
         int? maxPerPage = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         filter ??= tableItem => true;
 
-        return _client.QueryAsync(
-            filter: filter,
-            maxPerPage: maxPerPage,
-            cancellationToken: cancellationToken);
+        return _client.QueryAsync(filter: filter, maxPerPage: maxPerPage, cancellationToken: cancellationToken);
     }
 
     public async Task<TEntity?> GetEntityIfExists<TEntity>(
-        string tableName, 
-        string partitionKey, 
+        string tableName,
+        string partitionKey,
         string rowKey,
         IEnumerable<string>? select = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TEntity : class, ITableEntity
     {
         var tableClient = await GetTableClient(tableName, cancellationToken);
@@ -42,30 +40,25 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
             partitionKey: partitionKey,
             rowKey: rowKey,
             select: select,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
-        return createdEntity.HasValue
-            ? createdEntity.Value
-            : null;
+        return createdEntity.HasValue ? createdEntity.Value : null;
     }
 
-    public async Task CreateEntity(
-        string tableName, 
-        ITableEntity entity,
-        CancellationToken cancellationToken = default)
+    public async Task CreateEntity(string tableName, ITableEntity entity, CancellationToken cancellationToken = default)
     {
         var tableClient = await GetTableClient(tableName, cancellationToken);
 
-        await tableClient.AddEntityAsync(
-            entity: entity,
-            cancellationToken: cancellationToken);
+        await tableClient.AddEntityAsync(entity: entity, cancellationToken: cancellationToken);
     }
 
     public async Task UpdateEntity(
         string tableName,
         ITableEntity entity,
         TableUpdateMode updateMode = TableUpdateMode.Replace,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var tableClient = await GetTableClient(tableName, cancellationToken);
 
@@ -73,14 +66,16 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
             entity: entity,
             ifMatch: entity.ETag,
             mode: updateMode,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
 
     public async Task DeleteEntity(
-        string tableName, 
+        string tableName,
         string partitionKey,
         string rowKey,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var tableClient = await GetTableClient(tableName, cancellationToken);
 
@@ -88,7 +83,8 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
             partitionKey: partitionKey,
             rowKey: rowKey,
             ifMatch: ETag.All,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
 
     public async Task<AsyncPageable<TEntity>> QueryEntities<TEntity>(
@@ -96,7 +92,8 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
         Expression<Func<TEntity, bool>>? filter = null,
         int? maxPerPage = 1000,
         IEnumerable<string>? select = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TEntity : class, ITableEntity
     {
         filter ??= entity => true;
@@ -107,7 +104,8 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
             filter: filter,
             maxPerPage: maxPerPage,
             select: select,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
 
     public async Task<AsyncPageable<TEntity>> QueryEntities<TEntity>(
@@ -115,7 +113,8 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
         string filterStr = "",
         int? maxPerPage = 1000,
         IEnumerable<string>? select = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TEntity : class, ITableEntity
     {
         var tableClient = await GetTableClient(tableName, cancellationToken);
@@ -124,14 +123,16 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
             filter: filterStr,
             maxPerPage: maxPerPage,
             select: select,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
 
     public async Task BatchManipulateEntities<TEntity>(
-        string tableName, 
-        IEnumerable<TEntity> entities, 
+        string tableName,
+        IEnumerable<TEntity> entities,
         TableTransactionActionType tableTransactionActionType,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TEntity : class, ITableEntity
     {
         var tableClient = await GetTableClient(tableName, cancellationToken);
@@ -140,7 +141,8 @@ public class DataTableStorageService(string tableStorageConnectionString) : IDat
             tableClient: tableClient,
             entities: entities,
             tableTransactionActionType: tableTransactionActionType,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
     }
 
     private async Task<TableClient> GetTableClient(string tableName, CancellationToken cancellationToken)

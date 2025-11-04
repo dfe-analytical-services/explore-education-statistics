@@ -7,5 +7,6 @@ public interface IDataSetScreenerClient
 {
     Task<DataSetScreenerResponse> ScreenDataSet(
         DataSetScreenerRequest dataSetRequest,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken
+    );
 }

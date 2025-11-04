@@ -4,7 +4,7 @@
   "type": "module",
   "packageManager": "pnpm@8.8.0",
   "engines": {
-    "node": "20.19.2",
+    "node": "22.20.0",
     "pnpm": ">=8.8.0"
   },
   "devDependencies": {
@@ -89,6 +89,9 @@
       "python3 -m pipenv run flake8",
       "python3 -m pipenv run black",
       "python3 -m pipenv run isort"
+    ],
+    "*.{cs,csproj}": [
+      "dotnet csharpier check"
     ]
   }
 }

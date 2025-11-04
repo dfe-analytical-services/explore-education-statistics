@@ -5,8 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 
 public class AnalyticsManager : IAnalyticsManager
 {
-    private readonly Channel<IAnalyticsCaptureRequest> _channel =
-        Channel.CreateUnbounded<IAnalyticsCaptureRequest>();
+    private readonly Channel<IAnalyticsCaptureRequest> _channel = Channel.CreateUnbounded<IAnalyticsCaptureRequest>();
 
     public async Task Add(IAnalyticsCaptureRequest request, CancellationToken cancellationToken)
     {

@@ -18,18 +18,6 @@ user checks release update
     user waits until element contains    css:#releaseLastUpdates li:nth-of-type(${number}) time    ${date}
     user waits until element contains    css:#releaseLastUpdates li:nth-of-type(${number}) p    ${text}
 
-user checks publication is on find statistics page
-    # TODO EES-6063 - Remove this
-    [Arguments]    ${publication_name}
-    user navigates to public find statistics page
-    user clicks element    id:searchForm-search
-    user presses keys    ${publication_name}
-    user clicks button    Search
-    user waits until page finishes loading
-    user clicks radio    Relevance
-    user waits until page finishes loading
-    user waits until page contains link    ${publication_name}
-
 user waits until details dropdown contains publication
     [Arguments]    ${details_heading}    ${publication_name}    ${publication_type}=National and official statistics
     ${details}=    user gets details content element    ${details_heading}
@@ -92,3 +80,6 @@ user checks methodology note
     [Arguments]    ${number}    ${displayDate}    ${content}
     user waits until element contains    css:#methodologyNotes li:nth-of-type(${number}) time    ${displayDate}
     user waits until element contains    css:#methodologyNotes li:nth-of-type(${number}) p    ${content}
+
+user checks related information panel is visible
+    user waits until page contains element    xpath://h2[text()='Related information']

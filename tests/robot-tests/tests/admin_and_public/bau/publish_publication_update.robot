@@ -90,10 +90,6 @@ Validate publication redirect works
     user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}
     user checks url contains    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated${ACADEMIC_YEAR}
 
-Verify newly published release is on Find Statistics page
-    # TODO EES-6063 - Remove this
-    user checks publication is on find statistics page    ${PUBLICATION_NAME_UPDATED}
-
 Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME_UPDATED}    ${RELEASE_NAME}
 

@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Valid
 
 public class SortStringValidatorsTests
 {
-     public class SortStringTests : SortStringValidatorsTests
+    public class SortStringTests : SortStringValidatorsTests
     {
         private class TestClass
         {
@@ -58,7 +58,8 @@ public class SortStringValidatorsTests
 
             var result = _validator.TestValidate(testObj);
 
-            result.ShouldHaveValidationErrorFor(t => t.Sort)
+            result
+                .ShouldHaveValidationErrorFor(t => t.Sort)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
                 .Only();
         }
@@ -80,7 +81,8 @@ public class SortStringValidatorsTests
 
             var result = _validator.TestValidate(testObj);
 
-            result.ShouldHaveValidationErrorFor(t => t.Sort)
+            result
+                .ShouldHaveValidationErrorFor(t => t.Sort)
                 .WithErrorCode(ValidationMessages.SortFormat.Code)
                 .WithErrorMessage(ValidationMessages.SortFormat.Message)
                 .WithCustomState<FormatErrorDetail>(s => s.Value == sort)
@@ -98,7 +100,8 @@ public class SortStringValidatorsTests
 
             var result = _validator.TestValidate(testObj);
 
-            result.ShouldHaveValidationErrorFor(t => t.Sort)
+            result
+                .ShouldHaveValidationErrorFor(t => t.Sort)
                 .WithErrorCode(ValidationMessages.SortFieldNotEmpty.Code)
                 .WithErrorMessage(ValidationMessages.SortFieldNotEmpty.Message)
                 .WithMessageArgument("Property", "field")
@@ -114,7 +117,8 @@ public class SortStringValidatorsTests
 
             var result = _validator.TestValidate(testObj);
 
-            result.ShouldHaveValidationErrorFor(t => t.Sort)
+            result
+                .ShouldHaveValidationErrorFor(t => t.Sort)
                 .WithErrorCode(ValidationMessages.SortFieldMaxLength.Code)
                 .WithMessageArgument("MaxLength", 40)
                 .WithMessageArgument("Property", "field")
@@ -131,12 +135,14 @@ public class SortStringValidatorsTests
 
             var result = _validator.TestValidate(testObj);
 
-            result.ShouldHaveValidationErrorFor(t => t.Sort)
+            result
+                .ShouldHaveValidationErrorFor(t => t.Sort)
                 .WithErrorCode(ValidationMessages.SortDirection.Code)
                 .WithErrorMessage(ValidationMessages.SortDirection.Message)
                 .WithCustomState<AllowedValueValidator.AllowedErrorDetail<string>>(s => s.Value == direction)
                 .WithCustomState<AllowedValueValidator.AllowedErrorDetail<string>>(s =>
-                    s.Allowed.SequenceEqual([SortDirection.Asc.ToString(), SortDirection.Desc.ToString()]))
+                    s.Allowed.SequenceEqual([SortDirection.Asc.ToString(), SortDirection.Desc.ToString()])
+                )
                 .Only();
         }
     }

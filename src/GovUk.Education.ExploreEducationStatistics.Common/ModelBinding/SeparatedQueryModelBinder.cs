@@ -1,4 +1,3 @@
-#nullable enable
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
@@ -29,8 +28,9 @@ public class SeparatedQueryModelBinder : IModelBinder
         // messing up the value provider for the next value in the current binding.
         if (bindingContext.ValueProvider is CompositeValueProvider compositeProvider)
         {
-            var queryStringProvider = compositeProvider
-                .FirstOrDefault(provider => provider is QueryStringValueProvider);
+            var queryStringProvider = compositeProvider.FirstOrDefault(provider =>
+                provider is QueryStringValueProvider
+            );
 
             if (queryStringProvider is null)
             {
@@ -39,8 +39,7 @@ public class SeparatedQueryModelBinder : IModelBinder
 
             var index = compositeProvider.IndexOf(queryStringProvider);
 
-            compositeProvider[index] =
-                new SeparatedQueryStringValueProvider(query, _separator);
+            compositeProvider[index] = new SeparatedQueryStringValueProvider(query, _separator);
 
             await _modelBinder.BindModelAsync(bindingContext);
 
@@ -50,8 +49,7 @@ public class SeparatedQueryModelBinder : IModelBinder
         {
             var originalProvider = bindingContext.ValueProvider;
 
-            bindingContext.ValueProvider =
-                new SeparatedQueryStringValueProvider(query, _separator);
+            bindingContext.ValueProvider = new SeparatedQueryStringValueProvider(query, _separator);
 
             await _modelBinder.BindModelAsync(bindingContext);
 

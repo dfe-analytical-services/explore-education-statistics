@@ -32,7 +32,7 @@ const ReleaseContentAccordionSection = ({
   transformFeaturedTableLinks,
   ...props
 }: ReleaseContentAccordionSectionProps) => {
-  const { id: sectionId, caption, content: sectionContent = [] } = section;
+  const { id: sectionId, content: sectionContent = [] } = section;
 
   const { editingMode, unsavedCommentDeletions, unsavedBlocks } =
     useEditingContext();
@@ -154,7 +154,6 @@ const ReleaseContentAccordionSection = ({
           ? 'This section is being edited and cannot be removed'
           : undefined
       }
-      caption={caption}
       onHeadingChange={handleHeadingChange}
       onRemoveSection={handleRemoveSection}
       headerButtons={

@@ -11,17 +11,17 @@ import requests
 To generate datablocks.csv, use this SQL query against the Content DB:
 
 SELECT ContentBlock.Id                              AS ContentBlockId,
-       Releases.Id                                  AS ReleaseId,
+       ReleaseVersions.Id                           AS ReleaseVersionId,
        JSON_VALUE([DataBlock_Query], '$.SubjectId') AS SubjectId,
        ContentBlock.DataBlock_Query                 AS Query
 FROM ContentBlock
 LEFT JOIN DataBlockVersions ON DataBlockVersions.ContentBlockId = ContentBlock.Id
-LEFT JOIN Releases ON DataBlockVersions.ReleaseId = Releases.Id
+LEFT JOIN ReleaseVersions ON DataBlockVersions.ReleaseVersionId = ReleaseVersions.Id
 LEFT JOIN KeyStatisticsDataBlock ON ContentBlock.Id = KeyStatisticsDataBlock.DataBlockId
 LEFT JOIN FeaturedTables ON ContentBlock.Id = FeaturedTables.DataBlockId
 WHERE ContentBlock.Type = 'DataBlock'
-  AND Releases.Published IS NOT NULL
-  AND Releases.SoftDeleted = 0
+  AND ReleaseVersions.Published IS NOT NULL
+  AND ReleaseVersions.SoftDeleted = 0
   AND (
     -- Include DataBlocks that are linked to Content Sections
     ContentSectionId IS NOT NULL
@@ -33,23 +33,26 @@ WHERE ContentBlock.Type = 'DataBlock'
   -- Include only DataBlocks that are from the latest published Release
   AND NOT EXISTS(
     SELECT 1
-    FROM Releases PublicationReleases
-    WHERE PublicationReleases.PublicationId = Releases.PublicationId
-      AND PublicationReleases.Published IS NOT NULL
-      AND PublicationReleases.SoftDeleted = 0
-      AND PublicationReleases.Id <> Releases.Id
-      AND PublicationReleases.PreviousVersionId = Releases.Id
+    FROM ReleaseVersions PublicationReleaseVersions
+    WHERE PublicationReleaseVersions.PublicationId = ReleaseVersions.PublicationId
+      AND PublicationReleaseVersions.Published IS NOT NULL
+      AND PublicationReleaseVersions.SoftDeleted = 0
+      AND PublicationReleaseVersions.Id <> ReleaseVersions.Id
+      AND PublicationReleaseVersions.PreviousVersionId = ReleaseVersions.Id
   );
 
 And then save the results as a CSV in MS SQL Server Management Studio.
 Place it in the same directory as this script.
+
+Example usage of script:
+python get_data_block_responses.py --env dev --stage filters --file dev-datablocks.csv --sleep 1
 
 Find blocks that took over 10 seconds to respond:
 grep -r "time for response: [0-9][0-9][0-9]*" * | awk '{split($0,a,":"); print a[1];}' | zip -@ test.zip
 
 Compare two result directories for differences, but ignoring response time (and any responses that are both Not Found
 responses, as they contain unique traceIds):
-diff -I"^time for response:.*" -I "Not Found" -r results_dev1/responses results_dev2/responses
+diff -I"Run info - .*" -I "Not Found" -r results_dev1/responses results_dev2/responses
 """
 
 parser = argparse.ArgumentParser(
@@ -79,7 +82,7 @@ parser.add_argument(
     help="CSV of data blocks (see comment in this script)",
 )
 parser.add_argument(
-    "-s", "-sleep", dest="sleep_duration", default=1, help="duration to sleep between requests", type=int
+    "-s", "--sleep", dest="sleep_duration", default=1, help="duration to sleep between requests", type=int
 )
 args = parser.parse_args()
 
@@ -162,7 +165,11 @@ for datablock in datablocks:
     block_id = datablock[0]
     release_id = datablock[1]
     subject_id = datablock[2]
-    query_dict = json.loads(datablock[3])  # TODO Wrap in try/catch so can see line in CSV that it fails on?
+    try:
+        query_dict = json.loads(datablock[3])
+    except Exception as e:
+        print_to_console(f"Invalid JSON with block {block_id} subject {subject_id}, {e}")
+        continue
 
     if args.stage == "table":
         url = f"{data_api_url}/tablebuilder/release/{release_id}"
@@ -226,12 +233,12 @@ processing_time = round(end_time - start_time)
 sleep_time = args.sleep_duration * len(datablocks)
 processing_time_minus_sleep_time = round(processing_time - sleep_time)
 
-print_to_console(f"Total processed: {processed}")
-print_to_console(f"Total successes: {processed_successfully}")
-print_to_console(f"Total failures: {processed - processed_successfully}")
-print_to_console(f"Total time: {processing_time} seconds")
-print_to_console(f"Sleep time: {sleep_time} seconds")
-print_to_console(f"Total minus sleep time: {processing_time_minus_sleep_time} seconds")
+print_to_console(f"Run info - Total processed: {processed}")
+print_to_console(f"Run info - Total successes: {processed_successfully}")
+print_to_console(f"Run info - Total failures: {processed - processed_successfully}")
+print_to_console(f"Run info - Total time: {processing_time} seconds")
+print_to_console(f"Run info - Sleep time: {sleep_time} seconds")
+print_to_console(f"Run info - Total minus sleep time: {processing_time_minus_sleep_time} seconds")
 print_to_console(
-    f"Average processing time per block: {round(processing_time_minus_sleep_time / len(datablocks), 2)} seconds"
+    f"Run info - Average processing time per block: {round(processing_time_minus_sleep_time / len(datablocks), 2)} seconds"
 )

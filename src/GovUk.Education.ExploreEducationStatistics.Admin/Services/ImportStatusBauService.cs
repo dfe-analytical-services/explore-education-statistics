@@ -17,9 +17,7 @@ public class ImportStatusBauService : IImportStatusBauService
     private readonly IUserService _userService;
     private readonly ContentDbContext _contentDbContext;
 
-    public ImportStatusBauService(
-        IUserService userService,
-        ContentDbContext contentDbContext)
+    public ImportStatusBauService(IUserService userService, ContentDbContext contentDbContext)
     {
         _userService = userService;
         _contentDbContext = contentDbContext;
@@ -31,21 +29,19 @@ public class ImportStatusBauService : IImportStatusBauService
             .CheckCanViewAllImports()
             .OnSuccess(async () =>
             {
-                var releaseFilesQueryable = _contentDbContext.ReleaseFiles
-                    .Include(rf => rf.ReleaseVersion)
+                var releaseFilesQueryable = _contentDbContext
+                    .ReleaseFiles.Include(rf => rf.ReleaseVersion)
                     .ThenInclude(rv => rv.Release)
                     .ThenInclude(r => r.Publication);
 
-                return await _contentDbContext.DataImports
-                    .Include(dataImport => dataImport.File)
-                    .Join(releaseFilesQueryable,
+                return await _contentDbContext
+                    .DataImports.Include(dataImport => dataImport.File)
+                    .Join(
+                        releaseFilesQueryable,
                         dataImport => dataImport.FileId,
                         releaseFile => releaseFile.FileId,
-                        (dataImport, releaseFile) => new
-                        {
-                            DataImport = dataImport,
-                            releaseFile.ReleaseVersion
-                        })
+                        (dataImport, releaseFile) => new { DataImport = dataImport, releaseFile.ReleaseVersion }
+                    )
                     .Where(join => join.DataImport.Status != COMPLETE)
                     .OrderByDescending(join => join.DataImport.Created)
                     .Select(join => BuildViewModel(join.DataImport, join.ReleaseVersion))
@@ -53,9 +49,7 @@ public class ImportStatusBauService : IImportStatusBauService
             });
     }
 
-    private static ImportStatusBauViewModel BuildViewModel(
-        DataImport dataImport,
-        ReleaseVersion releaseVersion)
+    private static ImportStatusBauViewModel BuildViewModel(DataImport dataImport, ReleaseVersion releaseVersion)
     {
         var file = dataImport.File;
         var release = releaseVersion.Release;
@@ -73,7 +67,7 @@ public class ImportStatusBauService : IImportStatusBauService
             TotalRows = dataImport.TotalRows,
             Status = dataImport.Status,
             StagePercentageComplete = dataImport.StagePercentageComplete,
-            PercentageComplete = dataImport.PercentageComplete()
+            PercentageComplete = dataImport.PercentageComplete(),
         };
     }
 }

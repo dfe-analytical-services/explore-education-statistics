@@ -6,16 +6,11 @@ public partial class EES2030AddCreatedToContentBlock : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.AddColumn<DateTime>(
-            name: "Created",
-            table: "ContentBlock",
-            nullable: true);
+        migrationBuilder.AddColumn<DateTime>(name: "Created", table: "ContentBlock", nullable: true);
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "Created",
-            table: "ContentBlock");
+        migrationBuilder.DropColumn(name: "Created", table: "ContentBlock");
     }
 }

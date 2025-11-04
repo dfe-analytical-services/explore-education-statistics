@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
@@ -15,7 +14,15 @@ public static class DateTimeExtensions
      */
     public static DateTime AsStartOfDayUtcForTimeZone(this DateTime dateTime, TimeZoneInfo? timezone = null)
     {
-        var dateTimeStartOfDay = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, 0, 0, 0, DateTimeKind.Unspecified);
+        var dateTimeStartOfDay = new DateTime(
+            dateTime.Year,
+            dateTime.Month,
+            dateTime.Day,
+            0,
+            0,
+            0,
+            DateTimeKind.Unspecified
+        );
         return TimeZoneInfo.ConvertTimeToUtc(dateTimeStartOfDay, timezone ?? GetUkTimeZone());
     }
 
@@ -27,7 +34,8 @@ public static class DateTimeExtensions
     public static TimeZoneInfo GetUkTimeZone()
     {
         return TimeZoneInfo.FindSystemTimeZoneById(
-            RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "GMT Standard Time" : "Europe/London");
+            RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "GMT Standard Time" : "Europe/London"
+        );
     }
 
     public static bool IsBefore(this DateTime subject, DateTime target)

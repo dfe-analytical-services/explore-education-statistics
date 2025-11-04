@@ -10,14 +10,15 @@ public class Publication
 
     public string Slug { get; set; } = string.Empty;
 
-    [Required(AllowEmptyStrings = false)] public string Title { get; set; } = string.Empty;
+    [Required(AllowEmptyStrings = false)]
+    public string Title { get; set; } = string.Empty;
 
     [MaxLength(160)]
     public string Summary { get; set; } = string.Empty;
 
     public List<Release> Releases { get; set; } = [];
 
-    [Obsolete("Use indirect relationship via Publication.Releases. This will be removed in EES-5818")] 
+    [Obsolete("Use indirect relationship via Publication.Releases. This will be removed in EES-5818")]
     public List<ReleaseVersion> ReleaseVersions { get; set; } = [];
 
     public List<PublicationRedirect> PublicationRedirects { get; set; } = [];
@@ -47,4 +48,12 @@ public class Publication
     public ReleaseVersion? LatestPublishedReleaseVersion { get; set; }
 
     public List<ReleaseSeriesItem> ReleaseSeries { get; set; } = [];
+
+    /// <summary>
+    /// Provides a polymorphic list of the release series entries for this publication,
+    /// allowing consumers to interact with types of the <see cref="IPublicationReleaseEntry"/> interface
+    /// rather than directly with <see cref="ReleaseSeriesItem"/>.
+    /// </summary>
+    public List<IPublicationReleaseEntry> ReleaseEntries =>
+        ReleaseSeries.Select(item => item.ToPublicationReleaseEntry()).ToList();
 }

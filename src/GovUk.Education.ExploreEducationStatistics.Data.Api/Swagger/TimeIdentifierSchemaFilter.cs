@@ -8,7 +8,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Swagger;
 
 /// <summary>
-/// TimeIdentifier is special. Each enum value has an attached attribute that contains a different API value. 
+/// TimeIdentifier is special. Each enum value has an attached attribute that contains a different API value.
 /// </summary>
 public class TimeIdentifierSchemaFilter : ISchemaFilter
 {
@@ -19,7 +19,7 @@ public class TimeIdentifierSchemaFilter : ISchemaFilter
             schema.Enum.Clear();
             var timeIdentifiers = Enum.GetValues<TimeIdentifier>();
             var values = timeIdentifiers.Select(name => name.GetEnumValue());
-            schema.Enum.AddRange(values.Select(v => new OpenApiString($"{v}")));;
+            schema.Enum.AddRange(values.Select(v => new OpenApiString($"{v}")));
         }
     }
 }

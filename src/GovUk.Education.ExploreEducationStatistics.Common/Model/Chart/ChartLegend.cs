@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -18,14 +17,15 @@ public enum ChartLegendPosition
     none,
     bottom,
     top,
-    inline
+    inline,
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 [JsonConverter(typeof(StringEnumConverter))]
 public enum ChartLegendLabelColour
 {
-    black, inherit
+    black,
+    inherit,
 }
 
 public class ChartLegendItem

@@ -29,9 +29,7 @@ public abstract class PathUtilsTests
         [InlineData("/absolute/path/to/file", "absolute", "path", "to", "file")]
         public void CurrentOS_CorrectAbsolutePath(string path, params string[] segments)
         {
-            var expectedPath = Path.Combine(segments
-                .Prepend(Path.DirectorySeparatorChar.ToString())
-                .ToArray());
+            var expectedPath = Path.Combine(segments.Prepend(Path.DirectorySeparatorChar.ToString()).ToArray());
 
             Assert.Equal(expectedPath, PathUtils.OsPath(path));
         }

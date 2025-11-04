@@ -21,33 +21,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
 public class MethodologyApprovalServicePermissionTests
 {
-    private readonly MethodologyVersion _methodologyVersion = new()
-    {
-        Id = Guid.NewGuid(),
-        Status = Draft
-    };
+    private readonly MethodologyVersion _methodologyVersion = new() { Id = Guid.NewGuid(), Status = Draft };
 
-    private readonly MethodologyVersion _approvedMethodologyVersion = new()
-    {
-        Id = Guid.NewGuid(),
-        Status = Approved
-    };
+    private readonly MethodologyVersion _approvedMethodologyVersion = new() { Id = Guid.NewGuid(), Status = Approved };
 
     [Fact]
     public async Task UpdateApprovalStatus_Approve()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_methodologyVersion, CanApproveSpecificMethodology)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupService(userService: userService.Object);
-                    return service.UpdateApprovalStatus(_methodologyVersion.Id, new MethodologyApprovalUpdateRequest
-                    {
-                        Status = Approved
-                    });
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupService(userService: userService.Object);
+                return service.UpdateApprovalStatus(
+                    _methodologyVersion.Id,
+                    new MethodologyApprovalUpdateRequest { Status = Approved }
+                );
+            });
     }
 
     [Fact]
@@ -55,16 +45,14 @@ public class MethodologyApprovalServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_methodologyVersion, CanSubmitSpecificMethodologyToHigherReview)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupService(userService: userService.Object);
-                    return service.UpdateApprovalStatus(_methodologyVersion.Id, new MethodologyApprovalUpdateRequest
-                    {
-                        Status = HigherLevelReview,
-                    });
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupService(userService: userService.Object);
+                return service.UpdateApprovalStatus(
+                    _methodologyVersion.Id,
+                    new MethodologyApprovalUpdateRequest { Status = HigherLevelReview }
+                );
+            });
     }
 
     [Fact]
@@ -72,18 +60,16 @@ public class MethodologyApprovalServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_approvedMethodologyVersion, CanMarkSpecificMethodologyAsDraft)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupService(userService: userService.Object);
-                    return service.UpdateApprovalStatus(_approvedMethodologyVersion.Id, new MethodologyApprovalUpdateRequest
-                    {
-                        Status = Draft
-                    });
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupService(userService: userService.Object);
+                return service.UpdateApprovalStatus(
+                    _approvedMethodologyVersion.Id,
+                    new MethodologyApprovalUpdateRequest { Status = Draft }
+                );
+            });
     }
-    
+
     private MethodologyApprovalService SetupService(
         ContentDbContext? contentDbContext = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
@@ -96,7 +82,8 @@ public class MethodologyApprovalServicePermissionTests
         IUserReleaseRoleService? userReleaseRoleService = null,
         IMethodologyCacheService? methodologyCacheService = null,
         IEmailTemplateService? emailTemplateService = null,
-        IRedirectsCacheService? redirectsCacheService = null)
+        IRedirectsCacheService? redirectsCacheService = null
+    )
     {
         return new(
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
@@ -110,13 +97,16 @@ public class MethodologyApprovalServicePermissionTests
             userReleaseRoleService ?? Mock.Of<IUserReleaseRoleService>(Strict),
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
-            redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict));
-
+            redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict)
+        );
     }
-    
+
     private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
     {
-        var mock = MockPersistenceHelper<ContentDbContext, MethodologyVersion>(_methodologyVersion.Id, _methodologyVersion);
+        var mock = MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
+            _methodologyVersion.Id,
+            _methodologyVersion
+        );
         SetupCall(mock, _approvedMethodologyVersion.Id, _approvedMethodologyVersion);
         return mock;
     }

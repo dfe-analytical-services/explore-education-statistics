@@ -125,6 +125,98 @@ export const educationInNumbersPageReducer: Reducer<
       }
       return draft;
     }
+    case 'ADD_FREE_TEXT_STAT_TILE_TO_BLOCK': {
+      const { tile, meta } = action.payload;
+      const { blockId, sectionId } = meta;
+      if (!draft.pageContent.content) {
+        throw new Error(
+          `${action.type}: Error - Section "content" could not be found.`,
+        );
+      }
+      const matchingSection = draft.pageContent.content.find(
+        section => section.id === sectionId,
+      );
+      if (!matchingSection) return draft;
+      const matchingBlock = matchingSection.content.find(
+        block => block.id === blockId,
+      );
+      if (!matchingBlock || matchingBlock.type !== 'TileGroupBlock') {
+        return draft;
+      }
+      if (Array.isArray(matchingBlock.tiles)) {
+        matchingBlock.tiles.push(tile);
+      } else {
+        matchingBlock.tiles = [tile];
+      }
+      return draft;
+    }
+    case 'UPDATE_FREE_TEXT_STAT_TILE_IN_BLOCK': {
+      const { tile: newTile, meta } = action.payload;
+      const { blockId, sectionId, tileId } = meta;
+      if (!draft.pageContent.content) {
+        throw new Error(
+          `${action.type}: Error - Section "content" could not be found.`,
+        );
+      }
+      const matchingSection = draft.pageContent.content.find(
+        section => section.id === sectionId,
+      );
+      if (!matchingSection) return draft;
+      const matchingBlock = matchingSection.content.find(
+        block => block.id === blockId,
+      );
+      if (matchingBlock?.type !== 'TileGroupBlock' || !matchingBlock.tiles) {
+        return draft;
+      }
+      matchingBlock.tiles = matchingBlock.tiles.map(tileItem =>
+        tileItem.id === tileId ? newTile : tileItem,
+      );
+      return draft;
+    }
+    case 'REORDER_FREE_TEXT_STAT_TILES_IN_BLOCK': {
+      const { tiles: newTiles, meta } = action.payload;
+      const { blockId, sectionId } = meta;
+      if (!draft.pageContent.content) {
+        throw new Error(
+          `${action.type}: Error - Section "content" could not be found.`,
+        );
+      }
+      const matchingSection = draft.pageContent.content.find(
+        section => section.id === sectionId,
+      );
+      if (!matchingSection) return draft;
+      const matchingBlock = matchingSection.content.find(
+        block => block.id === blockId,
+      );
+      if (matchingBlock?.type !== 'TileGroupBlock' || !matchingBlock.tiles) {
+        return draft;
+      }
+      matchingBlock.tiles = newTiles;
+      return draft;
+    }
+    case 'DELETE_FREE_TEXT_STAT_TILE_FROM_BLOCK': {
+      const { meta } = action.payload;
+      const { blockId, sectionId, tileId } = meta;
+      if (!draft.pageContent.content) {
+        throw new Error(
+          `${action.type}: Error - Section "content" could not be found.`,
+        );
+      }
+      const matchingSection = draft.pageContent.content.find(
+        section => section.id === sectionId,
+      );
+      if (!matchingSection) return draft;
+      const matchingBlock = matchingSection.content.find(
+        block => block.id === blockId,
+      );
+      if (matchingBlock?.type !== 'TileGroupBlock' || !matchingBlock.tiles) {
+        return draft;
+      }
+      matchingBlock.tiles = matchingBlock.tiles.filter(
+        tileItem => tileItem.id !== tileId,
+      );
+      return draft;
+    }
     default: {
       return draft;
     }

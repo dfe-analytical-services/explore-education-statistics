@@ -51,22 +51,24 @@ public abstract class PublicationsSearchControllerCachingTests : CacheServiceTes
                 Summary = "summary",
                 Theme = "theme",
                 Title = "title",
-                Type = ReleaseType.OfficialStatistics
-            }
+                Type = ReleaseType.OfficialStatistics,
+            },
         ],
         totalResults: 1,
         page: 1,
-        pageSize: 10);
+        pageSize: 10
+    );
 
     public class GetPublicationsByGetRequestTests : PublicationsSearchControllerCachingTests
     {
         [Fact]
-        public async Task GetPublications_WhenNoCacheEntryExists_InvokesServiceAndCreateCache()
+        public async Task WhenNoCacheEntryExists_InvokesServiceAndCreateCache()
         {
             // Arrange
-            MemoryCacheService
-                .SetupNotFoundForAnyKey<ListPublicationsGetCacheKey,
-                    PaginatedListViewModel<PublicationSearchResultViewModel>>();
+            MemoryCacheService.SetupNotFoundForAnyKey<
+                ListPublicationsGetCacheKey,
+                PaginatedListViewModel<PublicationSearchResultViewModel>
+            >();
             _publicationsSearchService.WhereHasPublications(_publications);
 
             var sut = BuildController();
@@ -81,13 +83,16 @@ public abstract class PublicationsSearchControllerCachingTests : CacheServiceTes
         }
 
         [Fact]
-        public async Task GetPublications_WhenCachedEntryExists_ReturnsCachedSearchResults()
+        public async Task WhenCachedEntryExists_ReturnsCachedSearchResults()
         {
             // Arrange
             MemoryCacheService
-                .Setup(s => s.GetItem(
-                    new ListPublicationsGetCacheKey(_getQuery),
-                    typeof(PaginatedListViewModel<PublicationSearchResultViewModel>)))
+                .Setup(s =>
+                    s.GetItem(
+                        new ListPublicationsGetCacheKey(_getQuery),
+                        typeof(PaginatedListViewModel<PublicationSearchResultViewModel>)
+                    )
+                )
                 .Returns(_publications);
 
             var sut = BuildController();
@@ -105,7 +110,8 @@ public abstract class PublicationsSearchControllerCachingTests : CacheServiceTes
         public void PublicationSearchResultViewModel_SerializeAndDeserialize_MaintainsEquality()
         {
             var converted = JsonConvert.DeserializeObject<PaginatedListViewModel<PublicationSearchResultViewModel>>(
-                JsonConvert.SerializeObject(_publications));
+                JsonConvert.SerializeObject(_publications)
+            );
 
             converted.AssertDeepEqualTo(_publications);
         }
@@ -114,12 +120,13 @@ public abstract class PublicationsSearchControllerCachingTests : CacheServiceTes
     public class GetPublicationsByPostRequestTests : PublicationsSearchControllerCachingTests
     {
         [Fact]
-        public async Task GetPublications_WhenNoCacheEntryExists_InvokesServiceAndCreatesCache()
+        public async Task WhenNoCacheEntryExists_InvokesServiceAndCreatesCache()
         {
             // Arrange
-            MemoryCacheService
-                .SetupNotFoundForAnyKey<ListPublicationsPostCacheKey,
-                    PaginatedListViewModel<PublicationSearchResultViewModel>>();
+            MemoryCacheService.SetupNotFoundForAnyKey<
+                ListPublicationsPostCacheKey,
+                PaginatedListViewModel<PublicationSearchResultViewModel>
+            >();
             _publicationsSearchService.WhereHasPublications(_publications);
 
             var sut = BuildController();
@@ -134,13 +141,16 @@ public abstract class PublicationsSearchControllerCachingTests : CacheServiceTes
         }
 
         [Fact]
-        public async Task GetPublications_WhenCachedEntryExists_ReturnsCachedSearchResults()
+        public async Task WhenCachedEntryExists_ReturnsCachedSearchResults()
         {
             // Arrange
             MemoryCacheService
-                .Setup(s => s.GetItem(
-                    new ListPublicationsPostCacheKey(_postQuery),
-                    typeof(PaginatedListViewModel<PublicationSearchResultViewModel>)))
+                .Setup(s =>
+                    s.GetItem(
+                        new ListPublicationsPostCacheKey(_postQuery),
+                        typeof(PaginatedListViewModel<PublicationSearchResultViewModel>)
+                    )
+                )
                 .Returns(_publications);
 
             var sut = BuildController();

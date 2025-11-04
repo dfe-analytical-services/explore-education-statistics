@@ -27,12 +27,15 @@ public class ReleaseApprovalServicePermissionTests
     [Fact]
     public async Task ListReleaseStatuses()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id, CanViewReleaseStatusHistory)
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == releaseVersion.Id,
+                CanViewReleaseStatusHistory
+            )
             .AssertForbidden(async userService =>
             {
                 var contentDbContextId = Guid.NewGuid().ToString();
@@ -53,12 +56,15 @@ public class ReleaseApprovalServicePermissionTests
     [Fact]
     public async Task UpdateReleaseStatus_Draft()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id, CanMarkSpecificReleaseAsDraft)
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == releaseVersion.Id,
+                CanMarkSpecificReleaseAsDraft
+            )
             .AssertForbidden(async userService =>
             {
                 var contentDbContextId = Guid.NewGuid().ToString();
@@ -74,10 +80,7 @@ public class ReleaseApprovalServicePermissionTests
 
                     return await service.CreateReleaseStatus(
                         releaseVersion.Id,
-                        new ReleaseStatusCreateRequest
-                        {
-                            ApprovalStatus = ReleaseApprovalStatus.Draft
-                        }
+                        new ReleaseStatusCreateRequest { ApprovalStatus = ReleaseApprovalStatus.Draft }
                     );
                 }
             });
@@ -86,46 +89,48 @@ public class ReleaseApprovalServicePermissionTests
     [Fact]
     public async Task UpdateReleaseStatus_HigherLevelReview()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id, CanSubmitSpecificReleaseToHigherReview)
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == releaseVersion.Id,
+                CanSubmitSpecificReleaseToHigherReview
+            )
             .AssertForbidden(async userService =>
+            {
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    var contentDbContextId = Guid.NewGuid().ToString();
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        contentDbContext.ReleaseVersions.Add(releaseVersion);
-                        await contentDbContext.SaveChangesAsync();
-                    }
-
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        var service = BuildService(contentDbContext: contentDbContext, userService.Object);
-
-                        return await service.CreateReleaseStatus(
-                            releaseVersion.Id,
-                            new ReleaseStatusCreateRequest
-                            {
-                                ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview
-                            }
-                        );
-                    }
+                    contentDbContext.ReleaseVersions.Add(releaseVersion);
+                    await contentDbContext.SaveChangesAsync();
                 }
-            );
+
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = BuildService(contentDbContext: contentDbContext, userService.Object);
+
+                    return await service.CreateReleaseStatus(
+                        releaseVersion.Id,
+                        new ReleaseStatusCreateRequest { ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview }
+                    );
+                }
+            });
     }
 
     [Fact]
     public async Task UpdateReleaseStatus_Approve()
     {
-        ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion()
-            .WithRelease(_dataFixture.DefaultRelease()
-                .WithPublication(_dataFixture.DefaultPublication()));
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == releaseVersion.Id, CanApproveSpecificRelease)
+            .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                rv => rv.Id == releaseVersion.Id,
+                CanApproveSpecificRelease
+            )
             .AssertForbidden(async userService =>
             {
                 var contentDbContextId = Guid.NewGuid().ToString();
@@ -140,10 +145,7 @@ public class ReleaseApprovalServicePermissionTests
                     var service = BuildService(contentDbContext: contentDbContext, userService.Object);
                     return await service.CreateReleaseStatus(
                         releaseVersion.Id,
-                        new ReleaseStatusCreateRequest
-                        {
-                            ApprovalStatus = ReleaseApprovalStatus.Approved
-                        }
+                        new ReleaseStatusCreateRequest { ApprovalStatus = ReleaseApprovalStatus.Approved }
                     );
                 }
             });

@@ -24,7 +24,8 @@ public class TokenService(IOptions<AppOptions> appOptions) : ITokenService
             issuer: "Sample",
             audience: "Sample",
             claims: new[] { new Claim(JwtRegisteredClaimNames.Email, email) },
-            expires: expiryDateTime);
+            expires: expiryDateTime
+        );
 
         var handler = new JwtSecurityTokenHandler();
         return handler.WriteToken(secToken);
@@ -61,8 +62,7 @@ public class TokenService(IOptions<AppOptions> appOptions) : ITokenService
             ValidateIssuer = false, // Because there is no issuer in the generated token
             ValidIssuer = "Sample",
             ValidAudience = "Sample",
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(secretKey)) // The same key as the one that generate the token
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)), // The same key as the one that generate the token
         };
     }
 }

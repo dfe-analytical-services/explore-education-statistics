@@ -142,6 +142,8 @@ Save datablock
     user enters text into element    id:dataBlockDetailsForm-heading    UI Test datablock_title
     user clicks button    Save data block
 
+    user waits until h2 is visible    UI Test datablock_name
+
 Reload created datablock
     user reloads page
     user clicks link    Data blocks
@@ -198,10 +200,6 @@ Add headline text block to Content page
 Approve first release
     user clicks link    Sign off
     user approves release for immediate publication
-
-Verify newly published release is on Find Statistics page
-    # TODO EES-6063 - Remove this
-    user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Go to public table tool page
     user navigates to data tables page on public frontend

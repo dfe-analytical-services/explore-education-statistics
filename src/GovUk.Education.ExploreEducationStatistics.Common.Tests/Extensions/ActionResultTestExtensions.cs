@@ -11,7 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
 public static class ActionResultTestUtils
 {
-    public static T AssertOkObjectResult<T>(this IActionResult result, T? expectedValue = null) where T : class
+    public static T AssertOkObjectResult<T>(this IActionResult result, T? expectedValue = null)
+        where T : class
     {
         var okObjectResult = Assert.IsAssignableFrom<OkObjectResult>(result);
         var value = Assert.IsAssignableFrom<T>(okObjectResult.Value);
@@ -27,9 +28,9 @@ public static class ActionResultTestUtils
     }
 
     public static void AssertOkResult(this ActionResult result) => Assert.IsType<OkResult>(result);
-    
 
-    public static T AssertOkResult<T>(this ActionResult<T> result, T? expectedValue = null) where T : class
+    public static T AssertOkResult<T>(this ActionResult<T> result, T? expectedValue = null)
+        where T : class
     {
         Assert.IsAssignableFrom<ActionResult<T>>(result);
         var value = Assert.IsAssignableFrom<T>(result.Value);
@@ -45,7 +46,9 @@ public static class ActionResultTestUtils
     public static T AssertObjectResult<T>(
         this IActionResult result,
         HttpStatusCode expectedStatusCode,
-        T? expectedValue = null) where T : class
+        T? expectedValue = null
+    )
+        where T : class
     {
         var objectResult = Assert.IsAssignableFrom<ObjectResult>(result);
         Assert.Equal((int)expectedStatusCode, objectResult.StatusCode);
@@ -59,7 +62,8 @@ public static class ActionResultTestUtils
         return value;
     }
 
-    public static void AssertNotFoundResult<T>(this ActionResult<T> result) where T : class
+    public static void AssertNotFoundResult<T>(this ActionResult<T> result)
+        where T : class
     {
         Assert.IsAssignableFrom<NotFoundResult>(result.Result);
     }
@@ -96,6 +100,13 @@ public static class ActionResultTestUtils
         Assert.Equal(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
     }
 
+    public static void AssertInternalServerError<T>(this ActionResult<T> result)
+    {
+        var statusCodeResult = Assert.IsType<StatusCodeResult>(result.Result);
+
+        Assert.Equal(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
+    }
+
     public static void AssertValidationProblem<T>(this ActionResult<T> result, params Enum[] expectedErrorCodes)
     {
         Assert.NotNull(result.Result);
@@ -127,8 +138,10 @@ public static class ActionResultTestUtils
         return validationProblem;
     }
 
-    public static void AssertBadRequestWithValidationErrors(this IActionResult result,
-        List<ErrorViewModel> expectedErrors)
+    public static void AssertBadRequestWithValidationErrors(
+        this IActionResult result,
+        List<ErrorViewModel> expectedErrors
+    )
     {
         var validationProblem = result.AssertBadRequestWithValidationProblem();
 
@@ -140,7 +153,8 @@ public static class ActionResultTestUtils
     public static ValidationProblemViewModel AssertNotFoundWithValidationProblem<TEntity, TId>(
         this IActionResult result,
         TId expectedId,
-        string expectedPath)
+        string expectedPath
+    )
     {
         var notFound = Assert.IsAssignableFrom<NotFoundObjectResult>(result);
         var validationProblem = Assert.IsAssignableFrom<ValidationProblemViewModel>(notFound.Value);
@@ -149,32 +163,30 @@ public static class ActionResultTestUtils
             expectedPath: expectedPath,
             expectedCode: "NotFound",
             expectedMessage: $"{typeof(TEntity).Name} not found",
-            expectedDetail: new InvalidErrorDetail<TId>(expectedId));
+            expectedDetail: new InvalidErrorDetail<TId>(expectedId)
+        );
 
         return validationProblem;
     }
 
-    private static void AssertBadRequestWithValidationErrors(this IActionResult result,
-        params Enum[] expectedErrorCodes)
+    private static void AssertBadRequestWithValidationErrors(
+        this IActionResult result,
+        params Enum[] expectedErrorCodes
+    )
     {
         var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
         var validationProblem = Assert.IsAssignableFrom<ValidationProblemViewModel>(badRequest.Value);
 
         Assert.NotNull(validationProblem);
 
-        var errorCodes = validationProblem.Errors
-            .Select(error => error.Code)
-            .ToList();
+        var errorCodes = validationProblem.Errors.Select(error => error.Code).ToList();
 
         Assert.Equal(expectedErrorCodes.Length, errorCodes.Count);
 
-        expectedErrorCodes.ForEach(errorCode =>
-            Assert.Contains(errorCode.ToString(), errorCodes));
+        expectedErrorCodes.ForEach(errorCode => Assert.Contains(errorCode.ToString(), errorCodes));
     }
 
-    public static FileStreamResult AssertFileStreamResult(
-        this IActionResult result,
-        FileStreamResult expectedResult)
+    public static FileStreamResult AssertFileStreamResult(this IActionResult result, FileStreamResult expectedResult)
     {
         var fileStreamResult = Assert.IsAssignableFrom<FileStreamResult>(result);
         Assert.Equal(expectedResult, fileStreamResult);
@@ -185,7 +197,8 @@ public static class ActionResultTestUtils
         this IActionResult result,
         string expectedFilename,
         string expectedContentType,
-        Stream? expectedStream = null)
+        Stream? expectedStream = null
+    )
     {
         var fileStreamResult = Assert.IsAssignableFrom<FileStreamResult>(result);
 

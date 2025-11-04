@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Net.Http.Headers;
@@ -54,7 +53,7 @@ public class LowercasePathRule : IRule
     private static bool IsApplicable(PathString path)
     {
         return path.HasValue
-               && !Regex.IsMatch(path, ExcludedPathsRegex, RegexOptions.IgnoreCase)
-               && path.Value.Any(char.IsUpper);
+            && !Regex.IsMatch(path, ExcludedPathsRegex, RegexOptions.IgnoreCase)
+            && path.Value.Any(char.IsUpper);
     }
 }

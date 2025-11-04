@@ -28,7 +28,8 @@ public class ProcessorService : IProcessorService
         IImporterService importerService,
         IDataImportService dataImportService,
         IValidatorService validatorService,
-        IDbContextSupplier dbContextSupplier)
+        IDbContextSupplier dbContextSupplier
+    )
     {
         _logger = logger;
         _privateBlobStorageService = privateBlobStorageService;
@@ -41,14 +42,16 @@ public class ProcessorService : IProcessorService
 
     public async Task ProcessStage1(Guid importId)
     {
-        await _validatorService.Validate(importId)
+        await _validatorService
+            .Validate(importId)
             .OnSuccessDo(async result =>
             {
                 await _dataImportService.Update(
                     importId,
                     expectedImportedRows: result.ImportableRowCount,
                     totalRows: result.TotalRowCount,
-                    geographicLevels: result.GeographicLevels);
+                    geographicLevels: result.GeographicLevels
+                );
             })
             .OnFailureDo(async errors =>
             {
@@ -71,7 +74,12 @@ public class ProcessorService : IProcessorService
         var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
         var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
-        var subjectMeta = await _importerService.ImportMeta(metaFileCsvHeaders, metaFileCsvRows, subject, statisticsDbContext);
+        var subjectMeta = await _importerService.ImportMeta(
+            metaFileCsvHeaders,
+            metaFileCsvRows,
+            subject,
+            statisticsDbContext
+        );
         await _fileImportService.ImportFiltersAndLocations(import.Id, subjectMeta, statisticsDbContext);
     }
 
@@ -81,7 +89,10 @@ public class ProcessorService : IProcessorService
 
         try
         {
-            await _fileImportService.ImportObservations(import, _dbContextSupplier.CreateDbContext<StatisticsDbContext>());
+            await _fileImportService.ImportObservations(
+                import,
+                _dbContextSupplier.CreateDbContext<StatisticsDbContext>()
+            );
         }
         catch (Exception e)
         {
@@ -89,8 +100,8 @@ public class ProcessorService : IProcessorService
             if (e is SqlException exception && exception.Number == 1205)
             {
                 _logger.LogInformation(
-                    "ProcessStage3: Handling known exception when processing Import " +
-                    "{ImportId}: {Message} : transaction will be retried",
+                    "ProcessStage3: Handling known exception when processing Import "
+                        + "{ImportId}: {Message} : transaction will be retried",
                     import.Id,
                     exception.Message
                 );
@@ -103,7 +114,8 @@ public class ProcessorService : IProcessorService
                 mainException,
                 "ProcessStage3 FAILED for Import: {ImportId} : {Message}",
                 import.Id,
-                mainException.Message);
+                mainException.Message
+            );
 
             await _dataImportService.FailImport(import.Id);
         }

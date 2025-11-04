@@ -12,7 +12,7 @@ variables:
   IsBranchDeployable: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
   CI: true
   DotNetVersion: '8.0.x'
-  NodeVersion: '20.19.2'
+  NodeVersion: '22.20.0'
   RubyVersion: '3.2'
   AcrServiceConnection: s101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection
   PublicApiDir: GovUk.Education.ExploreEducationStatistics.Public.Data.Api
@@ -57,35 +57,22 @@ jobs:
           version: $(DotNetVersion)
           performMultiLevelLookup: true
 
-      # TODO: Uncomment this step once formatter has been run globally.
-      # This is because whitespace rules cannot be warnings or suggestions; they will always be errors
-      # - task: DotNetCoreCLI@2
-      #   displayName: Verify formatting
-      #   inputs:
-      #     command: custom
-      #     custom: format whitespace src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --severity error
-      #     arguments: --verify-no-changes --verbosity diagnostic
-
+      # Check code formatting
       - task: DotNetCoreCLI@2
-        displayName: Verify style
+        displayName: Restore .NET tools
         inputs:
           command: custom
-          custom: format
-          ## TODO: Remove "--severity error" once style formatter has been run across project
-          arguments: style --verify-no-changes --verbosity diagnostic --severity error
-          projects: src/GovUk.Education.ExploreEducationStatistics.sln
+          custom: tool
+          arguments: restore
 
       - task: DotNetCoreCLI@2
-        displayName: Verify analyzers
+        displayName: CSharpier check formatting
         inputs:
           command: custom
-          custom: format
-          ## TODO: Remove "--severity error" once work has been done to resolve build warnings (https://dfedigital.atlassian.net/browse/EES-4594).
-          arguments: analyzers --verify-no-changes --verbosity diagnostic --severity error
-          projects: src/GovUk.Education.ExploreEducationStatistics.sln
+          custom: csharpier
+          arguments: check .
 
-      # TODO: Wrap the above three tasks up into a single `dotnet format` task once all TODOs are done
-
+      # Check Public API OpenAPI docs
       - task: DotNetCoreCLI@2
         displayName: Build Public API
         inputs:
@@ -149,7 +136,7 @@ jobs:
         condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
           artifactName: analytics-function-app
-          targetPath: $(Build.ArtifactStagingDirectory)/analytics-function-app    
+          targetPath: $(Build.ArtifactStagingDirectory)/analytics-function-app
 
       - task: DotNetCoreCLI@2
         displayName: Package Data API

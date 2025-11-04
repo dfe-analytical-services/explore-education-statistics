@@ -17,10 +17,11 @@ public class MapperTests
             ContactName = "Mock Contact Name",
             ContactTelNo = "Mock Contact Tel No.",
             TeamName = "Mock Contact Team Name",
-            TeamEmail = "Mock Contact Team Email"
+            TeamEmail = "Mock Contact Team Email",
         };
 
         var services = new ServiceCollection();
+
         services.AddAutoMapper(typeof(MappingProfiles));
 
         var serviceProvider = services.BuildServiceProvider();

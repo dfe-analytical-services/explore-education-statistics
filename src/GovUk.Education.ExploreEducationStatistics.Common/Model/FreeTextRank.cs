@@ -1,5 +1,4 @@
-﻿#nullable enable
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -10,9 +9,7 @@ public record FreeTextRank(Guid Id, int Rank)
     {
         public void Configure(EntityTypeBuilder<FreeTextRank> builder)
         {
-            builder
-                .HasNoKey()
-                .ToTable((string?) null);
+            builder.HasNoKey().ToTable((string?)null);
         }
     }
 }

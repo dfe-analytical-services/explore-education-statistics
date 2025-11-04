@@ -4,13 +4,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
+// ReSharper disable once InconsistentNaming
 public partial class EES4426_RemoveInternalReleaseNoteFromMethodologyVersionTable : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "InternalReleaseNote",
-            table: "MethodologyVersions");
+        migrationBuilder.DropColumn(name: "InternalReleaseNote", table: "MethodologyVersions");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
@@ -19,6 +18,7 @@ public partial class EES4426_RemoveInternalReleaseNoteFromMethodologyVersionTabl
             name: "InternalReleaseNote",
             table: "MethodologyVersions",
             type: "nvarchar(max)",
-            nullable: true);
+            nullable: true
+        );
     }
 }

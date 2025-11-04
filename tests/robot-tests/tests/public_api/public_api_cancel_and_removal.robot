@@ -5,7 +5,7 @@ Resource            ../libs/admin/manage-content-common.robot
 Resource            ../libs/public-common.robot
 Resource            ../libs/public-api-common.robot
 
-Force Tags          Admin    Local    Dev    AltersData
+Force Tags          Admin    PublicApi    Local    Dev    AltersData
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
@@ -149,10 +149,6 @@ Approve first release
 Get public release link
     ${PUBLIC_RELEASE_LINK}=    user gets url public release will be accessible at
     Set Suite Variable    ${PUBLIC_RELEASE_LINK}
-
-Verify newly published release is on Find Statistics page
-    # TODO EES-6063 - Remove this
-    user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}

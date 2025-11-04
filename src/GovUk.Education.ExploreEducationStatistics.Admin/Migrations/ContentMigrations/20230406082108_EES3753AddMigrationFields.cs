@@ -17,13 +17,10 @@ public partial class EES3753AddMigrationFields : Migration
             table: "Permalinks",
             type: "bit",
             nullable: false,
-            defaultValue: false);
+            defaultValue: false
+        );
 
-        migrationBuilder.AddColumn<bool>(
-            name: "LegacyHasSnapshot",
-            table: "Permalinks",
-            type: "bit",
-            nullable: true);
+        migrationBuilder.AddColumn<bool>(name: "LegacyHasSnapshot", table: "Permalinks", type: "bit", nullable: true);
 
         // Set the Legacy flag to true for all existing Permalinks so we can differentiate
         // between legacy Permalinks and Permalinks snapshots while both routes exist
@@ -32,12 +29,8 @@ public partial class EES3753AddMigrationFields : Migration
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropColumn(
-            name: "Legacy",
-            table: "Permalinks");
+        migrationBuilder.DropColumn(name: "Legacy", table: "Permalinks");
 
-        migrationBuilder.DropColumn(
-            name: "LegacyHasSnapshot",
-            table: "Permalinks");
+        migrationBuilder.DropColumn(name: "LegacyHasSnapshot", table: "Permalinks");
     }
 }

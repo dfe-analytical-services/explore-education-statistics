@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
 
 /// <inheritdoc />
+// ReSharper disable once InconsistentNaming
 public partial class EES5868_ReduceReleaseLabelLimitTo20Characters : Migration
 {
     /// <inheritdoc />
@@ -18,7 +19,8 @@ public partial class EES5868_ReduceReleaseLabelLimitTo20Characters : Migration
             nullable: false,
             oldClrType: typeof(string),
             oldType: "nvarchar(81)",
-            oldMaxLength: 81);
+            oldMaxLength: 81
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Label",
@@ -29,7 +31,8 @@ public partial class EES5868_ReduceReleaseLabelLimitTo20Characters : Migration
             oldClrType: typeof(string),
             oldType: "nvarchar(50)",
             oldMaxLength: 50,
-            oldNullable: true);
+            oldNullable: true
+        );
     }
 
     /// <inheritdoc />
@@ -43,7 +46,8 @@ public partial class EES5868_ReduceReleaseLabelLimitTo20Characters : Migration
             nullable: false,
             oldClrType: typeof(string),
             oldType: "nvarchar(51)",
-            oldMaxLength: 51);
+            oldMaxLength: 51
+        );
 
         migrationBuilder.AlterColumn<string>(
             name: "Label",
@@ -54,6 +58,7 @@ public partial class EES5868_ReduceReleaseLabelLimitTo20Characters : Migration
             oldClrType: typeof(string),
             oldType: "nvarchar(20)",
             oldMaxLength: 20,
-            oldNullable: true);
+            oldNullable: true
+        );
     }
 }

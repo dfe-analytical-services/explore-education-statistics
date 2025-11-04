@@ -9,11 +9,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 public class CsvUtilsTest
 {
     private static readonly List<string> ExpectedHeaders = ListOf(
-        "time_period", "time_identifier", "geographic_level", "country_code",
-        "country_name", "old_la_code", "new_la_code", "la_name", "region_code", "region_name",
-        "lad_code", "lad_name", "local_enterprise_partnership_code",
-        "local_enterprise_partnership_name", "rsc_region_lead_name", "opportunity_area_code",
-        "opportunity_area_name", "pcon_code", "pcon_name", "ward_code", "ward_name",
+        "time_period",
+        "time_identifier",
+        "geographic_level",
+        "country_code",
+        "country_name",
+        "old_la_code",
+        "new_la_code",
+        "la_name",
+        "region_code",
+        "region_name",
+        "lad_code",
+        "lad_name",
+        "local_enterprise_partnership_code",
+        "local_enterprise_partnership_name",
+        "rsc_region_lead_name",
+        "opportunity_area_code",
+        "opportunity_area_name",
+        "pcon_code",
+        "pcon_name",
+        "ward_code",
+        "ward_name",
         "admission_numbers"
     );
 
@@ -75,7 +91,8 @@ public class CsvUtilsTest
                 rowIndexesProvided.Add(rowIndex);
                 lastLinesProvided.Add(lastLine);
                 return Task.FromResult(true);
-            });
+            }
+        );
 
         // We should have been provided 160 rows of data, each containing 22 cells.
         Assert.Equal(160, rowsProvided.Count);
@@ -87,15 +104,13 @@ public class CsvUtilsTest
         Assert.Equal("2007", rowsProvided[159][0]);
         Assert.Equal("9884", rowsProvided[159][21]);
 
-        // We should have received row indexes from 0 to 159. 
+        // We should have received row indexes from 0 to 159.
         Assert.Equal(160, rowIndexesProvided.Count);
-        rowIndexesProvided.ForEach((indexProvided, i) =>
-            Assert.Equal(i, indexProvided));
+        rowIndexesProvided.ForEach((indexProvided, i) => Assert.Equal(i, indexProvided));
 
-        // We should have received "false" for the lastLine variable value until the final line. 
+        // We should have received "false" for the lastLine variable value until the final line.
         Assert.Equal(160, lastLinesProvided.Count);
-        lastLinesProvided.ForEach((lastLine, i) =>
-            Assert.Equal(i == 159, lastLine));
+        lastLinesProvided.ForEach((lastLine, i) => Assert.Equal(i == 159, lastLine));
     }
 
     [Fact]
@@ -113,7 +128,8 @@ public class CsvUtilsTest
                 rowIndexesProvided.Add(rowIndex);
                 lastLinesProvided.Add(lastLine);
                 return Task.CompletedTask;
-            });
+            }
+        );
 
         // We should have been provided 160 rows of data, each containing 22 cells.
         Assert.Equal(160, rowsProvided.Count);
@@ -125,15 +141,13 @@ public class CsvUtilsTest
         Assert.Equal("2007", rowsProvided[159][0]);
         Assert.Equal("9884", rowsProvided[159][21]);
 
-        // We should have received row indexes from 0 to 159. 
+        // We should have received row indexes from 0 to 159.
         Assert.Equal(160, rowIndexesProvided.Count);
-        rowIndexesProvided.ForEach((indexProvided, i) =>
-            Assert.Equal(i, indexProvided));
+        rowIndexesProvided.ForEach((indexProvided, i) => Assert.Equal(i, indexProvided));
 
-        // We should have received "false" for the lastLine variable value until the final line. 
+        // We should have received "false" for the lastLine variable value until the final line.
         Assert.Equal(160, lastLinesProvided.Count);
-        lastLinesProvided.ForEach((lastLine, i) =>
-            Assert.Equal(i == 159, lastLine));
+        lastLinesProvided.ForEach((lastLine, i) => Assert.Equal(i == 159, lastLine));
     }
 
     [Fact]
@@ -150,7 +164,8 @@ public class CsvUtilsTest
                 rowsProvided.Add(cells);
                 rowIndexesProvided.Add(rowIndex);
                 lastLinesProvided.Add(lastLine);
-            });
+            }
+        );
 
         // We should have been provided 160 rows of data, each containing 22 cells.
         Assert.Equal(160, rowsProvided.Count);
@@ -162,15 +177,13 @@ public class CsvUtilsTest
         Assert.Equal("2007", rowsProvided[159][0]);
         Assert.Equal("9884", rowsProvided[159][21]);
 
-        // We should have received row indexes from 0 to 159. 
+        // We should have received row indexes from 0 to 159.
         Assert.Equal(160, rowIndexesProvided.Count);
-        rowIndexesProvided.ForEach((indexProvided, i) =>
-            Assert.Equal(i, indexProvided));
+        rowIndexesProvided.ForEach((indexProvided, i) => Assert.Equal(i, indexProvided));
 
-        // We should have received "false" for the lastLine variable value until the final line. 
+        // We should have received "false" for the lastLine variable value until the final line.
         Assert.Equal(160, lastLinesProvided.Count);
-        lastLinesProvided.ForEach((lastLine, i) =>
-            Assert.Equal(i == 159, lastLine));
+        lastLinesProvided.ForEach((lastLine, i) => Assert.Equal(i == 159, lastLine));
     }
 
     [Fact]
@@ -188,7 +201,8 @@ public class CsvUtilsTest
                 rowIndexesProvided.Add(rowIndex);
                 lastLinesProvided.Add(lastLine);
                 return true;
-            });
+            }
+        );
 
         // We should have been provided 160 rows of data, each containing 22 cells.
         Assert.Equal(160, rowsProvided.Count);
@@ -200,15 +214,13 @@ public class CsvUtilsTest
         Assert.Equal("2007", rowsProvided[159][0]);
         Assert.Equal("9884", rowsProvided[159][21]);
 
-        // We should have received row indexes from 0 to 159. 
+        // We should have received row indexes from 0 to 159.
         Assert.Equal(160, rowIndexesProvided.Count);
-        rowIndexesProvided.ForEach((indexProvided, i) =>
-            Assert.Equal(i, indexProvided));
+        rowIndexesProvided.ForEach((indexProvided, i) => Assert.Equal(i, indexProvided));
 
-        // We should have received "false" for the lastLine variable value until the final line. 
+        // We should have received "false" for the lastLine variable value until the final line.
         Assert.Equal(160, lastLinesProvided.Count);
-        lastLinesProvided.ForEach((lastLine, i) =>
-            Assert.Equal(i == 159, lastLine));
+        lastLinesProvided.ForEach((lastLine, i) => Assert.Equal(i == 159, lastLine));
     }
 
     [Fact]
@@ -229,7 +241,8 @@ public class CsvUtilsTest
                 rowsProvided.Add(cells);
 
                 return Task.FromResult(true);
-            });
+            }
+        );
 
         // We should have been provided 10 rows of data before we chose to exit the iterations.
         Assert.Equal(10, rowsProvided.Count);
@@ -252,7 +265,8 @@ public class CsvUtilsTest
                 lastLinesProvided.Add(lastLine);
                 return Task.FromResult(true);
             },
-            startingRowIndex: 20);
+            startingRowIndex: 20
+        );
 
         // We should have been provided 140 rows of data (160 minus the first 20).
         Assert.Equal(140, rowsProvided.Count);
@@ -264,15 +278,13 @@ public class CsvUtilsTest
         Assert.Equal("2007", rowsProvided[139][0]);
         Assert.Equal("9884", rowsProvided[139][21]);
 
-        // We should have received row indexes from 20 to 159. 
+        // We should have received row indexes from 20 to 159.
         Assert.Equal(140, rowIndexesProvided.Count);
-        rowIndexesProvided.ForEach((indexProvided, i) =>
-            Assert.Equal(i + 20, indexProvided));
+        rowIndexesProvided.ForEach((indexProvided, i) => Assert.Equal(i + 20, indexProvided));
 
-        // We should have received "false" for the lastLine variable value until the final line. 
+        // We should have received "false" for the lastLine variable value until the final line.
         Assert.Equal(140, lastLinesProvided.Count);
-        lastLinesProvided.ForEach((lastLine, i) =>
-            Assert.Equal(i == 139, lastLine));
+        lastLinesProvided.ForEach((lastLine, i) => Assert.Equal(i == 139, lastLine));
     }
 
     [Fact]
@@ -289,7 +301,8 @@ public class CsvUtilsTest
                 batchesProvided.Add(batchOfRows);
                 batchIndexesProvided.Add(batchIndex);
                 return Task.FromResult(true);
-            });
+            }
+        );
 
         // The test csv has 160 data rows, so we expect 4 batches of 50, 50, 50 and 10 rows respectively
         // to have been provided to our function.
@@ -300,8 +313,7 @@ public class CsvUtilsTest
         Assert.Equal(10, batchesProvided[3].Count);
 
         // Check that the batch index provided is correct.
-        batchIndexesProvided.ForEach((indexProvided, i) =>
-            Assert.Equal(i, indexProvided));
+        batchIndexesProvided.ForEach((indexProvided, i) => Assert.Equal(i, indexProvided));
 
         // Check the very first and very last cells of each batch.
         Assert.Equal("2018", batchesProvided[0][0][0]);
@@ -341,7 +353,8 @@ public class CsvUtilsTest
                 batchIndexesProvided.Add(batchIndex);
                 return Task.FromResult(true);
             },
-            startingBatchIndex: 2);
+            startingBatchIndex: 2
+        );
 
         // The test csv has 160 data rows but we have chosen to skip the first 20, so we expect 3 batches
         // of 50, 50, 40 rows respectively to have been provided to our function.
@@ -350,8 +363,7 @@ public class CsvUtilsTest
         Assert.Equal(10, batchesProvided[1].Count);
 
         // Check that the batch index provided is correct, starting at 2 as we have skipped the first 2 batches.
-        batchIndexesProvided.ForEach((indexProvided, i) =>
-            Assert.Equal(i + 2, indexProvided));
+        batchIndexesProvided.ForEach((indexProvided, i) => Assert.Equal(i + 2, indexProvided));
     }
 
     [Fact]
@@ -371,7 +383,8 @@ public class CsvUtilsTest
 
                 batchesProvided.Add(batchOfRows);
                 return Task.FromResult(true);
-            });
+            }
+        );
 
         // We should have been provided 2 batches of rows before we chose to exit the iterations.
         Assert.Equal(2, batchesProvided.Count);
@@ -379,8 +392,11 @@ public class CsvUtilsTest
 
     private static Stream GetFileStream()
     {
-        var csv = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources", "test.csv");
+        var csv = Path.Combine(
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+            "Resources",
+            "test.csv"
+        );
 
         return new StreamReader(File.OpenRead(csv)).BaseStream;
     }

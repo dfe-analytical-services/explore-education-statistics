@@ -1,4 +1,3 @@
-#nullable enable
 using System.Text.RegularExpressions;
 using System.Web;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -31,13 +30,10 @@ public class SensitiveDataTelemetryProcessor : ITelemetryProcessor
         "username",
         "firstname",
         "lastname",
-        "fullname"
+        "fullname",
     };
 
-    private readonly char[] _tokenDelimiters =
-    {
-        '_', '-', ':', '.', '|', ' ', '[', ']', '+'
-    };
+    private readonly char[] _tokenDelimiters = { '_', '-', ':', '.', '|', ' ', '[', ']', '+' };
 
     private readonly Regex _casingRegex = new("([A-Z][a-z]*|[0-9])", RegexOptions.Compiled);
 
@@ -117,21 +113,20 @@ public class SensitiveDataTelemetryProcessor : ITelemetryProcessor
 
         var queryParts = pathAndQuery[1].Split('&');
 
-        var filteredQuery = queryParts.Select(
-                keyValue =>
+        var filteredQuery = queryParts
+            .Select(keyValue =>
+            {
+                var parts = keyValue.Split('=', 2);
+
+                if (parts.Length < 2)
                 {
-                    var parts = keyValue.Split('=', 2);
-
-                    if (parts.Length < 2)
-                    {
-                        return keyValue;
-                    }
-
-                    var key = parts[0];
-
-                    return IsRedactedKey(key) ? $"{key}={RedactedValue}" : keyValue;
+                    return keyValue;
                 }
-            )
+
+                var key = parts[0];
+
+                return IsRedactedKey(key) ? $"{key}={RedactedValue}" : keyValue;
+            })
             .JoinToString('&');
 
         return $"{pathAndQuery[0]}?{filteredQuery}";
@@ -139,25 +134,24 @@ public class SensitiveDataTelemetryProcessor : ITelemetryProcessor
 
     private bool IsRedactedKey(string key)
     {
-        return HttpUtility.UrlDecode(key)
+        return HttpUtility
+            .UrlDecode(key)
             .Split(_tokenDelimiters, StringSplitOptions.RemoveEmptyEntries)
-            .Any(
-                token =>
+            .Any(token =>
+            {
+                if (_redactedTokens.Contains(token.ToLower()))
                 {
-                    if (_redactedTokens.Contains(token.ToLower()))
-                    {
-                        return true;
-                    }
-
-                    // The token may be camel/pascal cased, meaning we should split
-                    // it up to check if any of the words is a matching token.
-                    // Note - we can't just check if any of the redacted tokens are inside of
-                    // the current token as redacted tokens may constitute actual words
-                    // e.g. `code` is in `encode` (which shouldn't be redacted).
-                    var words = _casingRegex.Split(token);
-
-                    return words.Any(word => _redactedTokens.Contains(word.ToLower()));
+                    return true;
                 }
-            );
+
+                // The token may be camel/pascal cased, meaning we should split
+                // it up to check if any of the words is a matching token.
+                // Note - we can't just check if any of the redacted tokens are inside of
+                // the current token as redacted tokens may constitute actual words
+                // e.g. `code` is in `encode` (which shouldn't be redacted).
+                var words = _casingRegex.Split(token);
+
+                return words.Any(word => _redactedTokens.Contains(word.ToLower()));
+            });
     }
 }

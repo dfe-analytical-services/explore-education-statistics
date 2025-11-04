@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -11,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
@@ -21,24 +19,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class PreReleaseUserServicePermissionTests
 {
-    private readonly ReleaseVersion _releaseVersion = new()
-    {
-        Id = Guid.NewGuid()
-    };
+    private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
 
     [Fact]
     public async Task GetPreReleaseUsers()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupPreReleaseUserService(
-                        userService: userService.Object);
-                    return service.GetPreReleaseUsers(_releaseVersion.Id);
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupPreReleaseUserService(userService: userService.Object);
+                return service.GetPreReleaseUsers(_releaseVersion.Id);
+            });
     }
 
     [Fact]
@@ -46,17 +38,11 @@ public class PreReleaseUserServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupPreReleaseUserService(
-                        userService: userService.Object);
-                    return service.GetPreReleaseUsersInvitePlan(
-                        _releaseVersion.Id,
-                        ListOf("test@test.com")
-                    );
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupPreReleaseUserService(userService: userService.Object);
+                return service.GetPreReleaseUsersInvitePlan(_releaseVersion.Id, ListOf("test@test.com"));
+            });
     }
 
     [Fact]
@@ -64,17 +50,11 @@ public class PreReleaseUserServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupPreReleaseUserService(
-                        userService: userService.Object);
-                    return service.InvitePreReleaseUsers(
-                        _releaseVersion.Id,
-                        ListOf("test@test.com")
-                    );
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupPreReleaseUserService(userService: userService.Object);
+                return service.InvitePreReleaseUsers(_releaseVersion.Id, ListOf("test@test.com"));
+            });
     }
 
     [Fact]
@@ -82,14 +62,11 @@ public class PreReleaseUserServicePermissionTests
     {
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
-            .AssertForbidden(
-                userService =>
-                {
-                    var service = SetupPreReleaseUserService(
-                        userService: userService.Object);
-                    return service.RemovePreReleaseUser(_releaseVersion.Id, "test@test.com");
-                }
-            );
+            .AssertForbidden(userService =>
+            {
+                var service = SetupPreReleaseUserService(userService: userService.Object);
+                return service.RemovePreReleaseUser(_releaseVersion.Id, "test@test.com");
+            });
     }
 
     private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
@@ -99,7 +76,6 @@ public class PreReleaseUserServicePermissionTests
 
     private PreReleaseUserService SetupPreReleaseUserService(
         ContentDbContext? context = null,
-        UsersAndRolesDbContext? usersAndRolesDbContext = null,
         IEmailService? emailService = null,
         IOptions<AppOptions>? appOptions = null,
         IOptions<NotifyOptions>? notifyOptions = null,
@@ -107,13 +83,12 @@ public class PreReleaseUserServicePermissionTests
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IUserService? userService = null,
         IUserRepository? userRepository = null,
-        IUserInviteRepository? userInviteRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
-        IUserReleaseInviteRepository? userReleaseInviteRepository = null)
+        IUserReleaseInviteRepository? userReleaseInviteRepository = null
+    )
     {
         return new(
             context ?? Mock.Of<ContentDbContext>(),
-            usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
             emailService ?? Mock.Of<IEmailService>(Strict),
             appOptions ?? Mock.Of<IOptions<AppOptions>>(Strict),
             notifyOptions ?? Mock.Of<IOptions<NotifyOptions>>(Strict),
@@ -121,7 +96,6 @@ public class PreReleaseUserServicePermissionTests
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
             userService ?? Mock.Of<IUserService>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
-            userInviteRepository ?? Mock.Of<IUserInviteRepository>(Strict),
             userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
             userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict)
         );

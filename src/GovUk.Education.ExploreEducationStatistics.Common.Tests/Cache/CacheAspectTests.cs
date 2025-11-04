@@ -171,9 +171,8 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
 
     private class TestCacheAttribute : CacheAttribute
     {
-        public TestCacheAttribute(Type key, bool forceUpdate = false) : base(key, forceUpdate)
-        {
-        }
+        public TestCacheAttribute(Type key, bool forceUpdate = false)
+            : base(key, forceUpdate) { }
 
         public override object? Get(ICacheKey cacheKey, Type returnType)
         {
@@ -200,9 +199,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
     private static class TestMethods
     {
         [TestCache(typeof(TestCacheKey))]
-        public static void ReturnVoid()
-        {
-        }
+        public static void ReturnVoid() { }
 
         [TestCache(typeof(TestCacheKey))]
         public static TestValue NoParams()
@@ -278,11 +275,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         [TestCache(typeof(TestCacheKey))]
         public static Task<Either<Unit, Task<TestValue>>> NoParams_NestedTaskEither()
         {
-            return Task.FromResult(
-                new Either<Unit, Task<TestValue>>(
-                    Task.FromResult(new TestValue())
-                )
-            );
+            return Task.FromResult(new Either<Unit, Task<TestValue>>(Task.FromResult(new TestValue())));
         }
 
         [TestCache(typeof(TestCacheKeyWithString))]
@@ -334,9 +327,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         }
 
         [TestCache(typeof(TestCacheKeyWithString))]
-        public static TestValue TwoParamsOfSameType_ParamAttribute(
-            string param1,
-            [CacheKeyParam] string param2)
+        public static TestValue TwoParamsOfSameType_ParamAttribute(string param1, [CacheKeyParam] string param2)
         {
             return new();
         }
@@ -344,7 +335,8 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         [TestCache(typeof(TestCacheKeyWithString))]
         public static TestValue TwoParamsOfSameType_BothParamAttributes_Ambiguous(
             [CacheKeyParam] string param1,
-            [CacheKeyParam] string param2)
+            [CacheKeyParam] string param2
+        )
         {
             return new();
         }
@@ -352,7 +344,8 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         [TestCache(typeof(TestCacheKeyWithString))]
         public static TestValue TwoParamsOfSameType_BothParamAttributes_MatchOnParamName(
             [CacheKeyParam] string param1,
-            [CacheKeyParam] string key)
+            [CacheKeyParam] string key
+        )
         {
             return new();
         }
@@ -360,15 +353,14 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         [TestCache(typeof(TestCacheKeyWithString))]
         public static TestValue TwoParamsOfSameType_BothParamAttributes_MatchOnAttributeName(
             [CacheKeyParam] string param1,
-            [CacheKeyParam("key")] string param2)
+            [CacheKeyParam("key")] string param2
+        )
         {
             return new();
         }
 
         [TestCache(typeof(TestCacheKeyWithTwoStrings))]
-        public static TestValue TwoParamsOfSameType_KeyWithTwoParamsOfSameType_Ambiguous(
-            string param1,
-            string param2)
+        public static TestValue TwoParamsOfSameType_KeyWithTwoParamsOfSameType_Ambiguous(string param1, string param2)
         {
             return new();
         }
@@ -382,7 +374,8 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         [TestCache(typeof(TestCacheKeyWithTwoStrings))]
         public static TestValue TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_SingleAmbiguous(
             [CacheKeyParam] string param1,
-            [CacheKeyParam] string key2)
+            [CacheKeyParam] string key2
+        )
         {
             return new();
         }
@@ -390,34 +383,35 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         [TestCache(typeof(TestCacheKeyWithTwoStrings))]
         public static TestValue TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_BothAmbiguous(
             [CacheKeyParam] string param1,
-            [CacheKeyParam] string param2)
+            [CacheKeyParam] string param2
+        )
         {
             return new();
         }
 
         [TestCache(typeof(TestCacheKeyWithTwoStrings))]
-        public static TestValue
-            TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_MatchOnParamNames(
-                [CacheKeyParam] string key2,
-                [CacheKeyParam] string key1)
+        public static TestValue TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_MatchOnParamNames(
+            [CacheKeyParam] string key2,
+            [CacheKeyParam] string key1
+        )
         {
             return new();
         }
 
         [TestCache(typeof(TestCacheKeyWithTwoStrings))]
-        public static TestValue
-            TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_MatchOnAttributeNames(
-                [CacheKeyParam("key2")] string param1,
-                [CacheKeyParam("key1")] string param2)
+        public static TestValue TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_MatchOnAttributeNames(
+            [CacheKeyParam("key2")] string param1,
+            [CacheKeyParam("key1")] string param2
+        )
         {
             return new();
         }
 
         [TestCache(typeof(TestCacheKeyWithTwoStrings))]
-        public static TestValue
-            TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_MatchOnAttributeAndParamNames(
-                [CacheKeyParam] string key2,
-                [CacheKeyParam("key1")] string param2)
+        public static TestValue TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_MatchOnAttributeAndParamNames(
+            [CacheKeyParam] string key2,
+            [CacheKeyParam("key1")] string param2
+        )
         {
             return new();
         }
@@ -429,9 +423,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         }
 
         [TestCache(typeof(TestCacheKeyWithStringAndInt))]
-        public static TestValue TwoParamsOfDifferentType_KeyWithTwoParamsOfDifferentType(
-            int param1,
-            string param2)
+        public static TestValue TwoParamsOfDifferentType_KeyWithTwoParamsOfDifferentType(int param1, string param2)
         {
             return new();
         }
@@ -443,9 +435,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         }
 
         [TestCache(typeof(TestCacheKeyWithDefaultRecordConstructor))]
-        public static TestValue TwoParamsOfSameType_DefaultRecordConstructor(
-            string key1,
-            string key2)
+        public static TestValue TwoParamsOfSameType_DefaultRecordConstructor(string key1, string key2)
         {
             return new();
         }
@@ -477,7 +467,8 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         [TestCache(typeof(TestCacheKeyWithMultipleConstructors))]
         public static TestValue MultipleConstructors_TwoParamsOfSameType_MatchOnAttributesName(
             string param1,
-            [CacheKeyParam("key1")] string param2)
+            [CacheKeyParam("key1")] string param2
+        )
         {
             return new();
         }
@@ -485,7 +476,8 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         [TestCache(typeof(TestCacheKeyWithMultipleConstructors))]
         public static TestValue MultipleConstructors_TwoParamsOfSameType_MatchOnAttributesNames(
             [CacheKeyParam("key2")] string param1,
-            [CacheKeyParam("key1")] string param2)
+            [CacheKeyParam("key1")] string param2
+        )
         {
             return new();
         }
@@ -499,7 +491,8 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         [TestCache(typeof(TestCacheKeyWithMultipleConstructors))]
         public static TestValue MultipleConstructors_TwoParamsOfDifferentType_MatchOnAttributesName(
             int param1,
-            [CacheKeyParam("key1")] string param2)
+            [CacheKeyParam("key1")] string param2
+        )
         {
             return new();
         }
@@ -570,6 +563,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
             return new();
         }
     }
+
     // ReSharper enable UnusedParameter.Local
 
     [Fact]
@@ -628,9 +622,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
     {
         var cacheKey = new TestCacheKey();
 
-        CacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns((object?)null);
+        CacheService.Setup(s => s.GetItem(cacheKey, typeof(TestValue))).Returns((object?)null);
 
         TestMethods.NoParams_ActionResult_NotFound().AssertNotFoundResult();
 
@@ -650,9 +642,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
     {
         var cacheKey = new TestCacheKey();
 
-        CacheService
-            .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
-            .ReturnsAsync((object?)null);
+        CacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue))).ReturnsAsync((object?)null);
 
         var exception = await Assert.ThrowsAsync<Exception>(TestMethods.NoParams_Task_Failure);
 
@@ -683,9 +673,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
     {
         var cacheKey = new TestCacheKey();
 
-        CacheService
-            .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
-            .ReturnsAsync((object?)null);
+        CacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue))).ReturnsAsync((object?)null);
 
         var exception = await Assert.ThrowsAsync<Exception>(TestMethods.NoParams_TaskEither_Failure);
 
@@ -699,9 +687,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
     {
         var cacheKey = new TestCacheKey();
 
-        CacheService
-            .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
-            .ReturnsAsync((object?)null);
+        CacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue))).ReturnsAsync((object?)null);
 
         var result = await TestMethods.NoParams_TaskEither_Left();
 
@@ -715,8 +701,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
     {
         var cacheKey = new TestCacheKey();
 
-        await AssertCacheMissAsync(cacheKey,
-            async () => (await TestMethods.NoParams_TaskActionResult()).Value!);
+        await AssertCacheMissAsync(cacheKey, async () => (await TestMethods.NoParams_TaskActionResult()).Value!);
     }
 
     [Fact]
@@ -724,9 +709,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
     {
         var cacheKey = new TestCacheKey();
 
-        CacheService
-            .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
-            .ReturnsAsync((object?)null);
+        CacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue))).ReturnsAsync((object?)null);
 
         var result = await TestMethods.NoParams_TaskActionResult_NotFound();
 
@@ -741,15 +724,14 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         var cacheKey = new TestCacheKey();
         var returnType = typeof(TestValue);
 
-        CacheService
-            .Setup(s => s.GetItemAsync(cacheKey, returnType))
-            .ReturnsAsync((object?)null);
+        CacheService.Setup(s => s.GetItemAsync(cacheKey, returnType)).ReturnsAsync((object?)null);
 
         // TryUnboxResult unboxes the Either, but then throws an exception on hitting the Task
         var exception = await Assert.ThrowsAsync<ArgumentException>(TestMethods.NoParams_NestedTaskEither);
         Assert.Equal(
             "Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.",
-            exception.Message);
+            exception.Message
+        );
 
         VerifyAllMocks(CacheService);
     }
@@ -817,10 +799,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
             () => TestMethods.TwoParamsOfSameType_Ambiguous("test1", "test2")
         );
 
-        Assert.Contains(
-            "Constructor (String key) has multiple matches at position(s): 0",
-            exception.Message
-        );
+        Assert.Contains("Constructor (String key) has multiple matches at position(s): 0", exception.Message);
     }
 
     [Fact]
@@ -830,11 +809,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         // as types are same and parameter names match.
         var cacheKey = new TestCacheKeyWithString("test2");
 
-        AssertCacheMiss(
-            cacheKey,
-            () =>
-                TestMethods.TwoParamsOfSameType_MatchOnName("test1", "test2")
-        );
+        AssertCacheMiss(cacheKey, () => TestMethods.TwoParamsOfSameType_MatchOnName("test1", "test2"));
     }
 
     [Fact]
@@ -842,11 +817,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
     {
         var cacheKey = new TestCacheKeyWithString("test2");
 
-        AssertCacheMiss(
-            cacheKey,
-            () =>
-                TestMethods.TwoParamsOfSameType_ParamAttribute("test1", "test2")
-        );
+        AssertCacheMiss(cacheKey, () => TestMethods.TwoParamsOfSameType_ParamAttribute("test1", "test2"));
     }
 
     [Fact]
@@ -897,7 +868,6 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         );
     }
 
-
     [Fact]
     public void TwoParamsOfSameType_KeyWithTwoParamsOfSameType_MatchOnNames()
     {
@@ -906,8 +876,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
 
         AssertCacheMiss(
             cacheKey,
-            () =>
-                TestMethods.TwoParamsOfSameType_KeyWithTwoParamsOfSameType_MatchOnNames("test1", "test2")
+            () => TestMethods.TwoParamsOfSameType_KeyWithTwoParamsOfSameType_MatchOnNames("test1", "test2")
         );
     }
 
@@ -916,10 +885,11 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
     {
         var exception = AssertNoUnambiguousMatchException(
             typeof(TestCacheKeyWithTwoStrings),
-            () => TestMethods.TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_SingleAmbiguous(
-                "test1",
-                "test2"
-            )
+            () =>
+                TestMethods.TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_SingleAmbiguous(
+                    "test1",
+                    "test2"
+                )
         );
 
         Assert.Contains(
@@ -933,10 +903,11 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
     {
         var exception = AssertNoUnambiguousMatchException(
             typeof(TestCacheKeyWithTwoStrings),
-            () => TestMethods.TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_BothAmbiguous(
-                "test1",
-                "test2"
-            )
+            () =>
+                TestMethods.TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_BothAmbiguous(
+                    "test1",
+                    "test2"
+                )
         );
 
         Assert.Contains(
@@ -971,11 +942,10 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         AssertCacheMiss(
             cacheKey,
             () =>
-                TestMethods
-                    .TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_MatchOnAttributeNames(
-                        "test1",
-                        "test2"
-                    )
+                TestMethods.TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_MatchOnAttributeNames(
+                    "test1",
+                    "test2"
+                )
         );
     }
 
@@ -989,11 +959,10 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         AssertCacheMiss(
             cacheKey,
             () =>
-                TestMethods
-                    .TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_MatchOnAttributeAndParamNames(
-                        "test1",
-                        "test2"
-                    )
+                TestMethods.TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_MatchOnAttributeAndParamNames(
+                    "test1",
+                    "test2"
+                )
         );
     }
 
@@ -1012,11 +981,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         var cacheKey = new TestCacheKeyWithString("test");
         var expected = new TestValue();
 
-        AssertCacheHit(
-            cacheKey,
-            expected,
-            () => TestMethods.TwoParamsOfDifferentType(10, "test")
-        );
+        AssertCacheHit(cacheKey, expected, () => TestMethods.TwoParamsOfDifferentType(10, "test"));
     }
 
     [Fact]
@@ -1024,10 +989,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
     {
         var cacheKey = new TestCacheKeyWithString("test");
 
-        AssertCacheMiss(
-            cacheKey,
-            () => TestMethods.TwoParamsOfDifferentType(10, "test")
-        );
+        AssertCacheMiss(cacheKey, () => TestMethods.TwoParamsOfDifferentType(10, "test"));
     }
 
     [Fact]
@@ -1066,10 +1028,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
     {
         var cacheKey = new TestCacheKeyWithMultipleConstructors("test");
 
-        AssertCacheMiss(
-            cacheKey,
-            () => TestMethods.MultipleConstructors_SingleParam("test")
-        );
+        AssertCacheMiss(cacheKey, () => TestMethods.MultipleConstructors_SingleParam("test"));
     }
 
     [Fact]
@@ -1086,10 +1045,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
     {
         var cacheKey = new TestCacheKeyWithMultipleConstructors("test");
 
-        AssertCacheMiss(
-            cacheKey,
-            () => TestMethods.MultipleConstructors_TwoParamsOfSameType_MatchOnName("test")
-        );
+        AssertCacheMiss(cacheKey, () => TestMethods.MultipleConstructors_TwoParamsOfSameType_MatchOnName("test"));
     }
 
     [Fact]
@@ -1130,10 +1086,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
     {
         var cacheKey = new TestCacheKeyWithMultipleConstructors("test", 10);
 
-        AssertCacheMiss(
-            cacheKey,
-            () => TestMethods.MultipleConstructors_TwoParamsOfDifferentType(10, "test")
-        );
+        AssertCacheMiss(cacheKey, () => TestMethods.MultipleConstructors_TwoParamsOfDifferentType(10, "test"));
     }
 
     [Fact]
@@ -1195,7 +1148,6 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         AssertCacheMiss(cacheKey, () => TestMethods.NullableAndDefaultConstructors_SingleParam(10));
     }
 
-
     [Fact]
     public void NullableAndDefaultConstructors_TwoParams()
     {
@@ -1241,8 +1193,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         // Verify that there is no attempt to "get" a currently-cached value when the "ForceUpdate" flag is set.
         // This means that we're only ever getting fresh values for the item and then setting or updating the cached
         // entry with that new value rather than ever attempting to retrieve it.
-        CacheService
-            .Setup(s => s.SetItem(cacheKey, Capture.In(args)));
+        CacheService.Setup(s => s.SetItem(cacheKey, Capture.In(args)));
 
         var returnedItem = TestMethods.ForceUpdate();
 
@@ -1254,9 +1205,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
 
     private static void AssertCacheHit(ICacheKey cacheKey, object expectedResult, Func<TestValue> run)
     {
-        CacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .Returns(expectedResult);
+        CacheService.Setup(s => s.GetItem(cacheKey, typeof(TestValue))).Returns(expectedResult);
 
         var result = run();
 
@@ -1267,9 +1216,7 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
 
     private static async Task AssertCacheHitAsync(ICacheKey cacheKey, object expectedResult, Func<Task<TestValue>> run)
     {
-        CacheService
-            .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
-            .ReturnsAsync(expectedResult);
+        CacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue))).ReturnsAsync(expectedResult);
 
         var result = await run();
 
@@ -1290,14 +1237,11 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
 
     private static void AssertCacheMiss(ICacheKey cacheKey, Type returnType, Func<object> run)
     {
-        CacheService
-            .Setup(s => s.GetItem(cacheKey, returnType))
-            .Returns((object?)null);
+        CacheService.Setup(s => s.GetItem(cacheKey, returnType)).Returns((object?)null);
 
         var args = new List<object>();
 
-        CacheService
-            .Setup(s => s.SetItem(cacheKey, Capture.In(args)));
+        CacheService.Setup(s => s.SetItem(cacheKey, Capture.In(args)));
 
         var result = run();
 
@@ -1308,15 +1252,11 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
 
     private static async Task AssertCacheMissAsync(ICacheKey cacheKey, Type returnType, Func<Task<object>> run)
     {
-        CacheService
-            .Setup(s => s.GetItemAsync(cacheKey, returnType))
-            .ReturnsAsync((object?)null);
+        CacheService.Setup(s => s.GetItemAsync(cacheKey, returnType)).ReturnsAsync((object?)null);
 
         var args = new List<object>();
 
-        CacheService
-            .Setup(s => s.SetItemAsync(cacheKey, Capture.In(args)))
-            .Returns(Task.CompletedTask);
+        CacheService.Setup(s => s.SetItemAsync(cacheKey, Capture.In(args))).Returns(Task.CompletedTask);
 
         var result = await run();
 
@@ -1325,16 +1265,11 @@ public class CacheAspectTests : IClassFixture<CacheTestFixture>
         VerifyAllMocks(CacheService);
     }
 
-    private static void AssertNoMatchingConstructorException(
-        Type cacheKeyType,
-        Func<object> run)
+    private static void AssertNoMatchingConstructorException(Type cacheKeyType, Func<object> run)
     {
         var exception = Assert.Throws<MissingMemberException>(run);
 
-        Assert.Contains(
-            $"No matching constructor for cache key {cacheKeyType.GetPrettyFullName()}",
-            exception.Message
-        );
+        Assert.Contains($"No matching constructor for cache key {cacheKeyType.GetPrettyFullName()}", exception.Message);
     }
 
     private static AmbiguousMatchException AssertNoUnambiguousMatchException(Type cacheKeyType, Func<TestValue> run)

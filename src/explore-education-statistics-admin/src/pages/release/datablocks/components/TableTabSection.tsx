@@ -21,34 +21,35 @@ const TableTabSection = ({
   const dataTableRef = useRef<HTMLElement>(null);
 
   return (
-    <>
-      {onReorderTableHeaders && (
-        <TableHeadersForm
-          initialValues={tableHeaders}
-          onSubmit={nextTableHeaders => {
-            onReorderTableHeaders(nextTableHeaders);
-            if (dataTableRef.current) {
-              // add a short delay so the reordering form is closed before it scrolls.
-              setTimeout(() => {
-                dataTableRef?.current?.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
-                });
-              }, 200);
-            }
-          }}
-        />
-      )}
-
-      <TimePeriodDataTable
-        footnotesClassName="govuk-!-width-two-thirds"
-        fullTable={table}
-        tableHeadersConfig={tableHeaders}
-        captionTitle={dataBlock.heading}
-        source={dataBlock.source}
-        ref={dataTableRef}
-      />
-    </>
+    <TimePeriodDataTable
+      footnotesClassName="govuk-!-width-two-thirds"
+      fullTable={table}
+      tableHeadersConfig={tableHeaders}
+      captionTitle={dataBlock.heading}
+      source={dataBlock.source}
+      ref={dataTableRef}
+      tableHeadersForm={
+        <>
+          {onReorderTableHeaders && (
+            <TableHeadersForm
+              initialValues={tableHeaders}
+              onSubmit={nextTableHeaders => {
+                onReorderTableHeaders(nextTableHeaders);
+                if (dataTableRef.current) {
+                  // add a short delay so the reordering form is closed before it scrolls.
+                  setTimeout(() => {
+                    dataTableRef?.current?.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start',
+                    });
+                  }, 200);
+                }
+              }}
+            />
+          )}
+        </>
+      }
+    />
   );
 };
 

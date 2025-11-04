@@ -145,7 +145,6 @@ const ChartConfiguration = ({
       height: Yup.number()
         .required('Enter chart height')
         .positive('Chart height must be positive'),
-      width: Yup.number().positive('Chart width must be positive'),
       subtitle: Yup.string().max(
         160,
         'Subtitle must be 160 characters or fewer',
@@ -284,9 +283,8 @@ const ChartConfiguration = ({
   );
 
   const handleChange = useCallback(
-    ({ width, ...values }: FormValues) => {
-      // allow width to be set to undefined
-      onChange({ ...normalizeValues(values), width });
+    (values: FormValues) => {
+      onChange(normalizeValues(values));
     },
     [normalizeValues, onChange],
   );
@@ -406,15 +404,6 @@ const ChartConfiguration = ({
               <FormFieldNumberInput<FormValues>
                 name="height"
                 label="Height (pixels)"
-                width={5}
-              />
-            )}
-
-            {validationSchema.fields.width && (
-              <FormFieldNumberInput<FormValues>
-                name="width"
-                label="Width (pixels)"
-                hint="Leave blank to set as full width"
                 width={5}
               />
             )}

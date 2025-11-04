@@ -65,9 +65,11 @@ public class ViewReleaseStatusHistoryAuthorizationHandlerTests
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
                 userReleaseRoleRepository: new UserReleaseRoleRepository(
                     contentDbContext: contentDbContext,
-                    logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()),
-                userPublicationRoleRepository: new UserPublicationRoleRepository(
-                    contentDbContext: contentDbContext),
-                preReleaseService: Mock.Of<IPreReleaseService>(Strict)));
+                    logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
+                ),
+                userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext: contentDbContext),
+                preReleaseService: Mock.Of<IPreReleaseService>(Strict)
+            )
+        );
     }
 }

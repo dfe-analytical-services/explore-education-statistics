@@ -1,4 +1,3 @@
-#nullable enable
 using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -30,15 +29,13 @@ public record ValidationProblemViewModel : ProblemDetailsViewModel
 
     public static ValidationProblemViewModel Create(ValidationProblemDetails problemDetails)
     {
-        var errors = problemDetails.Errors
-            .SelectMany(errorEntry =>
-                errorEntry.Value.Select(
-                    message => new ErrorViewModel
-                    {
-                        Path = errorEntry.Key.IsNullOrEmpty() ? null : errorEntry.Key,
-                        Message = message
-                    }
-                )
+        var errors = problemDetails
+            .Errors.SelectMany(errorEntry =>
+                errorEntry.Value.Select(message => new ErrorViewModel
+                {
+                    Path = errorEntry.Key.IsNullOrEmpty() ? null : errorEntry.Key,
+                    Message = message,
+                })
             )
             .ToList();
 
@@ -47,7 +44,8 @@ public record ValidationProblemViewModel : ProblemDetailsViewModel
 
     public static ValidationProblemViewModel Create(
         ValidationProblemDetails problemDetails,
-        IEnumerable<ErrorViewModel> errors)
+        IEnumerable<ErrorViewModel> errors
+    )
     {
         var viewModel = new ValidationProblemViewModel
         {

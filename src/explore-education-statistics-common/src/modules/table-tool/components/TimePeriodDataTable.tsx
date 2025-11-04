@@ -10,7 +10,7 @@ import DataTableCaption from '@common/modules/table-tool/components/DataTableCap
 import FixedMultiHeaderDataTable from '@common/modules/table-tool/components/FixedMultiHeaderDataTable';
 import mapTableToJson from '@common/modules/table-tool/utils/mapTableToJson';
 import TableExportMenu from '@common/modules/find-statistics/components/TableExportMenu';
-import React, { forwardRef, memo, RefObject } from 'react';
+import React, { forwardRef, memo, ReactNode, RefObject } from 'react';
 
 interface Props {
   captionTitle?: string;
@@ -22,6 +22,7 @@ interface Props {
   releaseVersionId?: string;
   source?: string;
   tableHeadersConfig: TableHeadersConfig;
+  tableHeadersForm?: ReactNode;
   onError?: (message: string) => void;
 }
 
@@ -37,6 +38,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       releaseVersionId,
       source,
       tableHeadersConfig,
+      tableHeadersForm,
       onError,
     }: Props,
     dataTableRef,
@@ -91,8 +93,9 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
                 id={captionId}
               />
             }
-            tableJson={tableJson}
             captionId={captionId}
+            captionTitle={captionTitle}
+            tableJson={tableJson}
             footnotesClassName={footnotesClassName}
             footnotesId={
               dataBlockId
@@ -103,6 +106,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
             ref={dataTableRef}
             footnotes={subjectMeta.footnotes}
             source={source}
+            tableHeadersForm={tableHeadersForm}
           />
         </>
       );

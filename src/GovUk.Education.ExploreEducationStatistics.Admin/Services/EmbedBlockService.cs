@@ -29,7 +29,7 @@ public class EmbedBlockService : IEmbedBlockService
     public static readonly string[] PermittedDomains =
     {
         "https://department-for-education.shinyapps.io",
-        "https://dfe-analytical-services.github.io"
+        "https://dfe-analytical-services.github.io",
     };
 
     private readonly ContentDbContext _contentDbContext;
@@ -43,7 +43,8 @@ public class EmbedBlockService : IEmbedBlockService
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IContentBlockService contentBlockService,
         IUserService userService,
-        IMapper mapper)
+        IMapper mapper
+    )
     {
         _contentDbContext = contentDbContext;
         _persistenceHelper = persistenceHelper;
@@ -54,16 +55,24 @@ public class EmbedBlockService : IEmbedBlockService
 
     public async Task<Either<ActionResult, EmbedBlockLinkViewModel>> Create(
         Guid releaseVersionId,
-        EmbedBlockCreateRequest request)
+        EmbedBlockCreateRequest request
+    )
     {
         return await _persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-            .OnSuccess(_ => _persistenceHelper.CheckEntityExists<ContentSection>(
-                request.ContentSectionId,
-                query => query.Include(contentSection => contentSection.Content)))
-            .OnSuccessDo(_ => ValidateContentSectionAttachedToReleaseVersion(releaseVersionId: releaseVersionId,
-                contentSectionId: request.ContentSectionId))
+            .OnSuccess(_ =>
+                _persistenceHelper.CheckEntityExists<ContentSection>(
+                    request.ContentSectionId,
+                    query => query.Include(contentSection => contentSection.Content)
+                )
+            )
+            .OnSuccessDo(_ =>
+                ValidateContentSectionAttachedToReleaseVersion(
+                    releaseVersionId: releaseVersionId,
+                    contentSectionId: request.ContentSectionId
+                )
+            )
             .OnSuccessDo(_ => ValidateEmbedUrl(request.Url))
             .OnSuccess(async contentSection =>
             {
@@ -71,7 +80,7 @@ public class EmbedBlockService : IEmbedBlockService
                 {
                     Id = Guid.NewGuid(),
                     Title = request.Title,
-                    Url = request.Url
+                    Url = request.Url,
                 };
 
                 var order = contentSection.Content.Any()
@@ -83,7 +92,7 @@ public class EmbedBlockService : IEmbedBlockService
                     ContentSectionId = request.ContentSectionId,
                     Order = order,
                     EmbedBlock = embedBlock,
-                    ReleaseVersionId = releaseVersionId
+                    ReleaseVersionId = releaseVersionId,
                 };
 
                 _contentDbContext.EmbedBlocks.Add(embedBlock);
@@ -95,19 +104,27 @@ public class EmbedBlockService : IEmbedBlockService
             });
     }
 
-    public async Task<Either<ActionResult, EmbedBlockLinkViewModel>> Update(Guid releaseVersionId,
+    public async Task<Either<ActionResult, EmbedBlockLinkViewModel>> Update(
+        Guid releaseVersionId,
         Guid contentBlockId,
-        EmbedBlockUpdateRequest request)
+        EmbedBlockUpdateRequest request
+    )
     {
         return await _persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-            .OnSuccess(_ => _persistenceHelper.CheckEntityExists<EmbedBlockLink>(
-                contentBlockId,
-                query => query.Include(cb => cb.EmbedBlock)))
-            .OnSuccessDo(contentBlock => ValidateContentSectionAttachedToReleaseVersion(
-                releaseVersionId: releaseVersionId,
-                contentSectionId: contentBlock.ContentSectionId!.Value))
+            .OnSuccess(_ =>
+                _persistenceHelper.CheckEntityExists<EmbedBlockLink>(
+                    contentBlockId,
+                    query => query.Include(cb => cb.EmbedBlock)
+                )
+            )
+            .OnSuccessDo(contentBlock =>
+                ValidateContentSectionAttachedToReleaseVersion(
+                    releaseVersionId: releaseVersionId,
+                    contentSectionId: contentBlock.ContentSectionId!.Value
+                )
+            )
             .OnSuccessDo(_ => ValidateEmbedUrl(request.Url))
             .OnSuccess(async contentBlock =>
             {
@@ -131,16 +148,20 @@ public class EmbedBlockService : IEmbedBlockService
             .OnSuccessVoid(async releaseVersion =>
             {
                 return await _persistenceHelper
-                    .CheckEntityExists<EmbedBlockLink>(contentBlockId, query
-                        => query.Include(block => block.EmbedBlock))
+                    .CheckEntityExists<EmbedBlockLink>(
+                        contentBlockId,
+                        query => query.Include(block => block.EmbedBlock)
+                    )
                     .OnSuccess<ActionResult, EmbedBlockLink, Unit>(async contentBlock =>
                     {
-                        if (!_contentDbContext.ContentSections
-                                .Any(section => section.ReleaseVersionId == releaseVersion.Id
-                                                && section.Id == contentBlock.ContentSectionId))
+                        if (
+                            !_contentDbContext.ContentSections.Any(section =>
+                                section.ReleaseVersionId == releaseVersion.Id
+                                && section.Id == contentBlock.ContentSectionId
+                            )
+                        )
                         {
-                            return ValidationActionResult(
-                                ContentBlockNotAttachedToRelease);
+                            return ValidationActionResult(ContentBlockNotAttachedToRelease);
                         }
 
                         await _contentBlockService.DeleteContentBlockAndReorder(contentBlock.Id);
@@ -159,11 +180,12 @@ public class EmbedBlockService : IEmbedBlockService
 
     private Either<ActionResult, Unit> ValidateContentSectionAttachedToReleaseVersion(
         Guid releaseVersionId,
-        Guid contentSectionId)
+        Guid contentSectionId
+    )
     {
-        return _contentDbContext
-            .ContentSections
-            .Any(section => section.ReleaseVersionId == releaseVersionId && section.Id == contentSectionId)
+        return _contentDbContext.ContentSections.Any(section =>
+            section.ReleaseVersionId == releaseVersionId && section.Id == contentSectionId
+        )
             ? Unit.Instance
             : ValidationActionResult(ContentSectionNotAttachedToRelease);
     }

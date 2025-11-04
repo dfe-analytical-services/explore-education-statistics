@@ -20,5 +20,4 @@ public class SubscriptionEntity : ITableEntity
     public string Slug { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public DateTime? DateTimeCreated { get; set; } // For pending subs, this is used to store the time it expires, not the created date!
-
 }
