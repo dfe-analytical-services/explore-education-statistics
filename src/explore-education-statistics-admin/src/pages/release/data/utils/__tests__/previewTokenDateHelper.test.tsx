@@ -48,16 +48,14 @@ describe('PreviewTokenDateHelper', () => {
     });
 
     test('should use current time as start date when activates is today', () => {
-      const activatesDate = new Date('2025-01-15T10:00:00');
-      const expiresDate = new Date('2025-01-20T15:30:00');
-      const mockCurrentTimeUtc = new Date('2025-01-15T14:30:45Z');
-      const mockEndUtc = new Date('2025-01-20T23:59:59Z');
-
       mockIsToday.mockReturnValue(true);
-      mockZonedTimeToUtc
-        .mockReturnValueOnce(mockCurrentTimeUtc)
-        .mockReturnValueOnce(mockEndUtc);
+      const activatesDate = new Date('2025-01-15T10:00:00');
+      const expiresDate = new Date('2025-01-20T23:59:59');
 
+      mockZonedTimeToUtc
+        .mockReturnValueOnce(activatesDate)
+        .mockReturnValueOnce(expiresDate);
+      helper = new PreviewTokenDateHelper();
       const result = helper.setDateRangeBasedOnCustomDates(
         activatesDate,
         expiresDate,
@@ -75,16 +73,21 @@ describe('PreviewTokenDateHelper', () => {
         'Europe/London',
       );
       expect(result).toEqual({
-        startDate: mockCurrentTimeUtc,
-        endDate: mockEndUtc,
+        startDate: activatesDate,
+        endDate: expiresDate,
       });
     });
 
     test('should default to 24-hour range when dates are not provided', () => {
+      const currentDate = new Date('2025-01-10T10:59:59');
+
+      mockZonedTimeToUtc
+        .mockReturnValueOnce(currentDate)
+        .mockReturnValueOnce(currentDate);
+
       const result = helper.setDateRangeBasedOnCustomDates(null, null);
 
       expect(mockIsToday).not.toHaveBeenCalled();
-      expect(mockZonedTimeToUtc).not.toHaveBeenCalled();
       expect(result.endDate.getTime() - result.startDate.getTime()).toBeCloseTo(
         24 * 60 * 60 * 1000,
         -3,
@@ -109,11 +112,12 @@ describe('PreviewTokenDateHelper', () => {
 
       mockZonedTimeToUtc
         .mockReturnValueOnce(mockStartUtc)
-        .mockReturnValueOnce(mockEndUtc);
+        .mockReturnValueOnce(mockEndUtc)
+        .mockReturnValueOnce(mockStartUtc);
 
       const result = helper.setDateRangeBasedOnPresets(3);
 
-      expect(mockZonedTimeToUtc).toHaveBeenCalledTimes(2);
+      expect(mockZonedTimeToUtc).toHaveBeenCalledTimes(3);
       expect(mockZonedTimeToUtc).toHaveBeenNthCalledWith(
         1,
         expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/),

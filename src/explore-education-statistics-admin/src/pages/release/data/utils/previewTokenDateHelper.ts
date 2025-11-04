@@ -4,11 +4,6 @@ import { zonedTimeToUtc } from 'date-fns-tz';
 export type DateRange = { startDate: Date; endDate: Date };
 
 export default class PreviewTokenDateHelper {
-  constructor(
-    private readonly timezone: string = 'Europe/London',
-    private readonly nowUk: Date = this.toUtcAtTime(new Date()),
-  ) {}
-
   public setDateRangeBasedOnCustomDates(
     activates: Date | null | undefined,
     expires: Date | null | undefined,
@@ -24,14 +19,14 @@ export default class PreviewTokenDateHelper {
     }
 
     if (activates && expires) {
-      const startDate = !isToday(activates) // Activates is DATE Only and so we don't worry calling `toUtcAtTime` or retaining the correct local timezone & UTC offsets
-        ? this.toUtcAtTime(activates, '00:00:00')
-        : this.nowUk;
-      const endDate = this.toUtcAtTime(expires, '23:59:59'); // set custom dates
+      const startDate = !isToday(activates)
+        ? this.ukToUtcAtTime(activates, '00:00:00')
+        : this.ukToUtcAtTime(new Date());
+      const endDate = this.ukToUtcAtTime(expires, '23:59:59');
       return { startDate, endDate };
     }
-    const startDate = this.nowUk;
-    const endDate = new Date(this.nowUk);
+    const startDate = this.ukToUtcAtTime(new Date());
+    const endDate = new Date(this.ukToUtcAtTime(new Date()));
     endDate.setUTCDate(endDate.getUTCDate() + 1); // 24 hours
     return { startDate, endDate };
   }
@@ -49,22 +44,25 @@ export default class PreviewTokenDateHelper {
       );
     }
 
-    const endAnchor = new Date(this.nowUk);
-    endAnchor.setUTCDate(endAnchor.getUTCDate() + datePresetSpan); // add pre set days
-    const endDate = this.toUtcAtTime(endAnchor, '23:59:59');
+    const endAnchor = new Date(this.ukToUtcAtTime(new Date()));
+    endAnchor.setUTCDate(endAnchor.getUTCDate() + datePresetSpan); // add pre-set days
+    const endDate = this.ukToUtcAtTime(endAnchor, '23:59:59');
 
     // use current time as start date
-    return { startDate: this.nowUk, endDate };
+    return { startDate: this.ukToUtcAtTime(new Date()), endDate };
   }
 
-  /** Convert a given Date's calendar day (in this.timezone) plus HH:mm:ss into UTC Date. */
-  private toUtcAtTime(dateParam: Date, timeParam: string | null = null): Date {
+  /** Convert a given Date's calendar day (in 'Europe/London') plus HH:mm:ss into UTC Date. */
+  private ukToUtcAtTime(
+    dateParam: Date,
+    timeParam: string | null = null,
+  ): Date {
     let time = timeParam;
     if (!timeParam) {
       time = this.hhmmss(dateParam);
     }
     const localIso = `${dateParam.toISOString().substring(0, 10)}T${time}`;
-    return zonedTimeToUtc(localIso, this.timezone);
+    return zonedTimeToUtc(localIso, 'Europe/London');
   }
 
   /** Formats HH:mm:ss from a Date's local time portion. */
