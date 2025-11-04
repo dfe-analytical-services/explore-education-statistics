@@ -13,6 +13,7 @@ import publicationService, {
   ReleaseVersionHomeContent,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
+import { releaseTypes } from '@common/services/types/releaseType';
 import { Dictionary } from '@common/types';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import ReleasePageShell from '@frontend/modules/find-statistics/components/ReleasePageShell';
@@ -129,6 +130,7 @@ const PublicationReleasePage: NextPage<Props> = props => {
           praSummary={props.praSummary}
           publicationSummary={props.publicationSummary}
           relatedInformationItems={props.relatedInformationItems}
+          releaseVersionSummary={props.releaseVersionSummary}
         />
       )}
     </ReleasePageShell>
@@ -306,6 +308,10 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
                 page: 'help',
                 inPageNavItems: [
                   { ...contactUsNavItem, text: 'Get help by contacting us' },
+                  {
+                    id: 'release-type-section',
+                    text: releaseTypes[releaseVersionSummary.type],
+                  },
                   hasRelatedInformation && {
                     id: 'related-information-section',
                     text: 'Related information',
