@@ -36,7 +36,7 @@ export default function ReleasePageContentSection({
         data-testid={testId}
       >
         <h2
-          id={generateIdFromHeading(heading)}
+          id={generateIdFromHeading(heading, 'heading')}
           className={caption ? 'govuk-!-margin-bottom-4' : undefined}
         >
           {heading}
