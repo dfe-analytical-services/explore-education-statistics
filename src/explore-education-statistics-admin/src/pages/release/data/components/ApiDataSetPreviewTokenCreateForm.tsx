@@ -149,9 +149,9 @@ export default function ApiDataSetPreviewTokenCreateForm({
               if (!activates || !value) return false;
 
               const activatesUtc = ukStartOfDayUtc(activates);
-              const expiresUtc = ukEndOfDayUtc(value); // Set 'Expires' to the end of the day as FE doesn't allow Time input
+              const expiresUtc = ukEndOfDayUtc(value);
 
-              const activatesMaxUtc = new Date(activatesUtc);
+              const activatesMaxUtc = ukEndOfDayUtc(activates);
               activatesMaxUtc.setDate(activatesMaxUtc.getDate() + 7);
 
               const laterThanActivates =
