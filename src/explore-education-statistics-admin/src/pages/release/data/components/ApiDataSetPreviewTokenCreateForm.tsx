@@ -127,7 +127,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
                 if (value == null) return false;
                 const activatesUk = ukStartOfDayUtc(value);
                 const maxUk = nowUk();
-                maxUk.setDate(maxUk.getDate() + 7);
+                maxUk.setUTCDate(maxUk.getUTCDate() + 7);
                 const todayUk = nowUk();
                 todayUk.setHours(0, 0, 0, 0);
                 return endDateIsLaterThanOrEqualToStartDate(
