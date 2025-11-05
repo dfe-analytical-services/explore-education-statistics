@@ -2515,6 +2515,7 @@
                 "objectType": "BlobBackupDatasourceParameters",
                 "containersList": [
                   "cache",
+                  "backups",
                   "methodologies",
                   "releases",
                   "releases-temp"
