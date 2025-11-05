@@ -1,61 +1,47 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Database;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class BootstrapUsersService
+public class BootstrapUsersService(IConfiguration configuration, ContentDbContext contentDbContext)
 {
-    private readonly IConfiguration _configuration;
-    private readonly UsersAndRolesDbContext _usersAndRolesDbContext;
-    private readonly ContentDbContext _contentDbContext;
-
-    public BootstrapUsersService(
-        IConfiguration configuration,
-        UsersAndRolesDbContext usersAndRolesDbContext,
-        ContentDbContext contentDbContext
-    )
-    {
-        _configuration = configuration;
-        _usersAndRolesDbContext = usersAndRolesDbContext;
-        _contentDbContext = contentDbContext;
-    }
-
     /**
      * Add any bootstrapping BAU users that we have specified on startup.
      */
     public void AddBootstrapUsers()
     {
-        var bauBootstrapUserEmailAddresses = _configuration
+        var bauBootstrapUserEmailAddresses = configuration
             .GetSection("BootstrapUsers")
-            ?.GetValue<string>("BAU")
-            ?.Split(',');
+            .GetValue<string>("BAU")
+            ?.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(email => email.Trim())
+            .Where(email => !email.IsNullOrWhitespace())
+            .ToList();
 
         if (bauBootstrapUserEmailAddresses.IsNullOrEmpty())
         {
             return;
         }
 
-        var existingEmailInvites = _usersAndRolesDbContext
-            .UserInvites.AsQueryable()
-            .Select(i => i.Email.ToLower())
-            .ToList();
+        var existingUserEmails = contentDbContext.Users.Select(u => u.Email.ToLower()).ToList();
 
-        var existingUserEmails = _contentDbContext.Users.AsQueryable().Select(u => u.Email.ToLower()).ToList();
+        var placeholderDeletedUserId = contentDbContext
+            .Users.Where(u => u.Email == User.DeletedUserPlaceholderEmail)
+            .Select(u => u.Id)
+            .Single();
 
         var newInvitesToCreate = bauBootstrapUserEmailAddresses!
-            .Where(email =>
-                !existingEmailInvites.Contains(email.ToLower()) && !existingUserEmails.Contains(email.ToLower())
-            )
-            .Select(email => new UserInvite
+            .Where(email => !existingUserEmails.Contains(email.ToLower()))
+            .Select(email => new User
             {
                 Email = email,
                 RoleId = Role.BauUser.GetEnumValue(),
-                Accepted = false,
-                Created = DateTime.UtcNow,
+                Active = false,
+                Created = DateTimeOffset.UtcNow,
+                CreatedById = placeholderDeletedUserId,
             })
             .ToList();
 
@@ -64,7 +50,7 @@ public class BootstrapUsersService
             return;
         }
 
-        _usersAndRolesDbContext.UserInvites.AddRange(newInvitesToCreate);
-        _usersAndRolesDbContext.SaveChanges();
+        contentDbContext.Users.AddRange(newInvitesToCreate);
+        contentDbContext.SaveChanges();
     }
 }

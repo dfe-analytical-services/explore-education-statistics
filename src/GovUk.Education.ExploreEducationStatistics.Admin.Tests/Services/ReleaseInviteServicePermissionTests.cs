@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -142,13 +141,11 @@ public class ReleaseInviteServicePermissionTest
 
     private static ReleaseInviteService SetupReleaseInviteService(
         ContentDbContext? contentDbContext = null,
-        UsersAndRolesDbContext? usersAndRolesDbContext = null,
         IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
         IUserRepository? userRepository = null,
         IUserService? userService = null,
         IUserRoleService? userRoleService = null,
-        IUserInviteRepository? userInviteRepository = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IEmailService? emailService = null,
@@ -157,7 +154,6 @@ public class ReleaseInviteServicePermissionTest
     )
     {
         contentDbContext ??= InMemoryApplicationDbContext();
-        usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
         userRepository ??= new UserRepository(contentDbContext);
 
         return new ReleaseInviteService(
@@ -167,7 +163,6 @@ public class ReleaseInviteServicePermissionTest
             userRepository,
             userService ?? AlwaysTrueUserService().Object,
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
-            userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
             userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict),
             userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
             emailService ?? Mock.Of<IEmailService>(Strict),

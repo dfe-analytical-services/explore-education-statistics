@@ -338,6 +338,62 @@ public class DataSetValidatorTests
         }
     }
 
+    [Fact]
+    public async Task ValidateDataSet_DataFileAlreadyExists_ReturnsErrorDetails()
+    {
+        // Arrange
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+
+        var dataSetTitle = "Data set title";
+        var duplicateFileDataSetTitle = "Data set title for duplicate data file upload";
+        var dataFileName = "test-data.csv";
+        var metaFileName = "test-data.meta.csv";
+
+        var existingReleaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithName(dataSetTitle)
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithFilename(dataFileName))
+            .Generate();
+
+        var existingMetaReleaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Metadata).WithFilename(metaFileName))
+            .Generate();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contentDbContextId))
+        {
+            context.ReleaseFiles.AddRange(existingReleaseFile, existingMetaReleaseFile);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contentDbContextId))
+        {
+            var dataFile = await new DataSetFileBuilder().WhereFileNameIs(dataFileName).Build(FileType.Data);
+            var metaFile = await new DataSetFileBuilder().WhereFileNameIs(metaFileName).Build(FileType.Metadata);
+
+            var dataSetDto = new DataSetDto
+            {
+                ReleaseVersionId = releaseVersion.Id,
+                Title = duplicateFileDataSetTitle,
+                DataFile = dataFile,
+                MetaFile = metaFile,
+            };
+
+            var sut = BuildService(context);
+
+            // Act
+            var result = await sut.ValidateDataSet(dataSetDto);
+
+            // Assert
+            var errors = result.AssertLeft();
+            var error = Assert.Single(errors);
+            Assert.Equal(ValidationMessages.FileNameNotUnique.Code, error.Code);
+        }
+    }
+
     [Theory]
     [InlineData(FileType.Data)] // Metadata file is missing
     [InlineData(FileType.Metadata)] // Data file is missing

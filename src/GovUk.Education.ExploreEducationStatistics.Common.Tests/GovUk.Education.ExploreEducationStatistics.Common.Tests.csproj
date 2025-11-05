@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="AspectInjector" Version="2.8.2" />
     <!-- Required for AspectInjector tests within this test project -->
-    <PackageReference Include="Bogus" Version="35.6.4" />
+    <PackageReference Include="Bogus" Version="35.6.5" />
     <PackageReference Include="CompareNETObjects" Version="4.84.0" />
     <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.21" />

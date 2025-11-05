@@ -1,5 +1,4 @@
-type BackupVaultPolicyDataSourceType =
-  | 'blobs'
+import { getFullBackupVaultDataSourceType } from 'functions.bicep'
 
 @description('Name of the backup policy.')
 param policyName string
@@ -7,18 +6,10 @@ param policyName string
 @description('Name of the backup vault that this policy belongs to.')
 param vaultName string
 
-@description('Name of the Backup Policy')
-param backupDataSources BackupVaultPolicyDataSourceType[]
-
-@description('Operational tier backup retention duration in days (for PITR recovery).')
+@description('Vault tier default backup retention duration in years.')
 @minValue(1)
-@maxValue(360)
-param operationalTierRetentionInDays int
-
-@description('Vault tier default backup retention duration in days.')
-@minValue(7)
-@maxValue(3650)
-param vaultTierDefaultRetentionInDays int
+@maxValue(10)
+param vaultTierDefaultRetentionInYears int
 
 @description('Vault tier weekly backup retention duration in weeks.')
 @minValue(4)
@@ -35,24 +26,20 @@ param vaultTierMonthlyRetentionInMonths int
 @maxValue(10)
 param vaultTierYearlyRetentionInYears int
 
-@description('Vault tier daily backup schedule time, in hh:mm format e.g. 07:00.')
-param vaultTierDailyBackupScheduleTime string
+@description('Vault tier weekly backup schedule time, in hh:mm format e.g. 07:00.')
+param vaultTierWeeklyBackupScheduleTime string
 
-var dataSourceTypeMap = {
- blobs: 'Microsoft.Storage/storageAccounts/blobServices'
-}
-
-var operationalTierRetentionDuration = 'P${operationalTierRetentionInDays}D'
-var vaultTierDefaultRetentionDuration = 'P${vaultTierDefaultRetentionInDays}D'
+var vaultTierDefaultRetentionDuration = 'P${vaultTierDefaultRetentionInYears}Y'
 var vaultTierWeeklyRetentionDuration = 'P${vaultTierWeeklyRetentionInWeeks}W'
 var vaultTierMonthlyRetentionDuration = 'P${vaultTierMonthlyRetentionInMonths}M'
 var vaultTierYearlyRetentionDuration = 'P${vaultTierYearlyRetentionInYears}Y'
-var repeatingTimeIntervals = 'R/2024-05-06T${vaultTierDailyBackupScheduleTime}:00+00:00/P1D'
-var dataSourceTypes = map(backupDataSources, source => dataSourceTypeMap[source])
+var repeatingTimeIntervals = 'R/2024-05-06T${vaultTierWeeklyBackupScheduleTime}:00+00:00/P1W'
 
-resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-05-01' = {
+resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2025-07-01' = {
   name: '${vaultName}/${policyName}'
   properties: {
+    objectType: 'BackupPolicy'
+    datasourceTypes: [getFullBackupVaultDataSourceType('psqlFlexibleServer')]
     policyRules: [
       {
         name: 'Default'
@@ -61,11 +48,11 @@ resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022
         lifecycles: [
           {
             deleteAfter: {
-              duration: operationalTierRetentionDuration
+              duration: vaultTierDefaultRetentionDuration
               objectType: 'AbsoluteDeleteOption'
             }
             sourceDataStore: {
-              dataStoreType: 'OperationalStore'
+              dataStoreType: 'VaultStore'
               objectType: 'DataStoreInfoBase'
             }
             targetDataStoreCopySettings: []
@@ -127,28 +114,10 @@ resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022
         ]
       }
       {
-        name: 'Default'
-        objectType: 'AzureRetentionRule'
-        isDefault: true
-        lifecycles: [
-          {
-            deleteAfter: {
-              duration: vaultTierDefaultRetentionDuration
-              objectType: 'AbsoluteDeleteOption'
-            }
-            sourceDataStore: {
-              dataStoreType: 'VaultStore'
-              objectType: 'DataStoreInfoBase'
-            }
-            targetDataStoreCopySettings: []
-          }
-        ]
-      }
-      {
-        name: 'BackupDaily'
+        name: 'BackupWeekly'
         objectType: 'AzureBackupRule'
         backupParameters: {
-          backupType: 'Discrete'
+          backupType: 'Full'
           objectType: 'AzureBackupParams'
         }
         dataStore: {
@@ -156,6 +125,7 @@ resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022
           objectType: 'DataStoreInfoBase'
         }
         trigger: {
+          objectType: 'ScheduleBasedTriggerContext'
           schedule: {
             timeZone: 'UTC'
             repeatingTimeIntervals: [
@@ -216,11 +186,8 @@ resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022
               }
             }
           ]
-          objectType: 'ScheduleBasedTriggerContext'
         }
       }
     ]
-    datasourceTypes: dataSourceTypes
-    objectType: 'BackupPolicy'
   }
 }

@@ -8,7 +8,7 @@ param vaultName string
 
 var policyName = '${resourcePrefix}-blobs-${abbreviations.backupVaultPolicies}'
 
-module backupVaultPolicyModule '../../../common/components/data-protection/backupVaultPolicy.bicep' = {
+module backupVaultPolicyModule '../../../common/components/data-protection/blobBackupVaultPolicy.bicep' = {
   name: '${policyName}Deploy'
   params: {
     policyName: policyName
@@ -19,6 +19,5 @@ module backupVaultPolicyModule '../../../common/components/data-protection/backu
     vaultTierWeeklyRetentionInWeeks: 52
     vaultTierMonthlyRetentionInMonths: 12
     vaultTierYearlyRetentionInYears: 1
-    backupDataSources: ['blobs']
   }
 }

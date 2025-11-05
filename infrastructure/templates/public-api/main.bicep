@@ -161,6 +161,12 @@ param enableSwagger bool = false
 @description('Enable replacement of public API data sets.')
 param enableReplacementOfPublicApiDataSets bool = false
 
+@description('Whether to assign roles that enable us to register PostgreSQL Flexible Server with Backup Vault')
+param deployPsqlBackupVaultRoleAssignment bool = false
+
+@description('Whether to register PostgreSQL Flexible Server with Backup Vault')
+param deployPsqlBackupVaultRegistration bool = false
+
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
   DateProvisioned: dateProvisioned
@@ -181,19 +187,23 @@ var legacyResourcePrefix = subscription
 
 var resourceNames = {
   existingResources: {
-    adminApp: '${legacyResourcePrefix}-as-ees-admin'
-    analyticsFileShare: '${commonResourcePrefix}-${abbreviations.fileShare}-anlyt'
-    analyticsStorageAccount: '${replace(commonResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
-    publisherFunction: '${legacyResourcePrefix}-fa-ees-publisher'
-    keyVault: '${legacyResourcePrefix}-kv-ees-01'
-    vNet: '${legacyResourcePrefix}-vnet-ees'
-    alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
     acr: 'eesacr'
     acrResourceGroup: acrResourceGroupName
+    adminApp: '${legacyResourcePrefix}-as-ees-admin'
+    alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
+    analyticsFileShare: '${commonResourcePrefix}-${abbreviations.fileShare}-anlyt'
+    analyticsStorageAccount: '${replace(commonResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
+    backupVault: {
+      vault: '${commonResourcePrefix}-${abbreviations.backupVaults}'
+      psqlFlexibleServerBackupPolicy: '${commonResourcePrefix}-psql-flexible-server-${abbreviations.backupVaultPolicies}'
+    }
     // The Test Resource Group has broken from the naming convention of other environments for Core Storage
     coreStorageAccount: subscription == 's101t01' || subscription == 's101p02'
       ? '${legacyResourcePrefix}storageeescore'
       : '${legacyResourcePrefix}saeescore'
+    keyVault: '${legacyResourcePrefix}-kv-ees-01'
+    logAnalyticsWorkspace: '${commonResourcePrefix}-log'
+    publisherFunction: '${legacyResourcePrefix}-fa-ees-publisher'
     subnets: {
       adminApp: '${legacyResourcePrefix}-snet-ees-admin'
       publisherFunction: '${legacyResourcePrefix}-snet-ees-publisher'
@@ -204,7 +214,7 @@ var resourceNames = {
       storagePrivateEndpoints: '${publicApiResourcePrefix}-snet-${abbreviations.storageStorageAccounts}-pep'
       psqlFlexibleServer: '${commonResourcePrefix}-snet-${abbreviations.dBforPostgreSQLServers}'
     }
-    logAnalyticsWorkspace: '${commonResourcePrefix}-log'
+    vNet: '${legacyResourcePrefix}-vnet-ees'
   }
   sharedResources: {
     appGateway: '${commonResourcePrefix}-${abbreviations.networkApplicationGateways}-01'
@@ -303,6 +313,8 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
     serverConfig: postgreSqlServerConfig
     firewallRules: maintenanceIpRanges
     deployAlerts: deployAlerts
+    deployBackupVaultRoleAssignment: deployPsqlBackupVaultRoleAssignment
+    deployBackupVaultRegistration: deployPsqlBackupVaultRegistration
     tagValues: tagValues
   }
   dependsOn: [

@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -11,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
@@ -78,7 +76,6 @@ public class PreReleaseUserServicePermissionTests
 
     private PreReleaseUserService SetupPreReleaseUserService(
         ContentDbContext? context = null,
-        UsersAndRolesDbContext? usersAndRolesDbContext = null,
         IEmailService? emailService = null,
         IOptions<AppOptions>? appOptions = null,
         IOptions<NotifyOptions>? notifyOptions = null,
@@ -86,14 +83,12 @@ public class PreReleaseUserServicePermissionTests
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IUserService? userService = null,
         IUserRepository? userRepository = null,
-        IUserInviteRepository? userInviteRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null
     )
     {
         return new(
             context ?? Mock.Of<ContentDbContext>(),
-            usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
             emailService ?? Mock.Of<IEmailService>(Strict),
             appOptions ?? Mock.Of<IOptions<AppOptions>>(Strict),
             notifyOptions ?? Mock.Of<IOptions<NotifyOptions>>(Strict),
@@ -101,7 +96,6 @@ public class PreReleaseUserServicePermissionTests
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
             userService ?? Mock.Of<IUserService>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
-            userInviteRepository ?? Mock.Of<IUserInviteRepository>(Strict),
             userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
             userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict)
         );

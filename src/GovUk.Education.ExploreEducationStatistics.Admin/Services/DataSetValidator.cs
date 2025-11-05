@@ -224,11 +224,6 @@ public class DataSetValidator(
             )
             .ToListAsync();
 
-        if (releaseFilesToBeReplaced.Count == 0)
-        {
-            return (File?)null;
-        }
-
         var errors = new List<ErrorViewModel>();
 
         if (releaseFilesToBeReplaced.Count > 1)
@@ -236,16 +231,15 @@ public class DataSetValidator(
             errors.Add(ValidationMessages.GenerateErrorDataReplacementAlreadyInProgress());
         }
 
-        var fileToBeReplaced = releaseFilesToBeReplaced.First(f => f.File.ReplacedBy is null).File;
+        var fileToBeReplaced = releaseFilesToBeReplaced.FirstOrDefault(f => f.File.ReplacedBy is null)?.File;
         var isReplacement = fileToBeReplaced != null;
 
         if (isReplacement)
         {
             errors.AddRange(await ToBeReplacedFileHasNoIncompleteImports(fileToBeReplaced!));
-            errors.AddRange(
-                ValidateDataFileNames(releaseVersionId, dataSetName, replacementDataFileName, isReplacement)
-            );
         }
+
+        errors.AddRange(ValidateDataFileNames(releaseVersionId, dataSetName, replacementDataFileName, isReplacement));
 
         return errors.Count != 0 ? errors : fileToBeReplaced;
     }

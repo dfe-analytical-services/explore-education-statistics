@@ -199,7 +199,7 @@ public class PublicationServiceTests
     [Fact]
     public async Task ListPublications_CannotViewAllPublications()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var theme = new Theme { Title = "Theme title" };
 
@@ -279,7 +279,7 @@ public class PublicationServiceTests
     [Fact]
     public async Task ListPublications_CannotViewAllPublications_Order()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var theme = new Theme();
 
@@ -349,7 +349,7 @@ public class PublicationServiceTests
     [Fact]
     public async Task ListPublications_CannotViewAllPublications_NoTheme()
     {
-        var user = _dataFixture.DefaultUser().Generate();
+        User user = _dataFixture.DefaultUser();
 
         var publication1 = new Publication { Title = "publication1", Theme = new() };
 

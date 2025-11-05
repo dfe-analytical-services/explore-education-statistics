@@ -9,6 +9,7 @@ import publicationService, {
   PublicationSummaryRedesign,
   RelatedInformationItem,
   ReleaseVersion,
+  ReleaseVersionDataContent,
   ReleaseVersionHomeContent,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
@@ -24,6 +25,9 @@ import publicationQueries from '@frontend/queries/publicationQueries';
 import { QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import ReleaseExploreDataPage, {
+  pageSections as exploreDataPageSections,
+} from './ReleaseExploreDataPage';
 
 export const releasePageTabRouteItems = {
   home: {
@@ -61,6 +65,7 @@ interface HomeProps extends BaseReleaseProps {
 
 interface ExploreDataProps extends BaseReleaseProps {
   page: 'explore';
+  dataContent: ReleaseVersionDataContent;
 }
 
 interface MethodologyProps extends BaseReleaseProps {
@@ -106,7 +111,13 @@ const PublicationReleasePage: NextPage<Props> = props => {
           releaseVersionSummary={props.releaseVersionSummary}
         />
       )}
-      {page === 'explore' && <p>TODO EES-6444 Explore Data page</p>}
+      {page === 'explore' && (
+        <ReleaseExploreDataPage
+          dataContent={props.dataContent}
+          publicationSummary={props.publicationSummary}
+          releaseVersionSummary={props.releaseVersionSummary}
+        />
+      )}
       {page === 'methodology' && (
         <ReleaseMethodologyPage
           publicationSummary={props.publicationSummary}
@@ -218,14 +229,36 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
             };
           }
 
-          case 'explore':
+          case 'explore': {
+            const dataContent = await queryClient.fetchQuery(
+              publicationQueries.getReleaseVersionDataContent(
+                publicationSlug,
+                releaseSlug,
+              ),
+            );
+
+            const hasSupportingFiles = dataContent.supportingFiles.length;
+            const hasFeaturedTables = dataContent.featuredTables.length;
+            const hasDataDashboards =
+              dataContent.dataDashboards && dataContent.dataDashboards.length;
+
             return {
               props: {
                 ...baseProps,
                 page: 'explore',
-                inPageNavItems: [contactUsNavItem],
+                dataContent,
+                inPageNavItems: [
+                  exploreDataPageSections.explore,
+                  hasFeaturedTables && exploreDataPageSections.featuredTables,
+                  exploreDataPageSections.datasets,
+                  hasSupportingFiles && exploreDataPageSections.supportingFiles,
+                  hasDataDashboards && exploreDataPageSections.dataDashboards,
+                  exploreDataPageSections.dataGuidance,
+                  contactUsNavItem,
+                ].filter(item => !!item),
               },
             };
+          }
 
           case 'methodology': {
             const methodologiesSummary = await queryClient.fetchQuery(

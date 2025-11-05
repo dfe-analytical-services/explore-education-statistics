@@ -230,9 +230,9 @@ public class ReleaseApprovalService : IReleaseApprovalService
             .ToAsyncEnumerable()
             .SelectAwait(async invite =>
             {
-                var user = await _userRepository.FindByEmail(invite.Email);
+                var activeUser = await _userRepository.FindActiveUserByEmail(invite.Email);
                 return await _preReleaseUserService
-                    .SendPreReleaseInviteEmail(releaseVersion.Id, invite.Email.ToLower(), isNewUser: user == null)
+                    .SendPreReleaseInviteEmail(releaseVersion.Id, invite.Email.ToLower(), isNewUser: activeUser is null)
                     .OnSuccessDo(() => _preReleaseUserService.MarkInviteEmailAsSent(invite));
             })
             .ToListAsync();

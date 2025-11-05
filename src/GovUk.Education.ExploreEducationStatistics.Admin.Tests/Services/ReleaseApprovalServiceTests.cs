@@ -607,7 +607,7 @@ public class ReleaseApprovalServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-        var existingUser1 = _fixture.DefaultUser().WithEmail("test@test.com").Generate();
+        User existingUser1 = _fixture.DefaultUser().WithEmail("test@test.com");
 
         var existingUser1Invite = new UserReleaseInvite
         {
@@ -617,7 +617,7 @@ public class ReleaseApprovalServiceTests
             EmailSent = false,
         };
 
-        var existingUser2 = _fixture.DefaultUser().WithEmail("test2@test.com").Generate();
+        User existingUser2 = _fixture.DefaultUser().WithEmail("test2@test.com");
 
         var existingUser2SentInvite = new UserReleaseInvite
         {
@@ -627,7 +627,7 @@ public class ReleaseApprovalServiceTests
             EmailSent = true,
         };
 
-        var existingUser3 = _fixture.DefaultUser().WithEmail("test3@test.com").Generate();
+        User existingUser3 = _fixture.DefaultUser().WithEmail("test3@test.com");
 
         var existingUser3NonPreReleaseInvite = new UserReleaseInvite
         {

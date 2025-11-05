@@ -398,6 +398,9 @@ module deadlocksAlert 'alerts/staticMetricAlert.bicep' = if (alerts != null && a
   ]
 }
 
+@description('The name the Database Server.')
+output serverName string = databaseServerName
+
 @description('The fully qualified Azure resource ID of the Database Server.')
 output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseServerName)
 
