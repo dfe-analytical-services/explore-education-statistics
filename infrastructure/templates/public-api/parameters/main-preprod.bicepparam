@@ -42,3 +42,7 @@ param enableThemeDeletion = false
 param enableSwagger = true
 
 param enableReplacementOfPublicApiDataSets = true
+
+param deployPsqlBackupVaultRoleAssignment = true
+
+param deployPsqlBackupVaultRegistration = true
