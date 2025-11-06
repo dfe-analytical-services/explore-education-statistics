@@ -219,7 +219,10 @@ export default function DataFilesTableUploadRow({
               open={openDeleteConfirm}
               title="Confirm deletion of selected data files"
               triggerButton={
-                <ButtonText onClick={toggleOpenDeleteConfirm.on}>
+                <ButtonText
+                  onClick={toggleOpenDeleteConfirm.on}
+                  variant="warning"
+                >
                   Delete files
                 </ButtonText>
               }

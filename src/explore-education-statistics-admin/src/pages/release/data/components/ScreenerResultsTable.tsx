@@ -40,7 +40,7 @@ export default function ScreenerResultsTable({
       <tbody>
         {testResults.map(testResult => (
           <tr data-testid="screener-result-table-row" key={testResult.id}>
-            <td>
+            <td className="govuk-!-padding-right-0">
               <div>
                 {!hasFailures &&
                 onAcknowledgeWarning &&
