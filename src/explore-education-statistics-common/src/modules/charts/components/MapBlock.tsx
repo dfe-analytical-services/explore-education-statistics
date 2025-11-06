@@ -322,7 +322,7 @@ export default function MapBlock({
               onClick={toggleMobileOverlay.off}
             >
               <span className={styles.mobileOverlayButtonText}>
-                Tap to enable dragging the map
+                Tap to enable interactive map
               </span>
             </button>
           )}
