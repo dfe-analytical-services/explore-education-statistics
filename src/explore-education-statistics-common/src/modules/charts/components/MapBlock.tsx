@@ -33,6 +33,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
 import useToggle from '@common/hooks/useToggle';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import { useMobileMedia } from '@common/hooks/useMedia';
 import generateDataSetKey from '../util/generateDataSetKey';
 
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
@@ -132,8 +133,14 @@ export default function MapBlock({
   onBoundaryLevelChange,
   onChangeCategoricalDataConfig,
 }: MapBlockProps) {
+  const { isMedia: isMobileMedia } = useMobileMedia();
   const [isBoundaryLevelChanging, toggleBoundaryLevelChanging] =
     useToggle(false);
+  const [showMobileOverlay, toggleMobileOverlay] = useToggle(isMobileMedia);
+
+  useEffect(() => {
+    toggleMobileOverlay(isMobileMedia);
+  }, [isMobileMedia, toggleMobileOverlay]);
 
   const axisMajor = useMemo<AxisConfiguration>(
     () => ({
@@ -307,9 +314,23 @@ export default function MapBlock({
           >
             Skip to end of map
           </a>
+
+          {showMobileOverlay && (
+            <button
+              className={styles.mobileOverlayButton}
+              type="button"
+              onClick={toggleMobileOverlay.off}
+            >
+              <span className={styles.mobileOverlayButtonText}>
+                Tap to enable interactive map
+              </span>
+            </button>
+          )}
+
           <MapContainer
             style={{
               height: `${height || 600}px`,
+              maxHeight: '70vh',
             }}
             className={classNames(styles.map, 'dfe-print-break-avoid')}
             center={position}
