@@ -5,7 +5,10 @@ import {
 import { render, screen, within } from '@testing-library/react';
 import React from 'react';
 import ReleaseHelpPage from '../ReleaseHelpPage';
-import { testPublicationSummary } from './__data__/testReleaseData';
+import {
+  testPublicationSummary,
+  testReleaseVersionSummary,
+} from './__data__/testReleaseData';
 
 describe('ReleaseHelpPage', () => {
   const testRelatedLinks: RelatedInformationItem[] = [
@@ -53,12 +56,20 @@ describe('ReleaseHelpPage', () => {
         praSummary={testPraSummary}
         publicationSummary={testPublicationSummary}
         relatedInformationItems={testRelatedLinks}
+        releaseVersionSummary={testReleaseVersionSummary}
       />,
     );
 
     expect(
       screen.getByRole('heading', {
         name: 'Get help by contacting us',
+        level: 2,
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Accredited official statistics',
         level: 2,
       }),
     ).toBeInTheDocument();
@@ -88,6 +99,7 @@ describe('ReleaseHelpPage', () => {
         praSummary={testPraSummary}
         publicationSummary={testPublicationSummary}
         relatedInformationItems={[]}
+        releaseVersionSummary={testReleaseVersionSummary}
       />,
     );
 
@@ -104,6 +116,7 @@ describe('ReleaseHelpPage', () => {
         praSummary={{ ...testPraSummary, preReleaseAccessList: '' }}
         publicationSummary={testPublicationSummary}
         relatedInformationItems={testRelatedLinks}
+        releaseVersionSummary={testReleaseVersionSummary}
       />,
     );
 

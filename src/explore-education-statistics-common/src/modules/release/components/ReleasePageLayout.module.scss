@@ -1,19 +1,24 @@
 @import '~govuk-frontend/dist/govuk/base';
 
 .wrapper {
+  --tab-nav-height: 55px;
+  --layout-padding-top: #{govuk-spacing(4)};
   display: flex;
   gap: govuk-spacing(6);
-  --tab-nav-height: 55px;
-  --sidebar-y-offset: calc(var(--tab-nav-height) + #{govuk-spacing(4)});
+
+  @include govuk-media-query($from: tablet) {
+    --layout-padding-top: #{govuk-spacing(8)};
+  }
 }
 
 .sidebar {
   position: sticky;
-  top: var(--sidebar-y-offset);
+  top: var(--tab-nav-height);
   flex: 0 0 280px;
   max-width: 30vw;
   align-self: flex-start;
-  max-height: calc(100vh - (var(--sidebar-y-offset)));
+  max-height: calc(100vh - var(--layout-padding-top));
+  padding-top: var(--layout-padding-top);
   overflow-y: auto;
   // Provide space for nav item border to display
   margin-left: -14px;
@@ -22,12 +27,11 @@
 
 .content {
   flex: 1 1 auto;
+  padding-top: var(--layout-padding-top);
   padding-bottom: govuk-spacing(8);
   overflow: hidden;
 
-  section,
-  h2,
-  h3 {
-    scroll-margin-top: var(--sidebar-y-offset);
+  :target {
+    scroll-margin-top: calc(var(--tab-nav-height) + var(--layout-padding-top));
   }
 }
