@@ -5,10 +5,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class HtmlToTextUtils
 {
-    public static async Task<string> HtmlToText(string html)
+    public static string HtmlToText(string html)
     {
         var parser = new HtmlParser();
-        var document = await parser.ParseDocumentAsync("");
+        var document = parser.ParseDocument("");
 
         var converter = new HtmlToTextConverter();
         return converter.Convert(parser.ParseFragment(html, document.Body!));

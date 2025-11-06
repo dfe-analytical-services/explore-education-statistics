@@ -79,7 +79,7 @@ public class DataGuidanceFileWriter : IDataGuidanceFileWriter
             await file.WriteLineAsync();
 
             // Add the release's guidance content
-            var guidance = await HtmlToTextUtils.HtmlToText(releaseVersion.DataGuidance);
+            var guidance = HtmlToTextUtils.HtmlToText(releaseVersion.DataGuidance);
             await file.WriteAsync(guidance);
             await file.WriteLineAsync();
         }
@@ -123,7 +123,7 @@ public class DataGuidanceFileWriter : IDataGuidanceFileWriter
 
                     if (!dataSet.Content.IsNullOrWhitespace())
                     {
-                        var content = await HtmlToTextUtils.HtmlToText(dataSet.Content);
+                        var content = HtmlToTextUtils.HtmlToText(dataSet.Content);
                         await file.WriteLineAsync($"Content summary: {content}");
                     }
 
@@ -213,7 +213,7 @@ public class DataGuidanceFileWriter : IDataGuidanceFileWriter
                     await file.WriteAsync(listItemStart);
 
                     var indent = string.Empty.PadRight(listItemStart.Length);
-                    var label = await HtmlToTextUtils.HtmlToText(footnote.Label);
+                    var label = HtmlToTextUtils.HtmlToText(footnote.Label);
 
                     await label
                         .ToLines()
