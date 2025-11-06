@@ -44,7 +44,7 @@ export default function FilterAccordion({
       data-testid={testId}
       id={id}
     >
-      <div className="govuk-!-margin-bottom-1">
+      <div className={styles.inner}>
         <button
           aria-controls={contentId}
           aria-expanded={open}

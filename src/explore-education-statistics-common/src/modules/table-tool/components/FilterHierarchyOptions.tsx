@@ -57,7 +57,7 @@ function FilterHierarchyOptions({
       return null;
     }
     return (
-      <Tag className="govuk-!-margin-left-2 govuk-!-font-size-16">
+      <Tag className={`${styles.tag} govuk-!-font-size-16`}>
         {selectedChildrenCount} selected
       </Tag>
     );

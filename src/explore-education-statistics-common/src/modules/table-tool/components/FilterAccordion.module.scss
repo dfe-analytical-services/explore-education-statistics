@@ -1,13 +1,13 @@
 @import '~govuk-frontend/dist/govuk/base';
 
+.inner {
+  margin: 0 0 govuk-spacing(2) 44px;
+}
+
 .sectionContent {
   border-left: 5px solid govuk-colour('mid-grey');
   display: none;
   padding: govuk-spacing(3) 0 govuk-spacing(3) govuk-spacing(4);
-
-  :global(.govuk-accordion__show-all) {
-    margin-left: 44px;
-  }
 
   .sectionContent {
     background: govuk-colour('white');

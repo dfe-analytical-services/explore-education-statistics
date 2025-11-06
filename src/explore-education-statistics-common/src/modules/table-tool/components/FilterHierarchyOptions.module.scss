@@ -43,7 +43,7 @@
 
   @include govuk-media-query($until: tablet) {
     display: block;
-    margin: govuk-spacing(2) 0 govuk-spacing(2) 44px;
+    margin: govuk-spacing(2) 0;
   }
 }
 
@@ -55,5 +55,11 @@
 
   @include govuk-media-query($until: tablet) {
     display: none;
+  }
+}
+
+.tag {
+  @include govuk-media-query($from: tablet) {
+    margin-left: govuk-spacing(2);
   }
 }
