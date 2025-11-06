@@ -486,6 +486,13 @@
       "type": "bool",
       "defaultValue": true
     },
+    "backupVaultAzureBlobsRegistrationsDeployed": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Whether or not the Azure Blobs are already registered for an environent. Adding temporarily as the deploy process is trying to recreate the registrations every time rather than updating."
+      }
+    },
     "deployBackupVaultRegistrations": {
       "type": "bool",
       "defaultValue": true,
@@ -2466,7 +2473,7 @@
     {
       "type": "Microsoft.DataProtection/backupVaults/backupInstances",
       "apiVersion": "2022-05-01",
-      "condition": "[parameters('deployBackupVaultRegistrations')]",
+      "condition": "[and(parameters('deployBackupVaultRegistrations'), not(parameters('backupVaultAzureBlobsRegistrationsDeployed')))]",
       "name": "[format('{0}/{1}', variables('backupVaultName'), variables('coreStorageAccountName'))]",
       "properties": {
         "objectType": "BackupInstance",
@@ -3093,7 +3100,7 @@
     {
       "type": "Microsoft.DataProtection/backupVaults/backupInstances",
       "apiVersion": "2022-05-01",
-      "condition": "[parameters('deployBackupVaultRegistrations')]",
+      "condition": "[and(parameters('deployBackupVaultRegistrations'), not(parameters('backupVaultAzureBlobsRegistrationsDeployed')))]",
       "name": "[format('{0}/{1}', variables('backupVaultName'), variables('publicStorageAccountName'))]",
       "properties": {
         "objectType": "BackupInstance",
