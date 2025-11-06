@@ -1,4 +1,5 @@
 import Link from '@admin/components/Link';
+import PageMetaTitle from '@admin/components/PageMetaTitle';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import DataBlockDeletePlanModal from '@admin/pages/release/datablocks/components/DataBlockDeletePlanModal';
 import DataBlockPageReadOnlyTabs from '@admin/pages/release/datablocks/components/DataBlockPageReadOnlyTabs';
@@ -87,8 +88,11 @@ const ReleaseDataBlockEditPage = ({
 
   const { canUpdateRelease, dataBlock } = model ?? {};
 
+  const pageTitle = canUpdateRelease ? 'Edit data block' : 'View data block';
+
   return (
     <div ref={pageRef}>
+      <PageMetaTitle title={pageTitle} />
       <Link
         back
         className="govuk-!-margin-bottom-6"
@@ -101,7 +105,7 @@ const ReleaseDataBlockEditPage = ({
       </Link>
 
       <LoadingSpinner loading={isLoading}>
-        <h2>{canUpdateRelease ? 'Edit data block' : 'View data block'}</h2>
+        <h2>{pageTitle}</h2>
 
         <DataBlockSelector
           canUpdate={canUpdateRelease}

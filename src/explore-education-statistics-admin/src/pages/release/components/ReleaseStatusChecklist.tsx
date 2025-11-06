@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import releaseDataPageTabIds from '@admin/pages/release/data/utils/releaseDataPageTabIds';
+import releaseDataPageTabs from '@admin/pages/release/data/utils/releaseDataPageTabs';
 import { releasePreReleaseAccessPageTabs } from '@admin/pages/release/pre-release/ReleasePreReleaseAccessPage';
 import {
   MethodologyRouteParams,
@@ -52,13 +52,13 @@ const ReleaseStatusChecklist = ({ checklist, releaseVersion }: Props) => {
     const dataUploadsTabRoute = `${generatePath<ReleaseRouteParams>(
       releaseDataRoute.path,
       releaseRouteParams,
-    )}#${releaseDataPageTabIds.dataUploads}`;
+    )}#${releaseDataPageTabs.dataUploads.id}`;
 
     const apiDataSetsTabRoute = user?.permissions.isBauUser
       ? `${generatePath<ReleaseRouteParams>(
           releaseDataRoute.path,
           releaseRouteParams,
-        )}#${releaseDataPageTabIds.apiDataSets}`
+        )}#${releaseDataPageTabs.apiDataSets.id}`
       : undefined;
 
     return checklist.errors.map(error => {
@@ -80,7 +80,7 @@ const ReleaseStatusChecklist = ({ checklist, releaseVersion }: Props) => {
             link: `${generatePath<ReleaseRouteParams>(
               releaseDataRoute.path,
               releaseRouteParams,
-            )}#${releaseDataPageTabIds.dataGuidance}`,
+            )}#${releaseDataPageTabs.dataGuidance.id}`,
           };
         case 'ReleaseNoteRequired':
           return {
@@ -185,7 +185,7 @@ const ReleaseStatusChecklist = ({ checklist, releaseVersion }: Props) => {
             link: `${generatePath<ReleaseRouteParams>(
               releaseDataRoute.path,
               releaseRouteParams,
-            )}#${releaseDataPageTabIds.dataUploads}`,
+            )}#${releaseDataPageTabs.dataUploads.id}`,
           };
         case 'NoFootnotesOnSubjects':
           return {
@@ -227,7 +227,7 @@ const ReleaseStatusChecklist = ({ checklist, releaseVersion }: Props) => {
             link: `${generatePath<ReleaseRouteParams>(
               releasePreReleaseAccessRoute.path,
               releaseRouteParams,
-            )}#${releasePreReleaseAccessPageTabs.publicAccessList}`,
+            )}#${releasePreReleaseAccessPageTabs.publicAccessList.id}`,
           };
         default:
           // Show warning code, even if there is no mapping,

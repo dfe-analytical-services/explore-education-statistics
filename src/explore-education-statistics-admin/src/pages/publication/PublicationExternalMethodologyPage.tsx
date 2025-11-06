@@ -11,6 +11,7 @@ import React from 'react';
 import { generatePath, useHistory } from 'react-router';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import PageMetaTitle from '@admin/components/PageMetaTitle';
 
 const PublicationExternalMethodologyPage = () => {
   const history = useHistory();
@@ -48,19 +49,24 @@ const PublicationExternalMethodologyPage = () => {
     history.push(returnRoute);
   };
 
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  const title = externalMethodology
+    ? 'Edit external methodology link'
+    : 'Link to an externally hosted methodology';
+
   return (
-    <LoadingSpinner loading={isLoading}>
-      <h2>
-        {externalMethodology
-          ? 'Edit external methodology link'
-          : 'Link to an externally hosted methodology'}
-      </h2>
+    <>
+      <PageMetaTitle title={`${title} - ${publication.title}`} />
+      <h2>{title}</h2>
       <ExternalMethodologyForm
         initialValues={externalMethodology}
         onCancel={() => history.push(returnRoute)}
         onSubmit={handleExternalMethodologySubmit}
       />
-    </LoadingSpinner>
+    </>
   );
 };
 

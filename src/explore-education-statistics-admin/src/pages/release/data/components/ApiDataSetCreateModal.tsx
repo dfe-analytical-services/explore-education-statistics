@@ -15,7 +15,7 @@ import useToggle from '@common/hooks/useToggle';
 import { useQuery } from '@tanstack/react-query';
 import React, { ReactNode, useState } from 'react';
 import { generatePath } from 'react-router-dom';
-import releaseDataPageTabIds from '@admin/pages/release/data/utils/releaseDataPageTabIds';
+import releaseDataPageTabs from '@admin/pages/release/data/utils/releaseDataPageTabs';
 import { ApiDataSet } from '@admin/services/apiDataSetService';
 import ApiDataSetCreateProcessing from './ApiDataSetCreateProcessing';
 
@@ -92,7 +92,7 @@ export default function ApiDataSetCreateModal({
                       publicationId,
                       releaseVersionId,
                     },
-                  )}#${releaseDataPageTabIds.dataUploads}`}
+                  )}#${releaseDataPageTabs.dataUploads.id}`}
                   onClick={toggleOpen.off}
                 >
                   Data and files

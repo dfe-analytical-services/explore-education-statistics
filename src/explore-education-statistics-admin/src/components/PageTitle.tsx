@@ -1,19 +1,18 @@
 import classNames from 'classnames';
 import React from 'react';
-import { Helmet } from 'react-helmet';
+import PageMetaTitle from './PageMetaTitle';
 
 interface Props {
   caption?: string;
   className?: string;
+  metaTitle?: string;
   title: string;
 }
 
-const PageTitle = ({ caption, className, title }: Props) => {
+const PageTitle = ({ caption, className, metaTitle, title }: Props) => {
   return (
     <>
-      <Helmet>
-        <title>{`${title} - Explore education statistics - GOV.UK`}</title>
-      </Helmet>
+      <PageMetaTitle title={metaTitle ?? title} />
 
       {caption && (
         <span className="govuk-caption-xl" data-testid="page-title-caption">
