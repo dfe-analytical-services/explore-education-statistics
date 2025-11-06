@@ -261,6 +261,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         if (env.IsDevelopment() || env.IsIntegrationTest())
         {
             app.UseDeveloperExceptionPage();
+
+            // CORS config for dev/test/etc. environments set in IaC config
+            app.UseCors(options => options.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
         }
 
         // Rewrites
@@ -271,20 +274,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         app.UseResponseCaching();
         app.UseResponseCompression();
-
-        // CORS
-
-        app.UseCors(options =>
-            options
-                .WithOrigins(
-                    "http://localhost:3000",
-                    "http://localhost:3001",
-                    "https://localhost:3000",
-                    "https://localhost:3001"
-                )
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-        );
 
         // Routing / endpoints
 

@@ -797,6 +797,20 @@
       "metadata": {
         "description": "Feature flag to control the replacement of public API data sets"
       }
+    },
+    "additionalAdminAllowedOrigins": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Additional CORS allowed origins for admin"
+      }
+    },
+    "additionalPublicAllowedOrigins": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Additional CORS allowed origins for the public"
+      }
     }
   },
   "variables": {
@@ -1368,7 +1382,16 @@
     "searchReaderManagedIdentityName": "[concat(parameters('subscription'), '-', parameters('environment'), '-id-srch-reader')]",
     "searchServiceApiVersion": "2025-02-01-preview",
     "userAssignedIdentitiesApiVersion": "2024-11-30",
-    "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]"
+    "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
+    "baseAdminAllowedOrigins": [
+      "[concat('https://', parameters('adminUri'))]"
+    ],
+    "adminAllowedOrigins": "[union(variables('baseAdminAllowedOrigins'), parameters('additionalAdminAllowedOrigins'))]",
+    "basePublicAllowedOrigins": [
+      "[concat('https://', parameters('domain'))]",
+      "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]"
+    ],
+    "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]"
   },
   "resources": [
     {
@@ -1429,13 +1452,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]",
-              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
-              "https://localhost:3000",
-              "http://localhost:3000",
-              "http://127.0.0.1"
-            ]
+            "allowedOrigins": "[variables('publicAllowedOrigins')]"
           },
           "connectionStrings": [
             {
@@ -1539,13 +1556,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]",
-              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
-              "https://localhost:3000",
-              "http://localhost:3000",
-              "http://127.0.0.1"
-            ]
+            "allowedOrigins": "[variables('publicAllowedOrigins')]"
           }
         }
       },
@@ -1682,13 +1693,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]",
-              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
-              "https://localhost:3000",
-              "http://localhost:3000",
-              "http://127.0.0.1"
-            ]
+            "allowedOrigins": "[variables('publicAllowedOrigins')]"
           },
           "connectionStrings": [
             {
@@ -1786,13 +1791,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]",
-              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
-              "https://localhost:3000",
-              "http://localhost:3000",
-              "http://127.0.0.1"
-            ]
+            "allowedOrigins": "[variables('publicAllowedOrigins')]"
           }
         }
       },
@@ -1930,12 +1929,6 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
-          "cors": {
-            "allowedOrigins": [
-              "https://localhost:3000",
-              "http://localhost:3000"
-            ]
-          },
           "connectionStrings": [
             {
               "name": "StatisticsDb",
@@ -2067,13 +2060,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "use32BitWorkerProcess": false,
-          "cors": {
-            "allowedOrigins": [
-              "https://localhost:3000",
-              "http://localhost:3000"
-            ]
-          }
+          "use32BitWorkerProcess": false
         }
       },
       "resources": [
@@ -2163,11 +2150,7 @@
           }
         ],
         "cors": {
-          "allowedOrigins": [
-            "[concat('https://', parameters('adminUri'))]",
-            "https://localhost:5021",
-            "http://localhost:5021"
-          ]
+          "allowedOrigins": "[variables('adminAllowedOrigins')]"
         },
         "networkACLs": {
           "defaultAction": "deny",
@@ -3269,9 +3252,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]"
-            ]
+            "allowedOrigins": "[variables('publicAllowedOrigins')]"
           },
           "connectionStrings": [
             {
@@ -3423,9 +3404,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "cors": {
-            "allowedOrigins": []
-          },
           "connectionStrings": [
             {
               "name": "StatisticsDb",
@@ -3579,9 +3557,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "cors": {
-            "allowedOrigins": []
-          },
           "connectionStrings": [
             {
               "name": "ContentDb",
