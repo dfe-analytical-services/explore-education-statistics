@@ -149,9 +149,11 @@ describe('PublicationForm', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Search publications')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Search publications by title'),
+    ).toBeInTheDocument();
     const themeRadios = within(
-      screen.getByRole('group', { name: 'Select a theme' }),
+      screen.getByRole('group', { name: 'Show publications by theme' }),
     ).getAllByRole('radio');
     expect(themeRadios).toHaveLength(4);
     expect(themeRadios[0]).toEqual(
@@ -196,7 +198,7 @@ describe('PublicationForm', () => {
     );
 
     await userEvent.type(
-      screen.getByLabelText('Search publications'),
+      screen.getByLabelText('Search publications by title'),
       'find me',
     );
 
@@ -237,7 +239,7 @@ describe('PublicationForm', () => {
     );
 
     await userEvent.type(
-      screen.getByLabelText('Search publications'),
+      screen.getByLabelText('Search publications by title'),
       'Publication 11',
     );
 
@@ -262,7 +264,7 @@ describe('PublicationForm', () => {
     );
 
     await userEvent.type(
-      screen.getByLabelText('Search publications'),
+      screen.getByLabelText('Search publications by title'),
       'find me',
     );
 
@@ -303,7 +305,7 @@ describe('PublicationForm', () => {
     );
 
     await userEvent.type(
-      screen.getByLabelText('Search publications'),
+      screen.getByLabelText('Search publications by title'),
       'FiND Me',
     );
 
@@ -342,7 +344,10 @@ describe('PublicationForm', () => {
       />,
     );
 
-    await userEvent.type(screen.getByLabelText('Search publications'), 'Nope');
+    await userEvent.type(
+      screen.getByLabelText('Search publications by title'),
+      'Nope',
+    );
 
     expect(
       await screen.findByText('No publications found'),
@@ -369,7 +374,10 @@ describe('PublicationForm', () => {
       />,
     );
 
-    await user.type(screen.getByLabelText('Search publications'), '[[');
+    await user.type(
+      screen.getByLabelText('Search publications by title'),
+      '[[',
+    );
 
     expect(() => {
       jest.runOnlyPendingTimers();
@@ -389,7 +397,7 @@ describe('PublicationForm', () => {
     );
 
     expect(
-      screen.queryByRole('group', { name: 'Select a theme' }),
+      screen.queryByRole('group', { name: 'Show publications by theme' }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('group', { name: /Select a publication/ }),
@@ -495,7 +503,7 @@ describe('PublicationForm', () => {
     );
 
     expect(
-      screen.queryByRole('group', { name: 'Select a theme' }),
+      screen.queryByRole('group', { name: 'Show publications by theme' }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('group', { name: /Select a publication/ }),
