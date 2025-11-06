@@ -122,9 +122,6 @@
     "enableReplacementOfPublicApiDataSets" : {
       "value": true
     },
-    "deployBackupVaultRegistrations": {
-      "value": true
-    },
     "additionalAdminAllowedOrigins": {
       "value": [
         "https://localhost:5021",
