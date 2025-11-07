@@ -127,7 +127,7 @@ Generate permalink for archive-publication
 
     user waits until table tool wizard step is available    3    Choose locations
     user checks previous table tool step contains    2    Data set    ${SUBJECT_NAME_ARCHIVE}
-    user opens details dropdown    Regional
+    user clicks button    Regional
     user clicks checkbox    North East
     user clicks element    id:locationFiltersForm-submit
 

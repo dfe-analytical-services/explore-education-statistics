@@ -100,9 +100,9 @@ Select subject "UI test subject"
     user checks previous table tool step contains    1    Data set    UI test subject
 
 Select locations
-    user opens details dropdown    Opportunity area
+    user clicks button    Opportunity area
     user clicks checkbox    Bolton 001
-    user opens details dropdown    Ward
+    user clicks button    Ward
     user clicks checkbox    Nailsea Youngwood
     user clicks checkbox    Syon
     user clicks element    id:locationFiltersForm-submit
@@ -115,7 +115,7 @@ Select time period
     user waits until table tool wizard step is available    4    Choose your filters
 
 Select categories
-    user opens details dropdown    Random Filter
+    user clicks button    Random Filter
     user clicks checkbox    Blue
     user clicks checkbox    Orange
 

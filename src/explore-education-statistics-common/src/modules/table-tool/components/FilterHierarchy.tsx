@@ -1,10 +1,11 @@
 import ButtonText from '@common/components/ButtonText';
-import DetailsMenu from '@common/components/DetailsMenu';
 import { FormFieldset } from '@common/components/form';
 import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import FormCheckboxSelectedCount from '@common/components/form/FormCheckboxSelectedCount';
 import FormSearchBar from '@common/components/form/FormSearchBar';
 import Modal from '@common/components/Modal';
+import FilterAccordion from '@common/modules/table-tool/components/FilterAccordion';
+import getFilterOptionIdsRecursively from '@common/modules/table-tool/utils/getFilterOptionIdsRecursively';
 import { SubjectMetaFilterHierarchy } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import sortAlphabeticalTotalsFirst from '@common/utils/sortAlphabeticalTotalsFirst';
@@ -79,14 +80,9 @@ function FilterHierarchy({
 
   const expandAllOptions = useCallback(
     (optionTrees: FilterHierarchyOption[]) => {
-      function getOptionIdsRecursively(
-        optionTree: FilterHierarchyOption,
-      ): string[] {
-        const optionsIds =
-          optionTree.options?.flatMap(getOptionIdsRecursively) ?? [];
-        return [optionTree.value, ...optionsIds];
-      }
-      setExpandedOptionsList(optionTrees.flatMap(getOptionIdsRecursively));
+      setExpandedOptionsList(
+        optionTrees.flatMap(getFilterOptionIdsRecursively),
+      );
     },
     [setExpandedOptionsList],
   );
@@ -185,7 +181,7 @@ function FilterHierarchy({
     };
   }, [selectedValues, filterHierarchy, optionLabelsMap, getOptionUniqueValue]);
 
-  const toggleOptions = useCallback(
+  const handleToggleOptions = useCallback(
     (optionId: string) => {
       if (expandedOptionsList.includes(optionId)) {
         return setExpandedOptionsList(
@@ -218,13 +214,12 @@ function FilterHierarchy({
   }, [errors, name, open, onToggle]);
 
   return (
-    <DetailsMenu
+    <FilterAccordion
       id={`details-${customId ?? id}`}
       open={open}
-      jsRequired
+      label={`${legend}${tiersTotal > 1 ? ` (${tiersTotal} tiers)` : ''}`}
+      labelAfter={<FormCheckboxSelectedCount name={name} />}
       preventToggle={!!errorMessage}
-      summary={`${legend}${tiersTotal > 1 ? ` (${tiersTotal} tiers)` : ''}`}
-      summaryAfter={<FormCheckboxSelectedCount name={name} />}
       onToggle={onToggle}
     >
       <Modal
@@ -312,16 +307,16 @@ function FilterHierarchy({
                 disabled={disabled}
                 selectedValues={selectedValues}
                 level={0}
-                toggleOptions={toggleOptions}
                 expandedOptionsList={expandedOptionsList}
                 hierarchySearchTerm={hierarchySearchTerm}
                 selectedChildren={optionsWithSelectedChildren}
+                onToggleOptions={handleToggleOptions}
               />
             );
           })}
         </div>
       </FormFieldset>
-    </DetailsMenu>
+    </FilterAccordion>
   );
 }
 
