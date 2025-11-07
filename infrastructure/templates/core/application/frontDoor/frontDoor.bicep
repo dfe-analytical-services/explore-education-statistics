@@ -88,7 +88,7 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
   properties: {
     cacheConfiguration: {
       compressionSettings: {
-        isCompressionEnabled: true
+        isCompressionEnabled: false // @MarkFix
         contentTypesToCompress: [
           'application/eot'
           'application/font'
@@ -150,7 +150,7 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
     forwardingProtocol: 'MatchRequest'
     linkToDefaultDomain: 'Enabled'
     httpsRedirect: 'Enabled'
-    enabledState: 'Enabled'
+    enabledState: 'Disabled' // @MarkFix
   }
   dependsOn: [
     origin
@@ -177,18 +177,18 @@ resource diagnosticSetting 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
   }
 }
 
-resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: '${resourcePrefix}-ai-afd'
-  location: location
-  kind: 'web'
-  properties: {
-    Application_Type: 'web'
-    publicNetworkAccessForIngestion: 'Enabled'
-    publicNetworkAccessForQuery: 'Enabled'
-    WorkspaceResourceId: logAnalyticsWorkspaceId
-  }
-  tags: tagValues
-  dependsOn: [
-    diagnosticSetting
-  ]
-}
+//resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
+//  name: '${resourcePrefix}-ai-afd'
+//  location: location
+//  kind: 'web'
+//  properties: {
+//    Application_Type: 'web'
+//    publicNetworkAccessForIngestion: 'Enabled'
+//    publicNetworkAccessForQuery: 'Enabled'
+//    WorkspaceResourceId: logAnalyticsWorkspaceId
+//  }
+//  tags: tagValues
+//  dependsOn: [
+//    diagnosticSetting
+//  ]
+//}

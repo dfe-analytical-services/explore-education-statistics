@@ -30,6 +30,11 @@ var tagValues = union(resourceTags ?? {}, {
 
 var resourcePrefix = '${subscription}-ees'
 
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
+  name: '${resourcePrefix}-log'
+  scope: resourceGroup()
+}
+
 module backupsModule 'application/backups/backups.bicep' = {
   name: 'backupsModuleDeploy'
   params: {
@@ -43,8 +48,10 @@ module backupsModule 'application/backups/backups.bicep' = {
 module frontDoorModule 'application/frontDoor/frontDoor.bicep' = {
   name: 'frontDoorModuleDeploy'
   params: {
+    location: location
     subscription: subscription
     resourcePrefix: resourcePrefix
     tagValues: tagValues
+    logAnalyticsWorkspaceId: logAnalyticsWorkspace.id
   }
 }
