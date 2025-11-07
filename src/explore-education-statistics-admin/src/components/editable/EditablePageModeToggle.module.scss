@@ -20,6 +20,12 @@
   }
 }
 
+:global(body:has(#pageViewToggleButton[aria-expanded='true'])) {
+  @include govuk-media-query($until: tablet) {
+    --admin-bar-offset: 180px;
+  }
+}
+
 .container {
   background: $govuk-brand-colour;
   margin: -#{govuk-spacing(6)} 0 govuk-spacing(6) -#{govuk-spacing(3)};

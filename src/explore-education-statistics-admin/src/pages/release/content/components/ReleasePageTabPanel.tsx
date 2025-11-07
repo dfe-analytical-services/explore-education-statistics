@@ -14,6 +14,7 @@ const ReleasePageTabPanel = ({ children, hidden, tabKey }: Props) => {
       hidden={hidden}
       id={`tab-${tabKey}`}
       role="tabpanel"
+      data-testid="release-page-tab-panel"
     >
       {children}
     </div>

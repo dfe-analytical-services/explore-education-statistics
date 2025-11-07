@@ -28,7 +28,12 @@ const ReleasePageTabBar = ({ activeTab, onChangeTab }: Props) => {
   };
 
   return (
-    <div className={styles.nav} id="release-page-tabs" ref={ref}>
+    <div
+      className={styles.nav}
+      id="release-page-tabs"
+      data-testid="release-page-tabs"
+      ref={ref}
+    >
       <ul className={styles.navList} role="tablist">
         {tabs.map(([key, { title }], index) => {
           const sectionId = `tab-${key}`;

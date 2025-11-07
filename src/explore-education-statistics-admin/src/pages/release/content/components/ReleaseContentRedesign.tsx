@@ -38,6 +38,8 @@ const ReleaseContent = () => {
     'home',
   ]);
 
+  // Don't render all tabs on component mount, but keep track so we don't
+  // have to re-render them once they've been rendered once.
   useEffect(() => {
     if (!renderedTabs.includes(activeTabSection)) {
       setRenderedTabs(prevTabs => [...prevTabs, activeTabSection]);
