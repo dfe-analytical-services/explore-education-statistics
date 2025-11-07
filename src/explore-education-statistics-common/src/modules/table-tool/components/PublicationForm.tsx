@@ -135,11 +135,11 @@ const PublicationForm = ({
           return (
             <Form id={formId} onSubmit={handleSubmit}>
               {stepHeading}
-              <p>Search or select a theme to find publications</p>
+              <p>Search for a publication or show publications by theme</p>
               <FormGroup className="govuk-!-margin-bottom-3">
                 <FormTextSearchInput
                   id={`${formId}-publicationIdSearch`}
-                  label="Search publications"
+                  label="Search publications by title"
                   name="publicationSearch"
                   onChange={event => {
                     setSearchTerm(event.target.value);
@@ -171,7 +171,7 @@ const PublicationForm = ({
               <p>or</p>
               <div className={styles.optionsContainer}>
                 <FormFieldRadioGroup<FormValues>
-                  legend="Select a theme"
+                  legend="Show publications by theme"
                   legendSize="s"
                   name="themeId"
                   small
