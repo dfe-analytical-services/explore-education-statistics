@@ -1,0 +1,49 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.nav {
+  position: sticky;
+  top: var(--admin-bar-offset, 0);
+  z-index: 1001; // Above chart tooltip z-index of 1000
+  background-color: govuk-colour('white');
+}
+
+.navList {
+  display: flex;
+  align-items: flex-end;
+  gap: govuk-spacing(2);
+  border-bottom: 1px solid $govuk-border-colour;
+  min-width: 100%;
+  overflow-y: hidden;
+  overflow-x: auto;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  @include govuk-media-query($from: tablet) {
+    gap: govuk-spacing(4);
+  }
+
+  > li {
+    margin: 0;
+    flex-shrink: 0;
+  }
+}
+
+.navItem {
+  display: inline-flex;
+  margin: 0;
+  padding: govuk-spacing(3) govuk-spacing(1) govuk-spacing(2);
+  color: $govuk-link-colour;
+  border-bottom: 5px solid transparent;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: $govuk-link-hover-colour;
+  }
+
+  &:focus,
+  &[aria-selected='true'] {
+    border-color: currentColor;
+  }
+}

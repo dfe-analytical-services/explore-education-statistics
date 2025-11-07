@@ -11,6 +11,15 @@
   }
 }
 
+// Set offset for release nav if editing mode bar present
+:global(body:has(#editingMode)) {
+  --admin-bar-offset: 48px;
+
+  @include govuk-media-query($from: tablet) {
+    --admin-bar-offset: 54px;
+  }
+}
+
 .container {
   background: $govuk-brand-colour;
   margin: -#{govuk-spacing(6)} 0 govuk-spacing(6) -#{govuk-spacing(3)};

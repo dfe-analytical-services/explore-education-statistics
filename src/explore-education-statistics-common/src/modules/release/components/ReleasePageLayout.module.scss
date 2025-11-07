@@ -1,7 +1,7 @@
 @import '~govuk-frontend/dist/govuk/base';
 
 .wrapper {
-  --tab-nav-height: 55px;
+  --tab-nav-height: calc(55px + var(--admin-bar-offset, 0));
   --layout-padding-top: #{govuk-spacing(4)};
   display: flex;
   gap: govuk-spacing(6);
