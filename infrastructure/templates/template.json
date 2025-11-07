@@ -1398,9 +1398,10 @@
     "basePublicAllowedOrigins": [
       "[concat('https://', parameters('domain'))]",
       "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]"
-      // NOTE: We would like to add the frontDoor default hostname here, but as we use `reference()` to get it, we cannot and so must added it in place everywhere we want to use 'publicAllowedOrigins'
+      // NOTE: We would like to add the frontDoor default hostname here, but as we use `reference()` to get it, we cannot and so must added it in place everywhere we use 'publicAllowedOrigins'
     ],
-    "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]"
+    "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]",
+    "afdEndpointResourceId": "[resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName'))]"
   },
   "resources": [
     {
@@ -1461,7 +1462,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('afdEndpointResourceId'), '2025-04-15').hostName)))]"
           },
           "connectionStrings": [
             {
@@ -1565,7 +1566,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('afdEndpointResourceId'), '2025-04-15').hostName)))]"
           }
         }
       },
@@ -1702,7 +1703,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('afdEndpointResourceId'), '2025-04-15').hostName)))]"
           },
           "connectionStrings": [
             {
@@ -1800,7 +1801,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('afdEndpointResourceId'), '2025-04-15').hostName)))]"
           }
         }
       },
@@ -2306,7 +2307,7 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('afdEndpointResourceId'), '2025-04-15').hostName)))]"
           }
         }
       },
@@ -3274,7 +3275,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('afdEndpointResourceId'), '2025-04-15').hostName)))]"
           },
           "connectionStrings": [
             {
