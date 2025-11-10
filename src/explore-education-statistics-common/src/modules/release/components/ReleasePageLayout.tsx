@@ -17,7 +17,7 @@ const ReleasePageLayout = ({ children, navItems }: Props) => {
     <div className={styles.wrapper}>
       {!isMobileMedia && (
         <div className={styles.sidebar}>
-          <PageNavExpandable items={navItems} />
+          {navItems.length > 0 && <PageNavExpandable items={navItems} />}
         </div>
       )}
       <div className={styles.content}>{children}</div>
