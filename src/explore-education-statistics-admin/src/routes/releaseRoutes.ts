@@ -13,7 +13,7 @@ import ReleaseAncillaryFilePage from '@admin/pages/release/data/ReleaseAncillary
 import ReleaseDataFileReplacePage from '@admin/pages/release/data/ReleaseDataFileReplacePage';
 import ReleaseDataFileReplacementCompletePage from '@admin/pages/release/data/ReleaseDataFileReplacementCompletePage';
 import ReleaseDataPage from '@admin/pages/release/data/ReleaseDataPage';
-import releaseDataPageTabIds from '@admin/pages/release/data/utils/releaseDataPageTabIds';
+import releaseDataPageTabs from '@admin/pages/release/data/utils/releaseDataPageTabs';
 import ReleaseDataBlockCreatePage from '@admin/pages/release/datablocks/ReleaseDataBlockCreatePage';
 import ReleaseDataBlockEditPage from '@admin/pages/release/datablocks/ReleaseDataBlockEditPage';
 import ReleaseDataBlocksPage from '@admin/pages/release/datablocks/ReleaseDataBlocksPage';
@@ -88,7 +88,7 @@ export const releaseDataRoute: ReleaseRouteProps = {
 };
 
 export const releaseAncillaryFilesRoute: ReleaseRouteProps = {
-  path: `/publication/:publicationId/release/:releaseVersionId/data#${releaseDataPageTabIds.fileUploads}`,
+  path: `/publication/:publicationId/release/:releaseVersionId/data#${releaseDataPageTabs.fileUploads.id}`,
   title: 'Data and files',
   component: ReleaseDataPage,
 };
@@ -118,7 +118,7 @@ export const releaseDataFileReplacementCompleteRoute: ReleaseRouteProps = {
 };
 
 export const releaseApiDataSetsRoute: ReleaseRouteProps = {
-  path: `/publication/:publicationId/release/:releaseVersionId/data#${releaseDataPageTabIds.apiDataSets}`,
+  path: `/publication/:publicationId/release/:releaseVersionId/data#${releaseDataPageTabs.apiDataSets.id}`,
   title: 'API data sets',
   component: ReleaseDataPage,
   protectionAction: permissions => permissions.isBauUser,

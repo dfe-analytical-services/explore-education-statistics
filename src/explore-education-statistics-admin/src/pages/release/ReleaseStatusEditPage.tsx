@@ -1,3 +1,4 @@
+import PageMetaTitle from '@admin/components/PageMetaTitle';
 import ReleaseStatusChecklist from '@admin/pages/release/components/ReleaseStatusChecklist';
 import ReleaseStatusForm from '@admin/pages/release/components/ReleaseStatusForm';
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
@@ -29,37 +30,40 @@ const ReleaseStatusEditPage = ({
   );
 
   return (
-    <LoadingSpinner loading={isLoading}>
-      <h2>Edit release status</h2>
+    <>
+      <PageMetaTitle title="Edit release status" />
+      <LoadingSpinner loading={isLoading}>
+        <h2>Edit release status</h2>
 
-      {checklist && (
-        <ReleaseStatusChecklist
-          checklist={checklist}
+        {checklist && (
+          <ReleaseStatusChecklist
+            checklist={checklist}
+            releaseVersion={releaseVersion}
+          />
+        )}
+
+        <ReleaseStatusForm
           releaseVersion={releaseVersion}
+          statusPermissions={statusPermissions}
+          onCancel={onCancel}
+          onSubmit={async values => {
+            const nextRelease =
+              await releaseVersionService.createReleaseVersionStatus(
+                releaseVersion.id,
+                {
+                  ...values,
+                  publishScheduled: values.publishScheduled
+                    ? formatISO(values.publishScheduled, {
+                        representation: 'date',
+                      })
+                    : undefined,
+                },
+              );
+            onUpdate(nextRelease);
+          }}
         />
-      )}
-
-      <ReleaseStatusForm
-        releaseVersion={releaseVersion}
-        statusPermissions={statusPermissions}
-        onCancel={onCancel}
-        onSubmit={async values => {
-          const nextRelease =
-            await releaseVersionService.createReleaseVersionStatus(
-              releaseVersion.id,
-              {
-                ...values,
-                publishScheduled: values.publishScheduled
-                  ? formatISO(values.publishScheduled, {
-                      representation: 'date',
-                    })
-                  : undefined,
-              },
-            );
-          onUpdate(nextRelease);
-        }}
-      />
-    </LoadingSpinner>
+      </LoadingSpinner>
+    </>
   );
 };
 
