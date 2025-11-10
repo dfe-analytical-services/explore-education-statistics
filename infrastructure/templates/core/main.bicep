@@ -8,7 +8,7 @@ param location string = resourceGroup().location
 param environmentName string
 
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
-param deployBackupVaultReaderRoleAssignment bool = false
+param deployBackupVaultReaderRoleAssignment bool = true
 
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
