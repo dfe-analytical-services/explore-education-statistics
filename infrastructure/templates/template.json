@@ -2308,7 +2308,10 @@
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
-          "requestTracingEnabled": true
+          "requestTracingEnabled": true,
+          "cors": {
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/endpoints', variables('frontDoorName'), variables('frontDoorEndpointName'), '2023-05-01')).properties.hostName)))]"
+          }
         }
       },
       "dependsOn": [
