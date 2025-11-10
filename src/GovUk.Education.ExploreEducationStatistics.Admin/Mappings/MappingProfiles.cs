@@ -243,6 +243,10 @@ public class MappingProfiles : CommonMappingProfile
         CreateMap<DataSetUpload, DataSetUploadViewModel>()
             .ForMember(dest => dest.Status, m => m.MapFrom(upload => GetDataSetUploadStatus(upload.ScreenerResult)))
             .ForMember(
+                dest => dest.PublicApiCompatible,
+                m => m.MapFrom(upload => upload.ScreenerResult.PublicApiCompatible)
+            )
+            .ForMember(
                 dest => dest.DataFileSize,
                 m => m.MapFrom(upload => FileExtensions.DisplaySize(upload.DataFileSizeInBytes))
             )
