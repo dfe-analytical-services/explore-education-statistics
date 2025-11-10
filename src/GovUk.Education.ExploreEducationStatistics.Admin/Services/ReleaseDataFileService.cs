@@ -387,15 +387,31 @@ public class ReleaseDataFileService(
                 var request = mapper.Map<DataSetScreenerRequest>(dataSetUpload);
                 var result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
 
+                // TODO (EES-6693): Remove this automatic warning once the external screener is no longer required.
+                result.TestResults.Add(
+                    new DataScreenerTestResult
+                    {
+                        Result = TestResult.WARNING,
+                        TestFunctionName = "External screening",
+                        Notes =
+                            "I confirm that this data set has been separately screened by, and passed, the EES data screener (https://rsconnect/rsc/dfe-published-data-qa/).",
+                        Stage = "Manual acknowledgement",
+                    }
+                );
+
                 await dataSetFileStorage.AddScreenerResultToUpload(dataSetUpload.Id, result, cancellationToken);
 
-                // TODO (EES-6334): Basic auto-import added as an initial step. Once the screener has been re-enabled,
-                // this will later be refined to prevent auto-import when there are failures or warnings.
-                await SaveDataSetsFromTemporaryBlobStorage(
-                    dataSetUpload.ReleaseVersionId,
-                    [dataSetUpload.Id],
-                    cancellationToken
-                );
+                var hasWarnings = result.TestResults.Any(test => test.Result == TestResult.WARNING);
+                var hasFailures = result.TestResults.Any(test => test.Result == TestResult.FAIL);
+
+                if (!hasWarnings && !hasFailures)
+                {
+                    await SaveDataSetsFromTemporaryBlobStorage(
+                        dataSetUpload.ReleaseVersionId,
+                        [dataSetUpload.Id],
+                        cancellationToken
+                    );
+                }
 
                 return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
             })

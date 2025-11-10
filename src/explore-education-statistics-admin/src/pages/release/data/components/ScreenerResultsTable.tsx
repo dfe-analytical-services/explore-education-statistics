@@ -51,7 +51,7 @@ export default function ScreenerResultsTable({
                     label={testResult.testFunctionName}
                     hint={testResult.notes}
                     boldLabel
-                    checked={warningAcknowledgements?.[testResult.id]}
+                    checked={!!warningAcknowledgements?.[testResult.id]}
                     onChange={event =>
                       onAcknowledgeWarning(testResult.id, event.target.checked)
                     }

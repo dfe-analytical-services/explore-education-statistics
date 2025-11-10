@@ -150,7 +150,7 @@ export default function DataFilesTableUploadRow({
             disableConfirm={
               !Object.values(warningAcknowledgements).every(
                 acknowledgement => acknowledgement === true,
-              )
+              ) && !isBauUser
             }
             onConfirm={() => onConfirmImport([dataSetUpload.id])}
             confirmText={confirmText}

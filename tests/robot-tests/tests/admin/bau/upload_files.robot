@@ -48,11 +48,9 @@ Upload a ZIP file
 Check the screening results
     user clicks button in table cell    1    4    View details    testid:Data files table
 
-    Skip    msg=EES-6341 - skip result checking until Screener is re-enabled
-
     user waits until modal is visible    Data set details
-
     User waits until h3 is visible    Full breakdown of 3 tests checked against this file
+
     user checks screener results in modal    1    check_filename_spaces
     ...    'absence_in_prus.csv' does not have spaces in the filename.    Pass
     user checks screener results in modal    2    check_filename_spaces
