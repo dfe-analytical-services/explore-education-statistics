@@ -43,13 +43,17 @@ const ReleasePageTabMethodology = ({ hidden }: Props) => {
     return mappedMethodologies;
   }, [externalMethodology, methodologies]);
 
-  const navItems = [
-    allMethodologies.length > 0 && {
-      id: 'methodology-section',
-      text: 'Methodology',
-    },
-    contactUsNavItem,
-  ].filter(item => !!item);
+  const navItems = useMemo(
+    () =>
+      [
+        allMethodologies.length > 0 && {
+          id: 'methodology-section',
+          text: 'Methodology',
+        },
+        contactUsNavItem,
+      ].filter(item => !!item),
+    [allMethodologies.length],
+  );
 
   return (
     <ReleasePageTabPanel tabKey="explore" hidden={hidden}>
