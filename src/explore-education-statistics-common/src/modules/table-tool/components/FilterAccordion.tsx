@@ -49,6 +49,7 @@ export default function FilterAccordion({
           aria-controls={contentId}
           aria-expanded={open}
           className="govuk-accordion__show-all govuk-!-margin-bottom-0"
+          data-testid="filter-accordion-button"
           type="button"
           onClick={() => {
             if (!preventToggle) {
