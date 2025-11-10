@@ -1310,8 +1310,8 @@
     "backupVaultName": "[concat(parameters('subscription'), '-', parameters('environment'), '-bvault')]",
     "backupVaultBlobPolicyName": "[concat(parameters('subscription'), '-', parameters('environment'), '-blobs-bkpol')]",
     "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
-    "frontDoorName": "[concat(parameters('subscription'), '-afd-', parameters('environment'))]",
-    "frontDoorEndpointName": "[concat(parameters('subscription'), '-fde')]",
+    "frontDoorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-afd')]",
+    "frontDoorEndpointName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fde')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
     "ees-admin-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-admin-govuknotify-api-key')]",
     "ees-notifier-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-govuknotify-api-key')]",
@@ -1462,7 +1462,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/endpoints', variables('frontDoorName'), variables('frontDoorEndpointName'), '2023-05-01')).properties.hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
           },
           "connectionStrings": [
             {
@@ -1566,7 +1566,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/endpoints', variables('frontDoorName'), variables('frontDoorEndpointName'), '2023-05-01')).properties.hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
           }
         }
       },
@@ -1703,7 +1703,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/endpoints', variables('frontDoorName'), variables('frontDoorEndpointName'), '2023-05-01')).properties.hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
           },
           "connectionStrings": [
             {
@@ -1801,7 +1801,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/endpoints', variables('frontDoorName'), variables('frontDoorEndpointName'), '2023-05-01')).properties.hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
           }
         }
       },
@@ -2310,7 +2310,7 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/endpoints', variables('frontDoorName'), variables('frontDoorEndpointName'), '2023-05-01')).properties.hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
           }
         }
       },
@@ -3265,7 +3265,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/endpoints', variables('frontDoorName'), variables('frontDoorEndpointName'), '2023-05-01')).properties.hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
           },
           "connectionStrings": [
             {
