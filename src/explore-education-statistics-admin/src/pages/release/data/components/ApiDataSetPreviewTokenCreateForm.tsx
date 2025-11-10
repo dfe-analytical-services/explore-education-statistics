@@ -19,32 +19,7 @@ import { RadioOption } from '@common/components/form/FormRadioGroup';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import { PreviewTokenCreateValues } from '@admin/pages/release/data/types/PreviewTokenCreateValues';
 import InsetText from '@common/components/InsetText';
-import { zonedTimeToUtc, utcToZonedTime } from 'date-fns-tz';
-
-const UK_TZ = 'Europe/London';
-
-// Build a UTC instant corresponding to YYYY-MM-DD 00:00:00 in London.
-function ukStartOfDayUtc(d: Date): Date {
-  // Reconstruct Y/M/D to avoid any hidden time
-  const y = d.getFullYear();
-  const m = d.getMonth();
-  const day = d.getDate();
-  return zonedTimeToUtc(new Date(y, m, day, 0, 0, 0, 0), UK_TZ);
-}
-
-// End of day 23:59:59.999 in London, as a UTC instant
-function ukEndOfDayUtc(d: Date): Date {
-  // Reconstruct Y/M/D to avoid any hidden time
-  const y = d.getFullYear();
-  const m = d.getMonth();
-  const day = d.getDate();
-  return zonedTimeToUtc(new Date(y, m, day, 23, 59, 59, 999), UK_TZ);
-}
-
-// "Now" in London for comparisons
-function nowUk(): Date {
-  return utcToZonedTime(new Date(), UK_TZ);
-}
+import UkTimeHelper from '@common/utils/date/ukTimeHelper';
 
 interface FormValues {
   agreeTerms: boolean;
@@ -114,10 +89,13 @@ export default function ApiDataSetPreviewTokenCreateForm({
               message: 'Activates date must not be in the past',
               test(value) {
                 if (value == null) return false;
-                const activatesUtc = ukStartOfDayUtc(value);
-                const todayUkMidnight = nowUk();
-                todayUkMidnight.setHours(0, 0, 0, 0);
-                return !isBefore(activatesUtc, todayUkMidnight);
+                const activatesMidnightUk = new Date(
+                  UkTimeHelper.dateMidnightUk(value),
+                );
+                const todayMidnightUk = new Date(
+                  UkTimeHelper.todayMidnightUk(),
+                );
+                return !isBefore(activatesMidnightUk, todayMidnightUk);
               },
             })
             .test({
@@ -125,16 +103,32 @@ export default function ApiDataSetPreviewTokenCreateForm({
               message: 'Activates date must be within 7 days from today',
               test(value) {
                 if (value == null) return false;
-                const activatesUk = ukStartOfDayUtc(value);
-                const maxUk = nowUk();
-                maxUk.setUTCDate(maxUk.getUTCDate() + 7);
-                const todayUk = nowUk();
-                todayUk.setHours(0, 0, 0, 0);
+                const todayMidnightUk = new Date(
+                  UkTimeHelper.todayMidnightUk(),
+                );
+
+                const dateOnlyActivatesProvided = value
+                  .toISOString()
+                  .substring(0, 10);
+                const activatesMidnightUk = UkTimeHelper.ukStartOfDayUtc(
+                  dateOnlyActivatesProvided,
+                );
+
+                const sevenDaysFromTodayMidnightUk = new Date(
+                  UkTimeHelper.todayMidnightUk(),
+                );
+                sevenDaysFromTodayMidnightUk.setUTCDate(
+                  sevenDaysFromTodayMidnightUk.getUTCDate() + 7,
+                );
+
                 return endDateIsLaterThanOrEqualToStartDate(
-                  todayUk,
-                  activatesUk,
+                  todayMidnightUk,
+                  activatesMidnightUk,
                 )
-                  ? endDateIsLaterThanOrEqualToStartDate(activatesUk, maxUk)
+                  ? endDateIsLaterThanOrEqualToStartDate(
+                      activatesMidnightUk,
+                      sevenDaysFromTodayMidnightUk,
+                    )
                   : false;
               },
             }),
@@ -150,11 +144,17 @@ export default function ApiDataSetPreviewTokenCreateForm({
               const activates = context.parent.activates as Date | null;
               if (!activates || !value) return false;
 
-              const activatesUtc = ukStartOfDayUtc(activates);
-              const expiresUtc = ukEndOfDayUtc(value);
+              const activatesUtc = UkTimeHelper.ukStartOfDayUtc(
+                activates.toISOString(),
+              );
+              const expiresUtc = UkTimeHelper.ukEndOfDayUtc(
+                value.toISOString(),
+              );
 
-              const activatesMaxUtc = ukEndOfDayUtc(activates);
-              activatesMaxUtc.setDate(activatesMaxUtc.getDate() + 7);
+              const activatesMaxUtc = UkTimeHelper.ukEndOfDayUtc(
+                activates.toISOString(),
+              );
+              activatesMaxUtc.setUTCDate(activatesMaxUtc.getUTCDate() + 7);
 
               const laterThanActivates =
                 expiresUtc.getTime() >= activatesUtc.getTime();

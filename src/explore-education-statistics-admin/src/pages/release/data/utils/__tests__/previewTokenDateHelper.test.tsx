@@ -1,17 +1,10 @@
 ﻿import { isToday } from 'date-fns';
-import { zonedTimeToUtc } from 'date-fns-tz';
 import PreviewTokenDateHelper from '@admin/pages/release/data/utils/previewTokenDateHelper';
 
-jest.mock('@admin/services/utils/service');
-jest.mock('date-fns-tz');
 jest.mock('date-fns');
-
 describe('PreviewTokenDateHelper', () => {
   let helper: PreviewTokenDateHelper;
   const mockIsToday = isToday as jest.MockedFunction<typeof isToday>;
-  const mockZonedTimeToUtc = zonedTimeToUtc as jest.MockedFunction<
-    typeof zonedTimeToUtc
-  >;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -22,13 +15,28 @@ describe('PreviewTokenDateHelper', () => {
     test('should use provided dates when both activates and expires are given and activates is not today', () => {
       const activatesDate = new Date('2025-01-15T10:00:00');
       const expiresDate = new Date('2025-01-20T15:30:00');
-      const mockStartUtc = new Date('2025-01-15T00:00:00Z');
-      const mockEndUtc = new Date('2025-01-20T23:59:59Z');
-
+      const expectedStart = new Date('2025-01-15T00:00:00.000Z');
+      const expectedEnd = new Date('2025-01-20T23:59:59.000Z');
       mockIsToday.mockReturnValue(false);
-      mockZonedTimeToUtc
-        .mockReturnValueOnce(mockStartUtc)
-        .mockReturnValueOnce(mockEndUtc);
+      const result = helper.setDateRangeBasedOnCustomDates(
+        activatesDate,
+        expiresDate,
+      );
+
+      expect(mockIsToday).toHaveBeenCalledWith(activatesDate);
+      expect(result).toEqual({
+        startDate: expectedStart,
+        endDate: expectedEnd,
+      });
+    });
+
+    test('should use current time as start date when activates is today', () => {
+      const activatesDate = new Date();
+      const expiresDate = new Date(activatesDate);
+      expiresDate.setDate(activatesDate.getDate() + 1);
+      const timeThreshold = 100; // 100ms
+
+      mockIsToday.mockReturnValue(true);
 
       const result = helper.setDateRangeBasedOnCustomDates(
         activatesDate,
@@ -36,25 +44,20 @@ describe('PreviewTokenDateHelper', () => {
       );
 
       expect(mockIsToday).toHaveBeenCalledWith(activatesDate);
-      expect(mockZonedTimeToUtc).toHaveBeenCalledWith(
-        '2025-01-15T00:00:00',
-        'Europe/London',
+      const difference = Math.abs(
+        result.startDate.getTime() - activatesDate.getTime(),
       );
-      expect(mockZonedTimeToUtc).toHaveBeenCalledWith(
-        '2025-01-20T23:59:59',
-        'Europe/London',
-      );
-      expect(result).toEqual({ startDate: mockStartUtc, endDate: mockEndUtc });
+      expect(difference).toBeLessThanOrEqual(timeThreshold);
+
+      expiresDate.setHours(23, 59, 59, 0);
+      expect(result.endDate).toStrictEqual(expiresDate);
     });
 
-    test('should use current time as start date when activates is today', () => {
-      mockIsToday.mockReturnValue(true);
+    test('should use midnight as start date when activates is not today', () => {
       const activatesDate = new Date('2025-01-15T10:00:00');
       const expiresDate = new Date('2025-01-20T23:59:59');
+      mockIsToday.mockReturnValue(false);
 
-      mockZonedTimeToUtc
-        .mockReturnValueOnce(activatesDate)
-        .mockReturnValueOnce(expiresDate);
       helper = new PreviewTokenDateHelper();
       const result = helper.setDateRangeBasedOnCustomDates(
         activatesDate,
@@ -62,29 +65,12 @@ describe('PreviewTokenDateHelper', () => {
       );
 
       expect(mockIsToday).toHaveBeenCalledWith(activatesDate);
-      expect(mockZonedTimeToUtc).toHaveBeenNthCalledWith(
-        1,
-        expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/),
-        'Europe/London',
-      ); // Current time
-      expect(mockZonedTimeToUtc).toHaveBeenNthCalledWith(
-        2,
-        '2025-01-20T23:59:59',
-        'Europe/London',
-      );
-      expect(result).toEqual({
-        startDate: activatesDate,
-        endDate: expiresDate,
-      });
+
+      expect(result.startDate).toEqual(new Date('2025-01-15T00:00:00.000Z'));
+      expect(result.endDate).toEqual(new Date('2025-01-20T23:59:59.000Z'));
     });
 
     test('should default to 24-hour range when dates are not provided', () => {
-      const currentDate = new Date('2025-01-10T10:59:59');
-
-      mockZonedTimeToUtc
-        .mockReturnValueOnce(currentDate)
-        .mockReturnValueOnce(currentDate);
-
       const result = helper.setDateRangeBasedOnCustomDates(null, null);
 
       expect(mockIsToday).not.toHaveBeenCalled();
@@ -107,28 +93,21 @@ describe('PreviewTokenDateHelper', () => {
 
   describe('setDateRangeBasedOnPresets', () => {
     test('should create date range for valid preset span', () => {
-      const mockStartUtc = new Date('2025-01-15T14:30:45Z');
-      const mockEndUtc = new Date('2025-01-18T23:59:59Z');
+      const activatesDate = new Date();
+      const expiresDate = new Date(activatesDate);
+      const datePresetSpan = 3;
+      expiresDate.setDate(activatesDate.getDate() + datePresetSpan);
+      const timeThreshold = 100; // 100ms
 
-      mockZonedTimeToUtc
-        .mockReturnValueOnce(mockStartUtc)
-        .mockReturnValueOnce(mockEndUtc)
-        .mockReturnValueOnce(mockStartUtc);
+      const result = helper.setDateRangeBasedOnPresets(datePresetSpan);
 
-      const result = helper.setDateRangeBasedOnPresets(3);
-
-      expect(mockZonedTimeToUtc).toHaveBeenCalledTimes(3);
-      expect(mockZonedTimeToUtc).toHaveBeenNthCalledWith(
-        1,
-        expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/),
-        'Europe/London',
+      const difference = Math.abs(
+        result.startDate.getTime() - activatesDate.getTime(),
       );
-      expect(mockZonedTimeToUtc).toHaveBeenNthCalledWith(
-        2,
-        expect.stringMatching(/^\d{4}-\d{2}-\d{2}T23:59:59$/),
-        'Europe/London',
-      );
-      expect(result).toEqual({ startDate: mockStartUtc, endDate: mockEndUtc });
+      expect(difference).toBeLessThanOrEqual(timeThreshold);
+
+      expiresDate.setHours(23, 59, 59, 0);
+      expect(result.endDate.toISOString()).toBe(expiresDate.toISOString());
     });
 
     test('should throw error for invalid preset span - zero', () => {
