@@ -1,7 +1,7 @@
 @import '~govuk-frontend/dist/govuk/base';
 
 .inner {
-  margin: 0 0 govuk-spacing(2) 44px;
+  margin: 0 0 govuk-spacing(2) 0;
 }
 
 .sectionContent {
@@ -20,6 +20,10 @@
       padding: govuk-spacing(4) govuk-spacing(2) govuk-spacing(4)
         govuk-spacing(8) !important;
     }
+  }
+
+  .inner {
+    margin-left: 44px;
   }
 }
 
