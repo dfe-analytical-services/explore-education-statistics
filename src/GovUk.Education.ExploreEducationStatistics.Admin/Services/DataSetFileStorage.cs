@@ -74,7 +74,7 @@ public class DataSetFileStorage(
             type: FileType.Data,
             createdById: userService.GetUserId(),
             name: dataSet.Title,
-            dataSet.ReplacingFile,
+            replacingDataFile: dataSet.ReplacingFile,
             order: releaseDataFileOrder
         );
 
@@ -482,6 +482,7 @@ public class DataSetFileStorage(
                 dataSetUpload.DataFileName,
                 contentLength: dataSetUpload.DataFileSizeInBytes,
                 type: FileType.Data,
+                apiCompatible: dataSetUpload.ScreenerResult?.PublicApiCompatible,
                 createdById: userService.GetUserId(),
                 name: dataSetUpload.DataSetTitle,
                 replacingDataFile: replacingFile,
@@ -506,7 +507,8 @@ public class DataSetFileStorage(
                 dataSetUpload.MetaFileName,
                 dataSetUpload.MetaFileSizeInBytes,
                 type: FileType.Metadata,
-                createdById: userService.GetUserId()
+                createdById: userService.GetUserId(),
+                apiCompatible: dataSetUpload.ScreenerResult?.PublicApiCompatible
             );
 
             var sourceMetaFilePath = FileExtensions.Path(releaseVersionId, FileType.Metadata, dataSetUpload.MetaFileId);
