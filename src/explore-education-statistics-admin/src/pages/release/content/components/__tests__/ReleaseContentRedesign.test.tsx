@@ -1,11 +1,12 @@
-import ReleaseContentRedesign from '@admin/pages/release/content/components/ReleaseContentRedesign';
-import render from '@common-test/render';
-import { screen, within } from '@testing-library/react';
+import generateReleaseContent from '@admin-test/generators/releaseContentGenerators';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
+import ReleaseContentRedesign from '@admin/pages/release/content/components/ReleaseContentRedesign';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ReleaseContent as ReleaseContentType } from '@admin/services/releaseContentService';
+import render from '@common-test/render';
+import { screen, within } from '@testing-library/react';
 import React from 'react';
-import generateReleaseContent from '@admin-test/generators/releaseContentGenerators';
+import { MemoryRouter } from 'react-router';
 
 const testReleaseContent = generateReleaseContent({});
 const renderWithContext = (
@@ -20,7 +21,7 @@ const renderWithContext = (
       }}
     >
       <EditingContextProvider editingMode="preview">
-        {component}
+        <MemoryRouter>{component}</MemoryRouter>
       </EditingContextProvider>
       ,
     </ReleaseContentProvider>,
@@ -62,5 +63,37 @@ describe('ReleaseContentRedesign', () => {
     await user.keyboard('[ArrowRight]');
     tabPanels = screen.getAllByTestId('release-page-tab-panel');
     expect(tabPanels).toHaveLength(4);
+  });
+
+  test('renders methodology tab content', async () => {
+    const { user } = renderWithContext(<ReleaseContentRedesign />);
+
+    const tabsContainer = screen.getByTestId('release-page-tabs');
+    const tabs = within(tabsContainer).getAllByRole('tab');
+
+    await user.click(tabs[2]);
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Contact us',
+        level: 2,
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Methodology',
+        level: 2,
+      }),
+    ).toBeInTheDocument();
+
+    const list = screen.getByTestId('methodologies-list');
+    const listItems = within(list).getAllByRole('listitem');
+    expect(listItems).toHaveLength(1);
+    expect(
+      within(listItems[0]).getByRole('link', {
+        name: 'Methodology title',
+      }),
+    ).toHaveAttribute('href', '/methodology/methodology-id/summary');
   });
 });
