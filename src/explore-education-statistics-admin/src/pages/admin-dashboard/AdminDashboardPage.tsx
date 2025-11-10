@@ -34,12 +34,15 @@ const AdminDashboardPage = () => {
   const isBauUser = user?.permissions.isBauUser ?? false;
   const isApprover = user?.permissions.isApprover ?? false;
 
-  const initialTabTitle = hash
+  const tabTitleFromHash = hash
     ? Object.values(dashboardTabs).find(tab => tab.id === hash.replace('#', ''))
         ?.title
-    : dashboardTabs.publications.title;
+    : undefined;
+  const defaultTabTitle = dashboardTabs.publications.title;
 
-  const [tabTitle, setTabTitle] = useState<string | undefined>(initialTabTitle);
+  const [tabTitle, setTabTitle] = useState<string>(
+    tabTitleFromHash ?? defaultTabTitle,
+  );
 
   const {
     data: draftReleases = [],

@@ -86,7 +86,7 @@ const EducationInNumbersPage = ({
       }
     : undefined;
 
-  const pageTitle = useCurrentRouteTitle(navRoutes);
+  const pageRouteTitle = useCurrentRouteTitle(navRoutes);
 
   return (
     <Page
@@ -102,7 +102,7 @@ const EducationInNumbersPage = ({
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-two-thirds">
                 <PageTitle
-                  metaTitle={`${pageTitle} - ${educationInNumbersPage.title}`}
+                  metaTitle={`${pageRouteTitle} - ${educationInNumbersPage.title}`}
                   title={educationInNumbersPage.title}
                   caption="Edit Education in numbers Page"
                 />

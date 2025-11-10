@@ -21,14 +21,17 @@ const ReleaseDataPage = () => {
   const { user } = useAuthContext();
   const { hash } = useLocation();
 
-  const initialTabTitle = hash
+  const tabTitleFromHash = hash
     ? Object.values(releaseDataPageTabs).find(
         tab => tab.id === hash.replace('#', ''),
       )?.title
-    : releaseDataPageTabs.dataUploads.title;
+    : undefined;
+  const defaultTabTitle = releaseDataPageTabs.dataUploads.title;
 
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
-  const [tabTitle, setTabTitle] = useState<string | undefined>(initialTabTitle);
+  const [tabTitle, setTabTitle] = useState<string>(
+    tabTitleFromHash ?? defaultTabTitle,
+  );
 
   const { value: canUpdateRelease = false, isLoading } = useAsyncHandledRetry(
     () => permissionService.canUpdateRelease(releaseVersionId),

@@ -29,7 +29,6 @@ const PublicationAdoptMethodologyPage = () => {
 
   return (
     <>
-      {' '}
       <PageMetaTitle title={`Adopt a methodology - ${publication.title}`} />
       <h2>Adopt a methodology</h2>
       <LoadingSpinner loading={isLoading}>

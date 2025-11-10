@@ -28,12 +28,15 @@ const ReleasePreReleaseAccessPage = () => {
   const { releaseVersionId, releaseVersion } = useReleaseVersionContext();
   const { hash } = useLocation();
 
-  const initialTabTitle = hash
+  const tabTitleFromHash = hash
     ? Object.values(releasePreReleaseAccessPageTabs).find(
         tab => tab.id === hash.replace('#', ''),
       )?.title
-    : releasePreReleaseAccessPageTabs.users.title;
-  const [tabTitle, setTabTitle] = useState<string | undefined>(initialTabTitle);
+    : undefined;
+  const defaultTabTitle = releasePreReleaseAccessPageTabs.users.title;
+  const [tabTitle, setTabTitle] = useState<string>(
+    tabTitleFromHash ?? defaultTabTitle,
+  );
 
   const {
     value: release,
