@@ -8,7 +8,7 @@ import ReleasePageTitle from '@admin/pages/release/content/components/ReleasePag
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import ReleaseSummaryBlock from '@common/modules/release/components/ReleaseSummaryBlock';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useState } from 'react';
 
 export const releasePageTabSections = {
   home: {
@@ -38,13 +38,15 @@ const ReleaseContent = () => {
     'home',
   ]);
 
-  // Don't render all tabs on component mount, but keep track so we don't
-  // have to re-render them once they've been rendered once.
-  useEffect(() => {
-    if (!renderedTabs.includes(activeTabSection)) {
-      setRenderedTabs(prevTabs => [...prevTabs, activeTabSection]);
-    }
-  }, [activeTabSection, renderedTabs]);
+  const handleChangeTab = useCallback(
+    (sectionKey: ReleasePageTabSectionKey) => {
+      if (!renderedTabs.includes(sectionKey)) {
+        setRenderedTabs(prevTabs => [...prevTabs, sectionKey]);
+      }
+      setActiveTabSection(sectionKey);
+    },
+    [renderedTabs],
+  );
 
   const { publication } = release;
 
@@ -94,7 +96,7 @@ const ReleaseContent = () => {
 
       <ReleasePageTabBar
         activeTab={activeTabSection}
-        onChangeTab={setActiveTabSection}
+        onChangeTab={handleChangeTab}
       />
 
       {renderedTabs.includes('home') && (
