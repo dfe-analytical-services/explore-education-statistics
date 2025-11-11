@@ -33,9 +33,29 @@ public class PreviewTokenCreateRequestValidatorTests
     }
 
     [Theory]
+    [InlineData("2025-10-01T14:00:00 +01:00")]
+    [InlineData("2025-10-01T13:59:55 +01:00")]
+    public void Activates_WithoutExpires_ActivatesIsNow_Passes(string activates)
+    {
+        var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
+        var request = new PreviewTokenCreateRequest
+        {
+            DataSetVersionId = Guid.NewGuid(),
+            Label = "Test",
+            Activates = DateTimeOffset.Parse(activates),
+            Expires = null,
+        };
+
+        var result = validator.TestValidate(request);
+        result
+            .ShouldHaveValidationErrorFor(r => r.Activates)
+            .WithErrorMessage("Activates date must not be in the past.");
+    }
+
+    [Theory]
     [InlineData("2025-10-01T14:00:00 +00:00")]
     [InlineData("2025-10-01T14:00:01 +00:00")]
-    [InlineData("2025-10-07T23:00:00 +00:00")]
+    [InlineData("2025-10-07T23:00:00 +00:00")] // This, in BST is 2025-10-08T00:00:00
     [InlineData("2025-10-08T00:00:00 +01:00")]
     [InlineData("2025-10-08T13:59:59 +00:00")]
     [InlineData("2025-10-08T14:00:00 +00:00")]
