@@ -46,6 +46,7 @@ interface MethodologyLink {
   key: string;
   title: string;
   url: string;
+  external?: boolean;
 }
 
 const ReleaseContent = ({
@@ -119,6 +120,7 @@ const ReleaseContent = ({
       key: methodology.id,
       title: methodology.title,
       url: `/methodology/${methodology.id}/summary`,
+      external: false,
     }));
 
     if (publication.externalMethodology) {
@@ -126,6 +128,7 @@ const ReleaseContent = ({
         key: publication.externalMethodology.url,
         title: publication.externalMethodology.title,
         url: publication.externalMethodology.url,
+        external: true,
       });
     }
 
@@ -428,7 +431,10 @@ const ReleaseContent = ({
                       {editingMode === 'edit' ? (
                         <a>{methodology.title}</a>
                       ) : (
-                        <Link to={methodology.url}>{methodology.title}</Link>
+                        <Link to={methodology.url}>
+                          {methodology.title}
+                          {methodology.external && ' (opens in new tab)'}
+                        </Link>
                       )}
                     </li>
                   ))}

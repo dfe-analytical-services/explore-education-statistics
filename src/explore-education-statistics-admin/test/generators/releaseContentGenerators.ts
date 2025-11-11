@@ -78,7 +78,7 @@ const defaultHeadlinesSection: ContentSection<EditableContentBlock> = {
   ],
 };
 
-const defaultPublication: Publication = {
+export const defaultPublication: Publication = {
   contact: {
     contactName: 'Contact name',
     teamEmail: 'contact@test.com',
