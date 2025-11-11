@@ -25,6 +25,7 @@ public class ReleaseDataFileRepository : IReleaseDataFileRepository
         long contentLength,
         FileType type,
         Guid createdById,
+        bool? apiCompatible = null,
         string? name = null,
         File? replacingDataFile = null,
         int order = 0
@@ -59,6 +60,7 @@ public class ReleaseDataFileRepository : IReleaseDataFileRepository
                 Type = type,
                 Replacing = replacingDataFile,
             },
+            PublicApiCompatible = apiCompatible,
         };
         var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
         if (replacingDataFile != null)

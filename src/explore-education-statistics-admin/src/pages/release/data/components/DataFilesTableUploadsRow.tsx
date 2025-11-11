@@ -150,7 +150,7 @@ export default function DataFilesTableUploadRow({
             disableConfirm={
               !Object.values(warningAcknowledgements).every(
                 acknowledgement => acknowledgement === true,
-              )
+              ) && !(isBauUser && hasFailures)
             }
             onConfirm={() => onConfirmImport([dataSetUpload.id])}
             confirmText={confirmText}
@@ -219,7 +219,10 @@ export default function DataFilesTableUploadRow({
               open={openDeleteConfirm}
               title="Confirm deletion of selected data files"
               triggerButton={
-                <ButtonText onClick={toggleOpenDeleteConfirm.on}>
+                <ButtonText
+                  onClick={toggleOpenDeleteConfirm.on}
+                  variant="warning"
+                >
                   Delete files
                 </ButtonText>
               }

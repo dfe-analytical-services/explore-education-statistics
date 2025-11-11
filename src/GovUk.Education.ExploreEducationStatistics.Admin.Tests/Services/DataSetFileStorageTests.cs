@@ -92,6 +92,7 @@ public class DataSetFileStorageTests
                         434,
                         FileType.Data,
                         _user.Id,
+                        null,
                         dataSetName,
                         null,
                         0
@@ -108,6 +109,7 @@ public class DataSetFileStorageTests
                         157,
                         FileType.Metadata,
                         _user.Id,
+                        null,
                         null,
                         null,
                         0
@@ -488,6 +490,7 @@ public class DataSetFileStorageTests
                     434,
                     FileType.Data,
                     _user.Id,
+                    null,
                     dataSetName,
                     originalDataFile,
                     0
@@ -497,7 +500,18 @@ public class DataSetFileStorageTests
 
         releaseDataFileRepository
             .Setup(mock =>
-                mock.Create(releaseVersion.Id, subjectId, metaFileName, 157, FileType.Metadata, _user.Id, null, null, 0)
+                mock.Create(
+                    releaseVersion.Id,
+                    subjectId,
+                    metaFileName,
+                    157,
+                    FileType.Metadata,
+                    _user.Id,
+                    null,
+                    null,
+                    null,
+                    0
+                )
             )
             .Returns(Task.FromResult(metaFile));
 
