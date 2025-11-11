@@ -339,7 +339,8 @@ public class PreviewTokenCreateRequestValidatorTests
     [InlineData(null, "2025-10-01T14:00:01 +00:00", true)]
     [InlineData(null, "2025-10-08T13:59:59 +00:00", true)]
     [InlineData(null, "2025-10-08T14:00:00 +00:00", true)]
-    [InlineData(null, "2025-10-08T23:00:00 +00:00", false)] // 2025-10-08T23:00:00 == 2025-10-09T00:00:00. End of day of 025-10-09 is 025-10-09T23:59:59 local time.
+    [InlineData(null, "2025-10-08T23:00:00 +00:00", false)] // Expires at 23:00 UTC, which is 00:00 on 9 Oct in UK (BST).
+    // Since this falls at the start of 9 Oct, it is *not* within the end-of-day window for 8 Oct.
     [InlineData("2025-01-01T00:00:00 +00:00", "2025-01-09T00:00:00 +00:00", false)]
     [InlineData("2025-01-01T00:00:00 +00:00", "2025-01-08T23:59:59 +00:00", true)]
     public void Expires_WithoutActivates_Within7Days_PassesIfInBoundary(
@@ -407,7 +408,7 @@ public class PreviewTokenCreateRequestValidatorTests
     }
 
     [Fact]
-    public void Expires_EndOfDayBstTime_IsValid()
+    public void Expires_WithActivates_EndOfDayBstTime_IsValid()
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
         var activates = new DateTimeOffset(2025, 10, 5, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow
@@ -428,7 +429,7 @@ public class PreviewTokenCreateRequestValidatorTests
     }
 
     [Fact]
-    public void Expires_EndOfDayNonBstTime_IsValid()
+    public void Expires_WithActivates_EndOfDayNonBstTime_IsValid()
     {
         var currentTime = new DateTimeOffset(2025, 1, 14, 10, 0, 0, TimeSpan.Zero);
         var timeProvider = new FakeTimeProvider(currentTime);
@@ -459,7 +460,7 @@ public class PreviewTokenCreateRequestValidatorTests
     }
 
     [Fact]
-    public void Expires_NotEndOfDayBstTime_Fails()
+    public void Expires_WithActivates_NotEndOfDayBstTime_Fails()
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
         var activates = new DateTimeOffset(2025, 10, 6, 23, 0, 0, TimeSpan.Zero); // Midnight BST tomorrow

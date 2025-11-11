@@ -177,15 +177,11 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
 
   test('shows validation error when start date is in the past', async () => {
     const today = new Date();
-    const beforeTodayBy8Days = new Date();
-    beforeTodayBy8Days.setDate(today.getDate() - 8);
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
     const handleSubmit = jest.fn();
 
-    await renderWithCustomDatesSelected(
-      beforeTodayBy8Days,
-      today,
-      handleSubmit,
-    );
+    await renderWithCustomDatesSelected(yesterday, today, handleSubmit);
 
     expect(
       await screen.findByText('Activates date must not be in the past', {
@@ -237,9 +233,6 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
   });
 
   test('options are not visible for analysts', async () => {
-    const today = new Date();
-    const beyond7 = new Date();
-    beyond7.setDate(today.getDate() + 8);
     const handleSubmit = jest.fn();
     const analyst = {
       ...bau,
