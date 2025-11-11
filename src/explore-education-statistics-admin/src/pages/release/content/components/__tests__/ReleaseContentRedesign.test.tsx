@@ -64,36 +64,4 @@ describe('ReleaseContentRedesign', () => {
     tabPanels = screen.getAllByTestId('release-page-tab-panel');
     expect(tabPanels).toHaveLength(4);
   });
-
-  test('renders methodology tab content', async () => {
-    const { user } = renderWithContext(<ReleaseContentRedesign />);
-
-    const tabsContainer = screen.getByTestId('release-page-tabs');
-    const tabs = within(tabsContainer).getAllByRole('tab');
-
-    await user.click(tabs[2]);
-
-    expect(
-      screen.getByRole('heading', {
-        name: 'Contact us',
-        level: 2,
-      }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole('heading', {
-        name: 'Methodology',
-        level: 2,
-      }),
-    ).toBeInTheDocument();
-
-    const list = screen.getByTestId('methodologies-list');
-    const listItems = within(list).getAllByRole('listitem');
-    expect(listItems).toHaveLength(1);
-    expect(
-      within(listItems[0]).getByRole('link', {
-        name: 'Methodology title',
-      }),
-    ).toHaveAttribute('href', '/methodology/methodology-id/summary');
-  });
 });

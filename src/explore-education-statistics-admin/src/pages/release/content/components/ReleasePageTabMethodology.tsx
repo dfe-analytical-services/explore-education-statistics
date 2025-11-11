@@ -12,6 +12,7 @@ interface MethodologyLink {
   key: string;
   title: string;
   url: string;
+  external?: boolean;
 }
 
 interface Props {
@@ -30,6 +31,7 @@ const ReleasePageTabMethodology = ({ hidden }: Props) => {
       key: methodology.id,
       title: methodology.title,
       url: `/methodology/${methodology.id}/summary`,
+      external: false,
     }));
 
     if (externalMethodology) {
@@ -37,6 +39,7 @@ const ReleasePageTabMethodology = ({ hidden }: Props) => {
         key: externalMethodology.url,
         title: externalMethodology.title,
         url: externalMethodology.url,
+        external: true,
       });
     }
 
@@ -73,7 +76,10 @@ const ReleasePageTabMethodology = ({ hidden }: Props) => {
             >
               {allMethodologies.map(methodology => (
                 <li key={methodology.key}>
-                  <Link to={methodology.url}>{methodology.title}</Link>
+                  <Link to={methodology.url}>
+                    {methodology.title}
+                    {methodology.external && ' (opens in new tab)'}
+                  </Link>
                 </li>
               ))}
             </ul>

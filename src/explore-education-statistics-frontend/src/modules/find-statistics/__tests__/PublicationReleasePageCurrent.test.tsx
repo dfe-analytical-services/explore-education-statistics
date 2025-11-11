@@ -494,7 +494,7 @@ describe('PublicationReleasePageCurrent', () => {
 
     expect(
       within(usefulInfo).getByRole('link', {
-        name: 'External methodology title',
+        name: 'External methodology title (opens in new tab)',
       }),
     ).toHaveAttribute('href', 'http://gov.uk');
   });
@@ -533,7 +533,7 @@ describe('PublicationReleasePageCurrent', () => {
 
     expect(
       within(usefulInfo).getByRole('link', {
-        name: 'External methodology title',
+        name: 'External methodology title (opens in new tab)',
       }),
     ).toHaveAttribute('href', 'http://gov.uk');
   });
