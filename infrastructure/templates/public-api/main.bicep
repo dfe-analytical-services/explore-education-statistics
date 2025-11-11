@@ -1,4 +1,5 @@
-import { abbreviations } from 'abbreviations.bicep'
+import { abbreviations } from '../common/abbreviations.bicep'
+import { abbreviations as publicApiAbbreviations } from 'abbreviations.bicep'
 import {
   ContainerAppResourceConfig
   IpRange
@@ -212,7 +213,7 @@ var resourceNames = {
       dataProcessor: '${publicApiResourcePrefix}-snet-${abbreviations.webSitesFunctions}-processor'
       dataProcessorPrivateEndpoints: '${publicApiResourcePrefix}-snet-${abbreviations.webSitesFunctions}-processor-pep'
       storagePrivateEndpoints: '${publicApiResourcePrefix}-snet-${abbreviations.storageStorageAccounts}-pep'
-      psqlFlexibleServer: '${commonResourcePrefix}-snet-${abbreviations.dBforPostgreSQLServers}'
+      psqlFlexibleServer: '${commonResourcePrefix}-snet-${publicApiAbbreviations.dBforPostgreSQLServers}'
     }
     vNet: '${legacyResourcePrefix}-vnet-ees'
   }
@@ -221,8 +222,8 @@ var resourceNames = {
     appGatewayIdentity: '${commonResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.networkApplicationGateways}-01'
     containerAppEnvironment: '${commonResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
     logAnalyticsWorkspace: '${commonResourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
-    postgreSqlFlexibleServer: '${commonResourcePrefix}-${abbreviations.dBforPostgreSQLServers}'
-    recoveryVault: '${commonResourcePrefix}-${abbreviations.recoveryServicesVault}'
+    postgreSqlFlexibleServer: '${commonResourcePrefix}-${publicApiAbbreviations.dBforPostgreSQLServers}'
+    recoveryVault: '${commonResourcePrefix}-${abbreviations.recoveryServicesVaults}'
     recoveryVaultFileShareBackupPolicy: 'DailyPolicy'
   }
   publicApi: {

@@ -133,6 +133,7 @@ var abbreviations = {
   sqlServersDataWarehouse: 'sqldw'
   sqlServersDatabases: 'sqldb'
   sqlServersDatabasesStretch: 'sqlstrdb'
+  staticWebApps: 'stapp'
   // 'sa' is non-standard - it should be 'st'
   storageStorageAccounts: 'sa'
   storageStorageAccountsVm: 'stvm'
