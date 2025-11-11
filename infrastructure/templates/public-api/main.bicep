@@ -156,6 +156,9 @@ param publicApiContainerAppConfig ContainerAppResourceConfig = {
   workloadProfileName: 'Consumption'
 }
 
+@description('Name of the Search service index used to search publications.')
+param searchServiceIndexName string = ''
+
 @description('Enable the Swagger UI for public API.')
 param enableSwagger bool = false
 
@@ -225,6 +228,7 @@ var resourceNames = {
     postgreSqlFlexibleServer: '${commonResourcePrefix}-${publicApiAbbreviations.dBforPostgreSQLServers}'
     recoveryVault: '${commonResourcePrefix}-${abbreviations.recoveryServicesVaults}'
     recoveryVaultFileShareBackupPolicy: 'DailyPolicy'
+    searchService: '${commonResourcePrefix}-${abbreviations.searchSearchServices}'
   }
   publicApi: {
     apiApp: '${publicApiResourcePrefix}-${abbreviations.appContainerApps}-api'
@@ -280,6 +284,13 @@ module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = 
     storageFirewallRules: maintenanceIpRanges
     deployAlerts: deployAlerts
     tagValues: tagValues
+  }
+}
+
+module searchServiceModule 'application/shared/searchService.bicep' = {
+  name: 'searchServiceApplicationModuleDeploy'
+  params: {
+    name: resourceNames.sharedResources.searchService
   }
 }
 
@@ -384,6 +395,10 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     appInsightsConnectionString: appInsightsModule.outputs.appInsightsConnectionString
     deployAlerts: deployAlerts
     resourceAndScalingConfig: publicApiContainerAppConfig
+    searchServiceConfig: {
+      endpoint: searchServiceModule.outputs.searchServiceEndpoint
+      indexName: searchServiceIndexName
+    }
     enableSwagger: enableSwagger
     tagValues: tagValues
   }
