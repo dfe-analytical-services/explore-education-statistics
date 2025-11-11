@@ -1,3 +1,6 @@
+using System.Diagnostics.Contracts;
+using System.Runtime.InteropServices;
+
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 public static class DateTimeOffsetExtensions
@@ -91,4 +94,54 @@ public static class DateTimeOffsetExtensions
 
         return TruncateNanoseconds(offset.Value);
     }
+
+    [Pure]
+    private static DateTimeOffset AsXOfDayForTimeZone(
+        this DateTimeOffset instant,
+        DayPeriod period,
+        TimeZoneInfo timeZone = null
+    )
+    {
+        timeZone ??= DateTimeExtensions.GetUkTimeZone();
+        var local = TimeZoneInfo.ConvertTime(instant, timeZone);
+
+        var localMidnightDateTime =
+            period == DayPeriod.LastTick
+                ? new DateTime(local.Year, local.Month, local.Day, 23, 59, 59, DateTimeKind.Unspecified)
+            : period == DayPeriod.Midnight
+                ? new DateTime(local.Year, local.Month, local.Day, 0, 0, 0, DateTimeKind.Unspecified)
+            : throw new ArgumentException("Invalid day period");
+        var offset = timeZone.GetUtcOffset(localMidnightDateTime);
+        var lastTickOrMidnightOfDayLocal = new DateTimeOffset(localMidnightDateTime, offset);
+
+        return lastTickOrMidnightOfDayLocal;
+    }
+
+    [Pure]
+    public static DateTimeOffset AsStartOfDayForUkTimeZone(this DateTimeOffset instant, TimeZoneInfo timeZone = null) =>
+        AsXOfDayForTimeZone(instant, DayPeriod.Midnight, timeZone);
+
+    [Pure]
+    public static DateTimeOffset AsEndOfDayForUkTimeZone(this DateTimeOffset instant, TimeZoneInfo timeZone = null) =>
+        AsXOfDayForTimeZone(instant, DayPeriod.LastTick, timeZone);
+
+    public static bool IsSameDay(this DateTimeOffset date1, DateTimeOffset date2)
+    {
+        var ukDate1 = date1.ConvertToUkTimeZone();
+        var ukDate2 = date2.ConvertToUkTimeZone();
+        return ukDate1.Date == ukDate2.Date;
+    }
+
+    [Pure]
+    public static DateTimeOffset ConvertToUkTimeZone(this DateTimeOffset dateTime) =>
+        TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
+            dateTime,
+            RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "GMT Standard Time" : "Europe/London"
+        );
+}
+
+public enum DayPeriod
+{
+    Midnight,
+    LastTick,
 }
