@@ -48,7 +48,6 @@ module backupsModule 'application/backups/backups.bicep' = {
 module frontDoorModule 'application/frontDoor/frontDoor.bicep' = {
   name: 'frontDoorModuleDeploy'
   params: {
-    location: location
     subscription: subscription
     resourcePrefix: resourcePrefix
     tagValues: tagValues

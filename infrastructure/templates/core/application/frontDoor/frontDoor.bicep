@@ -15,9 +15,6 @@ param subscription string
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
-@description('Location of resources that aren\'t global.')
-param location string = resourceGroup().location // @MarkFix used later
-
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -86,9 +83,9 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
   parent: endpoints
   name: '${resourcePrefix}-${abbreviations.frontDoorRoutes}'
   properties: {
-    //cacheConfiguration: { // @MarkFix disable caching
+    //cacheConfiguration: { // @MarkFix enable this
     //  compressionSettings: {
-    //    isCompressionEnabled: false // @MarkFix
+    //    isCompressionEnabled: false
     //    contentTypesToCompress: [
     //      'application/eot'
     //      'application/font'
@@ -118,7 +115,7 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
     //      'font/ttf'
     //      'font/otf'
     //      'font/opentype'
-    //      'font/woff' // @MarkFix woff/woff2 required - could manually check the other stuff...
+    //      'font/woff'
     //      'font/woff2'
     //      'image/svg+xml'
     //      'text/css'
@@ -178,20 +175,3 @@ resource diagnosticSetting 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
     ]
   }
 }
-
-// @MarkFix create app insights instance
-//resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
-//  name: '${resourcePrefix}-ai-afd'
-//  location: location
-//  kind: 'web'
-//  properties: {
-//    Application_Type: 'web'
-//    publicNetworkAccessForIngestion: 'Enabled'
-//    publicNetworkAccessForQuery: 'Enabled'
-//    WorkspaceResourceId: logAnalyticsWorkspaceId
-//  }
-//  tags: tagValues
-//  dependsOn: [
-//    diagnosticSetting
-//  ]
-//}

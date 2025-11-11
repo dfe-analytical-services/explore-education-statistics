@@ -175,10 +175,10 @@ async function startServer() {
       express.static(path.resolve(__dirname, 'src/.next/static')),
     );
 
-    const conditionalBasicAuth = (req, res, nextThing) => {
-      // No basic auth with /api/ endpoints, so we can site works with azurewebsites.net and azurefd.net
+    const conditionalBasicAuth = (req, res, nextFunc) => {
+      // No basic auth with public site specific /api/ endpoints, so accessing via azurewebsites.net or azurefd.net works
       if (req.path.startsWith('/api/')) {
-        return nextThing();
+        return nextFunc();
       }
 
       const auth = basicAuth({
@@ -187,7 +187,7 @@ async function startServer() {
         },
         challenge: true,
       });
-      return auth(req, res, nextThing);
+      return auth(req, res, nextFunc);
     };
     server.use(conditionalBasicAuth);
   }
