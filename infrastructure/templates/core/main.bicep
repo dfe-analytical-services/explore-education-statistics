@@ -1,4 +1,4 @@
-@description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
+@description('Environment : Subscription name. Used as a prefix for created resources.')
 param subscription string = ''
 
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')

@@ -1399,7 +1399,7 @@
     "basePublicAllowedOrigins": [
       "[concat('https://', parameters('domain'))]",
       "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]"
-      // NOTE: We would like to add the frontDoor hostname here, but as we use `reference()` to get it, we cannot and so must added it in place everywhere we want to use 'publicAllowedOrigins'
+      // NOTE: We would like to add the frontDoor default hostname here, but as we use `reference()` to get it, we cannot and so must added it in place everywhere we want to use 'publicAllowedOrigins'
     ],
     "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]"
   },

@@ -1,6 +1,6 @@
 import { abbreviations } from '../../../common/abbreviations.bicep'
 
-@description('Environment: Subscription name. Used as a prefix for created resources')
+@description('Environment: Subscription name. Used as a prefix for created resources.')
 @allowed([
   's101d01'
   's101t01'
@@ -16,7 +16,7 @@ param subscription string
 param resourcePrefix string
 
 @description('Location of resources that aren\'t global.')
-param location string = resourceGroup().location
+param location string = resourceGroup().location // @MarkFix used later
 
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -28,7 +28,7 @@ var frontDoorName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}'
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' = {
   name: frontDoorName
-  location: 'global' // CDN must be global
+  location: 'global' // CDN lives in a resource group, but must be global
   tags: tagValues
   sku: {
     name: 'Standard_AzureFrontDoor'
@@ -118,6 +118,8 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
     //      'font/ttf'
     //      'font/otf'
     //      'font/opentype'
+    //      'font/woff' // @MarkFix woff/woff2 required - could manually check the other stuff...
+    //      'font/woff2'
     //      'image/svg+xml'
     //      'text/css'
     //      'text/csv'
@@ -177,6 +179,7 @@ resource diagnosticSetting 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
   }
 }
 
+// @MarkFix create app insights instance
 //resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
 //  name: '${resourcePrefix}-ai-afd'
 //  location: location
