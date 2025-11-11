@@ -96,10 +96,10 @@ const ReleasePageTabHelp = ({ hidden }: Props) => {
             includeSectionBreak={false}
           >
             <LoadingSpinner loading={isLoading}>
-              {isError ? (
+              {isError || !releaseVersion?.preReleaseAccessList ? (
                 <p>Failed to fetch the pre-release access list</p>
               ) : (
-                <ContentHtml html={releaseVersion!.preReleaseAccessList} />
+                <ContentHtml html={releaseVersion.preReleaseAccessList} />
               )}
             </LoadingSpinner>
           </ReleasePageContentSection>
