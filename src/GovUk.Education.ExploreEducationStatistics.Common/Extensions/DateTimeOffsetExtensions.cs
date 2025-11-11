@@ -125,7 +125,7 @@ public static class DateTimeOffsetExtensions
     public static DateTimeOffset AsEndOfDayForUkTimeZone(this DateTimeOffset instant, TimeZoneInfo timeZone = null) =>
         AsXOfDayForTimeZone(instant, DayPeriod.LastTick, timeZone);
 
-    public static bool IsSameDay(this DateTimeOffset date1, DateTimeOffset date2)
+    public static bool IsSameLocalDay(this DateTimeOffset date1, DateTimeOffset date2)
     {
         var ukDate1 = date1.ConvertToUkTimeZone();
         var ukDate2 = date2.ConvertToUkTimeZone();

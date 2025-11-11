@@ -52,7 +52,7 @@ public record PreviewTokenCreateRequest
                         {
                             var activatesMidnightUk = activates!.Value.AsStartOfDayForUkTimeZone();
                             var isMidnightInUk = activatesMidnightUk == activates;
-                            var isValid = activates.Value.IsSameDay(nowUk) || isMidnightInUk;
+                            var isValid = activates.Value.IsSameLocalDay(nowUk) || isMidnightInUk;
                             return isValid;
                         })
                         .WithMessage(
@@ -82,18 +82,7 @@ public record PreviewTokenCreateRequest
                                             return daysBetween < 8;
                                         }
                                     )
-                                    .WithMessage("Expires date must be no more than 7 days after the activates date.")
-                                    .Must(
-                                        (r, expires) =>
-                                        {
-                                            var expiresUkLastTick = expires!.Value.AsEndOfDayForUkTimeZone();
-                                            var isEndOfExpiresDay = expires == expiresUkLastTick;
-
-                                            var isValid = r.Activates!.Value.IsSameDay(nowUk) || isEndOfExpiresDay;
-                                            return isValid;
-                                        }
-                                    )
-                                    .WithMessage("Expires time must be at 23:59:59 UK local time for that date.");
+                                    .WithMessage("Expires date must be no more than 7 days after the activates date.");
                             }
                         )
                         .Otherwise(() =>
@@ -110,6 +99,20 @@ public record PreviewTokenCreateRequest
                                 })
                                 .WithMessage("Expires date must be no more than 7 days from today.");
                         });
+                    RuleFor(r => r.Expires)
+                        .Must(
+                            (r, expires) =>
+                            {
+                                var expiresUkLastTick = expires!.Value.AsEndOfDayForUkTimeZone();
+                                var isEndOfExpiresDay = expires == expiresUkLastTick;
+
+                                var isValid =
+                                    r.Activates.HasValue && r.Activates!.Value.IsSameLocalDay(nowUk)
+                                    || isEndOfExpiresDay;
+                                return isValid;
+                            }
+                        )
+                        .WithMessage("Expires time must be at 23:59:59 UK local time for that date.");
                 }
             );
 
