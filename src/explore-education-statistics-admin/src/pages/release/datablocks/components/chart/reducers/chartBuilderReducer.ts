@@ -14,6 +14,7 @@ import {
   ChartDefinitionOptions,
   chartDefinitions,
   MapConfig,
+  MapDataSetConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
@@ -64,6 +65,10 @@ export type ChartBuilderActions =
   | {
       type: 'UPDATE_MAP_BOUNDARY_LEVELS';
       payload: MapBoundaryLevelConfig;
+    }
+  | {
+      type: 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG';
+      payload: MapDataSetConfig;
     }
   | {
       type: 'UPDATE_MAP_DATA_GROUPINGS';
@@ -333,6 +338,20 @@ export function chartBuilderReducer(
 
         break;
       }
+      case 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG': {
+        if (!draft.map) {
+          throw new Error('Map config has not been initialised');
+        }
+
+        draft.map.dataSetConfigs = draft.map.dataSetConfigs.map(config => {
+          if (config.dataSetKey === action.payload.dataSetKey) {
+            return action.payload;
+          }
+          return config;
+        });
+
+        break;
+      }
       case 'UPDATE_MAP_DATA_GROUPINGS': {
         if (!draft.map) {
           throw new Error('Map config has not been initialised');
@@ -440,6 +459,16 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
     [dispatch],
   );
 
+  const updateMapCategoricalDataConfig = useCallback(
+    (payload: MapDataSetConfig) => {
+      dispatch({
+        type: 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG',
+        payload,
+      });
+    },
+    [dispatch],
+  );
+
   const updateMapDataGroupings = useCallback(
     (dataSetConfigs: MapDataGroupingConfig) => {
       dispatch({
@@ -472,6 +501,7 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
       updateChartDefinition,
       updateChartLegend,
       updateMapBoundaryLevels,
+      updateMapCategoricalDataConfig,
       updateMapDataGroupings,
       updateChartOptions,
       updateChartAxis,
@@ -482,6 +512,7 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
       updateChartDefinition,
       updateChartLegend,
       updateMapBoundaryLevels,
+      updateMapCategoricalDataConfig,
       updateMapDataGroupings,
       updateChartOptions,
       updateChartAxis,

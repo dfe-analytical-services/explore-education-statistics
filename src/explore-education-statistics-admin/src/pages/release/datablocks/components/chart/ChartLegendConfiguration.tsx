@@ -57,6 +57,7 @@ interface Props {
   meta: FullTableMeta;
   showDataLabels?: boolean;
   onChange: (legend: LegendConfiguration) => void;
+  onReorderCategories: (mapDataSetConfig: MapDataSetConfig) => void;
   onSubmit: (legend: LegendConfiguration) => void;
 }
 
@@ -70,6 +71,7 @@ const ChartLegendConfiguration = ({
   meta,
   showDataLabels,
   onChange,
+  onReorderCategories,
   onSubmit,
 }: Props) => {
   const { capabilities } = definition;
@@ -275,7 +277,7 @@ const ChartLegendConfiguration = ({
               onMount={updateForm}
             />
 
-            {validationSchema.fields.position && (
+            {capabilities.hasLegendPosition && (
               <FormFieldSelect<ChartLegendFormValues>
                 name="position"
                 hint={
@@ -302,6 +304,7 @@ const ChartLegendConfiguration = ({
               mapDataSetConfigs={mapDataSetConfigs}
               position={values.position}
               onChange={onChange}
+              onReorderCategories={onReorderCategories}
             />
 
             <ChartBuilderSaveActions

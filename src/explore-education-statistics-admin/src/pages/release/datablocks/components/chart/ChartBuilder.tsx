@@ -462,6 +462,7 @@ export default function ChartBuilder({
                     meta={meta}
                     showDataLabels={options?.showDataLabels}
                     onChange={handleLegendConfigurationChange}
+                    onReorderCategories={actions.updateMapCategoricalDataConfig}
                     onSubmit={actions.updateChartLegend}
                   />
                 </TabsSection>
