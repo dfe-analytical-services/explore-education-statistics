@@ -19,6 +19,7 @@ import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { mapCategoricalDataColours } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
+import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import getMapDataSetCategoryConfigs from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
@@ -287,6 +288,7 @@ function getMapDataSetConfigs({
       boundaryLevel: config.boundaryLevel,
       ...(categoricalDataConfig && { categoricalDataConfig }),
       dataSet: config.rawDataSet,
+      dataSetKey: generateDataSetKey(config.rawDataSet),
       dataGrouping: config.dataGrouping,
     };
   });

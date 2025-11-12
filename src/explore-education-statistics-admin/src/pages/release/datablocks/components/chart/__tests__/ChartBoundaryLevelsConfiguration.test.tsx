@@ -70,10 +70,12 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       {
         dataGrouping: defaultDataGrouping,
         dataSet: testDataSets[0],
+        dataSetKey: 'dataSetKey1',
       },
       {
         dataGrouping: defaultDataGrouping,
         dataSet: testDataSets[1],
+        dataSetKey: 'dataSetKey2',
       },
     ],
   };
@@ -183,11 +185,13 @@ describe('ChartBoundaryLevelsConfiguration', () => {
             {
               dataGrouping: defaultDataGrouping,
               dataSet: testDataSets[0],
+              dataSetKey: 'dataSetKey1',
               boundaryLevel: testMeta.boundaryLevels[0].id,
             },
             {
               dataGrouping: defaultDataGrouping,
               dataSet: testDataSets[1],
+              dataSetKey: 'dataSetKey2',
               boundaryLevel: testMeta.boundaryLevels[1].id,
             },
           ],

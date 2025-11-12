@@ -21,6 +21,7 @@ import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
+import { maxMapDataGroups } from '@common/modules/charts/components/MapBlock';
 
 const formId = 'chartDataGroupingForm';
 
@@ -90,19 +91,37 @@ export default function ChartDataGroupingForm({
                 function atLeastOne(value) {
                   return value && value.length > 0;
                 },
+              )
+              .test(
+                'max-five',
+                `Maximum ${maxMapDataGroups} custom groups`,
+                function maxFive(value) {
+                  return (
+                    value &&
+                    value.length > 0 &&
+                    value.length <= maxMapDataGroups
+                  );
+                },
               ),
         }),
 
-      numberOfGroups: Yup.number().when('type', {
-        is: 'EqualIntervals',
-        then: s => s.required('Enter a number of data groups'),
-        otherwise: s => s.notRequired(),
-      }),
-      numberOfGroupsQuantiles: Yup.number().when('type', {
-        is: 'Quantiles',
-        then: s => s.required('Enter a number of data groups'),
-        otherwise: s => s.notRequired(),
-      }),
+      numberOfGroups: Yup.number()
+        .max(maxMapDataGroups, `Maximum ${maxMapDataGroups} data groups`)
+        .min(1, 'Minimum 1 data group')
+        .when('type', {
+          is: 'EqualIntervals',
+          then: s => s.required('Enter a number of data groups'),
+
+          otherwise: s => s.notRequired(),
+        }),
+      numberOfGroupsQuantiles: Yup.number()
+        .max(maxMapDataGroups, `Maximum ${maxMapDataGroups} data groups`)
+        .min(1, 'Minimum 1 data group')
+        .when('type', {
+          is: 'Quantiles',
+          then: s => s.required('Enter a number of data groups'),
+          otherwise: s => s.notRequired(),
+        }),
       copyCustomGroups: Yup.string().when('type', {
         is: 'CopyCustom',
         then: s => s.required('Select a data set to copy custom groups from'),
@@ -197,7 +216,14 @@ export default function ChartDataGroupingForm({
     <FormProvider
       initialValues={{
         ...dataSetConfig.dataGrouping,
-        numberOfGroupsQuantiles: dataSetConfig.dataGrouping.numberOfGroups,
+        numberOfGroups:
+          dataSetConfig.dataGrouping.type === 'EqualIntervals'
+            ? dataSetConfig.dataGrouping.numberOfGroups
+            : maxMapDataGroups,
+        numberOfGroupsQuantiles:
+          dataSetConfig.dataGrouping.type === 'Quantiles'
+            ? dataSetConfig.dataGrouping.numberOfGroups
+            : maxMapDataGroups,
         copyCustomGroups: undefined,
       }}
       mode="onBlur"
@@ -209,7 +235,7 @@ export default function ChartDataGroupingForm({
           {
             label: 'Equal intervals',
             value: 'EqualIntervals',
-            hint: 'Data is grouped into equal-sized ranges.',
+            hint: `Data is grouped into equal-sized ranges. Maximum ${maxMapDataGroups} groups.`,
             conditional: (
               <FormFieldNumberInput<ChartDataGroupingFormValues>
                 name="numberOfGroups"
@@ -221,7 +247,7 @@ export default function ChartDataGroupingForm({
           {
             label: 'Quantiles',
             value: 'Quantiles',
-            hint: 'Data is grouped so that each group has a similar number of data points.',
+            hint: `Data is grouped so that each group has a similar number of data points. Maximum ${maxMapDataGroups} groups.`,
             conditional: (
               <FormFieldNumberInput<ChartDataGroupingFormValues>
                 name="numberOfGroupsQuantiles"
@@ -234,7 +260,7 @@ export default function ChartDataGroupingForm({
           {
             label: 'New custom groups',
             value: 'Custom',
-            hint: 'Define custom groups.',
+            hint: `Define custom groups. Maximum ${maxMapDataGroups} groups.`,
             conditional: (
               <ChartCustomDataGroupingsConfiguration
                 groups={values.customGroups}
@@ -311,6 +337,7 @@ export default function ChartDataGroupingForm({
 
                 onSubmit({
                   dataSet: dataSetConfig.dataSet,
+                  dataSetKey: 'dataSetKey1',
                   dataGrouping:
                     updatedGrouping.type === 'Custom'
                       ? updatedGrouping

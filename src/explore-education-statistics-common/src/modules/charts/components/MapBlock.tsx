@@ -35,6 +35,8 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import generateDataSetKey from '../util/generateDataSetKey';
 
+export const maxMapDataGroups = 5;
+
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
   data: number | string;

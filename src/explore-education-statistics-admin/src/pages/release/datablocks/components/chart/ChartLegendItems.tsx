@@ -19,11 +19,16 @@ import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
-import { ChartCapabilities } from '@common/modules/charts/types/chart';
+import {
+  ChartCapabilities,
+  MapDataSetConfig,
+} from '@common/modules/charts/types/chart';
 import { Dictionary } from '@common/types';
 import upperFirst from 'lodash/upperFirst';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import React from 'react';
+import { DataSet } from '@common/modules/charts/types/dataSet';
+import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 
 const symbolOptions: SelectOption[] = symbols.map(symbol => ({
   label: upperFirst(symbol),
@@ -50,15 +55,15 @@ const inlinePositionOptions: SelectOption[] = legendInlinePositions.map(
 );
 
 interface Props {
-  allowColourSelection?: boolean;
   capabilities: ChartCapabilities;
+  mapDataSetConfigs?: MapDataSetConfig[];
   position?: LegendPosition;
   onChange: (legend: LegendConfiguration) => void;
 }
 
 export default function ChartLegendItems({
-  allowColourSelection,
   capabilities,
+  mapDataSetConfigs,
   position,
   onChange,
 }: Props) {
@@ -66,7 +71,7 @@ export default function ChartLegendItems({
     name: 'items',
   });
 
-  const { formState } = useFormContext<ChartLegendFormValues>();
+  const { formState, getValues } = useFormContext<ChartLegendFormValues>();
 
   const currentItems = useWatch({ name: 'items' });
 
@@ -75,6 +80,11 @@ export default function ChartLegendItems({
       onChange({ items: currentItems });
     }
   }, 200);
+
+  const getMapDataSetConfig = (dataSet: DataSet) => {
+    const key = generateDataSetKey(dataSet);
+    return mapDataSetConfigs?.find(config => config.dataSetKey === key);
+  };
 
   return (
     <div className="dfe-overflow-x--auto govuk-!-margin-bottom-6">
@@ -94,6 +104,10 @@ export default function ChartLegendItems({
             const fieldErrorDetails = fieldErrors
               ? Object.values(fieldErrors as Dictionary<{ message: string }>)
               : [];
+            const currentItem = getValues().items[index];
+            const mapDataSetConfig = getMapDataSetConfig(currentItem.dataSet);
+            const allowColourSelection =
+              !mapDataSetConfig?.categoricalDataConfig?.length;
 
             return (
               <div key={item.id} className={styles.item}>

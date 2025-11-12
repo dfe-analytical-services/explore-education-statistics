@@ -70,6 +70,7 @@ describe('ChartDataGroupingsConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2014_AY',
               },
+              dataSetKey: 'dataSetKey1',
             },
           ],
         }}
@@ -104,6 +105,7 @@ describe('ChartDataGroupingsConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2014_AY',
               },
+              dataSetKey: 'dataSetKey1',
             },
             {
               dataGrouping: defaultDataGrouping,
@@ -112,6 +114,7 @@ describe('ChartDataGroupingsConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2015_AY',
               },
+              dataSetKey: 'dataSetKey2',
             },
           ],
         }}
@@ -154,6 +157,7 @@ describe('ChartDataGroupingsConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2014_AY',
               },
+              dataSetKey: 'dataSetKey1',
               dataGrouping: {
                 customGroups: [],
                 numberOfGroups: 4,
@@ -192,6 +196,7 @@ describe('ChartDataGroupingsConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2014_AY',
               },
+              dataSetKey: 'dataSetKey1',
               dataGrouping: {
                 customGroups: [],
                 numberOfGroups: 5,
@@ -204,6 +209,7 @@ describe('ChartDataGroupingsConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2015_AY',
               },
+              dataSetKey: 'dataSetKey2',
               dataGrouping: {
                 customGroups: [],
                 numberOfGroups: 2,
@@ -216,6 +222,7 @@ describe('ChartDataGroupingsConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2015_AY',
               },
+              dataSetKey: 'dataSetKey3',
               dataGrouping: {
                 customGroups: [{ min: 0, max: 50 }],
                 type: 'Custom',
@@ -271,6 +278,7 @@ describe('ChartDataGroupingsConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2014_AY',
               },
+              dataSetKey: 'dataSetKey1',
               dataGrouping: {
                 customGroups: [],
                 numberOfGroups: 5,
@@ -283,6 +291,7 @@ describe('ChartDataGroupingsConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2015_AY',
               },
+              dataSetKey: 'dataSetKey2',
               dataGrouping: {
                 customGroups: [],
                 numberOfGroups: 2,
@@ -295,6 +304,7 @@ describe('ChartDataGroupingsConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2015_AY',
               },
+              dataSetKey: 'dataSetKey3',
               dataGrouping: {
                 customGroups: [{ min: 0, max: 50 }],
                 type: 'Custom',
@@ -338,6 +348,7 @@ describe('ChartDataGroupingsConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2014_AY',
               },
+              dataSetKey: 'dataSetKey1',
             },
             {
               dataGrouping: defaultDataGrouping,
@@ -346,6 +357,7 @@ describe('ChartDataGroupingsConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2015_AY',
               },
+              dataSetKey: 'dataSetKey1',
             },
           ],
         }}
@@ -373,6 +385,7 @@ describe('ChartDataGroupingsConfiguration', () => {
               indicator: 'authorised-absence-sessions',
               timePeriod: '2014_AY',
             },
+            dataSetKey: 'dataSetKey1',
           },
           {
             dataGrouping: defaultDataGrouping,
@@ -381,6 +394,7 @@ describe('ChartDataGroupingsConfiguration', () => {
               indicator: 'authorised-absence-sessions',
               timePeriod: '2015_AY',
             },
+            dataSetKey: 'dataSetKey1',
           },
         ],
       });

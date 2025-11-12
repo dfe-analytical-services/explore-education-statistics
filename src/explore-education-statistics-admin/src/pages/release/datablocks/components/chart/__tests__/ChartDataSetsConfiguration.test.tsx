@@ -4,6 +4,7 @@ import {
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import render from '@common-test/render';
+import { MapDataSetConfig } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
@@ -1039,5 +1040,69 @@ describe('ChartDataSetsConfiguration', () => {
 
       expect(handleChange).toHaveBeenCalledWith([]);
     });
+  });
+
+  test('prevents adding categorical data with too many groups', async () => {
+    const testMapDataSetConfigs: MapDataSetConfig[] = [
+      {
+        dataSet: {
+          filters: [],
+          indicator: 'authorised-absence-sessions',
+          timePeriod: '2020_AY',
+        },
+        dataSetKey: 'dataSetKey1',
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 5,
+          type: 'EqualIntervals',
+        },
+        categoricalDataConfig: [
+          { value: 'tiny', colour: 'colour-1' },
+          { value: 'large', colour: 'colour-2' },
+          { value: 'xxlarge', colour: 'colour-3' },
+          { value: 'medium', colour: 'colour-4' },
+          { value: 'teeny', colour: 'colour-5' },
+          { value: 'small', colour: 'colour-6' },
+        ],
+      },
+    ];
+
+    const testDataSets = [
+      {
+        filters: [],
+        indicator: 'authorised-absence-sessions',
+        timePeriod: '2020_AY',
+        order: 0,
+      },
+    ];
+    const { user, rerender } = render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartDataSetsConfiguration meta={testSubjectMeta} onChange={noop} />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    // Simulate adding the data sets.
+    rerender(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartDataSetsConfiguration
+          dataSets={testDataSets}
+          mapDataSetConfigs={testMapDataSetConfigs}
+          meta={testSubjectMeta}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    const modal = within(screen.getByRole('dialog'));
+    expect(modal.getByText('Too many categories')).toBeInTheDocument();
+    await user.click(modal.getByRole('button', { name: 'Ok' }));
+
+    expect(
+      within(screen.getByTestId('errorSummary')).getByText(
+        'Too many categorical data values to display for the selected indicator(s) (max. 5)',
+      ),
+    ).toBeInTheDocument();
   });
 });

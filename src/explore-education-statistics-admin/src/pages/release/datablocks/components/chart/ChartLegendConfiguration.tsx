@@ -10,6 +10,7 @@ import {
   ChartDefinition,
   ChartSymbol,
   LineStyle,
+  MapDataSetConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSet, DataSetCategory } from '@common/modules/charts/types/dataSet';
 import {
@@ -47,12 +48,12 @@ export type ChartLegendFormValues = LegendConfiguration;
 const formId = 'chartLegendConfigurationForm';
 
 interface Props {
-  allowColourSelection?: boolean;
   axisMajor: AxisConfiguration;
   buttons?: ReactNode;
   data: TableDataResult[];
   definition: ChartDefinition;
   legend: LegendConfiguration;
+  mapDataSetConfigs?: MapDataSetConfig[];
   meta: FullTableMeta;
   showDataLabels?: boolean;
   onChange: (legend: LegendConfiguration) => void;
@@ -60,12 +61,12 @@ interface Props {
 }
 
 const ChartLegendConfiguration = ({
-  allowColourSelection = true,
   axisMajor,
   buttons,
   data,
   definition,
   legend,
+  mapDataSetConfigs,
   meta,
   showDataLabels,
   onChange,
@@ -298,7 +299,7 @@ const ChartLegendConfiguration = ({
 
             <ChartLegendItems
               capabilities={capabilities}
-              allowColourSelection={allowColourSelection}
+              mapDataSetConfigs={mapDataSetConfigs}
               position={values.position}
               onChange={onChange}
             />

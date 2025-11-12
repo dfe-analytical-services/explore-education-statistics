@@ -37,9 +37,10 @@ export default function generateFeaturesAndDataGroups({
 
   const { features, legendItems } = isCategoricalData
     ? getCategoricalDataFeatures({
-        categoricalDataConfig:
-          selectedDataSetConfig.categoricalDataConfig ||
-          deprecatedCategoricalDataConfig,
+        categoricalDataConfig: selectedDataSetConfig.categoricalDataConfig
+          ?.length
+          ? selectedDataSetConfig.categoricalDataConfig
+          : deprecatedCategoricalDataConfig,
         dataSetCategories,
         selectedDataSetKey,
       })

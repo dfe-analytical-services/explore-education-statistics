@@ -26,7 +26,9 @@ import reorder from '@common/utils/reorder';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
-import React, { ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { MapDataSetConfig } from '@common/modules/charts/types/chart';
+import { maxMapDataGroups } from '@common/modules/charts/components/MapBlock';
 
 const formId = 'chartDataSetsConfigurationForm';
 
@@ -41,20 +43,27 @@ interface Props {
   buttons?: ReactNode;
   dataSets?: DataSet[];
   dataSetsUnits?: string[];
+  mapDataSetConfigs?: MapDataSetConfig[];
   meta: FullTableMeta;
   onChange: (dataSets: DataSet[]) => void;
 }
 
 const ChartDataSetsConfiguration = ({
   buttons,
-  meta,
   dataSets: initialDataSets = [],
   dataSetsUnits = [],
+  mapDataSetConfigs,
+  meta,
   onChange,
 }: Props) => {
   const { forms, updateForm, submitForms } = useChartBuilderFormsContext();
   const [dataSets, setDataSets] = useState<DataSet[]>(initialDataSets);
   const [isReordering, toggleIsReordering] = useToggle(false);
+  const [showCategoricalDataModal, toggleShowCategoricalDataModal] =
+    useToggle(false);
+  const [showCategoricalDataError, toggleShowCategoricalDataError] =
+    useToggle(false);
+  const firstRender = useRef(true);
 
   const indicatorOptions = useMemo(
     () => Object.values(meta.indicators),
@@ -77,6 +86,38 @@ const ChartDataSetsConfiguration = ({
       isValid: initialDataSets.length > 0,
     });
   }, [initialDataSets.length, updateForm]);
+
+  useEffect(() => {
+    // Don't do this on first render as we only want the modal to
+    // appear when datasets are changed.
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+
+    if (mapDataSetConfigs) {
+      const values = mapDataSetConfigs.map(config => {
+        return config.categoricalDataConfig?.length;
+      });
+
+      if (values.some(value => value && value > maxMapDataGroups)) {
+        toggleShowCategoricalDataModal.on();
+        toggleShowCategoricalDataError.on();
+        updateForm({
+          formKey: 'dataSets',
+          isValid: false,
+        });
+      } else {
+        toggleShowCategoricalDataModal.off();
+        toggleShowCategoricalDataError.off();
+      }
+    }
+  }, [
+    mapDataSetConfigs,
+    toggleShowCategoricalDataModal,
+    toggleShowCategoricalDataError,
+    updateForm,
+  ]);
 
   const handleSubmit = (values: FormValues) => {
     const selectedDataSets = getSelectedDataSets({
@@ -144,6 +185,16 @@ const ChartDataSetsConfiguration = ({
         })}
       >
         <Form id={formId} onSubmit={handleSubmit}>
+          {showCategoricalDataError && (
+            <ErrorSummary
+              errors={[
+                {
+                  id: 'chart-data-sets',
+                  message: `Too many categorical data values to display for the selected indicator(s) (max. ${maxMapDataGroups})`,
+                },
+              ]}
+            />
+          )}
           <div className={styles.formSelectRow}>
             {orderBy(Object.entries(meta.filters), ([_, value]) => value.order)
               .filter(([, filters]) => filters.options.length > 1)
@@ -263,7 +314,7 @@ const ChartDataSetsConfiguration = ({
           }}
         />
       ) : (
-        <table data-testid="chart-data-sets">
+        <table data-testid="chart-data-sets" id="chart-data-sets">
           <thead>
             <tr>
               <th>Data set</th>
@@ -347,6 +398,28 @@ const ChartDataSetsConfiguration = ({
             </Button>
           )}
         </div>
+      )}
+      {showCategoricalDataModal && (
+        <ModalConfirm
+          confirmText="Ok"
+          open
+          showCancel={false}
+          title="Too many categories"
+          onConfirm={toggleShowCategoricalDataModal.off}
+        >
+          <p>
+            The indicators in the data sets you have selected contain more than
+            the maximum number ({maxMapDataGroups}) of categorical values
+            allowed.
+          </p>
+          <p>
+            This restriction is to help ensure that maps are accessible to all
+            users. If you have any questions please contact{' '}
+            <a href="mailto:explore.statistics@education.gov.uk">
+              explore.statistics@education.gov.uk
+            </a>
+          </p>
+        </ModalConfirm>
       )}
     </>
   );

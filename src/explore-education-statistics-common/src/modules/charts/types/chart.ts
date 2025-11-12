@@ -113,6 +113,7 @@ export interface MapDataSetConfig {
   boundaryLevel?: number;
   categoricalDataConfig?: MapCategoricalData[];
   dataSet: DataSet;
+  dataSetKey: string;
   dataGrouping: DataGroupingConfig;
 }
 

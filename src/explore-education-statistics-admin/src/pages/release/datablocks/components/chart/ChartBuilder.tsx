@@ -387,6 +387,7 @@ export default function ChartBuilder({
                     buttons={deleteButton}
                     dataSets={axes.major?.dataSets}
                     dataSetsUnits={dataSetsUnits}
+                    mapDataSetConfigs={map?.dataSetConfigs}
                     meta={meta}
                     onChange={actions.updateDataSets}
                   />
@@ -451,8 +452,8 @@ export default function ChartBuilder({
                     buttons={deleteButton}
                     data={data}
                     definition={definition}
-                    allowColourSelection={!map?.categoricalDataConfig?.length}
                     legend={legend}
+                    mapDataSetConfigs={map?.dataSetConfigs}
                     meta={meta}
                     showDataLabels={options?.showDataLabels}
                     onChange={handleLegendConfigurationChange}
