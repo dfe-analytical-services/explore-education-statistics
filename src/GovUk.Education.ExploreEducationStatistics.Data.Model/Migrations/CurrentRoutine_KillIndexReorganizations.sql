@@ -11,7 +11,8 @@ BEGIN
     END
 
     -- Put the individual table names along with their schema names into a temp table.
-    SELECT obj.name as TableName, OBJECT_SCHEMA_NAME(obj.object_id) as SchemaName
+    SELECT obj.name as TableName,
+           OBJECT_SCHEMA_NAME(obj.object_id) as SchemaName
     INTO #TableList
     FROM STRING_SPLIT(@Tables, ',')
     JOIN sys.objects obj ON obj.name = TRIM(value);

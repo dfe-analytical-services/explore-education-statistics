@@ -112,7 +112,8 @@ BEGIN
                    JOIN sys.indexes idx ON idx.object_id = ips.object_id AND idx.index_id = ips.index_id
                    JOIN sys.objects obj ON obj.object_id = ips.object_id
                    JOIN sys.schemas sch ON sch.schema_id = obj.schema_id
-          WHERE ips.alloc_unit_type_desc = 'IN_ROW_DATA') AS Fragmented;
+          WHERE ips.alloc_unit_type_desc = 'IN_ROW_DATA') AS Fragmented
+    ORDER BY Fragmented.HasPausedResumable DESC; -- Prefer to resume paused jobs first.
 
     ALTER TABLE #Stats
         ADD PRIMARY KEY (Id);
