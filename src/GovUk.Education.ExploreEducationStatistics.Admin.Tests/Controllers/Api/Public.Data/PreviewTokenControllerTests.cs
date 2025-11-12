@@ -130,7 +130,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             var twoDaysFromNow = DateTimeOffset.UtcNow.AddDays(2);
             var nineDaysFromNow = DateTimeOffset.UtcNow.AddDays(9);
 
-            TimeZoneInfo ukTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
+            TimeZoneInfo ukTimeZone = DateTimeExtensions.GetUkTimeZone();
 
             DateTimeOffset? activates = activatesProvided ? twoDaysFromNow : null;
             var sevenDaysFromNow = DateTimeOffset.UtcNow.AddDays(7);
