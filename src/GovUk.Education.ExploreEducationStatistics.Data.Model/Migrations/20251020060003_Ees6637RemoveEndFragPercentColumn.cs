@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
     {
         private const string PreviousRebuildIndexesMigrationId =
             EES5678_RebuildIndexesTimeoutDoesNotSkipTableStatsUpdate.MigrationId;
-        internal const string MigrationId = "20251020060003";
+        public const string MigrationId = "20251020060003";
 
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
