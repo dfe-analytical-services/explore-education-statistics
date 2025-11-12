@@ -18,7 +18,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, Route, Router } from 'react-router-dom';
 import { createMemoryHistory, MemoryHistory } from 'history';
-import addHours from 'date-fns/addHours';
+import { addHours } from 'date-fns';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/previewTokenService');
