@@ -3,6 +3,7 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AngleSharp.Io;
+using Azure.Identity;
 using Dapper;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Config;
@@ -179,8 +180,12 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // Azure Clients
         services.AddAzureClients(clientBuilder =>
         {
+            // Search Client
             var searchClientConfiguration = configuration.GetRequiredSection(AzureSearchClientOptions.Section);
             clientBuilder.AddSearchClient(searchClientConfiguration).WithName("PublicationsSearchClient");
+
+            // Register a shared credential for Microsoft Entra ID authentication
+            clientBuilder.UseCredential(new DefaultAzureCredential());
         });
 
         // Databases
