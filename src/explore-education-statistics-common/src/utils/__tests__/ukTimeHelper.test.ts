@@ -36,7 +36,7 @@ describe('UkTimeHelper', () => {
   test('should return today midnight in UK', () => {
     const result = UkTimeHelper.todayMidnightUk();
 
-    expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T00:00:00[+-]\d{2}:\d{2}$/);
+    expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T00:00:00(Z|[+-]\d{2}:\d{2})$/);
   });
 
   test('should return midnight UK time for given date string', () => {
@@ -55,14 +55,14 @@ describe('UkTimeHelper', () => {
 
   test('should return last tick UK time for given date string', () => {
     const dateString = '2025-10-15T14:30:00Z';
-    const result = UkTimeHelper.dateLastTickUk(dateString);
+    const result = UkTimeHelper.dateLastSecondUk(dateString);
 
     expect(result).toMatch(/^2025-10-15T23:59:59[+-]\d{2}:\d{2}$/);
   });
 
   test('should return last tick UK time for given date object', () => {
     const date = new Date('2025-10-15T14:30:00Z');
-    const result = UkTimeHelper.dateLastTickUk(date);
+    const result = UkTimeHelper.dateLastSecondUk(date);
 
     expect(result).toMatch(/^2025-10-15T23:59:59[+-]\d{2}:\d{2}$/);
   });
@@ -71,7 +71,7 @@ describe('UkTimeHelper', () => {
     const winterDate = '2023-01-15T14:30:00Z';
     const result = UkTimeHelper.dateMidnightUk(winterDate);
 
-    expect(result).toMatch(/^2023-01-15T00:00:00\+00:00$/);
+    expect(result).toMatch(/^2023-01-15T00:00:00Z$/);
   });
 
   test('should handle summer time (BST) correctly', () => {
