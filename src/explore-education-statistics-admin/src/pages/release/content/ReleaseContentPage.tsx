@@ -34,7 +34,7 @@ const ReleaseContentPageLoaded = () => {
 
   const previewRedesign =
     new URLSearchParams(window.location.search).get('redesign') === 'true' &&
-    process.env.NODE_ENV !== 'production';
+    !window.location.href.includes('admin.explore');
 
   return (
     <EditingContextProvider
