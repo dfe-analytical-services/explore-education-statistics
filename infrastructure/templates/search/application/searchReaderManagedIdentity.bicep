@@ -24,7 +24,7 @@ resource searchReaderIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   tags: tagValues
 }
 
-module searchReaderIdentityRoleAssignmentModule '../components/searchServiceRoleAssignment.bicep' = {
+module searchReaderIdentityRoleAssignmentModule '../../common/components/search/searchServiceRoleAssignment.bicep' = {
   name: 'searchReaderIdentityRoleAssignmentModuleDeploy'
   params: {
     searchServiceName: searchService.name
