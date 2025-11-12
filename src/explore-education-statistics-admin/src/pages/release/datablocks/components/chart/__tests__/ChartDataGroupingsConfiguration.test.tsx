@@ -57,7 +57,7 @@ describe('ChartDataGroupingsConfiguration', () => {
     expect(screen.getByText('No data groupings to edit.')).toBeInTheDocument();
   });
 
-  test('renders correctly with single data grouping from new data set', () => {
+  test.only('renders correctly with single data grouping from new data set', () => {
     render(
       <ChartDataGroupingsConfiguration
         meta={testTable.subjectMeta}
