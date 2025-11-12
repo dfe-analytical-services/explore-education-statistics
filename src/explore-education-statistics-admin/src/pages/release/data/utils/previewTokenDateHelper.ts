@@ -1,5 +1,6 @@
-﻿import { isToday } from 'date-fns';
+﻿import { isToday, addDays } from 'date-fns';
 import UkTimeHelper from '@common/utils/date/ukTimeHelper';
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 
 export type DateRange = { startDate: Date; endDate: Date };
 
@@ -33,8 +34,14 @@ export default class PreviewTokenDateHelper {
       return { startDate, endDate };
     }
 
+    const TZ = 'Europe/London';
     const startDate = new Date();
-    const endDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+
+    const plusOneDayUtc = addDays(startDate, 1);
+    const tomorrowYmdLondon = formatInTimeZone(plusOneDayUtc, TZ, 'yyyy-MM-dd');
+
+    const endDate = fromZonedTime(`${tomorrowYmdLondon}T23:59:59.999`, TZ);
+
     return { startDate, endDate };
   }
 
@@ -51,11 +58,8 @@ export default class PreviewTokenDateHelper {
       );
     }
     const startDate = new Date();
-
-    // Create the endDate object as a copy of the start date
-    let endDate = new Date(startDate);
-    endDate.setUTCDate(endDate.getUTCDate() + datePresetSpan);
-    endDate = UkTimeHelper.ukEndOfDayUtc(endDate.toISOString()); // Sets to 23:59:59 in UK X days from the current start date
+    let endDate = addDays(startDate, datePresetSpan);
+    endDate = UkTimeHelper.ukEndOfDayUtc(endDate.toISOString());
     return { startDate, endDate };
   }
 }

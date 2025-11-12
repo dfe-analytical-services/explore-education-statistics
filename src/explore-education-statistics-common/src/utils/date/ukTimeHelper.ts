@@ -1,13 +1,15 @@
-﻿import { formatInTimeZone } from 'date-fns-tz';
+﻿import { fromZonedTime, formatInTimeZone } from 'date-fns-tz';
 
 export default class UkTimeHelper {
+  private static readonly TZ = 'Europe/London';
+
   public static ukStartOfDayUtc(isoDate: string): Date {
     return new Date(UkTimeHelper.dateMidnightUk(isoDate));
   }
 
   // End of day 23:59:59.999 in London, as a UTC instant
   public static ukEndOfDayUtc(isoDate: string | Date): Date {
-    return new Date(UkTimeHelper.dateLastTickUk(isoDate));
+    return new Date(UkTimeHelper.dateLastSecondUk(isoDate));
   }
 
   public static todayMidnightUk(): string {
@@ -18,38 +20,32 @@ export default class UkTimeHelper {
     return UkTimeHelper.dateTimeInLondonTimeZone(date1, TimeOption.MIDNIGHT);
   }
 
-  public static dateLastTickUk(date1: Date | string): string {
-    return UkTimeHelper.dateTimeInLondonTimeZone(date1, TimeOption.LASTTICK);
+  public static dateLastSecondUk(date1: Date | string): string {
+    return UkTimeHelper.dateTimeInLondonTimeZone(date1, TimeOption.LASTSECOND);
   }
 
+  /**
+   * Returns a string like 'YYYY-MM-DDTHH:mm:ss±HH:MM' representing
+   * the requested London wall time (midnight or last tick) on the
+   * same London calendar day as `dateTime`.
+   *
+   * Safe across DST because we construct the *London wall time* and
+   * convert it to a real UTC instant via fromZonedTime.
+   */
   public static dateTimeInLondonTimeZone(
     dateTime: Date | string,
     option: TimeOption,
   ): string {
-    const formattedTimeNowInUk: string | Date = formatInTimeZone(
-      dateTime,
-      'Europe/London',
-      'yyyy-MM-dd HH:mm:ssXXX',
-    );
-    if (formattedTimeNowInUk === undefined) {
-      throw new Error('Could not format date');
-    }
-    const selectedOptionForTime =
-      option === TimeOption.MIDNIGHT ? 'T00:00:00' : 'T23:59:59';
+    const ymdLondon = formatInTimeZone(dateTime, this.TZ, 'yyyy-MM-dd');
 
-    const match = formattedTimeNowInUk.match(/([+-]\d{2}:\d{2}|Z)/i);
-    if (match) {
-      const offset = match[1] === 'Z' ? '+00:00' : match[1];
-      return `${formattedTimeNowInUk.substring(
-        0,
-        10,
-      )}${selectedOptionForTime}${offset}`;
-    }
+    const wall = option === TimeOption.MIDNIGHT ? 'T00:00:00' : 'T23:59:59.999';
 
-    throw new Error('Could not find timezone offset');
+    const utcInstant = fromZonedTime(`${ymdLondon}${wall}`, this.TZ);
+
+    return formatInTimeZone(utcInstant, this.TZ, "yyyy-MM-dd'T'HH:mm:ssXXX");
   }
 }
 enum TimeOption {
   MIDNIGHT = 'midnight',
-  LASTTICK = 'lastTick',
+  LASTSECOND = 'lastSecond',
 }
