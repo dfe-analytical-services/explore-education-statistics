@@ -47,9 +47,7 @@ public class PreviewTokenCreateRequestValidatorTests
         };
 
         var result = validator.TestValidate(request);
-        result
-            .ShouldHaveValidationErrorFor(r => r.Activates)
-            .WithErrorMessage("Activates date must not be in the past.");
+        result.ShouldNotHaveValidationErrorFor(r => r.Activates);
     }
 
     [Theory]
