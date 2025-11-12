@@ -7,6 +7,8 @@ public class ChartDataSetConfig
 {
     public ChartBaseDataSet DataSet;
     public ChartDataGrouping DataGrouping;
+    public List<ChartDataSetCategoricalDataConfig> CategoricalDataConfig =
+        new List<ChartDataSetCategoricalDataConfig>();
     public long? BoundaryLevel;
 }
 
@@ -23,4 +25,10 @@ public class ChartDataGrouping
     public ChartDataGroupingType Type;
     public int NumberOfGroups;
     public List<ChartCustomDataGroup> CustomGroups = new();
+}
+
+public class ChartDataSetCategoricalDataConfig
+{
+    public string Value;
+    public string Colour;
 }

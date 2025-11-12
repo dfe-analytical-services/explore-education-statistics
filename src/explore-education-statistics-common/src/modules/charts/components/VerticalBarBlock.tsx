@@ -332,6 +332,7 @@ export const verticalBarBlockDefinition: ChartDefinition = {
   capabilities: {
     canIncludeNonNumericData: true,
     canPositionLegendInline: false,
+    canReorderDataCategories: false,
     canSetBarThickness: true,
     canSetDataLabelColour: false,
     canSetDataLabelPosition: false,
