@@ -5,8 +5,8 @@ export type DateRange = { startDate: Date; endDate: Date };
 
 export default class PreviewTokenDateHelper {
   public setDateRangeBasedOnCustomDates(
-    activates?: Date,
-    expires?: Date,
+    activates?: Date | null,
+    expires?: Date | null,
   ): DateRange {
     // Validate that either both parameters have values or both are null/undefined
     const hasActivates = activates != null;
