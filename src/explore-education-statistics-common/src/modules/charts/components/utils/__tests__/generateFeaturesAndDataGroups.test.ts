@@ -403,7 +403,7 @@ describe('generateFeaturesAndDataGroups', () => {
     expect(result.legendItems).toEqual(expectedLegendItems);
   });
 
-  test('generates the correct features, legend items and categorical data groups for categorical data', () => {
+  test('generates the correct features and legend items for categorical data', () => {
     const testDataSetCategories: MapDataSetCategory[] = [
       {
         dataSets: {
@@ -441,6 +441,11 @@ describe('generateFeaturesAndDataGroups', () => {
         label: 'Indicator 1 (Time period 1)',
         colour: '#12436D',
       },
+      categoricalDataConfig: [
+        { colour: '#12436D', value: 'large' },
+        { colour: '#28A197', value: 'small' },
+        { colour: '#801650', value: 'medium' },
+      ],
       dataGrouping: testDataGrouping,
       dataKey: generateDataSetKey(testDataSet1, testTimePeriod1),
       dataSet: expandDataSet(testDataSet1, testSubjectMeta),
@@ -507,21 +512,5 @@ describe('generateFeaturesAndDataGroups', () => {
       },
     ];
     expect(result.legendItems).toEqual(expectedLegendItems);
-
-    const expectedCategoricalDataGroups: MapLegendItem[] = [
-      {
-        colour: '#12436D',
-        value: 'large',
-      },
-      {
-        colour: '#28A197',
-        value: 'small',
-      },
-      {
-        colour: '#801650',
-        value: 'medium',
-      },
-    ];
-    expect(result.categoricalDataGroups).toEqual(expectedCategoricalDataGroups);
   });
 });

@@ -12,18 +12,19 @@ import {
   ChartDefinitionAxis,
   ChartDefinitionOptions,
   chartDefinitions,
-  MapCategoricalDataConfig,
   MapConfig,
   MapDataSetConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
+import { mapCategoricalDataColours } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
 import getMapDataSetCategoryConfigs from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import deepMerge from 'deepmerge';
 import mapValues from 'lodash/mapValues';
+import uniq from 'lodash/uniq';
 import { Reducer, useCallback, useMemo } from 'react';
 
 export interface ChartBuilderReducerOptions {
@@ -71,10 +72,6 @@ export type ChartBuilderActions =
   | {
       type: 'UPDATE_MAP_DATA_GROUPINGS';
       payload: MapDataGroupingConfig;
-    }
-  | {
-      type: 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG';
-      payload: MapCategoricalDataConfig[];
     }
   | {
       type: 'UPDATE_CHART_AXIS';
@@ -230,7 +227,6 @@ function getInitialMapState({
       meta,
       options,
     }),
-    categoricalDataConfig: map?.categoricalDataConfig,
   };
 }
 
@@ -269,8 +265,27 @@ function getMapDataSetConfigs({
   });
 
   return dataSetCategoryConfigs.map(config => {
+    const values = dataSetCategories.map(
+      category => category.dataSets[config.dataKey]?.value,
+    );
+
+    const isCategoricalData = values.every(value => !Number.isFinite(value));
+    const categoricalDataConfig = isCategoricalData
+      ? uniq(values).map((value, i) => {
+          return {
+            colour:
+              mapCategoricalDataColours[i] ??
+              `#${Math.floor(Math.random() * 16777215)
+                .toString(16)
+                .padStart(6, '0')}`,
+            value: value.toString(),
+          };
+        })
+      : undefined;
+
     return {
       boundaryLevel: config.boundaryLevel,
+      ...(categoricalDataConfig && { categoricalDataConfig }),
       dataSet: config.rawDataSet,
       dataGrouping: config.dataGrouping,
     };
@@ -397,15 +412,6 @@ export function chartBuilderReducer(
 
         break;
       }
-      case 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG': {
-        if (!draft.map) {
-          throw new Error('Map config has not been initialised');
-        }
-
-        draft.map.categoricalDataConfig = action.payload;
-
-        break;
-      }
       case 'UPDATE_CHART_OPTIONS': {
         draft.options = {
           ...defaultOptions,
@@ -430,7 +436,6 @@ export function chartBuilderReducer(
             meta,
             options: draft.options,
           });
-          draft.map.categoricalDataConfig = [];
         }
 
         break;
@@ -511,16 +516,6 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
     [dispatch],
   );
 
-  const updateMapCategoricalDataConfig = useCallback(
-    (categoricalDataConfig: MapCategoricalDataConfig[]) => {
-      dispatch({
-        type: 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG',
-        payload: categoricalDataConfig,
-      });
-    },
-    [dispatch],
-  );
-
   const updateChartAxis = useCallback(
     (axisConfiguration: AxisConfiguration) => {
       dispatch({
@@ -544,7 +539,6 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
       updateChartLegend,
       updateMapBoundaryLevels,
       updateMapDataGroupings,
-      updateMapCategoricalDataConfig,
       updateChartOptions,
       updateChartAxis,
       resetState,
@@ -555,7 +549,6 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
       updateChartLegend,
       updateMapBoundaryLevels,
       updateMapDataGroupings,
-      updateMapCategoricalDataConfig,
       updateChartOptions,
       updateChartAxis,
       resetState,

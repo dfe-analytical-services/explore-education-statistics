@@ -160,11 +160,6 @@ export default function ChartBuilder({
     [axes.major?.dataSets, meta.indicators],
   );
 
-  const [handleMapCategoricalDataConfigChange] = useDebouncedCallback(
-    actions.updateMapCategoricalDataConfig,
-    200,
-  );
-
   const chart = useMemo<ChartBuilderChartProps | undefined>(() => {
     if (!definition || !options) {
       return undefined;
@@ -214,7 +209,6 @@ export default function ChartBuilder({
           type: 'map',
           onBoundaryLevelChange: (boundaryLevel: number) =>
             onTableQueryUpdate({}, boundaryLevel),
-          onChangeCategoricalDataConfig: handleMapCategoricalDataConfigChange,
         };
       default:
         return undefined;
@@ -229,7 +223,6 @@ export default function ChartBuilder({
     options,
     map,
     onTableQueryUpdate,
-    handleMapCategoricalDataConfigChange,
   ]);
 
   const handleSubmit = useCallback(async () => {
