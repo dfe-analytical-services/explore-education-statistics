@@ -28,6 +28,7 @@
   margin-top: govuk-spacing(3);
   padding: govuk-spacing(1) govuk-spacing(2);
   text-decoration: none;
+  color: $govuk-link-colour;
 
   @include govuk-media-query($from: tablet) {
     margin: 0 0 0 govuk-spacing(6);

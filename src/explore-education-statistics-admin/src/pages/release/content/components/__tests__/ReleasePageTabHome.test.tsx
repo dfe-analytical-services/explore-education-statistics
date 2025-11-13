@@ -136,6 +136,7 @@ describe('ReleasePageTabHome', () => {
     const content = screen.getByTestId('home-content');
 
     expect(within(content).getByTestId('accordion')).toBeInTheDocument();
+    expect(within(content).getAllByTestId('accordionSection')).toHaveLength(2);
     expect(
       within(content).queryByTestId('home-content-section'),
     ).not.toBeInTheDocument();

@@ -47,6 +47,29 @@ const ReleaseContentPageLoaded = () => {
         totalUnresolvedComments,
         totalUnsavedBlocks,
       }) => {
+        const transformFeaturedTableLinks = (url: string, text: string) => {
+          return (
+            <ButtonText
+              onClick={() => {
+                // the url format is `/data-tables/fast-track/<data-block-parent-id>?featuredTables`
+                // so split twice to get the dataBlockParentId.
+                const dataBlockParentId = url
+                  .split('fast-track/')[1]
+                  .split('?')[0];
+                const featuredTable = featuredTables?.find(
+                  table => table.dataBlockParentId === dataBlockParentId,
+                );
+                if (featuredTable) {
+                  setEditingMode('table-preview');
+                  setPreviewFeaturedTableId(featuredTable.dataBlockId);
+                }
+              }}
+            >
+              {text}
+            </ButtonText>
+          );
+        };
+
         return (
           <>
             {editingMode === 'edit' && (
@@ -105,7 +128,11 @@ const ReleaseContentPageLoaded = () => {
                 {editingMode !== 'table-preview' && (
                   <>
                     {previewRedesign && editingMode === 'preview' ? (
-                      <ReleaseContentRedesign />
+                      <ReleaseContentRedesign
+                        transformFeaturedTableLinks={
+                          transformFeaturedTableLinks
+                        }
+                      />
                     ) : (
                       <>
                         <span className="govuk-caption-l">{release.title}</span>
@@ -120,33 +147,7 @@ const ReleaseContentPageLoaded = () => {
                           <ReleaseContent
                             transformFeaturedTableLinks={
                               canPreviewRelease
-                                ? (url: string, text: string) => {
-                                    return (
-                                      <ButtonText
-                                        onClick={() => {
-                                          // the url format is `/data-tables/fast-track/<data-block-parent-id>?featuredTables`
-                                          // so split twice to get the dataBlockParentId.
-                                          const dataBlockParentId = url
-                                            .split('fast-track/')[1]
-                                            .split('?')[0];
-                                          const featuredTable =
-                                            featuredTables?.find(
-                                              table =>
-                                                table.dataBlockParentId ===
-                                                dataBlockParentId,
-                                            );
-                                          if (featuredTable) {
-                                            setEditingMode('table-preview');
-                                            setPreviewFeaturedTableId(
-                                              featuredTable.dataBlockId,
-                                            );
-                                          }
-                                        }}
-                                      >
-                                        {text}
-                                      </ButtonText>
-                                    );
-                                  }
+                                ? transformFeaturedTableLinks
                                 : undefined
                             }
                           />

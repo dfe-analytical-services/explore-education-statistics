@@ -1,4 +1,3 @@
-import Link from '@admin/components/Link';
 import styles from '@admin/pages/release/content/components/ReleasePageTitle.module.scss';
 import SubscribeIcon from '@common/components/SubscribeIcon';
 import { useMobileMedia } from '@common/hooks/useMedia';
@@ -37,10 +36,10 @@ const ReleasePageTitle = ({
       </div>
       {!isMobileMedia && (
         <div className="govuk-!-margin-bottom-4">
-          <Link className={styles.link} to="#" unvisited>
+          <span className={styles.link}>
             <SubscribeIcon className={styles.icon} />
             Get email alerts
-          </Link>
+          </span>
         </div>
       )}
     </div>

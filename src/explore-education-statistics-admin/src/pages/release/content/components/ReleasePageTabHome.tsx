@@ -6,7 +6,7 @@ import { useReleaseContentState } from '@admin/pages/release/content/contexts/Re
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
-import getNavItemsFromHtml from '@common/components/util/getNavItemsFromHtml';
+import getNavItemsFromContentSections from '@common/components/util/getNavItemsFromContentSections';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import ContactUsSection, {
@@ -36,33 +36,6 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
 
   const hasSummarySection = summarySection.content.length > 0;
 
-  // Get nav items for section headings (h2) and parse the section's
-  // HtmlBlocks for h3 headings to generate subNavItems
-  const contentSectionsItems = useMemo(
-    () =>
-      content.map(section => {
-        const { heading, content: sectionContent } = section;
-        const subNavItems = sectionContent
-          .flatMap(block => {
-            if (block.type === 'HtmlBlock') {
-              return getNavItemsFromHtml({
-                html: block.body,
-                blockId: block.id,
-              });
-            }
-            return null;
-          })
-          .filter(item => !!item);
-
-        return {
-          id: generateIdFromHeading(heading),
-          text: heading,
-          subNavItems,
-        };
-      }),
-    [content],
-  );
-
   const navItems = useMemo(
     () =>
       [
@@ -74,10 +47,10 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
           id: 'headlines-section',
           text: 'Headline facts and figures',
         },
-        ...contentSectionsItems,
+        ...getNavItemsFromContentSections(content),
         contactUsNavItem,
       ].filter(item => !!item),
-    [contentSectionsItems, hasSummarySection],
+    [content, hasSummarySection],
   );
 
   return (
@@ -123,9 +96,7 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
                 ) : undefined
               }
               renderSubscribeLink={
-                <Link to="#" unvisited>
-                  Get email alerts
-                </Link>
+                <span className="dfe-colour--link">Get email alerts</span>
               }
             />
           </section>
