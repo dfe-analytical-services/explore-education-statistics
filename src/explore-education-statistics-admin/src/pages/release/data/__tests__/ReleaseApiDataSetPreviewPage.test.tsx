@@ -18,7 +18,8 @@ import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, Route, Router } from 'react-router-dom';
 import { createMemoryHistory, MemoryHistory } from 'history';
-import { addHours } from 'date-fns';
+import { addDays, addHours } from 'date-fns';
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/previewTokenService');
@@ -112,12 +113,31 @@ describe('ReleaseApiDataSetPreviewPage', () => {
       expires: expect.any(Date),
       label: 'Test label',
     });
+    const fixedDate = new Date();
+    const TZ = 'Europe/London';
+
+    // Arrange expected end: end of *tomorrow* in London
+    // 1) London calendar for "today"
+    const todayYmdLondon = formatInTimeZone(fixedDate, TZ, 'yyyy-MM-dd');
+    // 2) Build "today at 00:00 London" → get UTC instant, add 1 day in absolute time, then get "tomorrow" YMD in London
+    const todayMidnightUtc = fromZonedTime(`${todayYmdLondon}T00:00:00`, TZ);
+    const plusOneDayUtc = addDays(todayMidnightUtc, 1);
+    const tomorrowYmdLondon = formatInTimeZone(plusOneDayUtc, TZ, 'yyyy-MM-dd');
+    // 3) End of tomorrow (London wall time) → exact UTC instant
+    const expectedEndUtc = fromZonedTime(
+      `${tomorrowYmdLondon}T23:59:59.999`,
+      TZ,
+    );
 
     const [[args]] = (previewTokenService.createPreviewToken as jest.Mock).mock
       .calls;
-    expect(args.expires.getTime() - args.activates.getTime()).toBe(
-      24 * 60 * 60 * 1000,
-    ); // Assert token activates and expires within 24 hours
+    // Assert: start is "now" (tight tolerance to avoid flakiness on CI)
+    expect(
+      Math.abs(args.activates.getTime() - fixedDate.getTime()),
+    ).toBeLessThanOrEqual(100);
+
+    // Assert: end equals exact end-of-tomorrow instant
+    expect(args.expires.toISOString()).toBe(expectedEndUtc.toISOString());
 
     await waitFor(() => {
       expect(history.location.pathname).toBe(
