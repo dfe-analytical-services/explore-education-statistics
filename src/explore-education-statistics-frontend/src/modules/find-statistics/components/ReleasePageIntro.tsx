@@ -38,6 +38,10 @@ const ReleasePageIntro = ({
   const { nextReleaseDate, latestRelease, supersededByPublication } =
     publicationSummary;
 
+  // Update count includes 'first published' by default, but we only
+  // want to show 'actual' update number.
+  const updateCountExcludingFirstPublished = updateCount - 1;
+
   return (
     <>
       {supersededByPublication && (
@@ -125,11 +129,13 @@ const ReleasePageIntro = ({
             )
           }
           renderUpdatesLink={
-            updateCount > 1 ? (
+            updateCountExcludingFirstPublished > 0 ? (
               <Link
                 to={`/find-statistics/${publicationSummary.slug}/${latestRelease.slug}/updates`}
+                data-testid="updates-link"
               >
-                {updateCount} updates{' '}
+                {updateCountExcludingFirstPublished} update
+                {updateCountExcludingFirstPublished === 1 ? '' : 's'}
                 <VisuallyHidden>for {title}</VisuallyHidden>
               </Link>
             ) : undefined

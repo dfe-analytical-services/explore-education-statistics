@@ -93,11 +93,11 @@ const ReleaseContent = ({
             )
           }
           renderUpdatesLink={
-            updates.length > 1 ? (
-              <Link to="#">
-                {updates.length} updates{' '}
+            updates.length > 0 ? (
+              <span className="govuk-link dfe-colour--link">
+                {updates.length} update{updates.length === 1 ? '' : 's'}
                 <VisuallyHidden>for {release.title}</VisuallyHidden>
-              </Link>
+              </span>
             ) : undefined
           }
         />
