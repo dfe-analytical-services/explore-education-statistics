@@ -26,6 +26,9 @@ public class SearchService(IAzureClientFactory<SearchClient> searchClientFactory
         {
             Filter = CreatePublicationIdsFilter(publicationIds),
             IncludeTotalCount = true,
+            QueryType = SearchQueryType.Semantic,
+            ScoringProfile = "scoring-profile-1",
+            SemanticSearch = new SemanticSearchOptions { SemanticConfigurationName = "semantic-configuration-1" },
             Size = pageSize,
             Skip = (page - 1) * pageSize,
         };
