@@ -2,6 +2,7 @@
 import { NavItem } from '@common/components/PageNavExpandable';
 import getNavItemsFromContentSections from '@common/components/util/getNavItemsFromContentSections';
 import { contactUsNavItem } from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+import exploreDataPageSections from '@common/modules/release/components/ReleaseExploreDataPageSections';
 import publicationService, {
   PreReleaseAccessListSummary,
   PublicationMethodologiesList,
@@ -19,15 +20,13 @@ import ReleasePageShell from '@frontend/modules/find-statistics/components/Relea
 import { TabRouteItem } from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
 import PublicationReleasePageCurrent from '@frontend/modules/find-statistics/PublicationReleasePageCurrent';
 import PublicationReleasePageHome from '@frontend/modules/find-statistics/PublicationReleasePageHome';
+import ReleaseExploreDataPage from '@frontend/modules/find-statistics/ReleaseExploreDataPage';
 import ReleaseHelpPage from '@frontend/modules/find-statistics/ReleaseHelpPage';
 import ReleaseMethodologyPage from '@frontend/modules/find-statistics/ReleaseMethodologyPage';
 import publicationQueries from '@frontend/queries/publicationQueries';
 import { QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import ReleaseExploreDataPage, {
-  pageSections as exploreDataPageSections,
-} from './ReleaseExploreDataPage';
 
 export const releasePageTabRouteItems = {
   home: {
