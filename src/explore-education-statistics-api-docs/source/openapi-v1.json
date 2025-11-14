@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.4",
   "info": {
     "title": "Explore education statistics - Public Data API",
     "contact": {
@@ -85,7 +85,7 @@
           {
             "name": "types",
             "in": "query",
-            "description": "The types of meta to get for the requested data set version.\r\n\r\nCan be any combination of the following:\r\n\r\n- `Filters` - include all meta relating to *filters*\r\n- `Indicators` - include all meta relating to *indicators*\r\n- `Locations` - include all meta relating to *locations*\r\n- `TimePeriods` - include all meta relating to *time periods*",
+            "description": "The types of meta to get for the requested data set version.\r\n            \r\nCan be any combination of the following:\r\n            \r\n- `Filters` - include all meta relating to *filters*\r\n- `Indicators` - include all meta relating to *indicators*\r\n- `Locations` - include all meta relating to *locations*\r\n- `TimePeriods` - include all meta relating to *time periods*",
             "schema": {
               "type": "array",
               "items": {
@@ -97,7 +97,7 @@
                 ],
                 "type": "string"
               },
-              "description": "The types of meta to get for the requested data set version.\r\n\r\nCan be any combination of the following:\r\n\r\n- `Filters` - include all meta relating to *filters*\r\n- `Indicators` - include all meta relating to *indicators*\r\n- `Locations` - include all meta relating to *locations*\r\n- `TimePeriods` - include all meta relating to *time periods*",
+              "description": "The types of meta to get for the requested data set version.\r\n            \r\nCan be any combination of the following:\r\n            \r\n- `Filters` - include all meta relating to *filters*\r\n- `Indicators` - include all meta relating to *indicators*\r\n- `Locations` - include all meta relating to *locations*\r\n- `TimePeriods` - include all meta relating to *time periods*",
               "nullable": true,
               "example": [
                 "Filters",
@@ -171,7 +171,7 @@
           "DataSets"
         ],
         "summary": "Query a data set (GET)",
-        "description": "Query a data set using a `GET` request, returning the filtered results.\r\n            \r\nNote that there is a `POST` variant of this endpoint which provides a more complete set\r\nof querying functionality. The `GET` variant is only recommended for initial exploratory\r\ntesting or simple queries that do not need advanced functionality.\r\n            \r\nUnlike the `POST` variant, this endpoint does not allow condition clauses (`and`, `or`, `not`)\r\nand consequently cannot express more complex queries. Use the `POST` variant instead for these\r\ntypes of queries.\r\n            \r\n## Indicators\r\n            \r\nThe `indicators` query parameter is used to include only specific values in the data set\r\nresults.\r\n            \r\nEach indicator should be a string containing the indicator ID e.g. `4xbOu`, `8g1RI`.\r\n            \r\nOmitting the `indicators` parameter will return values for all indicators.\r\n\r\n## Filters\r\n            \r\nThe `filters` query parameter is used to filter by other filter options (not locations,\r\ngeographic levels or time periods).\r\n            \r\nEach filter should be a string containing the required filter option ID e.g. `z4FQE`, `DcQeg`.\r\n            \r\n## Geographic levels\r\n            \r\nThe `geographicLevels` query parameter is used to filter results by geographic level.\r\n            \r\nThe geographic levels are specified as codes, and can be one of the following:\r\n            \r\n- `EDA` - English devolved area\r\n- `INST` - Institution\r\n- `LA` - Local authority\r\n- `LAD` - Local authority district\r\n- `LEP` - Local enterprise partnership\r\n- `LSIP` - Local skills improvement plan area\r\n- `MCA` - Mayoral combined authority\r\n- `MAT` - MAT\r\n- `NAT` - National\r\n- `OA` - Opportunity area\r\n- `PA` - Planning area\r\n- `PCON` - Parliamentary constituency\r\n- `PROV` - Provider\r\n- `REG` - Regional\r\n- `RSC` - RSC region\r\n- `SCH` - School\r\n- `SPON` - Sponsor\r\n- `WARD` - Ward\r\n            \r\n## Locations\r\n            \r\nThe `locations` query parameter is used to filter results by location.\r\n            \r\nThe locations should be strings formatted like `{level}|{property}|{value}` where:\r\n            \r\n- `{level}` is the location's level code (e.g. `NAT`, `REG`, `LA`)\r\n- `{property}` is the name of the identifying property to match on (e.g. `id, `code`, `urn`)\r\n- `{value}` is the value for the property to match\r\n            \r\nAn ID or a code can be used to identify a location, with the following differences:\r\n            \r\n- IDs only match a **single location**\r\n- Codes may match **multiple locations**\r\n            \r\nWhilst codes are generally unique to a single location, they can be used for multiple locations.\r\nThis may match more results than you expect so it's recommended to use IDs where possible.\r\n            \r\n### Examples\r\n            \r\n- `LA|code|E08000019` matches any local authority with code `E08000019`\r\n- `REG|id|6bQgZ` matches any region with ID `6bQgZ`\r\n- `SCH|urn|140821` matches any school with URN `140821`\r\n            \r\n## Time periods\r\n            \r\nThe `timePeriods` query parameter is used to filter results by time period.\r\n            \r\nThe time periods should be strings formatted like `{period}|{code}` where:\r\n            \r\n- `period` is the time period or range (e.g. `2020` or `2020/2021`)\r\n- `code` is the code identifying the time period type (e.g. `AY`, `CY`, `M1`, `W20`)\r\n            \r\nThe `period` should be a single year like `2020`, or a range like `2020/2021`.\r\nCurrently, only years (or year ranges) are supported.\r\n            \r\nSome time period types span two years e.g. financial year part 2 (`P2`), or may fall in a\r\nlatter year e.g. academic year summer term (`T3`). For these types, a singular year `period`\r\nlike `2020` is considered as `2020/2021`.\r\n            \r\nFor example, a `period` value of `2020` is applicable to the following time periods:\r\n            \r\n- 2020 calendar year\r\n- 2020/2021 academic year\r\n- 2020/2021 financial year part 2 (October to March)\r\n- 2020/2021 academic year's summer term\r\n            \r\nIf you wish to be more explicit, you may use a range for the `period` e.g. `2020/2021`.\r\nHowever, a range cannot be used with time period types which only span a single year,\r\nfor example, `2020/21` cannot be used with `CY`, `M` or `W` codes.\r\n            \r\n### Examples\r\n            \r\n- `2020|AY` is the 2020/21 academic year\r\n- `2021|FY` is the 2021/22 financial year\r\n- `2020|T3` is the 2020/21 academic year's summer term\r\n- `2020|P2` is the 2020/21 financial year part 2 (October to March)\r\n- `2020|CY` is the 2020 calendar year\r\n- `2020|W32` is 2020 week 32\r\n- `2020/2021|AY` is the 2020/21 academic year\r\n- `2021/2022|FY` is the 2021/22 financial year\r\n            \r\n## Sorts\r\n            \r\nThe `sorts` query parameter is used to sort the results.\r\n            \r\nSorts are applied in the order they are provided and should be strings\r\nformatted like `{field}|{direction}` where:\r\n            \r\n- `field` is the name of the field to sort e.g. `timePeriod`\r\n- `direction` is the direction to sort in e.g. ascending (`Asc`) or descending (`Desc`)\r\n            \r\nThe `field` can be one of the following:\r\n            \r\n- `timePeriod` to sort by time period\r\n- `geographicLevel` to sort by the geographic level of the data\r\n- `location|{level}` to sort by locations in a geographic level where `{level}` is the level code (e.g. `REG`, `LA`)\r\n- `filter|{id}` to sort by the options in a filter where `{id}` is the filter ID (e.g. `3RxWP`)\r\n- `indicator|{id}` to sort by the values in a indicator where `{id}` is the indicator ID (e.g. `6VfPgZ`)\r\n            \r\n### Examples\r\n            \r\n- `timePeriod|Desc` sorts by time period in descending order\r\n- `geographicLevel|Asc` sorts by geographic level in ascending order\r\n- `location|REG|Asc` sorts by regions in ascending order\r\n- `filter|3RxWP|Desc` sorts by options in filter `3RxWP` in descending order\r\n- `indicator|7a1dk|Asc` sorts by values in indicator `7a1dk` in ascending order",
+        "description": "Query a data set using a `GET` request, returning the filtered results.\r\n            \r\nNote that there is a `POST` variant of this endpoint which provides a more complete set\r\nof querying functionality. The `GET` variant is only recommended for initial exploratory\r\ntesting or simple queries that do not need advanced functionality.\r\n            \r\nUnlike the `POST` variant, this endpoint does not allow condition clauses (`and`, `or`, `not`)\r\nand consequently cannot express more complex queries. Use the `POST` variant instead for these\r\ntypes of queries.\r\n            \r\n## Indicators\r\n            \r\nThe `indicators` query parameter is used to include only specific values in the data set\r\nresults.\r\n            \r\nEach indicator should be a string containing the indicator ID e.g. `4xbOu`, `8g1RI`.\r\n            \r\nOmitting the `indicators` parameter will return values for all indicators.\r\n            \r\n## Filters\r\n            \r\nThe `filters` query parameter is used to filter by other filter options (not locations,\r\ngeographic levels or time periods).\r\n            \r\nEach filter should be a string containing the required filter option ID e.g. `z4FQE`, `DcQeg`.\r\n            \r\n## Geographic levels\r\n            \r\nThe `geographicLevels` query parameter is used to filter results by geographic level.\r\n            \r\nThe geographic levels are specified as codes, and can be one of the following:\r\n            \r\n- `EDA` - English devolved area\r\n- `INST` - Institution\r\n- `LA` - Local authority\r\n- `LAD` - Local authority district\r\n- `LEP` - Local enterprise partnership\r\n- `LSIP` - Local skills improvement plan area\r\n- `MCA` - Mayoral combined authority\r\n- `MAT` - MAT\r\n- `NAT` - National\r\n- `OA` - Opportunity area\r\n- `PA` - Planning area\r\n- `PCON` - Parliamentary constituency\r\n- `PROV` - Provider\r\n- `REG` - Regional\r\n- `RSC` - RSC region\r\n- `SCH` - School\r\n- `SPON` - Sponsor\r\n- `WARD` - Ward\r\n            \r\n## Locations\r\n            \r\nThe `locations` query parameter is used to filter results by location.\r\n            \r\nThe locations should be strings formatted like `{level}|{property}|{value}` where:\r\n            \r\n- `{level}` is the location's level code (e.g. `NAT`, `REG`, `LA`)\r\n- `{property}` is the name of the identifying property to match on (e.g. `id, `code`, `urn`)\r\n- `{value}` is the value for the property to match\r\n            \r\nAn ID or a code can be used to identify a location, with the following differences:\r\n            \r\n- IDs only match a **single location**\r\n- Codes may match **multiple locations**\r\n            \r\nWhilst codes are generally unique to a single location, they can be used for multiple locations.\r\nThis may match more results than you expect so it's recommended to use IDs where possible.\r\n            \r\n### Examples\r\n            \r\n- `LA|code|E08000019` matches any local authority with code `E08000019`\r\n- `REG|id|6bQgZ` matches any region with ID `6bQgZ`\r\n- `SCH|urn|140821` matches any school with URN `140821`\r\n            \r\n## Time periods\r\n            \r\nThe `timePeriods` query parameter is used to filter results by time period.\r\n            \r\nThe time periods should be strings formatted like `{period}|{code}` where:\r\n            \r\n- `period` is the time period or range (e.g. `2020` or `2020/2021`)\r\n- `code` is the code identifying the time period type (e.g. `AY`, `CY`, `M1`, `W20`)\r\n            \r\nThe `period` should be a single year like `2020`, or a range like `2020/2021`.\r\nCurrently, only years (or year ranges) are supported.\r\n            \r\nSome time period types span two years e.g. financial year part 2 (`P2`), or may fall in a\r\nlatter year e.g. academic year summer term (`T3`). For these types, a singular year `period`\r\nlike `2020` is considered as `2020/2021`.\r\n            \r\nFor example, a `period` value of `2020` is applicable to the following time periods:\r\n            \r\n- 2020 calendar year\r\n- 2020/2021 academic year\r\n- 2020/2021 financial year part 2 (October to March)\r\n- 2020/2021 academic year's summer term\r\n            \r\nIf you wish to be more explicit, you may use a range for the `period` e.g. `2020/2021`.\r\nHowever, a range cannot be used with time period types which only span a single year,\r\nfor example, `2020/21` cannot be used with `CY`, `M` or `W` codes.\r\n            \r\n### Examples\r\n            \r\n- `2020|AY` is the 2020/21 academic year\r\n- `2021|FY` is the 2021/22 financial year\r\n- `2020|T3` is the 2020/21 academic year's summer term\r\n- `2020|P2` is the 2020/21 financial year part 2 (October to March)\r\n- `2020|CY` is the 2020 calendar year\r\n- `2020|W32` is 2020 week 32\r\n- `2020/2021|AY` is the 2020/21 academic year\r\n- `2021/2022|FY` is the 2021/22 financial year\r\n            \r\n## Sorts\r\n            \r\nThe `sorts` query parameter is used to sort the results.\r\n            \r\nSorts are applied in the order they are provided and should be strings\r\nformatted like `{field}|{direction}` where:\r\n            \r\n- `field` is the name of the field to sort e.g. `timePeriod`\r\n- `direction` is the direction to sort in e.g. ascending (`Asc`) or descending (`Desc`)\r\n            \r\nThe `field` can be one of the following:\r\n            \r\n- `timePeriod` to sort by time period\r\n- `geographicLevel` to sort by the geographic level of the data\r\n- `location|{level}` to sort by locations in a geographic level where `{level}` is the level code (e.g. `REG`, `LA`)\r\n- `filter|{id}` to sort by the options in a filter where `{id}` is the filter ID (e.g. `3RxWP`)\r\n- `indicator|{id}` to sort by the values in a indicator where `{id}` is the indicator ID (e.g. `6VfPgZ`)\r\n            \r\n### Examples\r\n            \r\n- `timePeriod|Desc` sorts by time period in descending order\r\n- `geographicLevel|Asc` sorts by geographic level in ascending order\r\n- `location|REG|Asc` sorts by regions in ascending order\r\n- `filter|3RxWP|Desc` sorts by options in filter `3RxWP` in descending order\r\n- `indicator|7a1dk|Asc` sorts by values in indicator `7a1dk` in ascending order",
         "operationId": "QueryDataSetGet",
         "parameters": [
           {
@@ -481,13 +481,13 @@
           {
             "name": "indicators",
             "in": "query",
-            "description": "The IDs of indicators to return values for.\r\n\r\nOmitting this parameter will return values for all indicators.",
+            "description": "The IDs of indicators to return values for.\r\n            \r\nOmitting this parameter will return values for all indicators.",
             "schema": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "description": "The IDs of indicators to return values for.\r\n\r\nOmitting this parameter will return values for all indicators.",
+              "description": "The IDs of indicators to return values for.\r\n            \r\nOmitting this parameter will return values for all indicators.",
               "nullable": true
             }
           },
@@ -1404,7 +1404,7 @@
             "items": {
               "type": "string"
             },
-            "description": "The IDs of indicators to return values for.\r\n\r\nOmitting this parameter will return values for all indicators.",
+            "description": "The IDs of indicators to return values for.\r\n            \r\nOmitting this parameter will return values for all indicators.",
             "nullable": true
           },
           "sorts": {
@@ -1562,6 +1562,7 @@
                 "Local authority district",
                 "Local enterprise partnership",
                 "Local skills improvement plan area",
+                "Police force area",
                 "Institution",
                 "Mayoral combined authority",
                 "MAT",
@@ -1642,7 +1643,7 @@
               ],
               "type": "string"
             },
-            "description": "The types of meta to get for the requested data set version.\r\n\r\nCan be any combination of the following:\r\n\r\n- `Filters` - include all meta relating to *filters*\r\n- `Indicators` - include all meta relating to *indicators*\r\n- `Locations` - include all meta relating to *locations*\r\n- `TimePeriods` - include all meta relating to *time periods*",
+            "description": "The types of meta to get for the requested data set version.\r\n            \r\nCan be any combination of the following:\r\n            \r\n- `Filters` - include all meta relating to *filters*\r\n- `Indicators` - include all meta relating to *indicators*\r\n- `Locations` - include all meta relating to *locations*\r\n- `TimePeriods` - include all meta relating to *time periods*",
             "nullable": true,
             "example": [
               "Filters",
@@ -2447,7 +2448,7 @@
               "minLength": 1,
               "type": "string"
             },
-            "description": "The IDs of indicators to return values for.\r\n\r\nOmitting this parameter will return values for all indicators.",
+            "description": "The IDs of indicators to return values for.\r\n            \r\nOmitting this parameter will return values for all indicators.",
             "nullable": true,
             "example": [
               "C2ySJ",
@@ -2893,6 +2894,7 @@
                 "Local authority district",
                 "Local enterprise partnership",
                 "Local skills improvement plan area",
+                "Police force area",
                 "Institution",
                 "Mayoral combined authority",
                 "MAT",
@@ -3238,6 +3240,7 @@
           "OA",
           "PA",
           "PCON",
+          "PFA",
           "PROV",
           "REG",
           "RSC",
