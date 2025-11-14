@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "PoliceForceArea_Code",
                 table: "Location",
-                type: "nvarchar(max)",
+                type: "nvarchar(450)",
                 nullable: true
             );
 

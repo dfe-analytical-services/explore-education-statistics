@@ -392,7 +392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PoliceForceArea_Code")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("PoliceForceArea_Name")
                         .HasColumnType("nvarchar(max)");
@@ -459,6 +459,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasIndex("ParliamentaryConstituency_Code");
 
                     b.HasIndex("PlanningArea_Code");
+
+                    b.HasIndex("PoliceForceArea_Code");
 
                     b.HasIndex("Provider_Code");
 
