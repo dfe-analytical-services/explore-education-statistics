@@ -232,6 +232,8 @@ public class StatisticsDbContext : DbContext
         modelBuilder.Entity<Location>().HasIndex(location => location.Sponsor_Code);
 
         modelBuilder.Entity<Location>().HasIndex(location => location.Ward_Code);
+
+        modelBuilder.Entity<Location>().HasIndex(location => location.PoliceForceArea_Code);
     }
 
     private static void ConfigureObservation(ModelBuilder modelBuilder)
