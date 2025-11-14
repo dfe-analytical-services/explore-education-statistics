@@ -260,18 +260,14 @@ public class MappingProfiles : CommonMappingProfile
             .BeforeMap((_, d) => d.StorageContainerName = Constants.ContainerNames.PrivateReleaseTempFiles);
     }
 
-    private static string GetDataSetUploadStatus(DataSetScreenerResponse? screenerResult)
+    private static string GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)
     {
-        if (
-            screenerResult is not null
-            && screenerResult.Passed
-            && screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING)
-        )
+        if (screenerResult.Passed && screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING))
         {
             return DataSetUploadStatus.PENDING_REVIEW.ToString();
         }
 
-        return screenerResult is not { Passed: true }
+        return !screenerResult.Passed
             ? DataSetUploadStatus.FAILED_SCREENING.ToString()
             : DataSetUploadStatus.PENDING_IMPORT.ToString();
     }
