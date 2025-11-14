@@ -261,6 +261,7 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
             GeographicLevel.School => new School(viewModel.Value, viewModel.Label),
             GeographicLevel.Sponsor => new Sponsor(viewModel.Value, viewModel.Label),
             GeographicLevel.Ward => new Ward(viewModel.Value, viewModel.Label),
+            GeographicLevel.PoliceForceArea => new PoliceForceArea(viewModel.Value, viewModel.Label),
             _ => throw new ArgumentOutOfRangeException(),
         };
     }

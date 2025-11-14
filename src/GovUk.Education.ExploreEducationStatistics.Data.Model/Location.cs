@@ -419,6 +419,8 @@ public class Location
         hashCode.Add(Sponsor_Name);
         hashCode.Add(Ward_Code);
         hashCode.Add(Ward_Name);
+        hashCode.Add(PoliceForceArea_Code);
+        hashCode.Add(PoliceForceArea_Name);
         return hashCode.ToHashCode();
     }
 
@@ -452,6 +454,7 @@ public class Location
             GeographicLevel.School => School,
             GeographicLevel.Sponsor => Sponsor,
             GeographicLevel.Ward => Ward,
+            GeographicLevel.PoliceForceArea => PoliceForceArea,
             _ => throw new ArgumentOutOfRangeException(nameof(GeographicLevel), GeographicLevel, null),
         };
 
