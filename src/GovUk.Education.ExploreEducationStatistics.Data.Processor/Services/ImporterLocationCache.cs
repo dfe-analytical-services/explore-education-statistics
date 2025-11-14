@@ -100,7 +100,8 @@ public class ImporterLocationCache : IImporterLocationCache
         RscRegion? rscRegion,
         School? school,
         Sponsor? sponsor,
-        Ward? ward
+        Ward? ward,
+        PoliceForceArea? policeForceArea
     )
     {
         var locationAttributes = new LocationAttribute?[]
@@ -123,6 +124,7 @@ public class ImporterLocationCache : IImporterLocationCache
             school,
             sponsor,
             ward,
+            policeForceArea,
         };
 
         var tokens = locationAttributes.WhereNotNull().Select(attribute => attribute.GetCacheKey()).ToList();
@@ -152,7 +154,8 @@ public class ImporterLocationCache : IImporterLocationCache
             location.RscRegion,
             location.School,
             location.Sponsor,
-            location.Ward
+            location.Ward,
+            location.PoliceForceArea
         );
     }
 }

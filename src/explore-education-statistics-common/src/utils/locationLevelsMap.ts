@@ -19,7 +19,8 @@ export type GeographicLevelCode =
   | 'SCH'
   | 'SPON'
   | 'PA'
-  | 'WARD';
+  | 'WARD'
+  | 'PFA';
 
 export interface LocationLevelDetails {
   filterLabel: string; // used in the dropdown that filters data sets by geographic level
@@ -78,6 +79,13 @@ const locationLevelsMap = {
     plural: 'Local Skills Improvement Plan Areas',
     prefix: 'a',
     code: 'LSIP',
+  },
+  policeForceArea: {
+    filterLabel: 'Police Force Area',
+    label: 'Police Force Area',
+    plural: 'Police Force Areas',
+    prefix: 'a',
+    code: 'PFA',
   },
   mayoralCombinedAuthority: {
     filterLabel: 'Mayoral Combined Authority',
