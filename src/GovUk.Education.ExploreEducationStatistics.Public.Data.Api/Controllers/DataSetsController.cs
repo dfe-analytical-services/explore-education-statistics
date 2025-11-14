@@ -129,6 +129,7 @@ public class DataSetsController(IDataSetService dataSetService, IDataSetQuerySer
     /// - `SCH` - School
     /// - `SPON` - Sponsor
     /// - `WARD` - Ward
+    /// - `PFA` - Police Force Area
     ///
     /// ## Locations
     ///

@@ -256,3 +256,11 @@ public record Ward(string? Code, string? Name) : LocationAttribute(Code, Name)
 
     public override int CsvPriority => 10;
 }
+
+public record PoliceForceArea(string? Code, string? Name) : LocationAttribute(Code, Name)
+{
+    public override KeyValuePair<string, string>[] CsvValues =>
+        [new("pfa_code", Code ?? string.Empty), new("pfa_name", Name ?? string.Empty)];
+
+    public override int CsvPriority => 18;
+}

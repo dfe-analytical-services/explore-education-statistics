@@ -63,6 +63,7 @@ public static class GeographicLevelUtils
                 { GeographicLevel.School, new SchoolCsvColumns() },
                 { GeographicLevel.Sponsor, new GeographicCsvColumns(Codes: ["sponsor_id"], Name: "sponsor_name") },
                 { GeographicLevel.Ward, new GeographicCsvColumns(Codes: ["ward_code"], Name: "ward_name") },
+                { GeographicLevel.PoliceForceArea, new GeographicCsvColumns(Codes: ["pfa_code"], Name: "pfa_name") },
             }
         );
 
