@@ -129,10 +129,10 @@ public class FixedInformationDataFileReader
         PlanningAreaName,
 
         [EnumLabelValue("pfa_code")]
-        PFACode,
+        PoliceForceAreaCode,
 
         [EnumLabelValue("pfa_name")]
-        PFAName,
+        PoliceForceAreaName,
     }
 
     private static readonly EnumToEnumLabelConverter<TimeIdentifier> TimeIdentifierLookup = new();
@@ -349,17 +349,17 @@ public class FixedInformationDataFileReader
         return GetLocationAttributeOrDefault(() => new PlanningArea(code, name), code, name);
     }
 
+    private PoliceForceArea? GetPoliceForceArea(IReadOnlyList<string> rowValues)
+    {
+        var code = GetLocationAttributeValue(LocationColumn.PoliceForceAreaCode, rowValues);
+        var name = GetLocationAttributeValue(LocationColumn.PoliceForceAreaName, rowValues);
+        return GetLocationAttributeOrDefault(() => new PoliceForceArea(code, name), code, name);
+    }
+
     private string? GetLocationAttributeValue(LocationColumn column, IReadOnlyList<string> rowValues)
     {
         var columnIndex = _locationColumnIndexes[column];
         return columnIndex != -1 ? rowValues[columnIndex].Trim() : null;
-    }
-
-    private PoliceForceArea? GetPoliceForceArea(IReadOnlyList<string> rowValues)
-    {
-        var code = GetLocationAttributeValue(LocationColumn.PFACode, rowValues);
-        var name = GetLocationAttributeValue(LocationColumn.PFAName, rowValues);
-        return GetLocationAttributeOrDefault(() => new PoliceForceArea(code, name), code, name);
     }
 
     private TLocationAttribute? GetLocationAttributeOrDefault<TLocationAttribute>(

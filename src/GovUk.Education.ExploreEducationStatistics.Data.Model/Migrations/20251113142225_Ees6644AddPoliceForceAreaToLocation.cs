@@ -23,11 +23,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 type: "nvarchar(max)",
                 nullable: true
             );
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Location_PoliceForceArea_Code",
+                table: "Location",
+                column: "PoliceForceArea_Code"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropIndex(name: "IX_Location_PoliceForceArea_Code", table: "Location");
+
             migrationBuilder.DropColumn(name: "PoliceForceArea_Code", table: "Location");
 
             migrationBuilder.DropColumn(name: "PoliceForceArea_Name", table: "Location");
