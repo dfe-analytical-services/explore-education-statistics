@@ -306,6 +306,23 @@ public class Location
         }
     }
 
+    public string? PoliceForceArea_Code { get; set; }
+    public string? PoliceForceArea_Name { get; set; }
+
+    [NotMapped]
+    public PoliceForceArea? PoliceForceArea
+    {
+        get =>
+            PoliceForceArea_Code == null && PoliceForceArea_Name == null
+                ? null
+                : new PoliceForceArea(PoliceForceArea_Code, PoliceForceArea_Name);
+        init
+        {
+            PoliceForceArea_Code = value?.Code;
+            PoliceForceArea_Name = value?.Name;
+        }
+    }
+
     protected bool Equals(Location other)
     {
         return Id.Equals(other.Id)
@@ -345,7 +362,9 @@ public class Location
             && Sponsor_Code == other.Sponsor_Code
             && Sponsor_Name == other.Sponsor_Name
             && Ward_Code == other.Ward_Code
-            && Ward_Name == other.Ward_Name;
+            && Ward_Name == other.Ward_Name
+            && PoliceForceArea_Code == other.PoliceForceArea_Code
+            && PoliceForceArea_Name == other.PoliceForceArea_Name;
     }
 
     public override bool Equals(object? obj)
