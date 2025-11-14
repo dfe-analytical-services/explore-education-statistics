@@ -1,7 +1,8 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Search;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Search;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -14,7 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 internal class PublicationService(
     PublicDataDbContext publicDataDbContext,
     IContentApiClient contentApiClient,
-    IAnalyticsService analyticsService
+    IAnalyticsService analyticsService,
+    ISearchService searchService
 ) : IPublicationService
 {
     public async Task<Either<ActionResult, PublicationPaginatedListViewModel>> ListPublications(
@@ -26,10 +28,10 @@ internal class PublicationService(
     {
         return await GetPublishedDataSetPublicationIds(cancellationToken)
             .OnSuccess(async publicationIds =>
-                await contentApiClient.ListPublications(
+                await searchService.SearchPublications(
                     page: page,
                     pageSize: pageSize,
-                    search: search,
+                    searchText: search,
                     publicationIds: publicationIds,
                     cancellationToken: cancellationToken
                 )
@@ -94,13 +96,13 @@ internal class PublicationService(
         ).ToHashSet();
     }
 
-    private static PublicationSummaryViewModel MapPublication(PublicationSearchResultViewModel publication)
+    private static PublicationSummaryViewModel MapPublication(PublicationSearchResult publication)
     {
         return new PublicationSummaryViewModel
         {
-            Id = publication.Id,
+            Id = publication.PublicationId,
             Title = publication.Title,
-            Slug = publication.Slug,
+            Slug = publication.PublicationSlug,
             Summary = publication.Summary,
             LastPublished = publication.Published,
         };

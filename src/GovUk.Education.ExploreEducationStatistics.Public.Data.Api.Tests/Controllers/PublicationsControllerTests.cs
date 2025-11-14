@@ -2,10 +2,11 @@ using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Search;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Search;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Analytics;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
@@ -61,46 +62,44 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
                 var expectedPublicationIds = publishedDataSetPublicationIds.Take(2).ToList();
 
-                var expectedPublications = expectedPublicationIds
+                var publicationSearchResults = expectedPublicationIds
                     .Select(id =>
                         DataFixture
-                            .Generator<PublicationSearchResultViewModel>()
+                            .Generator<PublicationSearchResult>()
                             .ForInstance(s =>
-                                s.SetDefault(p => p.Title)
-                                    .SetDefault(p => p.Slug)
-                                    .SetDefault(p => p.Summary)
-                                    .SetDefault(p => p.Theme)
+                                s.Set(p => p.PublicationId, id)
+                                    .SetDefault(p => p.PublicationSlug)
                                     .Set(p => p.Published, p => p.Date.Past())
-                                    .Set(p => p.Type, ReleaseType.OfficialStatistics)
-                                    .Set(p => p.Id, id)
+                                    .SetDefault(p => p.Summary)
+                                    .SetDefault(p => p.Title)
                             )
                             .Generate()
                     )
                     .ToList();
 
-                var contentApiClient = new Mock<IContentApiClient>();
-                contentApiClient
+                var searchService = new Mock<ISearchService>();
+                searchService
                     .Setup(c =>
-                        c.ListPublications(
+                        c.SearchPublications(
                             page,
                             pageSize,
-                            null,
                             It.Is<IEnumerable<Guid>>(ids =>
                                 ids.Order().SequenceEqual(publishedDataSetPublicationIds.Order())
                             ),
+                            null,
                             It.IsAny<CancellationToken>()
                         )
                     )
                     .ReturnsAsync(
-                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
-                            results: expectedPublications,
+                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResult>(
+                            results: publicationSearchResults,
                             totalResults: numberOfPublishedDataSets,
                             page: page,
                             pageSize: pageSize
                         )
                     );
 
-                var client = BuildApp(contentApiClient.Object).CreateClient();
+                var client = BuildApp(searchService: searchService.Object).CreateClient();
 
                 var response = await ListPublications(client: client, page: page, pageSize: pageSize);
 
@@ -124,39 +123,37 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
                 await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-                PublicationSearchResultViewModel publication = DataFixture
-                    .Generator<PublicationSearchResultViewModel>()
+                PublicationSearchResult publicationSearchResult = DataFixture
+                    .Generator<PublicationSearchResult>()
                     .ForInstance(s =>
-                        s.SetDefault(p => p.Title)
-                            .SetDefault(p => p.Slug)
-                            .SetDefault(p => p.Summary)
-                            .SetDefault(p => p.Theme)
+                        s.Set(p => p.PublicationId, publicationId)
+                            .SetDefault(p => p.PublicationSlug)
                             .Set(p => p.Published, p => p.Date.Past())
-                            .Set(p => p.Type, ReleaseType.OfficialStatistics)
-                            .Set(p => p.Id, publicationId)
+                            .SetDefault(p => p.Summary)
+                            .SetDefault(p => p.Title)
                     );
 
-                var contentApiClient = new Mock<IContentApiClient>();
-                contentApiClient
+                var searchService = new Mock<ISearchService>();
+                searchService
                     .Setup(c =>
-                        c.ListPublications(
+                        c.SearchPublications(
                             1,
                             1,
+                            new List<Guid> { publicationId },
                             null,
-                            new List<Guid>() { publicationId },
                             It.IsAny<CancellationToken>()
                         )
                     )
                     .ReturnsAsync(
-                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
-                            results: [publication],
+                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResult>(
+                            results: [publicationSearchResult],
                             totalResults: 1,
                             page: 1,
                             pageSize: 1
                         )
                     );
 
-                var client = BuildApp(contentApiClient.Object).CreateClient();
+                var client = BuildApp(searchService: searchService.Object).CreateClient();
 
                 var response = await ListPublications(client: client, page: 1, pageSize: 1);
 
@@ -169,21 +166,23 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
                 var result = Assert.Single(content.Results);
 
-                Assert.Equal(publication.Id, result.Id);
-                Assert.Equal(publication.Title, result.Title);
-                Assert.Equal(publication.Slug, result.Slug);
-                Assert.Equal(publication.Summary, result.Summary);
-                Assert.Equal(publication.Published, result.LastPublished);
+                Assert.Equal(publicationSearchResult.PublicationId, result.Id);
+                Assert.Equal(publicationSearchResult.Title, result.Title);
+                Assert.Equal(publicationSearchResult.PublicationSlug, result.Slug);
+                Assert.Equal(publicationSearchResult.Summary, result.Summary);
+                Assert.Equal(publicationSearchResult.Published, result.LastPublished);
             }
 
             [Fact]
             public async Task NoPublishedDataSets_Returns200_EmptyList()
             {
-                var contentApiClient = new Mock<IContentApiClient>();
-                contentApiClient
-                    .Setup(c => c.ListPublications(1, 1, null, Enumerable.Empty<Guid>(), It.IsAny<CancellationToken>()))
+                var searchService = new Mock<ISearchService>();
+                searchService
+                    .Setup(c =>
+                        c.SearchPublications(1, 1, Enumerable.Empty<Guid>(), null, It.IsAny<CancellationToken>())
+                    )
                     .ReturnsAsync(
-                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
+                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResult>(
                             results: [],
                             totalResults: 0,
                             page: 1,
@@ -191,7 +190,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                         )
                     );
 
-                var client = BuildApp(contentApiClient.Object).CreateClient();
+                var client = BuildApp(searchService: searchService.Object).CreateClient();
 
                 var response = await ListPublications(client: client, page: 1, pageSize: 1);
 
@@ -270,13 +269,13 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             [Fact]
             public async Task AnalyticsRequestCaptured()
             {
-                var contentApiClient = new Mock<IContentApiClient>();
-                contentApiClient
+                var searchService = new Mock<ISearchService>();
+                searchService
                     .Setup(c =>
-                        c.ListPublications(1, 10, null, Enumerable.Empty<Guid>(), It.IsAny<CancellationToken>())
+                        c.SearchPublications(1, 10, Enumerable.Empty<Guid>(), null, It.IsAny<CancellationToken>())
                     )
                     .ReturnsAsync(
-                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
+                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResult>(
                             results: [],
                             totalResults: 0,
                             page: 1,
@@ -284,7 +283,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                         )
                     );
 
-                var client = BuildApp(contentApiClient.Object).CreateClient();
+                var client = BuildApp(searchService: searchService.Object).CreateClient();
 
                 var response = await ListPublications(client: client, page: 1, pageSize: 10);
 
@@ -302,13 +301,13 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             [Fact]
             public async Task RequestFromEes_AnalyticsRequestNotCaptured()
             {
-                var contentApiClient = new Mock<IContentApiClient>();
-                contentApiClient
+                var searchService = new Mock<ISearchService>();
+                searchService
                     .Setup(c =>
-                        c.ListPublications(1, 10, null, Enumerable.Empty<Guid>(), It.IsAny<CancellationToken>())
+                        c.SearchPublications(1, 10, Enumerable.Empty<Guid>(), null, It.IsAny<CancellationToken>())
                     )
                     .ReturnsAsync(
-                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
+                        new Common.ViewModels.PaginatedListViewModel<PublicationSearchResult>(
                             results: [],
                             totalResults: 0,
                             page: 1,
@@ -316,7 +315,9 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                         )
                     );
 
-                var client = BuildApp(contentApiClient.Object).CreateClient().WithRequestSourceHeader("EES");
+                var client = BuildApp(searchService: searchService.Object)
+                    .CreateClient()
+                    .WithRequestSourceHeader("EES");
 
                 var response = await ListPublications(client: client, page: 1, pageSize: 10);
 
@@ -1085,11 +1086,15 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
         }
     }
 
-    private WebApplicationFactory<Startup> BuildApp(IContentApiClient? contentApiClient = null)
+    private WebApplicationFactory<Startup> BuildApp(
+        IContentApiClient? contentApiClient = null,
+        ISearchService? searchService = null
+    )
     {
         return TestApp.ConfigureServices(services =>
             services
                 .ReplaceService(contentApiClient ?? Mock.Of<IContentApiClient>())
+                .ReplaceService(searchService ?? Mock.Of<ISearchService>())
                 .ReplaceService<IAnalyticsPathResolver>(_analyticsPathResolver, optional: true)
         );
     }

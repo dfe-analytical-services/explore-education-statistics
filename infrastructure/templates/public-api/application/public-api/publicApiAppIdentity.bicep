@@ -27,3 +27,12 @@ resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedI
 //     principalIds: [apiContainerAppManagedIdentity.properties.principalId]
 //   }
 // }
+
+module apiContainerAppSearchServiceRoleAssignmentModule '../../../common/components/search/searchServiceRoleAssignment.bicep' = {
+  name: '${resourceNames.publicApi.apiAppIdentity}SearchServiceRoleAssignmentDeploy'
+  params: {
+    searchServiceName: resourceNames.sharedResources.searchService
+    principalIds: [apiContainerAppManagedIdentity.properties.principalId]
+    role: 'Search Index Data Reader'
+  }
+}

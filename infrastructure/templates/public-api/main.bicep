@@ -1,4 +1,5 @@
-import { abbreviations } from 'abbreviations.bicep'
+import { abbreviations } from '../common/abbreviations.bicep'
+import { abbreviations as publicApiAbbreviations } from 'abbreviations.bicep'
 import {
   ContainerAppResourceConfig
   IpRange
@@ -155,6 +156,9 @@ param publicApiContainerAppConfig ContainerAppResourceConfig = {
   workloadProfileName: 'Consumption'
 }
 
+@description('Name of the Search service index used to search publications.')
+param searchServiceIndexName string = ''
+
 @description('Enable the Swagger UI for public API.')
 param enableSwagger bool = false
 
@@ -212,7 +216,7 @@ var resourceNames = {
       dataProcessor: '${publicApiResourcePrefix}-snet-${abbreviations.webSitesFunctions}-processor'
       dataProcessorPrivateEndpoints: '${publicApiResourcePrefix}-snet-${abbreviations.webSitesFunctions}-processor-pep'
       storagePrivateEndpoints: '${publicApiResourcePrefix}-snet-${abbreviations.storageStorageAccounts}-pep'
-      psqlFlexibleServer: '${commonResourcePrefix}-snet-${abbreviations.dBforPostgreSQLServers}'
+      psqlFlexibleServer: '${commonResourcePrefix}-snet-${publicApiAbbreviations.dBforPostgreSQLServers}'
     }
     vNet: '${legacyResourcePrefix}-vnet-ees'
   }
@@ -221,9 +225,10 @@ var resourceNames = {
     appGatewayIdentity: '${commonResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.networkApplicationGateways}-01'
     containerAppEnvironment: '${commonResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
     logAnalyticsWorkspace: '${commonResourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
-    postgreSqlFlexibleServer: '${commonResourcePrefix}-${abbreviations.dBforPostgreSQLServers}'
-    recoveryVault: '${commonResourcePrefix}-${abbreviations.recoveryServicesVault}'
+    postgreSqlFlexibleServer: '${commonResourcePrefix}-${publicApiAbbreviations.dBforPostgreSQLServers}'
+    recoveryVault: '${commonResourcePrefix}-${abbreviations.recoveryServicesVaults}'
     recoveryVaultFileShareBackupPolicy: 'DailyPolicy'
+    searchService: '${commonResourcePrefix}-${abbreviations.searchSearchServices}'
   }
   publicApi: {
     apiApp: '${publicApiResourcePrefix}-${abbreviations.appContainerApps}-api'
@@ -279,6 +284,13 @@ module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = 
     storageFirewallRules: maintenanceIpRanges
     deployAlerts: deployAlerts
     tagValues: tagValues
+  }
+}
+
+module searchServiceModule 'application/shared/searchService.bicep' = {
+  name: 'searchServiceApplicationModuleDeploy'
+  params: {
+    name: resourceNames.sharedResources.searchService
   }
 }
 
@@ -383,6 +395,10 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     appInsightsConnectionString: appInsightsModule.outputs.appInsightsConnectionString
     deployAlerts: deployAlerts
     resourceAndScalingConfig: publicApiContainerAppConfig
+    searchServiceConfig: {
+      endpoint: searchServiceModule.outputs.searchServiceEndpoint
+      indexName: searchServiceIndexName
+    }
     enableSwagger: enableSwagger
     tagValues: tagValues
   }

@@ -10,6 +10,8 @@ param publicUrls = {
   publicApiAppGateway: 'https://test.statistics.api.education.gov.uk'
 }
 
+param searchServiceIndexName = 'index-1'
+
 param enableThemeDeletion = false
 
 param enableReplacementOfPublicApiDataSets = true
