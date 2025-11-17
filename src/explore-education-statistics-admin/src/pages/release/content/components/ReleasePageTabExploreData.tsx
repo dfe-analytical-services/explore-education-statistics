@@ -22,8 +22,8 @@ import ReleasePageContentSection from '@common/modules/find-statistics/component
 import ReleaseDataPageCardLink, {
   ReleaseDataPageCardLinkGrid,
 } from '@common/modules/release/components/ReleaseDataPageCardLink';
-import pageSections from '@common/modules/release/components/ReleaseExploreDataPageSections';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
+import pageSections from '@common/modules/release/data/releaseExploreDataPageSections';
 import { useQuery } from '@tanstack/react-query';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo } from 'react';
@@ -112,7 +112,7 @@ const ReleasePageTabExploreData = ({ hidden }: Props) => {
         <ButtonText
           className="govuk-!-font-weight-bold"
           preventDoubleClick
-          onClick={() => releaseFileService.downloadAllFilesZip(release.id)}
+          onClick={() => releaseFileService.downloadFilesAsZip(release.id)}
         >
           Download all (ZIP)
         </ButtonText>
@@ -130,13 +130,11 @@ const ReleasePageTabExploreData = ({ hidden }: Props) => {
                 <VisuallyHidden>using {dataset.name}</VisuallyHidden>
               </span>
               <ButtonText
-                onClick={() =>
-                  downloadReleaseFileSecurely({
-                    releaseVersionId: release.id,
-                    fileId: dataset.id,
-                    fileName: dataset.fileName,
-                  })
-                }
+                onClick={() => {
+                  releaseFileService.downloadFilesAsZip(release.id, [
+                    dataset.id,
+                  ]);
+                }}
               >
                 Download <VisuallyHidden>{dataset.name}</VisuallyHidden> (ZIP)
               </ButtonText>
@@ -183,6 +181,7 @@ const ReleasePageTabExploreData = ({ hidden }: Props) => {
         key={block.id}
         block={block}
         releaseVersionId={release.id}
+        visible
       />
     ));
 
@@ -219,7 +218,7 @@ const ReleasePageTabExploreData = ({ hidden }: Props) => {
                     underline={false}
                     preventDoubleClick
                     onClick={() =>
-                      releaseFileService.downloadAllFilesZip(release.id)
+                      releaseFileService.downloadFilesAsZip(release.id)
                     }
                   >
                     Download all data from this release (ZIP)

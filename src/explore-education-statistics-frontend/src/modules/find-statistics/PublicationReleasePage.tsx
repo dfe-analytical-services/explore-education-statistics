@@ -2,7 +2,7 @@
 import { NavItem } from '@common/components/PageNavExpandable';
 import getNavItemsFromContentSections from '@common/components/util/getNavItemsFromContentSections';
 import { contactUsNavItem } from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
-import exploreDataPageSections from '@common/modules/release/components/ReleaseExploreDataPageSections';
+import exploreDataPageSections from '@common/modules/release/data/releaseExploreDataPageSections';
 import publicationService, {
   PreReleaseAccessListSummary,
   PublicationMethodologiesList,

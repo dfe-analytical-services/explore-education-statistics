@@ -13,7 +13,7 @@ import ReleasePageContentSection from '@common/modules/find-statistics/component
 import ReleaseDataPageCardLink, {
   ReleaseDataPageCardLinkGrid,
 } from '@common/modules/release/components/ReleaseDataPageCardLink';
-import pageSections from '@common/modules/release/components/ReleaseExploreDataPageSections';
+import pageSections from '@common/modules/release/data/releaseExploreDataPageSections';
 import {
   PublicationSummaryRedesign,
   ReleaseVersionDataContent,
