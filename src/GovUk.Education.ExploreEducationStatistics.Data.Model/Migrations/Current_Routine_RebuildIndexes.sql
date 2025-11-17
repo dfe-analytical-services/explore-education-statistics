@@ -5,6 +5,8 @@ CREATE OR ALTER PROCEDURE RebuildIndexes
     @StopInMinutes INT = 600
 AS
 BEGIN
+    SET NOCOUNT ON
+
     IF LEN(ISNULL(@Tables, '')) = 0
     BEGIN
         RAISERROR ('Empty @Tables argument provided', 0, 1, NULL) WITH NOWAIT;

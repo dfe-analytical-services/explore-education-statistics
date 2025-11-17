@@ -31,9 +31,6 @@ BEGIN
     DECLARE 
         @ResumablesCount INT,
         @ResumablesIndex INT = 1,
-        @IN NVARCHAR(MAX),
-        @SN NVARCHAR(MAX),
-        @TN NVARCHAR(MAX),
         @Command NVARCHAR(MAX);
 
     SELECT @ResumablesCount = COUNT(*) FROM #RunningResumables;
@@ -41,12 +38,25 @@ BEGIN
     -- For each resumable index rebuild, issue a PAUSE command.
     WHILE @ResumablesIndex <= @ResumablesCount
     BEGIN
-        SELECT @Command = 'ALTER INDEX ' + IndexName + ' ON ' + SchemaName + '.' + TableName + ' PAUSE'
-        FROM #RunningResumables
-        WHERE Id = @ResumablesIndex;
-
-        RAISERROR ('Executing command ''%s''.', 0, 1, @Command) WITH NOWAIT;
-        EXEC (@Command);
+        BEGIN TRY
+        
+            SELECT @Command = 'ALTER INDEX ' + IndexName + ' ON ' + SchemaName + '.' + TableName + ' PAUSE'
+            FROM #RunningResumables
+            WHERE Id = @ResumablesIndex;
+            
+            RAISERROR ('Executing command ''%s''.', 0, 1, @Command) WITH NOWAIT;
+            EXEC (@Command);
+        
+        END TRY
+        BEGIN CATCH
+                    
+            DECLARE @errorMessage NVARCHAR(max) = ERROR_MESSAGE();
+            DECLARE @errorSeverity INT = ERROR_SEVERITY();
+            DECLARE @errorState INT = ERROR_STATE();
+            DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
+            RAISERROR (N'Error executing %s MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @errorMessage);
+        
+        END CATCH
 
         SET @ResumablesIndex += 1;
     END

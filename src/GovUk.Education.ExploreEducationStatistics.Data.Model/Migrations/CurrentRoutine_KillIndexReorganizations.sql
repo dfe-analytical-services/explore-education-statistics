@@ -31,7 +31,7 @@ BEGIN
     WHERE r.database_id = DB_ID()
     AND EXISTS (
         SELECT 1 FROM #TableList tbl
-        WHERE txt.text LIKE 'ALTER INDEX%ON ' + tbl.TableName + ' ' + '%REORGANIZE%'
+        WHERE txt.text LIKE 'ALTER INDEX%ON ' + tbl.TableName + ' %REORGANIZE%'
         OR txt.text LIKE 'ALTER INDEX%ON ' + tbl.SchemaName + '.' + tbl.TableName + ' %REORGANIZE%'
     );
     
@@ -47,14 +47,27 @@ BEGIN
     -- For each REORGANIZE to kill, issue a kill command.
     WHILE @ReorganizationsIndex <= @ReorganizationsCount
     BEGIN
-        SELECT @Command = 'KILL ' + CAST(SessionId AS NVARCHAR),
-               @SessionId = SessionId,
-               @SqlText = SqlText
-        FROM #RunningReorganizations
-        WHERE Id = @ReorganizationsIndex;
+        BEGIN TRY
+            
+            SELECT @Command = 'KILL ' + CAST(SessionId AS NVARCHAR),
+                   @SessionId = SessionId,
+                   @SqlText = SqlText
+            FROM #RunningReorganizations
+            WHERE Id = @ReorganizationsIndex;
+            
+            RAISERROR ('Executing command ''%s'' to kill session %d with sql ''%s''.', 0, 1, @Command, @SessionId, @SqlText) WITH NOWAIT;
+            EXEC (@Command);
+            
+        END TRY
+        BEGIN CATCH
+                            
+            DECLARE @errorMessage NVARCHAR(max) = ERROR_MESSAGE();
+            DECLARE @errorSeverity INT = ERROR_SEVERITY();
+            DECLARE @errorState INT = ERROR_STATE();
+            DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
+            RAISERROR (N'Error executing %s MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @errorMessage);
         
-        RAISERROR ('Executing command ''%s'' to kill session %d with sql ''%s''.', 0, 1, @Command, @SessionId, @SqlText) WITH NOWAIT;
-        EXEC (@Command);
+        END CATCH
         
         SET @ReorganizationsIndex += 1;
     END
