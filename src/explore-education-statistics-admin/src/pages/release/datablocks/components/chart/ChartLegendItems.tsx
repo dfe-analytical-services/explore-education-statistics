@@ -30,6 +30,7 @@ import { Dictionary } from '@common/types';
 import upperFirst from 'lodash/upperFirst';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import React from 'react';
+import { FormFieldCheckbox } from '@common/components/form';
 
 const symbolOptions: SelectOption[] = symbols.map(symbol => ({
   label: upperFirst(symbol),
@@ -111,7 +112,8 @@ export default function ChartLegendItems({
               currentItems[index].dataSet,
             );
             const allowColourSelection =
-              !mapDataSetConfig?.categoricalDataConfig?.length;
+              !mapDataSetConfig?.categoricalDataConfig?.length ||
+              currentItems[index].sequentialCategoryColours;
 
             return (
               <div key={item.id} className={styles.item}>
@@ -132,6 +134,16 @@ export default function ChartLegendItems({
                         showError={false}
                       />
                     </div>
+                    {mapDataSetConfig &&
+                      mapDataSetConfig.categoricalDataConfig && (
+                        <div className={styles.labelInput}>
+                          <FormFieldCheckbox
+                            label="Sequential colours"
+                            name={`items.${index}.sequentialCategoryColours`}
+                            formGroup={false}
+                          />
+                        </div>
+                      )}
                     {allowColourSelection && (
                       <div className={styles.colourInput}>
                         <FormFieldColourInput

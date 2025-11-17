@@ -157,6 +157,7 @@ const ChartLegendConfiguration = ({
         .min(-100, 'Offset must be between -100 and 100')
         .max(100, 'Offset must be between -100 and 100')
         .optional(),
+      sequentialCategoryColours: Yup.boolean().optional(),
     });
 
     if (capabilities.canPositionLegendInline) {
@@ -236,6 +237,7 @@ const ChartLegendConfiguration = ({
     showDataLabels,
   ]);
 
+  // TODO if do as part of legend for it'll need to seperate it out somewhere
   const handleChange = useCallback(
     (values: LegendConfiguration) => {
       if (validationSchema.isValidSync(values)) {

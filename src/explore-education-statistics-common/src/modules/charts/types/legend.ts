@@ -16,6 +16,7 @@ export interface LegendItemConfiguration {
   lineStyle?: LineStyle;
   inlinePosition?: LegendInlinePosition;
   inlinePositionOffset?: number;
+  sequentialCategoryColours?: boolean;
 }
 
 export interface LegendItem extends LegendItemConfiguration {

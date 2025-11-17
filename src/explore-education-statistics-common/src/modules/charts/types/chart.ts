@@ -112,6 +112,7 @@ export interface MapCategoricalData {
 export interface MapDataSetConfig {
   boundaryLevel?: number;
   categoricalDataConfig?: MapCategoricalData[];
+  sequentialCategoryColours?: boolean;
   dataSet: DataSet;
   dataSetKey: string;
   dataGrouping: DataGroupingConfig;
