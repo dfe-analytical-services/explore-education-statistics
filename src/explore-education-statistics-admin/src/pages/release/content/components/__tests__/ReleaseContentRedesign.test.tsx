@@ -1,4 +1,5 @@
 import generateReleaseContent from '@admin-test/generators/releaseContentGenerators';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import ReleaseContentRedesign from '@admin/pages/release/content/components/ReleaseContentRedesign';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
@@ -23,17 +24,20 @@ const renderWithContext = (
   releaseContent: ReleaseContentType = testReleaseContent,
 ) =>
   render(
-    <ReleaseContentProvider
-      value={{
-        ...releaseContent,
-        canUpdateRelease: true,
-      }}
-    >
-      <EditingContextProvider editingMode="preview">
-        <MemoryRouter>{component}</MemoryRouter>
-      </EditingContextProvider>
+    <TestConfigContextProvider>
+      <ReleaseContentProvider
+        value={{
+          ...releaseContent,
+          canUpdateRelease: true,
+        }}
+      >
+        <EditingContextProvider editingMode="preview">
+          <MemoryRouter>{component}</MemoryRouter>
+        </EditingContextProvider>
+        ,
+      </ReleaseContentProvider>
       ,
-    </ReleaseContentProvider>,
+    </TestConfigContextProvider>,
   );
 
 describe('ReleaseContentRedesign', () => {
