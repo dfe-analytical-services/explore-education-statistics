@@ -93,13 +93,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
 
   return (
     <div data-testid="editableAccordionSection">
-      <AccordionSection
-        {...props}
-        id={id}
-        heading={heading}
-        header={header}
-        trackScroll
-      >
+      <AccordionSection {...props} id={id} heading={heading} header={header}>
         {sectionProps => (
           <>
             {editingMode === 'edit' && (

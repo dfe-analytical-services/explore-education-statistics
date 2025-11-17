@@ -1,4 +1,5 @@
 import Link from '@admin/components/Link';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseHeadlinesRedesign from '@admin/pages/release/content/components/ReleaseHeadlinesRedesign';
 import ReleasePageTabPanel from '@admin/pages/release/content/components/ReleasePageTabPanel';
@@ -8,6 +9,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
 import getNavItemsFromContentSections from '@common/components/util/getNavItemsFromContentSections';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import ContactUsSection, {
   contactUsNavItem,
@@ -15,13 +17,15 @@ import ContactUsSection, {
 import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import ReleaseSummaryBlockMobile from '@common/modules/release/components/ReleaseSummaryBlockMobile';
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment, useEffect, useMemo } from 'react';
 
 interface Props {
   hidden: boolean;
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }
 const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
+  const { setActiveSection } = useEditingContext();
+
   const { release } = useReleaseContentState();
   const {
     content,
@@ -33,6 +37,39 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
   } = release;
 
   const { isMedia: isMobileMedia } = useMobileMedia();
+
+  const [handleScroll] = useDebouncedCallback(() => {
+    const sections = document.querySelectorAll('[data-scroll]');
+
+    // Set a section as active when it's in the top third of the page.
+    const buffer = window.innerHeight / 3;
+    const scrollPosition = window.scrollY + buffer;
+
+    sections.forEach(section => {
+      if (section) {
+        const { height } = section.getBoundingClientRect();
+        const { offsetTop } = section as HTMLElement;
+        const offsetBottom = offsetTop + height;
+
+        if (
+          scrollPosition > offsetTop &&
+          scrollPosition < offsetBottom &&
+          section instanceof HTMLElement &&
+          section.dataset.scroll
+        ) {
+          setActiveSection(section.dataset.scroll);
+        }
+      }
+    });
+  }, 100);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [handleScroll]);
 
   const hasSummarySection = summarySection.content.length > 0;
 
@@ -57,7 +94,10 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
     <ReleasePageTabPanel tabKey="home" hidden={hidden}>
       <ReleasePageLayout navItems={navItems}>
         {isMobileMedia && (
-          <section id="publication-release-intro-mobile">
+          <section
+            id="publication-release-intro-mobile"
+            data-scroll="summary-section"
+          >
             <VisuallyHidden as="h2">Introduction</VisuallyHidden>
 
             <p className="govuk-body-l">{publication.summary}</p>
@@ -106,13 +146,17 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
             id="background-information"
           >
             {summarySection.content.map(block => (
-              <ReleaseBlock
+              <div
                 key={block.id}
-                block={block}
-                releaseVersionId={release.id}
-                transformFeaturedTableLinks={transformFeaturedTableLinks}
-                visible
-              />
+                data-scroll={`editableSectionBlocks-${block.id}`}
+              >
+                <ReleaseBlock
+                  block={block}
+                  releaseVersionId={release.id}
+                  transformFeaturedTableLinks={transformFeaturedTableLinks}
+                  visible
+                />
+              </div>
             ))}
           </ReleasePageContentSection>
         )}
@@ -152,15 +196,20 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
                 key={id}
                 id={generateIdFromHeading(heading)}
                 testId="home-content-section"
+                dataScrollId={`releaseMainContent-${id}`}
               >
                 {sectionContent.map(block => (
-                  <ReleaseBlock
+                  <div
                     key={block.id}
-                    block={block}
-                    releaseVersionId={release.id}
-                    transformFeaturedTableLinks={transformFeaturedTableLinks}
-                    visible
-                  />
+                    data-scroll={`editableSectionBlocks-${block.id}`}
+                  >
+                    <ReleaseBlock
+                      block={block}
+                      releaseVersionId={release.id}
+                      transformFeaturedTableLinks={transformFeaturedTableLinks}
+                      visible
+                    />
+                  </div>
                 ))}
               </ReleasePageContentSection>
             ))

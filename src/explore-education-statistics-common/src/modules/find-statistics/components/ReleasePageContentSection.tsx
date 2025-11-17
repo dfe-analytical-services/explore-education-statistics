@@ -8,6 +8,7 @@ interface Props {
   caption?: string;
   children: ReactNode;
   className?: string;
+  dataScrollId?: string;
   heading: string;
   id: string;
   includeBackToTopLink?: boolean;
@@ -19,6 +20,7 @@ export default function ReleasePageContentSection({
   caption,
   children,
   className,
+  dataScrollId,
   heading,
   id,
   includeSectionBreak = true,
@@ -33,6 +35,7 @@ export default function ReleasePageContentSection({
         className={className}
         id={id}
         data-page-section
+        data-scroll={dataScrollId}
         data-testid={testId}
       >
         <h2

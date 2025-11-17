@@ -57,12 +57,13 @@ const ReleaseHeadlinesRedesign = ({
       </KeyStatContainer>
 
       {headlinesSection.content.map(block => (
-        <ReleaseBlock
-          key={block.id}
-          block={block}
-          releaseVersionId={release.id}
-          transformFeaturedTableLinks={transformFeaturedTableLinks}
-        />
+        <div key={block.id} data-scroll={`editableSectionBlocks-${block.id}`}>
+          <ReleaseBlock
+            block={block}
+            releaseVersionId={release.id}
+            transformFeaturedTableLinks={transformFeaturedTableLinks}
+          />
+        </div>
       ))}
     </>
   );
@@ -72,6 +73,7 @@ const ReleaseHeadlinesRedesign = ({
       heading="Headline facts and figures"
       id="headlines-section"
       testId="headlines-section"
+      dataScrollId="releaseHeadlines-keyStatistics"
     >
       {!keyStatisticsSecondarySection.content.length ? (
         summaryTab
