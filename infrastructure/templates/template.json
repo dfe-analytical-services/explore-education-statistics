@@ -1388,9 +1388,8 @@
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
     "eventGridTopicNameThemeChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-theme-changed')]",
     "searchServiceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-srch')]",
-    "searchReaderManagedIdentityName": "[concat(parameters('subscription'), '-', parameters('environment'), '-id-srch-reader')]",
-    "searchServiceApiVersion": "2025-02-01-preview",
-    "userAssignedIdentitiesApiVersion": "2024-11-30",
+    "searchServiceApiVersion": "2025-05-01",
+    "searchIndexDataReaderRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '1407120a-92aa-4202-b7e9-c0e197c71c8f')]",
     "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
     "baseAdminAllowedOrigins": [
       "[concat('https://', parameters('adminUri'))]"
@@ -2270,10 +2269,7 @@
       "apiVersion": "2021-02-01",
       "location": "[resourceGroup().location]",
       "identity": {
-        "type": "SystemAssigned, UserAssigned",
-        "userAssignedIdentities": {
-          "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('searchReaderManagedIdentityName'))]": {}
-        }
+        "type": "SystemAssigned"
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2332,7 +2328,6 @@
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2020-02-02').InstrumentationKey]",
         "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('searchServiceApiVersion')).endpoint]",
         "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
-        "AZURE_SEARCH_MANAGED_IDENTITY_CLIENT_ID": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('searchReaderManagedIdentityName')), variables('userAssignedIdentitiesApiVersion')).clientId]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
@@ -2406,6 +2401,20 @@
         "Request_Source": "AzureTfsExtensionAzureProject",
         "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
       }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[resourceId('Microsoft.Search/searchServices', variables('searchServiceName'))]",
+      "name": "[guid(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), resourceId('Microsoft.Web/sites', variables('publicAppName')), variables('searchIndexDataReaderRoleId'))]",
+      "properties": {
+        "roleDefinitionId": "[variables('searchIndexDataReaderRoleId')]",
+        "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('publicAppName')), '2025-03-01', 'Full').identity.principalId]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]"
+      ]
     },
     {
       "name": "[variables('coreStorageAccountName')]",
