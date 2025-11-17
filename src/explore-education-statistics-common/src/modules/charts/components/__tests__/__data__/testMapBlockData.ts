@@ -100,6 +100,71 @@ export const testMapConfiguration: Chart = {
   },
 };
 
+export const testCategoricalMapConfiguration: Chart = {
+  type: 'map',
+  boundaryLevel: 1,
+  axes: {
+    major: {
+      type: 'major',
+      groupBy: 'locations',
+      sortBy: 'name',
+      sortAsc: true,
+      dataSets: [
+        {
+          indicator: 'indicator-1',
+          filters: [],
+          timePeriod: '2024_CY',
+        },
+      ],
+      referenceLines: [],
+      visible: true,
+      unit: '',
+      showGrid: true,
+      min: 0,
+      size: 50,
+      tickConfig: 'default',
+      tickSpacing: 1,
+    },
+  },
+  legend: {
+    position: 'none',
+    items: [
+      {
+        dataSet: {
+          indicator: 'indicator-1',
+          filters: [],
+          timePeriod: '2024_CY',
+        },
+        label: 'Indicator 1 (2024)',
+        colour: '#4763a5',
+        symbol: 'circle',
+        lineStyle: 'solid',
+      },
+    ],
+  },
+  title: '',
+  alt: '',
+  height: 600,
+  map: {
+    dataSetConfigs: [
+      {
+        categoricalDataConfig: [
+          { colour: '#12436D', value: 'small' },
+          { colour: '#801650', value: 'medium' },
+          { colour: '#28A197', value: 'large' },
+        ],
+        dataGrouping: { customGroups: [], type: 'EqualIntervals' },
+        dataSet: {
+          filters: [],
+          indicator: 'indicator-1',
+          timePeriod: '2024_CY',
+        },
+        dataSetKey: 'dataSetKey1',
+      },
+    ],
+  },
+};
+
 export const testMapTableData: TableDataResponse & {
   subjectMeta: TableDataResponse['subjectMeta'] & {
     locations: Dictionary<LocationGeoJsonOption[]>;

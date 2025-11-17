@@ -406,8 +406,8 @@ describe('generateFeaturesAndDataGroups', () => {
     expect(result.legendItems).toEqual(expectedLegendItems);
   });
 
-  test('generates the correct features and legend items for categorical data', () => {
-    const testDataSetCategories: MapDataSetCategory[] = [
+  describe('Categorical data', () => {
+    const testCategoricalDataSetCategories: MapDataSetCategory[] = [
       {
         dataSets: {
           [generateDataSetKey(testDataSet1, testTimePeriod1)]: {
@@ -439,205 +439,262 @@ describe('generateFeaturesAndDataGroups', () => {
         geoJson: testGeoJsonFeature3,
       },
     ];
-    const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
-      config: {
-        label: 'Indicator 1 (Time period 1)',
-        colour: '#12436D',
-      },
-      categoricalDataConfig: [
-        { colour: '#12436D', value: 'large' },
-        { colour: '#28A197', value: 'small' },
-        { colour: '#801650', value: 'medium' },
-      ],
-      dataGrouping: testDataGrouping,
-      dataKey: generateDataSetKey(testDataSet1, testTimePeriod1),
-      dataSet: expandDataSet(testDataSet1, testSubjectMeta),
-      rawDataSet: JSON.parse(generateDataSetKey(testDataSet1, testTimePeriod1)),
-    };
 
-    const result = generateFeaturesAndDataGroups({
-      dataSetCategories: testDataSetCategories,
-      selectedDataSetConfig: testSelectedDataSetConfig,
+    test('generates the correct features and legend items for categorical data', () => {
+      const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
+        config: {
+          label: 'Indicator 1 (Time period 1)',
+          colour: '#12436D',
+        },
+        categoricalDataConfig: [
+          { colour: '#12436D', value: 'large' },
+          { colour: '#28A197', value: 'small' },
+          { colour: '#801650', value: 'medium' },
+        ],
+        dataGrouping: testDataGrouping,
+        dataKey: generateDataSetKey(testDataSet1, testTimePeriod1),
+        dataSet: expandDataSet(testDataSet1, testSubjectMeta),
+        rawDataSet: JSON.parse(
+          generateDataSetKey(testDataSet1, testTimePeriod1),
+        ),
+      };
+
+      const result = generateFeaturesAndDataGroups({
+        dataSetCategories: testCategoricalDataSetCategories,
+        selectedDataSetConfig: testSelectedDataSetConfig,
+      });
+
+      const expectedFeatures: MapFeatureCollection = {
+        type: 'FeatureCollection',
+        features: [
+          {
+            id: testLocation1.id,
+            geometry: testGeoJsonFeature1.geometry,
+            properties: {
+              ...testGeoJsonFeature1.properties,
+              colour: '#12436D',
+              data: 'large',
+              dataSets: testCategoricalDataSetCategories[0].dataSets,
+            },
+            type: 'Feature',
+          },
+          {
+            id: testLocation2.id,
+            geometry: testGeoJsonFeature2.geometry,
+            properties: {
+              ...testGeoJsonFeature2.properties,
+              colour: '#28A197',
+              data: 'small',
+              dataSets: testCategoricalDataSetCategories[1].dataSets,
+            },
+            type: 'Feature',
+          },
+          {
+            id: testLocation3.id,
+            geometry: testGeoJsonFeature3.geometry,
+            properties: {
+              ...testGeoJsonFeature3.properties,
+              colour: '#801650',
+              data: 'medium',
+              dataSets: testCategoricalDataSetCategories[2].dataSets,
+            },
+            type: 'Feature',
+          },
+        ],
+      };
+      expect(result.features).toEqual(expectedFeatures);
+
+      const expectedLegendItems: MapLegendItem[] = [
+        {
+          colour: '#12436D',
+          value: 'large',
+        },
+        {
+          colour: '#28A197',
+          value: 'small',
+        },
+        {
+          colour: '#801650',
+          value: 'medium',
+        },
+      ];
+      expect(result.legendItems).toEqual(expectedLegendItems);
     });
 
-    const expectedFeatures: MapFeatureCollection = {
-      type: 'FeatureCollection',
-      features: [
+    test('generates the correct features and legend items for categorical data when sequential category colours is selected', () => {
+      const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
+        config: {
+          label: 'Indicator 1 (Time period 1)',
+          colour: '#12436D',
+          sequentialCategoryColours: true,
+        },
+        categoricalDataConfig: [
+          { colour: '#12436D', value: 'small' },
+          { colour: '#28A197', value: 'medium' },
+          { colour: '#801650', value: 'large' },
+        ],
+        dataGrouping: testDataGrouping,
+        dataKey: generateDataSetKey(testDataSet1, testTimePeriod1),
+        dataSet: expandDataSet(testDataSet1, testSubjectMeta),
+        rawDataSet: JSON.parse(
+          generateDataSetKey(testDataSet1, testTimePeriod1),
+        ),
+      };
+
+      const result = generateFeaturesAndDataGroups({
+        dataSetCategories: testCategoricalDataSetCategories,
+        selectedDataSetConfig: testSelectedDataSetConfig,
+      });
+
+      const expectedFeatures: MapFeatureCollection = {
+        type: 'FeatureCollection',
+        features: [
+          {
+            id: testLocation1.id,
+            geometry: testGeoJsonFeature1.geometry,
+            properties: {
+              ...testGeoJsonFeature1.properties,
+              colour: 'rgba(18, 67, 109, 1)',
+              data: 'large',
+              dataSets: testCategoricalDataSetCategories[0].dataSets,
+            },
+            type: 'Feature',
+          },
+          {
+            id: testLocation2.id,
+            geometry: testGeoJsonFeature2.geometry,
+            properties: {
+              ...testGeoJsonFeature2.properties,
+              colour: 'rgba(176, 192, 206, 1)',
+              data: 'small',
+              dataSets: testCategoricalDataSetCategories[1].dataSets,
+            },
+            type: 'Feature',
+          },
+          {
+            id: testLocation3.id,
+            geometry: testGeoJsonFeature3.geometry,
+            properties: {
+              ...testGeoJsonFeature3.properties,
+              colour: 'rgba(97, 130, 158, 1)',
+              data: 'medium',
+              dataSets: testCategoricalDataSetCategories[2].dataSets,
+            },
+            type: 'Feature',
+          },
+        ],
+      };
+      expect(result.features).toEqual(expectedFeatures);
+
+      const expectedLegendItems: MapLegendItem[] = [
         {
-          id: testLocation1.id,
-          geometry: testGeoJsonFeature1.geometry,
-          properties: {
-            ...testGeoJsonFeature1.properties,
-            colour: '#12436D',
-            data: 'large',
-            dataSets: testDataSetCategories[0].dataSets,
-          },
-          type: 'Feature',
+          colour: 'rgba(176, 192, 206, 1)',
+          value: 'small',
         },
         {
-          id: testLocation2.id,
-          geometry: testGeoJsonFeature2.geometry,
-          properties: {
-            ...testGeoJsonFeature2.properties,
-            colour: '#28A197',
-            data: 'small',
-            dataSets: testDataSetCategories[1].dataSets,
-          },
-          type: 'Feature',
+          colour: 'rgba(97, 130, 158, 1)',
+          value: 'medium',
         },
         {
-          id: testLocation3.id,
-          geometry: testGeoJsonFeature3.geometry,
-          properties: {
-            ...testGeoJsonFeature3.properties,
-            colour: '#801650',
-            data: 'medium',
-            dataSets: testDataSetCategories[2].dataSets,
-          },
-          type: 'Feature',
+          colour: 'rgba(18, 67, 109, 1)',
+          value: 'large',
         },
-      ],
-    };
-    expect(result.features).toEqual(expectedFeatures);
-
-    const expectedLegendItems: MapLegendItem[] = [
-      {
-        colour: '#12436D',
-        value: 'large',
-      },
-      {
-        colour: '#28A197',
-        value: 'small',
-      },
-      {
-        colour: '#801650',
-        value: 'medium',
-      },
-    ];
-    expect(result.legendItems).toEqual(expectedLegendItems);
-  });
-
-  test('generates the correct features and legend items for categorical data using deprecatedCategoricalDataConfig', () => {
-    const testDataSetCategories: MapDataSetCategory[] = [
-      {
-        dataSets: {
-          [generateDataSetKey(testDataSet1, testTimePeriod1)]: {
-            dataSet: testDataSet1,
-            value: 'large',
-          },
-        },
-        filter: testLocation1,
-        geoJson: testGeoJsonFeature1,
-      },
-      {
-        dataSets: {
-          [generateDataSetKey(testDataSet1, testTimePeriod1)]: {
-            dataSet: testDataSet2,
-            value: 'small',
-          },
-        },
-        filter: testLocation2,
-        geoJson: testGeoJsonFeature2,
-      },
-      {
-        dataSets: {
-          [generateDataSetKey(testDataSet1, testTimePeriod1)]: {
-            dataSet: testDataSet3,
-            value: 'medium',
-          },
-        },
-        filter: testLocation3,
-        geoJson: testGeoJsonFeature3,
-      },
-    ];
-    const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
-      config: {
-        label: 'Indicator 1 (Time period 1)',
-        colour: '#12436D',
-      },
-      categoricalDataConfig: [],
-      dataGrouping: testDataGrouping,
-      dataKey: generateDataSetKey(testDataSet1, testTimePeriod1),
-      dataSet: expandDataSet(testDataSet1, testSubjectMeta),
-      rawDataSet: JSON.parse(generateDataSetKey(testDataSet1, testTimePeriod1)),
-    };
-
-    const testDeprecatedCategoricalDataConfig: MapCategoricalData[] = [
-      {
-        value: 'large',
-        colour: '#12436D',
-      },
-      {
-        value: 'small',
-        colour: '#28A197',
-      },
-
-      {
-        value: 'medium',
-        colour: '#801650',
-      },
-    ];
-
-    const result = generateFeaturesAndDataGroups({
-      deprecatedCategoricalDataConfig: testDeprecatedCategoricalDataConfig,
-      dataSetCategories: testDataSetCategories,
-      selectedDataSetConfig: testSelectedDataSetConfig,
+      ];
+      expect(result.legendItems).toEqual(expectedLegendItems);
     });
 
-    const expectedFeatures: MapFeatureCollection = {
-      type: 'FeatureCollection',
-      features: [
-        {
-          id: testLocation1.id,
-          geometry: testGeoJsonFeature1.geometry,
-          properties: {
-            ...testGeoJsonFeature1.properties,
-            colour: '#12436D',
-            data: 'large',
-            dataSets: testDataSetCategories[0].dataSets,
-          },
-          type: 'Feature',
+    test('generates the correct features and legend items for categorical data using deprecatedCategoricalDataConfig', () => {
+      const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
+        config: {
+          label: 'Indicator 1 (Time period 1)',
+          colour: '#12436D',
         },
-        {
-          id: testLocation2.id,
-          geometry: testGeoJsonFeature2.geometry,
-          properties: {
-            ...testGeoJsonFeature2.properties,
-            colour: '#28A197',
-            data: 'small',
-            dataSets: testDataSetCategories[1].dataSets,
-          },
-          type: 'Feature',
-        },
-        {
-          id: testLocation3.id,
-          geometry: testGeoJsonFeature3.geometry,
-          properties: {
-            ...testGeoJsonFeature3.properties,
-            colour: '#801650',
-            data: 'medium',
-            dataSets: testDataSetCategories[2].dataSets,
-          },
-          type: 'Feature',
-        },
-      ],
-    };
-    expect(result.features).toEqual(expectedFeatures);
+        categoricalDataConfig: [],
+        dataGrouping: testDataGrouping,
+        dataKey: generateDataSetKey(testDataSet1, testTimePeriod1),
+        dataSet: expandDataSet(testDataSet1, testSubjectMeta),
+        rawDataSet: JSON.parse(
+          generateDataSetKey(testDataSet1, testTimePeriod1),
+        ),
+      };
 
-    const expectedLegendItems: MapLegendItem[] = [
-      {
-        colour: '#12436D',
-        value: 'large',
-      },
-      {
-        colour: '#28A197',
-        value: 'small',
-      },
-      {
-        colour: '#801650',
-        value: 'medium',
-      },
-    ];
-    expect(result.legendItems).toEqual(expectedLegendItems);
+      const testDeprecatedCategoricalDataConfig: MapCategoricalData[] = [
+        {
+          value: 'large',
+          colour: '#12436D',
+        },
+        {
+          value: 'small',
+          colour: '#28A197',
+        },
+
+        {
+          value: 'medium',
+          colour: '#801650',
+        },
+      ];
+
+      const result = generateFeaturesAndDataGroups({
+        deprecatedCategoricalDataConfig: testDeprecatedCategoricalDataConfig,
+        dataSetCategories: testCategoricalDataSetCategories,
+        selectedDataSetConfig: testSelectedDataSetConfig,
+      });
+
+      const expectedFeatures: MapFeatureCollection = {
+        type: 'FeatureCollection',
+        features: [
+          {
+            id: testLocation1.id,
+            geometry: testGeoJsonFeature1.geometry,
+            properties: {
+              ...testGeoJsonFeature1.properties,
+              colour: '#12436D',
+              data: 'large',
+              dataSets: testCategoricalDataSetCategories[0].dataSets,
+            },
+            type: 'Feature',
+          },
+          {
+            id: testLocation2.id,
+            geometry: testGeoJsonFeature2.geometry,
+            properties: {
+              ...testGeoJsonFeature2.properties,
+              colour: '#28A197',
+              data: 'small',
+              dataSets: testCategoricalDataSetCategories[1].dataSets,
+            },
+            type: 'Feature',
+          },
+          {
+            id: testLocation3.id,
+            geometry: testGeoJsonFeature3.geometry,
+            properties: {
+              ...testGeoJsonFeature3.properties,
+              colour: '#801650',
+              data: 'medium',
+              dataSets: testCategoricalDataSetCategories[2].dataSets,
+            },
+            type: 'Feature',
+          },
+        ],
+      };
+      expect(result.features).toEqual(expectedFeatures);
+
+      const expectedLegendItems: MapLegendItem[] = [
+        {
+          colour: '#12436D',
+          value: 'large',
+        },
+        {
+          colour: '#28A197',
+          value: 'small',
+        },
+        {
+          colour: '#801650',
+          value: 'medium',
+        },
+      ];
+      expect(result.legendItems).toEqual(expectedLegendItems);
+    });
   });
 });
