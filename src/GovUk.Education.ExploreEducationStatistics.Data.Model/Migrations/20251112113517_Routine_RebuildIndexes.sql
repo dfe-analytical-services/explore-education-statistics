@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE RebuildIndexes 
+CREATE OR ALTER PROCEDURE RebuildIndexes
     @Tables NVARCHAR(MAX), -- This is a comma-delimited list of table names e.g. "Observation, ObservationFilterItem".
     @FragmentationThresholdReorganize FLOAT = 5,
     @FragmentationThresholdRebuild FLOAT = 30,
@@ -13,7 +13,7 @@ BEGIN
         RETURN;
     END
 
-    DECLARE
+    DECLARE 
         @StatsCount INT,
         @StatsRowIndex INT = 1,
         @RunId INT,
