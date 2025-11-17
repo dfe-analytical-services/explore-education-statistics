@@ -299,7 +299,7 @@ const ReleaseContent = ({
                       className="govuk-!-margin-bottom-3"
                       preventDoubleClick
                       onClick={() =>
-                        releaseFileService.downloadAllFilesZip(release.id)
+                        releaseFileService.downloadFilesAsZip(release.id)
                       }
                     >
                       Download all data (ZIP)
@@ -462,7 +462,7 @@ const ReleaseContent = ({
           renderAllFilesLink={
             <ButtonText
               preventDoubleClick
-              onClick={() => releaseFileService.downloadAllFilesZip(release.id)}
+              onClick={() => releaseFileService.downloadFilesAsZip(release.id)}
             >
               Download all data (ZIP)
             </ButtonText>

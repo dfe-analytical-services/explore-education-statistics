@@ -111,6 +111,7 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
                 block={block}
                 releaseVersionId={release.id}
                 transformFeaturedTableLinks={transformFeaturedTableLinks}
+                visible
               />
             ))}
           </ReleasePageContentSection>
@@ -158,6 +159,7 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
                     block={block}
                     releaseVersionId={release.id}
                     transformFeaturedTableLinks={transformFeaturedTableLinks}
+                    visible
                   />
                 ))}
               </ReleasePageContentSection>

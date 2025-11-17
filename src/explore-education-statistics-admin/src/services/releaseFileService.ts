@@ -9,12 +9,17 @@ const releaseFileService = {
   //
   // Not easy to do though as this ZIP file is not currently from
   // Blob Storage but is created on-the-fly.
-  downloadAllFilesZip(releaseId: string): Promise<void> {
+  downloadFilesAsZip(releaseId: string, fileIds?: string[]): Promise<void> {
     return client
-      .get<Blob>(`/release/${releaseId}/files`, {
-        responseType: 'blob',
-        rawResponse: true,
-      })
+      .get<Blob>(
+        `/release/${releaseId}/files${
+          fileIds ? `/?fileIds=${fileIds.join(',')}` : ''
+        }`,
+        {
+          responseType: 'blob',
+          rawResponse: true,
+        },
+      )
       .then(({ data, headers }) => {
         const disposition = parseContentDisposition(
           headers['content-disposition'],
