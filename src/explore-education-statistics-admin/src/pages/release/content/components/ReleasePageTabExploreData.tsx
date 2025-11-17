@@ -125,7 +125,7 @@ const ReleasePageTabExploreData = ({ hidden }: Props) => {
           description={dataset.summary}
           actions={
             <>
-              <span className="govuk-link">
+              <span>
                 Create table{' '}
                 <VisuallyHidden>using {dataset.name}</VisuallyHidden>
               </span>
@@ -289,7 +289,7 @@ const ReleasePageTabExploreData = ({ hidden }: Props) => {
                       Data catalogue
                     </Link>
                   ) : (
-                    <span className="dfe-colour--link">
+                    <span>
                       Data catalogue (available when release is published)
                     </span>
                   )
