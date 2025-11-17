@@ -16,6 +16,11 @@ jest.mock('@common/hooks/useMedia', () => ({
       isMedia: mockIsMedia,
     };
   },
+  useDesktopMedia: () => {
+    return {
+      isMedia: mockIsMedia,
+    };
+  },
 }));
 
 const testReleaseContent = generateReleaseContent({});
