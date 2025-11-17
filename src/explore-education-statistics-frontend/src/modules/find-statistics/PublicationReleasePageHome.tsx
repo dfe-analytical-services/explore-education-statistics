@@ -40,6 +40,11 @@ const PublicationReleasePage = ({
 
   const { isMedia: isMobileMedia } = useMobileMedia();
 
+  // Update count includes 'first published' by default, but we only
+  // want to show 'actual' update number.
+  const updateCountExcludingFirstPublished =
+    releaseVersionSummary.updateCount - 1;
+
   return (
     <>
       {isMobileMedia && (
@@ -88,11 +93,12 @@ const PublicationReleasePage = ({
               </Link>
             }
             renderUpdatesLink={
-              releaseVersionSummary.updateCount > 1 ? (
+              updateCountExcludingFirstPublished > 0 ? (
                 <Link
                   to={`/find-statistics/${publicationSummary.slug}/${publicationSummary.latestRelease.slug}/updates`}
                 >
-                  {releaseVersionSummary.updateCount} updates{' '}
+                  {updateCountExcludingFirstPublished} update
+                  {updateCountExcludingFirstPublished === 1 ? '' : 's'}
                   <VisuallyHidden>
                     for `${releaseVersionSummary.title}`
                   </VisuallyHidden>

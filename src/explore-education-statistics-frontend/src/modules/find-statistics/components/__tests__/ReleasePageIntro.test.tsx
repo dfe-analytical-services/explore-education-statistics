@@ -302,4 +302,33 @@ describe('ReleasePageIntro', () => {
       }),
     ).toHaveAttribute('href', 'https://example.com');
   });
+
+  test('renders updates link when there are at least 2 updates', () => {
+    render(
+      <ReleasePageIntro
+        publicationSummary={testPublicationSummary}
+        releaseVersionSummary={testReleaseVersionSummary}
+      />,
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: '4 updates for Calendar year 2024 - Final',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/find-statistics/publication-slug/release-slug/updates',
+    );
+  });
+
+  test('does not render updates link when there are less than 2 updates', () => {
+    render(
+      <ReleasePageIntro
+        publicationSummary={testPublicationSummary}
+        releaseVersionSummary={{ ...testReleaseVersionSummary, updateCount: 1 }}
+      />,
+    );
+
+    expect(screen.queryByTestId('updates-link')).not.toBeInTheDocument();
+  });
 });

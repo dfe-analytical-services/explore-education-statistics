@@ -7,6 +7,7 @@ import ReleasePageTabMethodology from '@admin/pages/release/content/components/R
 import ReleasePageTitle from '@admin/pages/release/content/components/ReleasePageTitle';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import { useMobileMedia } from '@common/hooks/useMedia';
 import ReleaseSummaryBlock from '@common/modules/release/components/ReleaseSummaryBlock';
 import React, { Fragment, useCallback, useState } from 'react';
 
@@ -28,8 +29,14 @@ export const releasePageTabSections = {
 export type ReleasePageTabSectionItems = typeof releasePageTabSections;
 export type ReleasePageTabSectionKey = keyof ReleasePageTabSectionItems;
 
-const ReleaseContent = () => {
+const ReleaseContent = ({
+  transformFeaturedTableLinks,
+}: {
+  transformFeaturedTableLinks?: (url: string, text: string) => void;
+}) => {
   const { release } = useReleaseContentState();
+
+  const { isMedia: isMobileMedia } = useMobileMedia();
 
   const [activeTabSection, setActiveTabSection] =
     useState<ReleasePageTabSectionKey>('home');
@@ -48,7 +55,7 @@ const ReleaseContent = () => {
     [renderedTabs],
   );
 
-  const { publication } = release;
+  const { publication, publishingOrganisations, updates } = release;
 
   return (
     <>
@@ -58,41 +65,43 @@ const ReleaseContent = () => {
         releaseTitle={release.title}
       />
 
-      <ReleaseSummaryBlock
-        lastUpdated={release.updates[0]?.on}
-        releaseDate={release.published}
-        releaseType={release.type}
-        renderProducerLink={
-          release.publishingOrganisations?.length ? (
-            <span>
-              {release.publishingOrganisations.map((org, index) => (
-                <Fragment key={org.id}>
-                  {index > 0 && ' and '}
-                  <Link unvisited to={org.url}>
-                    {org.title}
-                  </Link>
-                </Fragment>
-              ))}
-            </span>
-          ) : (
-            <Link
-              unvisited
-              className="govuk-link--no-underline"
-              to="https://www.gov.uk/government/organisations/department-for-education"
-            >
-              Department for Education
-            </Link>
-          )
-        }
-        renderUpdatesLink={
-          release.updates.length > 1 ? (
-            <Link to="#">
-              {release.updates.length} updates{' '}
-              <VisuallyHidden>for {release.title}</VisuallyHidden>
-            </Link>
-          ) : undefined
-        }
-      />
+      {!isMobileMedia && (
+        <ReleaseSummaryBlock
+          lastUpdated={updates[0]?.on}
+          releaseDate={release.published}
+          releaseType={release.type}
+          renderProducerLink={
+            publishingOrganisations?.length ? (
+              <span>
+                {publishingOrganisations.map((org, index) => (
+                  <Fragment key={org.id}>
+                    {index > 0 && ' and '}
+                    <Link unvisited to={org.url}>
+                      {org.title}
+                    </Link>
+                  </Fragment>
+                ))}
+              </span>
+            ) : (
+              <Link
+                unvisited
+                className="govuk-link--no-underline"
+                to="https://www.gov.uk/government/organisations/department-for-education"
+              >
+                Department for Education
+              </Link>
+            )
+          }
+          renderUpdatesLink={
+            updates.length > 0 ? (
+              <span>
+                {updates.length} update{updates.length === 1 ? '' : 's'}
+                <VisuallyHidden>for {release.title}</VisuallyHidden>
+              </span>
+            ) : undefined
+          }
+        />
+      )}
 
       <ReleasePageTabBar
         activeTab={activeTabSection}
@@ -100,7 +109,10 @@ const ReleaseContent = () => {
       />
 
       {renderedTabs.includes('home') && (
-        <ReleasePageTabHome hidden={activeTabSection !== 'home'} />
+        <ReleasePageTabHome
+          hidden={activeTabSection !== 'home'}
+          transformFeaturedTableLinks={transformFeaturedTableLinks}
+        />
       )}
       {renderedTabs.includes('explore') && (
         <ReleasePageTabExploreData hidden={activeTabSection !== 'explore'} />

@@ -1,7 +1,6 @@
 /* eslint-disable react/destructuring-assignment */
 import { NavItem } from '@common/components/PageNavExpandable';
-import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
-import getNavItemsFromHtml from '@common/components/util/getNavItemsFromHtml';
+import getNavItemsFromContentSections from '@common/components/util/getNavItemsFromContentSections';
 import { contactUsNavItem } from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import publicationService, {
   PreReleaseAccessListSummary,
@@ -187,28 +186,6 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
             const { summarySection, content } = homeContent;
 
             const hasSummarySection = summarySection.content.length > 0;
-            // Get nav items for section headings (h2) and parse the section's
-            // HtmlBlocks for h3 headings to generate subNavItems
-            const contentSectionsItems = content.map(section => {
-              const { heading, content: sectionContent } = section;
-              const subNavItems = sectionContent
-                .flatMap(block => {
-                  if (block.type === 'HtmlBlock') {
-                    return getNavItemsFromHtml({
-                      html: block.body,
-                      blockId: block.id,
-                    });
-                  }
-                  return null;
-                })
-                .filter(item => !!item);
-
-              return {
-                id: generateIdFromHeading(heading),
-                text: heading,
-                subNavItems,
-              };
-            });
 
             return {
               props: {
@@ -224,7 +201,7 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
                     id: 'headlines-section',
                     text: 'Headline facts and figures',
                   },
-                  ...contentSectionsItems,
+                  ...getNavItemsFromContentSections(content),
                   contactUsNavItem,
                 ].filter(item => !!item),
               },

@@ -8,6 +8,15 @@ import { screen, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 
+let mockIsMedia = false;
+jest.mock('@common/hooks/useMedia', () => ({
+  useMobileMedia: () => {
+    return {
+      isMedia: mockIsMedia,
+    };
+  },
+}));
+
 const testReleaseContent = generateReleaseContent({});
 const renderWithContext = (
   component: React.ReactNode,
@@ -28,10 +37,20 @@ const renderWithContext = (
   );
 
 describe('ReleaseContentRedesign', () => {
-  test('renders the publication summary', () => {
+  test('renders the publication summary on desktop', () => {
     renderWithContext(<ReleaseContentRedesign />);
 
     expect(screen.getByTestId('release-summary-block')).toBeInTheDocument();
+  });
+
+  test('does not render the publication summary on mobile', () => {
+    mockIsMedia = true;
+    renderWithContext(<ReleaseContentRedesign />);
+
+    expect(
+      screen.queryByTestId('release-summary-block'),
+    ).not.toBeInTheDocument();
+    mockIsMedia = false;
   });
 
   test('tabs render when expected', async () => {

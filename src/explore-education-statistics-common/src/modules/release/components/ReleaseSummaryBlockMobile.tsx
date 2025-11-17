@@ -10,7 +10,7 @@ import React, { ReactNode } from 'react';
 
 interface Props {
   isEditing?: boolean;
-  lastUpdated?: string;
+  lastUpdated?: string | Date;
   releaseType: ReleaseType;
   renderProducerLink: ReactNode;
   renderSubscribeLink?: ReactNode;
