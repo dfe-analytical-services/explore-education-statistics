@@ -14,28 +14,40 @@ public class ReleaseNoteController(IReleaseNoteService releaseNoteService) : Con
     [HttpPost("release/{releaseVersionId:guid}/content/release-note")]
     public async Task<ActionResult<List<ReleaseNoteViewModel>>> AddReleaseNote(
         ReleaseNoteSaveRequest saveRequest,
-        Guid releaseVersionId
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default
     ) =>
         await releaseNoteService
-            .AddReleaseNote(releaseVersionId, saveRequest)
+            .AddReleaseNote(releaseVersionId, saveRequest, cancellationToken)
             .HandleFailuresOr(result => Created(HttpContext.Request.Path, result));
 
     [HttpPut("release/{releaseVersionId:guid}/content/release-note/{releaseNoteId:guid}")]
     public async Task<ActionResult<List<ReleaseNoteViewModel>>> UpdateReleaseNote(
         ReleaseNoteSaveRequest saveRequest,
         Guid releaseVersionId,
-        Guid releaseNoteId
+        Guid releaseNoteId,
+        CancellationToken cancellationToken = default
     ) =>
         await releaseNoteService
-            .UpdateReleaseNote(releaseVersionId: releaseVersionId, releaseNoteId: releaseNoteId, saveRequest)
+            .UpdateReleaseNote(
+                releaseVersionId: releaseVersionId,
+                releaseNoteId: releaseNoteId,
+                saveRequest,
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
 
     [HttpDelete("release/{releaseVersionId:guid}/content/release-note/{releaseNoteId:guid}")]
     public async Task<ActionResult<List<ReleaseNoteViewModel>>> DeleteReleaseNote(
         Guid releaseVersionId,
-        Guid releaseNoteId
+        Guid releaseNoteId,
+        CancellationToken cancellationToken = default
     ) =>
         await releaseNoteService
-            .DeleteReleaseNote(releaseVersionId: releaseVersionId, releaseNoteId: releaseNoteId)
+            .DeleteReleaseNote(
+                releaseVersionId: releaseVersionId,
+                releaseNoteId: releaseNoteId,
+                cancellationToken: cancellationToken
+            )
             .HandleFailuresOrOk();
 }

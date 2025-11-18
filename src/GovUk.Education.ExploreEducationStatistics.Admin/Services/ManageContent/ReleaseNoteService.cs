@@ -36,7 +36,8 @@ public class ReleaseNoteService : IReleaseNoteService
 
     public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> AddReleaseNote(
         Guid releaseVersionId,
-        ReleaseNoteSaveRequest saveRequest
+        ReleaseNoteSaveRequest saveRequest,
+        CancellationToken cancellationToken = default
     )
     {
         return _persistenceHelper
@@ -56,7 +57,7 @@ public class ReleaseNoteService : IReleaseNoteService
                     }
                 );
 
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
                 return GetReleaseNoteViewModels(releaseVersion.Id);
             });
     }
@@ -64,7 +65,8 @@ public class ReleaseNoteService : IReleaseNoteService
     public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> UpdateReleaseNote(
         Guid releaseVersionId,
         Guid releaseNoteId,
-        ReleaseNoteSaveRequest saveRequest
+        ReleaseNoteSaveRequest saveRequest,
+        CancellationToken cancellationToken = default
     )
     {
         return _persistenceHelper
@@ -83,14 +85,15 @@ public class ReleaseNoteService : IReleaseNoteService
                 releaseNote.Reason = saveRequest.Reason;
 
                 _context.Update.Update(releaseNote);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
                 return GetReleaseNoteViewModels(releaseVersion.Id);
             });
     }
 
     public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> DeleteReleaseNote(
         Guid releaseVersionId,
-        Guid releaseNoteId
+        Guid releaseNoteId,
+        CancellationToken cancellationToken = default
     )
     {
         return _persistenceHelper
@@ -106,7 +109,7 @@ public class ReleaseNoteService : IReleaseNoteService
                 }
 
                 _context.Update.Remove(releaseNote);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
                 return GetReleaseNoteViewModels(releaseVersion.Id);
             });
     }

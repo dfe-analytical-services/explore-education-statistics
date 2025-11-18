@@ -9,14 +9,20 @@ public interface IReleaseNoteService
 {
     Task<Either<ActionResult, List<ReleaseNoteViewModel>>> AddReleaseNote(
         Guid releaseVersionId,
-        ReleaseNoteSaveRequest saveRequest
+        ReleaseNoteSaveRequest saveRequest,
+        CancellationToken cancellationToken = default
     );
 
     Task<Either<ActionResult, List<ReleaseNoteViewModel>>> UpdateReleaseNote(
         Guid releaseVersionId,
         Guid releaseNoteId,
-        ReleaseNoteSaveRequest saveRequest
+        ReleaseNoteSaveRequest saveRequest,
+        CancellationToken cancellationToken = default
     );
 
-    Task<Either<ActionResult, List<ReleaseNoteViewModel>>> DeleteReleaseNote(Guid releaseVersionId, Guid releaseNoteId);
+    Task<Either<ActionResult, List<ReleaseNoteViewModel>>> DeleteReleaseNote(
+        Guid releaseVersionId,
+        Guid releaseNoteId,
+        CancellationToken cancellationToken = default
+    );
 }
