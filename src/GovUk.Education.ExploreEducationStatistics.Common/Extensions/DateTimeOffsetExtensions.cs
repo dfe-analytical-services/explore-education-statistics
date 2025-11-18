@@ -1,6 +1,3 @@
-using System.Diagnostics.Contracts;
-using System.Runtime.InteropServices;
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 public static class DateTimeOffsetExtensions
@@ -95,53 +92,47 @@ public static class DateTimeOffsetExtensions
         return TruncateNanoseconds(offset.Value);
     }
 
-    [Pure]
-    private static DateTimeOffset AsXOfDayForTimeZone(
-        this DateTimeOffset instant,
-        DayPeriod period,
-        TimeZoneInfo timeZone = null
-    )
+    public static DateTimeOffset GetUkStartOfDayOn(this DateTimeOffset dateTime, int daysAfter = 0)
     {
-        timeZone ??= DateTimeExtensions.GetUkTimeZone();
-        var local = TimeZoneInfo.ConvertTime(instant, timeZone);
+        // Convert the source instant to the UK local time
+        var ukLocal = dateTime.ConvertToUkTimeZone(); // returns DateTimeOffset with UK offset
 
-        var localMidnightDateTime =
-            period == DayPeriod.LastTick
-                ? new DateTime(local.Year, local.Month, local.Day, 23, 59, 59, DateTimeKind.Unspecified)
-            : period == DayPeriod.Midnight
-                ? new DateTime(local.Year, local.Month, local.Day, 0, 0, 0, DateTimeKind.Unspecified)
-            : throw new ArgumentException("Invalid day period");
-        var offset = timeZone.GetUtcOffset(localMidnightDateTime);
-        var lastTickOrMidnightOfDayLocal = new DateTimeOffset(localMidnightDateTime, offset);
+        // Get the local calendar date in UK, then add days
+        var targetUkLocalDate = ukLocal.Date.AddDays(daysAfter); // Date is midnight of that day (DateTime)
 
-        return lastTickOrMidnightOfDayLocal;
+        // Get the correct offset for that local UK date (handles DST transitions)
+        var targetUkOffset = targetUkLocalDate.GetUkOffset();
+
+        // Return DateTimeOffset with the correct offset for UK at that local midnight
+        return new DateTimeOffset(targetUkLocalDate, targetUkOffset);
     }
 
-    [Pure]
-    public static DateTimeOffset AsStartOfDayForUkTimeZone(this DateTimeOffset instant, TimeZoneInfo timeZone = null) =>
-        AsXOfDayForTimeZone(instant, DayPeriod.Midnight, timeZone);
-
-    [Pure]
-    public static DateTimeOffset AsEndOfDayForUkTimeZone(this DateTimeOffset instant, TimeZoneInfo timeZone = null) =>
-        AsXOfDayForTimeZone(instant, DayPeriod.LastTick, timeZone);
-
-    public static bool IsSameLocalDay(this DateTimeOffset date1, DateTimeOffset date2)
+    public static DateTimeOffset GetUkEndOfDayOn(this DateTimeOffset dateTimeOffset, int daysAfter = 0)
     {
-        var ukDate1 = date1.ConvertToUkTimeZone();
-        var ukDate2 = date2.ConvertToUkTimeZone();
-        return ukDate1.Date == ukDate2.Date;
-    }
+        // Convert the source instant to the UK local time
+        var ukLocal = dateTimeOffset.ConvertToUkTimeZone(); // returns DateTimeOffset with UK offset
 
-    [Pure]
-    public static DateTimeOffset ConvertToUkTimeZone(this DateTimeOffset dateTime) =>
-        TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
-            dateTime,
-            RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "GMT Standard Time" : "Europe/London"
+        // Get the local calendar date in UK, then add days
+        var targetUkLocalDate = ukLocal.Date.AddDays(daysAfter); // Date is midnight of that day (DateTime)
+
+        // Get the correct offset for that local UK date (handles DST transitions)
+        var targetUkOffset = targetUkLocalDate.GetUkOffset();
+
+        // Return DateTimeOffset with the correct offset for UK at that local end-of-day
+        return new DateTimeOffset(
+            targetUkLocalDate.Year,
+            targetUkLocalDate.Month,
+            targetUkLocalDate.Day,
+            23,
+            59,
+            59,
+            targetUkOffset
         );
-}
+    }
 
-public enum DayPeriod
-{
-    Midnight,
-    LastTick,
+    public static bool IsSameCalendarDay(this DateTimeOffset dateTime1, DateTimeOffset dateTime2) =>
+        dateTime1.UtcDateTime.Date == dateTime2.UtcDateTime.Date;
+
+    public static DateTimeOffset ConvertToUkTimeZone(this DateTimeOffset dateTime) =>
+        TimeZoneInfo.ConvertTime(dateTime, DateTimeExtensions.GetUkTimeZone());
 }

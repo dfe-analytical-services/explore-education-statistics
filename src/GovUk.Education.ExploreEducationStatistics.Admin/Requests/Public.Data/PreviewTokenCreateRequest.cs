@@ -19,6 +19,7 @@ public record PreviewTokenCreateRequest
 
     /// <summary>
     /// Business rules:
+    /// - Must always be set to 23:59:59 in UK time
     /// - If Activates is set: Expires must fall between Activates and Activates + 7 days
     /// - Else:                Expires must fall between now and now + 7 days
     /// </summary>
@@ -31,7 +32,7 @@ public record PreviewTokenCreateRequest
         public Validator(TimeProvider currentTime)
         {
             var nowUk = currentTime.GetUtcNow().ConvertToUkTimeZone();
-            var sevenDaysFromNowUkLastTick = GetLocalUkLastTickXDaysFrom(nowUk, 7);
+            var endOfDay7DaysFromNowUk = nowUk.GetUkEndOfDayOn(7);
 
             When(
                 r => r.Activates.HasValue,
@@ -41,19 +42,19 @@ public record PreviewTokenCreateRequest
                         .Cascade(CascadeMode.Stop)
                         .Must(activates =>
                         {
-                            var nowWithTolerance = nowUk.AddSeconds(-ToleranceSeconds);
-                            var isValid = activates!.Value >= nowWithTolerance;
-                            return isValid;
+                            var nowUkWithTolerance = nowUk.AddSeconds(-ToleranceSeconds);
+
+                            return activates >= nowUkWithTolerance;
                         })
                         .WithMessage("Activates date must not be in the past.")
-                        .Must(activates => activates!.Value <= sevenDaysFromNowUkLastTick)
+                        .Must(activates => activates < endOfDay7DaysFromNowUk)
                         .WithMessage("Activates date must be within the next 7 days.")
                         .Must(activates =>
                         {
-                            var activatesMidnightUk = activates!.Value.AsStartOfDayForUkTimeZone();
-                            var isMidnightInUk = activatesMidnightUk == activates;
-                            var isValid = activates.Value.IsSameLocalDay(nowUk) || isMidnightInUk;
-                            return isValid;
+                            var startOfDayOnActivatesDateUk = activates!.Value.GetUkStartOfDayOn();
+                            var activatesIsStartOfDayUk = startOfDayOnActivatesDateUk == activates;
+
+                            return activates.Value.IsSameCalendarDay(nowUk) || activatesIsStartOfDayUk;
                         })
                         .WithMessage(
                             "Activates time must be set to midnight UK local time when it's not today's date."
@@ -71,15 +72,14 @@ public record PreviewTokenCreateRequest
                             {
                                 RuleFor(r => r.Expires)
                                     .Cascade(CascadeMode.Stop)
-                                    .Must((r, expires) => expires!.Value != r.Activates!.Value)
-                                    .WithMessage("Expires date must not be the same dates as the activates date.")
-                                    .Must((r, expires) => expires!.Value > r.Activates!.Value)
+                                    .Must((r, expires) => expires > r.Activates)
                                     .WithMessage("Expires date must be after the activates date.")
                                     .Must(
                                         (r, expires) =>
                                         {
-                                            var daysBetween = (expires!.Value.Date - r.Activates!.Value.Date).Days;
-                                            return daysBetween < 8;
+                                            var endOfDay7DaysFromActivatesUk = r.Activates!.Value.GetUkEndOfDayOn(7);
+
+                                            return expires <= endOfDay7DaysFromActivatesUk;
                                         }
                                     )
                                     .WithMessage("Expires date must be no more than 7 days after the activates date.");
@@ -89,41 +89,26 @@ public record PreviewTokenCreateRequest
                         {
                             RuleFor(r => r.Expires)
                                 .Cascade(CascadeMode.Stop)
-                                .Must(expires => expires!.Value >= nowUk)
+                                .Must(expires => expires > nowUk)
                                 .WithMessage("Expires date must not be in the past.")
-                                .Must(expires =>
-                                {
-                                    var expiresUkLastTick = expires!.Value.AsEndOfDayForUkTimeZone();
-                                    var isValid = expiresUkLastTick <= sevenDaysFromNowUkLastTick;
-                                    return isValid;
-                                })
+                                .Must(expires => expires <= endOfDay7DaysFromNowUk)
                                 .WithMessage("Expires date must be no more than 7 days from today.");
                         });
                     RuleFor(r => r.Expires)
                         .Must(
                             (r, expires) =>
                             {
-                                var expiresUkLastTick = expires!.Value.AsEndOfDayForUkTimeZone();
-                                var isEndOfExpiresDay = expires == expiresUkLastTick;
+                                var endOfDayOnExpiryDateUk = expires!.Value.GetUkEndOfDayOn();
 
-                                var isValid =
-                                    r.Activates.HasValue && r.Activates!.Value.IsSameLocalDay(nowUk)
-                                    || isEndOfExpiresDay;
-                                return isValid;
+                                return expires == endOfDayOnExpiryDateUk;
                             }
                         )
-                        .WithMessage("Expires time must be at 23:59:59 UK local time for that date.");
+                        .WithMessage("Expires time must always be at 23:59:59 UK local time.");
                 }
             );
 
             RuleFor(r => r.DataSetVersionId).NotEmpty();
             RuleFor(r => r.Label).NotEmpty().MaximumLength(100);
-        }
-
-        private static DateTimeOffset GetLocalUkLastTickXDaysFrom(DateTimeOffset date, int days)
-        {
-            var xDaysFromGivenDate = date.AddDays(days);
-            return xDaysFromGivenDate.AsEndOfDayForUkTimeZone();
         }
     }
 }

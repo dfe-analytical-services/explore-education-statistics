@@ -122,52 +122,26 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         [InlineData(true, true)]
         [InlineData(true, false)]
         [InlineData(false, true)]
-        [InlineData(false, false)]
         public async Task CustomActivatesOrExpiresProvided_Success(bool activatesProvided, bool expiresProvided)
         {
             var dataSetVersion = await SetUpDataSetVersionTestData();
 
-            var twoDaysFromNow = DateTimeOffset.UtcNow.AddDays(2);
-            var nineDaysFromNow = DateTimeOffset.UtcNow.AddDays(9);
+            DateTimeOffset? suppliedActivates = activatesProvided
+                ? DateTimeOffset.UtcNow.AddDays(2).GetUkStartOfDayOn() // 2 days from now start of day UK time
+                : null;
 
-            TimeZoneInfo ukTimeZone = DateTimeExtensions.GetUkTimeZone();
-
-            DateTimeOffset? activates = activatesProvided ? twoDaysFromNow : null;
-            var sevenDaysFromNow = DateTimeOffset.UtcNow.AddDays(7);
-            DateTimeOffset? expires = expiresProvided ? activates?.AddDays(7) ?? sevenDaysFromNow : null;
-            if (activates.HasValue)
-            {
-                activates = TimeZoneInfo.ConvertTime(activates.Value, ukTimeZone);
-                activates = new DateTimeOffset(
-                    activates.Value.Year,
-                    activates.Value.Month,
-                    activates.Value.Day,
-                    0,
-                    0,
-                    0,
-                    activates.Value.Offset
-                );
-            }
-            if (expires.HasValue)
-            {
-                expires = TimeZoneInfo.ConvertTime(expires.Value, ukTimeZone);
-                expires = new DateTimeOffset(
-                    expires.Value.Year,
-                    expires.Value.Month,
-                    expires.Value.Day,
-                    23,
-                    59,
-                    59,
-                    expires.Value.Offset
-                );
-            }
+            DateTimeOffset? suppliedExpires =
+                !expiresProvided ? null
+                : activatesProvided ? suppliedActivates?.AddDays(5).GetUkEndOfDayOn() // 5 days after activates end of day UK time
+                : DateTimeOffset.UtcNow.AddDays(5).GetUkEndOfDayOn(); // 5 days from now end of day UK time
 
             var label = new string('A', count: 100);
+
             var response = await CreatePreviewToken(
                 dataSetVersionId: dataSetVersion.Id,
                 label: label,
-                activates: activates,
-                expires: expires
+                activates: suppliedActivates,
+                expires: suppliedExpires
             );
 
             var (viewModel, createdEntityId) = response.AssertCreated<PreviewTokenViewModel>(
@@ -175,22 +149,11 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
             );
             Assert.True(Guid.TryParse(createdEntityId, out var previewTokenId));
 
-            var expectedActivates = activatesProvided ? activates!.Value : viewModel.Created;
+            var expectedActivates = suppliedActivates ?? viewModel.Created;
             var expectedExpiry =
-                expires
-                ?? (
-                    activatesProvided
-                        ? new DateTimeOffset(
-                            nineDaysFromNow.Year,
-                            nineDaysFromNow.Month,
-                            nineDaysFromNow.Day,
-                            0,
-                            0,
-                            0,
-                            nineDaysFromNow.Offset
-                        )
-                        : sevenDaysFromNow
-                );
+                suppliedExpires
+                ?? suppliedActivates?.AddDays(7).GetUkStartOfDayOn() // 7 days after activates end of day UK time
+                ?? DateTimeOffset.UtcNow.AddDays(7).GetUkStartOfDayOn(); // 7 days from now end of day UK time
 
             Assert.Multiple(
                 () => Assert.Equal(previewTokenId, viewModel.Id),

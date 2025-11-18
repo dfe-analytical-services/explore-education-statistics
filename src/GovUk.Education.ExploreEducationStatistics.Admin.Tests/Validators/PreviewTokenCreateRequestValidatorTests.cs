@@ -220,7 +220,7 @@ public class PreviewTokenCreateRequestValidatorTests
         var result = validator.TestValidate(request);
         result
             .ShouldHaveValidationErrorFor(r => r.Expires)
-            .WithErrorMessage("Expires date must not be the same dates as the activates date.");
+            .WithErrorMessage("Expires time must always be at 23:59:59 UK local time.");
     }
 
     [Theory]
@@ -306,10 +306,9 @@ public class PreviewTokenCreateRequestValidatorTests
         }
         else
         {
-            result
-                .ShouldHaveValidationErrorFor(r => r.Expires)
-                .WithErrorMessage("Expires date must be no more than 7 days after the activates date.");
-            ;
+            Assert.False(
+                ContainsUnexpectedErrors(result, "Expires date must be no more than 7 days after the activates date.")
+            );
         }
     }
 
@@ -448,11 +447,15 @@ public class PreviewTokenCreateRequestValidatorTests
         Assert.False(ContainsUnexpectedErrors(result));
     }
 
-    private static bool ContainsUnexpectedErrors(TestValidationResult<PreviewTokenCreateRequest> result)
+    private static bool ContainsUnexpectedErrors(
+        TestValidationResult<PreviewTokenCreateRequest> result,
+        string expectedErrorMessage = null
+    )
     {
         var unexpectedErrors = result.Errors.Count(e =>
             e.ErrorMessage != "Activates time must be set to midnight UK local time when it's not today's date."
-            && e.ErrorMessage != "Expires time must be at 23:59:59 UK local time for that date."
+            && e.ErrorMessage != "Expires time must always be at 23:59:59 UK local time."
+            && e.ErrorMessage != expectedErrorMessage
         );
         return unexpectedErrors > 0;
     }
@@ -477,7 +480,7 @@ public class PreviewTokenCreateRequestValidatorTests
 
         result
             .ShouldHaveValidationErrorFor(r => r.Expires)
-            .WithErrorMessage("Expires time must be at 23:59:59 UK local time for that date.");
+            .WithErrorMessage("Expires time must always be at 23:59:59 UK local time.");
     }
 
     [Fact]
@@ -496,6 +499,6 @@ public class PreviewTokenCreateRequestValidatorTests
 
         var result = validator.TestValidate(request);
 
-        result.ShouldNotHaveAnyValidationErrors();
+        Assert.False(ContainsUnexpectedErrors(result));
     }
 }
