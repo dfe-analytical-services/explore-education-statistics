@@ -17,54 +17,66 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         string connectionString,
         HostBuilderContext hostBuilderContext,
-        Action<DbContextOptionsBuilder>? optionsConfiguration = null)
+        Action<DbContextOptionsBuilder>? optionsConfiguration = null
+    )
         where TDbContext : DbContext =>
         hostBuilderContext.HostingEnvironment.IsDevelopment()
             ? services.AddDevelopmentPsqlDbContext<TDbContext>(connectionString)
             : services.AddFunctionAppManagedIdentityPsqlDbContext<TDbContext>(
                 connectionString,
                 hostBuilderContext.Configuration,
-                optionsConfiguration);
+                optionsConfiguration
+            );
 
     public static IServiceCollection AddPsqlDbContext<TDbContext>(
         this IServiceCollection services,
         string connectionString,
         IHostEnvironment hostEnvironment,
-        Action<DbContextOptionsBuilder>? optionsConfiguration = null)
+        Action<DbContextOptionsBuilder>? optionsConfiguration = null
+    )
         where TDbContext : DbContext =>
         hostEnvironment.IsDevelopment()
             ? services.AddDevelopmentPsqlDbContext<TDbContext>(connectionString)
             : services.AddManagedIdentityPsqlDbContext<TDbContext>(
                 connectionString,
-                optionsConfiguration);
+                optionsConfiguration
+            );
 
     private static IServiceCollection AddFunctionAppManagedIdentityPsqlDbContext<TDbContext>(
         this IServiceCollection services,
         string connectionString,
         IConfiguration configuration,
-        Action<DbContextOptionsBuilder>? optionsConfiguration = null)
+        Action<DbContextOptionsBuilder>? optionsConfiguration = null
+    )
         where TDbContext : DbContext
     {
-        // Unlike Container Apps and App Services, DefaultAzureCredential does not pick up 
+        // Unlike Container Apps and App Services, DefaultAzureCredential does not pick up
         // the "AZURE_CLIENT_ID" environment variable automatically when operating within
         // a Function App.  We therefore provide it manually.
         var clientId = configuration["AZURE_CLIENT_ID"];
         return services.RegisterManagedIdentityPsqlDbContext<TDbContext>(
-            connectionString, clientId, optionsConfiguration);
+            connectionString,
+            clientId,
+            optionsConfiguration
+        );
     }
 
     private static IServiceCollection AddManagedIdentityPsqlDbContext<TDbContext>(
         this IServiceCollection services,
         string connectionString,
-        Action<DbContextOptionsBuilder>? optionsConfiguration = null)
+        Action<DbContextOptionsBuilder>? optionsConfiguration = null
+    )
         where TDbContext : DbContext =>
         services.RegisterManagedIdentityPsqlDbContext<TDbContext>(
-            connectionString, optionsConfiguration: optionsConfiguration);
+            connectionString,
+            optionsConfiguration: optionsConfiguration
+        );
 
     private static IServiceCollection AddDevelopmentPsqlDbContext<TDbContext>(
         this IServiceCollection services,
         string connectionString,
-        Action<DbContextOptionsBuilder>? optionsConfiguration = null)
+        Action<DbContextOptionsBuilder>? optionsConfiguration = null
+    )
         where TDbContext : DbContext
     {
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
@@ -77,10 +89,9 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<TDbContext>(options =>
         {
             options
-                .UseNpgsql(
-                    dataSource,
-                    psqlOptions => psqlOptions.EnableRetryOnFailure())
-                .EnableSensitiveDataLogging();
+                .UseNpgsql(dataSource, psqlOptions => psqlOptions.EnableRetryOnFailure())
+                .EnableSensitiveDataLogging()
+                .EnableDetailedErrors();
 
             optionsConfiguration?.Invoke(options);
         });
@@ -92,32 +103,41 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         string connectionString,
         string? managedIdentityClientId = null,
-        Action<DbContextOptionsBuilder>? optionsConfiguration = null)
+        Action<DbContextOptionsBuilder>? optionsConfiguration = null
+    )
         where TDbContext : DbContext
     {
-        var accessTokenProvider = managedIdentityClientId != null
-            ? new DefaultAzureCredential(
-                new DefaultAzureCredentialOptions {ManagedIdentityClientId = managedIdentityClientId})
-            : new DefaultAzureCredential();
+        var accessTokenProvider =
+            managedIdentityClientId != null
+                ? new DefaultAzureCredential(
+                    new DefaultAzureCredentialOptions
+                    {
+                        ManagedIdentityClientId = managedIdentityClientId,
+                    }
+                )
+                : new DefaultAzureCredential();
 
         var dataSource = new NpgsqlDataSourceBuilder(connectionString)
-            .UsePeriodicPasswordProvider(async (_, cancellationToken) =>
-            {
-                var tokenResponse = await accessTokenProvider
-                    .GetTokenAsync(new TokenRequestContext([
-                        "https://ossrdbms-aad.database.windows.net/.default"
-                    ]), cancellationToken);
+            .UsePeriodicPasswordProvider(
+                async (_, cancellationToken) =>
+                {
+                    var tokenResponse = await accessTokenProvider.GetTokenAsync(
+                        new TokenRequestContext(
+                            ["https://ossrdbms-aad.database.windows.net/.default"]
+                        ),
+                        cancellationToken
+                    );
 
-                return tokenResponse.Token;
-            }, TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(5))
+                    return tokenResponse.Token;
+                },
+                TimeSpan.FromMinutes(1),
+                TimeSpan.FromSeconds(5)
+            )
             .Build();
 
         services.AddDbContext<TDbContext>(options =>
         {
-            options
-                .UseNpgsql(
-                    dataSource,
-                    psqlOptions => psqlOptions.EnableRetryOnFailure());
+            options.UseNpgsql(dataSource, psqlOptions => psqlOptions.EnableRetryOnFailure());
 
             optionsConfiguration?.Invoke(options);
         });

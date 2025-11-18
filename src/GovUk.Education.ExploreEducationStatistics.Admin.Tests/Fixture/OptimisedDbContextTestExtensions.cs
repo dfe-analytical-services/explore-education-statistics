@@ -8,7 +8,8 @@ public static class OptimisedDbContextTestExtensions
 {
     public static async Task AddTestData<TDbContext>(
         this TDbContext context,
-        Action<TDbContext> supplier)
+        Action<TDbContext> supplier
+    )
         where TDbContext : DbContext
     {
         supplier.Invoke(context);

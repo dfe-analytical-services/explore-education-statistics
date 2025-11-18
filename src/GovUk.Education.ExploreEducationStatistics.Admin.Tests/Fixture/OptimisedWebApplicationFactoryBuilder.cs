@@ -38,11 +38,13 @@ using Testcontainers.PostgreSql;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 
 public class OptimisedWebApplicationFactoryBuilder<TStartup>(
-    WebApplicationFactory<TStartup> factory) where TStartup : class
+    WebApplicationFactory<TStartup> factory
+)
+    where TStartup : class
 {
     private readonly List<Action<IServiceCollection>> _serviceRegistrations = [];
     private readonly List<Action<IConfigurationBuilder>> _configRegistrations = [];
-    
+
     public WebApplicationFactory<TStartup> Build()
     {
         return factory.WithWebHostBuilder(builder =>
@@ -55,19 +57,27 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
                 {
                     _serviceRegistrations.ForEach(registrations => registrations.Invoke(services));
                 })
-                .ConfigureAppConfiguration((_, config) =>
-                {
-                    _configRegistrations.ForEach(registrations => registrations.Invoke(config));
-                })
+                .ConfigureAppConfiguration(
+                    (_, config) =>
+                    {
+                        _configRegistrations.ForEach(registrations => registrations.Invoke(config));
+                    }
+                )
                 .ConfigureAppConfiguration(config =>
                 {
-                    config.AddConfiguration(new ConfigurationBuilder()
-                        .AddJsonFile($"appsettings.{HostEnvironmentExtensions.IntegrationTestEnvironment}.json", optional: true)
-                        .Build());
-                });;
+                    config.AddConfiguration(
+                        new ConfigurationBuilder()
+                            .AddJsonFile(
+                                $"appsettings.{HostEnvironmentExtensions.IntegrationTestEnvironment}.json",
+                                optional: true
+                            )
+                            .Build()
+                    );
+                });
+            ;
         });
     }
-    
+
     // protected override IHostBuilder CreateHostBuilder()
     // {
     //     return Host
@@ -99,28 +109,36 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
     //             //     .Build());
     //         });
     // }
-    
+
     public OptimisedWebApplicationFactoryBuilder<TStartup> WithAdmin()
     {
         _serviceRegistrations.Add(RegisterAdminServices);
         return this;
     }
-    
+
     public OptimisedWebApplicationFactoryBuilder<TStartup> WithAzurite(
-        AzuriteContainer testContainer)
+        AzuriteContainer testContainer
+    )
     {
-        _serviceRegistrations.Add(services => RegisterAzuriteServices(services, testContainer.GetConnectionString()));
-        _configRegistrations.Add(config => RegisterAzuriteAppConfiguration(config, testContainer.GetConnectionString()));
+        _serviceRegistrations.Add(services =>
+            RegisterAzuriteServices(services, testContainer.GetConnectionString())
+        );
+        _configRegistrations.Add(config =>
+            RegisterAzuriteAppConfiguration(config, testContainer.GetConnectionString())
+        );
         return this;
     }
-    
+
     public OptimisedWebApplicationFactoryBuilder<TStartup> WithPostgres(
-        PostgreSqlContainer testContainer)
+        PostgreSqlContainer testContainer
+    )
     {
-        _serviceRegistrations.Add(services => RegisterPostgres(services, testContainer.GetConnectionString()));
+        _serviceRegistrations.Add(services =>
+            RegisterPostgres(services, testContainer.GetConnectionString())
+        );
         return this;
     }
-    
+
     private void RegisterAdminServices(IServiceCollection services)
     {
         services
@@ -129,7 +147,9 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
             .UseInMemoryDbContext<UsersAndRolesDbContext>()
             .AddScoped<PublicDataDbContext>(_ => Mock.Of<PublicDataDbContext>(MockBehavior.Loose))
             .AddSingleton<IProcessorClient>(_ => Mock.Of<IProcessorClient>(MockBehavior.Strict))
-            .AddSingleton<IPublicDataApiClient>(_ => Mock.Of<IPublicDataApiClient>(MockBehavior.Strict))
+            .AddSingleton<IPublicDataApiClient>(_ =>
+                Mock.Of<IPublicDataApiClient>(MockBehavior.Strict)
+            )
             .MockService<IDataProcessorClient>()
             .MockService<IPublisherClient>()
             .MockService<IPublisherTableStorageService>()
@@ -140,26 +160,32 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
 
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(JwtBearerDefaults.AuthenticationScheme,
-                null);
-   }
+            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                JwtBearerDefaults.AuthenticationScheme,
+                null
+            );
+    }
 
-    private void RegisterPostgres(
-        IServiceCollection services,
-        string connectionString)
+    private void RegisterPostgres(IServiceCollection services, string connectionString)
     {
-        var descriptor = services
-            .SingleOrDefault(d => d.ServiceType == typeof(PublicDataDbContext));
+        var descriptor = services.SingleOrDefault(d =>
+            d.ServiceType == typeof(PublicDataDbContext)
+        );
 
         if (descriptor != null)
         {
             services.Remove(descriptor);
         }
 
-        services.AddDbContext<PublicDataDbContext>(
-            options => options.UseNpgsql(connectionString));
+        services.AddDbContext<PublicDataDbContext>(options =>
+            options
+                .UseNpgsql(connectionString + ";Include Error Detail=true")
+                .EnableSensitiveDataLogging()
+                .EnableDetailedErrors()
+        );
 
-        using var serviceScope = services.BuildServiceProvider()
+        using var serviceScope = services
+            .BuildServiceProvider()
             .GetRequiredService<IServiceScopeFactory>()
             .CreateScope();
 
@@ -169,7 +195,8 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
 
     private static void RegisterAzuriteAppConfiguration(
         IConfigurationBuilder config,
-        string connectionString)
+        string connectionString
+    )
     {
         // if (_azuriteContainer.State != TestcontainersStates.Running)
         // {
@@ -177,40 +204,37 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
         //         $"Azurite container must be started via '{nameof(InitializeWithAzurite)}' method first");
         // }
 
-
         config.AddInMemoryCollection(
-        [
-            new KeyValuePair<string, string?>("PublicStorage", connectionString),
-            new KeyValuePair<string, string?>("PublisherStorage", connectionString),
-        ]);
+            [
+                new KeyValuePair<string, string?>("PublicStorage", connectionString),
+                new KeyValuePair<string, string?>("PublisherStorage", connectionString),
+            ]
+        );
     }
 
     private static void RegisterAzuriteServices(
         IServiceCollection services,
-        string connectionString)
+        string connectionString
+    )
     {
-        services.ReplaceService<IPublicBlobStorageService>(sp =>
-            new PublicBlobStorageService(
-                connectionString,
-                sp.GetRequiredService<ILogger<IBlobStorageService>>()
-            )
+        services.ReplaceService<IPublicBlobStorageService>(sp => new PublicBlobStorageService(
+            connectionString,
+            sp.GetRequiredService<ILogger<IBlobStorageService>>()
+        ));
+        services.ReplaceService<IPrivateBlobStorageService>(sp => new PrivateBlobStorageService(
+            connectionString,
+            sp.GetRequiredService<ILogger<IBlobStorageService>>()
+        ));
+        services.ReplaceService<IPublisherTableStorageService>(
+            _ => new PublisherTableStorageService(connectionString)
         );
-        services.ReplaceService<IPrivateBlobStorageService>(sp =>
-            new PrivateBlobStorageService(
-                connectionString,
-                sp.GetRequiredService<ILogger<IBlobStorageService>>()
-            )
-        );
-        services.ReplaceService<IPublisherTableStorageService>(_ =>
-            new PublisherTableStorageService(connectionString)
-        );
-        services.ReplaceService<IDataProcessorClient>(_ =>
-            new DataProcessorClient(connectionString)
-        );
+        services.ReplaceService<IDataProcessorClient>(_ => new DataProcessorClient(
+            connectionString
+        ));
         services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
         services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
     }
-    
+
     /// <summary>
     /// An AuthenticationHandler that allows the tests to make a ClaimsPrincipal available in the HttpContext
     /// for authentication and authorization mechanisms to use.
@@ -219,12 +243,17 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        IHttpContextAccessor httpContextAccessor)
-        : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
+        IHttpContextAccessor httpContextAccessor
+    ) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
     {
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            if (!httpContextAccessor.HttpContext.TryGetRequestHeader("TestUser", out var fakeUserName))
+            if (
+                !httpContextAccessor.HttpContext.TryGetRequestHeader(
+                    "TestUser",
+                    out var fakeUserName
+                )
+            )
             {
                 return Task.FromResult(AuthenticateResult.NoResult());
             }
@@ -240,7 +269,7 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
             {
                 TestUser.Bau => dataFixture.BauUser(),
                 TestUser.Authenticated => dataFixture.AuthenticatedUser(),
-                _ => throw new ArgumentException($"{fakeUserName} is not a recognised test user")
+                _ => throw new ArgumentException($"{fakeUserName} is not a recognised test user"),
             };
 
             var ticket = new AuthenticationTicket(user, JwtBearerDefaults.AuthenticationScheme);
@@ -253,5 +282,5 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
 public enum TestUser
 {
     Bau,
-    Authenticated
+    Authenticated,
 }
