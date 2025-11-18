@@ -32,12 +32,52 @@ const nextConfig = {
   },
   async headers() {
     return [
+      // @MarkFix Check all this is correct / desired
       {
-        source: '/fonts/(.*)',
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+        ],
+      },
+      {
+        source: '/favicon.svg',
         headers: [
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/assets/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value:
+              process.env.NODE_ENV === 'production' // i.e. not running locally
+                ? 'public, s-maxage=60, stale-while-revalidate=59'
+                : 'no-store, no-cache, must-revalidate, proxy-revalidate, private',
           },
         ],
       },
