@@ -25,9 +25,16 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-[Collection(nameof(OptimisedHttpClientWithPsqlFixture))]
+public class OptimisedDataSetVersionMappingControllerTestsFixture
+    : OptimisedHttpClientWithPsqlFixture;
+
+[CollectionDefinition(nameof(OptimisedDataSetVersionMappingControllerTestsFixture))]
+public class OptimisedDataSetVersionMappingControllerTestsCollection
+    : ICollectionFixture<OptimisedDataSetVersionMappingControllerTestsFixture>;
+
+[Collection(nameof(OptimisedDataSetVersionMappingControllerTestsFixture))]
 public abstract class OptimisedDataSetVersionMappingControllerTests(
-    OptimisedHttpClientWithPsqlFixture fixture,
+    OptimisedDataSetVersionMappingControllerTestsFixture fixture,
     ITestOutputHelper output
 ) : IAsyncLifetime
 {
@@ -51,11 +58,11 @@ public abstract class OptimisedDataSetVersionMappingControllerTests(
     }
 
     public class OptimisedGetLocationMappingsTests(
-        OptimisedHttpClientWithPsqlFixture fixture,
+        OptimisedDataSetVersionMappingControllerTestsFixture fixture,
         ITestOutputHelper output
     ) : OptimisedDataSetVersionMappingControllerTests(fixture, output)
     {
-        private readonly OptimisedHttpClientWithPsqlFixture _fixture = fixture;
+        private readonly OptimisedDataSetVersionMappingControllerTestsFixture _fixture = fixture;
         private readonly ITestOutputHelper _output = output;
 
         [Fact]
@@ -212,11 +219,11 @@ public abstract class OptimisedDataSetVersionMappingControllerTests(
     }
 
     public class OptimisedApplyBatchLocationMappingUpdatesTests(
-        OptimisedHttpClientWithPsqlFixture fixture,
+        OptimisedDataSetVersionMappingControllerTestsFixture fixture,
         ITestOutputHelper output
     ) : OptimisedDataSetVersionMappingControllerTests(fixture, output)
     {
-        private readonly OptimisedHttpClientWithPsqlFixture _fixture = fixture;
+        private readonly OptimisedDataSetVersionMappingControllerTestsFixture _fixture = fixture;
         private readonly ITestOutputHelper _output = output;
 
         [Fact]
@@ -1281,11 +1288,11 @@ public abstract class OptimisedDataSetVersionMappingControllerTests(
     }
 
     public class OptimisedGetFilterMappingsTests(
-        OptimisedHttpClientWithPsqlFixture fixture,
+        OptimisedDataSetVersionMappingControllerTestsFixture fixture,
         ITestOutputHelper output
     ) : OptimisedDataSetVersionMappingControllerTests(fixture, output)
     {
-        private readonly OptimisedHttpClientWithPsqlFixture _fixture = fixture;
+        private readonly OptimisedDataSetVersionMappingControllerTestsFixture _fixture = fixture;
         private readonly ITestOutputHelper _output = output;
 
         [Fact]
@@ -1404,11 +1411,11 @@ public abstract class OptimisedDataSetVersionMappingControllerTests(
     }
 
     public class OptimisedApplyBatchFilterOptionMappingUpdatesTests(
-        OptimisedHttpClientWithPsqlFixture fixture,
+        OptimisedDataSetVersionMappingControllerTestsFixture fixture,
         ITestOutputHelper output
     ) : OptimisedDataSetVersionMappingControllerTests(fixture, output)
     {
-        private readonly OptimisedHttpClientWithPsqlFixture _fixture = fixture;
+        private readonly OptimisedDataSetVersionMappingControllerTestsFixture _fixture = fixture;
         private readonly ITestOutputHelper _output = output;
 
         [Fact]

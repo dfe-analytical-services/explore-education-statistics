@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
 {
     private readonly OptimisedPostgreSqlContainerUtil _psql = new();
-    
+
     private WebApplicationFactory<Startup> _factory;
     private PublicDataDbContext _publicDataDbContext;
     private ContentDbContext _contentDbContext;
@@ -29,7 +29,7 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _psql.Start();
-            
+
         _factory = new TestWebApplicationFactory()
             .ConfigureAdmin()
             .WithPostgres(_psql.GetContainer())
@@ -40,15 +40,18 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
 
         _contentDbContext = _factory.Services.GetRequiredService<ContentDbContext>();
         _contentDbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-        
+
         _statisticsDbContext = _factory.Services.GetRequiredService<StatisticsDbContext>();
         _statisticsDbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-        
+
         _usersAndRolesDbContext = _factory.Services.GetRequiredService<UsersAndRolesDbContext>();
-        _usersAndRolesDbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        _usersAndRolesDbContext.ChangeTracker.QueryTrackingBehavior =
+            QueryTrackingBehavior.NoTracking;
 
         _processorClientMock = Mock.Get(_factory.Services.GetRequiredService<IProcessorClient>());
-        _publicDataApiClientMock = Mock.Get(_factory.Services.GetRequiredService<IPublicDataApiClient>());
+        _publicDataApiClientMock = Mock.Get(
+            _factory.Services.GetRequiredService<IPublicDataApiClient>()
+        );
     }
 
     public async Task DisposeAsync()
@@ -61,16 +64,16 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
     {
         _contentDbContext.ChangeTracker.Clear();
         await _contentDbContext.Database.EnsureDeletedAsync();
-        
+
         _statisticsDbContext.ChangeTracker.Clear();
         await _statisticsDbContext.Database.EnsureDeletedAsync();
-        
+
         _statisticsDbContext.ChangeTracker.Clear();
         await _statisticsDbContext.Database.EnsureDeletedAsync();
-        
+
         await _publicDataDbContext.ClearTestData();
     }
-    
+
     public HttpClient CreateClient()
     {
         return _factory.CreateClient();
@@ -85,17 +88,17 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
     {
         return _contentDbContext;
     }
-    
+
     public StatisticsDbContext GetStatisticsDbContext()
     {
         return _statisticsDbContext;
     }
-    
+
     public UsersAndRolesDbContext GetUsersAndRolesDbContext()
     {
         return _usersAndRolesDbContext;
     }
-    
+
     public PublicDataDbContext GetPublicDataDbContext()
     {
         return _publicDataDbContext;
@@ -105,7 +108,7 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
     {
         return _processorClientMock;
     }
-    
+
     public Mock<IPublicDataApiClient> GetPublicDataApiClientMock()
     {
         return _publicDataApiClientMock;
@@ -118,8 +121,6 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
         _statisticsDbContext.Dispose();
         _usersAndRolesDbContext.Dispose();
     }
-    
+
     private class TestWebApplicationFactory : WebApplicationFactory<Startup>;
 }
-
-public class OptimisedHttpClientWithPsqlFixture2 : OptimisedHttpClientWithPsqlFixture;
