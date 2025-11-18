@@ -27,11 +27,30 @@ const generalHeaders = [
   },
 ];
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV !== 'production') {
   // For local development, so hotreload works correctly
   generalHeaders.push({
     key: 'Cache-Control',
-    value: 'no-store, no-cache, must-revalidate, proxy-revalidate, private',
+    value: 'no-store, no-cache, must-revalidate',
+  });
+} else {
+  generalHeaders.push({
+    key: 'Cache-Control',
+    value: 'public, max-age=0',
+  });
+}
+
+const releasePageAndSubPageHeaders = [];
+if (process.env.NODE_ENV !== 'production') {
+  releasePageAndSubPageHeaders.push({
+    key: 'Cache-Control',
+    value: 'no-store, no-cache, must-revalidate',
+  });
+} else {
+  releasePageAndSubPageHeaders.push({
+    key: 'Cache-Control',
+    // value: 'public, max-age=30, s-maxage=604800', // TODO enable once we purge the release page CDN cache on a release page change
+    value: 'public, max-age=0',
   });
 }
 
@@ -79,6 +98,21 @@ const nextConfig = {
       {
         source: '/_next/static/:path*',
         headers: assetHeaders,
+      },
+      // for release pages and subpages
+      {
+        source: '/find-statistics/:publicationSlug/:releaseSlug/:path*',
+        headers: releasePageAndSubPageHeaders,
+      },
+      {
+        source:
+          '/_next/data/:buildId/find-statistics/:publicationSlug/:releaseSlug.json', // SPA load
+        headers: releasePageAndSubPageHeaders,
+      },
+      {
+        source:
+          '/_next/data/:buildId/find-statistics/:publicationSlug/:releaseSlug/:path*',
+        headers: releasePageAndSubPageHeaders,
       },
     ];
   },
