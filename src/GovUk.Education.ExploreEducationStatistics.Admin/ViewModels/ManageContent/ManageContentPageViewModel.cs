@@ -89,12 +89,3 @@ public class ManageContentPageViewModel
         public ExternalMethodology ExternalMethodology { get; set; }
     }
 }
-
-public class ReleaseNoteViewModel
-{
-    public Guid Id { get; set; }
-
-    public string Reason { get; set; }
-
-    public DateTime On { get; set; }
-}
