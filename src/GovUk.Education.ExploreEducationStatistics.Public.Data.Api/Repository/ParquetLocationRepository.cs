@@ -1,4 +1,5 @@
 using Dapper;
+using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -6,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;

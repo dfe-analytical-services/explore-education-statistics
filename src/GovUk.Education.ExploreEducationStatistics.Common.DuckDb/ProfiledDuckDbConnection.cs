@@ -2,7 +2,7 @@ using DuckDB.NET.Data;
 using StackExchange.Profiling;
 using StackExchange.Profiling.Data;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
+namespace GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 
 /// <summary>
 /// DuckDB connection profiled using MiniProfiler.

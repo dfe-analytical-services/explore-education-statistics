@@ -1,6 +1,6 @@
 using DuckDB.NET.Data;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
+namespace GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 
 /// <summary>
 /// Wrapper around underlying DuckDB.NET implementation to patch

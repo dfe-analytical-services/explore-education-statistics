@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using InterpolatedSql;
 using InterpolatedSql.SqlBuilders;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
+namespace GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 
 public static class DuckDbConnectionExtensions
 {

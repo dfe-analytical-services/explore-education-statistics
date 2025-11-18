@@ -1,6 +1,6 @@
 using DuckDB.NET.Data;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
+namespace GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 
 public class DuckDbConnection(string connectionString = DuckDBConnectionStringBuilder.InMemoryConnectionString)
     : DuckDBConnection(connectionString),

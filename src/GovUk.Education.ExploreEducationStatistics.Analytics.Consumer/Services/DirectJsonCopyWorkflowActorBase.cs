@@ -1,6 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services.Workflow;
-using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.Services;
 

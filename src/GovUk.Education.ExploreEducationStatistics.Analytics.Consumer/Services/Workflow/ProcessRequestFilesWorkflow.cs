@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Logging;
