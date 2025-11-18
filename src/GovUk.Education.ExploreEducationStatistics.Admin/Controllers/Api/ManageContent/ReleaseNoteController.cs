@@ -25,7 +25,7 @@ public class ReleaseNoteController : ControllerBase
     )
     {
         return await _releaseNoteService
-            .AddReleaseNoteAsync(releaseVersionId, saveRequest)
+            .AddReleaseNote(releaseVersionId, saveRequest)
             .HandleFailuresOr(result => Created(HttpContext.Request.Path, result));
     }
 
@@ -37,7 +37,7 @@ public class ReleaseNoteController : ControllerBase
     )
     {
         return await _releaseNoteService
-            .UpdateReleaseNoteAsync(releaseVersionId: releaseVersionId, releaseNoteId: releaseNoteId, saveRequest)
+            .UpdateReleaseNote(releaseVersionId: releaseVersionId, releaseNoteId: releaseNoteId, saveRequest)
             .HandleFailuresOrOk();
     }
 
@@ -48,7 +48,7 @@ public class ReleaseNoteController : ControllerBase
     )
     {
         return await _releaseNoteService
-            .DeleteReleaseNoteAsync(releaseVersionId: releaseVersionId, releaseNoteId: releaseNoteId)
+            .DeleteReleaseNote(releaseVersionId: releaseVersionId, releaseNoteId: releaseNoteId)
             .HandleFailuresOrOk();
     }
 }

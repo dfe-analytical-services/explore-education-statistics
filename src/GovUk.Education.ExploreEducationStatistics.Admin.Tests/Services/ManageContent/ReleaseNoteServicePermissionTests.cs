@@ -19,30 +19,29 @@ public class ReleaseNoteServicePermissionTests
     private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
 
     [Fact]
-    public void AddReleaseNoteAsync()
+    public void AddReleaseNote()
     {
         AssertSecurityPoliciesChecked(
-            service => service.AddReleaseNoteAsync(_releaseVersion.Id, new ReleaseNoteSaveRequest()),
+            service => service.AddReleaseNote(_releaseVersion.Id, new ReleaseNoteSaveRequest()),
             SecurityPolicies.CanUpdateSpecificReleaseVersion
         );
     }
 
     [Fact]
-    public void DeleteReleaseNoteAsync()
+    public void DeleteReleaseNote()
     {
         AssertSecurityPoliciesChecked(
-            service =>
-                service.DeleteReleaseNoteAsync(releaseVersionId: _releaseVersion.Id, releaseNoteId: Guid.NewGuid()),
+            service => service.DeleteReleaseNote(releaseVersionId: _releaseVersion.Id, releaseNoteId: Guid.NewGuid()),
             SecurityPolicies.CanUpdateSpecificReleaseVersion
         );
     }
 
     [Fact]
-    public void UpdateReleaseNoteAsync()
+    public void UpdateReleaseNote()
     {
         AssertSecurityPoliciesChecked(
             service =>
-                service.UpdateReleaseNoteAsync(
+                service.UpdateReleaseNote(
                     releaseVersionId: _releaseVersion.Id,
                     releaseNoteId: Guid.NewGuid(),
                     new ReleaseNoteSaveRequest()

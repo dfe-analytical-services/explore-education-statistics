@@ -7,19 +7,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
 public interface IReleaseNoteService
 {
-    Task<Either<ActionResult, List<ReleaseNoteViewModel>>> AddReleaseNoteAsync(
+    Task<Either<ActionResult, List<ReleaseNoteViewModel>>> AddReleaseNote(
         Guid releaseVersionId,
         ReleaseNoteSaveRequest saveRequest
     );
 
-    Task<Either<ActionResult, List<ReleaseNoteViewModel>>> UpdateReleaseNoteAsync(
+    Task<Either<ActionResult, List<ReleaseNoteViewModel>>> UpdateReleaseNote(
         Guid releaseVersionId,
         Guid releaseNoteId,
         ReleaseNoteSaveRequest saveRequest
     );
 
-    Task<Either<ActionResult, List<ReleaseNoteViewModel>>> DeleteReleaseNoteAsync(
-        Guid releaseVersionId,
-        Guid releaseNoteId
-    );
+    Task<Either<ActionResult, List<ReleaseNoteViewModel>>> DeleteReleaseNote(Guid releaseVersionId, Guid releaseNoteId);
 }

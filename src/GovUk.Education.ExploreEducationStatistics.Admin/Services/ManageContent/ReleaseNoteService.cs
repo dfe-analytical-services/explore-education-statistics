@@ -34,7 +34,7 @@ public class ReleaseNoteService : IReleaseNoteService
         _userService = userService;
     }
 
-    public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> AddReleaseNoteAsync(
+    public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> AddReleaseNote(
         Guid releaseVersionId,
         ReleaseNoteSaveRequest saveRequest
     )
@@ -61,7 +61,7 @@ public class ReleaseNoteService : IReleaseNoteService
             });
     }
 
-    public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> UpdateReleaseNoteAsync(
+    public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> UpdateReleaseNote(
         Guid releaseVersionId,
         Guid releaseNoteId,
         ReleaseNoteSaveRequest saveRequest
@@ -88,7 +88,7 @@ public class ReleaseNoteService : IReleaseNoteService
             });
     }
 
-    public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> DeleteReleaseNoteAsync(
+    public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> DeleteReleaseNote(
         Guid releaseVersionId,
         Guid releaseNoteId
     )
