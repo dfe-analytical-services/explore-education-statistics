@@ -5,7 +5,7 @@ using InterpolatedSql.Dapper;
 using InterpolatedSql.Dapper.SqlBuilders;
 using InterpolatedSql.SqlBuilders;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.DuckDb.DuckDb;
+namespace GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 
 public class DuckDbDapperSqlBuilder : DuckDbSqlBuilder, IDapperSqlBuilder
 {
