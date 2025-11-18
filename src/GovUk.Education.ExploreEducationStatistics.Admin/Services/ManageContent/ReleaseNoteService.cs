@@ -1,5 +1,4 @@
 #nullable enable
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
@@ -13,8 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 
-public class ReleaseNoteService(IMapper mapper, ContentDbContext contentDbContext, IUserService userService)
-    : IReleaseNoteService
+public class ReleaseNoteService(ContentDbContext contentDbContext, IUserService userService) : IReleaseNoteService
 {
     public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> AddReleaseNote(
         Guid releaseVersionId,
@@ -85,17 +83,14 @@ public class ReleaseNoteService(IMapper mapper, ContentDbContext contentDbContex
                 return await GetReleaseNoteViewModels(releaseVersionId, cancellationToken);
             });
 
-    private async Task<List<ReleaseNoteViewModel>> GetReleaseNoteViewModels(
+    private Task<List<ReleaseNoteViewModel>> GetReleaseNoteViewModels(
         Guid releaseVersionId,
         CancellationToken cancellationToken
-    )
-    {
-        var updates = await contentDbContext
+    ) =>
+        contentDbContext
             .Update.AsNoTracking()
             .Where(u => u.ReleaseVersionId == releaseVersionId)
             .OrderByDescending(u => u.On)
+            .Select(u => ReleaseNoteViewModel.FromModel(u))
             .ToListAsync(cancellationToken: cancellationToken);
-
-        return mapper.Map<List<ReleaseNoteViewModel>>(updates);
-    }
 }

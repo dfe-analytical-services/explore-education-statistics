@@ -1,5 +1,4 @@
 #nullable enable
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
@@ -53,9 +52,9 @@ public class ReleaseNoteServicePermissionTests
         params SecurityPolicies[] policies
     )
     {
-        var (mapper, contentDbContext, userService) = Mocks();
+        var (contentDbContext, userService) = Mocks();
 
-        var service = new ReleaseNoteService(mapper.Object, contentDbContext.Object, userService.Object);
+        var service = new ReleaseNoteService(contentDbContext.Object, userService.Object);
 
         PermissionTestUtil.AssertSecurityPoliciesChecked(
             protectedAction,
@@ -66,8 +65,8 @@ public class ReleaseNoteServicePermissionTests
         );
     }
 
-    private (Mock<IMapper>, Mock<ContentDbContext>, Mock<IUserService>) Mocks()
+    private (Mock<ContentDbContext>, Mock<IUserService>) Mocks()
     {
-        return (new Mock<IMapper>(), new Mock<ContentDbContext>(), new Mock<IUserService>());
+        return (new Mock<ContentDbContext>(), new Mock<IUserService>());
     }
 }
