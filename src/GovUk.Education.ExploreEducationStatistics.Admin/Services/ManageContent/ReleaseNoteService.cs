@@ -33,7 +33,6 @@ public class ReleaseNoteService(IMapper mapper, ContentDbContext contentDbContex
                         On = saveRequest.On ?? DateTime.Now,
                         Reason = saveRequest.Reason,
                         ReleaseVersionId = releaseVersion.Id,
-                        Created = DateTime.UtcNow,
                         CreatedById = userService.GetUserId(),
                     }
                 );
