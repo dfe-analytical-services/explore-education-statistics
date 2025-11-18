@@ -116,7 +116,6 @@ const ReleaseDataAndFiles = ({
             <AccordionSection
               id="supporting-files"
               heading="Additional supporting files"
-              trackScroll
             >
               <div
                 data-scroll={trackScroll ? true : undefined}
@@ -146,7 +145,6 @@ const ReleaseDataAndFiles = ({
             <AccordionSection
               id="related-dashboards"
               heading="View related dashboard(s)"
-              trackScroll
             >
               {renderRelatedDashboards}
             </AccordionSection>

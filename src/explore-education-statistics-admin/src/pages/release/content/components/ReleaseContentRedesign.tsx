@@ -1,4 +1,5 @@
 import Link from '@admin/components/Link';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import ReleasePageTabBar from '@admin/pages/release/content/components/ReleasePageTabBar';
 import ReleasePageTabExploreData from '@admin/pages/release/content/components/ReleasePageTabExploreData';
 import ReleasePageTabHelp from '@admin/pages/release/content/components/ReleasePageTabHelp';
@@ -35,6 +36,7 @@ const ReleaseContent = ({
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }) => {
   const { release } = useReleaseContentState();
+  const { setActiveSection } = useEditingContext();
 
   const { isMedia: isMobileMedia } = useMobileMedia();
 
@@ -51,8 +53,9 @@ const ReleaseContent = ({
         setRenderedTabs(prevTabs => [...prevTabs, sectionKey]);
       }
       setActiveTabSection(sectionKey);
+      setActiveSection('summary-section');
     },
-    [renderedTabs],
+    [renderedTabs, setActiveSection],
   );
 
   const { publication, publishingOrganisations, updates } = release;
@@ -100,6 +103,7 @@ const ReleaseContent = ({
               </span>
             ) : undefined
           }
+          trackScroll
         />
       )}
 

@@ -49,6 +49,7 @@ interface Props {
   releaseType: ReleaseType;
   renderProducerLink: ReactNode;
   renderUpdatesLink?: ReactNode;
+  trackScroll?: boolean;
   onShowReleaseTypeModal?: () => void;
 }
 
@@ -59,6 +60,7 @@ export default function ReleaseSummaryBlock({
   releaseType,
   renderProducerLink,
   renderUpdatesLink,
+  trackScroll,
   onShowReleaseTypeModal,
 }: Props) {
   return (
@@ -66,6 +68,7 @@ export default function ReleaseSummaryBlock({
       id="summary-section"
       className={styles.container}
       data-testid="release-summary-block"
+      data-scroll={trackScroll ? 'summary-section' : undefined}
     >
       <div className={styles.innerWrap}>
         <dl className={styles.list}>
