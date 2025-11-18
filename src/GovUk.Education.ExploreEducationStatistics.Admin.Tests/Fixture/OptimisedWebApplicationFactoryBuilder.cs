@@ -146,10 +146,8 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
             .UseInMemoryDbContext<StatisticsDbContext>()
             .UseInMemoryDbContext<UsersAndRolesDbContext>()
             .AddScoped<PublicDataDbContext>(_ => Mock.Of<PublicDataDbContext>(MockBehavior.Loose))
-            .AddSingleton<IProcessorClient>(_ => Mock.Of<IProcessorClient>(MockBehavior.Strict))
-            .AddSingleton<IPublicDataApiClient>(_ =>
-                Mock.Of<IPublicDataApiClient>(MockBehavior.Strict)
-            )
+            .MockService<IProcessorClient>()
+            .MockService<IPublicDataApiClient>()
             .MockService<IDataProcessorClient>()
             .MockService<IPublisherClient>()
             .MockService<IPublisherTableStorageService>()

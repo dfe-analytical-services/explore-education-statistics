@@ -19,20 +19,24 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection UseInMemoryDbContext<TDbContext>(
         this IServiceCollection services,
-        string databaseName = null)
+        string databaseName = null
+    )
         where TDbContext : DbContext
     {
         // Remove the default DbContext descriptor that was provided by Startup.cs.
-        var descriptor = services
-            .Single(d => d.ServiceType == typeof(DbContextOptions<TDbContext>));
+        var descriptor = services.Single(d =>
+            d.ServiceType == typeof(DbContextOptions<TDbContext>)
+        );
 
         services.Remove(descriptor);
 
         // Add the new In-Memory replacement.
-        return services.AddDbContext<TDbContext>(
-            options => options
-                .UseInMemoryDatabase(databaseName ?? nameof(TDbContext),
-                    builder => builder.EnableNullChecks(false)));
+        return services.AddDbContext<TDbContext>(options =>
+            options.UseInMemoryDatabase(
+                databaseName ?? nameof(TDbContext),
+                builder => builder.EnableNullChecks(false)
+            )
+        );
     }
 
     /// <summary>
@@ -42,7 +46,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection ReplaceService<TService>(
         this IServiceCollection services,
         TService replacement,
-        bool optional = false)
+        bool optional = false
+    )
         where TService : class
     {
         return services.ReplaceService(_ => replacement, optional);
@@ -55,12 +60,13 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection ReplaceService<TService>(
         this IServiceCollection services,
         Func<IServiceProvider, TService> replacement,
-        bool optional = false)
+        bool optional = false,
+        ServiceLifetime? lifetime = null
+    )
         where TService : class
     {
         // Remove the default service descriptor that was provided by Startup.cs.
-        var descriptor = services
-            .SingleOrDefault(d => d.ServiceType == typeof(TService));
+        var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(TService));
 
         if (descriptor == null)
         {
@@ -68,20 +74,23 @@ public static class ServiceCollectionExtensions
             {
                 return services;
             }
-            
-            throw new ArgumentNullException($"{nameof(TService)} service was not found to replace.");
+
+            throw new ArgumentNullException(
+                $"{nameof(TService)} service was not found to replace."
+            );
         }
 
         services.Remove(descriptor);
 
         // Add the replacement.
-        return descriptor.Lifetime switch
+        return (lifetime ?? descriptor.Lifetime) switch
         {
             ServiceLifetime.Singleton => services.AddSingleton(replacement),
             ServiceLifetime.Scoped => services.AddScoped(replacement),
             ServiceLifetime.Transient => services.AddTransient(replacement),
             _ => throw new ArgumentOutOfRangeException(
-                $"Cannot register test service with {nameof(ServiceLifetime)}.{descriptor.Lifetime}")
+                $"Cannot register test service with {nameof(ServiceLifetime)}.{descriptor.Lifetime}"
+            ),
         };
     }
 
@@ -91,7 +100,8 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection ReplaceService<TService>(
         this IServiceCollection services,
-        Mock<TService> replacement)
+        Mock<TService> replacement
+    )
         where TService : class
     {
         return services.ReplaceService(replacement.Object);
@@ -105,10 +115,14 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection MockService<TService>(
         this IServiceCollection services,
-        MockBehavior behavior = Strict)
+        MockBehavior behavior = Strict
+    )
         where TService : class
     {
-        return services.ReplaceService(_ => Mock.Of<TService>(behavior));
+        return services.ReplaceService(
+            _ => Mock.Of<TService>(behavior),
+            lifetime: ServiceLifetime.Singleton
+        );
     }
 
     /// <summary>
@@ -119,7 +133,8 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddControllers(options =>
-                options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(",")))
+                options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(","))
+            )
             .AddApplicationPart(typeof(TStartup).Assembly)
             .AddControllersAsServices();
 

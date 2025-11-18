@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -29,11 +28,11 @@ using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Moq;
-using Xunit.Abstractions;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class OptimisedDataSetVersionsControllerTestsFixture : OptimisedHttpClientWithPsqlFixture;
 
 [CollectionDefinition(nameof(OptimisedDataSetVersionsControllerTestsFixture))]
@@ -41,37 +40,19 @@ public class OptimisedDataSetVersionsControllerTestsCollection
     : ICollectionFixture<OptimisedDataSetVersionsControllerTestsFixture>;
 
 [Collection(nameof(OptimisedDataSetVersionsControllerTestsFixture))]
-public abstract class OptimisedDataSetVersionsControllerTests(
-    OptimisedDataSetVersionsControllerTestsFixture fixture,
-    ITestOutputHelper output
-) : IAsyncLifetime
+public abstract class OptimisedDataSetVersionsControllerTests
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
     private readonly DataFixture _dataFixture = new(new Random().Next());
-
-    public async Task InitializeAsync()
-    {
-        // var sw = new Stopwatch();
-        // sw.Start();
-        //
-        // await fixture.ClearTestData();
-        //
-        // output.WriteLine($"Clear up test data {sw.ElapsedMilliseconds}");
-        // sw.Restart();
-    }
 
     public Task DisposeAsync()
     {
         return Task.CompletedTask;
     }
 
-    public class OptimisedGetVersionsTests(
-        OptimisedDataSetVersionsControllerTestsFixture fixture,
-        ITestOutputHelper output
-    ) : OptimisedDataSetVersionsControllerTests(fixture, output)
+    public class OptimisedGetVersionsTests(OptimisedDataSetVersionsControllerTestsFixture fixture)
+        : OptimisedDataSetVersionsControllerTests
     {
-        private readonly OptimisedDataSetVersionsControllerTestsFixture _fixture = fixture;
-
         [Theory]
         [MemberData(
             nameof(DataSetVersionStatusTheoryData.AvailableStatuses),
@@ -94,7 +75,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 )
                 .WithFile(_dataFixture.DefaultFile(FileType.Data));
 
-            await _fixture
+            await fixture
                 .GetContentDbContext()
                 .AddTestData(context =>
                 {
@@ -103,7 +84,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
 
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusPublished();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -125,7 +106,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -137,7 +118,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 dataSetId: dataSet.Id,
                 page: 1,
                 pageSize: 10,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             var viewModel = response.AssertOk<
@@ -177,7 +158,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         {
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusPublished();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -188,7 +169,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -200,7 +181,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 dataSetId: dataSet.Id,
                 page: 1,
                 pageSize: 10,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             var viewModel = response.AssertOk<
@@ -249,7 +230,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 )
                 .GenerateList(numberOfPublishedDataSetVersions);
 
-            await _fixture
+            await fixture
                 .GetContentDbContext()
                 .AddTestData(context =>
                 {
@@ -258,7 +239,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
 
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusPublished();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -284,7 +265,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 )
                 .ToList();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -296,7 +277,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 dataSetId: dataSet.Id,
                 page: page,
                 pageSize: pageSize,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             var viewModel = response.AssertOk<
@@ -347,7 +328,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 )
                 .WithFile(_dataFixture.DefaultFile(FileType.Data));
 
-            await _fixture
+            await fixture
                 .GetContentDbContext()
                 .AddTestData(context =>
                 {
@@ -358,7 +339,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
 
             DataSet otherDataSet = _dataFixture.DefaultDataSet().WithStatusPublished();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.AddRange(targetDataSet, otherDataSet));
 
@@ -386,7 +367,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 )
                 .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -398,7 +379,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 dataSetId: targetDataSet.Id,
                 page: 1,
                 pageSize: 10,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             var viewModel = response.AssertOk<
@@ -436,7 +417,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 dataSetId: Guid.NewGuid(),
                 page: 1,
                 pageSize: 1,
-                client: _fixture.CreateClient().WithUser(TestUser.Authenticated)
+                client: fixture.CreateClient().WithUser(TestUser.Authenticated)
             );
 
             response.AssertForbidden();
@@ -445,7 +426,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         [Fact]
         public async Task NoDataSetId_Returns400()
         {
-            var response = await _fixture.CreateClient().WithUser(TestUser.Bau).GetAsync(BaseUrl);
+            var response = await fixture.CreateClient().WithUser(TestUser.Bau).GetAsync(BaseUrl);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -457,7 +438,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         {
             var response = await ListLiveVersions(
                 dataSetId: Guid.NewGuid(),
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             response.AssertNotFound();
@@ -483,13 +464,9 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         }
     }
 
-    public class GetDataSetVersionTests(
-        OptimisedDataSetVersionsControllerTestsFixture fixture,
-        ITestOutputHelper output
-    ) : OptimisedDataSetVersionsControllerTests(fixture, output)
+    public class GetDataSetVersionTests(OptimisedDataSetVersionsControllerTestsFixture fixture)
+        : OptimisedDataSetVersionsControllerTests
     {
-        private readonly OptimisedDataSetVersionsControllerTestsFixture _fixture = fixture;
-
         public static TheoryData<DataSetVersionStatus> AllDataSetVersionStatuses =>
             new(EnumUtil.GetEnums<DataSetVersionStatus>());
 
@@ -499,7 +476,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         {
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusPublished();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -509,7 +486,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 .WithDataSet(dataSet)
                 .GenerateList(3);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -521,7 +498,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
 
             var response = await GetDataSetVersion(
                 dataSetVersionId: requestedDataSetVersion.Id,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             var viewModel = response.AssertOk<DataSetVersionInfoViewModel>();
@@ -537,7 +514,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = _fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
 
             var response = await GetDataSetVersion(
                 dataSetVersionId: Guid.NewGuid(),
@@ -552,7 +529,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         {
             var response = await GetDataSetVersion(
                 dataSetVersionId: Guid.NewGuid(),
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             response.AssertNotFound();
@@ -569,13 +546,9 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         }
     }
 
-    public class CreateNextVersionTests(
-        OptimisedDataSetVersionsControllerTestsFixture fixture,
-        ITestOutputHelper output
-    ) : OptimisedDataSetVersionsControllerTests(fixture, output)
+    public class CreateNextVersionTests(OptimisedDataSetVersionsControllerTestsFixture fixture)
+        : OptimisedDataSetVersionsControllerTests
     {
-        private readonly OptimisedDataSetVersionsControllerTestsFixture _fixture = fixture;
-
         [Fact]
         public async Task Success()
         {
@@ -592,7 +565,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 )
                 .WithFile(_dataFixture.DefaultFile(FileType.Data));
 
-            await _fixture
+            await fixture
                 .GetContentDbContext()
                 .AddTestData(context =>
                 {
@@ -601,7 +574,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
 
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusPublished();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -612,7 +585,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -622,7 +595,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
 
             DataSetVersion? nextVersion = null;
 
-            _fixture
+            fixture
                 .GetProcessorClientMock()
                 .Setup(c =>
                     c.CreateNextDataSetVersionMappings(
@@ -634,7 +607,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 )
                 .Returns(async () =>
                 {
-                    var savedDataSet = await _fixture
+                    var savedDataSet = await fixture
                         .GetPublicDataDbContext()
                         .DataSets.SingleAsync(ds => ds.Id == dataSet.Id);
 
@@ -650,7 +623,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                         )
                         .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-                    await _fixture
+                    await fixture
                         .GetPublicDataDbContext()
                         .AddTestData(context =>
                         {
@@ -669,7 +642,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
             var response = await CreateNextVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: releaseFile.Id,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
@@ -684,7 +657,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = _fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
 
             var response = await CreateNextVersion(
                 dataSetId: Guid.NewGuid(),
@@ -701,7 +674,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
             var response = await CreateNextVersion(
                 dataSetId: Guid.Empty,
                 releaseFileId: Guid.Empty,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -731,13 +704,9 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         }
     }
 
-    public class CompleteNextVersionTests(
-        OptimisedDataSetVersionsControllerTestsFixture fixture,
-        ITestOutputHelper output
-    ) : OptimisedDataSetVersionsControllerTests(fixture, output)
+    public class CompleteNextVersionTests(OptimisedDataSetVersionsControllerTestsFixture fixture)
+        : OptimisedDataSetVersionsControllerTests
     {
-        private readonly OptimisedDataSetVersionsControllerTestsFixture _fixture = fixture;
-
         [Fact]
         public async Task Success()
         {
@@ -754,7 +723,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 )
                 .WithFile(_dataFixture.DefaultFile(FileType.Data));
 
-            await _fixture
+            await fixture
                 .GetContentDbContext()
                 .AddTestData(context =>
                 {
@@ -763,7 +732,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
 
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusPublished();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -784,7 +753,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 )
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -792,7 +761,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                     context.DataSets.Update(dataSet);
                 });
 
-            _fixture
+            fixture
                 .GetProcessorClientMock()
                 .Setup(c =>
                     c.CompleteNextDataSetVersionImport(
@@ -811,7 +780,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
 
             var response = await CompleteNextVersionImport(
                 dataSetVersionId: nextDataSetVersion.Id,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
@@ -825,7 +794,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = _fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
 
             var response = await CompleteNextVersionImport(
                 dataSetVersionId: Guid.NewGuid(),
@@ -840,7 +809,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         {
             var response = await CompleteNextVersionImport(
                 dataSetVersionId: Guid.Empty,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -867,26 +836,22 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         }
     }
 
-    public class DeleteVersionTests(
-        OptimisedDataSetVersionsControllerTestsFixture fixture,
-        ITestOutputHelper output
-    ) : OptimisedDataSetVersionsControllerTests(fixture, output)
+    public class DeleteVersionTests(OptimisedDataSetVersionsControllerTestsFixture fixture)
+        : OptimisedDataSetVersionsControllerTests
     {
-        private readonly OptimisedDataSetVersionsControllerTestsFixture _fixture = fixture;
-
         [Fact]
         public async Task Success()
         {
             var dataSetVersionId = Guid.NewGuid();
 
-            _fixture
+            fixture
                 .GetProcessorClientMock()
                 .Setup(c => c.DeleteDataSetVersion(dataSetVersionId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Either<ActionResult, Unit>(Unit.Instance));
 
             var response = await DeleteVersion(
                 dataSetVersionId,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             response.AssertNoContent();
@@ -895,7 +860,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = _fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
 
             var response = await DeleteVersion(Guid.NewGuid(), client);
 
@@ -907,7 +872,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         {
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusDraft();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -919,7 +884,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 .WithImports(() => _dataFixture.DefaultDataSetVersionImport().Generate(1))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -927,7 +892,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                     context.DataSets.Update(dataSet);
                 });
 
-            _fixture
+            fixture
                 .GetProcessorClientMock()
                 .Setup(c =>
                     c.DeleteDataSetVersion(dataSetVersion.Id, It.IsAny<CancellationToken>())
@@ -936,7 +901,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
 
             var response = await DeleteVersion(
                 dataSetVersion.Id,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             response.AssertNotFound();
@@ -947,7 +912,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         {
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusDraft();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -959,7 +924,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 .WithImports(() => _dataFixture.DefaultDataSetVersionImport().Generate(1))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -967,7 +932,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                     context.DataSets.Update(dataSet);
                 });
 
-            _fixture
+            fixture
                 .GetProcessorClientMock()
                 .Setup(c =>
                     c.DeleteDataSetVersion(dataSetVersion.Id, It.IsAny<CancellationToken>())
@@ -988,7 +953,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
 
             var response = await DeleteVersion(
                 dataSetVersion.Id,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -1001,7 +966,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         {
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusDraft();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -1013,7 +978,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 .WithImports(() => _dataFixture.DefaultDataSetVersionImport().Generate(1))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -1021,7 +986,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                     context.DataSets.Update(dataSet);
                 });
 
-            _fixture
+            fixture
                 .GetProcessorClientMock()
                 .Setup(c =>
                     c.DeleteDataSetVersion(dataSetVersion.Id, It.IsAny<CancellationToken>())
@@ -1031,7 +996,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 DeleteVersion(
                     dataSetVersion.Id,
-                    client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                    client: fixture.CreateClient().WithUser(TestUser.Bau)
                 )
             );
 
@@ -1049,19 +1014,15 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         }
     }
 
-    public class GetVersionChangesTests(
-        OptimisedDataSetVersionsControllerTestsFixture fixture,
-        ITestOutputHelper output
-    ) : OptimisedDataSetVersionsControllerTests(fixture, output)
+    public class GetVersionChangesTests(OptimisedDataSetVersionsControllerTestsFixture fixture)
+        : OptimisedDataSetVersionsControllerTests
     {
-        private readonly OptimisedDataSetVersionsControllerTestsFixture _fixture = fixture;
-
         [Fact]
         public async Task Success_Returns200()
         {
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusDraft();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -1072,7 +1033,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -1082,7 +1043,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
 
             var mockedChanges = new MockedChanges { Changes = ["test"] };
 
-            _fixture
+            fixture
                 .GetPublicDataApiClientMock()
                 .Setup(c =>
                     c.GetDataSetVersionChanges(
@@ -1100,7 +1061,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
 
             var response = await GetVersionChanges(
                 dataSetVersion.Id,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             response.AssertOk(mockedChanges, useSystemJson: true);
@@ -1109,7 +1070,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = _fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
 
             var response = await GetVersionChanges(Guid.NewGuid(), client);
 
@@ -1121,7 +1082,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         {
             var response = await GetVersionChanges(
                 Guid.NewGuid(),
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             response.AssertNotFound();
@@ -1132,7 +1093,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         {
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusDraft();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -1143,7 +1104,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -1151,7 +1112,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                     context.DataSets.Update(dataSet);
                 });
 
-            _fixture
+            fixture
                 .GetPublicDataApiClientMock()
                 .Setup(c =>
                     c.GetDataSetVersionChanges(
@@ -1164,10 +1125,10 @@ public abstract class OptimisedDataSetVersionsControllerTests(
 
             var response = await GetVersionChanges(
                 dataSetVersion.Id,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
-            MockUtils.VerifyAllMocks(_fixture.GetPublicDataApiClientMock());
+            MockUtils.VerifyAllMocks(fixture.GetPublicDataApiClientMock());
 
             response.AssertValidationProblem();
         }
@@ -1177,7 +1138,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         {
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusDraft();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -1188,7 +1149,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -1196,7 +1157,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                     context.DataSets.Update(dataSet);
                 });
 
-            _fixture
+            fixture
                 .GetPublicDataApiClientMock()
                 .Setup(c =>
                     c.GetDataSetVersionChanges(
@@ -1208,12 +1169,12 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 .ThrowsAsync(new HttpRequestException());
 
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                GetVersionChanges(dataSetVersion.Id, _fixture.CreateClient().WithUser(TestUser.Bau))
+                GetVersionChanges(dataSetVersion.Id, fixture.CreateClient().WithUser(TestUser.Bau))
             );
 
             Assert.IsType<HttpRequestException>(exception.InnerException);
 
-            MockUtils.VerifyAllMocks(_fixture.GetPublicDataApiClientMock());
+            MockUtils.VerifyAllMocks(fixture.GetPublicDataApiClientMock());
         }
 
         private async Task<HttpResponseMessage> GetVersionChanges(
@@ -1233,13 +1194,9 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         }
     }
 
-    public class UpdateVersionTests(
-        OptimisedDataSetVersionsControllerTestsFixture fixture,
-        ITestOutputHelper output
-    ) : OptimisedDataSetVersionsControllerTests(fixture, output)
+    public class UpdateVersionTests(OptimisedDataSetVersionsControllerTestsFixture fixture)
+        : OptimisedDataSetVersionsControllerTests
     {
-        private readonly OptimisedDataSetVersionsControllerTestsFixture _fixture = fixture;
-
         [Theory]
         [MemberData(
             nameof(DataSetVersionStatusTheoryData.UpdateableStatuses),
@@ -1260,7 +1217,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 )
                 .WithFile(_dataFixture.DefaultFile(FileType.Data));
 
-            await _fixture
+            await fixture
                 .GetContentDbContext()
                 .AddTestData(context =>
                 {
@@ -1269,7 +1226,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
 
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusPublished();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -1291,7 +1248,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 .WithNotes("initial notes.")
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -1304,7 +1261,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
             var response = await UpdateVersion(
                 nextDataSetVersion.Id,
                 updateRequest,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             var viewModel = response.AssertOk<DataSetDraftVersionViewModel>();
@@ -1335,7 +1292,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = _fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
 
             var updateRequest = new DataSetVersionUpdateRequest();
 
@@ -1352,7 +1309,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
             var response = await UpdateVersion(
                 Guid.NewGuid(),
                 updateRequest,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             response.AssertNotFound();
@@ -1369,7 +1326,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         {
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusPublished();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -1387,7 +1344,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -1400,7 +1357,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
             var response = await UpdateVersion(
                 nextDataSetVersion.Id,
                 updateRequest,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -1416,7 +1373,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
         {
             DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusDraft();
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
@@ -1427,7 +1384,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await _fixture
+            await fixture
                 .GetPublicDataDbContext()
                 .AddTestData(context =>
                 {
@@ -1440,7 +1397,7 @@ public abstract class OptimisedDataSetVersionsControllerTests(
             var response = await UpdateVersion(
                 dataSetVersion.Id,
                 updateRequest,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                fixture.CreateClient().WithUser(TestUser.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
