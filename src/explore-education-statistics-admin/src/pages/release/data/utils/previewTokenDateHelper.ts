@@ -22,15 +22,9 @@ export default class PreviewTokenDateHelper {
     if (activates && expires) {
       const isActivatesToday = isToday(activates);
       const startDate = !isActivatesToday
-        ? new Date(
-            UkTimeHelper.ukStartOfDayUtc(
-              activates.toISOString().substring(0, 10),
-            ),
-          )
+        ? UkTimeHelper.toUkStartOfDay(activates)
         : new Date();
-      const endDate = UkTimeHelper.ukEndOfDayUtc(
-        expires.toISOString().substring(0, 10),
-      );
+      const endDate = UkTimeHelper.toUkEndOfDay(expires);
       return { startDate, endDate };
     }
 
@@ -58,8 +52,9 @@ export default class PreviewTokenDateHelper {
       );
     }
     const startDate = new Date();
-    let endDate = addDays(startDate, datePresetSpan);
-    endDate = UkTimeHelper.ukEndOfDayUtc(endDate.toISOString());
+    const endDate = UkTimeHelper.toUkEndOfDay(
+      addDays(startDate, datePresetSpan),
+    );
     return { startDate, endDate };
   }
 }

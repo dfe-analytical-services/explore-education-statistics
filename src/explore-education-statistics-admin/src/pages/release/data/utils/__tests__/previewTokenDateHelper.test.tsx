@@ -201,7 +201,7 @@ describe('PreviewTokenDateHelper', () => {
 
       const result = helper.setDateRangeBasedOnPresets(1);
 
-      const expectedEndDate = UkTimeHelper.ukEndOfDayUtc('2023-01-02');
+      const expectedEndDate = UkTimeHelper.toUkEndOfDayString('2023-01-02');
       expect(result.endDate).toEqual(expectedEndDate);
     });
   });

@@ -3,30 +3,29 @@
 export default class UkTimeHelper {
   private static readonly TZ = 'Europe/London';
 
-  public static ukStartOfDayUtc(isoDate: string): Date {
-    return new Date(UkTimeHelper.dateMidnightUk(isoDate));
+  public static todayStartOfDayUk(): string {
+    return this.toUkStartOfDayString(new Date());
   }
 
-  // End of day 23:59:59.999 in London, as a UTC instant
-  public static ukEndOfDayUtc(isoDate: string | Date): Date {
-    return new Date(UkTimeHelper.dateLastSecondUk(isoDate));
+  public static toUkStartOfDay(date1: Date | string): Date {
+    return new Date(this.toUkStartOfDayString(date1));
   }
 
-  public static todayMidnightUk(): string {
-    return UkTimeHelper.dateMidnightUk(new Date());
+  public static toUkEndOfDay(date1: Date | string): Date {
+    return new Date(this.toUkEndOfDayString(date1));
   }
 
-  public static dateMidnightUk(date1: Date | string): string {
-    return UkTimeHelper.dateTimeInLondonTimeZone(date1, TimeOption.MIDNIGHT);
+  public static toUkStartOfDayString(date1: Date | string): string {
+    return this.dateTimeInLondonTimeZone(date1, DayOption.STARTOFDAY);
   }
 
-  public static dateLastSecondUk(date1: Date | string): string {
-    return UkTimeHelper.dateTimeInLondonTimeZone(date1, TimeOption.LASTSECOND);
+  public static toUkEndOfDayString(date1: Date | string): string {
+    return this.dateTimeInLondonTimeZone(date1, DayOption.ENDOFDAY);
   }
 
   /**
    * Returns a string like 'YYYY-MM-DDTHH:mm:ss±HH:MM' representing
-   * the requested London wall time (midnight or last tick) on the
+   * the requested London wall time (midnight or last second) on the
    * same London calendar day as `dateTime`.
    *
    * Safe across DST because we construct the *London wall time* and
@@ -34,18 +33,19 @@ export default class UkTimeHelper {
    */
   public static dateTimeInLondonTimeZone(
     dateTime: Date | string,
-    option: TimeOption,
+    option: DayOption,
   ): string {
     const ymdLondon = formatInTimeZone(dateTime, this.TZ, 'yyyy-MM-dd');
 
-    const wall = option === TimeOption.MIDNIGHT ? 'T00:00:00' : 'T23:59:59.999';
+    const wall =
+      option === DayOption.STARTOFDAY ? 'T00:00:00' : 'T23:59:59.999';
 
     const utcInstant = fromZonedTime(`${ymdLondon}${wall}`, this.TZ);
 
     return formatInTimeZone(utcInstant, this.TZ, "yyyy-MM-dd'T'HH:mm:ssXXX");
   }
 }
-enum TimeOption {
-  MIDNIGHT = 'midnight',
-  LASTSECOND = 'lastSecond',
+enum DayOption {
+  STARTOFDAY = 'StartOfDay',
+  ENDOFDAY = 'EndOfDay',
 }

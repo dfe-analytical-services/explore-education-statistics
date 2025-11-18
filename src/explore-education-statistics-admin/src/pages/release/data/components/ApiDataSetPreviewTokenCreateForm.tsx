@@ -1,4 +1,4 @@
-import { isSameDay, isBefore } from 'date-fns';
+import { addDays, isSameDay, isBefore } from 'date-fns';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -89,11 +89,9 @@ export default function ApiDataSetPreviewTokenCreateForm({
               message: 'Activates date must not be in the past',
               test(value) {
                 if (value == null) return false;
-                const activatesMidnightUk = new Date(
-                  UkTimeHelper.dateMidnightUk(value),
-                );
+                const activatesMidnightUk = UkTimeHelper.toUkStartOfDay(value);
                 const todayMidnightUk = new Date(
-                  UkTimeHelper.todayMidnightUk(),
+                  UkTimeHelper.todayStartOfDayUk(),
                 );
                 return !isBefore(activatesMidnightUk, todayMidnightUk);
               },
@@ -104,21 +102,12 @@ export default function ApiDataSetPreviewTokenCreateForm({
               test(value) {
                 if (value == null) return false;
                 const todayMidnightUk = new Date(
-                  UkTimeHelper.todayMidnightUk(),
+                  UkTimeHelper.todayStartOfDayUk(),
                 );
-
-                const dateOnlyActivatesProvided = value
-                  .toISOString()
-                  .substring(0, 10);
-                const activatesMidnightUk = UkTimeHelper.ukStartOfDayUtc(
-                  dateOnlyActivatesProvided,
-                );
-
-                const sevenDaysFromTodayMidnightUk = new Date(
-                  UkTimeHelper.todayMidnightUk(),
-                );
-                sevenDaysFromTodayMidnightUk.setUTCDate(
-                  sevenDaysFromTodayMidnightUk.getUTCDate() + 7,
+                const activatesMidnightUk = UkTimeHelper.toUkStartOfDay(value);
+                const sevenDaysFromTodayMidnightUk = addDays(
+                  todayMidnightUk,
+                  7,
                 );
 
                 return endDateIsLaterThanOrEqualToStartDate(
@@ -144,22 +133,18 @@ export default function ApiDataSetPreviewTokenCreateForm({
               const activates = context.parent.activates as Date | null;
               if (!activates || !value) return false;
 
-              const activatesUtc = UkTimeHelper.ukStartOfDayUtc(
-                activates.toISOString(),
-              );
-              const expiresUtc = UkTimeHelper.ukEndOfDayUtc(
-                value.toISOString(),
-              );
+              const activatesUtc = UkTimeHelper.toUkStartOfDay(activates);
+              const expiresUtc = UkTimeHelper.toUkEndOfDay(value);
 
-              const activatesMaxUtc = UkTimeHelper.ukEndOfDayUtc(
-                activates.toISOString(),
+              const expiryMaxUtc = addDays(
+                UkTimeHelper.toUkEndOfDay(activates),
+                7,
               );
-              activatesMaxUtc.setUTCDate(activatesMaxUtc.getUTCDate() + 7);
 
               const laterThanActivates =
                 expiresUtc.getTime() >= activatesUtc.getTime();
               const notLaterThanMax =
-                expiresUtc.getTime() <= activatesMaxUtc.getTime();
+                expiresUtc.getTime() <= expiryMaxUtc.getTime();
               return laterThanActivates && notLaterThanMax;
             },
           }),
