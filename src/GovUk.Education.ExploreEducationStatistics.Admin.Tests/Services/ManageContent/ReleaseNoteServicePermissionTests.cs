@@ -5,8 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
@@ -55,14 +53,9 @@ public class ReleaseNoteServicePermissionTests
         params SecurityPolicies[] policies
     )
     {
-        var (mapper, contentDbContext, releaseHelper, userService) = Mocks();
+        var (mapper, contentDbContext, userService) = Mocks();
 
-        var service = new ReleaseNoteService(
-            mapper.Object,
-            contentDbContext.Object,
-            releaseHelper.Object,
-            userService.Object
-        );
+        var service = new ReleaseNoteService(mapper.Object, contentDbContext.Object, userService.Object);
 
         PermissionTestUtil.AssertSecurityPoliciesChecked(
             protectedAction,
@@ -73,18 +66,8 @@ public class ReleaseNoteServicePermissionTests
         );
     }
 
-    private (
-        Mock<IMapper>,
-        Mock<ContentDbContext>,
-        Mock<IPersistenceHelper<ContentDbContext>>,
-        Mock<IUserService>
-    ) Mocks()
+    private (Mock<IMapper>, Mock<ContentDbContext>, Mock<IUserService>) Mocks()
     {
-        return (
-            new Mock<IMapper>(),
-            new Mock<ContentDbContext>(),
-            MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id, _releaseVersion),
-            new Mock<IUserService>()
-        );
+        return (new Mock<IMapper>(), new Mock<ContentDbContext>(), new Mock<IUserService>());
     }
 }

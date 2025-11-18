@@ -3,35 +3,30 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 
-public class ReleaseNoteService(
-    IMapper mapper,
-    ContentDbContext context,
-    IPersistenceHelper<ContentDbContext> persistenceHelper,
-    IUserService userService
-) : IReleaseNoteService
+public class ReleaseNoteService(IMapper mapper, ContentDbContext contentDbContext, IUserService userService)
+    : IReleaseNoteService
 {
     public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> AddReleaseNote(
         Guid releaseVersionId,
         ReleaseNoteSaveRequest saveRequest,
         CancellationToken cancellationToken = default
     ) =>
-        persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateReleaseVersionForUpdates)
+        contentDbContext
+            .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
-                context.Update.Add(
+                contentDbContext.Update.Add(
                     new Update
                     {
                         // TODO EES-6490 Convert 'On' from DateTime to DateTimeOffset
@@ -43,8 +38,8 @@ public class ReleaseNoteService(
                     }
                 );
 
-                await context.SaveChangesAsync(cancellationToken);
-                return GetReleaseNoteViewModels(releaseVersion.Id);
+                await contentDbContext.SaveChangesAsync(cancellationToken);
+                return await GetReleaseNoteViewModels(releaseVersion.Id, cancellationToken);
             });
 
     public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> UpdateReleaseNote(
@@ -53,24 +48,21 @@ public class ReleaseNoteService(
         ReleaseNoteSaveRequest saveRequest,
         CancellationToken cancellationToken = default
     ) =>
-        persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateReleaseVersionForUpdates)
+        contentDbContext
+            .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
+                await contentDbContext.Update.SingleOrNotFoundAsync(
+                    u => u.Id == releaseNoteId && u.ReleaseVersionId == releaseVersion.Id,
+                    cancellationToken
+                )
+            )
+            .OnSuccess(async update =>
             {
-                var releaseNote = releaseVersion.Updates.First(note => note.Id == releaseNoteId);
-
-                if (releaseNote == null)
-                {
-                    return NotFound<List<ReleaseNoteViewModel>>();
-                }
-
-                releaseNote.On = saveRequest.On ?? DateTime.Now;
-                releaseNote.Reason = saveRequest.Reason;
-
-                context.Update.Update(releaseNote);
-                await context.SaveChangesAsync(cancellationToken);
-                return GetReleaseNoteViewModels(releaseVersion.Id);
+                update.On = saveRequest.On ?? DateTime.Now;
+                update.Reason = saveRequest.Reason;
+                await contentDbContext.SaveChangesAsync(cancellationToken);
+                return await GetReleaseNoteViewModels(releaseVersionId, cancellationToken);
             });
 
     public Task<Either<ActionResult, List<ReleaseNoteViewModel>>> DeleteReleaseNote(
@@ -78,32 +70,33 @@ public class ReleaseNoteService(
         Guid releaseNoteId,
         CancellationToken cancellationToken = default
     ) =>
-        persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateReleaseVersionForUpdates)
+        contentDbContext
+            .ReleaseVersions.SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
+                await contentDbContext.Update.SingleOrNotFoundAsync(
+                    u => u.Id == releaseNoteId && u.ReleaseVersionId == releaseVersion.Id,
+                    cancellationToken
+                )
+            )
+            .OnSuccess(async update =>
             {
-                var releaseNote = releaseVersion.Updates.First(note => note.Id == releaseNoteId);
-
-                if (releaseNote == null)
-                {
-                    return NotFound<List<ReleaseNoteViewModel>>();
-                }
-
-                context.Update.Remove(releaseNote);
-                await context.SaveChangesAsync(cancellationToken);
-                return GetReleaseNoteViewModels(releaseVersion.Id);
+                contentDbContext.Update.Remove(update);
+                await contentDbContext.SaveChangesAsync(cancellationToken);
+                return await GetReleaseNoteViewModels(releaseVersionId, cancellationToken);
             });
 
-    private List<ReleaseNoteViewModel> GetReleaseNoteViewModels(Guid releaseVersionId)
+    private async Task<List<ReleaseNoteViewModel>> GetReleaseNoteViewModels(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken
+    )
     {
-        var releaseNotes = context
-            .Update.AsQueryable()
-            .Where(update => update.ReleaseVersionId == releaseVersionId)
-            .OrderByDescending(update => update.On);
-        return mapper.Map<List<ReleaseNoteViewModel>>(releaseNotes);
-    }
+        var updates = await contentDbContext
+            .Update.AsNoTracking()
+            .Where(u => u.ReleaseVersionId == releaseVersionId)
+            .OrderByDescending(u => u.On)
+            .ToListAsync(cancellationToken: cancellationToken);
 
-    private static IQueryable<ReleaseVersion> HydrateReleaseVersionForUpdates(IQueryable<ReleaseVersion> values) =>
-        values.Include(rv => rv.Updates);
+        return mapper.Map<List<ReleaseNoteViewModel>>(updates);
+    }
 }
