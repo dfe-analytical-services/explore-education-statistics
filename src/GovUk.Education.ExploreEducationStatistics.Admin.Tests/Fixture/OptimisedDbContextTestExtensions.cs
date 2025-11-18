@@ -12,8 +12,14 @@ public static class OptimisedDbContextTestExtensions
     )
         where TDbContext : DbContext
     {
-        supplier.Invoke(context);
-        await context.SaveChangesAsync();
-        context.ChangeTracker.Clear();
+        try
+        {
+            supplier.Invoke(context);
+            await context.SaveChangesAsync();
+        }
+        finally
+        {
+            context.ChangeTracker.Clear();
+        }
     }
 }
