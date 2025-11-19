@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -68,13 +67,6 @@ public abstract class UserResourceRoleRepositoryBase<TParent, TResourceRole, TRe
         await ContentDbContext.SaveChangesAsync();
     }
 
-    protected async Task Remove(TResourceRole resourceRole, CancellationToken cancellationToken = default)
-    {
-        ContentDbContext.Remove(resourceRole);
-
-        await ContentDbContext.SaveChangesAsync(cancellationToken);
-    }
-
     protected async Task RemoveMany(
         IReadOnlyList<TResourceRole> resourceRoles,
         CancellationToken cancellationToken = default
@@ -90,52 +82,16 @@ public abstract class UserResourceRoleRepositoryBase<TParent, TResourceRole, TRe
         await ContentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    protected async Task<List<TRoleEnum>> GetDistinctResourceRolesByUser(Guid userId)
-    {
-        return await ContentDbContext
-            .Set<TResourceRole>()
-            .AsQueryable()
-            .Where(r => r.UserId == userId)
-            .Select(r => r.Role)
-            .Distinct()
-            .ToListAsync();
-    }
-
-    protected async Task<List<TRoleEnum>> GetAllResourceRolesByUserAndResource(Guid userId, Guid resourceId)
-    {
-        return await GetResourceRolesQueryByResourceId(resourceId)
-            .Where(r => r.UserId == userId)
-            .Select(r => r.Role)
-            .Distinct()
-            .ToListAsync();
-    }
-
     protected async Task<TResourceRole?> GetResourceRole(Guid userId, Guid resourceId, TRoleEnum role)
     {
         return await GetResourceRolesQueryByResourceId(resourceId)
             .SingleOrDefaultAsync(r => r.UserId == userId && r.Role.Equals(role));
     }
 
-    protected async Task<List<TResourceRole>> ListResourceRoles(Guid resourceId, TRoleEnum[]? rolesToInclude)
-    {
-        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<TRoleEnum>();
-
-        return await GetResourceRolesQueryByResourceId(resourceId)
-            .Include(urr => urr.User)
-            .Where(urr => rolesToCheck.Contains(urr.Role))
-            .ToListAsync();
-    }
-
     protected async Task<bool> UserHasRoleOnResource(Guid userId, Guid resourceId, TRoleEnum role)
     {
         return await GetResourceRolesQueryByResourceId(resourceId)
             .AnyAsync(r => r.UserId == userId && r.Role.Equals(role));
-    }
-
-    protected async Task<bool> UserHasRoleOnResource(string email, Guid resourceId, TRoleEnum role)
-    {
-        return await GetResourceRolesQueryByResourceId(resourceId)
-            .AnyAsync(r => r.User.Email.ToLower().Equals(email.ToLower()) && r.Role.Equals(role));
     }
 
     private static TResourceRole NewResourceRole(Guid userId, Guid resourceId, TRoleEnum role, Guid createdById)

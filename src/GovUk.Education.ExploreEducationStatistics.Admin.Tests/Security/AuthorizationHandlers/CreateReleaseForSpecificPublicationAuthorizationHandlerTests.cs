@@ -50,7 +50,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
                 if (!expectedToPassByClaimAlone)
                 {
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                        .Setup(s => s.ListRolesByUserAndPublication(UserId, Publication.Id))
                         .ReturnsAsync(new List<PublicationRole>());
                 }
 
@@ -95,7 +95,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
                 var authContext = CreateAuthContext(user, Publication);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                    .Setup(s => s.ListRolesByUserAndPublication(UserId, Publication.Id))
                     .ReturnsAsync(CollectionUtils.ListOf(publicationRole));
 
                 await handler.HandleAsync(authContext);

@@ -136,10 +136,10 @@ public abstract class UserPublicationRoleRepositoryTests
         }
     }
 
-    public class GetDistinctRolesByUserTests : UserPublicationRoleRepositoryTests
+    public class ListDistinctRolesByUserTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
-        public async Task GetDistinctRolesByUser()
+        public async Task Success()
         {
             User user1 = _fixture.DefaultUser();
             User user2 = _fixture.DefaultUser();
@@ -189,7 +189,7 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                var result = await repository.GetDistinctRolesByUser(user1.Id);
+                var result = await repository.ListDistinctRolesByUser(user1.Id);
 
                 // Expect only distinct roles to be returned, therefore the 2nd "Owner" role is filtered out.
                 Assert.Equal([PublicationRole.Owner, PublicationRole.Allower], result);
@@ -200,7 +200,7 @@ public abstract class UserPublicationRoleRepositoryTests
         // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
         // filter out any usage of the NEW roles.
         [Fact]
-        public async Task GetDistinctRolesByUser_InvalidRolesNotReturned()
+        public async Task InvalidRolesNotReturned()
         {
             User user = _fixture.DefaultUser();
 
@@ -234,17 +234,17 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                var result = await repository.GetDistinctRolesByUser(user.Id);
+                var result = await repository.ListDistinctRolesByUser(user.Id);
 
                 Assert.Empty(result);
             }
         }
     }
 
-    public class GetAllRolesByUserAndPublicationTests : UserPublicationRoleRepositoryTests
+    public class ListRolesByUserAndPublicationTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
-        public async Task GetAllRolesByUserAndPublication()
+        public async Task Success()
         {
             User user1 = _fixture.DefaultUser();
             User user2 = _fixture.DefaultUser();
@@ -294,7 +294,7 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                var result = await repository.GetAllRolesByUserAndPublication(
+                var result = await repository.ListRolesByUserAndPublication(
                     userId: user1.Id,
                     publicationId: publication1.Id
                 );
@@ -307,7 +307,7 @@ public abstract class UserPublicationRoleRepositoryTests
         // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
         // filter out any usage of the NEW roles.
         [Fact]
-        public async Task GetAllRolesByUserAndPublication_InvalidRolesNotReturned()
+        public async Task InvalidRolesNotReturned()
         {
             User user = _fixture.DefaultUser();
 
@@ -350,7 +350,7 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                var result = await repository.GetAllRolesByUserAndPublication(
+                var result = await repository.ListRolesByUserAndPublication(
                     userId: user.Id,
                     publicationId: publication.Id
                 );

@@ -172,14 +172,14 @@ public class PermissionsController(
 
     private async Task<bool> IsReleaseApprover()
     {
-        return (await userReleaseRoleRepository.GetDistinctRolesByUser(userService.GetUserId())).Contains(
+        return (await userReleaseRoleRepository.ListDistinctRolesByUser(userService.GetUserId())).Contains(
             ReleaseRole.Approver
         );
     }
 
     private async Task<bool> IsPublicationApprover()
     {
-        return (await userPublicationRoleRepository.GetDistinctRolesByUser(userService.GetUserId())).Contains(
+        return (await userPublicationRoleRepository.ListDistinctRolesByUser(userService.GetUserId())).Contains(
             PublicationRole.Allower
         );
     }

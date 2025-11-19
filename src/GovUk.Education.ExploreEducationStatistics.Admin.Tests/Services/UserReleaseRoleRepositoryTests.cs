@@ -359,10 +359,10 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class GetAllRolesByUserAndReleaseVersionTests : UserReleaseRoleRepositoryTests
+    public class ListRolesByUserAndReleaseVersionTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
-        public async Task GetAllRolesByUserAndReleaseVersion()
+        public async Task Success()
         {
             User user = _fixture.DefaultUser();
             var releaseVersion = new ReleaseVersion();
@@ -416,7 +416,7 @@ public abstract class UserReleaseRoleRepositoryTests
             {
                 var service = CreateRepository(contentDbContext);
 
-                var result = await service.GetAllRolesByUserAndReleaseVersion(
+                var result = await service.ListRolesByUserAndReleaseVersion(
                     userId: user.Id,
                     releaseVersionId: releaseVersion.Id
                 );
@@ -428,10 +428,10 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class GetAllRolesByUserAndPublicationTests : UserReleaseRoleRepositoryTests
+    public class ListRolesByUserAndPublicationTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
-        public async Task GetAllRolesByUserAndPublication()
+        public async Task Success()
         {
             User user = _fixture.DefaultUser();
             var publication = new Publication();
@@ -507,7 +507,7 @@ public abstract class UserReleaseRoleRepositoryTests
             {
                 var service = CreateRepository(contentDbContext);
 
-                var result = await service.GetAllRolesByUserAndPublication(user.Id, publication.Id);
+                var result = await service.ListRolesByUserAndPublication(user.Id, publication.Id);
 
                 Assert.Equal(2, result.Count);
                 Assert.Equal(ReleaseRole.Contributor, result[0]);
@@ -516,10 +516,10 @@ public abstract class UserReleaseRoleRepositoryTests
         }
     }
 
-    public class GetDistinctRolesByUserTests : UserReleaseRoleRepositoryTests
+    public class ListDistinctRolesByUserTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
-        public async Task GetDistinctRolesByUser()
+        public async Task Success()
         {
             User user = _fixture.DefaultUser();
             var release1 = new ReleaseVersion();
@@ -586,7 +586,7 @@ public abstract class UserReleaseRoleRepositoryTests
             {
                 var service = CreateRepository(contentDbContext);
 
-                var result = await service.GetDistinctRolesByUser(user.Id);
+                var result = await service.ListDistinctRolesByUser(user.Id);
 
                 // Expect 3 distinct results.  The 4th duplicate "ReleaseRole.PrereleaseViewer" role is filtered out.
                 Assert.Equal([ReleaseRole.Contributor, ReleaseRole.PrereleaseViewer, ReleaseRole.Approver], result);

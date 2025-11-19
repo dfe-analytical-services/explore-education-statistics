@@ -1728,10 +1728,10 @@ public abstract class UserRoleServiceTests
             userPublicationRoleRepository
                 .Setup(m => m.Remove(It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id), default))
                 .Returns(Task.CompletedTask);
-            userPublicationRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userPublicationRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userReleaseRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -1799,13 +1799,13 @@ public abstract class UserRoleServiceTests
             userManager.Setup(s => s.GetRolesAsync(ItIsUser(identityUser))).ReturnsAsync(ListOf(RoleNames.BauUser));
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userReleaseRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleRepository
                 .Setup(m => m.Remove(It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id), default))
                 .Returns(Task.CompletedTask);
-            userPublicationRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userPublicationRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -1872,14 +1872,14 @@ public abstract class UserRoleServiceTests
             userManager.Setup(s => s.GetRolesAsync(ItIsUser(identityUser))).ReturnsAsync(ListOf(RoleNames.Analyst));
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userReleaseRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleRepository
                 .Setup(m => m.Remove(It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id), default))
                 .Returns(Task.CompletedTask);
             userPublicationRoleRepository
-                .Setup(m => m.GetDistinctRolesByUser(user.Id))
+                .Setup(m => m.ListDistinctRolesByUser(user.Id))
                 .ReturnsAsync([PublicationRole.Owner]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1941,14 +1941,14 @@ public abstract class UserRoleServiceTests
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
             userReleaseRoleRepository
-                .Setup(m => m.GetDistinctRolesByUser(user.Id))
+                .Setup(m => m.ListDistinctRolesByUser(user.Id))
                 .ReturnsAsync([ReleaseRole.Approver]);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleRepository
                 .Setup(m => m.Remove(It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id), default))
                 .Returns(Task.CompletedTask);
-            userPublicationRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userPublicationRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -2019,14 +2019,14 @@ public abstract class UserRoleServiceTests
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
             userReleaseRoleRepository
-                .Setup(m => m.GetDistinctRolesByUser(user.Id))
+                .Setup(m => m.ListDistinctRolesByUser(user.Id))
                 .ReturnsAsync([ReleaseRole.PrereleaseViewer]);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleRepository
                 .Setup(m => m.Remove(It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id), default))
                 .Returns(Task.CompletedTask);
-            userPublicationRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userPublicationRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -2094,13 +2094,13 @@ public abstract class UserRoleServiceTests
                 .ReturnsAsync(new IdentityResult());
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userPublicationRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository
                 .Setup(m => m.Remove(It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id), default))
                 .Returns(Task.CompletedTask);
-            userReleaseRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userReleaseRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -2172,13 +2172,13 @@ public abstract class UserRoleServiceTests
             userManager.Setup(s => s.GetRolesAsync(ItIsUser(identityUser))).ReturnsAsync(ListOf(RoleNames.BauUser));
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userPublicationRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository
                 .Setup(m => m.Remove(It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id), default))
                 .Returns(Task.CompletedTask);
-            userReleaseRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userReleaseRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -2246,14 +2246,14 @@ public abstract class UserRoleServiceTests
             userManager.Setup(s => s.GetRolesAsync(ItIsUser(identityUser))).ReturnsAsync(ListOf(RoleNames.Analyst));
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userPublicationRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository
                 .Setup(m => m.Remove(It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id), default))
                 .Returns(Task.CompletedTask);
             userReleaseRoleRepository
-                .Setup(m => m.GetDistinctRolesByUser(user.Id))
+                .Setup(m => m.ListDistinctRolesByUser(user.Id))
                 .ReturnsAsync([ReleaseRole.Approver]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2331,11 +2331,11 @@ public abstract class UserRoleServiceTests
             userReleaseRoleRepository
                 .Setup(m => m.Remove(It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id), default))
                 .Returns(Task.CompletedTask);
-            userReleaseRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userReleaseRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
             userPublicationRoleRepository
-                .Setup(m => m.GetDistinctRolesByUser(user.Id))
+                .Setup(m => m.ListDistinctRolesByUser(user.Id))
                 .ReturnsAsync([PublicationRole.Owner]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2427,14 +2427,14 @@ public abstract class UserRoleServiceTests
                 .ReturnsAsync(new IdentityResult());
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userPublicationRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository
                 .Setup(m => m.Remove(It.Is<UserReleaseRole>(urr => urr.Id == userReleaseRole.Id), default))
                 .Returns(Task.CompletedTask);
             userReleaseRoleRepository
-                .Setup(m => m.GetDistinctRolesByUser(user.Id))
+                .Setup(m => m.ListDistinctRolesByUser(user.Id))
                 .ReturnsAsync([ReleaseRole.PrereleaseViewer]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2499,14 +2499,14 @@ public abstract class UserRoleServiceTests
             var userManager = MockUserManager();
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository.Setup(m => m.GetDistinctRolesByUser(user.Id)).ReturnsAsync([]);
+            userPublicationRoleRepository.Setup(m => m.ListDistinctRolesByUser(user.Id)).ReturnsAsync([]);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository
                 .Setup(m => m.Remove(It.Is<UserReleaseRole>(urr => urr.Id == prereleaseRole.Id), default))
                 .Returns(Task.CompletedTask);
             userReleaseRoleRepository
-                .Setup(m => m.GetDistinctRolesByUser(user.Id))
+                .Setup(m => m.ListDistinctRolesByUser(user.Id))
                 .ReturnsAsync([ReleaseRole.Approver]);
 
             // Here the user has the Analyst role currently but now we are removing a Prerelease Release Role.

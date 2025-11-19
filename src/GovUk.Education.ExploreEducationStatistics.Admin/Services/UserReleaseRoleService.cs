@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -7,25 +8,27 @@ using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Con
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserReleaseRoleService : IUserReleaseRoleService
+public class UserReleaseRoleService(
+    ContentDbContext contentDbContext,
+    IReleaseVersionRepository releaseVersionRepository
+) : IUserReleaseRoleService
 {
-    private readonly ContentDbContext _contentDbContext;
-    private readonly IReleaseVersionRepository _releaseVersionRepository;
-
-    public UserReleaseRoleService(ContentDbContext contentDbContext, IReleaseVersionRepository releaseVersionRepository)
+    public async Task<List<UserReleaseRole>> ListLatestUserReleaseRolesByPublication(
+        Guid publicationId,
+        ReleaseRole[]? rolesToInclude,
+        bool includeInactiveUsers = false
+    )
     {
-        _contentDbContext = contentDbContext;
-        _releaseVersionRepository = releaseVersionRepository;
-    }
+        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<ReleaseRole>();
 
-    public async Task<List<UserReleaseRole>> ListUserReleaseRolesByPublication(ReleaseRole role, Guid publicationId)
-    {
-        var releaseVersionIds = await _releaseVersionRepository.ListLatestReleaseVersionIds(publicationId);
-        return await _contentDbContext
-            .UserReleaseRoles.Include(releaseRole => releaseRole.User)
-            .Where(userReleaseRole =>
-                releaseVersionIds.Contains(userReleaseRole.ReleaseVersionId) && userReleaseRole.Role == role
-            )
+        var releaseVersionIds = await releaseVersionRepository.ListLatestReleaseVersionIds(publicationId);
+
+        var query = includeInactiveUsers ? contentDbContext.UserReleaseRoles : contentDbContext.ActiveUserReleaseRoles;
+
+        return await query
+            .Include(releaseRole => releaseRole.User)
+            .Where(urr => releaseVersionIds.Contains(urr.ReleaseVersionId))
+            .Where(urr => rolesToCheck.Contains(urr.Role))
             .ToListAsync();
     }
 }

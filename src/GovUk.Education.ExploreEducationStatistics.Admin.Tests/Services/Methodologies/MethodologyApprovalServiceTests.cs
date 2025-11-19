@@ -368,7 +368,7 @@ public class MethodologyApprovalServiceTests
             .ReturnsAsync(false);
 
         userReleaseRoleService
-            .Setup(mock => mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
+            .Setup(mock => mock.ListLatestUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
             .ReturnsAsync(new List<UserReleaseRole>());
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -444,7 +444,7 @@ public class MethodologyApprovalServiceTests
             .ReturnsAsync(false);
 
         userReleaseRoleService
-            .Setup(mock => mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
+            .Setup(mock => mock.ListLatestUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
             .ReturnsAsync(new List<UserReleaseRole>());
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -1203,7 +1203,7 @@ public class MethodologyApprovalServiceTests
             .ReturnsAsync(false);
 
         userReleaseRoleService
-            .Setup(mock => mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
+            .Setup(mock => mock.ListLatestUserReleaseRolesByPublication(ReleaseRole.Approver, publication.Id))
             .ReturnsAsync(
                 new List<UserReleaseRole>
                 {

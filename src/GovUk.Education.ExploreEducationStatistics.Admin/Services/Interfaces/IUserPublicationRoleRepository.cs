@@ -7,9 +7,19 @@ public interface IUserPublicationRoleRepository
 {
     Task<UserPublicationRole> Create(Guid userId, Guid publicationId, PublicationRole role, Guid createdById);
 
-    Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId);
+    Task<List<PublicationRole>> ListDistinctRolesByUser(Guid userId, bool includeInactiveUsers = false);
 
-    Task<List<PublicationRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId);
+    Task<List<PublicationRole>> ListRolesByUserAndPublication(
+        Guid userId,
+        Guid publicationId,
+        bool includeInactiveUsers = false
+    );
+
+    Task<IReadOnlyList<UserPublicationRole>> ListUserPublicationRoles(
+        Guid publicationId,
+        PublicationRole[]? rolesToInclude,
+        bool includeInactiveUsers = false
+    );
 
     Task<UserPublicationRole?> GetUserPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
 

@@ -5,5 +5,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IUserReleaseRoleService
 {
-    Task<List<UserReleaseRole>> ListUserReleaseRolesByPublication(ReleaseRole role, Guid publicationId);
+    Task<List<UserReleaseRole>> ListLatestUserReleaseRolesByPublication(
+        Guid publicationId,
+        ReleaseRole[]? rolesToInclude,
+        bool includeInactiveUsers = false
+    );
 }

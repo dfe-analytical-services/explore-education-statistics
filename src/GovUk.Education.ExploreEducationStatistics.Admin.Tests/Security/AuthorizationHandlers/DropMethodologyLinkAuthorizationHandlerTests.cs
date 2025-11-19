@@ -79,7 +79,7 @@ public class DropMethodologyLinkAuthorizationHandlerTests
                 if (!expectedToPassByClaimAlone)
                 {
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
+                        .Setup(s => s.ListRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
                         .ReturnsAsync(new List<PublicationRole>());
                 }
 
@@ -137,7 +137,7 @@ public class DropMethodologyLinkAuthorizationHandlerTests
                 var handler = SetupHandler(userPublicationRoleRepository.Object);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
+                    .Setup(s => s.ListRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
                     .ReturnsAsync(ListOf(publicationRole));
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
@@ -162,7 +162,7 @@ public class DropMethodologyLinkAuthorizationHandlerTests
             var handler = SetupHandler(userPublicationRoleRepository.Object);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
+                .Setup(s => s.ListRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
                 .ReturnsAsync(new List<PublicationRole>());
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);

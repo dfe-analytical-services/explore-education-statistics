@@ -94,11 +94,11 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .Setup(mock => mock.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<PublicationRole>());
 
                     userReleaseRoleRepository
-                        .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .Setup(mock => mock.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<ReleaseRole>());
                 }
 
@@ -148,13 +148,13 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(mock => mock.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(publicationRole));
 
                 if (!expectedToPassByPublicationRole)
                 {
                     userReleaseRoleRepository
-                        .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .Setup(mock => mock.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<ReleaseRole>());
                 }
 
@@ -202,13 +202,13 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(mock => mock.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(publicationRole));
 
                 if (!expectedToPassByPublicationRole)
                 {
                     userReleaseRoleRepository
-                        .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .Setup(mock => mock.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<ReleaseRole>());
                 }
 
@@ -259,15 +259,15 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
                 userReleaseRoleRepository
-                    .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(mock => mock.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<ReleaseRole>());
 
                 userReleaseRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(releaseRole));
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
@@ -314,15 +314,15 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(mock => mock.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
                 userReleaseRoleRepository
-                    .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(mock => mock.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<ReleaseRole>());
 
                 userReleaseRoleRepository
-                    .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .Setup(mock => mock.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(releaseRole));
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
@@ -365,11 +365,11 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<PublicationRole>());
 
             userReleaseRoleRepository
-                .Setup(mock => mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                .Setup(mock => mock.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<ReleaseRole>());
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);

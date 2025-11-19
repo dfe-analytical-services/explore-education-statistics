@@ -27,7 +27,7 @@ public interface IUserResourceRoleNotificationService
     );
 
     Task NotifyUserOfNewPreReleaseRole(
-        string userEmail,
+        Guid userId,
         Guid releaseVersionId,
         CancellationToken cancellationToken = default
     );
