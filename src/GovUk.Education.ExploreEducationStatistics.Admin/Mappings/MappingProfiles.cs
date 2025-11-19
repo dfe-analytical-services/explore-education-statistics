@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Releases.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
@@ -25,7 +26,6 @@ using MethodologyNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admi
 using MethodologyVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyVersionViewModel;
 using OrganisationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.OrganisationViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.ReleaseNoteViewModel;
 using ReleaseVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionSummaryViewModel;
 using ReleaseVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionViewModel;
 using ThemeViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ThemeViewModel;
@@ -181,7 +181,7 @@ public class MappingProfiles : CommonMappingProfile
                 m => m.MapFrom(rv => rv.PublishingOrganisations.OrderBy(o => o.Title))
             );
 
-        CreateMap<Update, ReleaseNoteViewModel>();
+        CreateMap<Update, ReleaseUpdateDto>();
 
         CreateMap<Comment, CommentViewModel>()
             .ForMember(

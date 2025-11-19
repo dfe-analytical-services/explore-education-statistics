@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Releases.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -44,7 +45,7 @@ public class ManageContentPageViewModel
 
         public List<OrganisationViewModel> PublishingOrganisations { get; set; } = [];
 
-        public List<ReleaseNoteViewModel> Updates { get; set; } = [];
+        public List<ReleaseUpdateDto> Updates { get; set; } = [];
 
         public List<ContentSectionViewModel> Content { get; set; } = [];
 

@@ -24,6 +24,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Releases;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -614,7 +615,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IOrganisationService, OrganisationService>();
         services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
         services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
-        services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
+        services.AddTransient<IReleaseUpdatesService, ReleaseUpdatesService>();
         services.AddTransient<IReleaseRepository, ReleaseRepository>();
         services.AddTransient<
             Content.Model.Repository.Interfaces.IReleaseVersionRepository,
