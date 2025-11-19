@@ -11,8 +11,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -27,9 +27,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 using Moq;
 using Testcontainers.Azurite;
@@ -157,6 +155,7 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
             .RegisterControllers<Startup>();
 
         services
+            .AddSingleton<TestUserPool>()
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                 JwtBearerDefaults.AuthenticationScheme,
@@ -233,6 +232,31 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
         services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
     }
 
+    public class TestUserPool
+    {
+        private readonly Dictionary<Guid, ClaimsPrincipal> _users = new();
+
+        public TestUserPool()
+        {
+            AddUser(OptimisedTestUsers.Authenticated);
+            AddUser(OptimisedTestUsers.Bau);
+            AddUser(OptimisedTestUsers.Analyst);
+            AddUser(OptimisedTestUsers.PreReleaseUser);
+            AddUser(OptimisedTestUsers.Verified);
+            AddUser(OptimisedTestUsers.VerifiedButNotAuthorized);
+        }
+
+        public void AddUser(ClaimsPrincipal user)
+        {
+            _users.Add(user.GetUserId(), user);
+        }
+
+        public ClaimsPrincipal? GetUser(Guid id)
+        {
+            return _users.GetValueOrDefault(id);
+        }
+    }
+
     /// <summary>
     /// An AuthenticationHandler that allows the tests to make a ClaimsPrincipal available in the HttpContext
     /// for authentication and authorization mechanisms to use.
@@ -241,44 +265,34 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        IHttpContextAccessor httpContextAccessor
+        IHttpContextAccessor httpContextAccessor,
+        TestUserPool userPool
     ) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
     {
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             if (
-                !httpContextAccessor.HttpContext.TryGetRequestHeader(
-                    "TestUser",
-                    out var fakeUserName
-                )
+                !httpContextAccessor.HttpContext.TryGetRequestHeader("TestUser", out var testUserId)
             )
             {
                 return Task.FromResult(AuthenticateResult.NoResult());
             }
 
-            if (!Enum.TryParse(typeof(TestUser), fakeUserName, out var testUser))
+            if (!Guid.TryParse(testUserId, out var id))
             {
-                throw new ArgumentException($"{fakeUserName} is not a recognised test user");
+                throw new ArgumentException($"{testUserId} is not a Guid");
             }
 
-            var dataFixture = new DataFixture();
+            var user = userPool.GetUser(id);
 
-            ClaimsPrincipal user = testUser switch
+            if (user == null)
             {
-                TestUser.Bau => dataFixture.BauUser(),
-                TestUser.Authenticated => dataFixture.AuthenticatedUser(),
-                _ => throw new ArgumentException($"{fakeUserName} is not a recognised test user"),
-            };
+                throw new ArgumentException($"{testUserId} is not a recognised test user");
+            }
 
             var ticket = new AuthenticationTicket(user, JwtBearerDefaults.AuthenticationScheme);
             var result = AuthenticateResult.Success(ticket);
             return Task.FromResult(result);
         }
     }
-}
-
-public enum TestUser
-{
-    Bau,
-    Authenticated,
 }

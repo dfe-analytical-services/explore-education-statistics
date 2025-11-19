@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 {
     public class BlobCacheAttribute : CacheAttribute
     {
-        private static Dictionary<string, IBlobCacheService> Services { get; set; } = new();
+        private static ConcurrentDictionary<string, IBlobCacheService> Services { get; set; } =
+            new();
 
         protected override Type BaseKey => typeof(IBlobCacheKey);
 
@@ -21,17 +23,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         /// </summary>
         public string? ServiceName { get; set; }
 
-        public BlobCacheAttribute(Type key, bool forceUpdate = false) : base(key, forceUpdate)
-        {
-        }
+        public BlobCacheAttribute(Type key, bool forceUpdate = false)
+            : base(key, forceUpdate) { }
 
         public static void AddService(string name, IBlobCacheService service)
         {
             Services[name] = service;
         }
+
         public static void RemoveService(string name)
         {
-            Services.Remove(name);
+            Services.Remove(name, out var _);
         }
 
         public static void ClearServices()
@@ -53,7 +55,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
                 return service.GetItem(key, returnType);
             }
 
-            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            throw new ArgumentException(
+                $"Cache key must by assignable to {BaseKey.GetPrettyFullName()}"
+            );
         }
 
         public override async Task<object?> GetAsync(ICacheKey cacheKey, Type returnType)
@@ -70,7 +74,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
                 return await service.GetItemAsync(key, returnType);
             }
 
-            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            throw new ArgumentException(
+                $"Cache key must by assignable to {BaseKey.GetPrettyFullName()}"
+            );
         }
 
         public override void Set(ICacheKey cacheKey, object value)
@@ -89,7 +95,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
                 return;
             }
 
-            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            throw new ArgumentException(
+                $"Cache key must by assignable to {BaseKey.GetPrettyFullName()}"
+            );
         }
 
         public override async Task SetAsync(ICacheKey cacheKey, object value)
@@ -108,7 +116,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
                 return;
             }
 
-            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            throw new ArgumentException(
+                $"Cache key must by assignable to {BaseKey.GetPrettyFullName()}"
+            );
         }
 
         private IBlobCacheService? GetService()

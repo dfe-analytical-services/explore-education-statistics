@@ -1,4 +1,5 @@
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -36,17 +37,9 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
             .Build();
 
         _publicDataDbContext = _factory.Services.GetRequiredService<PublicDataDbContext>();
-        _publicDataDbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-
         _contentDbContext = _factory.Services.GetRequiredService<ContentDbContext>();
-        _contentDbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-
         _statisticsDbContext = _factory.Services.GetRequiredService<StatisticsDbContext>();
-        _statisticsDbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-
         _usersAndRolesDbContext = _factory.Services.GetRequiredService<UsersAndRolesDbContext>();
-        _usersAndRolesDbContext.ChangeTracker.QueryTrackingBehavior =
-            QueryTrackingBehavior.NoTracking;
 
         _processorClientMock = Mock.Get(_factory.Services.GetRequiredService<IProcessorClient>());
         _publicDataApiClientMock = Mock.Get(
@@ -54,9 +47,20 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
         );
     }
 
+    /// <summary>
+    /// This is called by the XUnit lifecycle management of test fixtures.
+    /// Once the test suite has finished using this fixture (either at class or
+    /// collection level), this method is called for us to dispose of any
+    /// disposable resources that we are keeping handles on.
+    ///
+    /// For example, the reusable DbContexts that we use to seed test data
+    /// and make assertions with are disposed of here, ensuring that they do
+    /// not hang around and allows the full disposal of the
+    /// WebApplicationFactory.
+    /// </summary>
     public async Task DisposeAsync()
     {
-        await _psql.Stop();
+        // await _psql.Stop();
         DisposeDbContexts();
     }
 
@@ -77,6 +81,14 @@ public class OptimisedHttpClientWithPsqlFixture : IAsyncLifetime
     public HttpClient CreateClient()
     {
         return _factory.CreateClient();
+    }
+
+    public void RegisterTestUser(ClaimsPrincipal user)
+    {
+        var userPool =
+            _factory.Services.GetRequiredService<OptimisedWebApplicationFactoryBuilder<Startup>.TestUserPool>();
+
+        userPool.AddUser(user);
     }
 
     public WebApplicationFactory<Startup> GetFactory()

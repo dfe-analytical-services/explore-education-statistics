@@ -118,7 +118,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
                 dataSetId: dataSet.Id,
                 page: 1,
                 pageSize: 10,
-                client: fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var viewModel = response.AssertOk<
@@ -181,7 +181,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
                 dataSetId: dataSet.Id,
                 page: 1,
                 pageSize: 10,
-                client: fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var viewModel = response.AssertOk<
@@ -277,7 +277,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
                 dataSetId: dataSet.Id,
                 page: page,
                 pageSize: pageSize,
-                client: fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var viewModel = response.AssertOk<
@@ -379,7 +379,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
                 dataSetId: targetDataSet.Id,
                 page: 1,
                 pageSize: 10,
-                client: fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var viewModel = response.AssertOk<
@@ -417,7 +417,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
                 dataSetId: Guid.NewGuid(),
                 page: 1,
                 pageSize: 1,
-                client: fixture.CreateClient().WithUser(TestUser.Authenticated)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated)
             );
 
             response.AssertForbidden();
@@ -426,7 +426,10 @@ public abstract class OptimisedDataSetVersionsControllerTests
         [Fact]
         public async Task NoDataSetId_Returns400()
         {
-            var response = await fixture.CreateClient().WithUser(TestUser.Bau).GetAsync(BaseUrl);
+            var response = await fixture
+                .CreateClient()
+                .WithUser(OptimisedTestUsers.Bau)
+                .GetAsync(BaseUrl);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -438,7 +441,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
         {
             var response = await ListLiveVersions(
                 dataSetId: Guid.NewGuid(),
-                client: fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertNotFound();
@@ -498,7 +501,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
 
             var response = await GetDataSetVersion(
                 dataSetVersionId: requestedDataSetVersion.Id,
-                fixture.CreateClient().WithUser(TestUser.Bau)
+                fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var viewModel = response.AssertOk<DataSetVersionInfoViewModel>();
@@ -514,7 +517,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated);
 
             var response = await GetDataSetVersion(
                 dataSetVersionId: Guid.NewGuid(),
@@ -529,7 +532,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
         {
             var response = await GetDataSetVersion(
                 dataSetVersionId: Guid.NewGuid(),
-                fixture.CreateClient().WithUser(TestUser.Bau)
+                fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertNotFound();
@@ -642,7 +645,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
             var response = await CreateNextVersion(
                 dataSetId: dataSet.Id,
                 releaseFileId: releaseFile.Id,
-                client: fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
@@ -657,7 +660,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated);
 
             var response = await CreateNextVersion(
                 dataSetId: Guid.NewGuid(),
@@ -674,7 +677,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
             var response = await CreateNextVersion(
                 dataSetId: Guid.Empty,
                 releaseFileId: Guid.Empty,
-                client: fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -780,7 +783,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
 
             var response = await CompleteNextVersionImport(
                 dataSetVersionId: nextDataSetVersion.Id,
-                client: fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
@@ -794,7 +797,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated);
 
             var response = await CompleteNextVersionImport(
                 dataSetVersionId: Guid.NewGuid(),
@@ -809,7 +812,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
         {
             var response = await CompleteNextVersionImport(
                 dataSetVersionId: Guid.Empty,
-                client: fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -851,7 +854,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
 
             var response = await DeleteVersion(
                 dataSetVersionId,
-                client: fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertNoContent();
@@ -860,7 +863,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated);
 
             var response = await DeleteVersion(Guid.NewGuid(), client);
 
@@ -901,7 +904,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
 
             var response = await DeleteVersion(
                 dataSetVersion.Id,
-                client: fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertNotFound();
@@ -953,7 +956,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
 
             var response = await DeleteVersion(
                 dataSetVersion.Id,
-                client: fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -996,7 +999,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 DeleteVersion(
                     dataSetVersion.Id,
-                    client: fixture.CreateClient().WithUser(TestUser.Bau)
+                    client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
                 )
             );
 
@@ -1061,7 +1064,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
 
             var response = await GetVersionChanges(
                 dataSetVersion.Id,
-                client: fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertOk(mockedChanges, useSystemJson: true);
@@ -1070,7 +1073,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated);
 
             var response = await GetVersionChanges(Guid.NewGuid(), client);
 
@@ -1082,7 +1085,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
         {
             var response = await GetVersionChanges(
                 Guid.NewGuid(),
-                fixture.CreateClient().WithUser(TestUser.Bau)
+                fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertNotFound();
@@ -1125,7 +1128,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
 
             var response = await GetVersionChanges(
                 dataSetVersion.Id,
-                client: fixture.CreateClient().WithUser(TestUser.Bau)
+                client: fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             MockUtils.VerifyAllMocks(fixture.GetPublicDataApiClientMock());
@@ -1169,7 +1172,10 @@ public abstract class OptimisedDataSetVersionsControllerTests
                 .ThrowsAsync(new HttpRequestException());
 
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                GetVersionChanges(dataSetVersion.Id, fixture.CreateClient().WithUser(TestUser.Bau))
+                GetVersionChanges(
+                    dataSetVersion.Id,
+                    fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
+                )
             );
 
             Assert.IsType<HttpRequestException>(exception.InnerException);
@@ -1261,7 +1267,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
             var response = await UpdateVersion(
                 nextDataSetVersion.Id,
                 updateRequest,
-                fixture.CreateClient().WithUser(TestUser.Bau)
+                fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var viewModel = response.AssertOk<DataSetDraftVersionViewModel>();
@@ -1292,7 +1298,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated);
 
             var updateRequest = new DataSetVersionUpdateRequest();
 
@@ -1309,7 +1315,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
             var response = await UpdateVersion(
                 Guid.NewGuid(),
                 updateRequest,
-                fixture.CreateClient().WithUser(TestUser.Bau)
+                fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertNotFound();
@@ -1357,7 +1363,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
             var response = await UpdateVersion(
                 nextDataSetVersion.Id,
                 updateRequest,
-                fixture.CreateClient().WithUser(TestUser.Bau)
+                fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -1397,7 +1403,7 @@ public abstract class OptimisedDataSetVersionsControllerTests
             var response = await UpdateVersion(
                 dataSetVersion.Id,
                 updateRequest,
-                fixture.CreateClient().WithUser(TestUser.Bau)
+                fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();

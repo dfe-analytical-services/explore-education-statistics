@@ -4,12 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
@@ -21,13 +19,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Moq;
 
@@ -43,7 +38,7 @@ public class OptimisedDataSetsControllerTestsCollection
 [Collection(nameof(OptimisedDataSetsControllerTestsFixture))]
 public class OptimisedDataSetsControllerTests
 {
-    private static readonly DataFixture _dataFixture = new(new Random().Next());
+    private readonly DataFixture _dataFixture = new(new Random().Next());
     private const string BaseUrl = "api/public-data/data-sets";
 
     public class ListDataSetsTests(OptimisedDataSetsControllerTestsFixture fixture)
@@ -707,7 +702,7 @@ public class OptimisedDataSetsControllerTests
                 .GetContentDbContext()
                 .AddTestData(context => context.Publications.Add(publication));
 
-            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated);
 
             var response = await ListPublicationDataSets(publication.Id, client: client);
 
@@ -793,7 +788,7 @@ public class OptimisedDataSetsControllerTests
                 .AuthenticatedUser()
                 .WithClaim(SecurityClaimTypes.AccessAllPublications.ToString());
 
-            client ??= fixture.CreateClient().WithUser(TestUser.Bau);
+            client ??= fixture.CreateClient().WithUser(OptimisedTestUsers.Bau);
 
             var queryParams = new Dictionary<string, string?>
             {
@@ -1263,7 +1258,7 @@ public class OptimisedDataSetsControllerTests
                 .GetPublicDataDbContext()
                 .AddTestData(context => context.DataSets.Add(dataSet));
 
-            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated);
 
             var response = await GetDataSet(dataSetId: dataSet.Id, client: client);
 
@@ -1348,7 +1343,7 @@ public class OptimisedDataSetsControllerTests
                 .AuthenticatedUser()
                 .WithClaim(SecurityClaimTypes.AccessAllPublications.ToString());
 
-            client ??= fixture.CreateClient().WithUser(TestUser.Bau);
+            client ??= fixture.CreateClient().WithUser(OptimisedTestUsers.Bau);
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}", UriKind.Relative);
 
@@ -1430,7 +1425,7 @@ public class OptimisedDataSetsControllerTests
                     };
                 });
 
-            var client = fixture.CreateClient().WithUser(TestUser.Bau);
+            var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Bau);
 
             var response = await CreateDataSet(releaseFile.Id, client);
 
@@ -1464,7 +1459,7 @@ public class OptimisedDataSetsControllerTests
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = fixture.CreateClient().WithUser(TestUser.Authenticated);
+            var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated);
 
             var response = await CreateDataSet(Guid.NewGuid(), client);
 
@@ -1497,7 +1492,7 @@ public class OptimisedDataSetsControllerTests
                 .Setup(c => c.CreateDataSet(releaseFileId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(ValidationUtils.ValidationResult(processorErrors));
 
-            var client = fixture.CreateClient().WithUser(TestUser.Bau);
+            var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Bau);
             var response = await CreateDataSet(releaseFileId, client);
 
             MockUtils.VerifyAllMocks(processorClient);
@@ -1512,7 +1507,7 @@ public class OptimisedDataSetsControllerTests
             HttpClient? client = null
         )
         {
-            client ??= fixture.CreateClient().WithUser(TestUser.Bau);
+            client ??= fixture.CreateClient().WithUser(OptimisedTestUsers.Bau);
 
             var request = new DataSetCreateRequest { ReleaseFileId = releaseFileId };
 

@@ -140,7 +140,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             var response = await GetLocationMappings(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var retrievedMappings = response.AssertOk<LocationMappingPlan>();
@@ -165,7 +165,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             var response = await GetLocationMappings(
                 Guid.NewGuid(),
-                _fixture.CreateClient().WithUser(TestUser.Authenticated)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated)
             );
 
             response.AssertForbidden();
@@ -182,7 +182,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             var response = await GetLocationMappings(
                 Guid.NewGuid(),
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertNotFound();
@@ -302,7 +302,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var viewModel = response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
@@ -528,7 +528,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
@@ -612,7 +612,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
@@ -688,7 +688,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
@@ -764,7 +764,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
@@ -840,7 +840,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertOk<BatchLocationMappingUpdatesResponseViewModel>();
@@ -951,7 +951,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -1084,7 +1084,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -1126,7 +1126,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: Guid.NewGuid(),
                 updates: [],
-                client: _fixture.CreateClient().WithUser(TestUser.Authenticated)
+                client: _fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated)
             );
 
             response.AssertForbidden();
@@ -1138,7 +1138,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: Guid.NewGuid(),
                 updates: [],
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertNotFound();
@@ -1150,7 +1150,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchLocationMappingUpdates(
                 nextDataSetVersionId: Guid.NewGuid(),
                 updates: [new LocationMappingUpdateRequest()],
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -1180,7 +1180,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         CandidateKey = candidateKeyValue,
                     },
                 ],
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -1212,7 +1212,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         CandidateKey = "target-location-1",
                     },
                 ],
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -1244,7 +1244,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         CandidateKey = null,
                     },
                 ],
-                client: _fixture.CreateClient().WithUser(TestUser.Bau)
+                client: _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -1349,7 +1349,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
 
             var response = await GetFilterMappings(
                 nextDataSetVersionId: nextDataSetVersion.Id,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var retrievedMappings = response.AssertOk<FilterMappingPlan>();
@@ -1366,7 +1366,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
         {
             var response = await GetFilterMappings(
                 nextDataSetVersionId: Guid.NewGuid(),
-                client: _fixture.CreateClient().WithUser(TestUser.Authenticated)
+                client: _fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated)
             );
 
             response.AssertForbidden();
@@ -1377,7 +1377,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
         {
             var response = await GetFilterMappings(
                 Guid.NewGuid(),
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertNotFound();
@@ -1494,7 +1494,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var viewModel = response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
@@ -1728,7 +1728,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
@@ -1845,7 +1845,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
@@ -1920,7 +1920,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
@@ -1996,7 +1996,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
@@ -2072,7 +2072,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
@@ -2174,7 +2174,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertOk<BatchFilterOptionMappingUpdatesResponseViewModel>();
@@ -2273,7 +2273,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -2412,7 +2412,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -2510,7 +2510,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: nextDataSetVersion.Id,
                 updates: updates,
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -2543,7 +2543,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: Guid.NewGuid(),
                 updates: [],
-                client: _fixture.CreateClient().WithUser(TestUser.Authenticated)
+                client: _fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated)
             );
 
             response.AssertForbidden();
@@ -2555,7 +2555,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: Guid.NewGuid(),
                 updates: [],
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             response.AssertNotFound();
@@ -2567,7 +2567,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
             var response = await ApplyBatchFilterOptionMappingUpdates(
                 nextDataSetVersionId: Guid.NewGuid(),
                 updates: [new FilterOptionMappingUpdateRequest()],
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -2597,7 +2597,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         CandidateKey = candidateKeyValue,
                     },
                 ],
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -2631,7 +2631,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         CandidateKey = "target-location-1",
                     },
                 ],
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -2665,7 +2665,7 @@ public abstract class OptimisedDataSetVersionMappingControllerTests
                         CandidateKey = null,
                     },
                 ],
-                _fixture.CreateClient().WithUser(TestUser.Bau)
+                _fixture.CreateClient().WithUser(OptimisedTestUsers.Bau)
             );
 
             var validationProblem = response.AssertValidationProblem();
