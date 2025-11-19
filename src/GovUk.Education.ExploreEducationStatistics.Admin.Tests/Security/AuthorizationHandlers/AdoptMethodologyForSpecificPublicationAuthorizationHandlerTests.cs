@@ -42,7 +42,7 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
                 if (!expectedToPassByClaimAlone)
                 {
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                        .Setup(s => s.ListRolesByUserAndPublication(UserId, Publication.Id))
                         .ReturnsAsync(new List<PublicationRole>());
                 }
 
@@ -74,7 +74,7 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
                 var handler = SetupHandler(userPublicationRoleRepository.Object);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                    .Setup(s => s.ListRolesByUserAndPublication(UserId, Publication.Id))
                     .ReturnsAsync(CollectionUtils.ListOf(publicationRole));
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);

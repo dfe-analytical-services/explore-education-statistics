@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -22,14 +23,50 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext)
         return ContentDbContext.UserPublicationRoles.Where(role => publicationIds.Contains(role.PublicationId));
     }
 
-    public async Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId)
+    public async Task<List<PublicationRole>> ListDistinctRolesByUser(Guid userId, bool includeInactiveUsers = false)
     {
-        return await GetDistinctResourceRolesByUser(userId);
+        var query = includeInactiveUsers
+            ? ContentDbContext.UserPublicationRoles
+            : ContentDbContext.ActiveUserPublicationRoles;
+
+        return await query.Where(r => r.UserId == userId).Select(r => r.Role).Distinct().ToListAsync();
     }
 
-    public async Task<List<PublicationRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId)
+    public async Task<List<PublicationRole>> ListRolesByUserAndPublication(
+        Guid userId,
+        Guid publicationId,
+        bool includeInactiveUsers = false
+    )
     {
-        return await GetAllResourceRolesByUserAndResource(userId, publicationId);
+        var query = includeInactiveUsers
+            ? ContentDbContext.UserPublicationRoles
+            : ContentDbContext.ActiveUserPublicationRoles;
+
+        return await query
+            .Where(r => r.UserId == userId)
+            .Where(upr => upr.PublicationId == publicationId)
+            .Select(r => r.Role)
+            .Distinct()
+            .ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<UserPublicationRole>> ListUserPublicationRoles(
+        Guid publicationId,
+        PublicationRole[]? rolesToInclude,
+        bool includeInactiveUsers = false
+    )
+    {
+        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<PublicationRole>();
+
+        var query = includeInactiveUsers
+            ? ContentDbContext.UserPublicationRoles
+            : ContentDbContext.ActiveUserPublicationRoles;
+
+        return await query
+            .Include(upr => upr.User)
+            .Where(upr => upr.PublicationId == publicationId)
+            .Where(upr => rolesToCheck.Contains(upr.Role))
+            .ToListAsync();
     }
 
     public async Task<UserPublicationRole?> GetUserPublicationRole(
@@ -46,9 +83,11 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext)
         return await UserHasRoleOnResource(userId, publicationId, role);
     }
 
-    public new async Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default)
+    public async Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default)
     {
-        await base.Remove(userPublicationRole, cancellationToken);
+        ContentDbContext.UserPublicationRoles.Remove(userPublicationRole);
+
+        await ContentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     public new async Task RemoveMany(
