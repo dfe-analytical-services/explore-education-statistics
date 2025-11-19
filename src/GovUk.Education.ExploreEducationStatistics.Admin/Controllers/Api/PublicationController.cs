@@ -35,12 +35,17 @@ public class PublicationController(IPublicationService publicationService, IUser
 
     [HttpGet("api/publications/{publicationId:guid}")]
     public async Task<ActionResult<PublicationViewModel>> GetPublication(
-        [Required] Guid publicationId,
-        [FromQuery] bool includePermissions = false
-    )
-    {
-        return await publicationService.GetPublication(publicationId, includePermissions).HandleFailuresOrOk();
-    }
+        Guid publicationId,
+        [FromQuery] bool includePermissions = false,
+        CancellationToken cancellationToken = default
+    ) =>
+        await publicationService
+            .GetPublication(
+                publicationId: publicationId,
+                includePermissions: includePermissions,
+                cancellationToken: cancellationToken
+            )
+            .HandleFailuresOrOk();
 
     [HttpGet("api/publication/{publicationId:guid}/external-methodology")]
     public async Task<ActionResult<ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId)

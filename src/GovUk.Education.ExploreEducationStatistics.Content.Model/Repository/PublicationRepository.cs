@@ -5,31 +5,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 
-public class PublicationRepository : IPublicationRepository
+public class PublicationRepository(ContentDbContext contentDbContext) : IPublicationRepository
 {
-    private readonly ContentDbContext _contentDbContext;
-
-    public PublicationRepository(ContentDbContext contentDbContext)
+    public async Task<bool> IsPublished(Guid publicationId, CancellationToken cancellationToken = default)
     {
-        _contentDbContext = contentDbContext;
-    }
-
-    public async Task<bool> IsPublished(Guid publicationId)
-    {
-        return await _contentDbContext.Publications.AnyAsync(p =>
-            p.Id == publicationId && p.LatestPublishedReleaseVersionId != null
+        return await contentDbContext.Publications.AnyAsync(
+            p => p.Id == publicationId && p.LatestPublishedReleaseVersionId != null,
+            cancellationToken: cancellationToken
         );
     }
 
-    public async Task<bool> IsSuperseded(Guid publicationId)
+    public async Task<bool> IsSuperseded(Guid publicationId, CancellationToken cancellationToken = default)
     {
         // To be superseded, a superseding publication must exist and have a published release
-        return await _contentDbContext
-            .Publications.Include(publication => publication.SupersededBy)
-            .AnyAsync(publication =>
+        return await contentDbContext.Publications.AnyAsync(
+            publication =>
                 publication.Id == publicationId
                 && publication.SupersededBy != null
-                && publication.SupersededBy.LatestPublishedReleaseVersionId != null
-            );
+                && publication.SupersededBy.LatestPublishedReleaseVersionId != null,
+            cancellationToken: cancellationToken
+        );
     }
 }

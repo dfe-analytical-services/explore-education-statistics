@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MethodologyVersionSummaryViewModel;
-using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
@@ -32,12 +31,12 @@ public static class PermissionsUtils
         };
     }
 
-    public static async Task<PublicationPermissions> GetPublicationPermissions(
+    public static async Task<PublicationPermissionsDto> GetPublicationPermissions(
         IUserService userService,
         Publication publication
     )
     {
-        return new PublicationPermissions
+        return new PublicationPermissionsDto
         {
             CanUpdatePublication = await userService.CheckCanUpdatePublication().IsRight(),
             CanUpdatePublicationSummary = await userService.CheckCanUpdatePublicationSummary(publication).IsRight(),

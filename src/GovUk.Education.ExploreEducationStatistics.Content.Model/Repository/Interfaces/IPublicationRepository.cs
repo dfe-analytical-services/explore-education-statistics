@@ -3,7 +3,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 
 public interface IPublicationRepository
 {
-    Task<bool> IsPublished(Guid publicationId);
+    Task<bool> IsPublished(Guid publicationId, CancellationToken cancellationToken = default);
 
-    Task<bool> IsSuperseded(Guid publicationId);
+    Task<bool> IsSuperseded(Guid publicationId, CancellationToken cancellationToken = default);
 }

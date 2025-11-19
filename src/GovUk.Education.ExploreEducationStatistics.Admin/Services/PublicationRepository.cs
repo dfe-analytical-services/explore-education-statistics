@@ -9,24 +9,17 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class PublicationRepository : Content.Model.Repository.PublicationRepository, IPublicationRepository
+public class PublicationRepository(ContentDbContext context)
+    : Content.Model.Repository.PublicationRepository(context),
+        IPublicationRepository
 {
-    private readonly ContentDbContext _context;
-
-    public PublicationRepository(ContentDbContext context)
-        : base(context)
+    public async Task<List<Publication>> ListPublicationsForUser(
+        Guid userId,
+        Guid? themeId = null,
+        CancellationToken cancellationToken = default
+    )
     {
-        _context = context;
-    }
-
-    public IQueryable<Publication> QueryPublicationsForTheme(Guid? themeId = null)
-    {
-        return _context.Publications.Where(publication => themeId == null || publication.ThemeId == themeId);
-    }
-
-    public async Task<List<Publication>> ListPublicationsForUser(Guid userId, Guid? themeId = null)
-    {
-        var publicationsGrantedByPublicationRoleQueryable = _context.UserPublicationRoles.Where(userPublicationRole =>
+        var publicationsGrantedByPublicationRoleQueryable = context.UserPublicationRoles.Where(userPublicationRole =>
             userPublicationRole.UserId == userId
             && ListOf(PublicationRole.Owner, PublicationRole.Allower).Contains(userPublicationRole.Role)
         );
@@ -40,13 +33,13 @@ public class PublicationRepository : Content.Model.Repository.PublicationReposit
 
         var publicationsGrantedByPublicationRole = await publicationsGrantedByPublicationRoleQueryable
             .Select(userPublicationRole => userPublicationRole.Publication)
-            .ToListAsync();
+            .ToListAsync(cancellationToken: cancellationToken);
 
         var publicationIdsGrantedByPublicationRole = publicationsGrantedByPublicationRole
             .Select(publication => publication.Id)
             .ToList();
 
-        var releasesGrantedByReleaseRolesQueryable = _context
+        var releasesGrantedByReleaseRolesQueryable = context
             .UserReleaseRoles.Include(userReleaseRole => userReleaseRole.ReleaseVersion)
             .ThenInclude(rv => rv.Release)
             .ThenInclude(r => r.Publication)
@@ -63,14 +56,15 @@ public class PublicationRepository : Content.Model.Repository.PublicationReposit
 
         var releasesGrantedByReleaseRoles = await releasesGrantedByReleaseRolesQueryable
             .Select(userReleaseRole => userReleaseRole.ReleaseVersion)
-            .ToListAsync();
+            .ToListAsync(cancellationToken: cancellationToken);
 
         var publications = new List<Publication>();
 
         // Add publication view models for the Publications granted directly via Publication roles
         publications.AddRange(
             await publicationsGrantedByPublicationRole.SelectAsync(async publication =>
-                await HydratePublication(_context.Publications).FirstAsync(p => p.Id == publication.Id)
+                await HydratePublication(context.Publications)
+                    .FirstAsync(p => p.Id == publication.Id, cancellationToken: cancellationToken)
             )
         );
 
@@ -87,9 +81,9 @@ public class PublicationRepository : Content.Model.Repository.PublicationReposit
                 .SelectAsync(async publicationWithReleases =>
                 {
                     var publication = publicationWithReleases.Key;
-                    return await HydratePublication(_context.Publications)
+                    return await HydratePublication(context.Publications)
                         .AsNoTracking()
-                        .FirstAsync(p => p.Id == publication.Id);
+                        .FirstAsync(p => p.Id == publication.Id, cancellationToken: cancellationToken);
                 })
         );
 

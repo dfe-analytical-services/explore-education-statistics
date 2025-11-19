@@ -44,35 +44,38 @@ public class PublicationService(
     IAdminEventRaiser adminEventRaiser
 ) : IPublicationService
 {
-    public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(Guid? themeId = null)
-    {
-        return await userService
+    public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
+        Guid? themeId = null,
+        CancellationToken cancellationToken = default
+    ) =>
+        await userService
             .CheckCanAccessSystem()
             .OnSuccess(_ =>
                 userService
                     .CheckCanViewAllPublications()
                     .OnSuccess(async () =>
-                    {
-                        var hydratedPublication = HydratePublication(
-                            publicationRepository.QueryPublicationsForTheme(themeId)
-                        );
-                        return await hydratedPublication.ToListAsync();
-                    })
+                        await HydratePublication(
+                                context.Publications.If(themeId.HasValue).ThenWhere(p => p.ThemeId == themeId)
+                            )
+                            .ToListAsync(cancellationToken: cancellationToken)
+                    )
                     .OrElse(() =>
-                    {
-                        var userId = userService.GetUserId();
-                        return publicationRepository.ListPublicationsForUser(userId, themeId);
-                    })
+                        publicationRepository.ListPublicationsForUser(
+                            userId: userService.GetUserId(),
+                            themeId: themeId,
+                            cancellationToken: cancellationToken
+                        )
+                    )
             )
             .OnSuccess(async publications =>
-            {
-                return await publications
+                await publications
                     .ToAsyncEnumerable()
-                    .SelectAwait(async publication => await GeneratePublicationViewModel(publication))
+                    .SelectAwait(async publication =>
+                        await GeneratePublicationViewModel(publication, cancellationToken)
+                    )
                     .OrderBy(publicationViewModel => publicationViewModel.Title)
-                    .ToListAsync();
-            });
-    }
+                    .ToListAsync(cancellationToken: cancellationToken)
+            );
 
     public async Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries()
     {
@@ -335,14 +338,21 @@ public class PublicationService(
 
     public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(
         Guid publicationId,
-        bool includePermissions = false
-    )
-    {
-        return await persistenceHelper
+        bool includePermissions = false,
+        CancellationToken cancellationToken = default
+    ) =>
+        await persistenceHelper
             .CheckEntityExists<Publication>(publicationId, HydratePublication)
             .OnSuccess(userService.CheckCanViewPublication)
-            .OnSuccess(publication => GeneratePublicationViewModel(publication, includePermissions));
-    }
+            .OnSuccess(async publication =>
+            {
+                var viewModel = await GeneratePublicationViewModel(publication, cancellationToken);
+                if (includePermissions)
+                {
+                    viewModel.Permissions = await PermissionsUtils.GetPublicationPermissions(userService, publication);
+                }
+                return viewModel;
+            });
 
     public async Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId)
     {
@@ -737,29 +747,16 @@ public class PublicationService(
         return Unit.Instance;
     }
 
-    public static IQueryable<Publication> HydratePublication(IQueryable<Publication> values)
-    {
-        return values.Include(p => p.Theme);
-    }
+    public static IQueryable<Publication> HydratePublication(IQueryable<Publication> values) =>
+        values.Include(p => p.Contact).Include(p => p.Theme);
 
     private async Task<PublicationViewModel> GeneratePublicationViewModel(
         Publication publication,
-        bool includePermissions = false
+        CancellationToken cancellationToken
     )
     {
-        var publicationViewModel = mapper.Map<PublicationViewModel>(publication);
-
-        publicationViewModel.IsSuperseded = await publicationRepository.IsSuperseded(publication.Id);
-
-        if (includePermissions)
-        {
-            publicationViewModel.Permissions = await PermissionsUtils.GetPublicationPermissions(
-                userService,
-                publication
-            );
-        }
-
-        return publicationViewModel;
+        var isSuperseded = await publicationRepository.IsSuperseded(publication.Id, cancellationToken);
+        return PublicationViewModel.FromModel(publication, isSuperseded);
     }
 
     private async Task<PublicationCreateViewModel> GeneratePublicationCreateViewModel(Publication publication)

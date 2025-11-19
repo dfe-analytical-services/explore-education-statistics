@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -310,41 +309,6 @@ public class PublicationRepositoryTests
 
             var resultPublication = Assert.Single(publications);
             Assert.Equal(publication.Id, resultPublication.Id);
-        }
-    }
-
-    [Fact]
-    public async Task QueryPublicationsForTheme()
-    {
-        var theme1 = new Theme
-        {
-            Title = "Theme 1",
-            Publications =
-            [
-                new Publication { Title = "Theme 1 Publication 1" },
-                new Publication { Title = "Theme 1 Publication 2" },
-            ],
-        };
-
-        var theme2 = new Theme { Title = "Theme 2", Publications = [new() { Title = "Theme 2 Publication 1" }] };
-
-        var theme3 = new Theme { Title = "Theme 3", Publications = [new() { Title = "Theme 3 Publication 1" }] };
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            await contentDbContext.Themes.AddRangeAsync(theme1, theme2, theme3);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            var publicationService = new PublicationRepository(contentDbContext);
-            var publications = await publicationService.QueryPublicationsForTheme(theme1.Id).ToListAsync();
-
-            Assert.Equal(2, publications.Count);
-            Assert.Equal(theme1.Publications[0].Title, publications[0].Title);
-            Assert.Equal(theme1.Publications[1].Title, publications[1].Title);
         }
     }
 }

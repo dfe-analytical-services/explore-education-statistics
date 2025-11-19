@@ -13,7 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IPublicationService
 {
-    Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(Guid? themeId = null);
+    Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
+        Guid? themeId = null,
+        CancellationToken cancellationToken = default
+    );
 
     Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries();
 
@@ -26,7 +29,8 @@ public interface IPublicationService
 
     Task<Either<ActionResult, PublicationViewModel>> GetPublication(
         Guid publicationId,
-        bool includePermissions = false
+        bool includePermissions = false,
+        CancellationToken cancellationToken = default
     );
 
     Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId);

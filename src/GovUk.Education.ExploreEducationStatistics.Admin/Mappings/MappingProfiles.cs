@@ -24,7 +24,6 @@ using KeyStatisticViewModel = GovUk.Education.ExploreEducationStatistics.Admin.V
 using MethodologyNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyNoteViewModel;
 using MethodologyVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyVersionViewModel;
 using OrganisationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.OrganisationViewModel;
-using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.ReleaseNoteViewModel;
 using ReleaseVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionSummaryViewModel;
 using ReleaseVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseVersionViewModel;
@@ -100,7 +99,6 @@ public class MappingProfiles : CommonMappingProfile
 
         CreateMap<Theme, IdTitleViewModel>();
         CreateMap<Publication, PublicationSummaryViewModel>();
-        CreateMap<Publication, PublicationViewModel>().ForMember(dest => dest.Theme, m => m.MapFrom(p => p.Theme));
         CreateMap<Publication, PublicationCreateViewModel>()
             .ForMember(dest => dest.Theme, m => m.MapFrom(p => p.Theme));
 
