@@ -58,6 +58,14 @@ public class UserRepository(ContentDbContext contentDbContext) : IUserRepository
             .SingleOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<User?> FindUserById(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await contentDbContext
+            .Users.Where(u => !u.SoftDeleted.HasValue)
+            .Where(u => u.Id == userId)
+            .SingleOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<User> FindDeletedUserPlaceholder(CancellationToken cancellationToken = default)
     {
         // This user should be seeded in the ContentDbContext as part of the migrations, so should always exist.

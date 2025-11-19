@@ -79,14 +79,14 @@ public class UserResourceRoleNotificationService(
     }
 
     public async Task NotifyUserOfNewPreReleaseRole(
-        string userEmail,
+        Guid userId,
         Guid releaseVersionId,
         CancellationToken cancellationToken = default
     )
     {
-        var activeUser = await userRepository.FindActiveUserByEmail(userEmail, cancellationToken);
+        var user = await FindUser(userId, cancellationToken);
 
-        var isNewUser = activeUser is null;
+        var isNewUser = !user.Active;
 
         await contentDbContext.RequireTransaction(async () =>
         {
@@ -96,15 +96,15 @@ public class UserResourceRoleNotificationService(
             // At least this way, if the email fails to send, the database transaction will be rolled back.
             // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
             await userReleaseRoleRepository.MarkEmailAsSent(
-                userId: activeUser!.Id,
+                userId: user!.Id,
                 releaseVersionId: releaseVersionId,
                 role: ReleaseRole.PrereleaseViewer,
                 cancellationToken: cancellationToken
             );
 
             await emailTemplateService
-                .SendPreReleaseInviteEmail(email: userEmail, releaseVersionId: releaseVersionId, isNewUser: isNewUser)
-                .OrThrow(_ => new EmailSendFailedException($"Failed to send pre-release role email to {userEmail}."));
+                .SendPreReleaseInviteEmail(email: user.Email, releaseVersionId: releaseVersionId, isNewUser: isNewUser)
+                .OrThrow(_ => new EmailSendFailedException($"Failed to send pre-release role email to {user.Email}."));
         });
     }
 
@@ -112,5 +112,11 @@ public class UserResourceRoleNotificationService(
     {
         return await userRepository.FindActiveUserById(userId, cancellationToken)
             ?? throw new ArgumentException($"Active user with ID {userId} does not exist.");
+    }
+
+    private async Task<User> FindUser(Guid userId, CancellationToken cancellationToken)
+    {
+        return await userRepository.FindUserById(userId, cancellationToken)
+            ?? throw new ArgumentException($"User with ID {userId} does not exist.");
     }
 }

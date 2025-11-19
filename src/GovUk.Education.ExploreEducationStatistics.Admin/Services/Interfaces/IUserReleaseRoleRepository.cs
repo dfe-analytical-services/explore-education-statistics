@@ -13,13 +13,25 @@ public interface IUserReleaseRoleRepository
 
     Task CreateManyIfNotExists(Guid userId, List<Guid> releaseVersionIds, ReleaseRole role, Guid createdById);
 
-    Task<List<ReleaseRole>> GetDistinctRolesByUser(Guid userId);
+    Task<List<ReleaseRole>> ListDistinctRolesByUser(Guid userId, bool includeInactiveUsers = false);
 
-    Task<List<ReleaseRole>> GetAllRolesByUserAndReleaseVersion(Guid userId, Guid releaseVersionId);
+    Task<List<ReleaseRole>> ListRolesByUserAndReleaseVersion(
+        Guid userId,
+        Guid releaseVersionId,
+        bool includeInactiveUsers = false
+    );
 
-    Task<List<ReleaseRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId);
+    Task<List<ReleaseRole>> ListRolesByUserAndPublication(
+        Guid userId,
+        Guid publicationId,
+        bool includeInactiveUsers = false
+    );
 
-    Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseVersionId, ReleaseRole[]? rolesToInclude);
+    Task<List<UserReleaseRole>> ListUserReleaseRoles(
+        Guid releaseVersionId,
+        ReleaseRole[]? rolesToInclude,
+        bool includeInactiveUsers = false
+    );
 
     Task<bool> HasUserReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role);
 

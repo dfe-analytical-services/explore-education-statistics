@@ -205,8 +205,8 @@ public class UserRoleService(
 
     private async Task<List<string>> GetRequiredGlobalRoleNamesForResourceRoles(ApplicationUser user)
     {
-        var releaseRoles = await userReleaseRoleRepository.GetDistinctRolesByUser(Guid.Parse(user.Id));
-        var publicationRoles = await userPublicationRoleRepository.GetDistinctRolesByUser(Guid.Parse(user.Id));
+        var releaseRoles = await userReleaseRoleRepository.ListDistinctRolesByUser(Guid.Parse(user.Id));
+        var publicationRoles = await userPublicationRoleRepository.ListDistinctRolesByUser(Guid.Parse(user.Id));
         var requiredGlobalRoleNames = releaseRoles
             .Select(GetAssociatedGlobalRoleNameForReleaseRole)
             .Concat(publicationRoles.Select(GetAssociatedGlobalRoleNameForPublicationRole))

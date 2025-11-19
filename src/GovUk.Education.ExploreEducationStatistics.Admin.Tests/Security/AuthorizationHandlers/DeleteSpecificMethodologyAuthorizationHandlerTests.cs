@@ -82,7 +82,7 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<PublicationRole>());
                 }
 
@@ -136,7 +136,7 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<PublicationRole>());
                 }
 
@@ -190,7 +190,7 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(role));
 
                     var user = DataFixture.AuthenticatedUser(userId: UserId);
@@ -215,7 +215,7 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<PublicationRole>());
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
@@ -259,7 +259,7 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(role));
 
                     var user = DataFixture.AuthenticatedUser(userId: UserId);
