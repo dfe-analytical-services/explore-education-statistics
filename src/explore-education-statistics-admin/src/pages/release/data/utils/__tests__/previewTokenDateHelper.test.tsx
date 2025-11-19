@@ -138,7 +138,7 @@ describe('PreviewTokenDateHelper', () => {
         );
         // 3) End of tomorrow (London wall time) → exact UTC instant
         const expectedEndUtc = fromZonedTime(
-          `${tomorrowYmdLondon}T23:59:59.999`,
+          `${tomorrowYmdLondon}T23:59:59`,
           TZ,
         );
 

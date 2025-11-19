@@ -37,10 +37,9 @@ export default class UkTimeHelper {
   ): string {
     const ymdLondon = formatInTimeZone(dateTime, this.TZ, 'yyyy-MM-dd');
 
-    const wall =
-      option === DayOption.STARTOFDAY ? 'T00:00:00' : 'T23:59:59.999';
+    const time = option === DayOption.STARTOFDAY ? 'T00:00:00' : 'T23:59:59';
 
-    const utcInstant = fromZonedTime(`${ymdLondon}${wall}`, this.TZ);
+    const utcInstant = fromZonedTime(`${ymdLondon}${time}`, this.TZ);
 
     return formatInTimeZone(utcInstant, this.TZ, "yyyy-MM-dd'T'HH:mm:ssXXX");
   }
