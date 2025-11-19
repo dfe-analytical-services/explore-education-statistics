@@ -23,8 +23,6 @@ public interface IUserReleaseRoleRepository
 
     Task<bool> HasUserReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role);
 
-    Task<bool> HasUserReleaseRole(string email, Guid releaseVersionId, ReleaseRole role);
-
     Task Remove(UserReleaseRole userReleaseRole, CancellationToken cancellationToken = default);
 
     Task RemoveMany(IReadOnlyList<UserReleaseRole> userReleaseRoles, CancellationToken cancellationToken = default);
