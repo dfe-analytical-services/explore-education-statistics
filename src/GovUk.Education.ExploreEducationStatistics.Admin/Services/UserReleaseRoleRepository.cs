@@ -54,11 +54,6 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
         return await UserHasRoleOnResource(userId, releaseVersionId, role);
     }
 
-    public async Task<bool> HasUserReleaseRole(string email, Guid releaseVersionId, ReleaseRole role)
-    {
-        return await UserHasRoleOnResource(email, releaseVersionId, role);
-    }
-
     public async Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseVersionId, ReleaseRole[]? rolesToInclude)
     {
         return await ListResourceRoles(releaseVersionId, rolesToInclude);

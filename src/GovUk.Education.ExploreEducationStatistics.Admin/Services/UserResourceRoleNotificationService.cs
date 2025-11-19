@@ -129,22 +129,17 @@ public class UserResourceRoleNotificationService(
 
         await contentDbContext.RequireTransaction(async () =>
         {
-            // This 'if' statement will be removed in EES-6511 when we stop using UserReleaseRoleInvites/UserPublicationRoleInvites
-            // altogether. At that point, a role will always exist when we send this email.
-            if (!isNewUser)
-            {
-                // Doing it in this order will technically set a `SentDate` slightly before the email is actually sent.
-                // But if we did it the other way, and the database transaction failed after sending the email, then we
-                // would have sent an email for a role which has an unmarked `SentDate`.
-                // At least this way, if the email fails to send, the database transaction will be rolled back.
-                // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
-                await userReleaseRoleRepository.MarkEmailAsSent(
-                    userId: activeUser!.Id,
-                    releaseVersionId: releaseVersionId,
-                    role: ReleaseRole.PrereleaseViewer,
-                    cancellationToken: cancellationToken
-                );
-            }
+            // Doing it in this order will technically set a `SentDate` slightly before the email is actually sent.
+            // But if we did it the other way, and the database transaction failed after sending the email, then we
+            // would have sent an email for a role which has an unmarked `SentDate`.
+            // At least this way, if the email fails to send, the database transaction will be rolled back.
+            // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
+            await userReleaseRoleRepository.MarkEmailAsSent(
+                userId: activeUser!.Id,
+                releaseVersionId: releaseVersionId,
+                role: ReleaseRole.PrereleaseViewer,
+                cancellationToken: cancellationToken
+            );
 
             await emailTemplateService
                 .SendPreReleaseInviteEmail(email: userEmail, releaseVersionId: releaseVersionId, isNewUser: isNewUser)
