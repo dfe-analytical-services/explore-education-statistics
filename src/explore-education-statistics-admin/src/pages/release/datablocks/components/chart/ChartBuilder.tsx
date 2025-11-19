@@ -377,18 +377,23 @@ export default function ChartBuilder({
                   />
                 </TabsSection>
               )}
-              {forms.dataSets && definition.axes.major && (
+              {forms.dataSets && definition.axes.major && axes.major && (
                 <TabsSection
                   title="Data sets"
                   headingTitle="Data sets"
                   id={forms.dataSets.id}
                 >
                   <ChartDataSetsConfiguration
+                    axisMajor={axes.major}
                     buttons={deleteButton}
+                    chartType={definition.type}
                     dataSets={axes.major?.dataSets}
+                    data={data}
                     dataSetsUnits={dataSetsUnits}
+                    legend={legend}
                     mapDataSetConfigs={map?.dataSetConfigs}
                     meta={meta}
+                    options={options}
                     onChange={actions.updateDataSets}
                   />
                 </TabsSection>

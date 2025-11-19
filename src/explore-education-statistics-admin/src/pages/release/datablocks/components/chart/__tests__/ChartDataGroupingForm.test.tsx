@@ -73,7 +73,7 @@ describe('ChartDataGroupingForm', () => {
 
     expect(screen.getByLabelText('Equal intervals')).toBeChecked();
     expect(
-      screen.getAllByLabelText('Number of data groups')[0],
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[0],
     ).toHaveNumericValue(5);
 
     expect(screen.getByLabelText('Quantiles')).not.toBeChecked();
@@ -96,7 +96,7 @@ describe('ChartDataGroupingForm', () => {
 
     expect(screen.getByLabelText('Quantiles')).toBeChecked();
     expect(
-      screen.getAllByLabelText('Number of data groups')[1],
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[1],
     ).toHaveNumericValue(4);
 
     expect(screen.getByLabelText('Equal intervals')).not.toBeChecked();
@@ -162,8 +162,13 @@ describe('ChartDataGroupingForm', () => {
     );
 
     await user.click(screen.getByLabelText('Quantiles'));
-    await user.clear(screen.getAllByLabelText('Number of data groups')[1]);
-    await user.type(screen.getAllByLabelText('Number of data groups')[1], '3');
+    await user.clear(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[1],
+    );
+    await user.type(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[1],
+      '3',
+    );
 
     await user.click(screen.getByRole('button', { name: 'Done' }));
 
@@ -298,7 +303,7 @@ describe('ChartDataGroupingForm', () => {
         indicator: 'authorised-absence-sessions',
         timePeriod: '2014_AY',
       },
-      dataSetKey: 'dataSetKey1',
+      dataSetKey: 'dataSetKey3',
       dataGrouping: {
         customGroups: [
           { min: 0, max: 10 },
@@ -372,7 +377,9 @@ describe('ChartDataGroupingForm', () => {
       />,
     );
 
-    await user.clear(screen.getAllByLabelText('Number of data groups')[0]);
+    await user.clear(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[0],
+    );
 
     await user.click(screen.getByRole('button', { name: 'Done' }));
 
@@ -396,8 +403,13 @@ describe('ChartDataGroupingForm', () => {
       />,
     );
 
-    await user.clear(screen.getAllByLabelText('Number of data groups')[0]);
-    await user.type(screen.getAllByLabelText('Number of data groups')[0], '6');
+    await user.clear(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[0],
+    );
+    await user.type(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[0],
+      '6',
+    );
 
     await user.click(screen.getByRole('button', { name: 'Done' }));
 
@@ -423,7 +435,9 @@ describe('ChartDataGroupingForm', () => {
 
     await user.click(screen.getByLabelText('Quantiles'));
 
-    await user.clear(screen.getAllByLabelText('Number of data groups')[1]);
+    await user.clear(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[1],
+    );
 
     await user.click(screen.getByRole('button', { name: 'Done' }));
 
@@ -449,9 +463,14 @@ describe('ChartDataGroupingForm', () => {
 
     await user.click(screen.getByLabelText('Quantiles'));
 
-    await user.clear(screen.getAllByLabelText('Number of data groups')[1]);
+    await user.clear(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[1],
+    );
 
-    await user.type(screen.getAllByLabelText('Number of data groups')[1], '6');
+    await user.type(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[1],
+      '6',
+    );
 
     await user.click(screen.getByRole('button', { name: 'Done' }));
 

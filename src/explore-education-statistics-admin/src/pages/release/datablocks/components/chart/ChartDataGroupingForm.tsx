@@ -235,11 +235,11 @@ export default function ChartDataGroupingForm({
           {
             label: 'Equal intervals',
             value: 'EqualIntervals',
-            hint: `Data is grouped into equal-sized ranges. Maximum ${maxMapDataGroups} groups.`,
+            hint: `Data is grouped into equal-sized ranges.`,
             conditional: (
               <FormFieldNumberInput<ChartDataGroupingFormValues>
                 name="numberOfGroups"
-                label="Number of data groups"
+                label={`Number of data groups (maximum ${maxMapDataGroups})`}
                 width={3}
               />
             ),
@@ -247,11 +247,11 @@ export default function ChartDataGroupingForm({
           {
             label: 'Quantiles',
             value: 'Quantiles',
-            hint: `Data is grouped so that each group has a similar number of data points. Maximum ${maxMapDataGroups} groups.`,
+            hint: `Data is grouped so that each group has a similar number of data points.`,
             conditional: (
               <FormFieldNumberInput<ChartDataGroupingFormValues>
                 name="numberOfGroupsQuantiles"
-                label="Number of data groups"
+                label={`Number of data groups (maximum ${maxMapDataGroups})`}
                 width={3}
               />
             ),
@@ -260,7 +260,7 @@ export default function ChartDataGroupingForm({
           {
             label: 'New custom groups',
             value: 'Custom',
-            hint: `Define custom groups. Maximum ${maxMapDataGroups} groups.`,
+            hint: `Define custom groups (maximum ${maxMapDataGroups}).`,
             conditional: (
               <ChartCustomDataGroupingsConfiguration
                 groups={values.customGroups}
@@ -337,7 +337,7 @@ export default function ChartDataGroupingForm({
 
                 onSubmit({
                   dataSet: dataSetConfig.dataSet,
-                  dataSetKey: 'dataSetKey1',
+                  dataSetKey: dataSetConfig.dataSetKey,
                   dataGrouping:
                     updatedGrouping.type === 'Custom'
                       ? updatedGrouping

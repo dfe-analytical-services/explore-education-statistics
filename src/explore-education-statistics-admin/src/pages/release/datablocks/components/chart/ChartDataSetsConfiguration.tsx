@@ -2,6 +2,8 @@ import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/
 import styles from '@admin/pages/release/datablocks/components/chart/ChartDataSetsConfiguration.module.scss';
 import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import generateDataSetLabel from '@admin/pages/release/datablocks/components/chart/utils/generateDataSetLabel';
+import getMapDataSetConfigs from '@admin/pages/release/datablocks/components/chart/utils/getMapDataSetConfigs';
+import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import ErrorSummary from '@common/components/ErrorSummary';
@@ -23,12 +25,18 @@ import Yup from '@common/validation/yup';
 import WarningMessage from '@common/components/WarningMessage';
 import getSelectedDataSets from '@admin/pages/release/datablocks/components/chart/utils/getSelectedDataSets';
 import reorder from '@common/utils/reorder';
+import {
+  AxisConfiguration,
+  ChartType,
+  MapDataSetConfig,
+} from '@common/modules/charts/types/chart';
+import { maxMapDataGroups } from '@common/modules/charts/components/MapBlock';
+import { LegendConfiguration } from '@common/modules/charts/types/legend';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
-import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
-import { MapDataSetConfig } from '@common/modules/charts/types/chart';
-import { maxMapDataGroups } from '@common/modules/charts/components/MapBlock';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 
 const formId = 'chartDataSetsConfigurationForm';
 
@@ -40,20 +48,30 @@ export interface FormValues {
 }
 
 interface Props {
+  axisMajor: AxisConfiguration;
   buttons?: ReactNode;
+  chartType: ChartType;
+  data: TableDataResult[];
   dataSets?: DataSet[];
   dataSetsUnits?: string[];
+  legend?: LegendConfiguration;
   mapDataSetConfigs?: MapDataSetConfig[];
   meta: FullTableMeta;
+  options?: ChartOptions;
   onChange: (dataSets: DataSet[]) => void;
 }
 
 const ChartDataSetsConfiguration = ({
+  axisMajor,
   buttons,
+  chartType,
+  data,
   dataSets: initialDataSets = [],
   dataSetsUnits = [],
+  legend,
   mapDataSetConfigs,
   meta,
+  options,
   onChange,
 }: Props) => {
   const { forms, updateForm, submitForms } = useChartBuilderFormsContext();
@@ -61,9 +79,6 @@ const ChartDataSetsConfiguration = ({
   const [isReordering, toggleIsReordering] = useToggle(false);
   const [showCategoricalDataModal, toggleShowCategoricalDataModal] =
     useToggle(false);
-  const [showCategoricalDataError, toggleShowCategoricalDataError] =
-    useToggle(false);
-  const firstRender = useRef(true);
 
   const indicatorOptions = useMemo(
     () => Object.values(meta.indicators),
@@ -86,38 +101,6 @@ const ChartDataSetsConfiguration = ({
       isValid: initialDataSets.length > 0,
     });
   }, [initialDataSets.length, updateForm]);
-
-  useEffect(() => {
-    // Don't do this on first render as we only want the modal to
-    // appear when datasets are changed.
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
-
-    if (mapDataSetConfigs) {
-      const values = mapDataSetConfigs.map(config => {
-        return config.categoricalDataConfig?.length;
-      });
-
-      if (values.some(value => value && value > maxMapDataGroups)) {
-        toggleShowCategoricalDataModal.on();
-        toggleShowCategoricalDataError.on();
-        updateForm({
-          formKey: 'dataSets',
-          isValid: false,
-        });
-      } else {
-        toggleShowCategoricalDataModal.off();
-        toggleShowCategoricalDataError.off();
-      }
-    }
-  }, [
-    mapDataSetConfigs,
-    toggleShowCategoricalDataModal,
-    toggleShowCategoricalDataError,
-    updateForm,
-  ]);
 
   const handleSubmit = (values: FormValues) => {
     const selectedDataSets = getSelectedDataSets({
@@ -151,6 +134,30 @@ const ChartDataSetsConfiguration = ({
         };
       },
     );
+
+    // Don't allow adding data sets with more that 5 categories for maps.
+    if (chartType === 'map') {
+      const updatedMapDataSetConfigs = getMapDataSetConfigs({
+        axisMajor: { ...axisMajor, dataSets: updatedDataSets },
+        data,
+        legend,
+        mapDataSetConfigs,
+        meta,
+        options,
+      });
+
+      if (
+        updatedMapDataSetConfigs.some(
+          config =>
+            config.categoricalDataConfig &&
+            config.categoricalDataConfig?.length > maxMapDataGroups,
+        )
+      ) {
+        toggleShowCategoricalDataModal.on();
+        return;
+      }
+    }
+
     onChange(updatedDataSets);
     setDataSets(updatedDataSets);
   };
@@ -185,16 +192,6 @@ const ChartDataSetsConfiguration = ({
         })}
       >
         <Form id={formId} onSubmit={handleSubmit}>
-          {showCategoricalDataError && (
-            <ErrorSummary
-              errors={[
-                {
-                  id: 'chart-data-sets',
-                  message: `Too many categorical data values to display for the selected indicator(s) (max. ${maxMapDataGroups})`,
-                },
-              ]}
-            />
-          )}
           <div className={styles.formSelectRow}>
             {orderBy(Object.entries(meta.filters), ([_, value]) => value.order)
               .filter(([, filters]) => filters.options.length > 1)
