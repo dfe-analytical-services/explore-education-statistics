@@ -1009,7 +1009,7 @@ public class ReleaseApprovalServiceTests
 
         userReleaseRoleService
             .Setup(mock =>
-                mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Release.PublicationId)
+                mock.ListLatestUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Release.PublicationId)
             )
             .ReturnsAsync(ListOf<UserReleaseRole>());
 
@@ -1106,7 +1106,7 @@ public class ReleaseApprovalServiceTests
 
         userReleaseRoleService
             .Setup(mock =>
-                mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Release.PublicationId)
+                mock.ListLatestUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Release.PublicationId)
             )
             .ReturnsAsync(ListOf<UserReleaseRole>());
 
@@ -1366,7 +1366,10 @@ public class ReleaseApprovalServiceTests
 
             userReleaseRoleService
                 .Setup(mock =>
-                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Release.PublicationId)
+                    mock.ListLatestUserReleaseRolesByPublication(
+                        ReleaseRole.Approver,
+                        releaseVersion.Release.PublicationId
+                    )
                 )
                 .ReturnsAsync(new List<UserReleaseRole>());
 
@@ -1452,7 +1455,10 @@ public class ReleaseApprovalServiceTests
 
             userReleaseRoleService
                 .Setup(mock =>
-                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Release.PublicationId)
+                    mock.ListLatestUserReleaseRolesByPublication(
+                        ReleaseRole.Approver,
+                        releaseVersion.Release.PublicationId
+                    )
                 )
                 .ReturnsAsync(ListOf(userReleaseRole1, userReleaseRole2));
 
@@ -1549,7 +1555,10 @@ public class ReleaseApprovalServiceTests
 
             userReleaseRoleService
                 .Setup(mock =>
-                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Release.PublicationId)
+                    mock.ListLatestUserReleaseRolesByPublication(
+                        ReleaseRole.Approver,
+                        releaseVersion.Release.PublicationId
+                    )
                 )
                 .ReturnsAsync(new List<UserReleaseRole>());
 
@@ -1644,7 +1653,10 @@ public class ReleaseApprovalServiceTests
 
             userReleaseRoleService
                 .Setup(mock =>
-                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Release.PublicationId)
+                    mock.ListLatestUserReleaseRolesByPublication(
+                        ReleaseRole.Approver,
+                        releaseVersion.Release.PublicationId
+                    )
                 )
                 .ReturnsAsync(ListOf(userReleaseRole1, userReleaseRole2));
 

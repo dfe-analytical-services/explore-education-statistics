@@ -53,7 +53,7 @@ public class AuthorizationHandlerService(
         IEnumerable<ReleaseRole> releaseRoles
     )
     {
-        var usersPublicationRoles = await userPublicationRoleRepository.GetAllRolesByUserAndPublication(
+        var usersPublicationRoles = await userPublicationRoleRepository.ListRolesByUserAndPublication(
             userId,
             publicationId
         );
@@ -70,7 +70,7 @@ public class AuthorizationHandlerService(
             return false;
         }
 
-        var usersReleaseRoles = await userReleaseRoleRepository.GetAllRolesByUserAndReleaseVersion(
+        var usersReleaseRoles = await userReleaseRoleRepository.ListRolesByUserAndReleaseVersion(
             userId: userId,
             releaseVersionId: releaseVersionId.Value
         );
@@ -85,7 +85,7 @@ public class AuthorizationHandlerService(
         IEnumerable<ReleaseRole> releaseRoles
     )
     {
-        var usersPublicationRoles = await userPublicationRoleRepository.GetAllRolesByUserAndPublication(
+        var usersPublicationRoles = await userPublicationRoleRepository.ListRolesByUserAndPublication(
             userId,
             publicationId
         );
@@ -95,7 +95,7 @@ public class AuthorizationHandlerService(
             return true;
         }
 
-        var usersReleaseRoles = await userReleaseRoleRepository.GetAllRolesByUserAndPublication(userId, publicationId);
+        var usersReleaseRoles = await userReleaseRoleRepository.ListRolesByUserAndPublication(userId, publicationId);
 
         return usersReleaseRoles.Any(releaseRoles.Contains);
     }
@@ -106,7 +106,7 @@ public class AuthorizationHandlerService(
         params PublicationRole[] publicationRoles
     )
     {
-        var usersPublicationRoles = await userPublicationRoleRepository.GetAllRolesByUserAndPublication(
+        var usersPublicationRoles = await userPublicationRoleRepository.ListRolesByUserAndPublication(
             userId,
             publicationId
         );
@@ -120,7 +120,7 @@ public class AuthorizationHandlerService(
         params ReleaseRole[] releaseRoles
     )
     {
-        var usersReleaseRoles = await userReleaseRoleRepository.GetAllRolesByUserAndReleaseVersion(
+        var usersReleaseRoles = await userReleaseRoleRepository.ListRolesByUserAndReleaseVersion(
             userId: userId,
             releaseVersionId: releaseVersionId
         );

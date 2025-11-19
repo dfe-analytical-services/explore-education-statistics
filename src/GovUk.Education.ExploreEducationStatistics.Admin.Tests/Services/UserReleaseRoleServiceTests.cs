@@ -15,7 +15,7 @@ public class UserReleaseRoleServiceTests
     private readonly DataFixture _dataFixture = new();
 
     [Fact]
-    public async Task ListUserReleaseRolesByPublication()
+    public async Task ListLatestUserReleaseRolesByPublication()
     {
         var (publication, publicationIgnored) = _dataFixture
             .DefaultPublication()
@@ -70,7 +70,7 @@ public class UserReleaseRoleServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = BuildService(contentDbContext);
-            var userReleaseRoles = await service.ListUserReleaseRolesByPublication(Contributor, publication.Id);
+            var userReleaseRoles = await service.ListLatestUserReleaseRolesByPublication(Contributor, publication.Id);
 
             Assert.Equal(3, userReleaseRoles.Count);
 

@@ -94,6 +94,11 @@ public class ContentDbContext : DbContext
     public virtual DbSet<EinContentBlock> EinContentBlocks { get; set; }
     public virtual DbSet<EinTile> EinTiles { get; set; }
 
+    public IQueryable<UserPublicationRole> ActiveUserPublicationRoles =>
+        UserPublicationRoles.Where(upr => upr.User.Active);
+
+    public IQueryable<UserReleaseRole> ActiveUserReleaseRoles => UserReleaseRoles.Where(urr => urr.User.Active);
+
     [DbFunction]
     public virtual IQueryable<FreeTextRank> ReleaseFilesFreeTextTable(string searchTerm) =>
         FromExpression(() => ReleaseFilesFreeTextTable(searchTerm));
