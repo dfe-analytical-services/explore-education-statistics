@@ -28,6 +28,11 @@ public static class UpdateGeneratorExtensions
     public static Generator<Update> WithReason(this Generator<Update> generator, string reason) =>
         generator.ForInstance(s => s.SetReason(reason));
 
+    public static Generator<Update> WithReleaseVersion(
+        this Generator<Update> generator,
+        ReleaseVersion releaseVersion
+    ) => generator.ForInstance(s => s.SetReleaseVersion(releaseVersion));
+
     public static Generator<Update> WithReleaseVersionId(this Generator<Update> generator, Guid releaseVersionId) =>
         generator.ForInstance(s => s.SetReleaseVersionId(releaseVersionId));
 
@@ -45,6 +50,11 @@ public static class UpdateGeneratorExtensions
 
     public static InstanceSetters<Update> SetReason(this InstanceSetters<Update> setters, string reason) =>
         setters.Set(u => u.Reason, reason);
+
+    public static InstanceSetters<Update> SetReleaseVersion(
+        this InstanceSetters<Update> setters,
+        ReleaseVersion releaseVersion
+    ) => setters.Set(u => u.ReleaseVersion, releaseVersion).SetReleaseVersionId(releaseVersion.Id);
 
     public static InstanceSetters<Update> SetReleaseVersionId(
         this InstanceSetters<Update> setters,
