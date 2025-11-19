@@ -19,6 +19,10 @@ public static class OptimisedDbContextTestExtensions
         }
         finally
         {
+            // As this DbContext is being reused to set up test data for
+            // various tests within a collection / class fixture scope,
+            // ensure that we don't track any entities between tests within
+            // this context.
             context.ChangeTracker.Clear();
         }
     }

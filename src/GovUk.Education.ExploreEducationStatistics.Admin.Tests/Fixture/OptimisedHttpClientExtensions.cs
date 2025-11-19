@@ -30,7 +30,10 @@ public static class OptimisedHttpClientExtensions
         return client;
     }
 
-    private static HttpClient WithAdditionalHeaders(
+    // TODO EES-6450 - remove these disables once we're able to without warnings.
+    // ReSharper disable once MemberCanBePrivate.Global
+    // ReSharper disable once UnusedMethodReturnValue.Global
+    public static HttpClient WithAdditionalHeaders(
         this HttpClient client,
         Dictionary<string, string>? additionalHeaders
     )
