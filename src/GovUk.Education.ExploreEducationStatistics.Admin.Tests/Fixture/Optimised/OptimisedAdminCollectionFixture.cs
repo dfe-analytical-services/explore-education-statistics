@@ -39,10 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimis
 ///
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public abstract class OptimisedHttpClientWithPsqlCollectionFixture : IAsyncLifetime
+public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapability[] capabilities) : IAsyncLifetime
 {
-    private readonly OptimisedPsqlContainerWrapper _psql = new();
-
     private WebApplicationFactory<Startup> _factory;
     private PublicDataDbContext _publicDataDbContext;
     private ContentDbContext _contentDbContext;
@@ -50,6 +48,8 @@ public abstract class OptimisedHttpClientWithPsqlCollectionFixture : IAsyncLifet
     private UsersAndRolesDbContext _usersAndRolesDbContext;
     private Mock<IProcessorClient> _processorClientMock;
     private Mock<IPublicDataApiClient> _publicDataApiClientMock;
+
+    private OptimisedPsqlContainerWrapper _psql;
     private OptimisedTestUserPool _userPool;
 
     /// <summary>
@@ -64,11 +64,15 @@ public abstract class OptimisedHttpClientWithPsqlCollectionFixture : IAsyncLifet
     /// method is preferable so that we can use async methods of this fixture more effectively.
     ///
     /// </summary>
-    public async Task InitializeAsync()
+    public virtual async Task InitializeAsync()
     {
-        // Invoke "start" on the Postgres container only once per test collection (i.e. per test suite using this
-        // fixture).
-        await _psql.Start();
+        if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
+        {
+            _psql = new OptimisedPsqlContainerWrapper();
+            // Invoke "start" on the Postgres container only once per test collection (i.e. per test suite using this
+            // fixture).
+            await _psql.Start();
+        }
 
         // Configure the factory that represents Admin (with some mocks swapped in where appropriate and commonly used).
         // Configure it with a PublicDataDbContext that has a connection to the PSQL TestContainer.
@@ -86,14 +90,26 @@ public abstract class OptimisedHttpClientWithPsqlCollectionFixture : IAsyncLifet
         // this test class.
         // 4. Finally, "Build()" generates the finalised WebApplicationFactory<Startup> instance. At this point, we
         // should not attempt to reconfigure the factory further.
-        _factory = new WebApplicationFactory<Startup>()
-            .WithReconfiguredAdmin()
-            .WithPostgres(_psql.GetContainer())
-            .Build();
+        var factoryBuilder = new WebApplicationFactory<Startup>().WithReconfiguredAdmin();
 
-        // Get a reference to the shared user pool that will be used throughout the life of the test class using this
-        // fixture.
-        _userPool = _factory.Services.GetRequiredService<OptimisedTestUserPool>();
+        if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
+        {
+            factoryBuilder = factoryBuilder.WithPostgres(_psql.GetContainer());
+        }
+
+        if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
+        {
+            factoryBuilder = factoryBuilder.WithTestUserAuthentication();
+        }
+
+        _factory = factoryBuilder.Build();
+
+        if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
+        {
+            // Get a reference to the shared user pool that will be used throughout the life of the test class using this
+            // fixture.
+            _userPool = _factory.Services.GetRequiredService<OptimisedTestUserPool>();
+        }
 
         // Grab reusable DbContexts that can be used for test data setup and test assertions. These are looked up once
         // per startup of a test class that uses this fixture and are disposed of at the end of its lifetime, via XUnit
@@ -124,7 +140,10 @@ public abstract class OptimisedHttpClientWithPsqlCollectionFixture : IAsyncLifet
     public async Task DisposeAsync()
     {
         // TODO EES-6450 - do we need this?
-        // await _psql.Stop();
+        // if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
+        // {
+        //     await _psql.Stop();
+        // }
 
         await DisposeReusableDbContexts();
     }
@@ -142,6 +161,10 @@ public abstract class OptimisedHttpClientWithPsqlCollectionFixture : IAsyncLifet
     /// </summary>
     public void RegisterTestUser(ClaimsPrincipal user)
     {
+        if (!capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
+        {
+            throw new Exception("""Cannot register test users if "useTestUserAuthentication" is false.""");
+        }
         _userPool.AddUserIfNotExists(user);
     }
 
@@ -156,8 +179,6 @@ public abstract class OptimisedHttpClientWithPsqlCollectionFixture : IAsyncLifet
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    /// TODO EES-6450 - remove disable once used.
-    // ReSharper disable once UnusedMember.Global
     public StatisticsDbContext GetStatisticsDbContext()
     {
         return _statisticsDbContext;
@@ -198,6 +219,22 @@ public abstract class OptimisedHttpClientWithPsqlCollectionFixture : IAsyncLifet
     }
 
     /// <summary>
+    ///
+    /// This method provides access to services within the WebApplicationFactory.
+    ///
+    /// Because these lookups can be expensive when used excessively, use sparingly. If lots of test methods within
+    /// a single test class require access to the same service (e.g. a test class explicitly for DataSetService),
+    /// consider subclassing this Fixture class and looking up once in an overridden <see cref="InitializeAsync"/>
+    /// method so that all test methods can reuse the same service.
+    ///
+    /// </summary>
+    protected TService GetService<TService>()
+        where TService : class
+    {
+        return _factory.Services.GetRequiredService<TService>();
+    }
+
+    /// <summary>
     /// Dispose of any DbContexts when the test class that was using this fixture has completed.
     /// </summary>
     private async Task DisposeReusableDbContexts()
@@ -207,4 +244,11 @@ public abstract class OptimisedHttpClientWithPsqlCollectionFixture : IAsyncLifet
         await _statisticsDbContext.DisposeAsync();
         await _usersAndRolesDbContext.DisposeAsync();
     }
+}
+
+public enum AdminIntegrationTestCapability
+{
+    Postgres,
+    Azurite,
+    UserAuth,
 }

@@ -1,15 +1,24 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.UserManagement;
 
-public class UserManagementControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
-{
-    private readonly DataFixture _fixture = new();
+// ReSharper disable once ClassNeverInstantiated.Global
+public class UserManagementControllerTestsFixture()
+    : OptimisedAdminCollectionFixture(capabilities: [AdminIntegrationTestCapability.UserAuth]);
 
-    public class DeleteUserTests(TestApplicationFactory testApp) : UserManagementControllerTests(testApp)
+[CollectionDefinition(nameof(UserManagementControllerTestsFixture))]
+public class UserManagementControllerTestsCollection : ICollectionFixture<UserManagementControllerTestsFixture>;
+
+[Collection(nameof(UserManagementControllerTestsFixture))]
+public class UserManagementControllerTests
+{
+    private static readonly DataFixture DataFixture = new(new Random().Next());
+
+    public class DeleteUserTests(UserManagementControllerTestsFixture fixture) : UserManagementControllerTests
     {
         [Theory]
         [InlineData("BAU User", false)]
@@ -17,12 +26,14 @@ public class UserManagementControllerTests(TestApplicationFactory testApp) : Int
         [InlineData("Prerelease User", false)]
         public async Task PermissionCheck(string globalRoleName, bool successExpected)
         {
-            var claimsPrincipal = _fixture
+            var claimsPrincipal = DataFixture
                 .AuthenticatedUser()
                 .WithRole(globalRoleName)
                 .WithEmail("user@education.gov.uk");
 
-            var client = TestApp.SetUser(claimsPrincipal).CreateClient();
+            fixture.RegisterTestUser(claimsPrincipal);
+
+            var client = fixture.CreateClient().WithUser(claimsPrincipal);
 
             var response = await client.DeleteAsync("/api/user-management/user/ees-test.delete@education.gov.uk");
 
