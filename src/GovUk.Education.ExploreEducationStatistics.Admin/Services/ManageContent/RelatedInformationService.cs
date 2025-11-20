@@ -1,36 +1,38 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.RelatedInformation.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.RelatedInformation.Dtos;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 
-public class RelatedInformationService(
-    ContentDbContext context,
-    IPersistenceHelper<ContentDbContext> persistenceHelper,
-    IUserService userService
-) : IRelatedInformationService
+public class RelatedInformationService(ContentDbContext contentDbContext, IUserService userService)
+    : IRelatedInformationService
 {
-    public Task<Either<ActionResult, List<Link>>> GetRelatedInformationAsync(Guid releaseVersionId)
-    {
-        return persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(releaseVersion => releaseVersion.RelatedInformation);
-    }
-
-    public Task<Either<ActionResult, List<Link>>> AddRelatedInformationAsync(
+    public Task<Either<ActionResult, List<RelatedInformationDto>>> GetRelatedInformation(
         Guid releaseVersionId,
-        CreateUpdateLinkRequest request
-    )
-    {
-        return persistenceHelper
-            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+        CancellationToken cancellationToken = default
+    ) =>
+        contentDbContext
+            .ReleaseVersions.AsNoTracking()
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
+            //.OnSuccess(rv => UserServiceExtensions.CheckCanViewReleaseVersion(userService, rv))
+            //.OnSuccess(rv => userService.CheckCanViewReleaseVersion(rv))
+            .OnSuccess(rv => rv.RelatedInformation.Select(RelatedInformationDto.FromModel).ToList());
+
+    public Task<Either<ActionResult, List<RelatedInformationDto>>> CreateRelatedInformation(
+        Guid releaseVersionId,
+        RelatedInformationCreateRequest request,
+        CancellationToken cancellationToken = default
+    ) =>
+        contentDbContext
+            .ReleaseVersions.CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
@@ -43,24 +45,22 @@ public class RelatedInformationService(
                     new Link
                     {
                         Id = Guid.NewGuid(),
-                        Description = request.Description,
+                        Description = request.Title,
                         Url = request.Url,
                     }
                 );
 
-                context.ReleaseVersions.Update(releaseVersion);
-                await context.SaveChangesAsync();
+                contentDbContext.ReleaseVersions.Update(releaseVersion);
+                await contentDbContext.SaveChangesAsync(cancellationToken);
                 return releaseVersion.RelatedInformation;
             });
-    }
 
-    public Task<Either<ActionResult, List<Link>>> UpdateRelatedInformation(
+    public Task<Either<ActionResult, List<RelatedInformationDto>>> UpdateRelatedInformation(
         Guid releaseVersionId,
-        List<CreateUpdateLinkRequest> updatedLinkRequests,
+        List<RelatedInformationCreateRequest> updatedLinkRequests,
         CancellationToken cancellationToken = default
-    )
-    {
-        return persistenceHelper
+    ) =>
+        persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
@@ -72,25 +72,24 @@ public class RelatedInformationService(
                         new Link
                         {
                             Id = Guid.NewGuid(),
-                            Description = r.Description,
+                            Description = r.Title,
                             Url = r.Url,
                         }
                     )
                 );
 
                 releaseVersion.RelatedInformation = updatedLinks;
-                await context.SaveChangesAsync(cancellationToken);
+                await contentDbContext.SaveChangesAsync(cancellationToken);
 
                 return releaseVersion.RelatedInformation;
             });
-    }
 
-    public Task<Either<ActionResult, List<Link>>> DeleteRelatedInformationAsync(
+    public Task<Either<ActionResult, List<RelatedInformationDto>>> DeleteRelatedInformation(
         Guid releaseVersionId,
-        Guid relatedInformationId
-    )
-    {
-        return persistenceHelper
+        Guid relatedInformationId,
+        CancellationToken cancellationToken = default
+    ) =>
+        persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
@@ -99,9 +98,8 @@ public class RelatedInformationService(
                     releaseVersion.RelatedInformation.Find(item => item.Id == relatedInformationId)
                 );
 
-                context.ReleaseVersions.Update(releaseVersion);
-                await context.SaveChangesAsync();
+                contentDbContext.ReleaseVersions.Update(releaseVersion);
+                await contentDbContext.SaveChangesAsync(cancellationToken);
                 return releaseVersion.RelatedInformation;
             });
-    }
 }

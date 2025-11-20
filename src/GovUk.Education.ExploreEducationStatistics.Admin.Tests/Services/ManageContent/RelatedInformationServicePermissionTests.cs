@@ -1,6 +1,6 @@
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.RelatedInformation.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -17,10 +17,10 @@ public class RelatedInformationServicePermissionTests
     private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
 
     [Fact]
-    public void AddRelatedInformationAsync()
+    public void CreateRelatedInformation()
     {
         AssertSecurityPoliciesChecked(
-            service => service.AddRelatedInformationAsync(_releaseVersion.Id, new CreateUpdateLinkRequest()),
+            service => service.CreateRelatedInformation(_releaseVersion.Id, new RelatedInformationCreateRequest()),
             SecurityPolicies.CanUpdateSpecificReleaseVersion
         );
     }
@@ -30,7 +30,7 @@ public class RelatedInformationServicePermissionTests
     {
         AssertSecurityPoliciesChecked(
             service =>
-                service.DeleteRelatedInformationAsync(
+                service.DeleteRelatedInformation(
                     releaseVersionId: _releaseVersion.Id,
                     relatedInformationId: Guid.NewGuid()
                 ),

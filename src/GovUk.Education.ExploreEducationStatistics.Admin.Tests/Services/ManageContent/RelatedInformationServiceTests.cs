@@ -1,6 +1,6 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.RelatedInformation.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -58,7 +58,7 @@ public class RelatedInformationServiceTests
         {
             var service = BuildRelatedInformationService(contentDbContext);
 
-            var result = await service.GetRelatedInformationAsync(releaseVersion.Id);
+            var result = await service.GetRelatedInformation(releaseVersion.Id);
 
             // Assert
             var links = result.AssertRight();
@@ -88,10 +88,10 @@ public class RelatedInformationServiceTests
         }
 
         // Act
-        var linkUpdateRequest = new List<CreateUpdateLinkRequest>
+        var linkUpdateRequest = new List<RelatedInformationCreateRequest>
         {
-            new() { Description = "Related page 2", Url = "related-page-2" },
-            new() { Description = "Related page 1", Url = "related-page-1" },
+            new() { Title = "Related page 2", Url = "related-page-2" },
+            new() { Title = "Related page 1", Url = "related-page-1" },
         };
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
