@@ -6,7 +6,7 @@ const path = require('path');
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
-  compress: false,
+  compress: !process.env.WEBSITES_DISABLE_CONTENT_COMPRESSION,
   reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,
