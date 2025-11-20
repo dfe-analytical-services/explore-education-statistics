@@ -92,7 +92,12 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                 () => Assert.Null(viewModel.Updated)
             );
 
-            var actualPreviewToken = Assert.Single(await fixture.GetPublicDataDbContext().PreviewTokens.ToListAsync());
+            var previewTokens = await fixture
+                .GetPublicDataDbContext()
+                .PreviewTokens.Where(pt => pt.DataSetVersionId == dataSetVersion.Id)
+                .ToListAsync();
+
+            var actualPreviewToken = Assert.Single(previewTokens);
 
             Assert.Multiple(
                 () => Assert.Equal(previewTokenId, actualPreviewToken.Id),

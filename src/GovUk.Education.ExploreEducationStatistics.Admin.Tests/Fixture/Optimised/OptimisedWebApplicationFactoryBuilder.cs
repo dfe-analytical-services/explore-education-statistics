@@ -89,9 +89,11 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
     private void ReconfigureAdminServices(IServiceCollection services)
     {
         services
-            .UseInMemoryDbContext<ContentDbContext>()
-            .UseInMemoryDbContext<StatisticsDbContext>()
-            .UseInMemoryDbContext<UsersAndRolesDbContext>()
+            .UseInMemoryDbContext<ContentDbContext>(databaseName: $"{nameof(ContentDbContext)}_{Guid.NewGuid()}")
+            .UseInMemoryDbContext<StatisticsDbContext>(databaseName: $"{nameof(StatisticsDbContext)}_{Guid.NewGuid()}")
+            .UseInMemoryDbContext<UsersAndRolesDbContext>(
+                databaseName: $"{nameof(UsersAndRolesDbContext)}_{Guid.NewGuid()}"
+            )
             .AddScoped<PublicDataDbContext>(_ => Mock.Of<PublicDataDbContext>(MockBehavior.Loose))
             .MockService<IProcessorClient>()
             .MockService<IPublicDataApiClient>()
