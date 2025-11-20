@@ -88,15 +88,14 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
 
     public OptimisedWebApplicationFactoryBuilder<TStartup> WithTestUserAuthentication()
     {
-        _serviceRegistrations.Add(services =>
-            services
-                .AddSingleton<OptimisedTestUserPool>()
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddScheme<AuthenticationSchemeOptions, OptimisedTestAuthHandler>(
-                    JwtBearerDefaults.AuthenticationScheme,
-                    null
-                )
-        );
+        return WithServiceCollectionModification(RegisterTestUserAuthentication);
+    }
+
+    public OptimisedWebApplicationFactoryBuilder<TStartup> WithServiceCollectionModification(
+        Action<IServiceCollection> modification
+    )
+    {
+        _serviceRegistrations.Add(modification);
         return this;
     }
 
@@ -179,6 +178,17 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
         services.ReplaceService<IDataProcessorClient>(_ => new DataProcessorClient(connectionString));
         services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
         services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
+    }
+
+    private static void RegisterTestUserAuthentication(IServiceCollection services)
+    {
+        services
+            .AddSingleton<OptimisedTestUserPool>()
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddScheme<AuthenticationSchemeOptions, OptimisedTestAuthHandler>(
+                JwtBearerDefaults.AuthenticationScheme,
+                null
+            );
     }
 }
 

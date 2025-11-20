@@ -43,4 +43,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Fixture\Optimised\WebApplicationFactoryConfiguration\" />
+  </ItemGroup>
 </Project>

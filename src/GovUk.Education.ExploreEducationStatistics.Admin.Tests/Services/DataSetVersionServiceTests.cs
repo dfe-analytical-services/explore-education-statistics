@@ -279,10 +279,8 @@ public class DataSetVersionServiceTestsFixture()
 {
     public IDataSetVersionService DataSetVersionService = null!;
 
-    public override async Task InitializeAsync()
+    protected override void AfterFactoryConstructed()
     {
-        await base.InitializeAsync();
-
         DataSetVersionService = GetService<IDataSetVersionService>();
     }
 }

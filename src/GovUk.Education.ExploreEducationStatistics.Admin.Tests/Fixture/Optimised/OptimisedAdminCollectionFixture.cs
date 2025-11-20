@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised.TestContainerWrappers;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -52,6 +53,8 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     private OptimisedPsqlContainerWrapper _psql;
     private OptimisedTestUserPool _userPool;
 
+    private OptimisedAzuriteContainerWrapper _azurite;
+
     /// <summary>
     ///
     /// This method is invoked by XUnit's standard fixture lifetime management. When a test class is registered to
@@ -64,7 +67,7 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     /// method is preferable so that we can use async methods of this fixture more effectively.
     ///
     /// </summary>
-    public virtual async Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
         {
@@ -74,6 +77,47 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
             await _psql.Start();
         }
 
+        if (capabilities.Contains(AdminIntegrationTestCapability.Azurite))
+        {
+            _azurite = new OptimisedAzuriteContainerWrapper();
+            // Invoke "start" on the Azurite container only once per test collection (i.e. per test suite using this
+            // fixture).
+            await _azurite.Start();
+        }
+
+        // Build the WebApplicationFactory from the various standard capabilities that have been chosen by the test
+        // class using this fixture, plus any additional test-specific configuration that a particular class may need to
+        // apply prior to building the factory.
+        _factory = BuildWebApplicationFactory();
+
+        if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
+        {
+            // Get a reference to the shared user pool that will be used throughout the life of the test class using this
+            // fixture.
+            _userPool = _factory.Services.GetRequiredService<OptimisedTestUserPool>();
+        }
+
+        // Grab reusable DbContexts that can be used for test data setup and test assertions. These are looked up once
+        // per startup of a test class that uses this fixture and are disposed of at the end of its lifetime, via XUnit
+        // calling "DisposeAsync" on this fixture.
+        _publicDataDbContext = _factory.Services.GetRequiredService<PublicDataDbContext>();
+        _contentDbContext = _factory.Services.GetRequiredService<ContentDbContext>();
+        _statisticsDbContext = _factory.Services.GetRequiredService<StatisticsDbContext>();
+        _usersAndRolesDbContext = _factory.Services.GetRequiredService<UsersAndRolesDbContext>();
+
+        // Look up the Mocks surrounding mocked-out dependencies once per test class using this fixture.
+        // Test classes can then use the Mocks for setups and verifications, as the Mocks will be the same ones
+        // as used in the tested code itself.
+        _processorClientMock = Mock.Get(_factory.Services.GetRequiredService<IProcessorClient>());
+        _publicDataApiClientMock = Mock.Get(_factory.Services.GetRequiredService<IPublicDataApiClient>());
+
+        // Call a lifecycle method to allow fixture subclasses to look up services after the finalised factory has been
+        // created.
+        AfterFactoryConstructed();
+    }
+
+    private WebApplicationFactory<Startup> BuildWebApplicationFactory()
+    {
         // Configure the factory that represents Admin (with some mocks swapped in where appropriate and commonly used).
         // Configure it with a PublicDataDbContext that has a connection to the PSQL TestContainer.
         // Each test class using this fixture will use this same factory.
@@ -97,34 +141,30 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
             factoryBuilder = factoryBuilder.WithPostgres(_psql.GetContainer());
         }
 
+        if (capabilities.Contains(AdminIntegrationTestCapability.Azurite))
+        {
+            factoryBuilder = factoryBuilder.WithAzurite(_azurite.GetContainer());
+        }
+
         if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
         {
             factoryBuilder = factoryBuilder.WithTestUserAuthentication();
         }
 
-        _factory = factoryBuilder.Build();
+        // Call a lifecycle method to allow any test classes that require fine-tuned modification of the
+        // WebApplicationFactory to apply their modifications at the end of the factory setup for their fixtures.
+        factoryBuilder = factoryBuilder.WithServiceCollectionModification(GetServiceCollectionModifications());
 
-        if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
-        {
-            // Get a reference to the shared user pool that will be used throughout the life of the test class using this
-            // fixture.
-            _userPool = _factory.Services.GetRequiredService<OptimisedTestUserPool>();
-        }
-
-        // Grab reusable DbContexts that can be used for test data setup and test assertions. These are looked up once
-        // per startup of a test class that uses this fixture and are disposed of at the end of its lifetime, via XUnit
-        // calling "DisposeAsync" on this fixture.
-        _publicDataDbContext = _factory.Services.GetRequiredService<PublicDataDbContext>();
-        _contentDbContext = _factory.Services.GetRequiredService<ContentDbContext>();
-        _statisticsDbContext = _factory.Services.GetRequiredService<StatisticsDbContext>();
-        _usersAndRolesDbContext = _factory.Services.GetRequiredService<UsersAndRolesDbContext>();
-
-        // Look up the Mocks surrounding mocked-out dependencies once per test class using this fixture.
-        // Test classes can then use the Mocks for setups and verifications, as the Mocks will be the same ones
-        // as used in the tested code itself.
-        _processorClientMock = Mock.Get(_factory.Services.GetRequiredService<IProcessorClient>());
-        _publicDataApiClientMock = Mock.Get(_factory.Services.GetRequiredService<IPublicDataApiClient>());
+        // Finally, build the final factory that will be used for all the test classes taht use this fixture.
+        return factoryBuilder.Build();
     }
+
+    protected virtual Action<IServiceCollection> GetServiceCollectionModifications()
+    {
+        return _ => { };
+    }
+
+    protected virtual void AfterFactoryConstructed() { }
 
     /// <summary>
     ///
@@ -232,6 +272,12 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
         where TService : class
     {
         return _factory.Services.GetRequiredService<TService>();
+    }
+
+    protected Mock<TService> GetServiceMock<TService>()
+        where TService : class
+    {
+        return Mock.Get(_factory.Services.GetRequiredService<TService>());
     }
 
     /// <summary>
