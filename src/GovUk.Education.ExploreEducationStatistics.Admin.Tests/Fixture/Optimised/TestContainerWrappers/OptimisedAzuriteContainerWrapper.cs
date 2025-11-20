@@ -8,6 +8,7 @@ public class OptimisedAzuriteContainerWrapper
 {
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
         .WithImage("mcr.microsoft.com/azure-storage/azurite:3.34.0")
+        .WithCommand("--skipApiVersionCheck")
         .Build();
 
     // TODO EES-6450 - sort out this WithAzurite cref

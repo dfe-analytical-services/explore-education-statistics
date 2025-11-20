@@ -676,12 +676,7 @@ public class ReleaseVersionsControllerUnitTests
 // ReSharper disable once ClassNeverInstantiated.Global
 public class ReleaseVersionsControllerIntegrationTestsFixture()
     : OptimisedAdminCollectionFixture(
-        capabilities:
-        [
-            AdminIntegrationTestCapability.UserAuth,
-            AdminIntegrationTestCapability.Azurite,
-            AdminIntegrationTestCapability.Postgres,
-        ]
+        capabilities: [AdminIntegrationTestCapability.UserAuth, AdminIntegrationTestCapability.Postgres]
     );
 
 [CollectionDefinition(nameof(ReleaseVersionsControllerIntegrationTestsFixture))]

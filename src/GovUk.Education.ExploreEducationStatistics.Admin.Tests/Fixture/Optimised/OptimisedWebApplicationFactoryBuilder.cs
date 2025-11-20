@@ -65,9 +65,9 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
         });
     }
 
-    public OptimisedWebApplicationFactoryBuilder<TStartup> WithReconfiguredAdmin()
+    public OptimisedWebApplicationFactoryBuilder<TStartup> WithReconfiguredAdmin(Type[] additionalControllers)
     {
-        _serviceRegistrations.Add(ReconfigureAdminServices);
+        _serviceRegistrations.Add(services => ReconfigureAdminServices(services, additionalControllers));
         return this;
     }
 
@@ -99,7 +99,7 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
         return this;
     }
 
-    private void ReconfigureAdminServices(IServiceCollection services)
+    private void ReconfigureAdminServices(IServiceCollection services, Type[] additionalControllers)
     {
         services
             .UseInMemoryDbContext<ContentDbContext>(databaseName: $"{nameof(ContentDbContext)}_{Guid.NewGuid()}")
@@ -116,7 +116,7 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
             .MockService<IPrivateBlobStorageService>()
             .MockService<IPublicBlobStorageService>()
             .MockService<IAdminEventRaiser>(MockBehavior.Loose) // Ignore calls to publish events
-            .RegisterControllers<Startup>();
+            .RegisterControllers<Startup>(additionalControllers);
     }
 
     private void RegisterPostgres(IServiceCollection services, string connectionString)
@@ -216,9 +216,10 @@ public static class OptimisedWebApplicationFactoryExtensions
     ///
     /// </summary>
     public static OptimisedWebApplicationFactoryBuilder<Startup> WithReconfiguredAdmin(
-        this WebApplicationFactory<Startup> testApp
+        this WebApplicationFactory<Startup> testApp,
+        Type[] additionalControllers
     )
     {
-        return new OptimisedWebApplicationFactoryBuilder<Startup>(testApp).WithReconfiguredAdmin();
+        return new OptimisedWebApplicationFactoryBuilder<Startup>(testApp).WithReconfiguredAdmin(additionalControllers);
     }
 }
