@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -10,13 +9,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics;
 
