@@ -23,7 +23,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 // TODO EES-6450 - decide if we're happy with ignoring this #pragma in test projects.
 // ReSharper disable once ClassNeverInstantiated.Global
 #pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
-public class PreviewTokenControllerTestsFixture : OptimisedHttpClientWithPsqlCollectionFixture;
+public class PreviewTokenControllerTestsFixture()
+    : OptimisedAdminCollectionFixture(
+        capabilities: [AdminIntegrationTestCapability.UserAuth, AdminIntegrationTestCapability.Postgres]
+    );
 
 [CollectionDefinition(nameof(PreviewTokenControllerTestsFixture))]
 public class PreviewTokenControllerTestsCollection : ICollectionFixture<PreviewTokenControllerTestsFixture>;

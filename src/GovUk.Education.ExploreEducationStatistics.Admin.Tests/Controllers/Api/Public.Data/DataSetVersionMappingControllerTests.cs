@@ -21,7 +21,10 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class DataSetVersionMappingControllerTestsFixture : OptimisedHttpClientWithPsqlCollectionFixture;
+public class DataSetVersionMappingControllerTestsFixture()
+    : OptimisedAdminCollectionFixture(
+        capabilities: [AdminIntegrationTestCapability.UserAuth, AdminIntegrationTestCapability.Postgres]
+    );
 
 [CollectionDefinition(nameof(DataSetVersionMappingControllerTestsFixture))]
 public class DataSetVersionMappingControllerTestsCollection

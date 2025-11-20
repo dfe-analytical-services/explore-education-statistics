@@ -86,6 +86,20 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
         return this;
     }
 
+    public OptimisedWebApplicationFactoryBuilder<TStartup> WithTestUserAuthentication()
+    {
+        _serviceRegistrations.Add(services =>
+            services
+                .AddSingleton<OptimisedTestUserPool>()
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddScheme<AuthenticationSchemeOptions, OptimisedTestAuthHandler>(
+                    JwtBearerDefaults.AuthenticationScheme,
+                    null
+                )
+        );
+        return this;
+    }
+
     private void ReconfigureAdminServices(IServiceCollection services)
     {
         services
@@ -104,14 +118,6 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
             .MockService<IPublicBlobStorageService>()
             .MockService<IAdminEventRaiser>(MockBehavior.Loose) // Ignore calls to publish events
             .RegisterControllers<Startup>();
-
-        services
-            .AddSingleton<OptimisedTestUserPool>()
-            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddScheme<AuthenticationSchemeOptions, OptimisedTestAuthHandler>(
-                JwtBearerDefaults.AuthenticationScheme,
-                null
-            );
     }
 
     private void RegisterPostgres(IServiceCollection services, string connectionString)

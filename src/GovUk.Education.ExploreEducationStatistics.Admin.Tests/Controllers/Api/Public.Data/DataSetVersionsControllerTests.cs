@@ -28,7 +28,10 @@ using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Vali
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class DataSetVersionsControllerTestsFixture : OptimisedHttpClientWithPsqlCollectionFixture;
+public class DataSetVersionsControllerTestsFixture()
+    : OptimisedAdminCollectionFixture(
+        capabilities: [AdminIntegrationTestCapability.UserAuth, AdminIntegrationTestCapability.Postgres]
+    );
 
 [CollectionDefinition(nameof(DataSetVersionsControllerTestsFixture))]
 public class DataSetVersionsControllerTestsCollection : ICollectionFixture<DataSetVersionsControllerTestsFixture>;
