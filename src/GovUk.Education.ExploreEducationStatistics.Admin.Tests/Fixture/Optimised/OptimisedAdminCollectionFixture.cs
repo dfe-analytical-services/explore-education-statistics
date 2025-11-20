@@ -134,7 +134,7 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
         // this test class.
         // 4. Finally, "Build()" generates the finalised WebApplicationFactory<Startup> instance. At this point, we
         // should not attempt to reconfigure the factory further.
-        var factoryBuilder = new WebApplicationFactory<Startup>().WithReconfiguredAdmin();
+        var factoryBuilder = new WebApplicationFactory<Startup>().WithReconfiguredAdmin(GetAdditionalControllers());
 
         if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
         {
@@ -162,6 +162,11 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     protected virtual Action<IServiceCollection> GetServiceCollectionModifications()
     {
         return _ => { };
+    }
+
+    protected virtual Type[] GetAdditionalControllers()
+    {
+        return [];
     }
 
     protected virtual void AfterFactoryConstructed() { }
