@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised.TestContainerWrappers;
 
 /// <summary>
 /// This is a convenience wrapper around a PSQL TestContainer, to allow clearer visibility of the management and

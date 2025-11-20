@@ -1,10 +1,10 @@
 using Testcontainers.Azurite;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised.TestContainerWrappers;
 
 // TODO EES-6450 - remove when this is being used?
 // ReSharper disable once UnusedType.Global
-public class OptimisedAzuriteContainerUtil
+public class OptimisedAzuriteContainerWrapper
 {
     private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
         .WithImage("mcr.microsoft.com/azure-storage/azurite:3.34.0")
@@ -32,5 +32,10 @@ public class OptimisedAzuriteContainerUtil
     public async Task Stop()
     {
         await _azuriteContainer.StopAsync();
+    }
+
+    public AzuriteContainer GetContainer()
+    {
+        return _azuriteContainer;
     }
 }
