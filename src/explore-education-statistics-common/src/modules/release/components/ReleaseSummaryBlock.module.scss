@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: space-between;
   gap: govuk-spacing(4);
-  margin-bottom: govuk-spacing(8);
+  margin-bottom: govuk-spacing(6);
   padding: govuk-spacing(2);
   background-color: $_govuk-rebrand-light-blue-background-colour;
 }
@@ -19,7 +19,7 @@
   column-gap: govuk-spacing(6);
   row-gap: govuk-spacing(4);
   margin-inline: govuk-spacing(2);
-  padding-block: govuk-spacing(4);
+  padding-block: govuk-spacing(2);
 }
 
 .list {
@@ -28,7 +28,7 @@
   align-items: center;
   justify-content: flex-start;
   column-gap: govuk-spacing(6);
-  row-gap: govuk-spacing(4);
+  row-gap: govuk-spacing(3);
   margin-block: 0;
 }
 

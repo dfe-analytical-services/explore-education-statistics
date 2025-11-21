@@ -18,6 +18,11 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  scrollbar-width: none;
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
 
   @include govuk-media-query($from: tablet) {
     gap: govuk-spacing(4);
