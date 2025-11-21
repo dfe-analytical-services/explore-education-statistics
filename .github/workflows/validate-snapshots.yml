@@ -32,8 +32,10 @@ jobs:
       - name: tune linux network
         run: sudo ethtool -K eth0 tx off rx off
 
+      # Using actions/checkout@v5 due to issue
+      # https://github.com/peter-evans/create-pull-request/issues/4228
       - name: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v5
 
       - name: Setup python
         uses: actions/setup-python@v6
@@ -85,7 +87,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v5
         with:
           token: ${{ env.GH_TOKEN }}
 
