@@ -36,7 +36,7 @@ public record ManageContentPageViewModel
         [JsonConverter(typeof(StringEnumConverter))]
         public required ReleaseApprovalStatus ApprovalStatus { get; init; }
 
-        public required PublicationViewModel Publication { get; init; }
+        public PublicationViewModel Publication { get; set; } = null!;
 
         public required bool LatestRelease { get; init; }
 
@@ -81,11 +81,11 @@ public record ManageContentPageViewModel
 
         public required string Slug { get; init; }
 
-        public List<ReleaseSeriesItemViewModel> ReleaseSeries { get; set; } = [];
+        public required List<ReleaseSeriesItemViewModel> ReleaseSeries { get; init; }
 
         public required Contact Contact { get; init; }
 
-        public List<IdTitleViewModel> Methodologies { get; set; } = [];
+        public required List<IdTitleViewModel> Methodologies { get; init; }
 
         public required ExternalMethodology? ExternalMethodology { get; init; }
     }

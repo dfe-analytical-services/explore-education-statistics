@@ -64,8 +64,10 @@ public class ManageContentPageService : IManageContentPageService
             {
                 var (releaseVersion, unattachedDataBlocks, files) = releaseVersionBlocksAndFiles;
 
+                var publication = releaseVersion.Release.Publication;
+
                 var methodologyVersions = await _methodologyVersionRepository.GetLatestVersionByPublication(
-                    releaseVersion.PublicationId
+                    publication.Id
                 );
 
                 if (isPrerelease)
@@ -95,18 +97,29 @@ public class ManageContentPageService : IManageContentPageService
                         .ToListAsync();
                 }
 
+                var publishedReleases = await _releaseRepository.ListPublishedReleases(publication.Id);
+
                 var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(releaseVersion);
-
-                var publishedReleases = await _releaseRepository.ListPublishedReleases(releaseVersion.PublicationId);
-
-                // Hydrate Publication.ReleaseSeries
-                releaseViewModel.Publication.ReleaseSeries = BuildReleaseSeriesItemViewModels(
-                    releaseVersion.Publication,
-                    publishedReleases
-                );
-
                 releaseViewModel.DownloadFiles = files.ToList();
-                releaseViewModel.Publication.Methodologies = _mapper.Map<List<IdTitleViewModel>>(methodologyVersions);
+                releaseViewModel.Publication = new ManageContentPageViewModel.PublicationViewModel
+                {
+                    Id = publication.Id,
+                    Title = publication.Title,
+                    Slug = publication.Slug,
+                    Contact = publication.Contact,
+                    ReleaseSeries = BuildReleaseSeriesItemViewModels(publication, publishedReleases),
+                    Methodologies = methodologyVersions
+                        .Select(mv => new IdTitleViewModel { Id = mv.Id, Title = mv.Title })
+                        .ToList(),
+                    ExternalMethodology =
+                        publication.ExternalMethodology != null
+                            ? new ExternalMethodology
+                            {
+                                Title = publication.ExternalMethodology.Title,
+                                Url = publication.ExternalMethodology.Url,
+                            }
+                            : null,
+                };
 
                 return new ManageContentPageViewModel
                 {
