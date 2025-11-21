@@ -35,7 +35,7 @@ const ReleasePageTitle = ({
         )}
       </div>
       {!isMobileMedia && (
-        <div className="govuk-!-margin-bottom-4">
+        <div className="govuk-!-margin-bottom-4 dfe-flex-shrink--0">
           <span className={styles.link}>
             <SubscribeIcon className={styles.icon} />
             Get email alerts

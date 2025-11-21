@@ -1,7 +1,6 @@
 import GoToTopLink from '@common/components/GoToTopLink';
 import SectionBreak from '@common/components/SectionBreak';
 import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
-import { useMobileMedia } from '@common/hooks/useMedia';
 import React, { ReactNode } from 'react';
 
 interface Props {
@@ -27,8 +26,6 @@ export default function ReleasePageContentSection({
   includeBackToTopLink = true,
   testId,
 }: Props) {
-  const { isMedia: isMobileMedia } = useMobileMedia();
-
   return (
     <>
       <section
@@ -50,7 +47,7 @@ export default function ReleasePageContentSection({
         <div>
           {children}
 
-          {isMobileMedia && includeBackToTopLink && (
+          {includeBackToTopLink && (
             <GoToTopLink className="govuk-!-margin-top-8" />
           )}
         </div>

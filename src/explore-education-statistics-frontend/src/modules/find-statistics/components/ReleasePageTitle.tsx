@@ -31,7 +31,7 @@ const ReleasePageTitle = ({ publicationSummary, releaseTitle }: Props) => {
         )}
       </div>
       {!isMobileMedia && (
-        <div className="govuk-!-margin-bottom-4">
+        <div className="govuk-!-margin-bottom-4 dfe-flex-shrink--0">
           <SubscribeLink
             url={`/subscriptions/new-subscription/${publicationSummary.slug}`}
           />
