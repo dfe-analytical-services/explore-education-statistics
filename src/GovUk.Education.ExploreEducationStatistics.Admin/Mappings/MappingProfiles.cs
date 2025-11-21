@@ -54,7 +54,7 @@ public class MappingProfiles : CommonMappingProfile
             )
             .ForMember(dest => dest.PublicationTitle, m => m.MapFrom(rv => rv.Release.Publication.Title))
             .ForMember(dest => dest.PublicationId, m => m.MapFrom(rv => rv.Release.Publication.Id))
-            .ForMember(dest => dest.PublicationSlug, m => m.MapFrom(rv => rv.Publication.Slug))
+            .ForMember(dest => dest.PublicationSlug, m => m.MapFrom(rv => rv.Release.Publication.Slug))
             .ForMember(
                 dest => dest.PublishScheduled,
                 m =>
