@@ -35,7 +35,7 @@ jobs:
       # Using actions/checkout@v5 due to issue
       # https://github.com/peter-evans/create-pull-request/issues/4228
       - name: checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup python
         uses: actions/setup-python@v6
@@ -87,7 +87,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ env.GH_TOKEN }}
 
