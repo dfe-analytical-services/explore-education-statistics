@@ -1,6 +1,8 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services.Releases.Dtos;
+﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Releases.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
@@ -8,13 +10,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Releases;
 
-public class ReleaseDataContentService(ContentDbContext contentDbContext) : IReleaseDataContentService
+public class ReleaseDataContentService(ContentDbContext contentDbContext, IUserService userService)
+    : IReleaseDataContentService
 {
     public async Task<Either<ActionResult, ReleaseDataContentDto>> GetReleaseDataContent(
         Guid releaseVersionId,
         CancellationToken cancellationToken = default
     ) =>
-        await GetReleaseVersion(releaseVersionId, cancellationToken: cancellationToken)
+        await GetReleaseVersion(releaseVersionId, cancellationToken)
+            .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
                 var dataSets = await GetDataSets(releaseVersion, cancellationToken);

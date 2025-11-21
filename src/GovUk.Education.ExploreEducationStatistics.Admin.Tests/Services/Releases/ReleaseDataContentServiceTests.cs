@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -20,12 +21,12 @@ public abstract class ReleaseDataContentServiceTests
     public class GetReleaseDataContentTests : ReleaseDataContentServiceTests
     {
         [Fact]
-        public async Task WhenPublicationAndReleaseExist_ReturnsExpectedDataContent()
+        public async Task WhenReleaseVersionExists_ReturnsExpectedDataContent()
         {
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
@@ -118,7 +119,7 @@ public abstract class ReleaseDataContentServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
@@ -182,7 +183,7 @@ public abstract class ReleaseDataContentServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
@@ -254,7 +255,7 @@ public abstract class ReleaseDataContentServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
@@ -318,7 +319,7 @@ public abstract class ReleaseDataContentServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
@@ -395,7 +396,7 @@ public abstract class ReleaseDataContentServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
@@ -439,7 +440,7 @@ public abstract class ReleaseDataContentServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
@@ -474,16 +475,17 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
-        public async Task WhenReleaseVersionHasNoContent_ReturnsEmptyDataContent()
+        public async Task WhenReleaseVersionHasNoDataGuidance_ReturnsNullDataGuidance()
         {
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            // Release version has no content assigned to test that empty/optional properties are handled correctly
+            // Release version has no data guidance (override the default value set by the fixture)
+            releaseVersion.DataGuidance = null;
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -502,8 +504,40 @@ public abstract class ReleaseDataContentServiceTests
                 // Assert
                 var result = outcome.AssertRight();
 
-                Assert.Equal(release.Id, result.ReleaseId);
-                Assert.Equal(release.Versions[0].Id, result.ReleaseVersionId);
+                Assert.Null(result.DataGuidance);
+            }
+        }
+
+        [Fact]
+        public async Task WhenReleaseVersionHasNoContent_ReturnsEmptyDataContent()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            // Release version has no content assigned to test that empty/optional properties are handled correctly
+            releaseVersion.DataGuidance = null;
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
+
+                // Assert
+                var result = outcome.AssertRight();
+
                 Assert.Null(result.DataDashboards);
                 Assert.Equal(releaseVersion.DataGuidance, result.DataGuidance);
                 Assert.Empty(result.DataSets);
@@ -575,5 +609,6 @@ public abstract class ReleaseDataContentServiceTests
         }
     }
 
-    private static ReleaseDataContentService BuildService(ContentDbContext contentDbContext) => new(contentDbContext);
+    private static ReleaseDataContentService BuildService(ContentDbContext contentDbContext) =>
+        new(contentDbContext: contentDbContext, userService: MockUtils.AlwaysTrueUserService().Object);
 }

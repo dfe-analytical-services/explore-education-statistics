@@ -12,7 +12,7 @@ public record ReleaseDataContentDto
     public required Guid ReleaseId { get; init; }
     public required Guid ReleaseVersionId { get; init; }
     public required string? DataDashboards { get; init; }
-    public required string DataGuidance { get; init; }
+    public required string? DataGuidance { get; init; }
     public required ReleaseDataContentDataSetDto[] DataSets { get; init; }
     public required ReleaseDataContentFeaturedTableDto[] FeaturedTables { get; init; }
     public required ReleaseDataContentSupportingFileDto[] SupportingFiles { get; init; } = [];
@@ -28,8 +28,7 @@ public record ReleaseDataContentDto
             ReleaseId = releaseVersion.ReleaseId,
             ReleaseVersionId = releaseVersion.Id,
             DataDashboards = releaseVersion.RelatedDashboardsSection?.FindSingleContentBlockOfType<HtmlBlock>()?.Body,
-            DataGuidance =
-                releaseVersion.DataGuidance ?? throw new ArgumentException("ReleaseVersion must have Data guidance"),
+            DataGuidance = releaseVersion.DataGuidance,
             DataSets = dataSets,
             FeaturedTables = featuredTables,
             SupportingFiles = supportingFiles,
