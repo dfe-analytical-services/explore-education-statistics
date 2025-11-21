@@ -5,7 +5,7 @@ using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Reflection;
 using System.Security.Claims;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Releases;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -35,7 +35,7 @@ using ErrorViewModel = GovUk.Education.ExploreEducationStatistics.Common.ViewMod
 using File = System.IO.File;
 using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Releases;
 
 public class ReleaseVersionsControllerUnitTests
 {
