@@ -270,6 +270,7 @@ public class ManageContentPageServiceTests
             Assert.Equal(publication.Contact.ContactTelNo, contentPublication.Contact.ContactTelNo);
             Assert.Null(contentPublication.ExternalMethodology);
             Assert.Equal(publication.Slug, contentPublication.Slug);
+            Assert.Equal(publication.Summary, contentPublication.Summary);
             Assert.Equal(publication.Title, contentPublication.Title);
 
             var contentPublicationReleaseSeries = contentPublication.ReleaseSeries;

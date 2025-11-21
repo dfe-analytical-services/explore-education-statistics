@@ -77,6 +77,8 @@ public record ManageContentPageViewModel
     {
         public required Guid Id { get; init; }
 
+        public required string Summary { get; init; }
+
         public required string Title { get; init; }
 
         public required string Slug { get; init; }
