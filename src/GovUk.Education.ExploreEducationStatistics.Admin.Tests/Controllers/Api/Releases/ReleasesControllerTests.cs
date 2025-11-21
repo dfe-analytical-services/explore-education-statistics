@@ -1,7 +1,7 @@
 #nullable enable
 using System.Net.Http.Json;
 using System.Security.Claims;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Releases;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
@@ -29,7 +29,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static Moq.MockBehavior;
 using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Releases;
 
 public class ReleasesControllerUnitTests
 {
