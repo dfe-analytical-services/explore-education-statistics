@@ -7,9 +7,15 @@ import ReleasePageTabHome from '@admin/pages/release/content/components/ReleaseP
 import ReleasePageTabMethodology from '@admin/pages/release/content/components/ReleasePageTabMethodology';
 import ReleasePageTitle from '@admin/pages/release/content/components/ReleasePageTitle';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
+import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
+import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import ReleaseSummaryBlock from '@common/modules/release/components/ReleaseSummaryBlock';
+import {
+  formatPartialDate,
+  isValidPartialDate,
+} from '@common/utils/date/partialDate';
 import React, { Fragment, useCallback, useState } from 'react';
 
 export const releasePageTabSections = {
@@ -58,7 +64,8 @@ const ReleaseContent = ({
     [renderedTabs, setActiveSection],
   );
 
-  const { publication, publishingOrganisations, updates } = release;
+  const { nextReleaseDate, publication, publishingOrganisations, updates } =
+    release;
 
   return (
     <>
@@ -67,6 +74,26 @@ const ReleaseContent = ({
         publicationTitle={publication.title}
         releaseTitle={release.title}
       />
+
+      <div className="dfe-flex dfe-flex-wrap dfe-align-items--center dfe-gap-4 govuk-!-margin-bottom-6">
+        <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
+
+        {isValidPartialDate(nextReleaseDate) && (
+          <p className="govuk-!-margin-bottom-0">
+            Next release{' '}
+            <time
+              className="govuk-!-font-weight-bold"
+              data-testid="Next update"
+            >
+              {formatPartialDate(nextReleaseDate)}
+            </time>
+          </p>
+        )}
+
+        <span className="govuk-!-display-none-print">
+          All releases in this series
+        </span>
+      </div>
 
       {!isMobileMedia && (
         <ReleaseSummaryBlock
