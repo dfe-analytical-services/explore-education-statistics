@@ -7,38 +7,40 @@ import {
   MapFeatureCollection,
 } from '@common/modules/charts/components/MapBlock';
 import {
-  MapCategoricalDataConfig,
+  MapCategoricalData,
   MapLegendItem,
 } from '@common/modules/charts/types/chart';
-import { mapCategoricalDataColours } from '@common/modules/charts/util/chartUtils';
-import uniq from 'lodash/uniq';
 
 export default function generateFeaturesAndDataGroups({
-  categoricalDataConfig,
+  deprecatedCategoricalDataConfig,
   dataSetCategories,
   selectedDataSetConfig,
 }: {
-  categoricalDataConfig?: MapCategoricalDataConfig[];
+  /**
+   * Deprecated as this information is now on the data set config.
+   * This is kept as a fallback for pre-existing maps.
+   * @deprecated
+   */
+  deprecatedCategoricalDataConfig?: MapCategoricalData[];
   dataSetCategories: MapDataSetCategory[];
   selectedDataSetConfig: MapDataSetCategoryConfig;
 }): {
   features: MapFeatureCollection;
   legendItems: MapLegendItem[];
-  categoricalDataGroups?: MapCategoricalDataConfig[];
+  categoricalDataConfig?: MapCategoricalData[];
 } {
   const selectedDataSetKey = selectedDataSetConfig.dataKey;
 
-  const values = dataSetCategories.map(
-    category => category.dataSets[selectedDataSetKey]?.value,
-  );
-
   const isCategoricalData =
-    categoricalDataConfig?.length ||
-    values.every(value => !Number.isFinite(value));
+    selectedDataSetConfig?.categoricalDataConfig?.length ||
+    deprecatedCategoricalDataConfig?.length;
 
-  const { features, legendItems, categoricalDataGroups } = isCategoricalData
+  const { features, legendItems } = isCategoricalData
     ? getCategoricalDataFeatures({
-        categoricalDataConfig,
+        categoricalDataConfig: selectedDataSetConfig.categoricalDataConfig
+          ?.length
+          ? selectedDataSetConfig.categoricalDataConfig
+          : deprecatedCategoricalDataConfig,
         dataSetCategories,
         selectedDataSetKey,
       })
@@ -48,7 +50,7 @@ export default function generateFeaturesAndDataGroups({
         selectedDataSetKey,
       });
 
-  return { features, legendItems, categoricalDataGroups };
+  return { features, legendItems };
 }
 
 function getCategoricalDataFeatures({
@@ -56,29 +58,11 @@ function getCategoricalDataFeatures({
   dataSetCategories,
   selectedDataSetKey,
 }: {
-  categoricalDataConfig?: MapCategoricalDataConfig[];
+  categoricalDataConfig?: MapCategoricalData[];
   dataSetCategories: MapDataSetCategory[];
   selectedDataSetKey: string;
 }) {
   const defaultColour = 'rgba(0,0,0,0)';
-
-  const values = dataSetCategories.map(
-    category => category.dataSets[selectedDataSetKey]?.value,
-  );
-
-  const categoricalDataGroups: MapCategoricalDataConfig[] =
-    categoricalDataConfig?.length
-      ? categoricalDataConfig
-      : uniq(values).map((value, i) => {
-          return {
-            colour:
-              mapCategoricalDataColours[i] ??
-              `#${Math.floor(Math.random() * 16777215)
-                .toString(16)
-                .padStart(6, '0')}`,
-            value: value.toString(),
-          };
-        });
 
   const features: MapFeatureCollection = {
     type: 'FeatureCollection',
@@ -86,7 +70,7 @@ function getCategoricalDataFeatures({
       (acc, { dataSets, filter, geoJson }) => {
         const value = dataSets?.[selectedDataSetKey]?.value;
 
-        const matchingDataGroup = categoricalDataGroups.find(
+        const matchingDataGroup = categoricalDataConfig?.find(
           dataClass => dataClass.value === value,
         );
 
@@ -109,8 +93,8 @@ function getCategoricalDataFeatures({
 
   return {
     features,
-    categoricalDataGroups,
-    legendItems: categoricalDataGroups,
+    categoricalDataConfig,
+    legendItems: categoricalDataConfig ?? [],
   };
 }
 

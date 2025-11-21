@@ -500,6 +500,7 @@ describe('ChartBuilder', () => {
               indicator: 'authorised-absence-sessions',
               timePeriod: '2014_AY',
             },
+            dataSetKey: 'dataSetKey1',
           },
           {
             dataGrouping: {
@@ -512,6 +513,7 @@ describe('ChartBuilder', () => {
               indicator: 'authorised-absence-sessions',
               timePeriod: '2015_AY',
             },
+            dataSetKey: 'dataSetKey2',
           },
         ],
       },

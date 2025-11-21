@@ -17,9 +17,10 @@ describe('ChartDataGroupingForm', () => {
         indicator: 'authorised-absence-sessions',
         timePeriod: '2014_AY',
       },
+      dataSetKey: 'dataSetKey1',
       dataGrouping: {
         customGroups: [],
-        numberOfGroups: 7,
+        numberOfGroups: 5,
         type: 'EqualIntervals',
       },
     },
@@ -29,6 +30,7 @@ describe('ChartDataGroupingForm', () => {
         indicator: 'authorised-absence-sessions',
         timePeriod: '2015_AY',
       },
+      dataSetKey: 'dataSetKey2',
       dataGrouping: {
         customGroups: [],
         numberOfGroups: 4,
@@ -41,6 +43,7 @@ describe('ChartDataGroupingForm', () => {
         indicator: 'authorised-absence-sessions',
         timePeriod: '2014_AY',
       },
+      dataSetKey: 'dataSetKey3',
       dataGrouping: {
         customGroups: [
           {
@@ -70,8 +73,8 @@ describe('ChartDataGroupingForm', () => {
 
     expect(screen.getByLabelText('Equal intervals')).toBeChecked();
     expect(
-      screen.getAllByLabelText('Number of data groups')[0],
-    ).toHaveNumericValue(7);
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[0],
+    ).toHaveNumericValue(5);
 
     expect(screen.getByLabelText('Quantiles')).not.toBeChecked();
     expect(screen.getByLabelText('New custom groups')).not.toBeChecked();
@@ -93,7 +96,7 @@ describe('ChartDataGroupingForm', () => {
 
     expect(screen.getByLabelText('Quantiles')).toBeChecked();
     expect(
-      screen.getAllByLabelText('Number of data groups')[1],
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[1],
     ).toHaveNumericValue(4);
 
     expect(screen.getByLabelText('Equal intervals')).not.toBeChecked();
@@ -159,8 +162,13 @@ describe('ChartDataGroupingForm', () => {
     );
 
     await user.click(screen.getByLabelText('Quantiles'));
-    await user.clear(screen.getAllByLabelText('Number of data groups')[1]);
-    await user.type(screen.getAllByLabelText('Number of data groups')[1], '3');
+    await user.clear(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[1],
+    );
+    await user.type(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[1],
+      '3',
+    );
 
     await user.click(screen.getByRole('button', { name: 'Done' }));
 
@@ -170,6 +178,7 @@ describe('ChartDataGroupingForm', () => {
         indicator: 'authorised-absence-sessions',
         timePeriod: '2014_AY',
       },
+      dataSetKey: 'dataSetKey1',
       dataGrouping: {
         customGroups: [],
         numberOfGroups: 3,
@@ -224,6 +233,7 @@ describe('ChartDataGroupingForm', () => {
         indicator: 'authorised-absence-sessions',
         timePeriod: '2014_AY',
       },
+      dataSetKey: 'dataSetKey1',
       dataGrouping: {
         customGroups: [{ min: 0, max: 10 }],
         type: 'Custom',
@@ -293,6 +303,7 @@ describe('ChartDataGroupingForm', () => {
         indicator: 'authorised-absence-sessions',
         timePeriod: '2014_AY',
       },
+      dataSetKey: 'dataSetKey3',
       dataGrouping: {
         customGroups: [
           { min: 0, max: 10 },
@@ -340,6 +351,7 @@ describe('ChartDataGroupingForm', () => {
         indicator: 'authorised-absence-sessions',
         timePeriod: '2014_AY',
       },
+      dataSetKey: 'dataSetKey1',
       dataGrouping: {
         customGroups: [
           { min: 0, max: 10 },
@@ -365,7 +377,9 @@ describe('ChartDataGroupingForm', () => {
       />,
     );
 
-    await user.clear(screen.getAllByLabelText('Number of data groups')[0]);
+    await user.clear(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[0],
+    );
 
     await user.click(screen.getByRole('button', { name: 'Done' }));
 
@@ -375,6 +389,36 @@ describe('ChartDataGroupingForm', () => {
 
     expect(
       screen.getByRole('link', { name: 'Enter a number of data groups' }),
+    ).toHaveAttribute('href', '#chartDataGroupingForm-numberOfGroups');
+  });
+
+  test('shows a validation error if too many groups when using equal intervals', async () => {
+    const { user } = render(
+      <ChartDataGroupingForm
+        dataSetConfig={testDataSetConfigs[0]}
+        dataSetConfigs={testDataSetConfigs}
+        meta={testTable.subjectMeta}
+        onCancel={noop}
+        onSubmit={noop}
+      />,
+    );
+
+    await user.clear(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[0],
+    );
+    await user.type(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[0],
+      '6',
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Done' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole('link', { name: 'Maximum 5 data groups' }),
     ).toHaveAttribute('href', '#chartDataGroupingForm-numberOfGroups');
   });
 
@@ -391,7 +435,9 @@ describe('ChartDataGroupingForm', () => {
 
     await user.click(screen.getByLabelText('Quantiles'));
 
-    await user.clear(screen.getAllByLabelText('Number of data groups')[1]);
+    await user.clear(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[1],
+    );
 
     await user.click(screen.getByRole('button', { name: 'Done' }));
 
@@ -401,6 +447,39 @@ describe('ChartDataGroupingForm', () => {
 
     expect(
       screen.getByRole('link', { name: 'Enter a number of data groups' }),
+    ).toHaveAttribute('href', '#chartDataGroupingForm-numberOfGroupsQuantiles');
+  });
+
+  test('shows a validation error if too many groups when using quantiles', async () => {
+    const { user } = render(
+      <ChartDataGroupingForm
+        dataSetConfig={testDataSetConfigs[1]}
+        dataSetConfigs={testDataSetConfigs}
+        meta={testTable.subjectMeta}
+        onCancel={noop}
+        onSubmit={noop}
+      />,
+    );
+
+    await user.click(screen.getByLabelText('Quantiles'));
+
+    await user.clear(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[1],
+    );
+
+    await user.type(
+      screen.getAllByLabelText('Number of data groups (maximum 5)')[1],
+      '6',
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Done' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole('link', { name: 'Maximum 5 data groups' }),
     ).toHaveAttribute('href', '#chartDataGroupingForm-numberOfGroupsQuantiles');
   });
 
@@ -639,6 +718,35 @@ describe('ChartDataGroupingForm', () => {
           screen.getByTestId('chartDataGroupingForm-max-error'),
         ).findByText('Max cannot overlap another group'),
       ).toBeInTheDocument();
+    });
+
+    test('does not allow adding more than the maximum custom groups', async () => {
+      render(
+        <ChartDataGroupingForm
+          dataSetConfig={{
+            ...testDataSetConfigs[2],
+            dataGrouping: {
+              ...testDataSetConfigs[2].dataGrouping,
+              customGroups: [
+                ...testDataSetConfigs[2].dataGrouping.customGroups,
+                { min: 21, max: 30 },
+                { min: 31, max: 40 },
+                { min: 41, max: 50 },
+              ],
+            },
+          }}
+          dataSetConfigs={testDataSetConfigs}
+          meta={testTable.subjectMeta}
+          onCancel={noop}
+          onSubmit={noop}
+        />,
+      );
+
+      expect(screen.queryByLabelText('Min')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('Max')).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Add group' }),
+      ).not.toBeInTheDocument();
     });
   });
 });

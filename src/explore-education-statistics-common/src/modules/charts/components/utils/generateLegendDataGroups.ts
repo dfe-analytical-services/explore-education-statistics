@@ -11,6 +11,7 @@ import { getScale } from 'color2k';
 import clamp from 'lodash/clamp';
 import orderBy from 'lodash/orderBy';
 import times from 'lodash/times';
+import { maxMapDataGroups } from '../MapBlock';
 
 export interface LegendDataGroup {
   colour: string;
@@ -43,7 +44,11 @@ export default function generateLegendDataGroups({
   values: initialValues,
   unit,
 }: Options): LegendDataGroup[] {
-  const { customGroups, numberOfGroups = 5, type } = dataGrouping;
+  const {
+    customGroups,
+    numberOfGroups = maxMapDataGroups,
+    type,
+  } = dataGrouping;
 
   let implicitDecimalPlaces = 0;
 

@@ -160,11 +160,6 @@ export default function ChartBuilder({
     [axes.major?.dataSets, meta.indicators],
   );
 
-  const [handleMapCategoricalDataConfigChange] = useDebouncedCallback(
-    actions.updateMapCategoricalDataConfig,
-    200,
-  );
-
   const chart = useMemo<ChartBuilderChartProps | undefined>(() => {
     if (!definition || !options) {
       return undefined;
@@ -214,7 +209,6 @@ export default function ChartBuilder({
           type: 'map',
           onBoundaryLevelChange: (boundaryLevel: number) =>
             onTableQueryUpdate({}, boundaryLevel),
-          onChangeCategoricalDataConfig: handleMapCategoricalDataConfigChange,
         };
       default:
         return undefined;
@@ -229,7 +223,6 @@ export default function ChartBuilder({
     options,
     map,
     onTableQueryUpdate,
-    handleMapCategoricalDataConfigChange,
   ]);
 
   const handleSubmit = useCallback(async () => {
@@ -384,17 +377,23 @@ export default function ChartBuilder({
                   />
                 </TabsSection>
               )}
-              {forms.dataSets && definition.axes.major && (
+              {forms.dataSets && definition.axes.major && axes.major && (
                 <TabsSection
                   title="Data sets"
                   headingTitle="Data sets"
                   id={forms.dataSets.id}
                 >
                   <ChartDataSetsConfiguration
+                    axisMajor={axes.major}
                     buttons={deleteButton}
+                    chartType={definition.type}
                     dataSets={axes.major?.dataSets}
+                    data={data}
                     dataSetsUnits={dataSetsUnits}
+                    legend={legend}
+                    mapDataSetConfigs={map?.dataSetConfigs}
                     meta={meta}
+                    options={options}
                     onChange={actions.updateDataSets}
                   />
                 </TabsSection>
@@ -458,8 +457,8 @@ export default function ChartBuilder({
                     buttons={deleteButton}
                     data={data}
                     definition={definition}
-                    allowColourSelection={!map?.categoricalDataConfig?.length}
                     legend={legend}
+                    mapDataSetConfigs={map?.dataSetConfigs}
                     meta={meta}
                     showDataLabels={options?.showDataLabels}
                     onChange={handleLegendConfigurationChange}

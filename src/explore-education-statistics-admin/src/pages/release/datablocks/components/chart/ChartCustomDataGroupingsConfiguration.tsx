@@ -3,6 +3,7 @@ import Button from '@common/components/Button';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import Tooltip from '@common/components/Tooltip';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import { maxMapDataGroups } from '@common/modules/charts/components/MapBlock';
 import { CustomDataGroup } from '@common/modules/charts/types/chart';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -65,50 +66,55 @@ export default function ChartCustomDataGroupingsConfiguration({
             </td>
           </tr>
         ))}
-
-        <tr>
-          <td className="dfe-vertical-align--bottom">
-            <FormFieldNumberInput
-              errorString={
-                touchedFields.min && !hasMinValue ? 'Enter a minimum value' : ''
-              }
-              name="min"
-              formGroup={false}
-              hideLabel
-              label={`Min${unitLabel}`}
-              width={10}
-            />
-          </td>
-          <td className="dfe-vertical-align--bottom">
-            <FormFieldNumberInput
-              errorString={
-                touchedFields.max && !hasMaxValue ? 'Enter a maximum value' : ''
-              }
-              name="max"
-              formGroup={false}
-              hideLabel
-              label={`Max${unitLabel}`}
-              width={10}
-            />
-          </td>
-          <td className="dfe-vertical-align--bottom">
-            <Tooltip
-              text={!canSubmit ? 'Cannot add invalid group' : ''}
-              enabled={!canSubmit}
-            >
-              {({ ref }) => (
-                <Button
-                  ariaDisabled={!canSubmit}
-                  className="govuk-!-margin-bottom-0 dfe-float--right"
-                  ref={ref}
-                  onClick={onAddGroup}
-                >
-                  Add group
-                </Button>
-              )}
-            </Tooltip>
-          </td>
-        </tr>
+        {groups.length < maxMapDataGroups && (
+          <tr>
+            <td className="dfe-vertical-align--bottom">
+              <FormFieldNumberInput
+                errorString={
+                  touchedFields.min && !hasMinValue
+                    ? 'Enter a minimum value'
+                    : ''
+                }
+                name="min"
+                formGroup={false}
+                hideLabel
+                label={`Min${unitLabel}`}
+                width={10}
+              />
+            </td>
+            <td className="dfe-vertical-align--bottom">
+              <FormFieldNumberInput
+                errorString={
+                  touchedFields.max && !hasMaxValue
+                    ? 'Enter a maximum value'
+                    : ''
+                }
+                name="max"
+                formGroup={false}
+                hideLabel
+                label={`Max${unitLabel}`}
+                width={10}
+              />
+            </td>
+            <td className="dfe-vertical-align--bottom">
+              <Tooltip
+                text={!canSubmit ? 'Cannot add invalid group' : ''}
+                enabled={!canSubmit}
+              >
+                {({ ref }) => (
+                  <Button
+                    ariaDisabled={!canSubmit}
+                    className="govuk-!-margin-bottom-0 dfe-float--right"
+                    ref={ref}
+                    onClick={onAddGroup}
+                  >
+                    Add group
+                  </Button>
+                )}
+              </Tooltip>
+            </td>
+          </tr>
+        )}
       </tbody>
     </table>
   );
