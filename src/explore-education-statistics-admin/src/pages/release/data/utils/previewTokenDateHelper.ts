@@ -64,9 +64,23 @@ export default class PreviewTokenDateHelper {
         `The number of days (${datePresetSpan}) selected is not allowed, please select between 1 to 7 days.`,
       );
     }
+    const TZ = UkTimeHelper.europeLondonTimeZoneId;
+
     const startDate = new Date();
-    const endOfTodayUk = UkTimeHelper.toUkEndOfDay(startDate);
-    const endDate = addDays(endOfTodayUk, datePresetSpan);
+    // 1) "Today" in London as a calendar date (no time)
+    const todayYmdLondon = formatInTimeZone(startDate, TZ, 'yyyy-MM-dd');
+
+    // 2) Today at 00:00 London → UTC instant
+    const todayMidnightUtc = fromZonedTime(`${todayYmdLondon}T00:00:00`, TZ);
+
+    // 3) Add N *calendar* days from that midnight
+    const plusNMidnightUtc = addDays(todayMidnightUtc, datePresetSpan);
+
+    // 4) What calendar day is that in London?
+    const plusNYmdLondon = formatInTimeZone(plusNMidnightUtc, TZ, 'yyyy-MM-dd');
+
+    // 5) End of that day in London → UTC instant
+    const endDate = fromZonedTime(`${plusNYmdLondon}T23:59:59`, TZ);
 
     return { startDate, endDate };
   }
