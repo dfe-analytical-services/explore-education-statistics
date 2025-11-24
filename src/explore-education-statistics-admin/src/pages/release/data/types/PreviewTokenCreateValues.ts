@@ -1,6 +1,6 @@
 ﻿export interface PreviewTokenCreateValues {
   label: string;
-  datePresetSpan?: number;
-  activates?: Date;
-  expires?: Date;
+  datePresetSpan?: number | null;
+  activates?: Date | null;
+  expires?: Date | null;
 }

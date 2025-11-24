@@ -1,6 +1,5 @@
 ﻿import { isToday, addDays } from 'date-fns';
 import UkTimeHelper from '@common/utils/date/ukTimeHelper';
-import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 
 export type DateRange = { startDate: Date; endDate: Date };
 
@@ -30,17 +29,8 @@ export default class PreviewTokenDateHelper {
 
     const startDate = new Date();
 
-    const plusOneDayUtc = addDays(startDate, 1);
-    const tomorrowYmdLondon = formatInTimeZone(
-      plusOneDayUtc,
-      UkTimeHelper.europeLondonTimeZoneId,
-      'yyyy-MM-dd',
-    );
-
-    const endDate = fromZonedTime(
-      `${tomorrowYmdLondon}T23:59:59`,
-      UkTimeHelper.europeLondonTimeZoneId,
-    );
+    const endOfTodayUk = UkTimeHelper.toUkEndOfDay(startDate);
+    const endDate = addDays(endOfTodayUk, 1);
 
     return { startDate, endDate };
   }
