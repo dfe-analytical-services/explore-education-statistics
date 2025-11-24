@@ -81,7 +81,6 @@ using Notify.Interfaces;
 using Semver;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.ObservationService;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
@@ -100,6 +99,7 @@ using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admi
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
+using IReleaseDataContentService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Releases.IReleaseDataContentService;
 using IReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseFileService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
@@ -109,6 +109,7 @@ using MethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyService;
 using PublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationRepository;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
+using ReleaseDataContentService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Releases.ReleaseDataContentService;
 using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseFileService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
@@ -407,11 +408,16 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IPublicationCacheService, PublicationCacheService>();
         services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
 
+        // Content.Model repositories
         services.AddTransient<IFileRepository, FileRepository>();
         services.AddTransient<IDataImportRepository, DataImportRepository>();
         services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
         services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
+        services.AddTransient<IMethodologyNoteRepository, MethodologyNoteRepository>();
+        services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
+        services.AddTransient<IMethodologyRepository, MethodologyRepository>();
 
+        services.AddTransient<IReleaseDataContentService, ReleaseDataContentService>();
         services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
         services.AddTransient<IDataSetFileStorage, DataSetFileStorage>();
         services.AddScoped<IDataSetUploadRepository, DataSetUploadRepository>();
@@ -441,9 +447,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
         services.AddTransient<IMethodologyService, MethodologyService>();
         services.AddTransient<IMethodologyNoteService, MethodologyNoteService>();
-        services.AddTransient<IMethodologyNoteRepository, MethodologyNoteRepository>();
-        services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
-        services.AddTransient<IMethodologyRepository, MethodologyRepository>();
         services.AddTransient<IMethodologyContentService, MethodologyContentService>();
         services.AddTransient<IMethodologyFileRepository, MethodologyFileRepository>();
         services.AddTransient<IMethodologyImageService, MethodologyImageService>();

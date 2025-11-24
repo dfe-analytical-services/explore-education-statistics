@@ -11,7 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Releases;
 
 [Route("api")]
 [ApiController]

@@ -1,18 +1,18 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services.Releases;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Releases.Dtos;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Releases;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Releases;
 
 public abstract class ReleaseDataContentServiceTests
 {
@@ -21,12 +21,12 @@ public abstract class ReleaseDataContentServiceTests
     public class GetReleaseDataContentTests : ReleaseDataContentServiceTests
     {
         [Fact]
-        public async Task WhenPublicationAndReleaseExist_ReturnsExpectedDataContent()
+        public async Task WhenReleaseVersionExists_ReturnsExpectedDataContent()
         {
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
@@ -86,10 +86,7 @@ public abstract class ReleaseDataContentServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetReleaseDataContent(
-                    publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug
-                );
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
 
                 // Assert
                 var result = outcome.AssertRight();
@@ -122,7 +119,7 @@ public abstract class ReleaseDataContentServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
@@ -171,10 +168,7 @@ public abstract class ReleaseDataContentServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetReleaseDataContent(
-                    publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug
-                );
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
 
                 // Assert
                 var result = outcome.AssertRight();
@@ -189,7 +183,7 @@ public abstract class ReleaseDataContentServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
@@ -246,10 +240,7 @@ public abstract class ReleaseDataContentServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetReleaseDataContent(
-                    publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug
-                );
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
 
                 // Assert
                 var result = outcome.AssertRight();
@@ -264,7 +255,7 @@ public abstract class ReleaseDataContentServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
@@ -313,10 +304,7 @@ public abstract class ReleaseDataContentServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetReleaseDataContent(
-                    publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug
-                );
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
 
                 // Assert
                 var result = outcome.AssertRight();
@@ -331,7 +319,7 @@ public abstract class ReleaseDataContentServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
@@ -393,10 +381,7 @@ public abstract class ReleaseDataContentServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetReleaseDataContent(
-                    publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug
-                );
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
 
                 // Assert
                 var result = outcome.AssertRight();
@@ -411,7 +396,7 @@ public abstract class ReleaseDataContentServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
@@ -439,10 +424,7 @@ public abstract class ReleaseDataContentServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetReleaseDataContent(
-                    publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug
-                );
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
 
                 // Assert
                 var result = outcome.AssertRight();
@@ -453,12 +435,52 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
+        public async Task WhenDataSetHasNoSummary_ReturnsNullSummary()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            // Data set has no summary (override the default value set by the fixture) to test that an empty summary is handled correctly.
+            // The summary is set only if provided in the Data Guidance section of the UI.
+            ReleaseFile dataSet = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(releaseVersion)
+                .WithSummary(null);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(dataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Null(result.DataSets[0].Summary);
+            }
+        }
+
+        [Fact]
         public async Task WhenDataSetSummaryIsHtml_ReturnsPlainTextSummary()
         {
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
@@ -483,10 +505,7 @@ public abstract class ReleaseDataContentServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetReleaseDataContent(
-                    publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug
-                );
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
 
                 // Assert
                 var result = outcome.AssertRight();
@@ -496,16 +515,17 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
-        public async Task WhenReleaseVersionHasNoContent_ReturnsEmptyDataContent()
+        public async Task WhenReleaseVersionHasNoDataGuidance_ReturnsNullDataGuidance()
         {
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            // Release version has no content assigned to test that empty/optional properties are handled correctly
+            // Release version has no data guidance (override the default value set by the fixture)
+            releaseVersion.DataGuidance = null;
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -519,10 +539,41 @@ public abstract class ReleaseDataContentServiceTests
                 var sut = BuildService(context);
 
                 // Act
-                var outcome = await sut.GetReleaseDataContent(
-                    publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug
-                );
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Null(result.DataGuidance);
+            }
+        }
+
+        [Fact]
+        public async Task WhenReleaseVersionHasNoContent_ReturnsEmptyDataContent()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            // Release version has no content assigned to test that empty/optional properties are handled correctly
+            releaseVersion.DataGuidance = null;
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
 
                 // Assert
                 var result = outcome.AssertRight();
@@ -536,113 +587,19 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
-        public async Task WhenReleaseHasMultiplePublishedVersions_ReturnsDataContentForLatestPublishedVersion()
+        public async Task WhenReleaseVersionDoesNotExist_ReturnsNotFound()
         {
             // Arrange
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 2)]);
-            var release = publication.Releases[0];
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                context.Publications.Add(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var sut = BuildService(context);
-
-                // Act
-                var outcome = await sut.GetReleaseDataContent(
-                    publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug
-                );
-
-                // Assert
-                var result = outcome.AssertRight();
-
-                Assert.Equal(release.Versions[1].Id, result.ReleaseVersionId);
-            }
-        }
-
-        [Fact]
-        public async Task WhenPublicationDoesNotExist_ReturnsNotFound()
-        {
-            // Arrange
-            const string publicationSlug = "publication-that-does-not-exist";
-            const string releaseSlug = "test-release";
+            var releaseVersionId = Guid.NewGuid();
 
             await using var context = InMemoryContentDbContext();
             var sut = BuildService(context);
 
             // Act
-            var outcome = await sut.GetReleaseDataContent(publicationSlug: publicationSlug, releaseSlug: releaseSlug);
+            var outcome = await sut.GetReleaseDataContent(releaseVersionId);
 
             // Assert
             outcome.AssertNotFound();
-        }
-
-        [Fact]
-        public async Task WhenReleaseDoesNotExist_ReturnsNotFound()
-        {
-            // Arrange
-            Publication publication = _dataFixture.DefaultPublication();
-            const string releaseSlug = "release-that-does-not-exist";
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                context.Publications.Add(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var sut = BuildService(context);
-
-                // Act
-                var outcome = await sut.GetReleaseDataContent(
-                    publicationSlug: publication.Slug,
-                    releaseSlug: releaseSlug
-                );
-
-                // Assert
-                outcome.AssertNotFound();
-            }
-        }
-
-        [Fact]
-        public async Task WhenReleaseHasNoPublishedVersion_ReturnsNotFound()
-        {
-            // Arrange
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
-            var release = publication.Releases[0];
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                context.Publications.Add(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var sut = BuildService(context);
-
-                // Act
-                var outcome = await sut.GetReleaseDataContent(
-                    publicationSlug: publication.Slug,
-                    releaseSlug: release.Slug
-                );
-
-                // Assert
-                outcome.AssertNotFound();
-            }
         }
 
         private static void AssertDataSetEqual(ReleaseFile expected, ReleaseDataContentDataSetDto actual)
@@ -692,5 +649,6 @@ public abstract class ReleaseDataContentServiceTests
         }
     }
 
-    private static ReleaseDataContentService BuildService(ContentDbContext contentDbContext) => new(contentDbContext);
+    private static ReleaseDataContentService BuildService(ContentDbContext contentDbContext) =>
+        new(contentDbContext: contentDbContext, userService: MockUtils.AlwaysTrueUserService().Object);
 }
