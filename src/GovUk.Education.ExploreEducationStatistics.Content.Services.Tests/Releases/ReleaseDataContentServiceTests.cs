@@ -527,8 +527,6 @@ public abstract class ReleaseDataContentServiceTests
                 // Assert
                 var result = outcome.AssertRight();
 
-                Assert.Equal(release.Id, result.ReleaseId);
-                Assert.Equal(release.Versions[0].Id, result.ReleaseVersionId);
                 Assert.Null(result.DataDashboards);
                 Assert.Equal(releaseVersion.DataGuidance, result.DataGuidance);
                 Assert.Empty(result.DataSets);
