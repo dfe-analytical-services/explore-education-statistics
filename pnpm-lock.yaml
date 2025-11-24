@@ -875,11 +875,11 @@ importers:
         specifier: ^3.0.6
         version: 3.1.5
       date-fns:
-        specifier: ^2.16.1
-        version: 2.30.0
+        specifier: ^3.6.0
+        version: 3.6.0
       date-fns-tz:
-        specifier: ^2.0.1
-        version: 2.0.1(date-fns@2.30.0)
+        specifier: ^3.2.0
+        version: 3.2.0(date-fns@3.6.0)
       explore-education-statistics-common:
         specifier: workspace:*
         version: link:../explore-education-statistics-common
@@ -9768,27 +9768,12 @@ packages:
       whatwg-url: 11.0.0
     dev: true
 
-  /date-fns-tz@2.0.1(date-fns@2.30.0):
-    resolution: {integrity: sha512-fJCG3Pwx8HUoLhkepdsP7Z5RsucUi+ZBOxyM5d0ZZ6c4SdYustq0VMmOu6Wf7bli+yS/Jwp91TOCqn9jMcVrUA==}
-    peerDependencies:
-      date-fns: 2.x
-    dependencies:
-      date-fns: 2.30.0
-    dev: false
-
   /date-fns-tz@3.2.0(date-fns@3.6.0):
     resolution: {integrity: sha512-sg8HqoTEulcbbbVXeg84u5UnlsQa8GS5QXMqjjYIhS4abEVVKIUwe0/l/UhrZdKaL/W5eWZNlbTeEIiOXTcsBQ==}
     peerDependencies:
       date-fns: ^3.0.0 || ^4.0.0
     dependencies:
       date-fns: 3.6.0
-    dev: false
-
-  /date-fns@2.30.0:
-    resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
-    engines: {node: '>=0.11'}
-    dependencies:
-      '@babel/runtime': 7.23.9
     dev: false
 
   /date-fns@3.6.0:
