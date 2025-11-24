@@ -1,5 +1,6 @@
 ﻿import { isToday, addDays } from 'date-fns';
 import UkTimeHelper from '@common/utils/date/ukTimeHelper';
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 
 export type DateRange = { startDate: Date; endDate: Date };
 
@@ -27,10 +28,26 @@ export default class PreviewTokenDateHelper {
       return { startDate, endDate };
     }
 
+    const TZ = UkTimeHelper.europeLondonTimeZoneId;
+    // When no custom dates are provided: start = now, end = end of *tomorrow* (London)
     const startDate = new Date();
 
-    const endOfTodayUk = UkTimeHelper.toUkEndOfDay(startDate);
-    const endDate = addDays(endOfTodayUk, 1);
+    // 1) “Today” in London, as a calendar date string
+    const todayYmdLondon = formatInTimeZone(startDate, TZ, 'yyyy-MM-dd');
+
+    // 2) Midnight today in London → UTC instant
+    const todayMidnightUtc = fromZonedTime(`${todayYmdLondon}T00:00:00`, TZ);
+
+    // 3) Add one *absolute* day, then re-resolve what “tomorrow” is in London
+    const tomorrowMidnightUtc = addDays(todayMidnightUtc, 1);
+    const tomorrowYmdLondon = formatInTimeZone(
+      tomorrowMidnightUtc,
+      TZ,
+      'yyyy-MM-dd',
+    );
+
+    // 4) End of *tomorrow* in London, as a UTC instant
+    const endDate = fromZonedTime(`${tomorrowYmdLondon}T23:59:59`, TZ);
 
     return { startDate, endDate };
   }
