@@ -69,10 +69,12 @@ const PreReleaseContentPage = ({
             value={{
               ...content,
               canUpdateRelease: false,
+              featuredTables,
             }}
           >
             {previewRedesign ? (
               <ReleaseContentRedesign
+                isPra
                 transformFeaturedTableLinks={handleFeaturedTableLinks}
               />
             ) : (

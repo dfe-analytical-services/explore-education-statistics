@@ -30,9 +30,10 @@ import React, { useMemo } from 'react';
 
 interface Props {
   hidden: boolean;
+  isPra?: boolean;
 }
 
-const ReleasePageTabExploreData = ({ hidden }: Props) => {
+const ReleasePageTabExploreData = ({ hidden, isPra = false }: Props) => {
   const { featuredTables, release } = useReleaseContentState();
   const { publication, downloadFiles } = release;
 
@@ -87,16 +88,23 @@ const ReleasePageTabExploreData = ({ hidden }: Props) => {
           title={featuredTable.name}
           description={featuredTable.description}
           actions={
-            <Link
-              to={
-                release.published
-                  ? `${publicAppUrl}/data-tables/fast-track/${featuredTable.dataBlockParentId}`
-                  : `/publication/${publication.id}/release/${release.id}/data-blocks/${featuredTable.dataBlockId}`
-              }
-            >
-              View, edit or download{' '}
-              <VisuallyHidden>{featuredTable.name}</VisuallyHidden>
-            </Link>
+            isPra ? (
+              <span>
+                View, edit or download{' '}
+                <VisuallyHidden>{featuredTable.name}</VisuallyHidden>
+              </span>
+            ) : (
+              <Link
+                to={
+                  release.published
+                    ? `${publicAppUrl}/data-tables/fast-track/${featuredTable.dataBlockParentId}`
+                    : `/publication/${publication.id}/release/${release.id}/data-blocks/${featuredTable.dataBlockId}`
+                }
+              >
+                View, edit or download{' '}
+                <VisuallyHidden>{featuredTable.name}</VisuallyHidden>
+              </Link>
+            )
           }
         />
       ))}

@@ -31,8 +31,10 @@ export type ReleasePageTabSectionItems = typeof releasePageTabSections;
 export type ReleasePageTabSectionKey = keyof ReleasePageTabSectionItems;
 
 const ReleaseContent = ({
+  isPra = false,
   transformFeaturedTableLinks,
 }: {
+  isPra?: boolean;
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }) => {
   const { release } = useReleaseContentState();
@@ -119,7 +121,10 @@ const ReleaseContent = ({
         />
       )}
       {renderedTabs.includes('explore') && (
-        <ReleasePageTabExploreData hidden={activeTabSection !== 'explore'} />
+        <ReleasePageTabExploreData
+          hidden={activeTabSection !== 'explore'}
+          isPra={isPra}
+        />
       )}
       {renderedTabs.includes('methodology') && (
         <ReleasePageTabMethodology
