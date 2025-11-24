@@ -62,16 +62,13 @@ function AcccessibilityStatementPage() {
           <h2>How accessible this website is</h2>
           <p>We know some parts of this website are not fully accessible:</p>
           <ul>
-            <li>some buttons and links are not descriptive enough</li>
             <li>
-              some errors are not automatically read back to the screen reader
+              some graphics, including geographic charts, used to convey
+              information may have poor colour contrast
             </li>
             <li>
-              some tables are missing a visible focus, making them difficult to
-              navigate by keyboard
-            </li>
-            <li>
-              some graphics used to convey information have poor colour contrast
+              users of voice activation software may have difficulties
+              interacting with geographic charts.
             </li>
           </ul>
           <h2>Feedback and contact information</h2>
@@ -139,26 +136,6 @@ function AcccessibilityStatementPage() {
           </p>
           <ol>
             <li>
-              Some publication pages have multiple help buttons and form labels
-              with the same title. This means it is difficult for screen reader
-              users to distinguish out of context what the titles are relating
-              to. This doesn't meet WCAG 2.2 (Level AA) success criterion 2.4.6
-              (understanding headings and labels).
-            </li>
-            <li>
-              On the find statistics page, if a search term has been entered
-              with fewer than three characters, the resulting error dialog isn't
-              automatically read back by the screen reader. This doesn't meet
-              WCAG 2.2 (Level AA) success criterion 4.1.3 (understanding status
-              messages).
-            </li>
-            <li>
-              On publication pages with embedded data, tables are missing focus
-              indicators. This means it is difficult to navigate tables of data
-              using a keyboard alone. This doesn't meet WCAG 2.2 (Level AA)
-              success criterion 2.4.7 (understanding focus visible)
-            </li>
-            <li>
               On publication pages with embedded charts, some colour elements
               used to distinguish different ranges of results have low contrast.
               This means it may be difficult for some low vision users to
@@ -170,7 +147,7 @@ function AcccessibilityStatementPage() {
           <p>Not applicable.</p>
           <h2>How we tested this website</h2>
           <p>
-            This website was last tested on 12 March 2024 against{' '}
+            This website was last tested on 19th August 2025 against{' '}
             <a
               href="https://www.w3.org/TR/WCAG22/"
               rel="noopener noreferrer nofollow"
