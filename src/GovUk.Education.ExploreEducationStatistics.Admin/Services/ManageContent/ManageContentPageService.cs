@@ -104,6 +104,7 @@ public class ManageContentPageService : IManageContentPageService
                 releaseViewModel.Publication = new ManageContentPageViewModel.PublicationViewModel
                 {
                     Id = publication.Id,
+                    Summary = publication.Summary,
                     Title = publication.Title,
                     Slug = publication.Slug,
                     Contact = publication.Contact,
