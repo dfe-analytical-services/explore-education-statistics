@@ -86,9 +86,6 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
     await waitFor(() => expect(handleSubmit).toHaveBeenCalledTimes(1));
 
     const handleSubmitParam: PreviewTokenCreateValues = {
-      activates: null,
-      datePresetSpan: null,
-      expires: null,
       label: 'Test label',
     };
     expect(handleSubmit).toHaveBeenCalledWith(handleSubmitParam);
@@ -165,7 +162,6 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
 
     const handleSubmitParam: PreviewTokenCreateValues = {
       activates: activatesStartOfDay,
-      datePresetSpan: null,
       expires: expiresStartOfDay,
       label: 'Test label',
     };

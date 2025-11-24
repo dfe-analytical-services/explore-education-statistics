@@ -28,13 +28,19 @@ export default class PreviewTokenDateHelper {
       return { startDate, endDate };
     }
 
-    const TZ = 'Europe/London';
     const startDate = new Date();
 
     const plusOneDayUtc = addDays(startDate, 1);
-    const tomorrowYmdLondon = formatInTimeZone(plusOneDayUtc, TZ, 'yyyy-MM-dd');
+    const tomorrowYmdLondon = formatInTimeZone(
+      plusOneDayUtc,
+      UkTimeHelper.europeLondonTimeZoneId,
+      'yyyy-MM-dd',
+    );
 
-    const endDate = fromZonedTime(`${tomorrowYmdLondon}T23:59:59.999`, TZ);
+    const endDate = fromZonedTime(
+      `${tomorrowYmdLondon}T23:59:59`,
+      UkTimeHelper.europeLondonTimeZoneId,
+    );
 
     return { startDate, endDate };
   }
@@ -52,9 +58,9 @@ export default class PreviewTokenDateHelper {
       );
     }
     const startDate = new Date();
-    const endDate = UkTimeHelper.toUkEndOfDay(
-      addDays(startDate, datePresetSpan),
-    );
+    const endOfTodayUk = UkTimeHelper.toUkEndOfDay(startDate);
+    const endDate = addDays(endOfTodayUk, datePresetSpan);
+
     return { startDate, endDate };
   }
 }

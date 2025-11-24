@@ -93,7 +93,7 @@ describe('PreviewTokenDateHelper', () => {
       );
     });
 
-    const TZ = 'Europe/London';
+    const TZ = UkTimeHelper.europeLondonTimeZoneId;
 
     const cases: string[] = [
       // ——— Around BST start (last Sunday in March 2025: 2025-03-30) ———
@@ -153,13 +153,13 @@ describe('PreviewTokenDateHelper', () => {
         // Assert: end equals exact end-of-tomorrow instant
         expect(result.endDate.toISOString()).toBe(expectedEndUtc.toISOString());
 
-        // Assert: in London, the wall-clock time is 23:59:59.999
+        // Assert: in London, the wall-clock time is 23:59:59
         const londonEndHms = formatInTimeZone(
           result.endDate,
           TZ,
           'HH:mm:ss.SSS',
         );
-        expect(londonEndHms).toBe('23:59:59.999');
+        expect(londonEndHms).toBe('23:59:59.000');
       },
     );
 
@@ -196,13 +196,12 @@ describe('PreviewTokenDateHelper', () => {
     );
 
     test('endDate should be exactly at UK end of day', () => {
-      const fixedDate = new Date('2023-01-01T12:00:00.000Z');
+      const fixedDate = new Date('2023-01-01T12:00:00Z');
       jest.setSystemTime(fixedDate);
 
       const result = helper.setDateRangeBasedOnPresets(1);
 
-      const expectedEndDate = UkTimeHelper.toUkEndOfDayString('2023-01-02');
-      expect(result.endDate).toEqual(expectedEndDate);
+      expect(result.endDate).toEqual(new Date('2023-01-02T23:59:59.000Z'));
     });
   });
 

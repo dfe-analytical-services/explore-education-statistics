@@ -1,7 +1,7 @@
 ﻿import { fromZonedTime, formatInTimeZone } from 'date-fns-tz';
 
 export default class UkTimeHelper {
-  private static readonly TZ = 'Europe/London';
+  public static readonly europeLondonTimeZoneId = 'Europe/London';
 
   public static todayStartOfDayUk(): string {
     return this.toUkStartOfDayString(new Date());
@@ -16,11 +16,11 @@ export default class UkTimeHelper {
   }
 
   public static toUkStartOfDayString(date1: Date | string): string {
-    return this.dateTimeInLondonTimeZone(date1, DayOption.STARTOFDAY);
+    return this.dateTimeInLondonTimeZone(date1, true);
   }
 
   public static toUkEndOfDayString(date1: Date | string): string {
-    return this.dateTimeInLondonTimeZone(date1, DayOption.ENDOFDAY);
+    return this.dateTimeInLondonTimeZone(date1, false);
   }
 
   /**
@@ -33,18 +33,25 @@ export default class UkTimeHelper {
    */
   public static dateTimeInLondonTimeZone(
     dateTime: Date | string,
-    option: DayOption,
+    startOfDayRatherThanEndOfDay: boolean,
   ): string {
-    const ymdLondon = formatInTimeZone(dateTime, this.TZ, 'yyyy-MM-dd');
+    const ymdLondon = formatInTimeZone(
+      dateTime,
+      this.europeLondonTimeZoneId,
+      'yyyy-MM-dd',
+    );
 
-    const time = option === DayOption.STARTOFDAY ? 'T00:00:00' : 'T23:59:59';
+    const time = startOfDayRatherThanEndOfDay ? 'T00:00:00' : 'T23:59:59.000';
 
-    const utcInstant = fromZonedTime(`${ymdLondon}${time}`, this.TZ);
+    const utcInstant = fromZonedTime(
+      `${ymdLondon}${time}`,
+      this.europeLondonTimeZoneId,
+    );
 
-    return formatInTimeZone(utcInstant, this.TZ, "yyyy-MM-dd'T'HH:mm:ssXXX");
+    return formatInTimeZone(
+      utcInstant,
+      this.europeLondonTimeZoneId,
+      "yyyy-MM-dd'T'HH:mm:ssXXX",
+    );
   }
-}
-enum DayOption {
-  STARTOFDAY = 'StartOfDay',
-  ENDOFDAY = 'EndOfDay',
 }

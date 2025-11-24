@@ -20,6 +20,7 @@ import { generatePath, Route, Router } from 'react-router-dom';
 import { createMemoryHistory, MemoryHistory } from 'history';
 import { addDays, addHours } from 'date-fns';
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
+import UkTimeHelper from '@common/utils/date/ukTimeHelper';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/previewTokenService');
@@ -114,7 +115,7 @@ describe('ReleaseApiDataSetPreviewPage', () => {
       label: 'Test label',
     });
     const fixedDate = new Date();
-    const TZ = 'Europe/London';
+    const TZ = UkTimeHelper.europeLondonTimeZoneId;
 
     // Arrange expected end: end of *tomorrow* in London
     // 1) London calendar for "today"

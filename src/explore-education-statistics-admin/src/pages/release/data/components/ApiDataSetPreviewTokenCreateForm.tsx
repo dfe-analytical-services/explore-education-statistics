@@ -12,7 +12,7 @@ import FormProvider from '@common/components/form/FormProvider';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
-import { ObjectSchema } from 'yup';
+import { ObjectSchema, Schema } from 'yup';
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
@@ -21,13 +21,9 @@ import { PreviewTokenCreateValues } from '@admin/pages/release/data/types/Previe
 import InsetText from '@common/components/InsetText';
 import UkTimeHelper from '@common/utils/date/ukTimeHelper';
 
-interface FormValues {
+interface FormValues extends PreviewTokenCreateValues {
   agreeTerms: boolean;
-  label: string;
-  datePresetSpan?: number | null;
-  activates?: Date | string | null;
-  expires?: Date | string | null;
-  selectionMethod?: 'presetDays' | 'customDates' | null;
+  selectionMethod?: 'presetDays' | 'customDates';
 }
 
 interface Props {
@@ -65,7 +61,6 @@ export default function ApiDataSetPreviewTokenCreateForm({
         .required('The terms of usage must be agreed')
         .oneOf([true], 'The terms of usage must be agreed'),
       datePresetSpan: Yup.number()
-        .nullable()
         .when('selectionMethod', {
           is: 'presetDays',
           then: s =>
@@ -78,7 +73,8 @@ export default function ApiDataSetPreviewTokenCreateForm({
                   return value >= 1 && value <= 7;
                 },
               }),
-        }),
+        })
+        .notRequired() as Schema<number | undefined>,
       activates: Yup.date().when('selectionMethod', {
         is: 'customDates',
         then: s =>
@@ -90,9 +86,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
               test(value) {
                 if (value == null) return false;
                 const activatesMidnightUk = UkTimeHelper.toUkStartOfDay(value);
-                const todayMidnightUk = new Date(
-                  UkTimeHelper.todayStartOfDayUk(),
-                );
+                const todayMidnightUk = UkTimeHelper.todayStartOfDayUk();
                 return !isBefore(activatesMidnightUk, todayMidnightUk);
               },
             })
@@ -149,9 +143,9 @@ export default function ApiDataSetPreviewTokenCreateForm({
             },
           }),
       }),
-      selectionMethod: Yup.mixed<'presetDays' | 'customDates'>()
-        .oneOf(['presetDays', 'customDates'])
-        .notRequired(),
+      selectionMethod: Yup.string()
+        .oneOf(['presetDays', 'customDates'] as const)
+        .notRequired() as Schema<'presetDays' | 'customDates' | undefined>,
     });
   }, []);
   return (
