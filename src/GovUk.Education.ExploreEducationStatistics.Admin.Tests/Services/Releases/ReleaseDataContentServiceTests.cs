@@ -435,6 +435,46 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
+        public async Task WhenDataSetHasNoSummary_ReturnsNullSummary()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            // Data set has no summary (override the default value set by the fixture) to test that an empty summary is handled correctly.
+            // The summary is set only if provided in the Data Guidance section of the UI.
+            ReleaseFile dataSet = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(releaseVersion)
+                .WithSummary(null);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(dataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Null(result.DataSets[0].Summary);
+            }
+        }
+
+        [Fact]
         public async Task WhenDataSetSummaryIsHtml_ReturnsPlainTextSummary()
         {
             // Arrange

@@ -42,7 +42,7 @@ public record ReleaseDataContentDataSetDto
     public required Guid SubjectId { get; init; }
     public required ReleaseDataContentDataSetMetaDto Meta { get; init; }
     public required string Title { get; init; }
-    public required string Summary { get; init; }
+    public required string? Summary { get; init; }
 
     public static ReleaseDataContentDataSetDto FromReleaseFile(ReleaseFile releaseFile) =>
         new()
@@ -54,9 +54,7 @@ public record ReleaseDataContentDataSetDto
             Meta = ReleaseDataContentDataSetMetaDto.FromReleaseFile(releaseFile),
             // Summaries created before EES-4353 may contain HTML. Convert them to plain text here.
             // TODO: Remove HtmlToText after migrating all summaries to plain text.
-            Summary = HtmlToTextUtils.HtmlToText(
-                releaseFile.Summary ?? throw new ArgumentException("ReleaseFile must have Summary")
-            ),
+            Summary = releaseFile.Summary != null ? HtmlToTextUtils.HtmlToText(releaseFile.Summary) : null,
             Title = releaseFile.Name ?? throw new ArgumentException("ReleaseFile must have Name"),
         };
 }
