@@ -1,9 +1,9 @@
-import DetailsMenu from '@common/components/DetailsMenu';
 import FormCheckboxSelectedCount from '@common/components/form/FormCheckboxSelectedCount';
 import FormFieldCheckboxSearchGroup from '@common/components/form/FormFieldCheckboxSearchGroup';
 import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
 import { FormFieldComponentProps } from '@common/components/form/FormField';
 import { FormCheckboxSearchGroupProps } from '@common/components/form/FormCheckboxSearchGroup';
+import FilterAccordion from '@common/modules/table-tool/components/FilterAccordion';
 import { OmitStrict } from '@common/types';
 import get from 'lodash/get';
 import React, { useEffect, useState } from 'react';
@@ -36,12 +36,12 @@ export default function FormFieldCheckboxMenu<TFormValues extends FieldValues>(
   }, [errors, name, open, setOpen]);
 
   return (
-    <DetailsMenu
-      id={`details-${id}`}
+    <FilterAccordion
+      id={`${id}-options`}
       open={open}
-      jsRequired
-      summary={legend}
-      summaryAfter={<FormCheckboxSelectedCount name={name} />}
+      label={legend}
+      labelAfter={<FormCheckboxSelectedCount name={name} />}
+      testId={`${id}-accordion`}
     >
       {options.length > 1 ? (
         <FormFieldCheckboxSearchGroup
@@ -54,6 +54,6 @@ export default function FormFieldCheckboxMenu<TFormValues extends FieldValues>(
       ) : (
         <FormFieldCheckboxGroup {...props} name={name} options={options} />
       )}
-    </DetailsMenu>
+    </FilterAccordion>
   );
 }

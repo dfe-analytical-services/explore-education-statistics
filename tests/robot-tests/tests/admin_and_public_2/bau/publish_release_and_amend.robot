@@ -621,7 +621,7 @@ Edit data block for amendment
 
     user clicks element    testid:wizardStep-4-goToButton
 
-    user opens details dropdown    Date
+    user clicks button    Date
     user clicks category checkbox    Date    24/03/2020
     user checks category checkbox is checked    Date    24/03/2020
 

@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -22,23 +23,16 @@ public class DataSetScreenerClient(
         CancellationToken cancellationToken
     )
     {
-        // TODO (EES-6341): Re-enable screening once fully implemented.
-        return new DataSetScreenerResponse
-        {
-            OverallResult = "Passed",
-            Passed = true,
-            PublicApiCompatible = true,
-        };
-        //await authenticationManager.AddAuthentication(httpClient, cancellationToken);
+        await authenticationManager.AddAuthentication(httpClient, cancellationToken);
 
-        //var json = JsonSerializer.Serialize(dataSetRequest, _jsonSerializerOptions);
-        //var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var json = JsonSerializer.Serialize(dataSetRequest, _jsonSerializerOptions);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        //// TODO (EES-5353): Add cancellation token handling logic to terminate Azure Function processes
-        //var response = await httpClient.PostAsync(httpClient.BaseAddress, content, CancellationToken.None);
+        // TODO (EES-6301): Add cancellation token handling logic to terminate Azure Function processes
+        var response = await httpClient.PostAsync(httpClient.BaseAddress, content, CancellationToken.None);
 
-        //return response.IsSuccessStatusCode
-        //    ? await response.Content.ReadFromJsonAsync<DataSetScreenerResponse>(cancellationToken)
-        //    : throw new Exception($"Screening process failed with status {response.StatusCode}");
+        return response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<DataSetScreenerResponse>(cancellationToken)
+            : throw new Exception($"Screening process failed with status {response.StatusCode}");
     }
 }

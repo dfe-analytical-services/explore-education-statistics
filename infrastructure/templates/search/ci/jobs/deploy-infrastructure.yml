@@ -67,7 +67,6 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 indexCorsAllowedOrigins:
                   - $(publicSiteUrl)
-                  - 'https://localhost:3000'
                   - 'http://localhost:3000'
                 dataSourceConnectionString: $(searchStorageAccountManagedIdentityConnectionString)
                 dataSourceContainerName: $(searchableDocumentsContainerName)

@@ -10,7 +10,7 @@ import React, { ReactNode } from 'react';
 
 interface Props {
   isEditing?: boolean;
-  lastUpdated?: string;
+  lastUpdated?: string | Date;
   releaseType: ReleaseType;
   renderProducerLink: ReactNode;
   renderSubscribeLink?: ReactNode;
@@ -32,6 +32,7 @@ export default function ReleaseSummaryBlockMobile({
       id="summary-section-mobile"
       className={styles.container}
       data-testid="release-summary-block-mobile"
+      data-page-section="true"
     >
       <div className={styles.innerWrap}>
         <div className={styles.innerContent}>

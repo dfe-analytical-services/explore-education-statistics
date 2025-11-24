@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -8,85 +9,87 @@ using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInf
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 
-public class ManageContentPageViewModel
+public record ManageContentPageViewModel
 {
-    public ReleaseViewModel Release { get; set; } = new();
+    public required ReleaseViewModel Release { get; init; }
 
-    public List<DataBlockViewModel> UnattachedDataBlocks { get; set; } = new();
+    public required List<DataBlockViewModel> UnattachedDataBlocks { get; init; }
 
-    public class ReleaseViewModel
+    public record ReleaseViewModel
     {
-        public Guid Id { get; set; }
+        public required Guid Id { get; init; }
 
-        public string Title { get; set; }
+        public required string Title { get; init; }
 
-        public string YearTitle { get; set; }
+        public required string YearTitle { get; init; }
 
-        public string CoverageTitle { get; set; }
+        public required string CoverageTitle { get; init; }
 
-        public string ReleaseName { get; set; }
+        public required string ReleaseName { get; init; }
 
-        public DateTime? Published { get; set; }
+        public required DateTime? Published { get; init; }
 
-        public string Slug { get; set; }
+        public required string Slug { get; init; }
 
-        public Guid PublicationId { get; set; }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseApprovalStatus ApprovalStatus { get; set; }
-
-        public PublicationViewModel Publication { get; set; }
-
-        public bool LatestRelease { get; set; }
+        public required Guid PublicationId { get; init; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseType Type { get; set; }
+        public required ReleaseApprovalStatus ApprovalStatus { get; init; }
 
-        public List<OrganisationViewModel> PublishingOrganisations { get; set; } = [];
+        public PublicationViewModel Publication { get; set; } = null!;
 
-        public List<ReleaseNoteViewModel> Updates { get; set; } = [];
+        public required bool LatestRelease { get; init; }
 
-        public List<ContentSectionViewModel> Content { get; set; } = [];
+        [JsonConverter(typeof(StringEnumConverter))]
+        public required ReleaseType Type { get; init; }
 
-        public ContentSectionViewModel SummarySection { get; set; } = new();
+        public required List<OrganisationViewModel> PublishingOrganisations { get; init; }
 
-        public ContentSectionViewModel HeadlinesSection { get; set; } = new();
+        public required List<ReleaseNoteViewModel> Updates { get; init; }
 
-        public List<KeyStatisticViewModel> KeyStatistics { get; set; } = [];
+        public required List<ContentSectionViewModel> Content { get; init; }
 
-        public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; } = new();
+        public required ContentSectionViewModel SummarySection { get; init; }
 
-        public ContentSectionViewModel RelatedDashboardsSection { get; set; } = new();
+        public required ContentSectionViewModel HeadlinesSection { get; init; }
 
-        public IEnumerable<FileInfo> DownloadFiles { get; set; }
+        public required List<KeyStatisticViewModel> KeyStatistics { get; init; }
 
-        public bool HasPreReleaseAccessList { get; set; }
+        public required ContentSectionViewModel KeyStatisticsSecondarySection { get; init; }
+
+        public required ContentSectionViewModel RelatedDashboardsSection { get; init; }
+
+        public IEnumerable<FileInfo> DownloadFiles { get; set; } = [];
+
+        public required bool HasPreReleaseAccessList { get; init; }
 
         public bool HasDataGuidance => DownloadFiles.Any(file => file.Type == FileType.Data);
 
         [JsonConverter(typeof(DateTimeToDateJsonConverter))]
-        public DateTime? PublishScheduled { get; set; }
+        public required DateTime? PublishScheduled { get; init; }
 
-        public PartialDate NextReleaseDate { get; set; }
+        public required PartialDate? NextReleaseDate { get; init; }
 
-        public List<Link> RelatedInformation { get; set; } = [];
+        public required List<Link> RelatedInformation { get; init; }
     }
 
-    public class PublicationViewModel
+    public record PublicationViewModel
     {
-        public Guid Id { get; set; }
+        public required Guid Id { get; init; }
 
-        public string Title { get; set; }
+        public required string Summary { get; init; }
 
-        public string Slug { get; set; }
+        public required string Title { get; init; }
 
-        public List<ReleaseSeriesItemViewModel> ReleaseSeries { get; set; }
+        public required string Slug { get; init; }
 
-        public Contact Contact { get; set; }
+        public required List<ReleaseSeriesItemViewModel> ReleaseSeries { get; init; }
 
-        public List<IdTitleViewModel> Methodologies { get; set; }
+        public required Contact Contact { get; init; }
 
-        public ExternalMethodology ExternalMethodology { get; set; }
+        public required List<IdTitleViewModel> Methodologies { get; init; }
+
+        public required ExternalMethodology? ExternalMethodology { get; init; }
     }
 }
 

@@ -363,7 +363,7 @@ describe('TableToolPage', () => {
     ).toHaveAttribute('aria-current', 'step');
 
     const themeRadios = within(
-      screen.getByRole('group', { name: 'Select a theme' }),
+      screen.getByRole('group', { name: 'Show publications by theme' }),
     ).getAllByRole('radio');
     expect(themeRadios).toHaveLength(1);
     expect(themeRadios[0]).toEqual(

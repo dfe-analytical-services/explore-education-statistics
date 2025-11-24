@@ -38,6 +38,7 @@ public class GeographicLevelSchemaFilter : ISchemaFilter
                 - `SCH` - School
                 - `SPON` - Sponsor
                 - `WARD` - Ward
+                - `PFA` - Police Force Area
                 """;
 
             schema.Example = new OpenApiString("NAT");

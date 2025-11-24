@@ -68,13 +68,13 @@ Select subject "UI test subject"
     user checks previous table tool step contains    1    Data set    UI test subject
 
 Select locations
-    user clicks element    testid:Expand Details Section Local authority
+    user clicks button    Local authority    testid:locations-localAuthority-accordion
     user clicks checkbox    Barnsley
     user clicks checkbox    Birmingham
     user clicks checkbox    Camden
     user clicks checkbox    Greenwich
 
-    user opens details dropdown    Ward
+    user clicks button    Ward
     user clicks checkbox    Nailsea Youngwood
     user clicks checkbox    Syon
     user clicks element    id:locationFiltersForm-submit
@@ -223,7 +223,7 @@ Select subject "UI test subject" again
     user checks previous table tool step contains    1    Data set    UI test subject
 
 Select locations again
-    user opens details dropdown    Opportunity area
+    user clicks button    Opportunity area
     user clicks checkbox    Bolton 001
 
     user clicks element    id:locationFiltersForm-submit

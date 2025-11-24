@@ -3,11 +3,13 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AngleSharp.Io;
+using Azure.Identity;
 using Dapper;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
@@ -19,11 +21,12 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.Inte
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Search;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Search;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
@@ -33,6 +36,7 @@ using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using RequestTimeoutOptions = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options.RequestTimeoutOptions;
@@ -173,6 +177,17 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerConfig>();
         }
 
+        // Azure Clients
+        services.AddAzureClients(clientBuilder =>
+        {
+            // Search Client
+            var searchClientConfiguration = configuration.GetRequiredSection(AzureSearchClientOptions.Section);
+            clientBuilder.AddSearchClient(searchClientConfiguration).WithName("PublicationsSearchClient");
+
+            // Register a shared credential for Microsoft Entra ID authentication
+            clientBuilder.UseCredential(new DefaultAzureCredential());
+        });
+
         // Databases
 
         // Only set up the `PublicDataDbContext` in non-integration test
@@ -242,6 +257,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddScoped<IParquetIndicatorRepository, ParquetIndicatorRepository>();
         services.AddScoped<IParquetLocationRepository, ParquetLocationRepository>();
         services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
+        services.AddScoped<ISearchService, SearchService>();
 
         services.AddAnalytics(configuration);
 
@@ -261,6 +277,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         if (env.IsDevelopment() || env.IsIntegrationTest())
         {
             app.UseDeveloperExceptionPage();
+
+            // CORS config for dev/test/etc. environments set in IaC config
+            app.UseCors(options => options.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
         }
 
         // Rewrites
@@ -271,20 +290,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         app.UseResponseCaching();
         app.UseResponseCompression();
-
-        // CORS
-
-        app.UseCors(options =>
-            options
-                .WithOrigins(
-                    "http://localhost:3000",
-                    "http://localhost:3001",
-                    "https://localhost:3000",
-                    "https://localhost:3001"
-                )
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-        );
 
         // Routing / endpoints
 

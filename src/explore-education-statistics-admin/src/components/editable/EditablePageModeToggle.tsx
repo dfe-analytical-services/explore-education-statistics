@@ -85,7 +85,7 @@ export default function EditablePageModeToggle({
           onChange={event => {
             setEditingMode(event.target.value as EditingMode);
 
-            // Zero timeout to ensure it's moved on to the next
+            // Small timeout to ensure it's moved on to the next
             // event in the loop before scrolling. Otherwise it might
             // scroll while still switching mode.
             setTimeout(() => {
@@ -93,17 +93,41 @@ export default function EditablePageModeToggle({
               // editable mode bar and there's a bit of space below it.
               const spacing = 150;
               const section = activeSection
-                ? document.getElementById(activeSection)
+                ? document.querySelector(
+                    `#${activeSection}, [data-scroll="${activeSection}"]`,
+                  )
                 : undefined;
 
               if (section) {
-                const top =
-                  section.getBoundingClientRect().top +
-                  document.documentElement.scrollTop;
+                // Check if the target section is within an accordion
+                const accordionSection = section.closest(
+                  '.govuk-accordion__section-content',
+                );
+                const button =
+                  accordionSection?.previousElementSibling?.querySelector(
+                    'button',
+                  );
 
-                window.scrollTo(0, top - spacing);
+                if (
+                  button &&
+                  !(button.getAttribute('aria-expanded') === 'true')
+                ) {
+                  // Expand the accordion section if it's not already open
+                  button.dispatchEvent(
+                    new MouseEvent('click', { bubbles: true }),
+                  );
+                }
+
+                // Small timeout to allow accordion to expand before measuring position
+                setTimeout(() => {
+                  const top =
+                    section.getBoundingClientRect().top +
+                    document.documentElement.scrollTop;
+
+                  window.scrollTo(0, top - spacing);
+                }, 20);
               }
-            }, 0);
+            }, 80);
           }}
         />
       </div>

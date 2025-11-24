@@ -424,6 +424,7 @@ export default function FiltersForm({
                                 disabled={formState.isSubmitting}
                                 groupLabel={filterGroup.legend}
                                 hint={filterGroup.hint}
+                                id={`filters-${filterKey}`}
                                 key={filterKey}
                                 legend={filterGroup.legend}
                                 name={filterName}

@@ -44,7 +44,7 @@ const ListItem = ({ children, term, testId = term }: ListItemProps) => {
 
 interface Props {
   isEditing?: boolean;
-  lastUpdated?: string;
+  lastUpdated?: string | Date;
   releaseDate?: string;
   releaseType: ReleaseType;
   renderProducerLink: ReactNode;
@@ -60,15 +60,15 @@ export default function ReleaseSummaryBlock({
   releaseType,
   renderProducerLink,
   renderUpdatesLink,
-  trackScroll = false,
+  trackScroll,
   onShowReleaseTypeModal,
 }: Props) {
   return (
     <div
-      data-scroll={trackScroll ? true : undefined}
       id="summary-section"
       className={styles.container}
       data-testid="release-summary-block"
+      data-scroll={trackScroll ? 'summary-section' : undefined}
     >
       <div className={styles.innerWrap}>
         <dl className={styles.list}>
@@ -99,7 +99,7 @@ export default function ReleaseSummaryBlock({
             {releaseDate ? (
               <FormattedDate>{parseISO(releaseDate)}</FormattedDate>
             ) : (
-              <p>TBA</p>
+              <p className="govuk-!-margin-bottom-0">TBA</p>
             )}
           </ListItem>
 

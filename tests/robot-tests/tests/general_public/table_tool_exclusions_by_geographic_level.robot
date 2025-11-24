@@ -32,7 +32,7 @@ Select subject "Exclusions by geographic level"
     user checks previous table tool step contains    2    Data set    Exclusions by geographic level
 
 Select all LA Locations
-    user opens details dropdown    Local authority
+    user clicks button    Local authority
     user clicks button    Select all 156 options
     user clicks element    id:locationFiltersForm-submit
     user waits until table tool wizard step is available    4    Choose time period
@@ -72,7 +72,7 @@ Select Indicator - Permanent exclusion rate
     user checks indicator checkbox is checked    Permanent exclusion rate
 
 Select Characteristic School types
-    user opens details dropdown    School type
+    user clicks button    School type
     user clicks category checkbox    School type    State-funded primary
     user clicks category checkbox    School type    State-funded secondary
     user clicks category checkbox    School type    Special
@@ -91,7 +91,7 @@ Go back to Locations step
     user waits until table tool wizard step is available    3    Choose locations
 
 Unselect all LA Locations
-    user opens details dropdown    Local authority
+    user clicks button    Local authority
     user clicks button    Unselect all 156 options
     user checks page contains element
     ...    xpath://*[@class="govuk-error-message" and text()="Select at least one location"]
@@ -127,7 +127,6 @@ Select Indicator again - Number of fixed period exclusions
     user checks indicator checkbox is checked    Number of fixed period exclusions
 
 Select Characteristic School type - State-funded secondary
-    user opens details dropdown    School type
     user clicks category checkbox    School type    State-funded secondary
 
 Create table again

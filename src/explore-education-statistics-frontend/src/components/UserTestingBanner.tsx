@@ -42,7 +42,8 @@ export default function UserTestingBanner({ width }: Props) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Share your feedback to help us improve this service
+            Share your feedback to help us improve this service (opens in new
+            tab)
           </Link>
         </p>
       </Banner>

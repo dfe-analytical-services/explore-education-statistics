@@ -26,47 +26,47 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_EmptyString()
+    public void HtmlToText_EmptyString()
     {
-        Assert.Empty(await HtmlToTextUtils.HtmlToText(""));
+        Assert.Empty(HtmlToTextUtils.HtmlToText(""));
     }
 
     [Fact]
-    public async Task HtmlToText_WhitespaceStrings()
+    public void HtmlToText_WhitespaceStrings()
     {
-        Assert.Empty(await HtmlToTextUtils.HtmlToText("  "));
-        Assert.Empty(await HtmlToTextUtils.HtmlToText("  \n  "));
-        Assert.Empty(await HtmlToTextUtils.HtmlToText("  \r\n  "));
+        Assert.Empty(HtmlToTextUtils.HtmlToText("  "));
+        Assert.Empty(HtmlToTextUtils.HtmlToText("  \n  "));
+        Assert.Empty(HtmlToTextUtils.HtmlToText("  \r\n  "));
     }
 
     [Fact]
-    public async Task HtmlToText_CrlfLineEndingsOnly()
+    public void HtmlToText_CrlfLineEndingsOnly()
     {
-        var text = await HtmlToTextUtils.HtmlToText("<p>Line 1</p><p>Line 2</p>");
+        var text = HtmlToTextUtils.HtmlToText("<p>Line 1</p><p>Line 2</p>");
 
         Assert.Equal("Line 1\r\n\r\nLine 2", text);
     }
 
     [Fact]
-    public async Task HtmlToText_SingleElement()
+    public void HtmlToText_SingleElement()
     {
-        var text = await HtmlToTextUtils.HtmlToText("<p>Test paragraph</p>");
+        var text = HtmlToTextUtils.HtmlToText("<p>Test paragraph</p>");
 
         Assert.Equal("Test paragraph", text);
     }
 
     [Fact]
-    public async Task HtmlToText_SingleElement_InDiv()
+    public void HtmlToText_SingleElement_InDiv()
     {
-        var text = await HtmlToTextUtils.HtmlToText("<div><p>Test paragraph</p></div>");
+        var text = HtmlToTextUtils.HtmlToText("<div><p>Test paragraph</p></div>");
 
         Assert.Equal("Test paragraph", text);
     }
 
     [Fact]
-    public async Task HtmlToText_InlineElements()
+    public void HtmlToText_InlineElements()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             "<p>Test paragraph with <strong>bold text</strong> and <em>italic text</em></p>"
         );
 
@@ -74,9 +74,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_Paragraph_InlineElements_Multiline()
+    public void HtmlToText_Paragraph_InlineElements_Multiline()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"<p>
                     Test paragraph with 
                     <strong>bold text</strong> 
@@ -89,9 +89,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_Paragraph_InlineElements_Punctuation()
+    public void HtmlToText_Paragraph_InlineElements_Punctuation()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"<p>
                     Test paragraph with 
                     <strong>bold text</strong>, 
@@ -110,33 +110,33 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_Paragraph_AfterInlineText()
+    public void HtmlToText_Paragraph_AfterInlineText()
     {
-        var text = await HtmlToTextUtils.HtmlToText(@"Something before <p>Test paragraph</p>");
+        var text = HtmlToTextUtils.HtmlToText(@"Something before <p>Test paragraph</p>");
 
         Assert.Equal("Something before\r\n\r\nTest paragraph", text);
     }
 
     [Fact]
-    public async Task HtmlToText_Paragraph_AfterInlineTextWithLineBreak()
+    public void HtmlToText_Paragraph_AfterInlineTextWithLineBreak()
     {
-        var text = await HtmlToTextUtils.HtmlToText(@"Something before<br/><p>Test paragraph</p>");
+        var text = HtmlToTextUtils.HtmlToText(@"Something before<br/><p>Test paragraph</p>");
 
         Assert.Equal("Something before\r\n\r\nTest paragraph", text);
     }
 
     [Fact]
-    public async Task HtmlToText_Link()
+    public void HtmlToText_Link()
     {
-        var text = await HtmlToTextUtils.HtmlToText(@"<a href=""https://test.com"">Page link</a>");
+        var text = HtmlToTextUtils.HtmlToText(@"<a href=""https://test.com"">Page link</a>");
 
         Assert.Equal("Page link (https://test.com)", text);
     }
 
     [Fact]
-    public async Task HtmlToText_Link_Inline()
+    public void HtmlToText_Link_Inline()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"<p>Test paragraph with <a href=""https://test.com"">page link</a> inline</p>"
         );
 
@@ -144,27 +144,25 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_Link_Inline_InDiv()
+    public void HtmlToText_Link_Inline_InDiv()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
-            @"<div>Test <a href=""https://test.com"">page link</a> inline</div>"
-        );
+        var text = HtmlToTextUtils.HtmlToText(@"<div>Test <a href=""https://test.com"">page link</a> inline</div>");
 
         Assert.Equal("Test page link (https://test.com) inline", text);
     }
 
     [Fact]
-    public async Task HtmlToText_Link_Inline_InText()
+    public void HtmlToText_Link_Inline_InText()
     {
-        var text = await HtmlToTextUtils.HtmlToText(@"Test <a href=""https://test.com"">page link</a> in some text");
+        var text = HtmlToTextUtils.HtmlToText(@"Test <a href=""https://test.com"">page link</a> in some text");
 
         Assert.Equal("Test page link (https://test.com) in some text", text);
     }
 
     [Fact]
-    public async Task HtmlToText_Links_Multiline()
+    public void HtmlToText_Links_Multiline()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"<p>
                     Test paragraph with 
                     <a href=""https://test.com"">page link</a> 
@@ -180,9 +178,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_InlineElements_NestedOneLevel()
+    public void HtmlToText_InlineElements_NestedOneLevel()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"<span>Test <a href=""https://test.com"">page link</a> and <strong>strong text</strong></span>"
         );
 
@@ -190,9 +188,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_InlineElements_NestedOneLevel_Multiline()
+    public void HtmlToText_InlineElements_NestedOneLevel_Multiline()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <span>
                     Test 
@@ -206,9 +204,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_InlineElements_NestedTwoLevels()
+    public void HtmlToText_InlineElements_NestedTwoLevels()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"<span>Test <a href=""https://test.com"">page <em>link</em></a> and <strong>strong text</strong></span>"
         );
 
@@ -216,9 +214,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_InlineElements_NestedTwoLevels_Multiline()
+    public void HtmlToText_InlineElements_NestedTwoLevels_Multiline()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <span>
                     Test 
@@ -235,7 +233,7 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_MultipleElements_Blocks_CrlfLineEndingsOnly()
+    public void HtmlToText_MultipleElements_Blocks_CrlfLineEndingsOnly()
     {
         var lines = new[]
         {
@@ -248,7 +246,7 @@ public class HtmlToTextUtilsTests
             "<p>Test paragraph 1</p>",
         };
 
-        var text = await HtmlToTextUtils.HtmlToText(lines.JoinToString());
+        var text = HtmlToTextUtils.HtmlToText(lines.JoinToString());
 
         var expectedLines = new[]
         {
@@ -267,9 +265,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_MultipleElements_Blocks()
+    public void HtmlToText_MultipleElements_Blocks()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <h1>Test heading 1</h1>
                 <h2>Test heading 2</h2>
@@ -284,9 +282,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_MultipleElements_Blocks_InDiv()
+    public void HtmlToText_MultipleElements_Blocks_InDiv()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <div>
                     <h1>Test heading 1</h1>
@@ -303,9 +301,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_MultipleElements_Blocks_Nested()
+    public void HtmlToText_MultipleElements_Blocks_Nested()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <section>
                     <ul>
@@ -321,9 +319,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_MultipleElements_Inline()
+    public void HtmlToText_MultipleElements_Inline()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <span>Test span 1</span>
                 <a href=""https://test.com"">Test link 1</a>
@@ -335,9 +333,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_MultipleElements_Inline_InDiv()
+    public void HtmlToText_MultipleElements_Inline_InDiv()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <div>
                     <span>Test span 1</span>
@@ -351,9 +349,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_MultipleElements_MixOfInlineAndBlocks()
+    public void HtmlToText_MultipleElements_MixOfInlineAndBlocks()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <h1>Test heading 1</h1>
                 <span>Test span 1</span>
@@ -372,9 +370,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_MultipleElements_MixOfInlineAndBlocks_InDiv()
+    public void HtmlToText_MultipleElements_MixOfInlineAndBlocks_InDiv()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <div>
                     <h1>Test heading 1</h1>
@@ -395,9 +393,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_MultipleElements_MixOfInlineAndBlocks_InlineFirst()
+    public void HtmlToText_MultipleElements_MixOfInlineAndBlocks_InlineFirst()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <span>Test span 1</span>
                 <p>Test paragraph 1</p>
@@ -409,9 +407,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_MultipleElements_MixOfInlineAndBlocks_InlineFirst_InDiv()
+    public void HtmlToText_MultipleElements_MixOfInlineAndBlocks_InlineFirst_InDiv()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <div>
                     <span>Test span 1</span>
@@ -425,9 +423,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_MultipleElements_MixOfInlineAndBlocks_InlineFirst_WithLineBreakElements()
+    public void HtmlToText_MultipleElements_MixOfInlineAndBlocks_InlineFirst_WithLineBreakElements()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <span>Test span 1 <br/></span>
                 <p>Test paragraph 1</p>
@@ -439,9 +437,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_HorizontalLineElement()
+    public void HtmlToText_HorizontalLineElement()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <p>Test paragraph 1</p>
                 <hr/>
@@ -453,9 +451,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_LineBreakElements()
+    public void HtmlToText_LineBreakElements()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <p>Test paragraph 1
                     <br/>with line break</p>
@@ -468,9 +466,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_UnorderedList()
+    public void HtmlToText_UnorderedList()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <ul>
                     <li>List item 1</li>
@@ -482,9 +480,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_UnorderedList_HasLineAfter()
+    public void HtmlToText_UnorderedList_HasLineAfter()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <ul>
                     <li>List item 1</li>
@@ -497,9 +495,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_OrderedList()
+    public void HtmlToText_OrderedList()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <ol>
                     <li>List item 1</li>
@@ -511,9 +509,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_OrderedList_HasLineAfter()
+    public void HtmlToText_OrderedList_HasLineAfter()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <ol>
                     <li>List item 1</li>
@@ -526,9 +524,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_OrderedList_OverTenItemsWithMultiline()
+    public void HtmlToText_OrderedList_OverTenItemsWithMultiline()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <ol>
                     <li>List item 1</li>
@@ -555,9 +553,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_UnorderedList_WithNestedText()
+    public void HtmlToText_UnorderedList_WithNestedText()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <ul>
                     <li>List item 1</li>
@@ -574,9 +572,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_UnorderedList_WithNestedList()
+    public void HtmlToText_UnorderedList_WithNestedList()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <ul>
                     <li>List item 1</li>
@@ -594,9 +592,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_UnorderedList_WithDeeplyNestedList()
+    public void HtmlToText_UnorderedList_WithDeeplyNestedList()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <ul>
                     <li>List item 1</li>
@@ -620,9 +618,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_UnorderedList_OverTenItemsWithMultiline()
+    public void HtmlToText_UnorderedList_OverTenItemsWithMultiline()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <ul>
                     <li>List item 1</li>
@@ -649,9 +647,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_DescriptionList()
+    public void HtmlToText_DescriptionList()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <dl>
                     <dt>Term 1</dt>
@@ -668,9 +666,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_DescriptionList_HasLineAfter()
+    public void HtmlToText_DescriptionList_HasLineAfter()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <dl>
                     <dt>Term 1</dt>
@@ -687,9 +685,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_DescriptionList_WithMultilineItem()
+    public void HtmlToText_DescriptionList_WithMultilineItem()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <dl>
                     <dt>Term 1</dt>
@@ -712,17 +710,17 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_Blockquote()
+    public void HtmlToText_Blockquote()
     {
-        var text = await HtmlToTextUtils.HtmlToText("<blockquote>Test quote</blockquote>");
+        var text = HtmlToTextUtils.HtmlToText("<blockquote>Test quote</blockquote>");
 
         Assert.Equal("Test quote", text);
     }
 
     [Fact]
-    public async Task HtmlToText_Blockquote_HasLineAfter()
+    public void HtmlToText_Blockquote_HasLineAfter()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <blockquote>Test quote</blockquote>
                 <p>Paragraph after</p>"
@@ -732,9 +730,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_Blockquote_WithParagraphs()
+    public void HtmlToText_Blockquote_WithParagraphs()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <blockquote>
                     <p>Test paragraph quote 1</p>
@@ -746,9 +744,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_Blockquote_WithCaption()
+    public void HtmlToText_Blockquote_WithCaption()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <figure>
                     <blockquote>
@@ -765,9 +763,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_Blockquote_WithCaptionHasLineAfter()
+    public void HtmlToText_Blockquote_WithCaptionHasLineAfter()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <figure>
                     <blockquote>
@@ -785,9 +783,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_PadsToLargestCell()
+    public void HtmlToText_TableElement_PadsToLargestCell()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -807,9 +805,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_MultilineCell()
+    public void HtmlToText_TableElement_MultilineCell()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -842,9 +840,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_EmptyCells()
+    public void HtmlToText_TableElement_EmptyCells()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -871,9 +869,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_RowHeader()
+    public void HtmlToText_TableElement_RowHeader()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <thead>
@@ -899,9 +897,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_ColumnHeader()
+    public void HtmlToText_TableElement_ColumnHeader()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -921,9 +919,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_ColumnAndRowHeaders()
+    public void HtmlToText_TableElement_ColumnAndRowHeaders()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <thead>
@@ -949,9 +947,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_ColSpans()
+    public void HtmlToText_TableElement_ColSpans()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -977,9 +975,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_ColSpanWithMultiline()
+    public void HtmlToText_TableElement_ColSpanWithMultiline()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -1011,9 +1009,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_RowHeaderWithColSpans()
+    public void HtmlToText_TableElement_RowHeaderWithColSpans()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <thead>
@@ -1046,9 +1044,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_ColumnHeaderWithColSpans()
+    public void HtmlToText_TableElement_ColumnHeaderWithColSpans()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -1069,9 +1067,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_RowSpans()
+    public void HtmlToText_TableElement_RowSpans()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -1094,9 +1092,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_RowSpansWithMultiline()
+    public void HtmlToText_TableElement_RowSpansWithMultiline()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -1125,9 +1123,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_RowHeaderWithRowSpans()
+    public void HtmlToText_TableElement_RowHeaderWithRowSpans()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <thead>
@@ -1160,9 +1158,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_ColHeaderWithRowSpans()
+    public void HtmlToText_TableElement_ColHeaderWithRowSpans()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -1183,9 +1181,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_RowAndColSpansInTopLeft()
+    public void HtmlToText_TableElement_RowAndColSpansInTopLeft()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -1209,9 +1207,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_RowAndColSpansInTopCenter()
+    public void HtmlToText_TableElement_RowAndColSpansInTopCenter()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -1238,9 +1236,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_RowAndColSpansInTopRight()
+    public void HtmlToText_TableElement_RowAndColSpansInTopRight()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -1264,9 +1262,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_RowAndColSpansInCenterLeft()
+    public void HtmlToText_TableElement_RowAndColSpansInCenterLeft()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -1295,9 +1293,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_RowAndColSpansInCenterRight()
+    public void HtmlToText_TableElement_RowAndColSpansInCenterRight()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -1326,9 +1324,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_RowAndColSpansInBottomLeft()
+    public void HtmlToText_TableElement_RowAndColSpansInBottomLeft()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -1352,9 +1350,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_RowAndColSpansInBottomCenter()
+    public void HtmlToText_TableElement_RowAndColSpansInBottomCenter()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -1381,9 +1379,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_RowAndColSpansInBottomRight()
+    public void HtmlToText_TableElement_RowAndColSpansInBottomRight()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -1407,9 +1405,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_LineAfter()
+    public void HtmlToText_TableElement_LineAfter()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <table>
                     <tbody>
@@ -1430,9 +1428,9 @@ public class HtmlToTextUtilsTests
     }
 
     [Fact]
-    public async Task HtmlToText_TableElement_InFigure_LineAfter()
+    public void HtmlToText_TableElement_InFigure_LineAfter()
     {
-        var text = await HtmlToTextUtils.HtmlToText(
+        var text = HtmlToTextUtils.HtmlToText(
             @"
                 <figure>
                     <table>
@@ -1458,7 +1456,7 @@ public class HtmlToTextUtilsTests
     public async Task HtmlToText_TestHtml1()
     {
         var html = await File.ReadAllTextAsync(Path.Combine(_dir, "Resources/test-html-1.html"));
-        var text = await HtmlToTextUtils.HtmlToText(html);
+        var text = HtmlToTextUtils.HtmlToText(html);
 
         Snapshot.Match(text);
     }

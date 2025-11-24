@@ -1,4 +1,13 @@
-trigger: none
+trigger:
+  branches:
+    include:
+      - master
+      - dev
+      - test
+  paths:
+    include:
+      - infrastructure/templates/common/**
+      - infrastructure/templates/screener/**
 
 parameters:
   - name: deployAlerts

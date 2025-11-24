@@ -74,11 +74,11 @@
       "properties": {
         "activities": [
           {
-            "name": "sp_rebuild_indexes",
+            "name": "Rebuild indexes",
             "type": "SqlServerStoredProcedure",
             "dependsOn": [],
             "policy": {
-              "timeout": "0.16:00:00",
+              "timeout": "0.06:00:00",
               "retry": 0,
               "retryIntervalInSeconds": 30,
               "secureOutput": false,
@@ -103,11 +103,11 @@
             }
           },
           {
-            "name": "Report success",
+            "name": "Report indexes rebuilt successfully",
             "type": "WebActivity",
             "dependsOn": [
               {
-                "activity": "sp_rebuild_indexes",
+                "activity": "Rebuild indexes",
                 "dependencyConditions": [
                   "Succeeded"
                 ]
@@ -130,60 +130,10 @@
               },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
-                "text": "Data Factory Success!",
-                "attachments": [{
-                  "color": "good",
-                  "fields": [{
-                    "title": "Data Factory",
-                    "value": "@{pipeline().DataFactory}",
-                    "short": true
-                  },
-                  {
-                    "title": "Pipeline",
-                    "value": "@{pipeline().Pipeline}",
-                    "short": true
-                  },
-                  {
-                    "title": "Duration",
-                    "value": "@{activity('sp_rebuild_indexes').Duration}",
-                    "short": true
-                  }]
-                }]
-              }
-            }
-          },
-          {
-            "name": "Report failure",
-            "type": "WebActivity",
-            "dependsOn": [
-              {
-                "activity": "sp_rebuild_indexes",
-                "dependencyConditions": [
-                  "Failed"
-                ]
-              }
-            ],
-            "policy": {
-              "timeout": "0.00:10:00",
-              "retry": 0,
-              "retryIntervalInSeconds": 30,
-              "secureOutput": false,
-              "secureInput": false
-            },
-            "userProperties": [],
-            "typeProperties": {
-              "url": "https://slack.com/api/chat.postMessage",
-              "method": "POST",
-              "headers": {
-                "Content-Type": "application/json",
-                "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
-              },
-              "body": {
-                "channel": "[parameters('slackAlertsChannel')]",
-                "text": "Data Factory Failure! Stored procedure may still be running!",
+                "text": "Data Factory Success! All fragmented indexes rebuilt.",
                 "attachments": [
                   {
-                    "color": "warning",
+                    "color": "good",
                     "fields": [
                       {
                         "title": "Data Factory",
@@ -196,19 +146,358 @@
                         "short": true
                       },
                       {
-                        "title": "Error",
-                        "value": "@{activity('sp_rebuild_indexes').Error.message}",
-                        "short": true
-                      },
-                      {
                         "title": "Duration",
-                        "value": "@{activity('sp_rebuild_indexes').Duration}",
+                        "value": "@{activity('Rebuild indexes').Duration}",
                         "short": true
                       }
                     ]
                   }
                 ]
               }
+            }
+          },
+          {
+            "name": "Get reason for index rebuild failure",
+            "type": "SetVariable",
+            "dependsOn": [
+              {
+                "activity": "Rebuild indexes",
+                "dependencyConditions": [
+                  "Failed"
+                ]
+              }
+            ],
+            "policy": {
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "variableName": "storedProcedureActivityFailure",
+              "value": {
+                "value": "@coalesce(\n  activity('Rebuild indexes').error.errorCode,\n  activity('Rebuild indexes').error.message,\n  'Unknown'\n)",
+                "type": "Expression"
+              }
+            }
+          },
+          {
+            "name": "Choose how to handle rebuild indexes failure",
+            "description": "This activity routes to the appropriate error handler based on the reason for the 'Rebuild indexes' activity's reason for failure",
+            "type": "Switch",
+            "dependsOn": [
+              {
+                "activity": "Get reason for index rebuild failure",
+                "dependencyConditions": [
+                  "Succeeded"
+                ]
+              }
+            ],
+            "userProperties": [],
+            "typeProperties": {
+              "on": {
+                "value": "@variables('storedProcedureActivityFailure')",
+                "type": "Expression"
+              },
+              "cases": [
+                {
+                  "value": "ActionTimedOut",
+                  "activities": [
+                    {
+                      "name": "Pause resumable index rebuilds after timeout",
+                      "description": "This activity pauses any ongoing RESUMABLE index REBUILDs.",
+                      "type": "SqlServerStoredProcedure",
+                      "dependsOn": [],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": false
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "storedProcedureName": "[[dbo].[PauseResumableIndexRebuilds]",
+                        "storedProcedureParameters": {
+                          "Tables": {
+                            "value": "@pipeline().parameters.Tables",
+                            "type": "String"
+                          }
+                        }
+                      },
+                      "linkedServiceName": {
+                        "referenceName": "ls_sql_statistics",
+                        "type": "LinkedServiceReference"
+                      }
+                    },
+                    {
+                      "name": "Kill index reorganizes after timeout",
+                      "description": "This activity kills any ongoing index REORGANIZEs after a timeout.",
+                      "type": "SqlServerStoredProcedure",
+                      "dependsOn": [
+                        {
+                          "activity": "Pause resumable index rebuilds after timeout",
+                          "dependencyConditions": [
+                            "Succeeded"
+                          ]
+                        }
+                      ],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": false
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "storedProcedureName": "[[dbo].[KillIndexReorganizations]",
+                        "storedProcedureParameters": {
+                          "Tables": {
+                            "value": "@pipeline().parameters.Tables",
+                            "type": "String"
+                          }
+                        }
+                      },
+                      "linkedServiceName": {
+                        "referenceName": "ls_sql_statistics",
+                        "type": "LinkedServiceReference"
+                      }
+                    },
+                    {
+                      "name": "Report timeout handled successfully",
+                      "description": "Messages Slack to inform that the timeout has been handled successfully",
+                      "type": "WebActivity",
+                      "dependsOn": [
+                        {
+                          "activity": "Kill index reorganizes after timeout",
+                          "dependencyConditions": [
+                            "Succeeded"
+                          ]
+                        }
+                      ],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": false
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "method": "POST",
+                        "headers": {
+                          "Content-Type": "application/json",
+                          "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
+                        },
+                        "url": "https://slack.com/api/chat.postMessage",
+                        "body": {
+                          "channel": "[parameters('slackAlertsChannel')]",
+                          "text": "Data Factory timeout handled successfully.",
+                          "attachments": [
+                            {
+                              "color": "good",
+                              "fields": [
+                                {
+                                  "title": "Data Factory",
+                                  "value": "@{pipeline().DataFactory}",
+                                  "short": true
+                                },
+                                {
+                                  "title": "Pipeline",
+                                  "value": "@{pipeline().Pipeline}",
+                                  "short": true
+                                },
+                                {
+                                  "title": "Details",
+                                  "value": "Any resumable index rebuilds have been paused.\nAny reorganizations have been killed.",
+                                  "short": true
+                                },
+                                {
+                                  "title": "Duration",
+                                  "value": "@{activity('Rebuild indexes').Duration}",
+                                  "short": true
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "Report error when pausing resumable index rebuilds",
+                      "type": "WebActivity",
+                      "dependsOn": [
+                        {
+                          "activity": "Pause resumable index rebuilds after timeout",
+                          "dependencyConditions": [
+                            "Failed"
+                          ]
+                        }
+                      ],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": false
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "method": "POST",
+                        "headers": {
+                          "Content-Type": "application/json",
+                          "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
+                        },
+                        "url": "https://slack.com/api/chat.postMessage",
+                        "body": {
+                          "channel": "[parameters('slackAlertsChannel')]",
+                          "text": "Data Factory failure! Problem encountered when pausing resumable index rebuilds.",
+                          "attachments": [
+                            {
+                              "color": "warning",
+                              "fields": [
+                                {
+                                  "title": "Data Factory",
+                                  "value": "@{pipeline().DataFactory}",
+                                  "short": true
+                                },
+                                {
+                                  "title": "Pipeline",
+                                  "value": "@{pipeline().Pipeline}",
+                                  "short": true
+                                },
+                                {
+                                  "title": "Activity",
+                                  "value": "@{activity('Pause resumable index rebuilds after timeout').Error.message}",
+                                  "short": true
+                                },
+                                {
+                                  "title": "Duration",
+                                  "value": "@{activity('Rebuild indexes').Duration}",
+                                  "short": true
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "Report error when killing index reorganizations",
+                      "type": "WebActivity",
+                      "dependsOn": [
+                        {
+                          "activity": "Kill index reorganizes after timeout",
+                          "dependencyConditions": [
+                            "Failed"
+                          ]
+                        }
+                      ],
+                      "policy": {
+                        "timeout": "0.00:10:00",
+                        "retry": 0,
+                        "retryIntervalInSeconds": 30,
+                        "secureOutput": false,
+                        "secureInput": false
+                      },
+                      "userProperties": [],
+                      "typeProperties": {
+                        "method": "POST",
+                        "headers": {
+                          "Content-Type": "application/json",
+                          "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
+                        },
+                        "url": "https://slack.com/api/chat.postMessage",
+                        "body": {
+                          "channel": "[parameters('slackAlertsChannel')]",
+                          "text": "Data Factory failure! Problem encountered when killing index reorganizations.",
+                          "attachments": [
+                            {
+                              "color": "warning",
+                              "fields": [
+                                {
+                                  "title": "Data Factory",
+                                  "value": "@{pipeline().DataFactory}",
+                                  "short": true
+                                },
+                                {
+                                  "title": "Pipeline",
+                                  "value": "@{pipeline().Pipeline}",
+                                  "short": true
+                                },
+                                {
+                                  "title": "Activity",
+                                  "value": "@{activity('Kill index reorganizes after timeout').Error.message}",
+                                  "short": true
+                                },
+                                {
+                                  "title": "Duration",
+                                  "value": "@{activity('Rebuild indexes').Duration}",
+                                  "short": true
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              ],
+              "defaultActivities": [
+                {
+                  "name": "Report failure",
+                  "type": "WebActivity",
+                  "dependsOn": [],
+                  "policy": {
+                    "timeout": "0.00:10:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                  },
+                  "userProperties": [],
+                  "typeProperties": {
+                    "method": "POST",
+                    "headers": {
+                      "Content-Type": "application/json",
+                      "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
+                    },
+                    "url": "https://slack.com/api/chat.postMessage",
+                    "body": {
+                      "channel": "[parameters('slackAlertsChannel')]",
+                      "text": "Data Factory Failure!",
+                      "attachments": [
+                        {
+                          "color": "warning",
+                          "fields": [
+                            {
+                              "title": "Data Factory",
+                              "value": "@{pipeline().DataFactory}",
+                              "short": true
+                            },
+                            {
+                              "title": "Pipeline",
+                              "value": "@{pipeline().Pipeline}",
+                              "short": true
+                            },
+                            {
+                              "title": "Error",
+                              "value": "@{activity('Rebuild indexes').Error.message}",
+                              "short": true
+                            },
+                            {
+                              "title": "Duration",
+                              "value": "@{activity('Rebuild indexes').Duration}",
+                              "short": true
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
             }
           }
         ],
@@ -218,8 +507,13 @@
             "defaultValue": "[variables('fragmentationTables')]"
           }
         },
+        "variables": {
+          "storedProcedureActivityFailure": {
+            "type": "String"
+          }
+        },
         "annotations": [],
-        "lastPublishTime": "2020-09-14T16:47:14Z"
+        "lastPublishTime": "2025-11-12T11:47:14Z"
       },
       "dependsOn": [
         "[concat(variables('factoryId'), '/linkedServices/ls_sql_statistics')]"

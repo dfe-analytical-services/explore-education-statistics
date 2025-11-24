@@ -217,7 +217,7 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
   }
 }
 
-module functionAppIdentityRoleAssignmentModule '../components/searchServiceRoleAssignment.bicep' = {
+module functionAppIdentityRoleAssignmentModule '../../common/components/search/searchServiceRoleAssignment.bicep' = {
   name: 'searchDocsFunctionAppRoleAssignmentModuleDeploy'
   params: {
     searchServiceName: searchService.name

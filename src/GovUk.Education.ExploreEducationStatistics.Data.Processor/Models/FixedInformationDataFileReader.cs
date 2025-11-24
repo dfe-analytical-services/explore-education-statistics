@@ -127,6 +127,12 @@ public class FixedInformationDataFileReader
 
         [EnumLabelValue("planning_area_name")]
         PlanningAreaName,
+
+        [EnumLabelValue("pfa_code")]
+        PoliceForceAreaCode,
+
+        [EnumLabelValue("pfa_name")]
+        PoliceForceAreaName,
     }
 
     private static readonly EnumToEnumLabelConverter<TimeIdentifier> TimeIdentifierLookup = new();
@@ -213,6 +219,7 @@ public class FixedInformationDataFileReader
             School = GetSchool(rowValues),
             Sponsor = GetSponsor(rowValues),
             Ward = GetWard(rowValues),
+            PoliceForceArea = GetPoliceForceArea(rowValues),
         };
     }
 
@@ -340,6 +347,13 @@ public class FixedInformationDataFileReader
         var code = GetLocationAttributeValue(LocationColumn.PlanningAreaCode, rowValues);
         var name = GetLocationAttributeValue(LocationColumn.PlanningAreaName, rowValues);
         return GetLocationAttributeOrDefault(() => new PlanningArea(code, name), code, name);
+    }
+
+    private PoliceForceArea? GetPoliceForceArea(IReadOnlyList<string> rowValues)
+    {
+        var code = GetLocationAttributeValue(LocationColumn.PoliceForceAreaCode, rowValues);
+        var name = GetLocationAttributeValue(LocationColumn.PoliceForceAreaName, rowValues);
+        return GetLocationAttributeOrDefault(() => new PoliceForceArea(code, name), code, name);
     }
 
     private string? GetLocationAttributeValue(LocationColumn column, IReadOnlyList<string> rowValues)

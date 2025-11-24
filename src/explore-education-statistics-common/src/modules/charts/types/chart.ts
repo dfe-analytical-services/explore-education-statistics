@@ -104,15 +104,17 @@ export interface DataGroupingConfig {
   customGroups: CustomDataGroup[];
 }
 
-export interface MapDataSetConfig {
-  dataSet: DataSet;
-  dataGrouping: DataGroupingConfig;
-  boundaryLevel?: number;
+export interface MapCategoricalData {
+  colour: string;
+  value: string;
 }
 
-export interface MapCategoricalDataConfig {
-  value: string;
-  colour: string;
+export interface MapDataSetConfig {
+  boundaryLevel?: number;
+  categoricalDataConfig?: MapCategoricalData[];
+  dataSet: DataSet;
+  dataSetKey: string;
+  dataGrouping: DataGroupingConfig;
 }
 
 export interface MapLegendItem {
@@ -121,7 +123,12 @@ export interface MapLegendItem {
 }
 
 export interface MapConfig {
-  categoricalDataConfig?: MapCategoricalDataConfig[];
+  /**
+   * Deprecated as this information is now on the data set config.
+   * This is kept as a fallback for pre-existing maps.
+   * @deprecated
+   */
+  categoricalDataConfig?: MapCategoricalData[];
   dataSetConfigs: MapDataSetConfig[];
 }
 

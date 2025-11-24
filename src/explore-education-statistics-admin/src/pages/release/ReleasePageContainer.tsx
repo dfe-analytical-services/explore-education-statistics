@@ -44,6 +44,7 @@ import React, { useMemo } from 'react';
 import { generatePath, RouteComponentProps, Switch } from 'react-router';
 import { publicationReleasesRoute } from '@admin/routes/publicationRoutes';
 import { PublicationRouteParams } from '@admin/routes/routes';
+import useCurrentRouteTitle from '@admin/utils/useCurrentRouteTitle';
 
 const allNavRoutes = [
   releaseSummaryRoute,
@@ -144,6 +145,8 @@ const ReleasePageContainer = ({
       }
     : undefined;
 
+  const pageTitle = useCurrentRouteTitle(navRoutes);
+
   return (
     <LoadingSpinner loading={loadingRelease}>
       {releaseVersion && (
@@ -163,6 +166,11 @@ const ReleasePageContainer = ({
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
               <PageTitle
+                metaTitle={
+                  pageTitle
+                    ? `${pageTitle} - ${releaseVersion.publicationTitle}`
+                    : releaseVersion.publicationTitle
+                }
                 title={releaseVersion.publicationTitle}
                 caption={`${
                   releaseVersion.amendment ? 'Amend release' : 'Edit release'

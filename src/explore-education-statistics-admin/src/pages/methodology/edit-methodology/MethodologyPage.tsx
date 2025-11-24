@@ -19,6 +19,7 @@ import Tag from '@common/components/Tag';
 import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
 import getMethodologyApprovalStatusLabel from '@admin/pages/methodology/utils/getMethodologyApprovalStatusLabel';
+import useCurrentRouteTitle from '@admin/utils/useCurrentRouteTitle';
 
 const navRoutes: MethodologyRouteProps[] = [
   methodologySummaryRoute,
@@ -79,6 +80,8 @@ const MethodologyPage = ({
       }
     : undefined;
 
+  const pageTitle = useCurrentRouteTitle(navRoutes);
+
   return (
     <Page wide breadcrumbs={[{ name: 'Edit methodology' }]}>
       <LoadingSpinner loading={isLoading}>
@@ -87,6 +90,11 @@ const MethodologyPage = ({
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-two-thirds">
                 <PageTitle
+                  metaTitle={
+                    pageTitle
+                      ? `${pageTitle} - ${methodology.title}`
+                      : methodology.title
+                  }
                   title={methodology.title}
                   caption={
                     methodology.amendment

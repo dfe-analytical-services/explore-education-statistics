@@ -26,6 +26,8 @@ param publicApiContainerAppWorkloadProfiles = [{
   maximumCount: 10
 }]
 
+param searchServiceIndexName = 'index-1'
+
 param enableThemeDeletion = true
 
 param enableSwagger = true

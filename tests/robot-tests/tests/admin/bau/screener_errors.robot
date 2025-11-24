@@ -7,17 +7,7 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-# Skip entire suite until Screener is re-enabled
-Force Tags
-...                 Admin
-...                 Local
-...                 Dev
-...                 AltersData
-...                 NotAgainstLocal
-...                 NotAgainstDev
-...                 NotAgainstTest
-...                 NotAgainstPreProd
-...                 NotAgainstProd
+Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***

@@ -19,6 +19,9 @@ public enum GeographicLevel
     [EnumLabelValue("Local skills improvement plan area", "LSIP")]
     LocalSkillsImprovementPlanArea,
 
+    [EnumLabelValue("Police force area", "PFA")]
+    PoliceForceArea,
+
     [EnumLabelValue("Institution", "INST")]
     Institution,
 

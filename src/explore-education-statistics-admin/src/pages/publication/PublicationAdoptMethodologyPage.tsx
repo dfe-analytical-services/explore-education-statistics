@@ -1,3 +1,4 @@
+import PageMetaTitle from '@admin/components/PageMetaTitle';
 import AdoptMethodologyForm from '@admin/pages/methodology/adopt-methodology/components/AdoptMethodologyForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import {
@@ -13,7 +14,7 @@ import { generatePath, useHistory } from 'react-router';
 const PublicationAdoptMethodologyPage = () => {
   const history = useHistory();
 
-  const { publicationId } = usePublicationContext();
+  const { publicationId, publication } = usePublicationContext();
 
   const { value: adoptableMethodologies, isLoading } = useAsyncHandledRetry(
     async () => publicationService.getAdoptableMethodologies(publicationId),
@@ -28,6 +29,7 @@ const PublicationAdoptMethodologyPage = () => {
 
   return (
     <>
+      <PageMetaTitle title={`Adopt a methodology - ${publication.title}`} />
       <h2>Adopt a methodology</h2>
       <LoadingSpinner loading={isLoading}>
         {adoptableMethodologies && adoptableMethodologies.length > 0 ? (

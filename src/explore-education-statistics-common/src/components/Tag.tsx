@@ -17,15 +17,23 @@ export interface TagProps {
     | 'yellow';
   className?: string;
   id?: string;
+  testId?: string;
 }
 
-export default function Tag({ children, className, colour, id }: TagProps) {
+export default function Tag({
+  children,
+  className,
+  colour,
+  id,
+  testId,
+}: TagProps) {
   return (
     <strong
       className={classNames('govuk-tag', styles.tag, className, {
         [`govuk-tag--${colour}`]: !!colour,
       })}
       id={id}
+      data-testid={testId}
     >
       {children}
     </strong>

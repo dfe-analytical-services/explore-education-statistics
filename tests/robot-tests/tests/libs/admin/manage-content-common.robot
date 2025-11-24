@@ -91,7 +91,7 @@ user creates data block for dates csv
     user clicks element    id:publicationDataStepForm-submit
 
     user waits until table tool wizard step is available    2    Choose locations
-    user opens details dropdown    National
+    user clicks button    National
     user checks location checkbox is checked    England
 
     user clicks element    id:locationFiltersForm-submit
@@ -107,7 +107,7 @@ user creates data block for dates csv
     user clicks subheaded indicator checkbox    Open settings    Proportion of settings open
     user checks subheaded indicator checkbox is checked    Open settings    Proportion of settings open
 
-    user opens details dropdown    Date
+    user clicks button    Date
     user clicks category checkbox    Date    23/03/2020
     user checks category checkbox is checked    Date    23/03/2020
 
@@ -149,7 +149,7 @@ user creates key stats data block for dates csv
     user clicks element    id:publicationDataStepForm-submit
 
     user waits until table tool wizard step is available    2    Choose locations
-    user opens details dropdown    National
+    user clicks button    National
     user checks location checkbox is checked    England
 
     user clicks element    id:locationFiltersForm-submit
@@ -163,7 +163,7 @@ user creates key stats data block for dates csv
     user clicks subheaded indicator checkbox    Open settings    ${indicator_name}
     user checks subheaded indicator checkbox is checked    Open settings    ${indicator_name}
 
-    user opens details dropdown    Date
+    user clicks button    Date
     user clicks category checkbox    Date    23/03/2020
     user checks category checkbox is checked    Date    23/03/2020
 

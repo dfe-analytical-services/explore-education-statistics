@@ -1,0 +1,177 @@
+import { abbreviations } from '../../../common/abbreviations.bicep'
+
+@description('Environment: Subscription name. Used as a prefix for created resources.')
+@allowed([
+  's101d01'
+  's101t01'
+  's101p02'
+  's101p01'
+  's180d01'
+  's180t01'
+  's180p01'
+])
+param subscription string
+
+@description('Resource prefix for all resources.')
+param resourcePrefix string
+
+@description('A set of tags with which to tag the resource in Azure.')
+param tagValues object
+
+@description('The Id of the Log Analytics Workspace.')
+param logAnalyticsWorkspaceId string
+
+var frontDoorName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}'
+
+resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' = {
+  name: frontDoorName
+  location: 'global' // CDN lives in a resource group, but must be global
+  tags: tagValues
+  sku: {
+    name: 'Standard_AzureFrontDoor'
+  }
+  properties: {
+    originResponseTimeoutSeconds: 60 // @MarkFix maybe want longer - for table tool exclusively?
+  }
+}
+
+resource endpoints 'Microsoft.Cdn/profiles/afdendpoints@2025-04-15' = {
+  parent: frontDoor
+  name: '${resourcePrefix}-${abbreviations.frontDoorEndpoints}'
+  location: 'global'
+  tags: tagValues
+  properties: {
+    enabledState: 'Enabled'
+  }
+}
+
+resource originGroup 'Microsoft.Cdn/profiles/origingroups@2025-04-15' = {
+  parent: frontDoor
+  name: '${resourcePrefix}-${abbreviations.frontDoorOriginGroups}'
+  properties: {
+    loadBalancingSettings: {
+      sampleSize: 4
+      successfulSamplesRequired: 3
+      additionalLatencyInMilliseconds: 50
+    }
+    healthProbeSettings: {
+      probePath: '/api/health'
+      probeRequestType: 'HEAD'
+      probeProtocol: 'Https'
+      probeIntervalInSeconds: 100
+    }
+    sessionAffinityState: 'Disabled'
+  }
+}
+
+resource origin 'Microsoft.Cdn/profiles/origingroups/origins@2025-04-15' = {
+  parent: originGroup
+  name: '${resourcePrefix}-${abbreviations.frontDoorOrigins}'
+  properties: {
+    hostName: '${subscription}-as-ees-public-site.azurewebsites.net'
+    httpPort: 80
+    httpsPort: 443
+    originHostHeader: '${subscription}-as-ees-public-site.azurewebsites.net'
+    priority: 1
+    weight: 1000
+    enabledState: 'Enabled'
+    enforceCertificateNameCheck: true
+  }
+}
+
+resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
+  parent: endpoints
+  name: '${resourcePrefix}-${abbreviations.frontDoorRoutes}'
+  properties: {
+    //cacheConfiguration: { // @MarkFix enable this
+    //  compressionSettings: {
+    //    isCompressionEnabled: false
+    //    contentTypesToCompress: [
+    //      'application/eot'
+    //      'application/font'
+    //      'application/font-sfnt'
+    //      'application/javascript'
+    //      'application/json'
+    //      'application/opentype'
+    //      'application/otf'
+    //      'application/pkcs7-mime'
+    //      'application/truetype'
+    //      'application/ttf'
+    //      'application/vnd.ms-fontobject'
+    //      'application/xhtml+xml'
+    //      'application/xml'
+    //      'application/xml+rss'
+    //      'application/x-font-opentype'
+    //      'application/x-font-truetype'
+    //      'application/x-font-ttf'
+    //      'application/x-httpd-cgi'
+    //      'application/x-javascript'
+    //      'application/x-mpegurl'
+    //      'application/x-opentype'
+    //      'application/x-otf'
+    //      'application/x-perl'
+    //      'application/x-ttf'
+    //      'font/eot'
+    //      'font/ttf'
+    //      'font/otf'
+    //      'font/opentype'
+    //      'font/woff'
+    //      'font/woff2'
+    //      'image/svg+xml'
+    //      'text/css'
+    //      'text/csv'
+    //      'text/html'
+    //      'text/javascript'
+    //      'text/js'
+    //      'text/plain'
+    //      'text/richtext'
+    //      'text/tab-separated-values'
+    //      'text/xml'
+    //      'text/x-script'
+    //      'text/x-component'
+    //      'text/x-java-source'
+    //    ]
+    //  }
+    //  queryStringCachingBehavior: 'IgnoreQueryString'
+    //}
+    customDomains: []
+    originGroup: {
+      id: originGroup.id
+    }
+    ruleSets: []
+    supportedProtocols: [
+      'Http'
+      'Https'
+    ]
+    patternsToMatch: [
+      '/*'
+    ]
+    forwardingProtocol: 'MatchRequest'
+    linkToDefaultDomain: 'Enabled'
+    httpsRedirect: 'Enabled'
+    enabledState: 'Enabled'
+  }
+  dependsOn: [
+    origin
+  ]
+}
+
+resource diagnosticSetting 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: 'afd-diagnostic-setting'
+  scope: frontDoor
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+  }
+}

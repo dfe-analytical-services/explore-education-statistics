@@ -27,7 +27,7 @@ public class DataSetScreenerClientTests
 
     public class AuthenticationTests : DataSetScreenerClientTests
     {
-        [Fact(Skip = "EES-6341: Skip until screener has been re-enabled")]
+        [Fact]
         public async Task AuthenticationManagerCalled()
         {
             var responseBody = new DataSetScreenerResponse { OverallResult = "Failed", TestResults = [] };
@@ -67,7 +67,7 @@ public class DataSetScreenerClientTests
 
     public class ScreenDataSetTests : DataSetScreenerClientTests
     {
-        [Fact(Skip = "EES-6341: Skip until screener has been re-enabled")]
+        [Fact]
         public async Task Success()
         {
             var request = new DataSetScreenerRequest

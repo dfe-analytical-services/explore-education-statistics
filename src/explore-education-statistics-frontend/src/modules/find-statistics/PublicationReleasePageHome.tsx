@@ -1,5 +1,6 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
+import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
@@ -38,6 +39,11 @@ const PublicationReleasePage = ({
   } = homeContent;
 
   const { isMedia: isMobileMedia } = useMobileMedia();
+
+  // Update count includes 'first published' by default, but we only
+  // want to show 'actual' update number.
+  const updateCountExcludingFirstPublished =
+    releaseVersionSummary.updateCount - 1;
 
   return (
     <>
@@ -87,11 +93,12 @@ const PublicationReleasePage = ({
               </Link>
             }
             renderUpdatesLink={
-              releaseVersionSummary.updateCount > 1 ? (
+              updateCountExcludingFirstPublished > 0 ? (
                 <Link
                   to={`/find-statistics/${publicationSummary.slug}/${publicationSummary.latestRelease.slug}/updates`}
                 >
-                  {releaseVersionSummary.updateCount} updates{' '}
+                  {updateCountExcludingFirstPublished} update
+                  {updateCountExcludingFirstPublished === 1 ? '' : 's'}
                   <VisuallyHidden>
                     for `${releaseVersionSummary.title}`
                   </VisuallyHidden>
@@ -167,7 +174,12 @@ const PublicationReleasePage = ({
           </Accordion>
         ) : (
           content.map(({ heading, id, content: sectionContent }) => (
-            <ReleasePageContentSection heading={heading} key={id} id={id}>
+            <ReleasePageContentSection
+              heading={heading}
+              key={id}
+              id={generateIdFromHeading(heading)}
+              testId="home-content-section"
+            >
               <PublicationSectionBlocks
                 blocks={sectionContent}
                 releaseVersionId={releaseVersionSummary.id}

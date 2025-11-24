@@ -1,6 +1,7 @@
 import {
   DataGroupingConfig,
   DataGroupingType,
+  MapCategoricalData,
   MapDataSetConfig,
 } from '@common/modules/charts/types/chart';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
@@ -18,6 +19,7 @@ export const defaultDataGrouping: DataGroupingConfig = {
 
 export interface MapDataSetCategoryConfig extends DataSetCategoryConfig {
   boundaryLevel?: number;
+  categoricalDataConfig?: MapCategoricalData[];
   dataGrouping: DataGroupingConfig;
 }
 
@@ -64,13 +66,15 @@ export default function getMapDataSetCategoryConfigs({
     const dataSetConfig =
       dataSetConfigsByDataSet[dataSetCategoryConfig.dataKey];
 
-    const { dataGrouping, boundaryLevel } = dataSetConfig ?? {
-      dataGrouping: defaultDataGrouping,
-    };
+    const { dataGrouping, boundaryLevel, categoricalDataConfig } =
+      dataSetConfig ?? {
+        dataGrouping: defaultDataGrouping,
+      };
 
     return {
       ...dataSetCategoryConfig,
       boundaryLevel,
+      categoricalDataConfig,
       dataGrouping: deprecatedGrouping ?? dataGrouping,
     };
   });

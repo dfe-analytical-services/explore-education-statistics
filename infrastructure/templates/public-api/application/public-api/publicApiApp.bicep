@@ -1,4 +1,4 @@
-import { ResourceNames, ContainerAppResourceConfig } from '../../types.bicep'
+import { ResourceNames, ContainerAppResourceConfig, SearchServiceConfig } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -32,6 +32,9 @@ param appInsightsConnectionString string
 
 @description('Resource limits and scaling configuration.')
 param resourceAndScalingConfig ContainerAppResourceConfig
+
+@description('Configuration settings for the Search service used to search publications.')
+param searchServiceConfig SearchServiceConfig
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
@@ -142,6 +145,14 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       {
         name: 'AppInsights__ConnectionString'
         value: appInsightsConnectionString
+      }
+      {
+        name: 'AzureSearchClient__Endpoint'
+        value: searchServiceConfig.endpoint
+      }
+      {
+        name: 'AzureSearchClient__IndexName'
+        value: searchServiceConfig.indexName
       }
       {
         name: 'ContentApi__Url'

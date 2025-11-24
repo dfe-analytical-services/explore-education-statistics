@@ -37,8 +37,14 @@ param postgreSqlServerConfig = {
 
 param recoveryVaultImmutable = true
 
+param searchServiceIndexName = 'index-1'
+
 param enableThemeDeletion = false
 
 param enableSwagger = true
 
 param enableReplacementOfPublicApiDataSets = true
+
+param deployPsqlBackupVaultRoleAssignment = true
+
+param deployPsqlBackupVaultRegistration = true

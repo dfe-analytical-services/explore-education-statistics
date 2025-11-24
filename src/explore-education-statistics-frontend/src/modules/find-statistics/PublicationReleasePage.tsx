@@ -1,8 +1,8 @@
 /* eslint-disable react/destructuring-assignment */
 import { NavItem } from '@common/components/PageNavExpandable';
-import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
-import getNavItemsFromHtml from '@common/components/util/getNavItemsFromHtml';
+import getNavItemsFromContentSections from '@common/components/util/getNavItemsFromContentSections';
 import { contactUsNavItem } from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+import exploreDataPageSections from '@common/modules/release/data/releaseExploreDataPageSections';
 import publicationService, {
   PreReleaseAccessListSummary,
   PublicationMethodologiesList,
@@ -13,21 +13,20 @@ import publicationService, {
   ReleaseVersionHomeContent,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
+import { releaseTypes } from '@common/services/types/releaseType';
 import { Dictionary } from '@common/types';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import ReleasePageShell from '@frontend/modules/find-statistics/components/ReleasePageShell';
 import { TabRouteItem } from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
 import PublicationReleasePageCurrent from '@frontend/modules/find-statistics/PublicationReleasePageCurrent';
 import PublicationReleasePageHome from '@frontend/modules/find-statistics/PublicationReleasePageHome';
+import ReleaseExploreDataPage from '@frontend/modules/find-statistics/ReleaseExploreDataPage';
 import ReleaseHelpPage from '@frontend/modules/find-statistics/ReleaseHelpPage';
 import ReleaseMethodologyPage from '@frontend/modules/find-statistics/ReleaseMethodologyPage';
 import publicationQueries from '@frontend/queries/publicationQueries';
 import { QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import ReleaseExploreDataPage, {
-  pageSections as exploreDataPageSections,
-} from './ReleaseExploreDataPage';
 
 export const releasePageTabRouteItems = {
   home: {
@@ -129,6 +128,7 @@ const PublicationReleasePage: NextPage<Props> = props => {
           praSummary={props.praSummary}
           publicationSummary={props.publicationSummary}
           relatedInformationItems={props.relatedInformationItems}
+          releaseVersionSummary={props.releaseVersionSummary}
         />
       )}
     </ReleasePageShell>
@@ -185,28 +185,6 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
             const { summarySection, content } = homeContent;
 
             const hasSummarySection = summarySection.content.length > 0;
-            // Get nav items for section headings (h2) and parse the section's
-            // HtmlBlocks for h3 headings to generate subNavItems
-            const contentSectionsItems = content.map(section => {
-              const { heading, content: sectionContent } = section;
-              const subNavItems = sectionContent
-                .flatMap(block => {
-                  if (block.type === 'HtmlBlock') {
-                    return getNavItemsFromHtml({
-                      html: block.body,
-                      blockId: block.id,
-                    });
-                  }
-                  return null;
-                })
-                .filter(item => !!item);
-
-              return {
-                id: generateIdFromHeading(heading),
-                text: heading,
-                subNavItems,
-              };
-            });
 
             return {
               props: {
@@ -222,7 +200,7 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
                     id: 'headlines-section',
                     text: 'Headline facts and figures',
                   },
-                  ...contentSectionsItems,
+                  ...getNavItemsFromContentSections(content),
                   contactUsNavItem,
                 ].filter(item => !!item),
               },
@@ -306,6 +284,10 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
                 page: 'help',
                 inPageNavItems: [
                   { ...contactUsNavItem, text: 'Get help by contacting us' },
+                  {
+                    id: 'release-type-section',
+                    text: releaseTypes[releaseVersionSummary.type],
+                  },
                   hasRelatedInformation && {
                     id: 'related-information-section',
                     text: 'Related information',

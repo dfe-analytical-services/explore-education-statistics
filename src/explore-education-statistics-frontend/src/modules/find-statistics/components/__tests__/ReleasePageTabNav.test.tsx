@@ -19,7 +19,7 @@ describe('ReleasePageTabNav', () => {
       within(heading).getByRole('link', { name: 'Release home' }),
     ).toHaveAttribute(
       'href',
-      '/find-statistics/test-publication/test-slug?redesign=true',
+      '/find-statistics/test-publication/test-slug?redesign=true#content',
     ); // TODO EES-6449 - remove query param
     expect(
       within(heading).getByRole('link', { name: 'Release home' }),
@@ -29,7 +29,7 @@ describe('ReleasePageTabNav', () => {
       within(heading).getByRole('link', { name: 'Explore and download data' }),
     ).toHaveAttribute(
       'href',
-      '/find-statistics/test-publication/test-slug/explore',
+      '/find-statistics/test-publication/test-slug/explore#content',
     );
     expect(
       within(heading).getByRole('link', { name: 'Explore and download data' }),
@@ -39,7 +39,7 @@ describe('ReleasePageTabNav', () => {
       within(heading).getByRole('link', { name: 'Methodology' }),
     ).toHaveAttribute(
       'href',
-      '/find-statistics/test-publication/test-slug/methodology',
+      '/find-statistics/test-publication/test-slug/methodology#content',
     );
     expect(
       within(heading).getByRole('link', { name: 'Methodology' }),
@@ -51,7 +51,7 @@ describe('ReleasePageTabNav', () => {
       }),
     ).toHaveAttribute(
       'href',
-      '/find-statistics/test-publication/test-slug/help',
+      '/find-statistics/test-publication/test-slug/help#content',
     );
     expect(
       within(heading).getByRole('link', {

@@ -78,7 +78,7 @@ const defaultHeadlinesSection: ContentSection<EditableContentBlock> = {
   ],
 };
 
-const defaultPublication: Publication = {
+export const defaultPublication: Publication = {
   contact: {
     contactName: 'Contact name',
     teamEmail: 'contact@test.com',
@@ -167,6 +167,7 @@ export function generateEditableRelease({
   publication = defaultPublication,
   published,
   publishScheduled,
+  relatedDashboardsSection,
   relatedInformation = defaultRelatedInformation,
   title = 'Release title',
   slug,
@@ -193,6 +194,7 @@ export function generateEditableRelease({
     publication,
     published,
     publishScheduled,
+    relatedDashboardsSection,
     relatedInformation,
     slug: slug ?? releaseSlug,
     summarySection,
