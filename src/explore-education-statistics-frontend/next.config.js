@@ -5,6 +5,35 @@ const path = require('path');
 /**
  * @type {import('next').NextConfig}
  */
+
+const assetHeaders = [
+  {
+    key: 'Cache-Control',
+    value: 'public, max-age=31536000, immutable',
+  },
+];
+
+const metaHeaders = [
+  {
+    key: 'Cache-Control',
+    value: 'public, max-age=3600',
+  },
+];
+
+const generalHeaders = [
+  {
+    key: 'X-Content-Type-Options',
+    value: 'nosniff',
+  },
+];
+if (process.env.NODE_ENV !== 'production') {
+  // For local development, so hotreload works correctly
+  generalHeaders.push({
+    key: 'Cache-Control',
+    value: 'no-store, no-cache, must-revalidate, proxy-revalidate, private',
+  });
+}
+
 const nextConfig = {
   compress: !process.env.WEBSITES_DISABLE_CONTENT_COMPRESSION,
   reactStrictMode: true,
@@ -32,54 +61,23 @@ const nextConfig = {
   },
   async headers() {
     return [
-      // @MarkFix Check all this is correct / desired
+      // general case
       {
         source: '/:path*',
-        headers: [
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-        ],
+        headers: generalHeaders,
       },
+      // specific cases (that overwrite the general case headers)
       {
-        source: '/favicon.svg',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
+        source: '/:file(favicon.svg|manifest.json)',
+        headers: metaHeaders,
       },
       {
         source: '/assets/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
+        headers: assetHeaders,
       },
       {
         source: '/_next/static/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value:
-              process.env.NODE_ENV === 'production' // i.e. not running locally
-                ? 'public, s-maxage=60, stale-while-revalidate=59'
-                : 'no-store, no-cache, must-revalidate, proxy-revalidate, private',
-          },
-        ],
+        headers: assetHeaders,
       },
     ];
   },
