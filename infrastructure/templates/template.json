@@ -1397,13 +1397,15 @@
     "basePublicAllowedOrigins": [
       "[concat('https://', parameters('domain'))]",
       "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]"
-      // NOTE: We would like to add the frontDoor default hostname here, but as we use `reference()` to get it, we cannot and so must added it in place everywhere we use 'publicAllowedOrigins'
+      // NOTE: reference() cannot be used in variables, so the default FrontDoor hostname cannot be put here. It must added in place wherever we use publicAllowedOrigins
     ],
     "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]",
-    "afdEndpointResourceId": "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', variables('frontDoorName'), variables('frontDoorEndpointName'))]",
     "apiVersions": {
       "afdEndpoint": "2025-06-01",
       "searchService": "2025-05-01"
+    },
+    "resourceIds": {
+      "afdEndpoint": "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', variables('frontDoorName'), variables('frontDoorEndpointName'))]"
     }
   },
   "resources": [
@@ -1465,7 +1467,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('afdEndpointResourceId'), variables('apiVersions').afdEndpoint).hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           },
           "connectionStrings": [
             {
@@ -1569,7 +1571,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('afdEndpointResourceId'), variables('apiVersions').afdEndpoint).hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           }
         }
       },
@@ -1706,7 +1708,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('afdEndpointResourceId'), variables('apiVersions').afdEndpoint).hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           },
           "connectionStrings": [
             {
@@ -1804,7 +1806,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('afdEndpointResourceId'), variables('apiVersions').afdEndpoint).hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           }
         }
       },
@@ -2310,7 +2312,7 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('afdEndpointResourceId'), variables('apiVersions').afdEndpoint).hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           }
         }
       },
@@ -3278,7 +3280,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('afdEndpointResourceId'), variables('apiVersions').afdEndpoint).hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           },
           "connectionStrings": [
             {
