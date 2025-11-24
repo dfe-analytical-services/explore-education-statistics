@@ -46,4 +46,8 @@
   &[aria-selected='true'] {
     border-color: currentColor;
   }
+
+  &:visited {
+    color: $govuk-link-colour;
+  }
 }

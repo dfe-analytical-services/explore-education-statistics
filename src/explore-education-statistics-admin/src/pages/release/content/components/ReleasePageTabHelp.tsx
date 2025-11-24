@@ -53,7 +53,7 @@ const ReleasePageTabHelp = ({ hidden }: Props) => {
   );
 
   return (
-    <ReleasePageTabPanel tabKey="explore" hidden={hidden}>
+    <ReleasePageTabPanel tabKey="help" hidden={hidden}>
       <ReleasePageLayout navItems={navItems}>
         <ContactUsSection
           publicationContact={publication.contact}
