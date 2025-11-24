@@ -95,24 +95,14 @@ export default function ApiDataSetPreviewTokenCreateForm({
               message: 'Activates date must be within 7 days from today',
               test(value) {
                 if (value == null) return false;
-                const todayMidnightUk = new Date(
-                  UkTimeHelper.todayStartOfDayUk(),
-                );
                 const activatesMidnightUk = UkTimeHelper.toUkStartOfDay(value);
-                const sevenDaysFromTodayMidnightUk = addDays(
-                  todayMidnightUk,
-                  7,
-                );
+                const todayEndOfDayUk = UkTimeHelper.todayEndOfDayUk();
 
+                const endOfDay7DaysFromTodayUk = addDays(todayEndOfDayUk, 7);
                 return endDateIsLaterThanOrEqualToStartDate(
-                  todayMidnightUk,
                   activatesMidnightUk,
-                )
-                  ? endDateIsLaterThanOrEqualToStartDate(
-                      activatesMidnightUk,
-                      sevenDaysFromTodayMidnightUk,
-                    )
-                  : false;
+                  endOfDay7DaysFromTodayUk,
+                );
               },
             }),
       }),
@@ -126,20 +116,12 @@ export default function ApiDataSetPreviewTokenCreateForm({
             test(value, context) {
               const activates = context.parent.activates as Date | null;
               if (!activates || !value) return false;
-
-              const activatesUtc = UkTimeHelper.toUkStartOfDay(activates);
-              const expiresUtc = UkTimeHelper.toUkEndOfDay(value);
-
               const expiryMaxUtc = addDays(
                 UkTimeHelper.toUkEndOfDay(activates),
                 7,
               );
 
-              const laterThanActivates =
-                expiresUtc.getTime() >= activatesUtc.getTime();
-              const notLaterThanMax =
-                expiresUtc.getTime() <= expiryMaxUtc.getTime();
-              return laterThanActivates && notLaterThanMax;
+              return value >= activates && value <= expiryMaxUtc;
             },
           }),
       }),

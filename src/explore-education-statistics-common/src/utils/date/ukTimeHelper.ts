@@ -3,8 +3,12 @@
 export default class UkTimeHelper {
   public static readonly europeLondonTimeZoneId = 'Europe/London';
 
-  public static todayStartOfDayUk(): string {
-    return this.toUkStartOfDayString(new Date());
+  public static todayStartOfDayUk(): Date {
+    return this.toUkStartOfDay(new Date());
+  }
+
+  public static todayEndOfDayUk(): Date {
+    return this.toUkEndOfDay(new Date());
   }
 
   public static toUkStartOfDay(date1: Date | string): Date {

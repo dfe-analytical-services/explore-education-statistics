@@ -82,6 +82,7 @@ public class PreviewTokenCreateRequestValidatorTests
         [InlineData("2025-10-08T00:00:00 +01:00")]
         [InlineData("2025-10-08T13:59:59 +00:00")]
         [InlineData("2025-10-08T14:00:00 +00:00")]
+        [InlineData("2025-10-01T16:00:00 +01:00")]
         public void ActivatesWithin7Days_Passes(string activates)
         {
             var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
@@ -126,26 +127,6 @@ public class PreviewTokenCreateRequestValidatorTests
 
             // Activates date is GMT (not BST) and has the offset 0 based on the time and place (UK) this test is based on.
             var activates = new DateTimeOffset(2025, 1, 16, 0, 0, 0, TimeSpan.Zero);
-            var request = new PreviewTokenCreateRequest
-            {
-                DataSetVersionId = Guid.NewGuid(),
-                Label = "Test Label",
-                Activates = activates,
-            };
-
-            var result = validator.TestValidate(request);
-
-            result.ShouldNotHaveValidationErrorFor(r => r.Activates);
-        }
-
-        [Fact]
-        public void ActivatesTodayAndNotAtMidnight_IsValid()
-        {
-            var timeProvider = GetTimeProvider();
-            var validator = new PreviewTokenCreateRequest.Validator(timeProvider);
-
-            // Activates date is same as current date
-            var activates = DefaultBritishTimeNow.AddHours(2);
             var request = new PreviewTokenCreateRequest
             {
                 DataSetVersionId = Guid.NewGuid(),
