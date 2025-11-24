@@ -107,7 +107,7 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                     <td>{token.label}</td>
                     <td>{token.createdByEmail}</td>
                     <td>
-                      <FormattedDate format="d MMMM yyyy, HH:mm">
+                      <FormattedDate usingGmt format="d MMMM yyyy, HH:mm">
                         {token.activates}
                       </FormattedDate>
                     </td>
@@ -117,7 +117,7 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                       </Tag>
                     </td>
                     <td>
-                      <FormattedDate format="d MMMM yyyy, HH:mm">
+                      <FormattedDate usingGmt format="d MMMM yyyy, HH:mm">
                         {token.expires}
                       </FormattedDate>
                     </td>

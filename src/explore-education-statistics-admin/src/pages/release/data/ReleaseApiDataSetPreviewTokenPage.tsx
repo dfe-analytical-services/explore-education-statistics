@@ -112,17 +112,22 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                     <>
                       The token is active from:{' '}
                       <strong>
-                        <FormattedDate>{previewToken.activates}</FormattedDate>{' '}
-                        (local time){' '}
+                        <FormattedDate usingGmt>
+                          {previewToken.activates}
+                        </FormattedDate>{' '}
+                        (GMT/BST){' '}
                       </strong>
                       and expires:
                     </>
                   )}{' '}
                   <strong>
-                    <FormattedDate formatRelativeToNow={displayActivatedDate}>
+                    <FormattedDate
+                      usingGmt
+                      formatRelativeToNow={displayActivatedDate}
+                    >
                       {previewToken.expires}
                     </FormattedDate>{' '}
-                    (local time)
+                    (GMT/BST)
                   </strong>
                 </p>
 
