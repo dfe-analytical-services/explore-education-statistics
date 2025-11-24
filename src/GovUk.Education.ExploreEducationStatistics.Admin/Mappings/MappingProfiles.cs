@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -54,7 +55,7 @@ public class MappingProfiles : CommonMappingProfile
             )
             .ForMember(dest => dest.PublicationTitle, m => m.MapFrom(rv => rv.Release.Publication.Title))
             .ForMember(dest => dest.PublicationId, m => m.MapFrom(rv => rv.Release.Publication.Id))
-            .ForMember(dest => dest.PublicationSlug, m => m.MapFrom(rv => rv.Publication.Slug))
+            .ForMember(dest => dest.PublicationSlug, m => m.MapFrom(rv => rv.Release.Publication.Slug))
             .ForMember(
                 dest => dest.PublishScheduled,
                 m =>
@@ -139,26 +140,7 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(dest => dest.Content, m => m.MapFrom(rv => rv.GenericContent.OrderBy(s => s.Order)))
             .ForMember(dest => dest.KeyStatistics, m => m.MapFrom(rv => rv.KeyStatistics.OrderBy(ks => ks.Order)))
             .ForMember(dest => dest.Updates, m => m.MapFrom(rv => rv.Updates.OrderByDescending(update => update.On)))
-            .ForMember(
-                dest => dest.Publication,
-                m =>
-                    m.MapFrom(rv => new ManageContentPageViewModel.PublicationViewModel
-                    {
-                        Id = rv.Release.Publication.Id,
-                        Title = rv.Release.Publication.Title,
-                        Slug = rv.Release.Publication.Slug,
-                        Contact = rv.Release.Publication.Contact,
-                        ReleaseSeries = new List<ReleaseSeriesItemViewModel>(), // Must be hydrated after mapping
-                        ExternalMethodology =
-                            rv.Release.Publication.ExternalMethodology != null
-                                ? new ExternalMethodology
-                                {
-                                    Title = rv.Release.Publication.ExternalMethodology.Title,
-                                    Url = rv.Release.Publication.ExternalMethodology.Url,
-                                }
-                                : null,
-                    })
-            )
+            .ForMember(dest => dest.Publication, m => m.Ignore())
             .ForMember(
                 dest => dest.LatestRelease,
                 m => m.MapFrom(rv => rv.Release.Publication.LatestPublishedReleaseVersionId == rv.Id)
