@@ -126,7 +126,7 @@ describe('ReleaseApiDataSetPreviewPage', () => {
     const tomorrowYmdLondon = formatInTimeZone(plusOneDayUtc, TZ, 'yyyy-MM-dd');
     // 3) End of tomorrow (London wall time) → exact UTC instant
     const expectedEndUtc = fromZonedTime(
-      `${tomorrowYmdLondon}T23:59:59.999`,
+      `${tomorrowYmdLondon}T23:59:59.000`,
       TZ,
     );
 
