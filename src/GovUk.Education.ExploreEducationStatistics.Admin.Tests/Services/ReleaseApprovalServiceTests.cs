@@ -1,5 +1,6 @@
 #nullable enable
 using System.Globalization;
+using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -1196,7 +1197,6 @@ public class ReleaseApprovalServiceTests
 
         var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
         var contentService = new Mock<IContentService>(MockBehavior.Strict);
-        var preReleaseUserService = new Mock<IPreReleaseUserService>(MockBehavior.Strict);
         var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(MockBehavior.Strict);
 
         releaseChecklistService
@@ -1211,17 +1211,7 @@ public class ReleaseApprovalServiceTests
             .Setup(mock =>
                 mock.NotifyUserOfNewPreReleaseRole(invite1.Email, releaseVersion.Id, It.IsAny<CancellationToken>())
             )
-            .Returns(Task.CompletedTask);
-
-        userResourceRoleNotificationService
-            .Setup(mock =>
-                mock.NotifyUserOfNewPreReleaseRole(invite2.Email, releaseVersion.Id, It.IsAny<CancellationToken>())
-            )
-            .Returns(Task.CompletedTask);
-
-        preReleaseUserService
-            .Setup(mock => mock.MarkInviteEmailAsSent(It.Is<UserReleaseInvite>(i => i.Email == invite2.Email)))
-            .Returns(Task.CompletedTask);
+            .ThrowsAsync(new EmailSendFailedException(""));
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
@@ -1229,29 +1219,23 @@ public class ReleaseApprovalServiceTests
                 contentDbContext: context,
                 releaseChecklistService: releaseChecklistService.Object,
                 contentService: contentService.Object,
-                preReleaseUserService: preReleaseUserService.Object,
                 userResourceRoleNotificationService: userResourceRoleNotificationService.Object
             );
 
-            var result = await releaseService.CreateReleaseStatus(
-                releaseVersion.Id,
-                new ReleaseStatusCreateRequest
-                {
-                    ApprovalStatus = ReleaseApprovalStatus.Approved,
-                    InternalReleaseNote = "Test note",
-                    PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2051-06-30",
-                }
+            await Assert.ThrowsAsync<EmailSendFailedException>(async () =>
+                await releaseService.CreateReleaseStatus(
+                    releaseVersion.Id,
+                    new ReleaseStatusCreateRequest
+                    {
+                        ApprovalStatus = ReleaseApprovalStatus.Approved,
+                        InternalReleaseNote = "Test note",
+                        PublishMethod = PublishMethod.Scheduled,
+                        PublishScheduled = "2051-06-30",
+                    }
+                )
             );
 
-            VerifyAllMocks(
-                contentService,
-                preReleaseUserService,
-                releaseChecklistService,
-                userResourceRoleNotificationService
-            );
-
-            result.AssertLeft();
+            VerifyAllMocks(contentService, releaseChecklistService, userResourceRoleNotificationService);
         }
 
         await using (var context = InMemoryApplicationDbContext(contextId))
