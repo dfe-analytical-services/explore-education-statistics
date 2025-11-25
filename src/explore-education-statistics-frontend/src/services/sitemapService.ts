@@ -51,46 +51,9 @@ function buildPublicationRoutes(
         //   lastmod: publication.lastModified,
         // },
         {
-          loc: `${process.env.PROD_PUBLIC_URL}/find-statistics/${publication.slug}`,
-          lastmod: publication.lastModified,
-          priority: 0.7,
-        },
-        {
-          loc: `${process.env.PROD_PUBLIC_URL}/find-statistics/${publication.slug}/data-guidance`,
+          loc: `${process.env.PROD_PUBLIC_URL}/find-statistics/${publication.slug}/releases`,
           lastmod: publication.lastModified,
           priority: 0.4,
-        },
-        {
-          loc: `${process.env.PROD_PUBLIC_URL}/find-statistics/${publication.slug}/prerelease-access-list`,
-          lastmod: publication.lastModified,
-          priority: 0.2,
-        },
-      ],
-    );
-
-    fields.push(
-      ...[
-        // TODO: Check if data-tables should be included in the sitemap
-        // Add <noindex, nofollow> to the data-tables page if not
-        // Add to robots.txt if not
-        // {
-        //   loc: `${process.env.PROD_PUBLIC_URL}/data-tables/${publication.slug}`,
-        //   lastmod: publication.lastModified,
-        // },
-        {
-          loc: `${process.env.PROD_PUBLIC_URL}/find-statistics/${publication.slug}`,
-          lastmod: publication.lastModified,
-          priority: 0.7,
-        },
-        {
-          loc: `${process.env.PROD_PUBLIC_URL}/find-statistics/${publication.slug}/data-guidance`,
-          lastmod: publication.lastModified,
-          priority: 0.4,
-        },
-        {
-          loc: `${process.env.PROD_PUBLIC_URL}/find-statistics/${publication.slug}/prerelease-access-list`,
-          lastmod: publication.lastModified,
-          priority: 0.2,
         },
       ],
     );
@@ -103,14 +66,21 @@ function buildPublicationRoutes(
             lastmod: release.lastModified,
           },
           {
-            loc: `${process.env.PROD_PUBLIC_URL}/find-statistics/${publication.slug}/${release.slug}/data-guidance`,
+            loc: `${process.env.PROD_PUBLIC_URL}/find-statistics/${publication.slug}/${release.slug}/explore`,
             lastmod: release.lastModified,
-            priority: 0.4,
           },
           {
-            loc: `${process.env.PROD_PUBLIC_URL}/find-statistics/${publication.slug}/${release.slug}/prerelease-access-list`,
+            loc: `${process.env.PROD_PUBLIC_URL}/find-statistics/${publication.slug}/${release.slug}/methodology`,
             lastmod: release.lastModified,
-            priority: 0.2,
+          },
+          {
+            loc: `${process.env.PROD_PUBLIC_URL}/find-statistics/${publication.slug}/${release.slug}/help`,
+            lastmod: release.lastModified,
+          },
+          {
+            loc: `${process.env.PROD_PUBLIC_URL}/find-statistics/${publication.slug}/${release.slug}/updates`,
+            lastmod: release.lastModified,
+            priority: 0.4,
           },
           // TODO: Check if data-tables should be included in the sitemap
           // Add <noindex, nofollow> to the data-tables page if not
