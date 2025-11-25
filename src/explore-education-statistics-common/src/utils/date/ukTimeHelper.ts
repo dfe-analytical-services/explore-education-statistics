@@ -45,7 +45,9 @@ export default class UkTimeHelper {
       'yyyy-MM-dd',
     );
 
-    const time = startOfDayRatherThanEndOfDay ? 'T00:00:00' : 'T23:59:59.000';
+    const time = startOfDayRatherThanEndOfDay
+      ? 'T00:00:00.000'
+      : 'T23:59:59.000';
 
     const utcInstant = fromZonedTime(
       `${ymdLondon}${time}`,
