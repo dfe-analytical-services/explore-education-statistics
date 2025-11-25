@@ -558,7 +558,7 @@ user uploads subject and waits until complete
     ...    Complete
     ...    ${FOLDER}
 
-user uploads subject and waits until pending import
+user uploads subject and waits until pending review
     [Arguments]
     ...    ${SUBJECT_NAME}
     ...    ${SUBJECT_FILE}
@@ -568,7 +568,7 @@ user uploads subject and waits until pending import
     ...    ${SUBJECT_NAME}
     ...    ${SUBJECT_FILE}
     ...    ${META_FILE}
-    ...    Pending import
+    ...    Pending review
     ...    ${FOLDER}
 
 user uploads subject and waits until failed screening
@@ -622,14 +622,36 @@ user confirms upload to complete import
     [Arguments]
     ...    ${SUBJECT_NAME}
     ${row}=    user gets table row    ${SUBJECT_NAME}    testid:Data files table
+    ${statusText}=    Get Text    xpath=//tr[td[1][text()[contains(.,'${SUBJECT_NAME}')]]]/td[3]/strong
     ${button}=    user gets button element    View details    ${row}
     user clicks element    ${button}
 
-    # EES-6341 - reinstate "Continue import" button when Screener is re-enabled.
-    # user clicks button    Continue import
-    user clicks button    Close
+    IF    '${statusText}' == 'Pending review'
+        user acknowledges any warnings in modal
+        user clicks button    Continue import with warnings
+    ELSE
+        User waits until h3 is visible    Screener test failures
+        user clicks button    Continue import (override failures)
+    END
 
     user waits until data file import is complete    ${SUBJECT_NAME}
+
+user confirms replacement upload
+    [Arguments]
+    ...    ${SUBJECT_NAME}
+    ${statusText}=    Get Text    xpath=//tr[td[1][text()[contains(.,'${SUBJECT_NAME}')]]]/td[3]/strong
+    user clicks button in table cell    1    4    View details    testid:Data file replacements table
+    user waits until modal is visible    Data set details
+
+    IF    '${statusText}' == 'Pending review'
+        user acknowledges any warnings in modal
+        user clicks button    Continue import with warnings
+    ELSE
+        User waits until h3 is visible    Screener test failures
+        user clicks button    Continue import (override failures)
+    END
+
+    user waits until data file replacement is in status    ${SUBJECT_NAME}    Ready
 
 user waits until data upload is completed
     [Arguments]
@@ -658,11 +680,26 @@ user waits until data file import is in status
     ...    xpath:.//tbody/tr/td[contains(., "${subject_name}")]/../td[contains(., "${status}")]
     ...    %{WAIT_DATA_FILE_IMPORT}
 
+user waits until data file replacement is in status
+    [Arguments]
+    ...    ${SUBJECT_NAME}
+    ...    ${STATUS}
+    user waits until page contains element    testid:Data file replacements table
+    user waits until parent contains element
+    ...    testid:Data file replacements table
+    ...    xpath:.//tbody/tr/td[contains(., "${SUBJECT_NAME}")]/../td[contains(., "${STATUS}")]
+    ...    %{WAIT_DATA_FILE_IMPORT}
+
 user waits until page contains data uploads table
     user waits until page contains testid    Data files table    %{WAIT_DATA_FILE_IMPORT}
 
 user waits until page does not contain data uploads table
     user waits until page does not contain testid    Data files table
+
+user acknowledges any warnings in modal
+    user clicks element    id:screener-results-filtered-tab
+    User waits until h3 is visible    Screener test warnings
+    user clicks all checkboxes in parent    screener-results-filtered
 
 user puts release into draft
     [Arguments]

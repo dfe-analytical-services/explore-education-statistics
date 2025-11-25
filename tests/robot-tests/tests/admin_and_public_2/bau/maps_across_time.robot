@@ -28,10 +28,8 @@ Go to "Release summary" page
     ...    ${RELEASE_NAME}
 
 Upload subject
-    # EES-6341 - reinstate "pending import" stage when Screener is re-enabled.
-    # user uploads subject and waits until pending import    Dates test subject    dates.csv    dates.meta.csv
-    # user confirms upload to complete import    Dates test subject
-    user uploads subject and waits until complete    Dates test subject    dates.csv    dates.meta.csv
+    user uploads subject and waits until pending review    Dates test subject    dates.csv    dates.meta.csv
+    user confirms upload to complete import    Dates test subject
 
 Add data guidance
     user clicks link    Data guidance
