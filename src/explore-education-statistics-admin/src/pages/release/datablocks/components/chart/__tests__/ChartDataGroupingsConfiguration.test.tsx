@@ -357,7 +357,7 @@ describe('ChartDataGroupingsConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2015_AY',
               },
-              dataSetKey: 'dataSetKey1',
+              dataSetKey: 'dataSetKey2',
             },
           ],
         }}
@@ -394,7 +394,7 @@ describe('ChartDataGroupingsConfiguration', () => {
               indicator: 'authorised-absence-sessions',
               timePeriod: '2015_AY',
             },
-            dataSetKey: 'dataSetKey1',
+            dataSetKey: 'dataSetKey2',
           },
         ],
       });

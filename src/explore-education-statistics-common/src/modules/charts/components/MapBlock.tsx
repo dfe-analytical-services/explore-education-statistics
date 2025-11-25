@@ -74,6 +74,7 @@ export const mapBlockDefinition: ChartDefinition = {
   capabilities: {
     canIncludeNonNumericData: false,
     canPositionLegendInline: false,
+    canReorderDataCategories: true,
     canSetBarThickness: false,
     canSetDataLabelColour: false,
     canSetDataLabelPosition: false,

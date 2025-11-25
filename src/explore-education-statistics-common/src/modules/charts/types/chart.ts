@@ -156,6 +156,7 @@ export interface StackedBarProps extends ChartProps {
 export interface ChartCapabilities {
   canIncludeNonNumericData: boolean;
   canPositionLegendInline: boolean;
+  canReorderDataCategories: boolean;
   canSetBarThickness: boolean;
   canSetDataLabelColour: boolean;
   canSetDataLabelPosition: boolean;

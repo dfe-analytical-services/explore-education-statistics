@@ -28,6 +28,7 @@ describe('chartBuilderReducer', () => {
     capabilities: {
       canPositionLegendInline: true,
       canIncludeNonNumericData: true,
+      canReorderDataCategories: false,
       canSetBarThickness: true,
       canSetDataLabelColour: true,
       canSetDataLabelPosition: true,
