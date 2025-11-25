@@ -1,2 +1,24 @@
-time_period,time_identifier,geographic_level,country_code,country_name,region_name,region_code,URN,old_la_code,la_name,Estab,school_name,LAEstab,OpenDate,sex_of_school,Phase-type_grouping,type_of_esstablishment,middle_school,all_through_school,hospital_school,Denomination,Denomination_Detail,admissions_policy,district_administrative_code,district_administrative_name,parlc_code,parlc_name,ward_code,ward_name,urban_rural,school_postcode,new_la_code,ethnicity,FSM,Language,headcount,percent_of_pupils
-201920,Academic year,Local authority,E92000001,England,East Midlands,E12000004,,856,Leicester,,,,,,Pupil referral unit,,,,,,,,,,,,,,,,E06000016,Asian - Pakistani,Total,Total,0,0
+"time_period","time_identifier","geographic_level","country_code","country_name","pupil_gender_girls_percent"
+201920,"Academic year","National","E92000001","England",43.75
+201920,"Academic year","National","E92000001","England",43.75
+201920,"Academic year","National","E92000001","England",27.27272727
+201920,"Academic year","National","E92000001","England",58.33333333
+201920,"Academic year","National","E92000001","England",0
+201920,"Academic year","National","E92000001","England",42.85714286
+201920,"Academic year","National","E92000001","England",37.5
+201920,"Academic year","National","E92000001","England",71.42857143
+201920,"Academic year","National","E92000001","England",50
+201920,"Academic year","National","E92000001","England",0
+NA,"","","","",NA
+NA,"","","","",NA
+NA,"","","","",NA
+NA,"","","","",NA
+NA,"","","","",NA
+NA,"","","","",NA
+NA,"","","","",NA
+NA,"","","","",NA
+NA,"","","","",NA
+NA,"","","","",NA
+NA,"","","","",NA
+NA,"","","","",NA
+NA,"","","","",NA

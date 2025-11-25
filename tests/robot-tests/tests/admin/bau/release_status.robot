@@ -312,6 +312,7 @@ Upload data files
     user waits until page contains data uploads table
     user uploads subject replacement    Dates test subject    dates-replacement.csv    dates-replacement.meta.csv
     user waits until page contains element    testid:Data file replacements table
+    user confirms replacement upload    ${SUBJECT_NAME}
 
 Navigate to data replacement page
     user clicks link in table cell    1    4    View details    testid:Data file replacements table
