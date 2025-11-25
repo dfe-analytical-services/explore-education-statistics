@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
     /// <inheritdoc />
     public partial class Ees6508AddingEmailSentColumnToUserPublicationRolesAndUserReleaseRoles : Migration
     {
-        private const string MigrationId = "20251022145107";
+        private const string MigrationId = "20251125101356";
 
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
