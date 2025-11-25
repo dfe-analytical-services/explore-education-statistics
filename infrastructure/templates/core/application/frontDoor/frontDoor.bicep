@@ -135,7 +135,7 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
           'font/woff2'
         ]
       }
-      queryStringCachingBehavior: 'IgnoreQueryString'
+      queryStringCachingBehavior: 'UseQueryString'
     }
     customDomains: []
     originGroup: {
