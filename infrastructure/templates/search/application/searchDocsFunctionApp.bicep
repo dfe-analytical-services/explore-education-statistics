@@ -96,7 +96,7 @@ resource searchableDocumentsContainer 'Microsoft.Storage/storageAccounts/blobSer
   name: searchableDocumentsContainerName
 }
 
-resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' existing = {
+resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
   name: searchServiceName
 }
 
