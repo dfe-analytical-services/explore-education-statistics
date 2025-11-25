@@ -1388,7 +1388,6 @@
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
     "eventGridTopicNameThemeChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-theme-changed')]",
     "searchServiceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-srch')]",
-    "searchServiceApiVersion": "2025-05-01",
     "searchIndexDataReaderRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '1407120a-92aa-4202-b7e9-c0e197c71c8f')]",
     "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
     "baseAdminAllowedOrigins": [
@@ -1398,9 +1397,16 @@
     "basePublicAllowedOrigins": [
       "[concat('https://', parameters('domain'))]",
       "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]"
-      // NOTE: We would like to add the frontDoor default hostname here, but as we use `reference()` to get it, we cannot and so must added it in place everywhere we want to use 'publicAllowedOrigins'
+      // NOTE: reference() cannot be used in variables, so the default FrontDoor hostname cannot be put here. It must added in place wherever we use publicAllowedOrigins
     ],
-    "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]"
+    "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]",
+    "apiVersions": {
+      "afdEndpoint": "2025-06-01",
+      "searchService": "2025-05-01"
+    },
+    "resourceIds": {
+      "afdEndpoint": "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', variables('frontDoorName'), variables('frontDoorEndpointName'))]"
+    }
   },
   "resources": [
     {
@@ -1461,7 +1467,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           },
           "connectionStrings": [
             {
@@ -1565,7 +1571,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           }
         }
       },
@@ -1702,7 +1708,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           },
           "connectionStrings": [
             {
@@ -1800,7 +1806,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           }
         }
       },
@@ -2306,7 +2312,7 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           }
         }
       },
@@ -2326,7 +2332,7 @@
       "properties": {
         "APP_ENV": "[parameters('environmentName')]",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2020-02-02').InstrumentationKey]",
-        "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('searchServiceApiVersion')).endpoint]",
+        "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('apiVersions').searchService).endpoint]",
         "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
@@ -3274,7 +3280,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(resourceId('Microsoft.Cdn/profiles/afdendpoints', variables('frontDoorName'), variables('frontDoorEndpointName')), '2025-04-15').hostName)))]"
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           },
           "connectionStrings": [
             {
