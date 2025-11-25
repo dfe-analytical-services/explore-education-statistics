@@ -100,11 +100,7 @@ resource searchService 'Microsoft.Search/searchServices@2025-05-01' = {
     userAssignedIdentities: !empty(userAssignedIdentityName) ? { '${userAssignedIdentity.id}': {} } : null
   }
   properties: {
-    authOptions: {
-      aadOrApiKey: {
-        aadAuthFailureMode: 'http403'
-      }
-    }
+    disableLocalAuth: true
     replicaCount: replicaCount
     networkRuleSet: {
       bypass: length(ipRules) > 0 ? 'AzureServices' : 'None'
