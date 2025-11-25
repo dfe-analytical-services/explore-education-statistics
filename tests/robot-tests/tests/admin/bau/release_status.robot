@@ -31,7 +31,7 @@ Go to release sign off page and verify initial release checklist
     ...    Financial year 2100-01
 
 Validate checklist errors and warnings
-    user edits release status
+    user clicks link    Publishing checklist
 
     user checks checklist warnings contains
     ...    4 things you may have forgotten, but do not need to resolve to publish this release.
@@ -53,7 +53,7 @@ Add headline text block to Content page
     user adds content to headlines text block    Headline text block text
 
 Validate checklist errors and warnings after adding headline text block
-    user edits release status
+    user clicks link    Publishing checklist
 
     user checks checklist warnings contains
     ...    4 things you may have forgotten, but do not need to resolve to publish this release.
@@ -82,7 +82,7 @@ Add empty Related dashboards section text block to the page
     user waits until page contains accordion section    View related dashboard(s)
 
 Validate checklist errors and warnings after adding empty content sections
-    user edits release status
+    user clicks link    Publishing checklist
 
     user checks checklist warnings contains
     ...    4 things you may have forgotten, but do not need to resolve to publish this release.
@@ -126,7 +126,7 @@ Add content to text block in Related dashboards section
     user adds content to related dashboards text block    Related dashboards test text
 
 Validate checklist errors and warnings after adding content to text blocks
-    user edits release status
+    user clicks link    Publishing checklist
 
     user checks checklist warnings contains
     ...    4 things you may have forgotten, but do not need to resolve to publish this release.
@@ -139,6 +139,7 @@ Validate checklist errors and warnings after adding content to text blocks
     user waits until page does not contain testid    releaseChecklist-success
 
 Submit release for Higher Review
+    user edits release status
     user clicks radio    Ready for higher review (this will notify approvers)
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Submitted for Higher Review
     user enters text into element    id:releaseStatusForm-nextReleaseDate-month    12
@@ -151,7 +152,7 @@ Verify release status is Higher Review
     user checks summary list contains    Next release expected    December 2100
 
 Verify release checklist has not been updated by status
-    user edits release status
+    user clicks link    Publishing checklist
 
     user checks checklist warnings contains
     ...    3 things you may have forgotten, but do not need to resolve to publish this release.
@@ -167,7 +168,7 @@ Add public prerelease access list via release checklist
     user creates public prerelease access list    Test public access list
 
 Verify release checklist has been updated
-    user edits release status
+    user clicks link    Publishing checklist
 
     user checks checklist warnings contains
     ...    2 things you may have forgotten, but do not need to resolve to publish this release.
@@ -178,6 +179,7 @@ Verify release checklist has been updated
     user waits until page does not contain testid    releaseChecklist-success
 
 Approve release
+    user edits release status
     user clicks radio    Approved for publication
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved for release
 
@@ -210,7 +212,7 @@ Check that having a Draft owned Methodology attached to this Release's Publicati
     user creates methodology for publication    ${PUBLICATION_NAME}
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Financial year 2100-01
-    user edits release status
+    user clicks link    Publishing checklist
     user waits until element is visible    testid:releaseChecklist-warnings    %{WAIT_SMALL}
     user checks checklist warnings contains
     ...    2 things you may have forgotten, but do not need to resolve to publish this release.
@@ -220,7 +222,7 @@ Approve the owned methodology and verify the warning disappears
     user approves methodology for publication    ${PUBLICATION_NAME}
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Financial year 2100-01
-    user edits release status
+    user clicks link    Publishing checklist
     user waits until element is visible    testid:releaseChecklist-warnings    %{WAIT_SMALL}
     user checks checklist warnings contains
     ...    1 thing you may have forgotten, but do not need to resolve to publish this release.
@@ -253,7 +255,7 @@ Adopt a methodology with a draft amendment
 Check that having a draft methodology amendment adopted by this Release's Publication will show a checklist warning
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Financial year 2100-01
-    user edits release status
+    user clicks link    Publishing checklist
     user checks checklist warnings contains
     ...    2 things you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings contains link    A methodology for this publication is not yet approved
@@ -262,7 +264,7 @@ Approve the adopted methodology amendment and verify the warning disappears
     user approves methodology for publication    ${ADOPTED_PUBLICATION_NAME}
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Financial year 2100-01
-    user edits release status
+    user clicks link    Publishing checklist
     user checks checklist warnings contains
     ...    1 thing you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings does not contain link    A methodology for this publication is not yet approved
@@ -279,7 +281,7 @@ Publish new release from adopted publication and make an amendment
     user creates amendment for release    ${ADOPTED_PUBLICATION_NAME}    ${RELEASE_1_NAME}
 
 Verify the checklist errors and warnings for amendment
-    user edits release status
+    user clicks link    Publishing checklist
     user checks checklist warnings contains
     ...    2 things you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings contains link    No data files uploaded
@@ -322,7 +324,7 @@ Navigate to data replacement page
     ...    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Validate checklist errors
-    user edits release status
+    user clicks link    Publishing checklist
 
     user checks checklist errors contains
     ...    3 issues that must be resolved before this release can be published.
@@ -353,7 +355,7 @@ Validate checklist errors (3rd release)
     # TODO https://github.com/dfe-analytical-services/eesyscreener/issues/2
     Skip    Skipping until the "large-data-set.csv" is compatible with screener.
 
-    user edits release status
+    user clicks link    Publishing checklist
 
     user checks checklist errors contains
     ...    3 issues that must be resolved before this release can be published.

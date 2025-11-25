@@ -12,20 +12,22 @@ import {
   releaseFootnotesRoute,
   releasePreReleaseAccessRoute,
   ReleaseRouteParams,
+  releaseStatusRoute,
 } from '@admin/routes/releaseRoutes';
 import { PublicationRouteParams } from '@admin/routes/routes';
 import {
   ReleaseVersion,
-  ReleaseVersionChecklist,
   ReleaseVersionChecklistError,
   ReleaseVersionChecklistWarning,
 } from '@admin/services/releaseVersionService';
-import InsetText from '@common/components/InsetText';
-import React, { useMemo } from 'react';
-import { generatePath } from 'react-router';
+import releaseQueries from '@admin/queries/releaseQueries';
 import { publicationMethodologiesRoute } from '@admin/routes/publicationRoutes';
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import { formId } from './ReleaseStatusForm';
+import InsetText from '@common/components/InsetText';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import React, { useMemo } from 'react';
+import { generatePath } from 'react-router';
+import { useQuery } from '@tanstack/react-query';
 
 interface ChecklistMessage {
   message: string;
@@ -33,12 +35,17 @@ interface ChecklistMessage {
 }
 
 interface Props {
-  checklist: ReleaseVersionChecklist;
   releaseVersion: ReleaseVersion;
 }
 
-const ReleaseStatusChecklist = ({ checklist, releaseVersion }: Props) => {
+const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
   const { user } = useAuthContext();
+
+  const { data: checklist, isLoading } = useQuery(
+    releaseQueries.getChecklist(releaseVersion.id),
+  );
+
+  const { errors = [], warnings = [] } = checklist ?? {};
 
   const releaseRouteParams = useMemo<ReleaseRouteParams>(
     () => ({
@@ -48,7 +55,7 @@ const ReleaseStatusChecklist = ({ checklist, releaseVersion }: Props) => {
     [releaseVersion.id, releaseVersion.publicationId],
   );
 
-  const errors = useMemo<ChecklistMessage[]>(() => {
+  const errorDetails = useMemo<ChecklistMessage[]>(() => {
     const dataUploadsTabRoute = `${generatePath<ReleaseRouteParams>(
       releaseDataRoute.path,
       releaseRouteParams,
@@ -61,7 +68,7 @@ const ReleaseStatusChecklist = ({ checklist, releaseVersion }: Props) => {
         )}#${releaseDataPageTabs.apiDataSets.id}`
       : undefined;
 
-    return checklist.errors.map(error => {
+    return errors.map(error => {
       switch (error.code) {
         case 'DataFileImportsMustBeCompleted':
           return {
@@ -164,10 +171,10 @@ const ReleaseStatusChecklist = ({ checklist, releaseVersion }: Props) => {
           };
       }
     });
-  }, [checklist.errors, releaseRouteParams, user?.permissions.isBauUser]);
+  }, [errors, releaseRouteParams, user?.permissions.isBauUser]);
 
-  const warnings = useMemo<ChecklistMessage[]>(() => {
-    return checklist.warnings.map(warning => {
+  const warningDetails = useMemo<ChecklistMessage[]>(() => {
+    return warnings.map(warning => {
       switch (warning.code) {
         case 'MethodologyNotApproved':
           return {
@@ -211,7 +218,10 @@ const ReleaseStatusChecklist = ({ checklist, releaseVersion }: Props) => {
         case 'NoNextReleaseDate':
           return {
             message: 'No next expected release date has been added',
-            link: `#${formId}-nextReleaseDate-month`,
+            link: generatePath<ReleaseRouteParams>(
+              releaseStatusRoute.path,
+              releaseRouteParams,
+            ),
           };
         case 'NoFeaturedTables':
           return {
@@ -237,76 +247,78 @@ const ReleaseStatusChecklist = ({ checklist, releaseVersion }: Props) => {
           };
       }
     });
-  }, [checklist.warnings, releaseVersion.publicationId, releaseRouteParams]);
+  }, [warnings, releaseVersion.publicationId, releaseRouteParams]);
 
   return (
     <div className="govuk-!-width-two-thirds">
-      <h3>Publishing checklist</h3>
+      <LoadingSpinner loading={isLoading}>
+        {errorDetails.length === 0 && warnings.length === 0 && (
+          <InsetText variant="success" testId="releaseChecklist-success">
+            <h3 className="govuk-heading-m">All checks passed</h3>
 
-      {errors.length === 0 && checklist.warnings.length === 0 && (
-        <InsetText variant="success" testId="releaseChecklist-success">
-          <h4 className="govuk-heading-m">All checks passed</h4>
+            <p>No issues to resolve. This release can be published.</p>
+          </InsetText>
+        )}
 
-          <p>No issues to resolve. This release can be published.</p>
-        </InsetText>
-      )}
+        {errorDetails.length > 0 && (
+          <InsetText variant="error" testId="releaseChecklist-errors">
+            <h3 className="govuk-heading-m">Errors</h3>
 
-      {errors.length > 0 && (
-        <InsetText variant="error" testId="releaseChecklist-errors">
-          <h4 className="govuk-heading-m">Errors</h4>
+            <p>
+              <strong>
+                {`${errorDetails.length} ${
+                  errorDetails.length === 1 ? 'issue' : 'issues'
+                }`}
+              </strong>{' '}
+              that must be resolved before this release can be published.
+            </p>
 
-          <p>
-            <strong>
-              {`${errors.length} ${errors.length === 1 ? 'issue' : 'issues'}`}
-            </strong>{' '}
-            that must be resolved before this release can be published.
-          </p>
+            <ul>
+              {errorDetails.map(error => (
+                <li key={`${error.message}${error.link}`}>
+                  {error.link ? (
+                    <Link to={error.link} unvisited>
+                      {error.message}
+                    </Link>
+                  ) : (
+                    error.message
+                  )}
+                </li>
+              ))}
+            </ul>
+          </InsetText>
+        )}
 
-          <ul>
-            {errors.map(error => (
-              <li key={`${error.message}${error.link}`}>
-                {error.link ? (
-                  <Link to={error.link} unvisited>
-                    {error.message}
-                  </Link>
-                ) : (
-                  error.message
-                )}
-              </li>
-            ))}
-          </ul>
-        </InsetText>
-      )}
+        {warningDetails.length > 0 && (
+          <InsetText variant="warning" testId="releaseChecklist-warnings">
+            <h3 className="govuk-heading-m">Warnings</h3>
 
-      {warnings.length > 0 && (
-        <InsetText variant="warning" testId="releaseChecklist-warnings">
-          <h4 className="govuk-heading-m">Warnings</h4>
+            <p>
+              <strong>
+                {`${warningDetails.length} ${
+                  warningDetails.length === 1 ? 'thing' : 'things'
+                }`}
+              </strong>{' '}
+              you may have forgotten, but do not need to resolve to publish this
+              release.
+            </p>
 
-          <p>
-            <strong>
-              {`${warnings.length} ${
-                warnings.length === 1 ? 'thing' : 'things'
-              }`}
-            </strong>{' '}
-            you may have forgotten, but do not need to resolve to publish this
-            release.
-          </p>
-
-          <ul>
-            {warnings.map(warning => (
-              <li key={`${warning.message}${warning.link}`}>
-                {warning.link ? (
-                  <Link to={warning.link} unvisited>
-                    {warning.message}
-                  </Link>
-                ) : (
-                  warning.message
-                )}
-              </li>
-            ))}
-          </ul>
-        </InsetText>
-      )}
+            <ul>
+              {warningDetails.map(warning => (
+                <li key={`${warning.message}${warning.link}`}>
+                  {warning.link ? (
+                    <Link to={warning.link} unvisited>
+                      {warning.message}
+                    </Link>
+                  ) : (
+                    warning.message
+                  )}
+                </li>
+              ))}
+            </ul>
+          </InsetText>
+        )}
+      </LoadingSpinner>
     </div>
   );
 };

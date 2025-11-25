@@ -2,12 +2,8 @@ import PublicationDraftReleases from '@admin/pages/publication/components/Public
 import _releaseVersionService, {
   ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseVersionService';
-import {
-  render as baseRender,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
+import baseRender from '@common-test/render';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React, { ReactElement } from 'react';

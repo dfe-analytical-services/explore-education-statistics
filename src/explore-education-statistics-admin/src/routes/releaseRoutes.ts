@@ -23,6 +23,7 @@ import ReleaseFootnoteEditPage from '@admin/pages/release/footnotes/ReleaseFootn
 import ReleaseFootnotesPage from '@admin/pages/release/footnotes/ReleaseFootnotesPage';
 import ReleasePreReleaseAccessPage from '@admin/pages/release/pre-release/ReleasePreReleaseAccessPage';
 import ReleasePublishStatusPage from '@admin/pages/release/ReleaseStatusPage';
+import ReleasePublishChecklistPage from '@admin/pages/release/ReleaseChecklistPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/ReleaseSummaryPage';
 
@@ -226,6 +227,12 @@ export const releaseContentRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/content',
   title: 'Content',
   component: ReleaseContentPage,
+};
+
+export const releaseChecklistRoute: ReleaseRouteProps = {
+  path: '/publication/:publicationId/release/:releaseVersionId/checklist',
+  title: 'Publishing checklist',
+  component: ReleasePublishChecklistPage,
 };
 
 export const releaseStatusRoute: ReleaseRouteProps = {
