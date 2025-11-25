@@ -1,8 +1,5 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using System.Net.Mime;
-using System.Threading.Tasks;
 using Azure;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -58,7 +55,7 @@ public abstract class BlobSasServiceTests
                 filename: filename,
                 path: path,
                 expiryDuration: expiryDuration,
-                cancellationToken: default
+                cancellationToken: CancellationToken.None
             );
 
             var token = result.AssertRight();
@@ -85,7 +82,9 @@ public abstract class BlobSasServiceTests
                 metadata: new Dictionary<string, string>()
             );
 
-            blobClient.Setup(client => client.ExistsAsync(default)).ReturnsAsync(Response.FromValue(false, null!));
+            blobClient
+                .Setup(client => client.ExistsAsync(CancellationToken.None))
+                .ReturnsAsync(Response.FromValue(false, null!));
 
             var blobContainerClient = MockBlobContainerClient(container.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
@@ -98,7 +97,7 @@ public abstract class BlobSasServiceTests
                 filename: filename,
                 path: path,
                 expiryDuration: TimeSpan.FromSeconds(37),
-                cancellationToken: default
+                cancellationToken: CancellationToken.None
             );
 
             result.AssertNotFound();
