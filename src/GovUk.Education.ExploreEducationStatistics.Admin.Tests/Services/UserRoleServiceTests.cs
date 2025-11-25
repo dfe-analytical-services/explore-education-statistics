@@ -2139,7 +2139,7 @@ public abstract class UserRoleServiceTests
                 .DefaultReleaseVersion()
                 .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
-            var user = _dataFixture.DefaultUser();
+            User user = _dataFixture.DefaultUser();
 
             var identityUser = new ApplicationUser { Id = user.Id.ToString() };
 
