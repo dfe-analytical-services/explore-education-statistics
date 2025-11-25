@@ -24,7 +24,7 @@ export default class PreviewTokenDateHelper {
       const endDate = UkTimeHelper.toUkEndOfDay(expires);
       return { startDate, endDate };
     }
-    const { startDate, endDate } = UkTimeHelper.getDateRangeFromToday(1);
+    const { startDate, endDate } = UkTimeHelper.getDateRangeFromDate(1);
 
     return { startDate, endDate };
   }
@@ -41,6 +41,6 @@ export default class PreviewTokenDateHelper {
         `The number of days (${datePresetSpan}) selected is not allowed, please select between 1 to 7 days.`,
       );
     }
-    return UkTimeHelper.getDateRangeFromToday(datePresetSpan);
+    return UkTimeHelper.getDateRangeFromDate(datePresetSpan);
   }
 }

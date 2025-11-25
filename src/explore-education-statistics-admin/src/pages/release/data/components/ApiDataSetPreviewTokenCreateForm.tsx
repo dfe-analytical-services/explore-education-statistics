@@ -1,5 +1,4 @@
-import { addDays, isSameDay, isBefore } from 'date-fns';
-import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
+import { isSameDay, isBefore } from 'date-fns';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -96,41 +95,17 @@ export default function ApiDataSetPreviewTokenCreateForm({
               message: 'Activates date must be within 7 days from today',
               test(value) {
                 if (value == null) return false;
-                const TZ = UkTimeHelper.europeLondonTimeZoneId;
-
                 // Start of activates day in UK (UTC instant)
                 const activatesMidnightUk = UkTimeHelper.toUkStartOfDay(value);
 
-                // ----- Compute "end of 7 days from today" in a DST-safe way -----
-                // 1) Today's calendar date in London
-                const now = new Date();
-                const todayYmdLondon = formatInTimeZone(now, TZ, 'yyyy-MM-dd');
-
-                // 2) Today at 00:00 London → UTC instant
-                const todayMidnightUtc = fromZonedTime(
-                  `${todayYmdLondon}T00:00:00`,
-                  TZ,
-                );
-
-                // 3) Add 7 *calendar* days (in absolute time)
-                const plus7DaysUtc = addDays(todayMidnightUtc, 7);
-
-                // 4) What is that calendar day in London?
-                const plus7YmdLondon = formatInTimeZone(
-                  plus7DaysUtc,
-                  TZ,
-                  'yyyy-MM-dd',
-                );
-
-                // 5) End of that day in London → UTC instant
-                const endOfDay7DaysFromTodayUk = fromZonedTime(
-                  `${plus7YmdLondon}T23:59:59`,
-                  TZ,
+                const range = UkTimeHelper.getDateRangeFromDate(
+                  7,
+                  activatesMidnightUk,
                 );
 
                 return endDateIsLaterThanOrEqualToStartDate(
                   activatesMidnightUk,
-                  endOfDay7DaysFromTodayUk,
+                  range.endDate,
                 );
               },
             }),
@@ -146,28 +121,14 @@ export default function ApiDataSetPreviewTokenCreateForm({
               const activates = context.parent.activates as Date | null;
               if (!activates || !value) return false;
 
-              const TZ = UkTimeHelper.europeLondonTimeZoneId;
-              // 1) Start from "start of activates day in UK" as a UTC instant
               const activatesStartOfDayUtc =
                 UkTimeHelper.toUkStartOfDay(activates);
-
-              // 2) Move forward 7 *absolute* days from that midnight
-              const plus7MidnightUtc = addDays(activatesStartOfDayUtc, 7);
-
-              // 3) Ask: what calendar day is that in London?
-              const plus7YmdLondon = formatInTimeZone(
-                plus7MidnightUtc,
-                TZ,
-                'yyyy-MM-dd',
+              const range = UkTimeHelper.getDateRangeFromDate(
+                7,
+                activatesStartOfDayUtc,
               );
 
-              // 4) Build "that day at 23:59:59 in London" and convert to UTC
-              const expiryMaxUtc = fromZonedTime(
-                `${plus7YmdLondon}T23:59:59`,
-                TZ,
-              );
-
-              return value >= activates && value <= expiryMaxUtc;
+              return value >= activates && value <= range.endDate;
             },
           }),
       }),

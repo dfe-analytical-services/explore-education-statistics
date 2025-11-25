@@ -52,10 +52,20 @@ export default class UkTimeHelper {
     );
   }
 
-  public static getDateRangeFromToday(daysToAdd: number): DateRange {
+  /**
+   * Calculates a date range from a given start date (defaults to today) to N days in the future.
+   * All dates are handled in UK time zone to ensure consistent calendar date calculations.
+   *
+   * @param daysToAdd - The number of calendar days to add to the start date
+   * @param startDate - Optional start date (defaults to current date/time)
+   * @returns DateRange containing the start date and end date (at 23:59:59) in UK time
+   */
+  public static getDateRangeFromDate(
+    daysToAdd: number,
+    startDate: Date = new Date(),
+  ): DateRange {
     const TZ = UkTimeHelper.europeLondonTimeZoneId;
 
-    const startDate = new Date();
     // 1) "Today" in London as a calendar date (no time)
     const todayYmdLondon = formatInTimeZone(startDate, TZ, 'yyyy-MM-dd');
 
