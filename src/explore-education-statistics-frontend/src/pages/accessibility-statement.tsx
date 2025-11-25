@@ -166,7 +166,9 @@ function AcccessibilityStatementPage() {
             >
               Digital accessibility centre (DAC) (opens in new tab)
             </a>
-            .
+            . The service was tested by a team of experienced auditors and
+            analysts, many of who are disabled individuals and users of adaptive
+            technology.
           </p>
           <p>
             DAC tested a sample of pages to cover the core functionality of the
@@ -215,10 +217,10 @@ function AcccessibilityStatementPage() {
           <h3>Preparation of this accessibility statement</h3>
           <p>
             This statement was prepared on 4 December 2019. It was last reviewed
-            on 1 July 2024.
+            on 25 November 2025.
           </p>
           <p>
-            This website was last tested in March 2024 against the WCAG 2.2 AA
+            This website was last tested in August 2025 against the WCAG 2.2 AA
             standard. This test of a representative sample of pages was carried
             out by the Digital Accessibility Centre (DAC).
           </p>
