@@ -41,10 +41,10 @@ param partitionCount int = 1
 
 @description('Applicable only for SKUs set to standard3. You can set this property to enable a single, high density partition that allows up to 1000 indexes, which is much higher than the maximum indexes allowed for any other SKU.')
 @allowed([
-  'default'
-  'highDensity'
+  'Default'
+  'HighDensity'
 ])
-param hostingMode string = 'default'
+param hostingMode string = 'Default'
 
 @description('Specifies whether traffic is allowed over the public interface.')
 @allowed([
@@ -89,7 +89,7 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   name: userAssignedIdentityName
 }
 
-resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' = {
+resource searchService 'Microsoft.Search/searchServices@2025-05-01' = {
   name: name
   location: location
   sku: {
@@ -100,11 +100,7 @@ resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' = {
     userAssignedIdentities: !empty(userAssignedIdentityName) ? { '${userAssignedIdentity.id}': {} } : null
   }
   properties: {
-    authOptions: {
-      aadOrApiKey: {
-        aadAuthFailureMode: 'http403'
-      }
-    }
+    disableLocalAuth: true
     replicaCount: replicaCount
     networkRuleSet: {
       bypass: length(ipRules) > 0 ? 'AzureServices' : 'None'
