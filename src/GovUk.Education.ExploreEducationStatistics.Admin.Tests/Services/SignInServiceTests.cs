@@ -340,7 +340,7 @@ public class SignInServiceTests
                     NormalizedName = "ROLE",
                 }
             );
-        
+
         var contentDbContextId = Guid.NewGuid().ToString();
         var usersAndRolesDbContextId = Guid.NewGuid().ToString();
 

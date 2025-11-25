@@ -1326,7 +1326,11 @@ public abstract class UserRoleServiceTests
         [Fact]
         public async Task GetPublicationRolesForUser()
         {
-            User user = _dataFixture.DefaultUser().WithFirstName("User").WithLastName("1").WithEmail("user1@example.com");
+            User user = _dataFixture
+                .DefaultUser()
+                .WithFirstName("User")
+                .WithLastName("1")
+                .WithEmail("user1@example.com");
 
             var userPublicationRole1 = new UserPublicationRole
             {

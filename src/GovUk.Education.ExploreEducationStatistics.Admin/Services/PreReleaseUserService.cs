@@ -208,7 +208,9 @@ public class PreReleaseUserService(
         User user
     )
     {
-        if (await userReleaseInviteRepository.UserHasInvite(releaseVersion.Id, user.Email, ReleaseRole.PrereleaseViewer))
+        if (
+            await userReleaseInviteRepository.UserHasInvite(releaseVersion.Id, user.Email, ReleaseRole.PrereleaseViewer)
+        )
         {
             return Unit.Instance;
         }
