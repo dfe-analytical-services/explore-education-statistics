@@ -35,7 +35,7 @@ public class PreviewTokenCreateRequestValidatorTests
     [Theory]
     [InlineData("2025-10-01T14:00:00 +01:00")]
     [InlineData("2025-10-01T13:59:55 +01:00")] // inside 10 second tolerance
-    public void ActivatesActivatesIsNow_Passes(string activates)
+    public void ActivatesIsNow_Passes(string activates)
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
         var request = new PreviewTokenCreateRequest
