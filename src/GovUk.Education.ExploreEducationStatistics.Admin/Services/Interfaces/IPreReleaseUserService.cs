@@ -22,7 +22,5 @@ public interface IPreReleaseUserService
 
     Task<Either<ActionResult, Unit>> RemovePreReleaseUser(Guid releaseVersionId, string email);
 
-    Task<Either<ActionResult, Unit>> SendPreReleaseInviteEmail(Guid releaseVersionId, string email, bool isNewUser);
-
     Task MarkInviteEmailAsSent(UserReleaseInvite invite);
 }

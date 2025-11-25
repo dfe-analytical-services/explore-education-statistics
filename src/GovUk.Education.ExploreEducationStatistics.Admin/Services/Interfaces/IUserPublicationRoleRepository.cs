@@ -23,4 +23,12 @@ public interface IUserPublicationRoleRepository
     );
 
     Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default);
+
+    Task MarkEmailAsSent(
+        Guid userId,
+        Guid publicationId,
+        PublicationRole role,
+        DateTimeOffset? emailSent = null,
+        CancellationToken cancellationToken = default
+    );
 }

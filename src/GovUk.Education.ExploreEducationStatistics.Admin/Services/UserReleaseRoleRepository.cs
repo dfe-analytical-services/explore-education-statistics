@@ -204,4 +204,29 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
 
         await base.RemoveMany(userReleaseRoles, cancellationToken);
     }
+
+    // The optional 'emailSent' date parameter will be removed in EES-6511 when we stop using UserReleaseRoleInvites/UserPublicationRoleInvites
+    // altogether. At that point, a role will always exist at the point of sending an email; which means we can always set the date at the point
+    // of sending.
+    public async Task MarkEmailAsSent(
+        Guid userId,
+        Guid releaseVersionId,
+        ReleaseRole role,
+        DateTimeOffset? emailSent = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var userReleaseRole = await GetUserReleaseRole(userId: userId, releaseVersionId: releaseVersionId, role: role);
+
+        if (userReleaseRole is null)
+        {
+            throw new InvalidOperationException(
+                $"No User Release Role found for {nameof(userId)} '{userId}', {nameof(releaseVersionId)} '{releaseVersionId}', {nameof(role)} '{role}'"
+            );
+        }
+
+        userReleaseRole.EmailSent = emailSent?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
+
+        await ContentDbContext.SaveChangesAsync(cancellationToken);
+    }
 }

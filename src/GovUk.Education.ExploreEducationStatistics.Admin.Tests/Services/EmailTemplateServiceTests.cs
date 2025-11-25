@@ -1,10 +1,15 @@
 #nullable enable
+using System.Globalization;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -120,6 +125,85 @@ public class EmailTemplateServiceTests
         result.AssertRight();
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task SendPreReleaseInviteEmail(bool isNewUser)
+    {
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        // UK time 00:00 on 9th Sept 2020
+        var publishedScheduledStartOfDay = DateTime.Parse(
+            "2020-09-08T23:00:00.00Z",
+            styles: DateTimeStyles.AdjustToUniversal
+        );
+
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+            .WithPublishScheduled(publishedScheduledStartOfDay);
+
+        await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var preReleaseService = new Mock<IPreReleaseService>(Strict);
+        preReleaseService
+            .Setup(s => s.GetPreReleaseWindow(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
+            .Returns(
+                new PreReleaseWindow
+                {
+                    Start = DateTime.Parse("2020-09-08T07:30:00.00Z", styles: DateTimeStyles.AdjustToUniversal), // UK time 08:30 on 8th Sept 2020
+                    ScheduledPublishDate = publishedScheduledStartOfDay,
+                }
+            );
+
+        const string expectedTemplateId = "prerelease-template-id";
+
+        var expectedValues = new Dictionary<string, dynamic>
+        {
+            { "newUser", isNewUser ? "yes" : "no" },
+            { "release name", releaseVersion.Release.Title },
+            { "publication name", releaseVersion.Release.Publication.Title },
+            {
+                "prerelease link",
+                $"https://admin-uri/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/prerelease/content"
+            },
+            { "prerelease day", "Tuesday 08 September 2020" },
+            { "prerelease time", "08:30" },
+            { "publish day", "Wednesday 09 September 2020" },
+            { "publish time", "09:30" },
+        };
+
+        var emailService = new Mock<IEmailService>(Strict);
+        emailService
+            .Setup(mock => mock.SendEmail("test@test.com", expectedTemplateId, expectedValues))
+            .Returns(Unit.Instance);
+
+        await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupEmailTemplateService(
+                contentDbContext: contentDbContext,
+                emailService: emailService.Object,
+                preReleaseService: preReleaseService.Object
+            );
+
+            var result = await service.SendPreReleaseInviteEmail(
+                email: "test@test.com",
+                releaseVersionId: releaseVersion.Id,
+                isNewUser: isNewUser
+            );
+
+            result.AssertRight();
+        }
+
+        emailService.Verify(s => s.SendEmail("test@test.com", expectedTemplateId, expectedValues), Times.Once);
+
+        VerifyAllMocks(emailService);
+    }
+
     [Fact]
     public void SendReleaseHigherReviewEmail()
     {
@@ -207,16 +291,23 @@ public class EmailTemplateServiceTests
             ReleaseRoleTemplateId = "release-role-template-id",
             ReleaseHigherReviewersTemplateId = "notify-release-higher-reviewers-template-id",
             MethodologyHigherReviewersTemplateId = "notify-methodology-higher-reviewers-template-id",
+            PreReleaseTemplateId = "prerelease-template-id",
         }.ToOptionsWrapper();
     }
 
     private static EmailTemplateService SetupEmailTemplateService(
+        ContentDbContext? contentDbContext = null,
+        IPreReleaseService? preReleaseService = null,
         IEmailService? emailService = null,
         IOptions<AppOptions>? appOptions = null,
         IOptions<NotifyOptions>? notifyOptions = null
     )
     {
+        contentDbContext ??= DbUtils.InMemoryApplicationDbContext();
+
         return new(
+            contentDbContext,
+            preReleaseService ?? Mock.Of<IPreReleaseService>(Strict),
             emailService ?? Mock.Of<IEmailService>(Strict),
             appOptions ?? DefaultAppOptions(),
             notifyOptions ?? DefaultNotifyOptions()
