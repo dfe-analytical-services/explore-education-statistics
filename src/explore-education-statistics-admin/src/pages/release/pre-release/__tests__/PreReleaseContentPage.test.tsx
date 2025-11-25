@@ -17,6 +17,18 @@ import { generatePath } from 'react-router-dom';
 
 jest.mock('@admin/services/featuredTableService');
 jest.mock('@admin/services/releaseContentService');
+jest.mock('@common/hooks/useMedia', () => ({
+  useMobileMedia: () => {
+    return {
+      isMedia: false,
+    };
+  },
+  useDesktopMedia: () => {
+    return {
+      isMedia: false,
+    };
+  },
+}));
 
 const releaseContentService = _releaseContentService as jest.Mocked<
   typeof _releaseContentService
@@ -247,6 +259,43 @@ describe('PreReleaseContentPage', () => {
       'href',
       '/publication/publication-1/release/release-1/prerelease/table-tool/data-block-1',
     );
+  });
+
+  test('renders the redesigned content', async () => {
+    releaseContentService.getContent.mockResolvedValue(testReleaseContent);
+    featuredTableService.listFeaturedTables.mockResolvedValue(
+      testFeaturedTables,
+    );
+
+    renderPage();
+
+    window.history.pushState({}, '', '?redesign=true');
+
+    await waitFor(() => {
+      expect(screen.getByText('Academic year 2020/21')).toBeInTheDocument();
+    });
+
+    expect(screen.getByTestId('release-page-tabs')).toBeInTheDocument();
+
+    const headlinesSection = screen.getByTestId('headlines-section');
+    expect(headlinesSection).toBeInTheDocument();
+
+    expect(
+      within(headlinesSection).getByRole('heading', {
+        level: 2,
+        name: 'Headline facts and figures',
+      }),
+    ).toBeInTheDocument();
+
+    const content = screen.getByTestId('home-content');
+    expect(content).toBeInTheDocument();
+
+    const sections = within(content).getAllByTestId('home-content-section');
+    expect(sections).toHaveLength(2);
+    expect(sections[0]).toHaveAttribute('id', 'section-section-1');
+    expect(
+      within(sections[0]).getByRole('heading', { level: 2 }),
+    ).toHaveTextContent('Section 1');
   });
 
   const renderPage = (

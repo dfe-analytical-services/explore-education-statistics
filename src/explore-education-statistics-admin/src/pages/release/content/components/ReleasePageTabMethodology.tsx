@@ -59,7 +59,7 @@ const ReleasePageTabMethodology = ({ hidden }: Props) => {
   );
 
   return (
-    <ReleasePageTabPanel tabKey="explore" hidden={hidden}>
+    <ReleasePageTabPanel tabKey="methodology" hidden={hidden}>
       <ReleasePageLayout navItems={navItems}>
         {allMethodologies.length > 0 && (
           <ReleasePageContentSection

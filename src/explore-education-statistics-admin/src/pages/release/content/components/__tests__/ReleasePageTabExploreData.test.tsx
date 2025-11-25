@@ -195,9 +195,11 @@ describe('ReleasePageTabExploreData', () => {
         "Featured tables are pre-prepared tables created from a statistical release's data sets. They provide statistics that are regularly requested by some users (such as local councils, regional government or government policy teams) and can be adapted to switch between different categories (such as different geographies, time periods or characteristics where available).",
       ),
     ).toBeInTheDocument();
-    expect(within(featuredTablesSection).getAllByRole('listitem')).toHaveLength(
-      2,
+    const featuredTableItems = within(featuredTablesSection).getAllByRole(
+      'listitem',
     );
+    expect(featuredTableItems).toHaveLength(2);
+    expect(within(featuredTableItems[0]).getByRole('link')).toBeInTheDocument();
 
     const datasetsSection = screen.getByTestId('datasets-section');
     expect(
@@ -288,6 +290,19 @@ describe('ReleasePageTabExploreData', () => {
         'Description of the data included in this release, this is a methodology document, providing information on data sources, their coverage and quality and how the data is produced.',
       ),
     ).toBeInTheDocument();
+  });
+
+  test('does not render featured table links if isPra', () => {
+    renderWithContext(<ReleasePageTabExploreData hidden={false} isPra />);
+
+    const featuredTablesSection = screen.getByTestId('featured-tables-section');
+    const featuredTableItems = within(featuredTablesSection).getAllByRole(
+      'listitem',
+    );
+    expect(featuredTableItems).toHaveLength(2);
+    expect(
+      within(featuredTableItems[0]).queryByRole('link'),
+    ).not.toBeInTheDocument();
   });
 
   test('does not render optional content sections or links when not present', () => {
