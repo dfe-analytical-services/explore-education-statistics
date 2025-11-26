@@ -98,14 +98,9 @@ public abstract class IntegrationTestFixture(TestApplicationFactory testApp)
                 .ConfigureAppConfiguration(
                     (_, config) =>
                     {
-                        config.AddInMemoryCollection(
-                            [
-                                new KeyValuePair<string, string?>(
-                                    "PublicStorage",
-                                    _azuriteContainer.GetConnectionString()
-                                ),
-                            ]
-                        );
+                        config.AddInMemoryCollection([
+                            new KeyValuePair<string, string?>("PublicStorage", _azuriteContainer.GetConnectionString()),
+                        ]);
                     }
                 )
                 .ConfigureServices(services =>

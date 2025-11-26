@@ -18,7 +18,7 @@ public class FilterRepository : IFilterRepository
     {
         return _context
             .Filter.Include(filter => filter.FilterGroups)
-            .ThenInclude(group => group.FilterItems)
+                .ThenInclude(group => group.FilterItems)
             .Where(filter => filter.SubjectId == subjectId)
             .ToListAsync();
     }

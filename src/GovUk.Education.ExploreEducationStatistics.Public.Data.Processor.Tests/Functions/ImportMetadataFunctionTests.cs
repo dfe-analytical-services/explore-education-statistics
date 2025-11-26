@@ -237,7 +237,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             var actualLocations = await publicDataDbContext
                 .LocationMetas.Include(lm => lm.Options)
                 .Include(lm => lm.OptionLinks)
-                .ThenInclude(locationOptionMetaLink => locationOptionMetaLink.Option)
+                    .ThenInclude(locationOptionMetaLink => locationOptionMetaLink.Option)
                 .Where(lm => lm.DataSetVersionId == targetDataSetVersion.Id)
                 .OrderBy(lm => lm.Level)
                 .ToListAsync();
@@ -1325,7 +1325,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         await GetDbContext<PublicDataDbContext>()
             .FilterMetas.Include(fm => fm.Options.OrderBy(o => o.Label))
             .Include(fm => fm.OptionLinks.OrderBy(l => l.Option.Label))
-            .ThenInclude(fm => fm.Option)
+                .ThenInclude(fm => fm.Option)
             .Where(fm => fm.DataSetVersionId == dataSetVersionId)
             .OrderBy(fm => fm.Label)
             .ToListAsync();

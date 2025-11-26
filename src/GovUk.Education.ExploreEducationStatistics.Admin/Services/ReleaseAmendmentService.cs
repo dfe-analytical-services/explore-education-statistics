@@ -661,21 +661,23 @@ internal static class ReleaseAmendmentQueryableExtensions
             .Include(releaseVersion => releaseVersion.Release)
             .Include(releaseVersion => releaseVersion.PublishingOrganisations)
             .Include(releaseVersion => releaseVersion.Content)
-            .ThenInclude(section => section.Content)
-            .ThenInclude(block => (block as EmbedBlockLink)!.EmbedBlock)
+                .ThenInclude(section => section.Content)
+                    .ThenInclude(block => (block as EmbedBlockLink)!.EmbedBlock)
             .Include(releaseVersion => releaseVersion.Updates)
             .Include(releaseVersion => releaseVersion.Content)
-            .ThenInclude(contentSection => contentSection.Content)
+                .ThenInclude(contentSection => contentSection.Content)
             .Include(releaseVersion => releaseVersion.KeyStatistics)
-            .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock)
+                .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock)
             .Include(releaseVersion => releaseVersion.FeaturedTables)
             .Include(releaseVersion => releaseVersion.DataBlockVersions)
             .Include(releaseVersion => releaseVersion.DataBlockVersions)
-            .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
-            .ThenInclude(dataBlockParent => dataBlockParent.LatestDraftVersion)
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                    .ThenInclude(dataBlockParent => dataBlockParent.LatestDraftVersion)
             .Include(releaseVersion => releaseVersion.DataBlockVersions)
-            .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
-            .ThenInclude(dataBlockParent => dataBlockParent.LatestPublishedVersion)
-            .ThenInclude(dataBlockVersion => dataBlockVersion != null ? dataBlockVersion.ContentBlock : null);
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                    .ThenInclude(dataBlockParent => dataBlockParent.LatestPublishedVersion)
+                        .ThenInclude(dataBlockVersion =>
+                            dataBlockVersion != null ? dataBlockVersion.ContentBlock : null
+                        );
     }
 }

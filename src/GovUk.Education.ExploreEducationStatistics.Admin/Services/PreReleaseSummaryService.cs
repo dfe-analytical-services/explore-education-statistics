@@ -40,8 +40,8 @@ public class PreReleaseSummaryService(ContentDbContext contentDbContext, IUserSe
     {
         return await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
-            .ThenInclude(p => p.Contact)
+                .ThenInclude(r => r.Publication)
+                    .ThenInclude(p => p.Contact)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken);
     }
 }

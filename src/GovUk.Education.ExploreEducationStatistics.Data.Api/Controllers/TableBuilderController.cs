@@ -197,9 +197,9 @@ public class TableBuilderController(
     {
         return await contextDbContext
             .DataBlockParents.Include(dbp => dbp.LatestPublishedVersion)
-            .ThenInclude(dbv => dbv.ReleaseVersion)
-            .ThenInclude(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(dbv => dbv.ReleaseVersion)
+                    .ThenInclude(rv => rv.Release)
+                        .ThenInclude(r => r.Publication)
             .SingleOrNotFoundAsync(dbp => dbp.Id == dataBlockParentId)
             .OnSuccess(dbp => dbp.LatestPublishedVersion)
             .OrNotFound();
@@ -211,8 +211,8 @@ public class TableBuilderController(
     {
         return await contextDbContext
             .Publications.Include(p => p.LatestPublishedReleaseVersion)
-            .ThenInclude(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(rv => rv.Release)
+                    .ThenInclude(r => r.Publication)
             .SingleOrNotFoundAsync(p => p.Id == dataBlockVersion.ReleaseVersion.Release.PublicationId)
             .OnSuccess(p => p.LatestPublishedReleaseVersion)
             .OrNotFound();

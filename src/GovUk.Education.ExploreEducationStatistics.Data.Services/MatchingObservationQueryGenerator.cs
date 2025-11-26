@@ -212,7 +212,7 @@ public class MatchingObservationsQueryGenerator(ITemporaryTableCreator tempTable
     {
         var filtersForSubject = await context
             .Filter.Include(filter => filter.FilterGroups)
-            .ThenInclude(filterGroup => filterGroup.FilterItems)
+                .ThenInclude(filterGroup => filterGroup.FilterItems)
             .Where(filterItem => filterItem.SubjectId == subjectId)
             .ToListAsync(cancellationToken);
 

@@ -134,13 +134,11 @@ public class ReplacementBatchServiceTests
             // The valid replacement completes, but we still return errors for the invalid and not found
             // replacements as in normal usage the user should never see one of these errors.
             var validationProblem = result.AssertBadRequestWithValidationProblem();
-            validationProblem.AssertHasErrors(
-                [
-                    ValidationMessages.GenerateErrorReplacementNotFound(originalFileNotFoundId),
-                    ValidationMessages.GenerateErrorReplacementMustBeValid(originalFileInvalidId),
-                    ValidationMessages.GenerateErrorReplacementImportMustBeComplete(originalFileImportNotCompleteId),
-                ]
-            );
+            validationProblem.AssertHasErrors([
+                ValidationMessages.GenerateErrorReplacementNotFound(originalFileNotFoundId),
+                ValidationMessages.GenerateErrorReplacementMustBeValid(originalFileInvalidId),
+                ValidationMessages.GenerateErrorReplacementImportMustBeComplete(originalFileImportNotCompleteId),
+            ]);
 
             VerifyAllMocks(replacementService);
         }

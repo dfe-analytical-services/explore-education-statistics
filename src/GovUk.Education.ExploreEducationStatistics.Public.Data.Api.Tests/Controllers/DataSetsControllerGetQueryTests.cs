@@ -617,28 +617,26 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 {
                     {
                         path,
-                        new StringValues(
-                            [
-                                "",
-                                "invalid",
-                                "||",
-                                "LADD|code|12345",
-                                "NATT|code|12345",
-                                "NAT|invalid|12345",
-                                "LA|urn|12345",
-                                "SCH|code|12345",
-                                "PROV|oldCode|12345",
-                                "RSC|code|12345",
-                                "NAT|id| ",
-                                "LA|code| ",
-                                $"NAT|id|{new string('a', 11)}",
-                                $"LA|code|{new string('a', 31)}",
-                                $"LA|oldCode|{new string('a', 21)}",
-                                $"SCH|urn|{new string('a', 21)}",
-                                $"PROV|ukprn|{new string('a', 21)}",
-                                $"RSC|id|{new string('a', 11)}",
-                            ]
-                        )
+                        new StringValues([
+                            "",
+                            "invalid",
+                            "||",
+                            "LADD|code|12345",
+                            "NATT|code|12345",
+                            "NAT|invalid|12345",
+                            "LA|urn|12345",
+                            "SCH|code|12345",
+                            "PROV|oldCode|12345",
+                            "RSC|code|12345",
+                            "NAT|id| ",
+                            "LA|code| ",
+                            $"NAT|id|{new string('a', 11)}",
+                            $"LA|code|{new string('a', 31)}",
+                            $"LA|oldCode|{new string('a', 21)}",
+                            $"SCH|urn|{new string('a', 21)}",
+                            $"PROV|ukprn|{new string('a', 21)}",
+                            $"RSC|id|{new string('a', 11)}",
+                        ])
                     },
                 }
             );
@@ -825,21 +823,19 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                 {
                     {
                         path,
-                        new StringValues(
-                            [
-                                "",
-                                "invalid",
-                                "|",
-                                "2020/2019|AY",
-                                "2020/2022|AY",
-                                "2020|INVALID",
-                                "2020/2021|CY",
-                                "2020/2021|CYQ2",
-                                "2020/2021|RY",
-                                "2020/2021|W10",
-                                "2020/2021|M5",
-                            ]
-                        )
+                        new StringValues([
+                            "",
+                            "invalid",
+                            "|",
+                            "2020/2019|AY",
+                            "2020/2022|AY",
+                            "2020|INVALID",
+                            "2020/2021|CY",
+                            "2020/2021|CYQ2",
+                            "2020/2021|RY",
+                            "2020/2021|W10",
+                            "2020/2021|M5",
+                        ])
                     },
                 }
             );
@@ -2082,12 +2078,10 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
                     { "filters.notEq", AbsenceSchoolData.FilterNcYear8 },
                     {
                         "filters.in",
-                        new StringValues(
-                            [
-                                AbsenceSchoolData.FilterAcademyTypeSecondaryFreeSchool,
-                                AbsenceSchoolData.FilterAcademyTypeSecondarySponsorLed,
-                            ]
-                        )
+                        new StringValues([
+                            AbsenceSchoolData.FilterAcademyTypeSecondaryFreeSchool,
+                            AbsenceSchoolData.FilterAcademyTypeSecondarySponsorLed,
+                        ])
                     },
                     { "geographicLevels.notEq", "NAT" },
                     { "locations.eq", $"NAT|id|{AbsenceSchoolData.LocationNatEngland}" },
@@ -2980,14 +2974,12 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             .WithMetaSummary(
                 DataFixture
                     .DefaultDataSetVersionMetaSummary()
-                    .WithGeographicLevels(
-                        [
-                            GeographicLevel.Country,
-                            GeographicLevel.LocalAuthority,
-                            GeographicLevel.Region,
-                            GeographicLevel.School,
-                        ]
-                    )
+                    .WithGeographicLevels([
+                        GeographicLevel.Country,
+                        GeographicLevel.LocalAuthority,
+                        GeographicLevel.Region,
+                        GeographicLevel.School,
+                    ])
             )
             .WithStatus(versionStatus);
 

@@ -946,12 +946,10 @@ public class PermalinkServiceTests
     {
         Publication publication = _fixture
             .DefaultPublication()
-            .WithReleases(
-                [
-                    _fixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                    _fixture.DefaultRelease(publishedVersions: 1, year: 2021),
-                ]
-            )
+            .WithReleases([
+                _fixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                _fixture.DefaultRelease(publishedVersions: 1, year: 2021),
+            ])
             .WithTheme(_fixture.DefaultTheme());
 
         var release2020 = publication.Releases.Single(r => r.Year == 2020);

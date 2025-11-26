@@ -2697,15 +2697,15 @@ public class ReplacementServiceTests
     {
         return await context
             .Footnote.Include(footnote => footnote.Filters)
-            .ThenInclude(filterFootnote => filterFootnote.Filter)
+                .ThenInclude(filterFootnote => filterFootnote.Filter)
             .Include(footnote => footnote.FilterGroups)
-            .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
+                .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
             .Include(footnote => footnote.FilterItems)
-            .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
+                .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
             .Include(footnote => footnote.Indicators)
-            .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
+                .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
             .Include(footnote => footnote.Subjects)
-            .ThenInclude(subjectFootnote => subjectFootnote.Subject)
+                .ThenInclude(subjectFootnote => subjectFootnote.Subject)
             .SingleAsync(footnote => footnote.Id == id);
     }
 

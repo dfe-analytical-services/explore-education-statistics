@@ -859,24 +859,22 @@ public abstract class UserReleaseRoleRepositoryTests
 
                 expectedUserReleaseRolesToRemove.AddRange(targetedUserReleaseRoles);
 
-                allUserReleaseRoles.AddRange(
-                    [
-                        .. targetedUserReleaseRoles,
-                        // Create a user release role for EACH ROLE for the OTHER release version and EACH EMAIL
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user1)
-                            .WithRole(role)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user2)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    .. targetedUserReleaseRoles,
+                    // Create a user release role for EACH ROLE for the OTHER release version and EACH EMAIL
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user1)
+                        .WithRole(role)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user2)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -975,70 +973,66 @@ public abstract class UserReleaseRoleRepositoryTests
 
                 expectedUserReleaseRolesToRemove.AddRange(targetedUserReleaseRoles);
 
-                allUserReleaseRoles.AddRange(
-                    [
-                        .. targetedUserReleaseRoles,
-                        // Create a user release role for each TARGET role for the OTHER release version and EACH EMAIL
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user1)
-                            .WithRole(targetRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user2)
-                            .WithRole(targetRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    .. targetedUserReleaseRoles,
+                    // Create a user release role for each TARGET role for the OTHER release version and EACH EMAIL
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user1)
+                        .WithRole(targetRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user2)
+                        .WithRole(targetRole)
+                        .Generate(),
+                ]);
             }
 
             foreach (var otherRole in otherRoles)
             {
-                allUserReleaseRoles.AddRange(
-                    [
-                        // Create a user release role for each OTHER role for each TARGET release version and EACH EMAIL
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion1)
-                            .WithUser(user1)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion1)
-                            .WithUser(user2)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion2)
-                            .WithUser(user1)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion2)
-                            .WithUser(user2)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        // Create a user release role for each OTHER role for the OTHER release version and EACH EMAIL
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user1)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user2)
-                            .WithRole(otherRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    // Create a user release role for each OTHER role for each TARGET release version and EACH EMAIL
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion1)
+                        .WithUser(user1)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion1)
+                        .WithUser(user2)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion2)
+                        .WithUser(user1)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion2)
+                        .WithUser(user2)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    // Create a user release role for each OTHER role for the OTHER release version and EACH EMAIL
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user1)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user2)
+                        .WithRole(otherRole)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1094,23 +1088,21 @@ public abstract class UserReleaseRoleRepositoryTests
 
             foreach (var role in allRoles)
             {
-                allUserReleaseRoles.AddRange(
-                    [
-                        // Create a user release role for EACH ROLE for the OTHER release version and EACH EMAIL
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user1)
-                            .WithRole(role)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user2)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    // Create a user release role for EACH ROLE for the OTHER release version and EACH EMAIL
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user1)
+                        .WithRole(role)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user2)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1181,38 +1173,36 @@ public abstract class UserReleaseRoleRepositoryTests
 
                 expectedUserReleaseRolesToRemove.AddRange(targetedUserReleaseRoles);
 
-                allUserReleaseRoles.AddRange(
-                    [
-                        .. targetedUserReleaseRoles,
-                        // Create a user release role for EACH ROLE for each TARGET release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion1)
-                            .WithUser(otherUser)
-                            .WithRole(role)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion2)
-                            .WithUser(otherUser)
-                            .WithRole(role)
-                            .Generate(),
-                        // Create a user release role for EACH ROLE for the OTHER release version and TARGET email
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(targetUser)
-                            .WithRole(role)
-                            .Generate(),
-                        // Create a user release role for EACH ROLE for the OTHER release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(otherUser)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    .. targetedUserReleaseRoles,
+                    // Create a user release role for EACH ROLE for each TARGET release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion1)
+                        .WithUser(otherUser)
+                        .WithRole(role)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion2)
+                        .WithUser(otherUser)
+                        .WithRole(role)
+                        .Generate(),
+                    // Create a user release role for EACH ROLE for the OTHER release version and TARGET email
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(targetUser)
+                        .WithRole(role)
+                        .Generate(),
+                    // Create a user release role for EACH ROLE for the OTHER release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(otherUser)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1302,72 +1292,68 @@ public abstract class UserReleaseRoleRepositoryTests
 
                 expectedUserReleaseRolesToRemove.AddRange(targetedUserReleaseRoles);
 
-                allUserReleaseRoles.AddRange(
-                    [
-                        .. targetedUserReleaseRoles,
-                        // Create a user release role for each TARGET role for each TARGET release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion1)
-                            .WithUser(otherUser)
-                            .WithRole(targetRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion2)
-                            .WithUser(otherUser)
-                            .WithRole(targetRole)
-                            .Generate(),
-                        // Create a user release role for each TARGET role for the OTHER release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(otherUser)
-                            .WithRole(targetRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    .. targetedUserReleaseRoles,
+                    // Create a user release role for each TARGET role for each TARGET release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion1)
+                        .WithUser(otherUser)
+                        .WithRole(targetRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion2)
+                        .WithUser(otherUser)
+                        .WithRole(targetRole)
+                        .Generate(),
+                    // Create a user release role for each TARGET role for the OTHER release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(otherUser)
+                        .WithRole(targetRole)
+                        .Generate(),
+                ]);
             }
 
             foreach (var otherRole in otherRoles)
             {
-                allUserReleaseRoles.AddRange(
-                    [
-                        // Create a user release role for each OTHER role for each TARGET release version and TARGET email
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion1)
-                            .WithUser(targetUser)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion2)
-                            .WithUser(targetUser)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        // Create a user release role for each OTHER role for each TARGET release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion1)
-                            .WithUser(otherUser)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion2)
-                            .WithUser(otherUser)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        // Create a user release role for each OTHER role for the OTHER release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(otherUser)
-                            .WithRole(otherRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    // Create a user release role for each OTHER role for each TARGET release version and TARGET email
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion1)
+                        .WithUser(targetUser)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion2)
+                        .WithUser(targetUser)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    // Create a user release role for each OTHER role for each TARGET release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion1)
+                        .WithUser(otherUser)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion2)
+                        .WithUser(otherUser)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    // Create a user release role for each OTHER role for the OTHER release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(otherUser)
+                        .WithRole(otherRole)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1424,17 +1410,15 @@ public abstract class UserReleaseRoleRepositoryTests
 
             foreach (var role in allRoles)
             {
-                allUserReleaseRoles.AddRange(
-                    [
-                        // Create a user release role for EACH ROLE for the OTHER release version and OTHER EMAIL
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(otherUser)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    // Create a user release role for EACH ROLE for the OTHER release version and OTHER EMAIL
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(otherUser)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1513,24 +1497,22 @@ public abstract class UserReleaseRoleRepositoryTests
 
                 expectedUserReleaseRolesToRemove.AddRange(targetedUserReleaseRoles);
 
-                allUserReleaseRoles.AddRange(
-                    [
-                        .. targetedUserReleaseRoles,
-                        // Create a user release role for EACH ROLE for the OTHER release version and EACH user
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user1)
-                            .WithRole(role)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user2)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    .. targetedUserReleaseRoles,
+                    // Create a user release role for EACH ROLE for the OTHER release version and EACH user
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user1)
+                        .WithRole(role)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user2)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1612,58 +1594,54 @@ public abstract class UserReleaseRoleRepositoryTests
 
                 expectedUserReleaseRolesToRemove.AddRange(targetedUserReleaseRoles);
 
-                allUserReleaseRoles.AddRange(
-                    [
-                        .. targetedUserReleaseRoles,
-                        // Create a user release role for each TARGET role for the OTHER release version and EACH user
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user1)
-                            .WithRole(targetRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user2)
-                            .WithRole(targetRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    .. targetedUserReleaseRoles,
+                    // Create a user release role for each TARGET role for the OTHER release version and EACH user
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user1)
+                        .WithRole(targetRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user2)
+                        .WithRole(targetRole)
+                        .Generate(),
+                ]);
             }
 
             foreach (var otherRole in otherRoles)
             {
-                allUserReleaseRoles.AddRange(
-                    [
-                        // Create a user release role for each OTHER role for the TARGET release version and EACH user
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion)
-                            .WithUser(user1)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion)
-                            .WithUser(user2)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        // Create a user release role for each OTHER role for the OTHER release version and EACH user
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user1)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user2)
-                            .WithRole(otherRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    // Create a user release role for each OTHER role for the TARGET release version and EACH user
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion)
+                        .WithUser(user1)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion)
+                        .WithUser(user2)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    // Create a user release role for each OTHER role for the OTHER release version and EACH user
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user1)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user2)
+                        .WithRole(otherRole)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1718,23 +1696,21 @@ public abstract class UserReleaseRoleRepositoryTests
 
             foreach (var role in allRoles)
             {
-                allUserReleaseRoles.AddRange(
-                    [
-                        // Create a user release role for EACH ROLE for the OTHER release version and EACH user
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user1)
-                            .WithRole(role)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(user2)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    // Create a user release role for EACH ROLE for the OTHER release version and EACH user
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user1)
+                        .WithRole(role)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(user2)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1794,32 +1770,30 @@ public abstract class UserReleaseRoleRepositoryTests
 
                 expectedUserReleaseRolesToRemove.AddRange(targetedUserReleaseRoles);
 
-                allUserReleaseRoles.AddRange(
-                    [
-                        .. targetedUserReleaseRoles,
-                        // Create a user release role for EACH ROLE for the TARGET release version and OTHER user
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion)
-                            .WithUser(otherUser)
-                            .WithRole(role)
-                            .Generate(),
-                        // Create a user release role for EACH ROLE for the OTHER release version and TARGET user
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(targetUser)
-                            .WithRole(role)
-                            .Generate(),
-                        // Create a user release role for EACH ROLE for the OTHER release version and OTHER user
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(otherUser)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    .. targetedUserReleaseRoles,
+                    // Create a user release role for EACH ROLE for the TARGET release version and OTHER user
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion)
+                        .WithUser(otherUser)
+                        .WithRole(role)
+                        .Generate(),
+                    // Create a user release role for EACH ROLE for the OTHER release version and TARGET user
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(targetUser)
+                        .WithRole(role)
+                        .Generate(),
+                    // Create a user release role for EACH ROLE for the OTHER release version and OTHER user
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(otherUser)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1898,54 +1872,50 @@ public abstract class UserReleaseRoleRepositoryTests
 
                 expectedUserReleaseRolesToRemove.AddRange(targetedUserReleaseRoles);
 
-                allUserReleaseRoles.AddRange(
-                    [
-                        .. targetedUserReleaseRoles,
-                        // Create a user release role for each TARGET role for the TARGET release version and OTHER user
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion)
-                            .WithUser(otherUser)
-                            .WithRole(targetRole)
-                            .Generate(),
-                        // Create a user release role for each TARGET role for the OTHER release version and OTHER user
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(otherUser)
-                            .WithRole(targetRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    .. targetedUserReleaseRoles,
+                    // Create a user release role for each TARGET role for the TARGET release version and OTHER user
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion)
+                        .WithUser(otherUser)
+                        .WithRole(targetRole)
+                        .Generate(),
+                    // Create a user release role for each TARGET role for the OTHER release version and OTHER user
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(otherUser)
+                        .WithRole(targetRole)
+                        .Generate(),
+                ]);
             }
 
             foreach (var otherRole in otherRoles)
             {
-                allUserReleaseRoles.AddRange(
-                    [
-                        // Create a user release role for each OTHER role for the TARGET release version and TARGET user
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion)
-                            .WithUser(targetUser)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        // Create a user release role for each OTHER role for the TARGET release version and OTHER user
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(targetReleaseVersion)
-                            .WithUser(otherUser)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        // Create a user release role for each OTHER role for the OTHER release version and OTHER user
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(otherUser)
-                            .WithRole(otherRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    // Create a user release role for each OTHER role for the TARGET release version and TARGET user
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion)
+                        .WithUser(targetUser)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    // Create a user release role for each OTHER role for the TARGET release version and OTHER user
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(targetReleaseVersion)
+                        .WithUser(otherUser)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    // Create a user release role for each OTHER role for the OTHER release version and OTHER user
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(otherUser)
+                        .WithRole(otherRole)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -2001,17 +1971,15 @@ public abstract class UserReleaseRoleRepositoryTests
 
             foreach (var role in allRoles)
             {
-                allUserReleaseRoles.AddRange(
-                    [
-                        // Create a user release role for EACH ROLE for the OTHER release version and OTHER user
-                        _fixture
-                            .DefaultUserReleaseRole()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithUser(otherUser)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseRoles.AddRange([
+                    // Create a user release role for EACH ROLE for the OTHER release version and OTHER user
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithUser(otherUser)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();

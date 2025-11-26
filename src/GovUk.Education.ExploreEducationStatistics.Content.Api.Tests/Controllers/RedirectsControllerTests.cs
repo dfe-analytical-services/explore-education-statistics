@@ -313,20 +313,18 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
             {
                 Publication publication = DataFixture
                     .DefaultPublication()
-                    .WithReleases(
-                        [
-                            DataFixture
-                                .DefaultRelease(publishedVersions: 1)
-                                .WithSlug("updated-release-slug-1")
-                                .WithRedirects(
-                                    DataFixture
-                                        .DefaultReleaseRedirect()
-                                        .ForIndex(0, s => s.SetSlug("first-release-slug-1"))
-                                        .ForIndex(1, s => s.SetSlug("second-release-slug-1"))
-                                        .GenerateList(2)
-                                ),
-                        ]
-                    )
+                    .WithReleases([
+                        DataFixture
+                            .DefaultRelease(publishedVersions: 1)
+                            .WithSlug("updated-release-slug-1")
+                            .WithRedirects(
+                                DataFixture
+                                    .DefaultReleaseRedirect()
+                                    .ForIndex(0, s => s.SetSlug("first-release-slug-1"))
+                                    .ForIndex(1, s => s.SetSlug("second-release-slug-1"))
+                                    .GenerateList(2)
+                            ),
+                    ])
                     .WithSlug("updated-publication-slug-1")
                     .WithRedirects([DataFixture.DefaultPublicationRedirect().WithSlug("original-publication-slug-1")]);
 
@@ -360,20 +358,18 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
             {
                 Publication publication = DataFixture
                     .DefaultPublication()
-                    .WithReleases(
-                        [
-                            DataFixture
-                                .DefaultRelease(publishedVersions: 1)
-                                .WithSlug("updated-release-slug-1")
-                                .WithRedirects(
-                                    DataFixture
-                                        .DefaultReleaseRedirect()
-                                        .ForIndex(0, s => s.SetSlug("first-release-slug-1"))
-                                        .ForIndex(1, s => s.SetSlug("second-release-slug-1"))
-                                        .GenerateList(2)
-                                ),
-                        ]
-                    )
+                    .WithReleases([
+                        DataFixture
+                            .DefaultRelease(publishedVersions: 1)
+                            .WithSlug("updated-release-slug-1")
+                            .WithRedirects(
+                                DataFixture
+                                    .DefaultReleaseRedirect()
+                                    .ForIndex(0, s => s.SetSlug("first-release-slug-1"))
+                                    .ForIndex(1, s => s.SetSlug("second-release-slug-1"))
+                                    .GenerateList(2)
+                            ),
+                    ])
                     .WithSlug("original-publication-slug-1");
 
                 await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
@@ -404,20 +400,18 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
             {
                 Publication publication = DataFixture
                     .DefaultPublication()
-                    .WithReleases(
-                        [
-                            DataFixture
-                                .DefaultRelease(publishedVersions: 1)
-                                .WithSlug("updated-release-slug-1")
-                                .WithRedirects(
-                                    DataFixture
-                                        .DefaultReleaseRedirect()
-                                        .ForIndex(0, s => s.SetSlug("first-release-slug-1"))
-                                        .ForIndex(1, s => s.SetSlug("second-release-slug-1"))
-                                        .GenerateList(2)
-                                ),
-                        ]
-                    )
+                    .WithReleases([
+                        DataFixture
+                            .DefaultRelease(publishedVersions: 1)
+                            .WithSlug("updated-release-slug-1")
+                            .WithRedirects(
+                                DataFixture
+                                    .DefaultReleaseRedirect()
+                                    .ForIndex(0, s => s.SetSlug("first-release-slug-1"))
+                                    .ForIndex(1, s => s.SetSlug("second-release-slug-1"))
+                                    .GenerateList(2)
+                            ),
+                    ])
                     .WithSlug("original-publication-slug-1");
 
                 await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));

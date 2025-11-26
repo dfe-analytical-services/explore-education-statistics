@@ -49,15 +49,13 @@ public class ReleaseVersionRepositoryTests
                 .WithPublication(
                     _fixture
                         .DefaultPublication()
-                        .WithReleases(
-                            [
-                                _fixture
-                                    .DefaultRelease()
-                                    .WithVersions(
-                                        [_fixture.DefaultReleaseVersion().WithApprovalStatus(releaseApprovalStatus)]
-                                    ),
-                            ]
-                        )
+                        .WithReleases([
+                            _fixture
+                                .DefaultRelease()
+                                .WithVersions([
+                                    _fixture.DefaultReleaseVersion().WithApprovalStatus(releaseApprovalStatus),
+                                ]),
+                        ])
                 );
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -171,19 +169,13 @@ public class ReleaseVersionRepositoryTests
                 .WithPublication(
                     _fixture
                         .DefaultPublication()
-                        .WithReleases(
-                            [
-                                _fixture
-                                    .DefaultRelease()
-                                    .WithVersions(
-                                        [
-                                            _fixture
-                                                .DefaultReleaseVersion()
-                                                .WithApprovalStatus(ReleaseApprovalStatus.Approved),
-                                        ]
-                                    ),
-                            ]
-                        )
+                        .WithReleases([
+                            _fixture
+                                .DefaultRelease()
+                                .WithVersions([
+                                    _fixture.DefaultReleaseVersion().WithApprovalStatus(ReleaseApprovalStatus.Approved),
+                                ]),
+                        ])
                 );
 
             var contentDbContextId = Guid.NewGuid().ToString();

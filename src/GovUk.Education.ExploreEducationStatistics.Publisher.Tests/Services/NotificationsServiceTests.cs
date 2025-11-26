@@ -69,9 +69,11 @@ public abstract class NotificationsServiceTests
                     notifierClient: notifierClient.Object
                 );
 
-                await notificationsService.NotifySubscribersIfApplicable(
-                    [publication1ReleaseVersion0.Id, publication2ReleaseVersion0.Id, publication3ReleaseVersion1.Id]
-                );
+                await notificationsService.NotifySubscribersIfApplicable([
+                    publication1ReleaseVersion0.Id,
+                    publication2ReleaseVersion0.Id,
+                    publication3ReleaseVersion1.Id,
+                ]);
 
                 notifierClient.Verify(
                     mock =>
@@ -294,9 +296,10 @@ public abstract class NotificationsServiceTests
                     notifierClient: notifierClient.Object
                 );
 
-                await notificationsService.SendReleasePublishingFeedbackEmails(
-                    [release1Version.Id, release2Version.Id]
-                );
+                await notificationsService.SendReleasePublishingFeedbackEmails([
+                    release1Version.Id,
+                    release2Version.Id,
+                ]);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -386,9 +389,9 @@ public abstract class NotificationsServiceTests
                     notifierClient: notifierClient.Object
                 );
 
-                await notificationsService.SendReleasePublishingFeedbackEmails(
-                    [publication.Releases[0].Versions[0].Id]
-                );
+                await notificationsService.SendReleasePublishingFeedbackEmails([
+                    publication.Releases[0].Versions[0].Id,
+                ]);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))

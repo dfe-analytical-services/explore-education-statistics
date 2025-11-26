@@ -45,8 +45,8 @@ public class MethodologyVersionRepositoryTests
         {
             var methodologyVersion = await contentDbContext
                 .MethodologyVersions.Include(m => m.Methodology)
-                .ThenInclude(p => p.Publications)
-                .ThenInclude(p => p.Publication)
+                    .ThenInclude(p => p.Publications)
+                        .ThenInclude(p => p.Publication)
                 .SingleAsync(m => m.Id == methodologyVersionId);
 
             var savedPublication = await contentDbContext.Publications.SingleAsync(p => p.Id == publication.Id);

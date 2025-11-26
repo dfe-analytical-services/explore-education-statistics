@@ -106,23 +106,21 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                      </html>
                     """;
 
-                Assert.Multiple(
-                    [
-                        () => Assert.Equal(release.Id, actual.ReleaseId),
-                        () => Assert.Equal(release.Slug, actual.ReleaseSlug),
-                        () => Assert.Equal(releaseVersion.Id, actual.ReleaseVersionId),
-                        () => Assert.Equal(publication.Id, actual.PublicationId),
-                        () => Assert.Equal(publication.Slug, actual.PublicationSlug),
-                        () => Assert.Equal(publication.Summary, actual.Summary),
-                        () => Assert.Equal(publication.Title, actual.PublicationTitle),
-                        () => Assert.Equal(releaseVersion.Published!.Value, actual.Published),
-                        () => Assert.Equal(publication.Theme.Id, actual.ThemeId),
-                        () => Assert.Equal(publication.Theme.Title, actual.ThemeTitle),
-                        () => Assert.Equal(releaseVersion.Type.ToString(), actual.Type),
-                        () => Assert.Equal(releaseVersion.Type.ToSearchDocumentTypeBoost(), actual.TypeBoost),
-                        .. GetAssertTrimmedLinesEqual(expectedHtmlContent, actual.HtmlContent),
-                    ]
-                );
+                Assert.Multiple([
+                    () => Assert.Equal(release.Id, actual.ReleaseId),
+                    () => Assert.Equal(release.Slug, actual.ReleaseSlug),
+                    () => Assert.Equal(releaseVersion.Id, actual.ReleaseVersionId),
+                    () => Assert.Equal(publication.Id, actual.PublicationId),
+                    () => Assert.Equal(publication.Slug, actual.PublicationSlug),
+                    () => Assert.Equal(publication.Summary, actual.Summary),
+                    () => Assert.Equal(publication.Title, actual.PublicationTitle),
+                    () => Assert.Equal(releaseVersion.Published!.Value, actual.Published),
+                    () => Assert.Equal(publication.Theme.Id, actual.ThemeId),
+                    () => Assert.Equal(publication.Theme.Title, actual.ThemeTitle),
+                    () => Assert.Equal(releaseVersion.Type.ToString(), actual.Type),
+                    () => Assert.Equal(releaseVersion.Type.ToSearchDocumentTypeBoost(), actual.TypeBoost),
+                    .. GetAssertTrimmedLinesEqual(expectedHtmlContent, actual.HtmlContent),
+                ]);
             }
         }
 

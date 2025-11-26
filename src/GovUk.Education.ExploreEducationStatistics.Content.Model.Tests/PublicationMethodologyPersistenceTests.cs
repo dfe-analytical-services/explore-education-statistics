@@ -42,7 +42,7 @@ public class PublicationMethodologyPersistenceTests
         {
             var methodology = await context
                 .MethodologyVersions.Include(m => m.Methodology)
-                .ThenInclude(m => m.Publications)
+                    .ThenInclude(m => m.Publications)
                 .FirstAsync(m => m.Id == methodologyVersionId);
 
             Assert.Equal(
@@ -63,7 +63,7 @@ public class PublicationMethodologyPersistenceTests
         {
             var methodologyVersion = await context
                 .MethodologyVersions.Include(m => m.Methodology)
-                .ThenInclude(m => m.Publications)
+                    .ThenInclude(m => m.Publications)
                 .FirstAsync(m => m.Id == methodologyVersionId);
 
             Assert.Equal(
