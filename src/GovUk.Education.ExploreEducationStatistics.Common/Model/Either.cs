@@ -142,6 +142,19 @@ public static class EitherExtensions
 
         return Unit.Instance;
     }
+
+    public static TSuccess? OrThrow<TFailure, TSuccess>(
+        this Either<TFailure, TSuccess> task,
+        Func<TFailure?, Exception> func
+    )
+    {
+        if (task.IsRight)
+        {
+            return task.Right;
+        }
+
+        throw func(task.Left);
+    }
 }
 
 public static class EitherTaskExtensions

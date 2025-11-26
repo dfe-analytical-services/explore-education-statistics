@@ -55,6 +55,7 @@ public abstract class UserReleaseRoleRepositoryTests
                 Assert.Equal(ReleaseRole.Contributor, result.Role);
                 Assert.Equal(createdByUser.Id, result.CreatedById);
                 result.Created.AssertUtcNow();
+                Assert.Null(result.EmailSent);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -67,6 +68,7 @@ public abstract class UserReleaseRoleRepositoryTests
                 Assert.Equal(ReleaseRole.Contributor, userReleaseRole.Role);
                 Assert.Equal(createdByUser.Id, userReleaseRole.CreatedById);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRole.Created!.Value).Milliseconds, 0, 1500);
+                Assert.Null(userReleaseRole.EmailSent);
             }
         }
     }
@@ -98,6 +100,7 @@ public abstract class UserReleaseRoleRepositoryTests
                 Assert.Equal(ReleaseRole.Contributor, result.Role);
                 Assert.Equal(createdById, result.CreatedById);
                 result.Created.AssertUtcNow();
+                Assert.Null(result.EmailSent);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -110,6 +113,7 @@ public abstract class UserReleaseRoleRepositoryTests
                 Assert.Equal(ReleaseRole.Contributor, userReleaseRole.Role);
                 Assert.Equal(createdById, userReleaseRole.CreatedById);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRole.Created!.Value).Milliseconds, 0, 1500);
+                Assert.Null(userReleaseRole.EmailSent);
             }
         }
 
@@ -123,6 +127,7 @@ public abstract class UserReleaseRoleRepositoryTests
                 Role = ReleaseRole.Approver,
                 CreatedById = Guid.NewGuid(),
                 Created = new DateTime(2021, 12, 25),
+                EmailSent = DateTimeOffset.UtcNow,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -149,6 +154,7 @@ public abstract class UserReleaseRoleRepositoryTests
                 Assert.Equal(userReleaseRole.Role, result.Role);
                 Assert.Equal(userReleaseRole.CreatedById, result.CreatedById);
                 Assert.Equal(userReleaseRole.Created, result.Created);
+                Assert.Equal(userReleaseRole.EmailSent, result.EmailSent);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -156,11 +162,12 @@ public abstract class UserReleaseRoleRepositoryTests
                 var dbUserReleaseRole = await contentDbContext.UserReleaseRoles.AsQueryable().SingleAsync();
 
                 Assert.NotEqual(Guid.Empty, dbUserReleaseRole.Id);
-                Assert.Equal(dbUserReleaseRole.UserId, dbUserReleaseRole.UserId);
-                Assert.Equal(dbUserReleaseRole.ReleaseVersionId, dbUserReleaseRole.ReleaseVersionId);
-                Assert.Equal(dbUserReleaseRole.Role, dbUserReleaseRole.Role);
-                Assert.Equal(dbUserReleaseRole.CreatedById, dbUserReleaseRole.CreatedById);
-                Assert.Equal(dbUserReleaseRole.Created, dbUserReleaseRole.Created);
+                Assert.Equal(userReleaseRole.UserId, dbUserReleaseRole.UserId);
+                Assert.Equal(userReleaseRole.ReleaseVersionId, dbUserReleaseRole.ReleaseVersionId);
+                Assert.Equal(userReleaseRole.Role, dbUserReleaseRole.Role);
+                Assert.Equal(userReleaseRole.CreatedById, dbUserReleaseRole.CreatedById);
+                Assert.Equal(userReleaseRole.Created, dbUserReleaseRole.Created);
+                Assert.Equal(userReleaseRole.EmailSent, dbUserReleaseRole.EmailSent);
             }
         }
     }
@@ -180,6 +187,7 @@ public abstract class UserReleaseRoleRepositoryTests
                 Role = ReleaseRole.Contributor,
                 CreatedById = Guid.NewGuid(),
                 Created = new DateTime(2000, 12, 25),
+                EmailSent = DateTimeOffset.UtcNow,
             };
 
             User user2 = _fixture.DefaultUser();
@@ -217,24 +225,28 @@ public abstract class UserReleaseRoleRepositoryTests
                 Assert.Equal(ReleaseRole.Contributor, userReleaseRoles[0].Role);
                 Assert.Equal(user1ReleaseRole1.CreatedById, userReleaseRoles[0].CreatedById);
                 Assert.Equal(user1ReleaseRole1.Created, userReleaseRoles[0].Created);
+                Assert.Equal(user1ReleaseRole1.EmailSent, userReleaseRoles[0].EmailSent);
 
                 Assert.Equal(user2.Id, userReleaseRoles[1].UserId);
                 Assert.Equal(releaseVersion.Id, userReleaseRoles[1].ReleaseVersionId);
                 Assert.Equal(ReleaseRole.Contributor, userReleaseRoles[1].Role);
                 Assert.Equal(createdByUser.Id, userReleaseRoles[1].CreatedById);
-                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[1].Created!.Value).Milliseconds, 0, 1500);
+                userReleaseRoles[1].Created!.Value.AssertUtcNow();
+                Assert.Null(userReleaseRoles[1].EmailSent);
 
                 Assert.Equal(user3.Id, userReleaseRoles[2].UserId);
                 Assert.Equal(releaseVersion.Id, userReleaseRoles[2].ReleaseVersionId);
                 Assert.Equal(ReleaseRole.Contributor, userReleaseRoles[2].Role);
                 Assert.Equal(createdByUser.Id, userReleaseRoles[2].CreatedById);
-                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[2].Created!.Value).Milliseconds, 0, 1500);
+                userReleaseRoles[2].Created!.Value.AssertUtcNow();
+                Assert.Null(userReleaseRoles[2].EmailSent);
 
                 Assert.Equal(user4.Id, userReleaseRoles[3].UserId);
                 Assert.Equal(releaseVersion.Id, userReleaseRoles[3].ReleaseVersionId);
                 Assert.Equal(ReleaseRole.Contributor, userReleaseRoles[3].Role);
                 Assert.Equal(createdByUser.Id, userReleaseRoles[3].CreatedById);
-                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[3].Created!.Value).Milliseconds, 0, 1500);
+                userReleaseRoles[3].Created!.Value.AssertUtcNow();
+                Assert.Null(userReleaseRoles[3].EmailSent);
             }
         }
 
@@ -2162,6 +2174,135 @@ public abstract class UserReleaseRoleRepositoryTests
                 Assert.Equal(otherUser.Id, remainingRoles[1].User.Id);
                 Assert.Equal(role2, remainingRoles[1].Role);
             }
+        }
+    }
+
+    public class MarkEmailAsSentTests : UserReleaseRoleRepositoryTests
+    {
+        [Fact]
+        public async Task UnsuppliedEmailSentDate_UpdatesEmailSentDateToUtcNow()
+        {
+            UserReleaseRole userReleaseRole = _fixture.DefaultUserReleaseRole();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.Add(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                await repository.MarkEmailAsSent(
+                    userId: userReleaseRole.UserId,
+                    releaseVersionId: userReleaseRole.ReleaseVersionId,
+                    role: userReleaseRole.Role
+                );
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedUserReleaseRole = await contentDbContext.UserReleaseRoles.SingleAsync();
+
+                Assert.Equal(userReleaseRole.Id, updatedUserReleaseRole.Id);
+                updatedUserReleaseRole.EmailSent.AssertUtcNow();
+            }
+        }
+
+        [Fact]
+        public async Task SuppliedEmailSentDate_UpdatesEmailSentDateToSuppliedDate()
+        {
+            UserReleaseRole userReleaseRole = _fixture.DefaultUserReleaseRole();
+
+            var emailSentDate = DateTimeOffset.UtcNow.AddDays(-2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.Add(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                await repository.MarkEmailAsSent(
+                    userId: userReleaseRole.UserId,
+                    releaseVersionId: userReleaseRole.ReleaseVersionId,
+                    role: userReleaseRole.Role,
+                    emailSent: emailSentDate
+                );
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedUserReleaseRole = await contentDbContext.UserReleaseRoles.SingleAsync();
+
+                Assert.Equal(userReleaseRole.Id, updatedUserReleaseRole.Id);
+                updatedUserReleaseRole.EmailSent.AssertEqual(emailSentDate);
+            }
+        }
+
+        [Fact]
+        public async Task SuppliedEmailSentDateNotInUtc_EmailSentDateIsStoredAsUniversalTime()
+        {
+            UserReleaseRole userReleaseRole = _fixture.DefaultUserReleaseRole();
+
+            // Supply a local date with a +2 hour offset (not UTC)
+            var emailSentDateWithOffset = new DateTimeOffset(2025, 1, 15, 10, 0, 0, TimeSpan.FromHours(2));
+            var expectedUtcDate = emailSentDateWithOffset.ToUniversalTime();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.Add(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                await repository.MarkEmailAsSent(
+                    userId: userReleaseRole.UserId,
+                    releaseVersionId: userReleaseRole.ReleaseVersionId,
+                    role: userReleaseRole.Role,
+                    emailSent: emailSentDateWithOffset
+                );
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedUserReleaseRole = await contentDbContext.UserReleaseRoles.SingleAsync();
+
+                Assert.Equal(userReleaseRole.Id, updatedUserReleaseRole.Id);
+
+                // The stored value should be in UTC
+                Assert.Equal(expectedUtcDate, updatedUserReleaseRole.EmailSent);
+                Assert.Equal(TimeSpan.Zero, updatedUserReleaseRole.EmailSent!.Value.Offset);
+            }
+        }
+
+        [Fact]
+        public async Task UserReleaseRoleDoesNotExist_Throws()
+        {
+            await using var contentDbContext = InMemoryApplicationDbContext();
+
+            var repository = CreateRepository(contentDbContext);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await repository.MarkEmailAsSent(
+                    userId: Guid.NewGuid(),
+                    releaseVersionId: Guid.NewGuid(),
+                    role: ReleaseRole.PrereleaseViewer
+                )
+            );
         }
     }
 

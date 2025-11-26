@@ -214,6 +214,8 @@ Upload a replacement data set
     user waits until page contains data uploads table
     user uploads subject replacement    Dates test subject    dates-replacement.csv
     ...    dates-replacement.meta.csv
+    user waits until page contains element    testid:Data file replacements table
+    user confirms replacement upload    Dates test subject
 
 Confirm data replacement via quick action
     user waits until page contains element    testid:Data file replacements table
@@ -232,6 +234,8 @@ Upload a replacement data set using the button
     user chooses file    id:dataFileReplacementUploadForm-dataFile    ${FILES_DIR}dates-replacement.csv
     user chooses file    id:dataFileReplacementUploadForm-metadataFile    ${FILES_DIR}dates-replacement.meta.csv
     user clicks element    testid:upload-replacement-files-button
+    user waits until page contains element    testid:Data file replacements table
+    user confirms replacement upload    Dates test subject
 
 Confirm data replacement via quick action
     user waits until page contains element    testid:Data file replacements table
@@ -314,7 +318,8 @@ Edit data block for amendment
 
     user clicks element    testid:wizardStep-4-goToButton
 
-    user opens details dropdown    Date
+    user scrolls to element    id:filtersForm-filters
+    user clicks button    Date
     user clicks category checkbox    Date    24/03/2020
     user checks category checkbox is checked    Date    24/03/2020
 

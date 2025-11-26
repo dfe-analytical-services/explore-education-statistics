@@ -13,7 +13,6 @@ import {
   ChartDefinition,
   ChartProps,
   DataGroupingType,
-  MapCategoricalDataConfig,
   MapConfig,
   MapLegendItem,
 } from '@common/modules/charts/types/chart';
@@ -33,7 +32,10 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MapContainer } from 'react-leaflet';
 import useToggle from '@common/hooks/useToggle';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import { useMobileMedia } from '@common/hooks/useMedia';
 import generateDataSetKey from '../util/generateDataSetKey';
+
+export const maxMapDataGroups = 5;
 
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
@@ -64,9 +66,6 @@ export interface MapBlockProps extends ChartProps {
   position?: { lat: number; lng: number };
   boundaryLevel: number;
   onBoundaryLevelChange: (boundaryLevel: number) => Promise<void>;
-  onChangeCategoricalDataConfig?: (
-    categoricalDataConfig: MapCategoricalDataConfig[],
-  ) => Promise<void>;
 }
 
 export const mapBlockDefinition: ChartDefinition = {
@@ -75,6 +74,7 @@ export const mapBlockDefinition: ChartDefinition = {
   capabilities: {
     canIncludeNonNumericData: false,
     canPositionLegendInline: false,
+    canReorderDataCategories: true,
     canSetBarThickness: false,
     canSetDataLabelColour: false,
     canSetDataLabelPosition: false,
@@ -130,10 +130,15 @@ export default function MapBlock({
   title,
   boundaryLevel,
   onBoundaryLevelChange,
-  onChangeCategoricalDataConfig,
 }: MapBlockProps) {
+  const { isMedia: isMobileMedia } = useMobileMedia();
   const [isBoundaryLevelChanging, toggleBoundaryLevelChanging] =
     useToggle(false);
+  const [showMobileOverlay, toggleMobileOverlay] = useToggle(isMobileMedia);
+
+  useEffect(() => {
+    toggleMobileOverlay(isMobileMedia);
+  }, [isMobileMedia, toggleMobileOverlay]);
 
   const axisMajor = useMemo<AxisConfiguration>(
     () => ({
@@ -198,31 +203,29 @@ export default function MapBlock({
 
   const [legendItems, setLegendItems] = useState<MapLegendItem[]>([]);
 
-  const [categoricalDataGroups, setCategoricalDataGroups] = useState<
-    MapCategoricalDataConfig[] | undefined
-  >([]);
-
   const selectedDataSetConfig = dataSetCategoryConfigs[selectedDataSetKey];
 
   const selectedDataSet =
     selectedFeature?.properties?.dataSets[selectedDataSetKey];
 
+  useEffect(() => {
+    if (!selectedDataSetKey) {
+      setSelectedDataSetKey(dataSetOptions[0]?.value as string);
+    }
+  }, [dataSetOptions, selectedDataSetKey]);
+
   // Rebuild the geometry if the selection has changed
   useEffect(() => {
     if (dataSetCategories.length && selectedDataSetConfig) {
-      const {
-        features: newFeatures,
-        legendItems: newLegendItems,
-        categoricalDataGroups: newCategoricalDataGroups,
-      } = generateFeaturesAndDataGroups({
-        categoricalDataConfig: map?.categoricalDataConfig,
-        selectedDataSetConfig,
-        dataSetCategories,
-      });
+      const { features: newFeatures, legendItems: newLegendItems } =
+        generateFeaturesAndDataGroups({
+          deprecatedCategoricalDataConfig: map?.categoricalDataConfig,
+          selectedDataSetConfig,
+          dataSetCategories,
+        });
 
       setFeatures(newFeatures);
       setLegendItems(newLegendItems);
-      setCategoricalDataGroups(newCategoricalDataGroups);
     }
   }, [
     dataSetCategories,
@@ -231,12 +234,6 @@ export default function MapBlock({
     selectedDataSetConfig,
     selectedDataSetKey,
   ]);
-
-  useEffect(() => {
-    if (categoricalDataGroups?.length) {
-      onChangeCategoricalDataConfig?.(categoricalDataGroups);
-    }
-  }, [categoricalDataGroups, onChangeCategoricalDataConfig]);
 
   const handleLocationChange = useCallback(
     (value: string) => {
@@ -307,9 +304,23 @@ export default function MapBlock({
           >
             Skip to end of map
           </a>
+
+          {showMobileOverlay && (
+            <button
+              className={styles.mobileOverlayButton}
+              type="button"
+              onClick={toggleMobileOverlay.off}
+            >
+              <span className={styles.mobileOverlayButtonText}>
+                Tap to enable interactive map
+              </span>
+            </button>
+          )}
+
           <MapContainer
             style={{
               height: `${height || 600}px`,
+              maxHeight: '70vh',
             }}
             className={classNames(styles.map, 'dfe-print-break-avoid')}
             center={position}

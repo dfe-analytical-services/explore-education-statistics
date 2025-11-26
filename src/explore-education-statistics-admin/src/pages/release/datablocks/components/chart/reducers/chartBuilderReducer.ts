@@ -2,6 +2,7 @@ import {
   MapBoundaryLevelConfig,
   MapDataGroupingConfig,
 } from '@admin/pages/release/datablocks/components/chart/types/mapConfig';
+import getMapDataSetConfigs from '@admin/pages/release/datablocks/components/chart/utils/getMapDataSetConfigs';
 import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import {
   AxesConfiguration,
@@ -12,14 +13,11 @@ import {
   ChartDefinitionAxis,
   ChartDefinitionOptions,
   chartDefinitions,
-  MapCategoricalDataConfig,
   MapConfig,
   MapDataSetConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
-import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
-import getMapDataSetCategoryConfigs from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import deepMerge from 'deepmerge';
@@ -69,12 +67,12 @@ export type ChartBuilderActions =
       payload: MapBoundaryLevelConfig;
     }
   | {
-      type: 'UPDATE_MAP_DATA_GROUPINGS';
-      payload: MapDataGroupingConfig;
+      type: 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG';
+      payload: MapDataSetConfig;
     }
   | {
-      type: 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG';
-      payload: MapCategoricalDataConfig[];
+      type: 'UPDATE_MAP_DATA_GROUPINGS';
+      payload: MapDataGroupingConfig;
     }
   | {
       type: 'UPDATE_CHART_AXIS';
@@ -226,55 +224,11 @@ function getInitialMapState({
       axisMajor: axes.major,
       data,
       legend,
-      map,
+      mapDataSetConfigs: map?.dataSetConfigs,
       meta,
       options,
     }),
-    categoricalDataConfig: map?.categoricalDataConfig,
   };
-}
-
-function getMapDataSetConfigs({
-  axisMajor,
-  data,
-  legend,
-  map,
-  meta,
-  options,
-}: {
-  axisMajor: AxisConfiguration;
-  data: TableDataResult[];
-  legend?: LegendConfiguration;
-  map?: MapConfig;
-  meta: FullTableMeta;
-  options?: ChartOptions;
-}): MapDataSetConfig[] {
-  const dataSetCategories = createDataSetCategories({
-    axisConfiguration: {
-      ...axisMajor,
-      groupBy: 'locations',
-    },
-    data,
-    includeNonNumericData: true,
-    meta,
-  });
-
-  const dataSetCategoryConfigs = getMapDataSetCategoryConfigs({
-    dataSetCategories,
-    dataSetConfigs: map?.dataSetConfigs,
-    legendItems: legend?.items ?? [],
-    meta,
-    deprecatedDataClassification: options?.dataClassification,
-    deprecatedDataGroups: options?.dataGroups,
-  });
-
-  return dataSetCategoryConfigs.map(config => {
-    return {
-      boundaryLevel: config.boundaryLevel,
-      dataSet: config.rawDataSet,
-      dataGrouping: config.dataGrouping,
-    };
-  });
 }
 
 export function chartBuilderReducer(
@@ -384,6 +338,20 @@ export function chartBuilderReducer(
 
         break;
       }
+      case 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG': {
+        if (!draft.map) {
+          throw new Error('Map config has not been initialised');
+        }
+
+        draft.map.dataSetConfigs = draft.map.dataSetConfigs.map(config => {
+          if (config.dataSetKey === action.payload.dataSetKey) {
+            return action.payload;
+          }
+          return config;
+        });
+
+        break;
+      }
       case 'UPDATE_MAP_DATA_GROUPINGS': {
         if (!draft.map) {
           throw new Error('Map config has not been initialised');
@@ -394,15 +362,6 @@ export function chartBuilderReducer(
           dataSetConfig.dataGrouping =
             action.payload.dataSetConfigs[index].dataGrouping;
         });
-
-        break;
-      }
-      case 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG': {
-        if (!draft.map) {
-          throw new Error('Map config has not been initialised');
-        }
-
-        draft.map.categoricalDataConfig = action.payload;
 
         break;
       }
@@ -426,11 +385,10 @@ export function chartBuilderReducer(
             axisMajor: draft.axes.major,
             data,
             legend: draft.legend,
-            map: draft.map,
+            mapDataSetConfigs: draft.map.dataSetConfigs,
             meta,
             options: draft.options,
           });
-          draft.map.categoricalDataConfig = [];
         }
 
         break;
@@ -501,21 +459,21 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
     [dispatch],
   );
 
-  const updateMapDataGroupings = useCallback(
-    (dataSetConfigs: MapDataGroupingConfig) => {
+  const updateMapCategoricalDataConfig = useCallback(
+    (payload: MapDataSetConfig) => {
       dispatch({
-        type: 'UPDATE_MAP_DATA_GROUPINGS',
-        payload: dataSetConfigs,
+        type: 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG',
+        payload,
       });
     },
     [dispatch],
   );
 
-  const updateMapCategoricalDataConfig = useCallback(
-    (categoricalDataConfig: MapCategoricalDataConfig[]) => {
+  const updateMapDataGroupings = useCallback(
+    (dataSetConfigs: MapDataGroupingConfig) => {
       dispatch({
-        type: 'UPDATE_MAP_CATEGORICAL_DATA_CONFIG',
-        payload: categoricalDataConfig,
+        type: 'UPDATE_MAP_DATA_GROUPINGS',
+        payload: dataSetConfigs,
       });
     },
     [dispatch],
@@ -543,8 +501,8 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
       updateChartDefinition,
       updateChartLegend,
       updateMapBoundaryLevels,
-      updateMapDataGroupings,
       updateMapCategoricalDataConfig,
+      updateMapDataGroupings,
       updateChartOptions,
       updateChartAxis,
       resetState,
@@ -554,8 +512,8 @@ export function useChartBuilderReducer(options: ChartBuilderReducerOptions) {
       updateChartDefinition,
       updateChartLegend,
       updateMapBoundaryLevels,
-      updateMapDataGroupings,
       updateMapCategoricalDataConfig,
+      updateMapDataGroupings,
       updateChartOptions,
       updateChartAxis,
       resetState,

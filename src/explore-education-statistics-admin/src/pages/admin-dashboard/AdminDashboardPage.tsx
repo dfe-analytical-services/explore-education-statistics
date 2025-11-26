@@ -11,16 +11,38 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import methodologyQueries from '@admin/queries/methodologyQueries';
 import { handleLogout } from '@admin/auth/msal';
 import ButtonText from '@common/components/ButtonText';
+import { useLocation } from 'react-router';
+
+const dashboardTabs = {
+  publications: { id: 'publications', title: 'Your publications' },
+  draftReleases: { id: 'draft-releases', title: 'Draft releases' },
+  approvals: { id: 'approvals', title: 'Your approvals' },
+  scheduledReleases: {
+    id: 'scheduled-releases',
+    title: 'Approved scheduled releases',
+  },
+};
 
 const AdminDashboardPage = () => {
   const { user } = useAuthContext();
+  const { hash } = useLocation();
   const isBauUser = user?.permissions.isBauUser ?? false;
   const isApprover = user?.permissions.isApprover ?? false;
+
+  const tabTitleFromHash = hash
+    ? Object.values(dashboardTabs).find(tab => tab.id === hash.replace('#', ''))
+        ?.title
+    : undefined;
+  const defaultTabTitle = dashboardTabs.publications.title;
+
+  const [tabTitle, setTabTitle] = useState<string>(
+    tabTitleFromHash ?? defaultTabTitle,
+  );
 
   const {
     data: draftReleases = [],
@@ -60,6 +82,7 @@ const AdminDashboardPage = () => {
         <div className="govuk-grid-column-two-thirds">
           <PageTitle
             caption={`Welcome ${user?.name}`}
+            metaTitle={`${tabTitle} - Dashboard`}
             title="Dashboard"
             className="govuk-!-margin-bottom-4"
           />
@@ -110,15 +133,23 @@ const AdminDashboardPage = () => {
         </div>
       </div>
 
-      <Tabs id="dashboardTabs">
-        <TabsSection id="publications" title="Your publications">
+      <Tabs
+        id="dashboardTabs"
+        onToggle={section => {
+          setTabTitle(section.title);
+        }}
+      >
+        <TabsSection
+          id={dashboardTabs.publications.id}
+          title={dashboardTabs.publications.title}
+        >
           <PublicationsTab isBauUser={isBauUser} />
         </TabsSection>
         <TabsSection
           lazy
-          id="draft-releases"
+          id={dashboardTabs.draftReleases.id}
           data-testid="publication-draft-releases"
-          title={`Draft releases ${
+          title={`${dashboardTabs.draftReleases.title} ${
             !isLoadingDraftReleases ? `(${draftReleases.length})` : ''
           }`}
         >
@@ -133,9 +164,9 @@ const AdminDashboardPage = () => {
         {isApprover && (
           <TabsSection
             lazy
-            id="approvals"
+            id={dashboardTabs.approvals.id}
             data-testid="publication-approvals"
-            title={`Your approvals ${
+            title={`${dashboardTabs.approvals.title} ${
               !isLoadingApprovals ? `(${totalApprovals})` : ''
             }`}
           >
@@ -149,8 +180,8 @@ const AdminDashboardPage = () => {
 
         <TabsSection
           lazy
-          id="scheduled-releases"
-          title={`Approved scheduled releases ${
+          id={dashboardTabs.scheduledReleases.id}
+          title={`${dashboardTabs.scheduledReleases.title} ${
             !isLoadingScheduledReleases ? `(${scheduledReleases.length})` : ''
           }`}
         >

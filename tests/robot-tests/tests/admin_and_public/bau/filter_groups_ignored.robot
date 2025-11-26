@@ -78,7 +78,7 @@ Select subject for data block
     user checks previous table tool step contains    1    Data set    ${SUBJECT_1_NAME}
 
 Select locations
-    user clicks element    testid:Expand Details Section Local authority
+    user clicks button    Local authority
     user clicks checkbox    Barnsley
     user clicks checkbox    Birmingham
 
@@ -94,7 +94,8 @@ Select time period
     user waits until table tool wizard step is available    4    Choose your filters
 
 Verify that only one filter is shown (Filter groups ignored by table tool)
-    @{filter_item_details_sections}=    Get WebElements    //*[starts-with(@data-testid, 'Expand Details Section')]
+    ${filter_item_details_sections}=    get child elements    id:filtersForm-filters
+    ...    css:[data-testid="filter-accordion-button"]
     Length Should Be    ${filter_item_details_sections}    1
 
 Approve first release
@@ -139,7 +140,7 @@ Create a new table using the table tool
     user clicks element    id:publicationDataStepForm-submit
 
     user waits until table tool wizard step is available    3    Choose locations
-    user clicks element    testid:Expand Details Section Local authority
+    user clicks button    Local authority
     user clicks checkbox    Barnsley
     user clicks checkbox    Birmingham
     user clicks element    id:locationFiltersForm-submit
@@ -153,6 +154,7 @@ Create a new table using the table tool
 Verify filter used in filter_grouping_column is ignored in the table tool
     user waits until table tool wizard step is available    5    Choose your filters
     user waits until element is visible
-    ...    xpath://*[@data-testid="Expand Details Section Name of course being studied"]
-    @{filter_item_details_sections}=    Get WebElements    //*[starts-with(@data-testid, 'Expand Details Section')]
+    ...    xpath://*[@data-testid="filter-accordion-button"]
+    ${filter_item_details_sections}=    get child elements    id:filtersForm-filters
+    ...    css:[data-testid="filter-accordion-button"]
     Length Should Be    ${filter_item_details_sections}    1

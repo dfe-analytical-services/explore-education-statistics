@@ -10,6 +10,7 @@ import {
   ChartDefinition,
   ChartSymbol,
   LineStyle,
+  MapDataSetConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSet, DataSetCategory } from '@common/modules/charts/types/dataSet';
 import {
@@ -47,28 +48,30 @@ export type ChartLegendFormValues = LegendConfiguration;
 const formId = 'chartLegendConfigurationForm';
 
 interface Props {
-  allowColourSelection?: boolean;
   axisMajor: AxisConfiguration;
   buttons?: ReactNode;
   data: TableDataResult[];
   definition: ChartDefinition;
   legend: LegendConfiguration;
+  mapDataSetConfigs?: MapDataSetConfig[];
   meta: FullTableMeta;
   showDataLabels?: boolean;
   onChange: (legend: LegendConfiguration) => void;
+  onReorderCategories: (mapDataSetConfig: MapDataSetConfig) => void;
   onSubmit: (legend: LegendConfiguration) => void;
 }
 
 const ChartLegendConfiguration = ({
-  allowColourSelection = true,
   axisMajor,
   buttons,
   data,
   definition,
   legend,
+  mapDataSetConfigs,
   meta,
   showDataLabels,
   onChange,
+  onReorderCategories,
   onSubmit,
 }: Props) => {
   const { capabilities } = definition;
@@ -274,7 +277,7 @@ const ChartLegendConfiguration = ({
               onMount={updateForm}
             />
 
-            {validationSchema.fields.position && (
+            {capabilities.hasLegendPosition && (
               <FormFieldSelect<ChartLegendFormValues>
                 name="position"
                 hint={
@@ -298,9 +301,10 @@ const ChartLegendConfiguration = ({
 
             <ChartLegendItems
               capabilities={capabilities}
-              allowColourSelection={allowColourSelection}
+              mapDataSetConfigs={mapDataSetConfigs}
               position={values.position}
               onChange={onChange}
+              onReorderCategories={onReorderCategories}
             />
 
             <ChartBuilderSaveActions

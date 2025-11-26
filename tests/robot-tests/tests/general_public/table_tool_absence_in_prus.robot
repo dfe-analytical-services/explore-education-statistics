@@ -33,7 +33,7 @@ Select subject "Absence in PRUs"
     user checks previous table tool step contains    2    Data set    Absence in PRUs
 
 Select Location Country, England
-    user opens details dropdown    National
+    user clicks button    National
     user clicks checkbox    England
     user clicks element    id:locationFiltersForm-submit
     user waits until table tool wizard step is available    4    Choose time period
@@ -82,7 +82,7 @@ Go back to Locations step
 
 Unselect England as a location
     [Documentation]    DFE-1142    EES-231
-    user opens details dropdown    National
+    user clicks button    National
     user clicks checkbox    England
     user checks page contains element
     ...    xpath://*[@class="govuk-error-message" and text()="Select at least one location"]
@@ -91,10 +91,10 @@ Unselect England as a location
     user sets focus to element    id:locationFiltersForm-submit
     user waits until page contains    Select at least one location
 
-    user closes details dropdown    National
+    user clicks button    National
 
 Select locations LAs Barnet, Barnsley, Bedford
-    user opens details dropdown    Local authority
+    user clicks button    Local authority
     user clicks checkbox    Barnet
     user clicks checkbox    Barnsley
     user clicks checkbox    Bedford

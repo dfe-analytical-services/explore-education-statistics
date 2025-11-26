@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.21")
+                .HasAnnotation("ProductVersion", "8.0.22")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -1558,6 +1558,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset?>("EmailSent")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1629,6 +1632,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("EmailSent")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("ReleaseVersionId")
                         .HasColumnType("uniqueidentifier");

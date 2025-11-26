@@ -228,6 +228,7 @@ Replace subject data
     user uploads subject replacement    ${SUBJECT_NAME}    grouped-filters-and-indicators-replacement.csv
     ...    grouped-filters-and-indicators-replacement.meta.csv
     user waits until page contains element    testid:Data file replacements table
+    user confirms replacement upload    ${SUBJECT_NAME}
 
 Confirm data replacement details on replacement page
     user checks table cell contains    1    1    ${SUBJECT_NAME}    testid:Data file replacements table
@@ -439,7 +440,7 @@ Select subject
     user checks previous table tool step contains    2    Data set    ${SUBJECT_NAME}
 
 Select all provider locations
-    user opens details dropdown    Provider
+    user clicks button    Provider
     user clicks button    Select all 2 options
     user clicks element    id:locationFiltersForm-submit
     user waits until table tool wizard step is available    4    Choose time period
@@ -479,14 +480,14 @@ Check filters match the expected order
     ...    Filter 1
 
 Check filter groups match the expected order
-    user opens details dropdown    Filter 2
+    user clicks button    Filter 2
     user checks filter contains exact items in order
     ...    Total
     ...    Filter 2 group 1
     ...    Filter 2 group 2
     ...    filter_label=Filter 2
 
-    user opens details dropdown    Filter 1
+    user clicks button    Filter 1
     user checks filter contains exact items in order
     ...    Total
     ...    Filter 1 group 2
@@ -596,7 +597,7 @@ Go back to locations step
     user waits until table tool wizard step is available    3    Choose locations
 
 Select provider 1
-    user opens details dropdown    Provider
+    user clicks button    Provider
     user clicks button    Unselect all 2 options    css:#locationFiltersForm
     user checks page contains element
     ...    xpath://*[@class="govuk-error-message" and text()="Select at least one location"]
@@ -617,7 +618,6 @@ Select a single indicator
     user clicks category checkbox    Indicator group 1    Indicator 1
 
 Select all filter 1's filters
-    user opens details dropdown    Filter 1
     user clicks category checkbox    Total    Total
     user clicks category checkbox    Filter 1 group 2    F1G2-2
     user clicks select all for category    Filter 1 group 1

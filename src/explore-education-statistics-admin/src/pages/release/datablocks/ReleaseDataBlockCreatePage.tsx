@@ -1,4 +1,5 @@
 import Link from '@admin/components/Link';
+import PageMetaTitle from '@admin/components/PageMetaTitle';
 import DataBlockPageTabs from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import {
   releaseDataBlockEditRoute,
@@ -45,6 +46,7 @@ const ReleaseDataBlockCreatePage = ({
 
   return (
     <>
+      <PageMetaTitle title="Create data block" />
       <Link
         back
         className="govuk-!-margin-bottom-6"

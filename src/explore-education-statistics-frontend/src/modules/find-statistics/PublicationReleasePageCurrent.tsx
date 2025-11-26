@@ -400,7 +400,8 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {releaseVersion.publication.externalMethodology.title}
+                        {releaseVersion.publication.externalMethodology.title}{' '}
+                        (opens in new tab)
                       </Link>
                     </li>
                   )}

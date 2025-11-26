@@ -21,6 +21,8 @@ public abstract class ResourceRole<TRoleEnum, TResource>
 
     public TRoleEnum Role { get; set; }
 
+    public DateTimeOffset? EmailSent { get; set; }
+
     public Guid? CreatedById { get; set; }
 
     public User? CreatedBy { get; set; }

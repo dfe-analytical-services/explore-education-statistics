@@ -1,5 +1,6 @@
 import styles from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration.module.scss';
 import { ChartLegendFormValues } from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration';
+import ChartReorderCategories from '@admin/pages/release/datablocks/components/chart/ChartReorderCategories';
 import {
   legendInlinePositions,
   colours,
@@ -19,7 +20,12 @@ import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
-import { ChartCapabilities } from '@common/modules/charts/types/chart';
+import { DataSet } from '@common/modules/charts/types/dataSet';
+import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
+import {
+  ChartCapabilities,
+  MapDataSetConfig,
+} from '@common/modules/charts/types/chart';
 import { Dictionary } from '@common/types';
 import upperFirst from 'lodash/upperFirst';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
@@ -50,17 +56,19 @@ const inlinePositionOptions: SelectOption[] = legendInlinePositions.map(
 );
 
 interface Props {
-  allowColourSelection?: boolean;
   capabilities: ChartCapabilities;
+  mapDataSetConfigs?: MapDataSetConfig[];
   position?: LegendPosition;
   onChange: (legend: LegendConfiguration) => void;
+  onReorderCategories: (mapDataSetConfig: MapDataSetConfig) => void;
 }
 
 export default function ChartLegendItems({
-  allowColourSelection,
   capabilities,
+  mapDataSetConfigs,
   position,
   onChange,
+  onReorderCategories,
 }: Props) {
   const { fields } = useFieldArray({
     name: 'items',
@@ -75,6 +83,11 @@ export default function ChartLegendItems({
       onChange({ items: currentItems });
     }
   }, 200);
+
+  const getMapDataSetConfig = (dataSet: DataSet) => {
+    const key = generateDataSetKey(dataSet);
+    return mapDataSetConfigs?.find(config => config.dataSetKey === key);
+  };
 
   return (
     <div className="dfe-overflow-x--auto govuk-!-margin-bottom-6">
@@ -94,6 +107,11 @@ export default function ChartLegendItems({
             const fieldErrorDetails = fieldErrors
               ? Object.values(fieldErrors as Dictionary<{ message: string }>)
               : [];
+            const mapDataSetConfig = getMapDataSetConfig(
+              currentItems[index].dataSet,
+            );
+            const allowColourSelection =
+              !mapDataSetConfig?.categoricalDataConfig?.length;
 
             return (
               <div key={item.id} className={styles.item}>
@@ -187,6 +205,17 @@ export default function ChartLegendItems({
                         </div>
                       </>
                     )}
+                    {capabilities.canReorderDataCategories &&
+                      mapDataSetConfig &&
+                      mapDataSetConfig.categoricalDataConfig && (
+                        <ChartReorderCategories
+                          label={currentItems[index].label}
+                          mapDataSetConfig={mapDataSetConfig}
+                          onReorder={updatedConfig =>
+                            onReorderCategories(updatedConfig)
+                          }
+                        />
+                      )}
                   </div>
                 </FormFieldset>
               </div>

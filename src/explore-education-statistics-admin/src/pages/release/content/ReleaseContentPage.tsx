@@ -22,6 +22,7 @@ import ButtonText from '@common/components/ButtonText';
 import classNames from 'classnames';
 import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router';
+import ReleaseContentRedesign from '@admin/pages/release/content/components/ReleaseContentRedesign';
 
 const ReleaseContentPageLoaded = () => {
   const { canUpdateRelease, release, featuredTables } =
@@ -30,6 +31,10 @@ const ReleaseContentPageLoaded = () => {
     useState<string>();
   const canPreviewRelease =
     canUpdateRelease || (!canUpdateRelease && !release.published);
+
+  const previewRedesign =
+    new URLSearchParams(window.location.search).get('redesign') === 'true' &&
+    !window.location.href.includes('admin.explore');
 
   return (
     <EditingContextProvider
@@ -42,6 +47,29 @@ const ReleaseContentPageLoaded = () => {
         totalUnresolvedComments,
         totalUnsavedBlocks,
       }) => {
+        const transformFeaturedTableLinks = (url: string, text: string) => {
+          return (
+            <ButtonText
+              onClick={() => {
+                // the url format is `/data-tables/fast-track/<data-block-parent-id>?featuredTables`
+                // so split twice to get the dataBlockParentId.
+                const dataBlockParentId = url
+                  .split('fast-track/')[1]
+                  .split('?')[0];
+                const featuredTable = featuredTables?.find(
+                  table => table.dataBlockParentId === dataBlockParentId,
+                );
+                if (featuredTable) {
+                  setEditingMode('table-preview');
+                  setPreviewFeaturedTableId(featuredTable.dataBlockId);
+                }
+              }}
+            >
+              {text}
+            </ButtonText>
+          );
+        };
+
         return (
           <>
             {editingMode === 'edit' && (
@@ -84,7 +112,10 @@ const ReleaseContentPageLoaded = () => {
             <div
               className={classNames({
                 [`govuk-width-container ${styles.container}`]:
-                  editingMode !== 'table-preview',
+                  editingMode === 'edit' ||
+                  (editingMode === 'preview' && !previewRedesign),
+                'govuk-width-container dfe-width-container--wide':
+                  editingMode === 'preview' && previewRedesign,
               })}
             >
               <div
@@ -96,49 +127,33 @@ const ReleaseContentPageLoaded = () => {
               >
                 {editingMode !== 'table-preview' && (
                   <>
-                    <span className="govuk-caption-l">{release.title}</span>
-
-                    <h2 className="govuk-heading-l dfe-print-break-before">
-                      {release.publication.title}
-                    </h2>
-
-                    <ReleaseContentHubContextProvider
-                      releaseVersionId={release.id}
-                    >
-                      <ReleaseContent
+                    {previewRedesign && editingMode === 'preview' ? (
+                      <ReleaseContentRedesign
                         transformFeaturedTableLinks={
-                          canPreviewRelease
-                            ? (url: string, text: string) => {
-                                return (
-                                  <ButtonText
-                                    onClick={() => {
-                                      // the url format is `/data-tables/fast-track/<data-block-parent-id>?featuredTables`
-                                      // so split twice to get the dataBlockParentId.
-                                      const dataBlockParentId = url
-                                        .split('fast-track/')[1]
-                                        .split('?')[0];
-                                      const featuredTable =
-                                        featuredTables?.find(
-                                          table =>
-                                            table.dataBlockParentId ===
-                                            dataBlockParentId,
-                                        );
-                                      if (featuredTable) {
-                                        setEditingMode('table-preview');
-                                        setPreviewFeaturedTableId(
-                                          featuredTable.dataBlockId,
-                                        );
-                                      }
-                                    }}
-                                  >
-                                    {text}
-                                  </ButtonText>
-                                );
-                              }
-                            : undefined
+                          transformFeaturedTableLinks
                         }
                       />
-                    </ReleaseContentHubContextProvider>
+                    ) : (
+                      <>
+                        <span className="govuk-caption-l">{release.title}</span>
+
+                        <h2 className="govuk-heading-l dfe-print-break-before">
+                          {release.publication.title}
+                        </h2>
+
+                        <ReleaseContentHubContextProvider
+                          releaseVersionId={release.id}
+                        >
+                          <ReleaseContent
+                            transformFeaturedTableLinks={
+                              canPreviewRelease
+                                ? transformFeaturedTableLinks
+                                : undefined
+                            }
+                          />
+                        </ReleaseContentHubContextProvider>
+                      </>
+                    )}
                   </>
                 )}
                 {editingMode === 'table-preview' && (

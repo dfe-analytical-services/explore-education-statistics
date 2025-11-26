@@ -49,7 +49,10 @@ public class SignInServiceTests
             .WithReleaseVersion(_dataFixture.DefaultReleaseVersion())
             .WithCreatedById(CreatedById)
             .ForIndex(0, s => s.SetRole(ReleaseRole.Contributor))
-            .ForIndex(1, s => s.SetRole(ReleaseRole.Approver))
+            // (This comment and change can be removed in EES-6511)
+            // Set `EmailSent` to true for one invite to test that the corresponding role is marked
+            // with an `EmailSent` timestamp upon activation.
+            .ForIndex(1, s => s.SetRole(ReleaseRole.Approver).SetEmailSent(true))
             .ForIndex(2, s => s.SetRole(ReleaseRole.PrereleaseViewer))
             .GenerateList(3);
 
@@ -111,6 +114,21 @@ public class SignInServiceTests
                     )
                 )
                 .ReturnsAsync(new UserReleaseRole());
+
+            if (userReleaseInvite.EmailSent)
+            {
+                userReleaseRoleRepository
+                    .Setup(mock =>
+                        mock.MarkEmailAsSent(
+                            It.IsAny<Guid>(),
+                            userReleaseInvite.ReleaseVersionId,
+                            userReleaseInvite.Role,
+                            DateTimeOffset.MinValue,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .Returns(Task.CompletedTask);
+            }
         }
 
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
@@ -126,6 +144,18 @@ public class SignInServiceTests
                     )
                 )
                 .ReturnsAsync(new UserPublicationRole());
+
+            userPublicationRoleRepository
+                .Setup(mock =>
+                    mock.MarkEmailAsSent(
+                        It.IsAny<Guid>(),
+                        userPublicationInvite.PublicationId,
+                        userPublicationInvite.Role,
+                        DateTimeOffset.MinValue,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .Returns(Task.CompletedTask);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

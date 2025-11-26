@@ -8,7 +8,7 @@ END TRY
 BEGIN CATCH
     DECLARE @errorMessage NVARCHAR(max) = ERROR_MESSAGE();
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
-    DECLARE @errorState INT = ERROR_SEVERITY();
+    DECLARE @errorState INT = ERROR_STATE();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
     DECLARE @subjectIdString NVARCHAR(50) = CONVERT(nvarchar(50), @subjectId);
     DECLARE @footnoteIdString NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
@@ -29,7 +29,7 @@ END TRY
 BEGIN CATCH
     DECLARE @errorMessage NVARCHAR(max) = ERROR_MESSAGE();
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
-    DECLARE @errorState INT = ERROR_SEVERITY();
+    DECLARE @errorState INT = ERROR_STATE();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
     DECLARE @subjectIdString NVARCHAR(50) = CONVERT(nvarchar(50), @subjectId);
     DECLARE @footnoteIdString NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
@@ -50,7 +50,7 @@ END TRY
 BEGIN CATCH
     DECLARE @errorMessage NVARCHAR(max) = ERROR_MESSAGE();
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
-    DECLARE @errorState INT = ERROR_SEVERITY();
+    DECLARE @errorState INT = ERROR_STATE();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
     DECLARE @subjectIdString NVARCHAR(50) = CONVERT(nvarchar(50), @subjectId);
     DECLARE @footnoteIdString NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
@@ -71,7 +71,7 @@ END TRY
 BEGIN CATCH
     DECLARE @errorMessage NVARCHAR(max) = ERROR_MESSAGE();
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
-    DECLARE @errorState INT = ERROR_SEVERITY();
+    DECLARE @errorState INT = ERROR_STATE();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
     DECLARE @subjectIdString NVARCHAR(50) = CONVERT(nvarchar(50), @subjectId);
     DECLARE @footnoteIdString NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);
@@ -92,7 +92,7 @@ END TRY
 BEGIN CATCH
     DECLARE @errorMessage NVARCHAR(max) = ERROR_MESSAGE();
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
-    DECLARE @errorState INT = ERROR_SEVERITY();
+    DECLARE @errorState INT = ERROR_STATE();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
     DECLARE @subjectIdString NVARCHAR(50) = CONVERT(nvarchar(50), @subjectId);
     DECLARE @footnoteIdString NVARCHAR(50) = CONVERT(nvarchar(50), @footnoteId);

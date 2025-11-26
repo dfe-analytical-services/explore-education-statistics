@@ -12,6 +12,7 @@ public interface IReleaseDataFileRepository
         long contentLength,
         FileType type,
         Guid createdById,
+        bool? apiCompatible = null,
         string? name = null,
         File? replacingDataFile = null,
         int order = 0

@@ -53,7 +53,7 @@ Validate back takes you to step 2
     user clicks element    id:publicationDataStepForm-submit
 
 Select Location Country, England
-    user opens details dropdown    National
+    user clicks button    National
     user clicks checkbox    England
     user clicks element    id:locationFiltersForm-submit
     # Extra timeout until EES-315/316
@@ -81,7 +81,7 @@ Select Indicators - Unauthorised absence rate
     user checks subheaded indicator checkbox is checked    Absence fields    Unauthorised absence rate
 
 Select Characteristics
-    user opens details dropdown    Characteristic
+    user clicks button    Characteristic
     user clicks category checkbox    Characteristic    Gender female
     user clicks category checkbox    Characteristic    Gender male
 

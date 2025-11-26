@@ -1,5 +1,5 @@
-@description('Environment : Specifies the location in which the Azure resources should be deployed.')
-param resourcePrefix string = resourceGroup().location
+@description('Resource prefix for all resources.')
+param resourcePrefix string
 
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location

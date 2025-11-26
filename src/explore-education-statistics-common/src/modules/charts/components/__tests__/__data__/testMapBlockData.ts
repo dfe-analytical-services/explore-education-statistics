@@ -84,6 +84,7 @@ export const testMapConfiguration: Chart = {
           indicator: 'authorised-absence-rate',
           timePeriod: '2016_AY',
         },
+        dataSetKey: 'dataSetKey1',
       },
       {
         dataGrouping: { customGroups: [], type: 'EqualIntervals' },
@@ -92,6 +93,7 @@ export const testMapConfiguration: Chart = {
           indicator: 'overall-absence-rate',
           timePeriod: '2016_AY',
         },
+        dataSetKey: 'dataSetKey2',
         boundaryLevel: 2,
       },
     ],

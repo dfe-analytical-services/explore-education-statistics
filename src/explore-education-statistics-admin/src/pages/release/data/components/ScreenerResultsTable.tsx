@@ -40,7 +40,7 @@ export default function ScreenerResultsTable({
       <tbody>
         {testResults.map(testResult => (
           <tr data-testid="screener-result-table-row" key={testResult.id}>
-            <td>
+            <td className="govuk-!-padding-right-0">
               <div>
                 {!hasFailures &&
                 onAcknowledgeWarning &&
@@ -51,7 +51,7 @@ export default function ScreenerResultsTable({
                     label={testResult.testFunctionName}
                     hint={testResult.notes}
                     boldLabel
-                    checked={warningAcknowledgements?.[testResult.id]}
+                    checked={!!warningAcknowledgements?.[testResult.id]}
                     onChange={event =>
                       onAcknowledgeWarning(testResult.id, event.target.checked)
                     }

@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -7,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -76,10 +74,7 @@ public class PreReleaseUserServicePermissionTests
 
     private PreReleaseUserService SetupPreReleaseUserService(
         ContentDbContext? context = null,
-        IEmailService? emailService = null,
-        IOptions<AppOptions>? appOptions = null,
-        IOptions<NotifyOptions>? notifyOptions = null,
-        IPreReleaseService? preReleaseService = null,
+        IUserResourceRoleNotificationService? userResourceRoleNotificationService = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IUserService? userService = null,
         IUserRepository? userRepository = null,
@@ -89,10 +84,7 @@ public class PreReleaseUserServicePermissionTests
     {
         return new(
             context ?? Mock.Of<ContentDbContext>(),
-            emailService ?? Mock.Of<IEmailService>(Strict),
-            appOptions ?? Mock.Of<IOptions<AppOptions>>(Strict),
-            notifyOptions ?? Mock.Of<IOptions<NotifyOptions>>(Strict),
-            preReleaseService ?? Mock.Of<IPreReleaseService>(Strict),
+            userResourceRoleNotificationService ?? Mock.Of<IUserResourceRoleNotificationService>(Strict),
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
             userService ?? Mock.Of<IUserService>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),

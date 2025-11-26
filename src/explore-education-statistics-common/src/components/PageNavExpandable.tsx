@@ -1,7 +1,8 @@
 import styles from '@common/components/PageNavExpandable.module.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
+import useToggle from '@common/hooks/useToggle';
 
 interface Props {
   heading?: string;
@@ -13,6 +14,10 @@ export default function PageNavExpandable({
   items,
 }: Props) {
   const [activeSection, setActiveSection] = useState(items[0].id);
+  const [isScrollHandlingBlocked, toggleScrollHandlingBlocked] =
+    useToggle(false);
+
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setActiveSection(items[0].id);
@@ -24,7 +29,41 @@ export default function PageNavExpandable({
     }
   };
 
+  const handleNavItemClick = (id: string) => {
+    startBlocking();
+    setActiveSection(id);
+  };
+
+  // Set temporary state to 'block' scroll handling when nav item is clicked
+  const startBlocking = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    toggleScrollHandlingBlocked.on();
+
+    timeoutRef.current = setTimeout(
+      () => toggleScrollHandlingBlocked.off(),
+      200,
+    );
+  }, [toggleScrollHandlingBlocked]);
+
+  useEffect(() => {
+    return () => {
+      // When the component unmounts, clear any active timer
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   const [handleScroll] = useDebouncedCallback(() => {
+    // If the user has just clicked a nav item, don't auto-update the active section
+    // when the window scrolls to the target
+    if (isScrollHandlingBlocked) {
+      return;
+    }
+
     const sections = document.querySelectorAll('[data-page-section]');
 
     // Set a section as active when it's in the top third of the page.
@@ -70,14 +109,14 @@ export default function PageNavExpandable({
               isActive={activeSection === item.id}
               text={item.text}
               subNavItems={item.subNavItems}
-              onClick={setActiveSection}
+              onClick={() => handleNavItemClick(item.id)}
             />
           ))}
           <NavItem
             className={items.length ? 'govuk-!-margin-top-8' : undefined}
             id="top"
             text="Back to top"
-            onClick={() => setActiveSection(items[0].id)}
+            onClick={() => handleNavItemClick(items[0].id)}
           />
         </ul>
       </nav>

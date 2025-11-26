@@ -179,11 +179,13 @@ describe('getMapDataSetCategoryConfigs', () => {
       dataSetConfigs: [
         {
           dataSet: testDataSets[0],
+          dataSetKey: 'dataSetKey1',
           dataGrouping: testDataGrouping,
           boundaryLevel: 15,
         },
         {
           dataSet: testDataSets[1],
+          dataSetKey: 'dataSetKey2',
           dataGrouping: customDataGrouping,
           boundaryLevel: 6,
         },

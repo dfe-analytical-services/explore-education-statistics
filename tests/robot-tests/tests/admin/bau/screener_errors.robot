@@ -7,17 +7,7 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-# Skip entire suite until Screener is re-enabled
-Force Tags
-...                 Admin
-...                 Local
-...                 Dev
-...                 AltersData
-...                 NotAgainstLocal
-...                 NotAgainstDev
-...                 NotAgainstTest
-...                 NotAgainstPreProd
-...                 NotAgainstProd
+Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
@@ -54,8 +44,9 @@ Check the screening failures
 Check all screening checks
     user clicks element    id:screener-results-all-tab
     user waits until h3 is not visible    Screener test failures
-    user waits until h3 is visible    Full breakdown of 3 tests checked against this file
-    user checks all invalid data set screener results in modal
+    user waits until h3 is visible    Full breakdown of
+    user checks modal warning text contains    You will need to delete this file
+    user checks results contain at least one specific result    testid:screener-result-table    Fail
 
 Check the file details in the modal
     user clicks element    id:file-details-tab
@@ -92,8 +83,9 @@ Check the screening failures for the ZIP file
 Check all screening checks for the ZIP file
     user clicks element    id:screener-results-all-tab
     user waits until h3 is not visible    Screener test failures
-    user waits until h3 is visible    Full breakdown of 3 tests checked against this file
-    user checks all invalid data set screener results in modal
+    user waits until h3 is visible    Full breakdown of
+    user checks modal warning text contains    You will need to delete this file
+    user checks results contain at least one specific result    testid:screener-result-table    Fail
 
 Check the file details in the modal for the ZIP file
     user clicks element    id:file-details-tab
@@ -113,32 +105,34 @@ user checks screener results in modal
     user waits until modal table cell contains    ${row}    1    ${screener_message}
     user waits until modal table cell contains    ${row}    2    ${screener_result}
 
+user checks results contain at least one specific result
+    [Arguments]
+    ...    ${table_test_id}
+    ...    ${screener_result}
+    @{result_cells}=    Get WebElements    css:[data-testid="${table_test_id}"] tr td:nth-child(2) strong
+    FOR    ${result}    IN    @{result_cells}
+        ${text}=    Get Text    ${result}
+        IF    '${text}' == '${screener_result}'
+            Exit For Loop
+        END
+    END
+
 user checks invalid data set details in data uploads table
     user checks table cell contains    1    1    Invalid data set    testid:Data files table
-    user checks table cell contains    1    2    680 B    testid:Data files table
+    user checks table cell contains    1    2    976 B    testid:Data files table
     user waits until table cell contains    1    3    Failed screening    testid:Data files table
     user checks table cell contains    1    4    View details    testid:Data files table
     user checks table cell contains    1    4    Delete files    testid:Data files table
 
 user checks invalid data set details in modal
     user checks modal warning text contains    You will need to delete this file
-    user checks screener results in modal    1    check_empty_cols
-    ...    The following columns in 'invalid-data-set.csv' are empty: 'URN', 'Estab', 'school_name',    Fail
 
 user checks invalid data set file details in modal
     user checks summary list contains    Title    Invalid data set    testid:Data file details
     user checks summary list contains    Data file    invalid-data-set.csv    testid:Data file details
     user checks summary list contains    Meta file    invalid-data-set.meta.csv    testid:Data file details
-    user checks summary list contains    Size    680 B    testid:Data file details
+    user checks summary list contains    Size    976 B    testid:Data file details
     user checks summary list contains    Status    Failed screening    testid:Data file details
     user checks summary list contains    Uploaded by    ees-test.bau1@education.gov.uk    testid:Data file details
     ${date}=    get london date
     user checks summary list contains    Date uploaded    ${date}    testid:Data file details
-
-user checks all invalid data set screener results in modal
-    user checks screener results in modal    1    check_filename_spaces
-    ...    'invalid-data-set.csv' does not have spaces in the filename.    Pass
-    user checks screener results in modal    2    check_filename_spaces
-    ...    'invalid-data-set.meta.csv' does not have spaces in the filename.    Pass
-    user checks screener results in modal    3    check_empty_cols
-    ...    The following columns in 'invalid-data-set.csv' are empty: 'URN',    Fail

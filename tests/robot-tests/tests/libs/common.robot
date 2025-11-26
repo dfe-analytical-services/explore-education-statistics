@@ -946,6 +946,14 @@ user clicks checkbox
     user scrolls to element    xpath://label[${text_matcher} or strong[${text_matcher}]]/../input[@type="checkbox"]
     user clicks element    xpath://label[${text_matcher} or strong[${text_matcher}]]/../input[@type="checkbox"]
 
+user clicks all checkboxes in parent
+    [Arguments]    ${testid}
+    @{checkboxes}=    Get WebElements    css:[data-testid="${testid}"] input[type=checkbox]
+    FOR    ${checkbox}    IN    @{checkboxes}
+        user scrolls to element    ${checkbox}
+        user clicks element    ${checkbox}
+    END
+
 user checks checkbox is checked
     [Arguments]    ${label}    ${exact_match}=${True}
     ${text_matcher}=    get xpath text matcher    ${label}    ${exact_match}

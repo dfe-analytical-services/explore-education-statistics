@@ -453,6 +453,49 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
+        public async Task WhenDataSetSummaryIsHtml_ReturnsPlainTextSummary()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            ReleaseFile dataSet = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(releaseVersion)
+                .WithSummary(
+                    "<div><p>Test paragraph with <strong>bold text</strong> and <em>italic text</em></p></div>"
+                );
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(dataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(
+                    publicationSlug: publication.Slug,
+                    releaseSlug: release.Slug
+                );
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Equal("Test paragraph with bold text and italic text", result.DataSets[0].Summary);
+            }
+        }
+
+        [Fact]
         public async Task WhenReleaseVersionHasNoContent_ReturnsEmptyDataContent()
         {
             // Arrange
@@ -484,8 +527,6 @@ public abstract class ReleaseDataContentServiceTests
                 // Assert
                 var result = outcome.AssertRight();
 
-                Assert.Equal(release.Id, result.ReleaseId);
-                Assert.Equal(release.Versions[0].Id, result.ReleaseVersionId);
                 Assert.Null(result.DataDashboards);
                 Assert.Equal(releaseVersion.DataGuidance, result.DataGuidance);
                 Assert.Empty(result.DataSets);

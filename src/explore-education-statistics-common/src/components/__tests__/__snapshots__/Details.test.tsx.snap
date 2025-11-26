@@ -8,7 +8,6 @@ exports[`Details renders correctly 1`] = `
            aria-controls="test-details"
            aria-expanded="false"
            role="button"
-           tabindex="0"
   >
     <span id="details-heading-test-details"
           class="summaryText govuk-details__summary-text"
@@ -34,7 +33,6 @@ exports[`Details renders correctly with \`open\` prop set to true 1`] = `
            aria-controls="test-details"
            aria-expanded="true"
            role="button"
-           tabindex="0"
   >
     <span id="details-heading-test-details"
           class="summaryText govuk-details__summary-text"

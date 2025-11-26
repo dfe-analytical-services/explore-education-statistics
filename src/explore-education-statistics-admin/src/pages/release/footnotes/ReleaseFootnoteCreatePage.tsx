@@ -1,4 +1,5 @@
 import Link from '@admin/components/Link';
+import PageMetaTitle from '@admin/components/PageMetaTitle';
 import FootnoteForm from '@admin/pages/release/footnotes/components/FootnoteForm';
 import {
   releaseFootnotesRoute,
@@ -31,6 +32,7 @@ const ReleaseFootnoteCreatePage = ({
 
   return (
     <>
+      <PageMetaTitle title="Create footnote" />
       <Link to={footnotesPath} back className="govuk-!-margin-bottom-6">
         Back
       </Link>

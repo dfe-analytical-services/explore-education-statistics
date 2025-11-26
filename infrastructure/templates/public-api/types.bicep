@@ -56,6 +56,7 @@ type ResourceNames = {
     postgreSqlFlexibleServer: string
     recoveryVault: string
     recoveryVaultFileShareBackupPolicy: string
+    searchService: string
   }
   publicApi: {
     apiApp: string
@@ -295,6 +296,12 @@ type AppGatewayFirewallPolicyCustomRule = {
 
   @description('A set of match conditions that apply to this rule. They are combined with the AND operator')
   matchConditions: AppGatewayFirewallPolicyCustomRuleMatchCondition[]
+}
+
+@export()
+type SearchServiceConfig = {
+  endpoint: string
+  indexName: string
 }
 
 @export()

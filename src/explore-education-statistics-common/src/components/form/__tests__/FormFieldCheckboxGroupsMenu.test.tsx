@@ -2,9 +2,9 @@ import FormFieldCheckboxGroupsMenu from '@common/components/form/FormFieldCheckb
 import Form from '@common/components/form/Form';
 import FormProvider from '@common/components/form/FormProvider';
 import Yup from '@common/validation/yup';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
+import render from '@common-test/render';
 
 describe('FormFieldCheckboxGroupsMenu', () => {
   test('renders multiple checkbox groups in correct order with search input', () => {
@@ -111,7 +111,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
   });
 
   test('menu contents is expanded if there is a field error', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           test: [],
@@ -141,24 +141,22 @@ describe('FormFieldCheckboxGroupsMenu', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Choose options' }),
-    ).not.toHaveAttribute('aria-expanded', 'true');
+      screen.getByRole('button', { name: 'Choose options - show options' }),
+    ).toHaveAttribute('aria-expanded', 'false');
 
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Option 1')).toBeVisible();
     });
 
     expect(
-      screen.getByRole('button', { name: 'Choose options' }),
+      screen.getByRole('button', { name: 'Choose options - hide options' }),
     ).toHaveAttribute('aria-expanded', 'true');
-
-    expect(screen.getByRole('group', { name: 'Choose options' })).toBeVisible();
   });
 
   test('clicking menu does not collapse it if there is a field error', async () => {
-    render(
+    const { user } = render(
       <FormProvider
         initialValues={{
           test: [],
@@ -187,20 +185,20 @@ describe('FormFieldCheckboxGroupsMenu', () => {
       </FormProvider>,
     );
 
-    const summary = screen.getByRole('button', { name: 'Choose options' });
-
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Option 1')).toBeVisible();
     });
 
-    expect(summary).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('group', { name: 'Choose options' })).toBeVisible();
+    const button = screen.getByRole('button', {
+      name: 'Choose options - hide options',
+    });
 
-    await userEvent.click(summary);
+    expect(button).toHaveAttribute('aria-expanded', 'true');
 
-    expect(summary).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('group', { name: 'Choose options' })).toBeVisible();
+    await user.click(button);
+
+    expect(button).toHaveAttribute('aria-expanded', 'true');
   });
 });

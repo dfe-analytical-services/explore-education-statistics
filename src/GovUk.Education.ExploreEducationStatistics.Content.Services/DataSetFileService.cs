@@ -105,8 +105,9 @@ public class DataSetFileService(
         }
 
         return new PaginatedListViewModel<DataSetFileSummaryViewModel>(
-            // TODO Remove ChangeSummaryHtmlToText once we do further work to remove all HTML at source
-            await ChangeSummaryHtmlToText(results),
+            // Summaries created before EES-4353 may contain HTML. Convert them to plain text here.
+            // TODO: Remove ChangeSummaryHtmlToText after migrating all summaries to plain text
+            ChangeSummaryHtmlToText(results),
             totalResults: await query.CountAsync(cancellationToken: cancellationToken),
             page,
             pageSize
@@ -184,20 +185,12 @@ public class DataSetFileService(
             .ToListAsync(cancellationToken);
     }
 
-    private static async Task<List<DataSetFileSummaryViewModel>> ChangeSummaryHtmlToText(
+    private static List<DataSetFileSummaryViewModel> ChangeSummaryHtmlToText(
         IList<DataSetFileSummaryViewModel> results
-    )
-    {
-        return await results
-            .ToAsyncEnumerable()
-            .SelectAwait(async viewModel =>
-                viewModel with
-                {
-                    Content = await HtmlToTextUtils.HtmlToText(viewModel.Content),
-                }
-            )
-            .ToListAsync();
-    }
+    ) =>
+        results
+            .Select(viewModel => viewModel with { Content = HtmlToTextUtils.HtmlToText(viewModel.Content) })
+            .ToList();
 
     public async Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
         Guid dataSetFileId,

@@ -56,4 +56,12 @@ public interface IUserReleaseRoleRepository
     );
 
     Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default);
+
+    Task MarkEmailAsSent(
+        Guid userId,
+        Guid releaseVersionId,
+        ReleaseRole role,
+        DateTimeOffset? emailSent = null,
+        CancellationToken cancellationToken = default
+    );
 }

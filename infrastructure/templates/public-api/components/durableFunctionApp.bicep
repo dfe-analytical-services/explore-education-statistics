@@ -7,7 +7,7 @@ import {
 
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
-import { abbreviations } from '../abbreviations.bicep'
+import { abbreviations } from '../../common/abbreviations.bicep'
 
 @description('Specifies the location for all resources.')
 param location string

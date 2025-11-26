@@ -52,6 +52,8 @@ param docsAppSku = 'Standard'
 
 param recoveryVaultImmutable = true
 
+param searchServiceIndexName = 'index-1'
+
 param enableThemeDeletion = false
 
 param enableReplacementOfPublicApiDataSets = true

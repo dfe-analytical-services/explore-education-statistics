@@ -222,6 +222,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
+
+            // CORS config for dev/test/etc. environments set in IaC config
+            app.UseCors(options => options.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
         }
         else
         {
@@ -244,18 +247,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         }
 
         app.UseRewriter(rewriteOptions);
-
-        app.UseCors(options =>
-            options
-                .WithOrigins(
-                    "http://localhost:3000",
-                    "http://localhost:3001",
-                    "https://localhost:3000",
-                    "https://localhost:3001"
-                )
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-        );
 
         app.UseMiddleware(typeof(SeoSecurityHeaderMiddleware));
         app.UseMvc();

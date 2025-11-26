@@ -17,6 +17,7 @@ describe('ChartConfiguration', () => {
   const testLineChartCapabilities: ChartCapabilities = {
     canIncludeNonNumericData: true,
     canPositionLegendInline: true,
+    canReorderDataCategories: false,
     canSetBarThickness: false,
     canSetDataLabelColour: true,
     canSetDataLabelPosition: true,
@@ -35,6 +36,7 @@ describe('ChartConfiguration', () => {
   };
   const testBarChartCapabilities: ChartCapabilities = {
     canIncludeNonNumericData: true,
+    canReorderDataCategories: false,
     canPositionLegendInline: true,
     canSetBarThickness: true,
     canSetDataLabelColour: false,

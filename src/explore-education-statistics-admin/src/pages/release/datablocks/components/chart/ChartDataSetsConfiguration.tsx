@@ -2,6 +2,8 @@ import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/
 import styles from '@admin/pages/release/datablocks/components/chart/ChartDataSetsConfiguration.module.scss';
 import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import generateDataSetLabel from '@admin/pages/release/datablocks/components/chart/utils/generateDataSetLabel';
+import getMapDataSetConfigs from '@admin/pages/release/datablocks/components/chart/utils/getMapDataSetConfigs';
+import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import ErrorSummary from '@common/components/ErrorSummary';
@@ -23,6 +25,14 @@ import Yup from '@common/validation/yup';
 import WarningMessage from '@common/components/WarningMessage';
 import getSelectedDataSets from '@admin/pages/release/datablocks/components/chart/utils/getSelectedDataSets';
 import reorder from '@common/utils/reorder';
+import {
+  AxisConfiguration,
+  ChartType,
+  MapDataSetConfig,
+} from '@common/modules/charts/types/chart';
+import { maxMapDataGroups } from '@common/modules/charts/components/MapBlock';
+import { LegendConfiguration } from '@common/modules/charts/types/legend';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
@@ -38,23 +48,37 @@ export interface FormValues {
 }
 
 interface Props {
+  axisMajor: AxisConfiguration;
   buttons?: ReactNode;
+  chartType: ChartType;
+  data: TableDataResult[];
   dataSets?: DataSet[];
   dataSetsUnits?: string[];
+  legend?: LegendConfiguration;
+  mapDataSetConfigs?: MapDataSetConfig[];
   meta: FullTableMeta;
+  options?: ChartOptions;
   onChange: (dataSets: DataSet[]) => void;
 }
 
 const ChartDataSetsConfiguration = ({
+  axisMajor,
   buttons,
-  meta,
+  chartType,
+  data,
   dataSets: initialDataSets = [],
   dataSetsUnits = [],
+  legend,
+  mapDataSetConfigs,
+  meta,
+  options,
   onChange,
 }: Props) => {
   const { forms, updateForm, submitForms } = useChartBuilderFormsContext();
   const [dataSets, setDataSets] = useState<DataSet[]>(initialDataSets);
   const [isReordering, toggleIsReordering] = useToggle(false);
+  const [showCategoricalDataModal, toggleShowCategoricalDataModal] =
+    useToggle(false);
 
   const indicatorOptions = useMemo(
     () => Object.values(meta.indicators),
@@ -110,6 +134,30 @@ const ChartDataSetsConfiguration = ({
         };
       },
     );
+
+    // Don't allow adding data sets with more that 5 categories for maps.
+    if (chartType === 'map') {
+      const updatedMapDataSetConfigs = getMapDataSetConfigs({
+        axisMajor: { ...axisMajor, dataSets: updatedDataSets },
+        data,
+        legend,
+        mapDataSetConfigs,
+        meta,
+        options,
+      });
+
+      if (
+        updatedMapDataSetConfigs.some(
+          config =>
+            config.categoricalDataConfig &&
+            config.categoricalDataConfig?.length > maxMapDataGroups,
+        )
+      ) {
+        toggleShowCategoricalDataModal.on();
+        return;
+      }
+    }
+
     onChange(updatedDataSets);
     setDataSets(updatedDataSets);
   };
@@ -263,7 +311,7 @@ const ChartDataSetsConfiguration = ({
           }}
         />
       ) : (
-        <table data-testid="chart-data-sets">
+        <table data-testid="chart-data-sets" id="chart-data-sets">
           <thead>
             <tr>
               <th>Data set</th>
@@ -347,6 +395,28 @@ const ChartDataSetsConfiguration = ({
             </Button>
           )}
         </div>
+      )}
+      {showCategoricalDataModal && (
+        <ModalConfirm
+          confirmText="Ok"
+          open
+          showCancel={false}
+          title="Too many categories"
+          onConfirm={toggleShowCategoricalDataModal.off}
+        >
+          <p>
+            The indicators in the data sets you have selected contain more than
+            the maximum number ({maxMapDataGroups}) of categorical values
+            allowed.
+          </p>
+          <p>
+            This restriction is to help ensure that maps are accessible to all
+            users. If you have any questions please contact{' '}
+            <a href="mailto:explore.statistics@education.gov.uk">
+              explore.statistics@education.gov.uk
+            </a>
+          </p>
+        </ModalConfirm>
       )}
     </>
   );

@@ -148,19 +148,19 @@ Select Indicators
     user checks indicator checkbox is checked    Lower quartile annualised earnings
 
 Select cheese filter
-    user opens details dropdown    Cheese
+    user clicks button    Cheese
     user clicks select all for category    Cheese
 
 Select Number of years after achievement of learning aim filter
-    user opens details dropdown    Number of years after achievement of learning aim
+    user clicks button    Number of years after achievement of learning aim
     user clicks select all for category    Number of years after achievement of learning aim
 
 Select ethnicity group filter
-    user opens details dropdown    Ethnicity group
+    user clicks button    Ethnicity group
     user clicks select all for category    Ethnicity group
 
 Select Provision filter
-    user opens details dropdown    Provision
+    user clicks button    Provision
     user clicks select all for category    Provision
 
 Click submit button
@@ -253,6 +253,7 @@ Create release amendment
 Replace subject data
     user uploads subject replacement    ${SUBJECT_NAME}    dates.csv    dates.meta.csv
     user waits until page contains element    testid:Data file replacements table
+    user confirms replacement upload    ${SUBJECT_NAME}
     user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains    Footnotes: ERROR    %{WAIT_MEDIUM}
@@ -466,8 +467,8 @@ Select four indicators
     user clicks indicator checkbox    Response rate
     user checks indicator checkbox is checked    Response rate
 
-Select the date cateogory
-    user opens details dropdown    Date
+Select the date category
+    user clicks button    Date
     user clicks select all for category    Date
 
 Attempt to generate a table that is too large

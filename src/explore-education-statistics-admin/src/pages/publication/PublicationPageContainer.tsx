@@ -21,6 +21,7 @@ import {
 import publicationService, {
   PublicationWithPermissions,
 } from '@admin/services/publicationService';
+import useCurrentRouteTitle from '@admin/utils/useCurrentRouteTitle';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import WarningMessage from '@common/components/WarningMessage';
@@ -79,6 +80,8 @@ const PublicationPageContainer = ({
     });
   };
 
+  const pageTitle = useCurrentRouteTitle(navRoutes);
+
   return (
     <LoadingSpinner loading={loadingPublication}>
       {publication ? (
@@ -86,6 +89,11 @@ const PublicationPageContainer = ({
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
               <PageTitle
+                metaTitle={
+                  pageTitle
+                    ? `${pageTitle} - ${publication.title}`
+                    : publication.title
+                }
                 title={publication.title}
                 caption="Manage publication"
               />

@@ -17,10 +17,6 @@ type ResourceNames = {
 }
 
 @export()
-// The built in Search Service roles. See https://learn.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles/ai-machine-learning
-type SearchServiceRole = 'Search Index Data Contributor' | 'Search Index Data Reader' | 'Search Service Contributor'
-
-@export()
 @sealed()
 type SearchStorageQueueNames = {
   @description('Queue name for when a publication is archived.')

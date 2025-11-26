@@ -273,6 +273,7 @@ public class DataSetFileStorageTestFixture
                         user.Id,
                         null,
                         null,
+                        null,
                         0
                     )
                 )
@@ -327,6 +328,7 @@ public class DataSetFileStorageTestFixture
                     DataFile.ContentLength,
                     FileType.Data,
                     user.Id,
+                    null,
                     dataSetName,
                     ReleaseFile.File,
                     0
@@ -363,6 +365,7 @@ public class DataSetFileStorageTestFixture
                         It.IsAny<long>(),
                         FileType.Data,
                         It.IsAny<Guid>(),
+                        null,
                         It.Is<string>(actual => actual == dataSetName),
                         It.IsAny<File>(),
                         It.IsAny<int>()
@@ -474,6 +477,7 @@ public class DataSetFileStorageTestFixture
                     434,
                     FileType.Data,
                     user.Id,
+                    null,
                     dataSetName,
                     DataFileReplace,
                     1
@@ -505,6 +509,7 @@ public class DataSetFileStorageTestFixture
                         157,
                         FileType.Metadata,
                         user.Id,
+                        null,
                         null,
                         null,
                         0

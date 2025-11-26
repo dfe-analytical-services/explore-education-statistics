@@ -32,7 +32,6 @@ export interface AccordionSectionProps {
   id?: string;
 
   open?: boolean;
-  trackScroll?: boolean;
   onToggle?: ToggleHandler;
 }
 
@@ -59,7 +58,6 @@ const AccordionSection = ({
   headingTag = 'h2',
   id = 'accordionSection',
   open = false,
-  trackScroll = false,
   onToggle,
 }: AccordionSectionProps) => {
   const { isMounted } = useMounted();
@@ -99,7 +97,6 @@ const AccordionSection = ({
                   open ? 'hide' : 'show'
                 } this section`}
                 className={classes.sectionButton}
-                data-scroll={trackScroll ? true : undefined}
                 id={headingId}
                 type="button"
                 onClick={() => {

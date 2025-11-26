@@ -127,9 +127,15 @@ describe('PublicationReleasePageHome', () => {
     expect(content).toBeInTheDocument();
 
     expect(within(content).queryByTestId('accordion')).not.toBeInTheDocument();
-    expect(within(content).getAllByRole('heading', { level: 2 })).toHaveLength(
-      3,
-    );
+    const sections = within(content).getAllByTestId('home-content-section');
+    expect(sections).toHaveLength(3);
+    expect(sections[0]).toHaveAttribute('id', 'section-section-1-heading');
+    expect(
+      within(sections[0]).getByRole('heading', { level: 2 }),
+    ).toHaveTextContent('Section 1 heading');
+    expect(
+      within(sections[0]).getByRole('heading', { level: 2 }),
+    ).toHaveAttribute('id', 'heading-section-1-heading');
   });
 
   test('renders content sections as accordions on mobile', () => {
@@ -145,6 +151,9 @@ describe('PublicationReleasePageHome', () => {
     const content = screen.getByTestId('home-content');
 
     expect(within(content).getByTestId('accordion')).toBeInTheDocument();
+    expect(
+      within(content).queryByTestId('home-content-section'),
+    ).not.toBeInTheDocument();
     mockIsMedia = false;
   });
 });

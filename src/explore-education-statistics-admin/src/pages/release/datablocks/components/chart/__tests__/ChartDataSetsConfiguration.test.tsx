@@ -4,14 +4,23 @@ import {
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import render from '@common-test/render';
+import {
+  AxisConfiguration,
+  MapDataSetConfig,
+} from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import mapFullTableMeta from '@common/modules/table-tool/utils/mapFullTableMeta';
-import { TableDataSubjectMeta } from '@common/services/tableBuilderService';
+import {
+  TableDataResult,
+  TableDataSubjectMeta,
+} from '@common/services/tableBuilderService';
 import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
+import { testCategoricalMeta } from './__data__/testCategoricalData';
+import { testTableData } from './__data__/testTableData';
 
 describe('ChartDataSetsConfiguration', () => {
   const testMeta: TableDataSubjectMeta = {
@@ -135,11 +144,21 @@ describe('ChartDataSetsConfiguration', () => {
     },
   };
 
+  const testAxisMajor = {
+    dataSets: [],
+    groupBy: 'locations',
+    referenceLines: [],
+    type: 'major',
+    visible: true,
+  } as AxisConfiguration;
+
   test('renders data set labels correctly', () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartDataSetsConfiguration
-          meta={testSubjectMeta}
+          axisMajor={testAxisMajor}
+          chartType="line"
+          data={testTableData.results}
           dataSets={[
             {
               indicator: 'authorised-absence-sessions',
@@ -163,6 +182,7 @@ describe('ChartDataSetsConfiguration', () => {
               timePeriod: '2019_AY',
             },
           ]}
+          meta={testSubjectMeta}
           onChange={noop}
         />
       </ChartBuilderFormsContextProvider>,
@@ -195,6 +215,9 @@ describe('ChartDataSetsConfiguration', () => {
         }}
       >
         <ChartDataSetsConfiguration
+          axisMajor={testAxisMajor}
+          chartType="line"
+          data={testTableData.results}
           meta={testSubjectMeta}
           dataSets={[
             {
@@ -220,7 +243,13 @@ describe('ChartDataSetsConfiguration', () => {
   test('submitting fails if there are no data sets', async () => {
     const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
-        <ChartDataSetsConfiguration meta={testSubjectMeta} onChange={noop} />
+        <ChartDataSetsConfiguration
+          axisMajor={testAxisMajor}
+          chartType="line"
+          data={testTableData.results}
+          meta={testSubjectMeta}
+          onChange={noop}
+        />
       </ChartBuilderFormsContextProvider>,
     );
 
@@ -240,6 +269,9 @@ describe('ChartDataSetsConfiguration', () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartDataSetsConfiguration
+          axisMajor={testAxisMajor}
+          chartType="line"
+          data={testTableData.results}
           meta={testSubjectMeta}
           dataSets={[
             {
@@ -262,6 +294,9 @@ describe('ChartDataSetsConfiguration', () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartDataSetsConfiguration
+          axisMajor={testAxisMajor}
+          chartType="line"
+          data={testTableData.results}
           meta={testSubjectMeta}
           dataSets={[
             {
@@ -302,6 +337,9 @@ describe('ChartDataSetsConfiguration', () => {
     const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartDataSetsConfiguration
+          axisMajor={testAxisMajor}
+          chartType="line"
+          data={testTableData.results}
           meta={testSubjectMeta}
           dataSets={[
             {
@@ -353,7 +391,13 @@ describe('ChartDataSetsConfiguration', () => {
     test('renders correctly with multiple options per select', async () => {
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
-          <ChartDataSetsConfiguration meta={testSubjectMeta} onChange={noop} />
+          <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
+            meta={testSubjectMeta}
+            onChange={noop}
+          />
         </ChartBuilderFormsContextProvider>,
       );
 
@@ -403,6 +447,9 @@ describe('ChartDataSetsConfiguration', () => {
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={{
               ...testSubjectMeta,
               indicators: [],
@@ -419,6 +466,9 @@ describe('ChartDataSetsConfiguration', () => {
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={{
               ...testSubjectMeta,
               indicators: [testSubjectMeta.indicators[0]],
@@ -435,6 +485,9 @@ describe('ChartDataSetsConfiguration', () => {
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={{
               ...testSubjectMeta,
               locations: [],
@@ -451,6 +504,9 @@ describe('ChartDataSetsConfiguration', () => {
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={{
               ...testSubjectMeta,
               locations: [testSubjectMeta.locations[0]],
@@ -467,6 +523,9 @@ describe('ChartDataSetsConfiguration', () => {
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={{
               ...testSubjectMeta,
               timePeriodRange: [],
@@ -483,6 +542,9 @@ describe('ChartDataSetsConfiguration', () => {
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={{
               ...testSubjectMeta,
               timePeriodRange: [testSubjectMeta.timePeriodRange[0]],
@@ -501,6 +563,9 @@ describe('ChartDataSetsConfiguration', () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={testSubjectMeta}
             dataSets={[
               {
@@ -540,6 +605,9 @@ describe('ChartDataSetsConfiguration', () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={testSubjectMeta}
             onChange={handleChange}
           />
@@ -575,6 +643,9 @@ describe('ChartDataSetsConfiguration', () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={testSubjectMeta}
             onChange={handleChange}
           />
@@ -623,6 +694,9 @@ describe('ChartDataSetsConfiguration', () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={{
               ...testSubjectMeta,
               filters: {},
@@ -660,6 +734,9 @@ describe('ChartDataSetsConfiguration', () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={testSubjectMeta}
             onChange={handleChange}
           />
@@ -714,6 +791,9 @@ describe('ChartDataSetsConfiguration', () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={testSubjectMeta}
             onChange={handleChange}
           />
@@ -771,6 +851,9 @@ describe('ChartDataSetsConfiguration', () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={testSubjectMetaMultipleFilters}
             onChange={handleChange}
           />
@@ -868,6 +951,9 @@ describe('ChartDataSetsConfiguration', () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={testSubjectMeta}
             onChange={handleChange}
           />
@@ -943,6 +1029,9 @@ describe('ChartDataSetsConfiguration', () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={testSubjectMeta}
             dataSets={[
               {
@@ -968,6 +1057,9 @@ describe('ChartDataSetsConfiguration', () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={testSubjectMeta}
             dataSets={[
               {
@@ -1005,6 +1097,9 @@ describe('ChartDataSetsConfiguration', () => {
       const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartDataSetsConfiguration
+            axisMajor={testAxisMajor}
+            chartType="line"
+            data={testTableData.results}
             meta={testSubjectMeta}
             dataSets={[
               {
@@ -1039,5 +1134,130 @@ describe('ChartDataSetsConfiguration', () => {
 
       expect(handleChange).toHaveBeenCalledWith([]);
     });
+  });
+
+  test('prevents adding categorical data with too many groups', async () => {
+    const testMapDataSetConfigs: MapDataSetConfig[] = [
+      {
+        dataSet: {
+          filters: [],
+          indicator: 'indicator-1',
+          timePeriod: '2024_CY',
+        },
+        dataSetKey: 'dataSetKey1',
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 5,
+          type: 'EqualIntervals',
+        },
+        categoricalDataConfig: [],
+      },
+    ];
+
+    const testCategoricalDataTooMany: TableDataResult[] = [
+      {
+        filters: [],
+        geographicLevel: 'region',
+        locationId: 'location-1',
+        measures: {
+          'indicator-2': 'large',
+        },
+        timePeriod: '2024_CY',
+      },
+      {
+        filters: [],
+        geographicLevel: 'region',
+        locationId: 'location-6-value',
+        measures: {
+          'indicator-2': 'medium',
+        },
+        timePeriod: '2024_CY',
+      },
+      {
+        filters: [],
+        geographicLevel: 'region',
+        locationId: 'location-7-value',
+        measures: {
+          'indicator-2': 'small',
+        },
+        timePeriod: '2024_CY',
+      },
+      {
+        filters: [],
+        geographicLevel: 'region',
+        locationId: 'location-1-value',
+        measures: {
+          'indicator-2': 'small',
+        },
+        timePeriod: '2024_CY',
+      },
+      {
+        filters: [],
+        geographicLevel: 'region',
+        locationId: 'location-2-value',
+        measures: {
+          'indicator-2': 'xxlarge',
+        },
+        timePeriod: '2024_CY',
+      },
+      {
+        filters: [],
+        geographicLevel: 'region',
+        locationId: 'location-8-value',
+        measures: {
+          'indicator-2': 'small',
+        },
+        timePeriod: '2024_CY',
+      },
+      {
+        filters: [],
+        geographicLevel: 'region',
+        locationId: 'location-9-value',
+        measures: {
+          'indicator-2': 'tiny',
+        },
+        timePeriod: '2024_CY',
+      },
+      {
+        filters: [],
+        geographicLevel: 'region',
+        locationId: 'location-5-value',
+        measures: {
+          'indicator-2': 'teeny',
+        },
+        timePeriod: '2024_CY',
+      },
+      {
+        filters: [],
+        geographicLevel: 'region',
+        locationId: 'location-3-value',
+        measures: {
+          'indicator-2': 'large',
+        },
+        timePeriod: '2024_CY',
+      },
+    ];
+    const handleChange = jest.fn();
+    const { user } = render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartDataSetsConfiguration
+          axisMajor={testAxisMajor}
+          chartType="map"
+          data={testCategoricalDataTooMany}
+          mapDataSetConfigs={testMapDataSetConfigs}
+          meta={testCategoricalMeta}
+          onChange={handleChange}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Add data set' }));
+
+    const modal = within(screen.getByRole('dialog'));
+    expect(modal.getByText('Too many categories')).toBeInTheDocument();
+
+    expect(handleChange).not.toHaveBeenCalled();
   });
 });

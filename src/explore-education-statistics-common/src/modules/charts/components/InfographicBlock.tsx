@@ -64,6 +64,7 @@ export const infographicBlockDefinition: ChartDefinition = {
   capabilities: {
     canIncludeNonNumericData: false,
     canPositionLegendInline: false,
+    canReorderDataCategories: false,
     canSetBarThickness: false,
     canSetDataLabelColour: false,
     canSetDataLabelPosition: false,

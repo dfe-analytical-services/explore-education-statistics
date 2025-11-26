@@ -486,6 +486,13 @@
       "type": "bool",
       "defaultValue": true
     },
+    "backupVaultAzureBlobsRegistrationsDeployed": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Whether or not the Azure Blobs are already registered for an environent. Adding temporarily as the deploy process is trying to recreate the registrations every time rather than updating."
+      }
+    },
     "deployBackupVaultRegistrations": {
       "type": "bool",
       "defaultValue": true,
@@ -796,6 +803,20 @@
       "defaultValue": false,
       "metadata": {
         "description": "Feature flag to control the replacement of public API data sets"
+      }
+    },
+    "additionalAdminAllowedOrigins": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Additional CORS allowed origins for admin"
+      }
+    },
+    "additionalPublicAllowedOrigins": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Additional CORS allowed origins for the public"
       }
     }
   },
@@ -1289,6 +1310,8 @@
     "backupVaultName": "[concat(parameters('subscription'), '-', parameters('environment'), '-bvault')]",
     "backupVaultBlobPolicyName": "[concat(parameters('subscription'), '-', parameters('environment'), '-blobs-bkpol')]",
     "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
+    "frontDoorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-afd')]",
+    "frontDoorEndpointName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fde')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
     "ees-admin-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-admin-govuknotify-api-key')]",
     "ees-notifier-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-govuknotify-api-key')]",
@@ -1365,10 +1388,25 @@
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
     "eventGridTopicNameThemeChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-theme-changed')]",
     "searchServiceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-srch')]",
-    "searchReaderManagedIdentityName": "[concat(parameters('subscription'), '-', parameters('environment'), '-id-srch-reader')]",
-    "searchServiceApiVersion": "2025-02-01-preview",
-    "userAssignedIdentitiesApiVersion": "2024-11-30",
-    "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]"
+    "searchIndexDataReaderRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '1407120a-92aa-4202-b7e9-c0e197c71c8f')]",
+    "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
+    "baseAdminAllowedOrigins": [
+      "[concat('https://', parameters('adminUri'))]"
+    ],
+    "adminAllowedOrigins": "[union(variables('baseAdminAllowedOrigins'), parameters('additionalAdminAllowedOrigins'))]",
+    "basePublicAllowedOrigins": [
+      "[concat('https://', parameters('domain'))]",
+      "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]"
+      // NOTE: reference() cannot be used in variables, so the default FrontDoor hostname cannot be put here. It must added in place wherever we use publicAllowedOrigins
+    ],
+    "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]",
+    "apiVersions": {
+      "afdEndpoint": "2025-06-01",
+      "searchService": "2025-05-01"
+    },
+    "resourceIds": {
+      "afdEndpoint": "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', variables('frontDoorName'), variables('frontDoorEndpointName'))]"
+    }
   },
   "resources": [
     {
@@ -1429,13 +1467,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]",
-              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
-              "https://localhost:3000",
-              "http://localhost:3000",
-              "http://127.0.0.1"
-            ]
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           },
           "connectionStrings": [
             {
@@ -1539,13 +1571,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]",
-              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
-              "https://localhost:3000",
-              "http://localhost:3000",
-              "http://127.0.0.1"
-            ]
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           }
         }
       },
@@ -1682,13 +1708,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]",
-              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
-              "https://localhost:3000",
-              "http://localhost:3000",
-              "http://127.0.0.1"
-            ]
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           },
           "connectionStrings": [
             {
@@ -1786,13 +1806,7 @@
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]",
-              "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
-              "https://localhost:3000",
-              "http://localhost:3000",
-              "http://127.0.0.1"
-            ]
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           }
         }
       },
@@ -1930,12 +1944,6 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
-          "cors": {
-            "allowedOrigins": [
-              "https://localhost:3000",
-              "http://localhost:3000"
-            ]
-          },
           "connectionStrings": [
             {
               "name": "StatisticsDb",
@@ -2067,13 +2075,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "use32BitWorkerProcess": false,
-          "cors": {
-            "allowedOrigins": [
-              "https://localhost:3000",
-              "http://localhost:3000"
-            ]
-          }
+          "use32BitWorkerProcess": false
         }
       },
       "resources": [
@@ -2163,11 +2165,7 @@
           }
         ],
         "cors": {
-          "allowedOrigins": [
-            "[concat('https://', parameters('adminUri'))]",
-            "https://localhost:5021",
-            "http://localhost:5021"
-          ]
+          "allowedOrigins": "[variables('adminAllowedOrigins')]"
         },
         "networkACLs": {
           "defaultAction": "deny",
@@ -2277,10 +2275,7 @@
       "apiVersion": "2021-02-01",
       "location": "[resourceGroup().location]",
       "identity": {
-        "type": "SystemAssigned, UserAssigned",
-        "userAssignedIdentities": {
-          "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('searchReaderManagedIdentityName'))]": {}
-        }
+        "type": "SystemAssigned"
       },
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2315,7 +2310,10 @@
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
-          "requestTracingEnabled": true
+          "requestTracingEnabled": true,
+          "cors": {
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
+          }
         }
       },
       "dependsOn": [
@@ -2334,9 +2332,8 @@
       "properties": {
         "APP_ENV": "[parameters('environmentName')]",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('publicAppInsights')), '2020-02-02').InstrumentationKey]",
-        "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('searchServiceApiVersion')).endpoint]",
+        "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('apiVersions').searchService).endpoint]",
         "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
-        "AZURE_SEARCH_MANAGED_IDENTITY_CLIENT_ID": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('searchReaderManagedIdentityName')), variables('userAssignedIdentitiesApiVersion')).clientId]",
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
@@ -2412,6 +2409,20 @@
       }
     },
     {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[resourceId('Microsoft.Search/searchServices', variables('searchServiceName'))]",
+      "name": "[guid(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), resourceId('Microsoft.Web/sites', variables('publicAppName')), variables('searchIndexDataReaderRoleId'))]",
+      "properties": {
+        "roleDefinitionId": "[variables('searchIndexDataReaderRoleId')]",
+        "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('publicAppName')), '2025-03-01', 'Full').identity.principalId]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]"
+      ]
+    },
+    {
       "name": "[variables('coreStorageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2023-05-01",
@@ -2483,7 +2494,7 @@
     {
       "type": "Microsoft.DataProtection/backupVaults/backupInstances",
       "apiVersion": "2022-05-01",
-      "condition": "[parameters('deployBackupVaultRegistrations')]",
+      "condition": "[and(parameters('deployBackupVaultRegistrations'), not(parameters('backupVaultAzureBlobsRegistrationsDeployed')))]",
       "name": "[format('{0}/{1}', variables('backupVaultName'), variables('coreStorageAccountName'))]",
       "properties": {
         "objectType": "BackupInstance",
@@ -3110,7 +3121,7 @@
     {
       "type": "Microsoft.DataProtection/backupVaults/backupInstances",
       "apiVersion": "2022-05-01",
-      "condition": "[parameters('deployBackupVaultRegistrations')]",
+      "condition": "[and(parameters('deployBackupVaultRegistrations'), not(parameters('backupVaultAzureBlobsRegistrationsDeployed')))]",
       "name": "[format('{0}/{1}', variables('backupVaultName'), variables('publicStorageAccountName'))]",
       "properties": {
         "objectType": "BackupInstance",
@@ -3269,9 +3280,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "cors": {
-            "allowedOrigins": [
-              "[concat('https://', parameters('domain'))]"
-            ]
+            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           },
           "connectionStrings": [
             {
@@ -3423,9 +3432,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "cors": {
-            "allowedOrigins": []
-          },
           "connectionStrings": [
             {
               "name": "StatisticsDb",
@@ -3579,9 +3585,6 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "cors": {
-            "allowedOrigins": []
-          },
           "connectionStrings": [
             {
               "name": "ContentDb",

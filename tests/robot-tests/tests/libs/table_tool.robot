@@ -37,17 +37,17 @@ user checks filters list contains exact items in order
     [Arguments]    @{items}
     user checks items matching locator contain exact items in order
     ...    @{items}
-    ...    locator=xpath://*[@id="filtersForm-filters"]//details
+    ...    locator=xpath://*[@id="filtersForm-filters"]//button[contains(., "show options")]
 
 user checks filter contains exact items in order
     [Arguments]    @{items}    ${filter_label}
     user checks items matching locator contain exact items in order    @{items}
-    ...    locator=xpath://*[@id="filtersForm-filters"]//details[summary[contains(., "${filter_label}")]]//*[contains(@id,"-options-")]//legend
+    ...    locator=xpath://*[@id="filtersForm-filters"]//fieldset[legend[contains(., "${filter_label}")]]//*[contains(@id,"-options-")]//legend
 
 user checks filter group contains exact items in order
     [Arguments]    @{items}    ${filter_label}    ${group_label}
     user checks items matching locator contain exact items in order    @{items}
-    ...    locator=xpath://*[@id="filtersForm-filters"]//details[summary[contains(., "${filter_label}")]]//*[contains(@id,"-options-")]//legend[text()="${group_label}"]/..//label
+    ...    locator=xpath://*[@id="filtersForm-filters"]//fieldset[legend[contains(., "${filter_label}")]]//*[contains(@id,"-options-")]//legend[text()="${group_label}"]/..//label
 
 user checks subheaded indicator checkbox is checked
     [Arguments]    ${subheading_label}    ${indicator_label}

@@ -96,7 +96,7 @@ resource searchableDocumentsContainer 'Microsoft.Storage/storageAccounts/blobSer
   name: searchableDocumentsContainerName
 }
 
-resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' existing = {
+resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
   name: searchServiceName
 }
 
@@ -217,7 +217,7 @@ module functionAppModule '../../common/components/functionApp.bicep' = {
   }
 }
 
-module functionAppIdentityRoleAssignmentModule '../components/searchServiceRoleAssignment.bicep' = {
+module functionAppIdentityRoleAssignmentModule '../../common/components/search/searchServiceRoleAssignment.bicep' = {
   name: 'searchDocsFunctionAppRoleAssignmentModuleDeploy'
   params: {
     searchServiceName: searchService.name

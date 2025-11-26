@@ -33,7 +33,7 @@ BEGIN CATCH
     ROLLBACK TRANSACTION
     DECLARE @errorMessage NVARCHAR(max) = ERROR_MESSAGE();
     DECLARE @errorSeverity INT = ERROR_SEVERITY();
-    DECLARE @errorState INT = ERROR_SEVERITY();
+    DECLARE @errorState INT = ERROR_STATE();
     DECLARE @errorProcedure NVARCHAR(max) = ERROR_PROCEDURE();
     RAISERROR (N'Error executing %s MESSAGE: %s', @errorSeverity, @errorState, @errorProcedure, @errorMessage);
 END CATCH

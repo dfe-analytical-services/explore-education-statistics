@@ -1,16 +1,20 @@
-CREATE OR ALTER PROCEDURE RebuildIndexes @Tables NVARCHAR(MAX), -- comma separated list of user-defined table names
-                                         @FragmentationThresholdReorganize FLOAT = 5,
-                                         @FragmentationThresholdRebuild FLOAT = 30,
-                                         @StopInMinutes INT = 600
+CREATE OR ALTER PROCEDURE RebuildIndexes 
+    @Tables NVARCHAR(MAX), -- This is a comma-delimited list of table names e.g. "Observation, ObservationFilterItem".
+    @FragmentationThresholdReorganize FLOAT = 5,
+    @FragmentationThresholdRebuild FLOAT = 30,
+    @StopInMinutes INT = 600
 AS
 BEGIN
-    IF LEN(ISNULL(@Tables, '')) = 0
-        BEGIN
-            RAISERROR ('Empty @Tables argument provided', 0, 1, NULL) WITH NOWAIT;
-            RETURN;
-        END
+    SET NOCOUNT ON
 
-    DECLARE @StatsCount INT,
+    IF LEN(ISNULL(@Tables, '')) = 0
+    BEGIN
+        RAISERROR ('Empty @Tables argument provided', 0, 1, NULL) WITH NOWAIT;
+        RETURN;
+    END
+
+    DECLARE
+        @StatsCount INT,
         @StatsRowIndex INT = 1,
         @RunId INT,
         @StopTime DATETIME = DATEADD(MINUTE, @StopInMinutes, GETUTCDATE()),
@@ -87,6 +91,7 @@ BEGIN
                 Fragmented.ObjectName,
                 Fragmented.FragPercent,
                 CASE
+                    WHEN Fragmented.HasPausedResumable = 1 THEN 'Resume'
                     WHEN Fragmented.FragPercent >= @FragmentationThresholdRebuild THEN 'Rebuild'
                     WHEN Fragmented.FragPercent >= @FragmentationThresholdReorganize THEN 'Reorganize'
                     ELSE 'None'
@@ -95,14 +100,22 @@ BEGIN
     FROM (SELECT idx.name                         AS IndexName,
                  sch.name                         AS SchemaName,
                  tl.ObjectName,
-                 ips.avg_fragmentation_in_percent AS FragPercent
+                 ips.avg_fragmentation_in_percent AS FragPercent,
+                 CASE WHEN EXISTS (
+                     SELECT 1
+                     FROM sys.index_resumable_operations iro
+                     WHERE iro.object_id = ips.object_id
+                     AND iro.index_id  = ips.index_id
+                     AND iro.state_desc = N'PAUSED'
+                 ) THEN 1 ELSE 0 END AS HasPausedResumable
           FROM #TableList AS tl
                    JOIN sys.dm_db_index_physical_stats(DB_ID(), NULL, NULL, NULL, 'LIMITED') ips
                         ON ips.object_id = OBJECT_ID(tl.ObjectName, 'U')
                    JOIN sys.indexes idx ON idx.object_id = ips.object_id AND idx.index_id = ips.index_id
                    JOIN sys.objects obj ON obj.object_id = ips.object_id
                    JOIN sys.schemas sch ON sch.schema_id = obj.schema_id
-          WHERE ips.alloc_unit_type_desc = 'IN_ROW_DATA') AS Fragmented;
+          WHERE ips.alloc_unit_type_desc = 'IN_ROW_DATA') AS Fragmented
+    ORDER BY Fragmented.HasPausedResumable DESC; -- Prefer to resume paused jobs first.
 
     ALTER TABLE #Stats
         ADD PRIMARY KEY (Id);
@@ -132,10 +145,16 @@ BEGIN
     WHILE @StatsRowIndex <= @StatsCount AND @SkipRemainingTasks = 0
         BEGIN
             SELECT @Command =
-                   'ALTER INDEX ' + IndexName + ' ON ' + SchemaName + '.' + ObjectName +
-                   IIF(ActionRequired = 'Rebuild',
-                       ' REBUILD WITH (ONLINE = ON)',
-                       ' REORGANIZE'),
+                   'ALTER INDEX ' + IndexName + ' ON ' + SchemaName + '.' + ObjectName + ' ' +
+                   CASE
+                       WHEN ActionRequired = 'Resume'
+                           THEN 'RESUME'
+                       WHEN ActionRequired = 'Rebuild'
+                           THEN 'REBUILD WITH (ONLINE = ON, RESUMABLE = ON, MAXDOP = 4)'
+                       WHEN ActionRequired = 'Reorganize'
+                           THEN 'REORGANIZE'
+                       ELSE ''
+                   END,
                    @FragPercentBefore = FragPercent,
                    @IndexName = IndexName,
                    @SchemaName = SchemaName,

@@ -20,6 +20,7 @@ import educationInNumbersService, {
   EinSummary,
 } from '@admin/services/educationInNumbersService';
 import { EducationInNumbersPageContextProvider } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
+import useCurrentRouteTitle from '@admin/utils/useCurrentRouteTitle';
 
 const navRoutes: EducationInNumbersRouteProps[] = [
   educationInNumbersSummaryRoute,
@@ -85,6 +86,8 @@ const EducationInNumbersPage = ({
       }
     : undefined;
 
+  const pageRouteTitle = useCurrentRouteTitle(navRoutes);
+
   return (
     <Page
       wide
@@ -99,6 +102,7 @@ const EducationInNumbersPage = ({
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-two-thirds">
                 <PageTitle
+                  metaTitle={`${pageRouteTitle} - ${educationInNumbersPage.title}`}
                   title={educationInNumbersPage.title}
                   caption="Edit Education in numbers Page"
                 />

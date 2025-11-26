@@ -508,6 +508,7 @@ Change the Release type
 Upload a replacement data set
     user uploads subject replacement    Dates test subject    dates-replacement.csv    dates-replacement.meta.csv
     user waits until page contains element    testid:Data file replacements table
+    user confirms replacement upload    Dates test subject
 
 Confirm data replacement details on replacement page
     user checks table cell contains    1    1    Dates test subject    testid:Data file replacements table
@@ -621,7 +622,7 @@ Edit data block for amendment
 
     user clicks element    testid:wizardStep-4-goToButton
 
-    user opens details dropdown    Date
+    user clicks button    Date
     user clicks category checkbox    Date    24/03/2020
     user checks category checkbox is checked    Date    24/03/2020
 

@@ -1,23 +1,28 @@
 import ContentHtml from '@common/components/ContentHtml';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
+import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
 import {
   PreReleaseAccessListSummary,
   PublicationSummaryRedesign,
   RelatedInformationItem,
+  ReleaseVersionSummary,
 } from '@common/services/publicationService';
+import { releaseTypes } from '@common/services/types/releaseType';
 import React from 'react';
 
 interface Props {
   praSummary: PreReleaseAccessListSummary;
   publicationSummary: PublicationSummaryRedesign;
   relatedInformationItems: RelatedInformationItem[];
+  releaseVersionSummary: ReleaseVersionSummary;
 }
 
 const ReleaseHelpPage = ({
   praSummary,
   publicationSummary,
   relatedInformationItems,
+  releaseVersionSummary,
 }: Props) => {
   const hasPraSummary = !!praSummary.preReleaseAccessList;
   const hasRelatedInformation = relatedInformationItems.length > 0;
@@ -28,8 +33,19 @@ const ReleaseHelpPage = ({
         publicationContact={publicationSummary.contact}
         publicationTitle={publicationSummary.title}
         sectionTitle="Get help by contacting us"
-        includeSectionBreak={hasPraSummary || hasRelatedInformation}
+        includeSectionBreak
       />
+
+      <ReleasePageContentSection
+        heading={releaseTypes[releaseVersionSummary.type]}
+        id="release-type-section"
+        includeSectionBreak={hasPraSummary || hasRelatedInformation}
+      >
+        <ReleaseTypeSection
+          type={releaseVersionSummary.type}
+          showHeading={false}
+        />
+      </ReleasePageContentSection>
 
       {hasRelatedInformation && (
         <ReleasePageContentSection

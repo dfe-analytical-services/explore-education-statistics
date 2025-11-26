@@ -28,6 +28,7 @@ describe('chartBuilderReducer', () => {
     capabilities: {
       canPositionLegendInline: true,
       canIncludeNonNumericData: true,
+      canReorderDataCategories: false,
       canSetBarThickness: true,
       canSetDataLabelColour: true,
       canSetDataLabelPosition: true,
@@ -605,6 +606,8 @@ describe('chartBuilderReducer', () => {
         dataSetConfigs: [
           {
             dataSet: { filters: [] },
+            dataSetKey:
+              '{"filters":["ethnicity-major-chinese","state-funded-primary"],"indicator":"authorised-absence-sessions","timePeriod":"2015_AY"}',
             dataGrouping: { type: 'EqualIntervals', customGroups: [] },
           },
         ],
@@ -646,6 +649,8 @@ describe('chartBuilderReducer', () => {
         dataSetConfigs: [
           {
             dataSet: { filters: [] },
+            dataSetKey:
+              '{"filters":["ethnicity-major-chinese","state-funded-primary"],"indicator":"authorised-absence-sessions","timePeriod":"2015_AY"}',
             dataGrouping: { type: 'EqualIntervals', customGroups: [] },
           },
         ],
@@ -1203,6 +1208,8 @@ describe('chartBuilderReducer', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2015_AY',
               },
+              dataSetKey:
+                '{"filters":["ethnicity-major-chinese","state-funded-primary"],"indicator":"authorised-absence-sessions","timePeriod":"2015_AY"}',
             },
             {
               dataGrouping: {
@@ -1215,6 +1222,8 @@ describe('chartBuilderReducer', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2014_AY',
               },
+              dataSetKey:
+                '{"filters":["ethnicity-major-chinese","state-funded-primary"],"indicator":"authorised-absence-sessions","timePeriod":"2014_AY"}',
             },
           ],
         },
@@ -1270,6 +1279,8 @@ describe('chartBuilderReducer', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2015_AY',
               },
+              dataSetKey:
+                '{"filters":["ethnicity-major-chinese","state-funded-primary"],"indicator":"authorised-absence-sessions","timePeriod":"2015_AY"}',
               dataGrouping: { type: 'EqualIntervals', customGroups: [] },
               boundaryLevel: 2,
             },
@@ -1279,6 +1290,8 @@ describe('chartBuilderReducer', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2014_AY',
               },
+              dataSetKey:
+                '{"filters":["ethnicity-major-chinese","state-funded-primary"],"indicator":"authorised-absence-sessions","timePeriod":"2014_AY"}',
               dataGrouping: { type: 'Custom', customGroups: [] },
               boundaryLevel: 3,
             },
@@ -1326,6 +1339,8 @@ describe('chartBuilderReducer', () => {
               indicator: 'authorised-absence-sessions',
               timePeriod: '2015_AY',
             },
+            dataSetKey:
+              '{"filters":["ethnicity-major-chinese","state-funded-primary"],"indicator":"authorised-absence-sessions","timePeriod":"2015_AY"}',
             dataGrouping: { type: 'EqualIntervals', customGroups: [] },
             boundaryLevel: 20,
           },
@@ -1335,6 +1350,8 @@ describe('chartBuilderReducer', () => {
               indicator: 'authorised-absence-sessions',
               timePeriod: '2014_AY',
             },
+            dataSetKey:
+              '{"filters":["ethnicity-major-chinese","state-funded-primary"],"indicator":"authorised-absence-sessions","timePeriod":"2014_AY"}',
             dataGrouping: { type: 'Custom', customGroups: [] },
             boundaryLevel: 30,
           },
@@ -1379,6 +1396,8 @@ describe('chartBuilderReducer', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2015_AY',
               },
+              dataSetKey:
+                '{"filters":["ethnicity-major-chinese","state-funded-primary"],"indicator":"authorised-absence-sessions","timePeriod":"2015_AY"}',
               dataGrouping: { type: 'EqualIntervals', customGroups: [] },
               boundaryLevel: 2,
             },
@@ -1388,6 +1407,8 @@ describe('chartBuilderReducer', () => {
                 indicator: 'authorised-absence-sessions',
                 timePeriod: '2014_AY',
               },
+              dataSetKey:
+                '{"filters":["ethnicity-major-chinese","state-funded-primary"],"indicator":"authorised-absence-sessions","timePeriod":"2014_AY"}',
               dataGrouping: { type: 'Custom', customGroups: [] },
               boundaryLevel: 3,
             },
@@ -1434,6 +1455,8 @@ describe('chartBuilderReducer', () => {
               indicator: 'authorised-absence-sessions',
               timePeriod: '2015_AY',
             },
+            dataSetKey:
+              '{"filters":["ethnicity-major-chinese","state-funded-primary"],"indicator":"authorised-absence-sessions","timePeriod":"2015_AY"}',
             dataGrouping: { type: 'Quantiles', customGroups: [] },
             boundaryLevel: 2,
           },
@@ -1443,6 +1466,8 @@ describe('chartBuilderReducer', () => {
               indicator: 'authorised-absence-sessions',
               timePeriod: '2014_AY',
             },
+            dataSetKey:
+              '{"filters":["ethnicity-major-chinese","state-funded-primary"],"indicator":"authorised-absence-sessions","timePeriod":"2014_AY"}',
             dataGrouping: { type: 'Quantiles', customGroups: [] },
             boundaryLevel: 3,
           },
