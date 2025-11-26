@@ -5,7 +5,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IUserPublicationRoleRepository
 {
-    Task<UserPublicationRole> Create(Guid userId, Guid publicationId, PublicationRole role, Guid createdById);
+    Task<UserPublicationRole> Create(
+        Guid userId,
+        Guid publicationId,
+        PublicationRole role,
+        Guid createdById,
+        DateTime? createdDate = null
+    );
+
+    Task CreateManyIfNotExists(IReadOnlyList<UserPublicationRole> userPublicationRoles);
 
     Task<List<PublicationRole>> ListDistinctRolesByUser(Guid userId, bool includeInactiveUsers = false);
 
@@ -15,7 +23,9 @@ public interface IUserPublicationRoleRepository
         bool includeInactiveUsers = false
     );
 
-    Task<IReadOnlyList<UserPublicationRole>> ListUserPublicationRoles(
+    Task<List<UserPublicationRole>> ListUserPublicationRoles(Guid userId);
+
+    Task<List<UserPublicationRole>> ListUserPublicationRoles(
         Guid publicationId,
         PublicationRole[]? rolesToInclude,
         bool includeInactiveUsers = false
