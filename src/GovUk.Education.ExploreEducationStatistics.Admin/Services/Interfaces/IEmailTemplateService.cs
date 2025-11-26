@@ -7,10 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IEmailTemplateService
 {
-    Either<ActionResult, Unit> SendInviteEmail(
+    Task<Either<ActionResult, Unit>> SendInviteEmail(
         string email,
-        List<UserReleaseInvite> userReleaseInvites,
-        List<UserPublicationInvite> userPublicationInvites
+        HashSet<Guid> userReleaseRoleIds,
+        HashSet<Guid> userPublicationRoleIds
     );
 
     Either<ActionResult, Unit> SendPublicationRoleEmail(string email, Publication publication, PublicationRole role);

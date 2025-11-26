@@ -16,6 +16,61 @@ public class UserResourceRoleNotificationService(
     IUserPublicationRoleRepository userPublicationRoleRepository
 ) : IUserResourceRoleNotificationService
 {
+    public async Task NotifyUserOfInvite(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var user = await FindUser(userId, cancellationToken);
+
+        if (user.Active)
+        {
+            throw new ArgumentException($"User with ID {userId} is already active and does not need notifying.");
+        }
+
+        var userReleaseRoles = await userReleaseRoleRepository.ListUserReleaseRoles(user!.Id);
+        var userPublicationRoles = await userPublicationRoleRepository.ListUserPublicationRoles(user.Id);
+
+        var userReleaseRoleIds = userReleaseRoles.Select(urr => urr.Id).ToHashSet();
+        var userPublicationRoleIds = userPublicationRoles.Select(urr => urr.Id).ToHashSet();
+
+        await contentDbContext.RequireTransaction(async () =>
+        {
+            // Doing it in this order will technically set a `SentDate` slightly before the email is actually sent.
+            // But if we did it the other way, and the database transaction failed after sending the email, then we
+            // would have sent an email for multiple roles which have an unmarked `SentDate`.
+            // At least this way, if the email fails to send, the database transaction will be rolled back.
+            // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
+
+            await userReleaseRoles
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async userReleaseRole =>
+                    await userReleaseRoleRepository.MarkEmailAsSent(
+                        userId: userId,
+                        releaseVersionId: userReleaseRole.ReleaseVersionId,
+                        role: userReleaseRole.Role,
+                        cancellationToken: cancellationToken
+                    )
+                );
+
+            await userPublicationRoles
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async userPublicationRole =>
+                    await userPublicationRoleRepository.MarkEmailAsSent(
+                        userId: userId,
+                        publicationId: userPublicationRole.PublicationId,
+                        role: userPublicationRole.Role,
+                        cancellationToken: cancellationToken
+                    )
+                );
+
+            await emailTemplateService
+                .SendInviteEmail(
+                    email: user.Email,
+                    userReleaseRoleIds: userReleaseRoleIds,
+                    userPublicationRoleIds: userPublicationRoleIds
+                )
+                .OrThrow(_ => throw new EmailSendFailedException($"Failed to send user invite email to {user.Email}."));
+        });
+    }
+
     public async Task NotifyUserOfNewPublicationRole(
         Guid userId,
         Publication publication,

@@ -13,6 +13,23 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext)
     ),
         IUserPublicationRoleRepository
 {
+    public async Task CreateManyIfNotExists(IReadOnlyList<UserPublicationRole> userPublicationRoles)
+    {
+        var newUserPublicationRoles = await userPublicationRoles
+            .ToAsyncEnumerable()
+            .WhereAwait(async userPublicationRole =>
+                !await UserHasRoleOnPublication(
+                    userId: userPublicationRole.UserId,
+                    publicationId: userPublicationRole.PublicationId,
+                    role: userPublicationRole.Role
+                )
+            )
+            .ToListAsync();
+
+        await contentDbContext.UserPublicationRoles.AddRangeAsync(newUserPublicationRoles);
+        await contentDbContext.SaveChangesAsync();
+    }
+
     protected override IQueryable<UserPublicationRole> GetResourceRolesQueryByResourceId(Guid publicationId)
     {
         return ContentDbContext.UserPublicationRoles.Where(role => role.PublicationId == publicationId);
@@ -50,7 +67,12 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext)
             .ToListAsync();
     }
 
-    public async Task<IReadOnlyList<UserPublicationRole>> ListUserPublicationRoles(
+    public async Task<List<UserPublicationRole>> ListUserPublicationRoles(Guid userId)
+    {
+        return await ContentDbContext.UserPublicationRoles.Where(upr => upr.UserId == userId).ToListAsync();
+    }
+
+    public async Task<List<UserPublicationRole>> ListUserPublicationRoles(
         Guid publicationId,
         PublicationRole[]? rolesToInclude,
         bool includeInactiveUsers = false

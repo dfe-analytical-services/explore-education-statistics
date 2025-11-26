@@ -5,7 +5,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IUserReleaseRoleRepository
 {
-    Task<UserReleaseRole> Create(Guid userId, Guid releaseVersionId, ReleaseRole role, Guid createdById);
+    Task<UserReleaseRole> Create(
+        Guid userId,
+        Guid releaseVersionId,
+        ReleaseRole role,
+        Guid createdById,
+        DateTime? createdDate = null
+    );
 
     Task<UserReleaseRole> CreateIfNotExists(Guid userId, Guid releaseVersionId, ReleaseRole role, Guid createdById);
 
@@ -26,6 +32,8 @@ public interface IUserReleaseRoleRepository
         Guid publicationId,
         bool includeInactiveUsers = false
     );
+
+    Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid userId);
 
     Task<List<UserReleaseRole>> ListUserReleaseRoles(
         Guid releaseVersionId,
