@@ -111,6 +111,8 @@ jobs:
             **/GovUk.*[Tt]ests/*.csproj
             !**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj
           arguments: --configuration $(BuildConfiguration)
+        env:
+          DOCKER_API_VERSION: 1.43
 
   - job: BackendPublish
     pool:
@@ -308,6 +310,8 @@ jobs:
           command: test
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
           arguments: --configuration $(BuildConfiguration) --collect "Code coverage"
+        env:
+          DOCKER_API_VERSION: 1.43
 
       - task: Bash@3
         displayName: pnpm i
