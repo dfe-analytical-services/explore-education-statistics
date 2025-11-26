@@ -105,23 +105,24 @@ export default function ChartDataGroupingForm({
               ),
         }),
 
-      numberOfGroups: Yup.number()
-        .max(maxMapDataGroups, `Maximum ${maxMapDataGroups} data groups`)
-        .min(1, 'Minimum 1 data group')
-        .when('type', {
-          is: 'EqualIntervals',
-          then: s => s.required('Enter a number of data groups'),
-
-          otherwise: s => s.notRequired(),
-        }),
-      numberOfGroupsQuantiles: Yup.number()
-        .max(maxMapDataGroups, `Maximum ${maxMapDataGroups} data groups`)
-        .min(1, 'Minimum 1 data group')
-        .when('type', {
-          is: 'Quantiles',
-          then: s => s.required('Enter a number of data groups'),
-          otherwise: s => s.notRequired(),
-        }),
+      numberOfGroups: Yup.number().when('type', {
+        is: 'EqualIntervals',
+        then: s =>
+          s
+            .required('Enter a number of data groups')
+            .max(maxMapDataGroups, `Maximum ${maxMapDataGroups} data groups`)
+            .min(1, 'Minimum 1 data group'),
+        otherwise: s => s.notRequired(),
+      }),
+      numberOfGroupsQuantiles: Yup.number().when('type', {
+        is: 'Quantiles',
+        then: s =>
+          s
+            .required('Enter a number of data groups')
+            .max(maxMapDataGroups, `Maximum ${maxMapDataGroups} data groups`)
+            .min(1, 'Minimum 1 data group'),
+        otherwise: s => s.notRequired(),
+      }),
       copyCustomGroups: Yup.string().when('type', {
         is: 'CopyCustom',
         then: s => s.required('Select a data set to copy custom groups from'),
@@ -229,7 +230,7 @@ export default function ChartDataGroupingForm({
       mode="onBlur"
       validationSchema={validationSchema}
     >
-      {({ resetField, setValue, watch }) => {
+      {({ resetField, setValue, watch, clearErrors }) => {
         const values = watch();
         const defaultOptions: RadioOption<GroupingType>[] = [
           {
@@ -362,6 +363,9 @@ export default function ChartDataGroupingForm({
                     : defaultOptions
                 }
                 order={[]}
+                onChange={() => {
+                  clearErrors();
+                }}
               />
               <ButtonGroup>
                 <Button type="submit">Done</Button>
