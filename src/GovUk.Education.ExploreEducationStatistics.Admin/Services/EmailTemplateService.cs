@@ -19,16 +19,19 @@ public class EmailTemplateService(
     IOptions<NotifyOptions> notifyOptions
 ) : IEmailTemplateService
 {
-    public Either<ActionResult, Unit> SendInviteEmail(
+    public async Task<Either<ActionResult, Unit>> SendInviteEmail(
         string email,
-        List<UserReleaseInvite> userReleaseInvites,
-        List<UserPublicationInvite> userPublicationInvites
+        HashSet<Guid> userReleaseRoleIds,
+        HashSet<Guid> userPublicationRoleIds
     )
     {
         var url = appOptions.Value.Url;
         var template = notifyOptions.Value.InviteWithRolesTemplateId;
 
-        var releaseRoleList = userReleaseInvites
+        List<UserReleaseRole> userReleaseRoles = await GetUserReleaseRoles(userReleaseRoleIds);
+        List<UserPublicationRole> userPublicationRoles = await GetUserPublicationRoles(userPublicationRoleIds);
+
+        var releaseRoleList = userReleaseRoles
             .OrderBy(invite => invite.ReleaseVersion.Release.Publication.Title)
             .ThenBy(invite => invite.ReleaseVersion.Release.Title)
             .ThenBy(invite => invite.Role.ToString())
@@ -40,7 +43,7 @@ public class EmailTemplateService(
         // The transformation step here is necessary to ensure that the email still uses the name 'Approver' for the
         // temporarily named 'Allower' role, as this is the name used in the UI. This will be removed in the future;
         // likely in STEP 9 (EES-6196) of the permissions rework approach (NO TICKET HAS BEEN CREATED FOR THIS YET).
-        var publicationRoleList = userPublicationInvites
+        var publicationRoleList = userPublicationRoles
             .OrderBy(invite => invite.Publication.Title)
             .ThenBy(invite => invite.Role)
             .Select(invite => $"* {invite.Publication.Title} - {TransformPublicationRole(invite.Role)}")
@@ -222,6 +225,26 @@ public class EmailTemplateService(
         };
 
         return emailService.SendEmail(email, template, emailValues);
+    }
+
+    private async Task<List<UserReleaseRole>> GetUserReleaseRoles(HashSet<Guid> userReleaseRoleIds)
+    {
+        return await contentDbContext
+            .UserReleaseRoles.AsNoTracking()
+            .Include(urr => urr.ReleaseVersion)
+            .ThenInclude(rv => rv.Release)
+            .ThenInclude(r => r.Publication)
+            .Where(urr => userReleaseRoleIds.Contains(urr.Id))
+            .ToListAsync();
+    }
+
+    private async Task<List<UserPublicationRole>> GetUserPublicationRoles(HashSet<Guid> userPublicationRoleIds)
+    {
+        return await contentDbContext
+            .UserPublicationRoles.AsNoTracking()
+            .Include(upr => upr.Publication)
+            .Where(upr => userPublicationRoleIds.Contains(upr.Id))
+            .ToListAsync();
     }
 
     private static string TransformPublicationRole(PublicationRole role)
