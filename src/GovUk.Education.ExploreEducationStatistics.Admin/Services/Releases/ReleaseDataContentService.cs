@@ -52,6 +52,12 @@ public class ReleaseDataContentService(ContentDbContext contentDbContext, IUserS
             .Include(rf => rf.File)
                 .ThenInclude(f => f.DataSetFileVersionGeographicLevels)
             .Where(rf => rf.ReleaseVersionId == releaseVersion.Id && rf.File.Type == FileType.Data)
+            .Join(
+                contentDbContext.DataImports.Where(di => di.Status == DataImportStatus.COMPLETE),
+                rf => rf.FileId,
+                di => di.FileId,
+                (rf, di) => rf
+            )
             .OrderBy(rf => rf.Order)
             .ToArrayAsync(cancellationToken);
         return releaseFiles.Select(ReleaseDataContentDataSetDto.FromReleaseFile).ToArray();
