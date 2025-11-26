@@ -40,9 +40,9 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
         var query = includeInactiveUsers ? ContentDbContext.UserReleaseRoles : ContentDbContext.ActiveUserReleaseRoles;
 
         return await query
-            .Where(r => r.UserId == userId)
-            .Where(role => role.ReleaseVersionId == releaseVersionId)
-            .Select(r => r.Role)
+            .Where(urr => urr.UserId == userId)
+            .Where(urr => urr.ReleaseVersionId == releaseVersionId)
+            .Select(urr => urr.Role)
             .Distinct()
             .ToListAsync();
     }
@@ -63,6 +63,11 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
             .ToListAsync();
     }
 
+    public async Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid userId)
+    {
+        return await ContentDbContext.UserReleaseRoles.Where(urr => urr.UserId == userId).ToListAsync();
+    }
+
     public async Task<List<UserReleaseRole>> ListUserReleaseRoles(
         Guid releaseVersionId,
         ReleaseRole[]? rolesToInclude,
@@ -75,7 +80,7 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
 
         return await query
             .Include(urr => urr.User)
-            .Where(role => role.ReleaseVersionId == releaseVersionId)
+            .Where(urr => urr.ReleaseVersionId == releaseVersionId)
             .Where(urr => rolesToCheck.Contains(urr.Role))
             .ToListAsync();
     }

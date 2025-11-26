@@ -1,5 +1,4 @@
 #nullable enable
-using AngleSharp.Dom;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -27,14 +26,12 @@ public class UserManagementService(
     UsersAndRolesDbContext usersAndRolesDbContext,
     ContentDbContext contentDbContext,
     IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
-    IEmailTemplateService emailTemplateService,
     IUserRoleService userRoleService,
     IUserRepository userRepository,
     IUserService userService,
-    IUserReleaseInviteRepository userReleaseInviteRepository,
-    IUserPublicationInviteRepository userPublicationInviteRepository,
     IUserReleaseRoleRepository userReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
+    IUserResourceRoleNotificationService userResourceRoleNotificationService,
     UserManager<ApplicationUser> userManager
 ) : IUserManagementService
 {
@@ -183,8 +180,14 @@ public class UserManagementService(
             .OnSuccess(async () =>
             {
                 var pendingUserInvites = await contentDbContext
-                    .Users.WhereInvitePending()
-                    .Select(u => new { u.Email, u.Role })
+                    .Users.AsNoTracking()
+                    .WhereInvitePending()
+                    .Select(u => new
+                    {
+                        u.Id,
+                        u.Email,
+                        u.Role,
+                    })
                     .OrderBy(u => u.Email)
                     .ToListAsync();
 
@@ -192,36 +195,28 @@ public class UserManagementService(
                     .ToAsyncEnumerable()
                     .SelectAwait(async pendingUserInvite =>
                     {
-                        var userReleaseInvites = await contentDbContext
-                            .UserReleaseInvites.Include(uri => uri.ReleaseVersion)
-                                .ThenInclude(rv => rv.Release)
-                                    .ThenInclude(r => r.Publication)
-                            .Where(uri => uri.Email.ToLower().Equals(pendingUserInvite.Email.ToLower()))
+                        var userReleaseRoles = await contentDbContext
+                            .UserReleaseRoles.AsNoTracking()
+                            .Where(urr => urr.UserId == pendingUserInvite.Id)
+                            .Select(urr => new UserReleaseRoleViewModel
+                            {
+                                Id = urr.Id,
+                                Publication = urr.ReleaseVersion.Release.Publication.Title,
+                                Release = urr.ReleaseVersion.Release.Title,
+                                Role = urr.Role,
+                            })
                             .ToListAsync();
 
-                        var userReleaseRoles = userReleaseInvites
-                            .Select(userReleaseInvite => new UserReleaseRoleViewModel
+                        var userPublicationRoles = await contentDbContext
+                            .UserPublicationRoles.AsNoTracking()
+                            .Where(upr => upr.UserId == pendingUserInvite.Id)
+                            .Select(upr => new UserPublicationRoleViewModel
                             {
-                                Id = userReleaseInvite.Id,
-                                Publication = userReleaseInvite.ReleaseVersion.Release.Publication.Title,
-                                Release = userReleaseInvite.ReleaseVersion.Release.Title,
-                                Role = userReleaseInvite.Role,
+                                Id = upr.Id,
+                                Publication = upr.Publication.Title,
+                                Role = upr.Role,
                             })
-                            .ToList();
-
-                        var userPublicationInvites = await contentDbContext
-                            .UserPublicationInvites.Include(upi => upi.Publication)
-                            .Where(upi => upi.Email.ToLower().Equals(pendingUserInvite.Email.ToLower()))
                             .ToListAsync();
-
-                        var userPublicationRoles = userPublicationInvites
-                            .Select(userPublicationInvite => new UserPublicationRoleViewModel
-                            {
-                                Id = userPublicationInvite.Id,
-                                Publication = userPublicationInvite.Publication.Title,
-                                Role = userPublicationInvite.Role,
-                            })
-                            .ToList();
 
                         return new PendingInviteViewModel
                         {
@@ -237,13 +232,12 @@ public class UserManagementService(
 
     public async Task<Either<ActionResult, User>> InviteUser(UserInviteCreateRequest request)
     {
-        var email = request.Email;
-        var sanitisedEmail = email.Trim().ToLower();
+        var sanitisedEmail = request.Email.Trim().ToLower();
         var roleId = request.RoleId;
 
         return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(() => ValidateIdentityUserDoesNotExist(email))
+            .OnSuccess(() => ValidateActiveUserDoesNotExist(sanitisedEmail))
             .OnSuccess<ActionResult, Unit, User>(async () =>
             {
                 var role = await usersAndRolesDbContext.Roles.AsNoTracking().SingleOrDefaultAsync(r => r.Id == roleId);
@@ -260,10 +254,10 @@ public class UserManagementService(
                     createdDate: request.CreatedDate
                 );
 
-                // Clear out any pre-existing Release or Publication invites prior to adding
+                // Clear out any pre-existing Release Roles or Publication Roles prior to adding
                 // new ones.
-                await userReleaseInviteRepository.RemoveByUserEmail(sanitisedEmail);
-                await userPublicationInviteRepository.RemoveByUserEmail(sanitisedEmail);
+                await userReleaseRoleRepository.RemoveForUser(user.Id);
+                await userPublicationRoleRepository.RemoveForUser(user.Id);
 
                 foreach (var userReleaseRole in request.UserReleaseRoles)
                 {
@@ -271,42 +265,31 @@ public class UserManagementService(
                         .ReleaseVersions.LatestReleaseVersion(releaseId: userReleaseRole.ReleaseId)
                         .SingleAsync();
 
-                    await userReleaseInviteRepository.Create(
+                    await userReleaseRoleRepository.Create(
+                        userId: user.Id,
                         releaseVersionId: latestReleaseVersion!.Id,
-                        email: sanitisedEmail,
-                        releaseRole: userReleaseRole.ReleaseRole,
-                        emailSent: true,
+                        role: userReleaseRole.ReleaseRole,
                         createdById: userService.GetUserId(),
-                        request.CreatedDate?.UtcDateTime
+                        createdDate: request.CreatedDate?.UtcDateTime
                     );
                 }
 
-                await userPublicationInviteRepository.CreateManyIfNotExists(
-                    request.UserPublicationRoles,
-                    sanitisedEmail,
-                    userService.GetUserId(),
-                    request.CreatedDate?.UtcDateTime
-                );
+                var userPublicationRoles = request
+                    .UserPublicationRoles.Select(userPublicationRole => new UserPublicationRole
+                    {
+                        UserId = user.Id,
+                        ResourceId = userPublicationRole.PublicationId,
+                        Role = userPublicationRole.PublicationRole,
+                        Created = request.CreatedDate?.UtcDateTime ?? DateTime.UtcNow,
+                        CreatedById = userService.GetUserId(),
+                    })
+                    .ToList();
+
+                await userPublicationRoleRepository.CreateManyIfNotExists(userPublicationRoles);
+
+                await userResourceRoleNotificationService.NotifyUserOfInvite(user.Id);
 
                 return user;
-            })
-            .OnSuccess(async user =>
-            {
-                var userReleaseInvites = await contentDbContext
-                    .UserReleaseInvites.Include(uri => uri.ReleaseVersion)
-                        .ThenInclude(rv => rv.Release)
-                            .ThenInclude(r => r.Publication)
-                    .Where(uri => uri.Email.ToLower() == sanitisedEmail)
-                    .ToListAsync();
-
-                var userPublicationInvites = await contentDbContext
-                    .UserPublicationInvites.Include(upi => upi.Publication)
-                    .Where(upi => upi.Email.ToLower() == sanitisedEmail)
-                    .ToListAsync();
-
-                return emailTemplateService
-                    .SendInviteEmail(sanitisedEmail, userReleaseInvites, userPublicationInvites)
-                    .OnSuccess(() => user);
             });
     }
 
@@ -319,8 +302,8 @@ public class UserManagementService(
             {
                 await contentDbContext.RequireTransaction(async () =>
                 {
-                    await userReleaseInviteRepository.RemoveByUserEmail(email);
-                    await userPublicationInviteRepository.RemoveByUserEmail(email);
+                    await userReleaseRoleRepository.RemoveForUser(invitedUser.Id);
+                    await userPublicationRoleRepository.RemoveForUser(invitedUser.Id);
 
                     await userRepository.SoftDeleteUser(invitedUser.Id, userService.GetUserId());
                 });
@@ -348,9 +331,6 @@ public class UserManagementService(
                 {
                     await userManager.DeleteAsync(identityUser);
 
-                    await userPublicationInviteRepository.RemoveByUserEmail(email);
-                    await userReleaseInviteRepository.RemoveByUserEmail(email);
-
                     await userReleaseRoleRepository.RemoveForUser(activeInternalUser.Id);
                     await userPublicationRoleRepository.RemoveForUser(activeInternalUser.Id);
 
@@ -365,8 +345,8 @@ public class UserManagementService(
     private async Task<Either<ActionResult, ApplicationUser>> GetIdentityUser(string email) =>
         await usersAndRolesDbContext.Users.SingleOrNotFoundAsync(user => user.Email == email);
 
-    private async Task<Either<ActionResult, Unit>> ValidateIdentityUserDoesNotExist(string email) =>
-        await usersAndRolesDbContext.Users.AnyAsync(u => u.Email!.ToLower().Equals(email.ToLower()))
+    private async Task<Either<ActionResult, Unit>> ValidateActiveUserDoesNotExist(string email) =>
+        (await userRepository.FindActiveUserByEmail(email)) is not null
             ? ValidationActionResult(UserAlreadyExists)
             : Unit.Instance;
 

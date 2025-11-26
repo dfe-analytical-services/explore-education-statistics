@@ -14,9 +14,21 @@ public abstract class UserResourceRoleRepositoryBase<TParent, TResourceRole, TRe
 {
     protected readonly ContentDbContext ContentDbContext = contentDbContext;
 
-    public async Task<TResourceRole> Create(Guid userId, Guid resourceId, TRoleEnum role, Guid createdById)
+    public async Task<TResourceRole> Create(
+        Guid userId,
+        Guid resourceId,
+        TRoleEnum role,
+        Guid createdById,
+        DateTime? createdDate = null
+    )
     {
-        var newResourceRole = NewResourceRole(userId, resourceId, role, createdById);
+        var newResourceRole = NewResourceRole(
+            userId: userId,
+            resourceId: resourceId,
+            role: role,
+            createdById: createdById,
+            createdDate: createdDate
+        );
 
         await ContentDbContext.Set<TResourceRole>().AddAsync(newResourceRole);
         await ContentDbContext.SaveChangesAsync();
@@ -94,13 +106,19 @@ public abstract class UserResourceRoleRepositoryBase<TParent, TResourceRole, TRe
             .AnyAsync(r => r.UserId == userId && r.Role.Equals(role));
     }
 
-    private static TResourceRole NewResourceRole(Guid userId, Guid resourceId, TRoleEnum role, Guid createdById)
+    private static TResourceRole NewResourceRole(
+        Guid userId,
+        Guid resourceId,
+        TRoleEnum role,
+        Guid createdById,
+        DateTime? createdDate = null
+    )
     {
         var resourceRole = Activator.CreateInstance<TResourceRole>();
         resourceRole.UserId = userId;
         resourceRole.ResourceId = resourceId;
         resourceRole.Role = role;
-        resourceRole.Created = DateTime.UtcNow;
+        resourceRole.Created = createdDate?.ToUniversalTime() ?? DateTime.UtcNow;
         resourceRole.CreatedById = createdById;
         return resourceRole;
     }
