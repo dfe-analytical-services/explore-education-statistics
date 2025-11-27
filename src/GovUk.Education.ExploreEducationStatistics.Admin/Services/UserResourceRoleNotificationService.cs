@@ -25,8 +25,14 @@ public class UserResourceRoleNotificationService(
             throw new ArgumentException($"User with ID {userId} is already active and does not need notifying.");
         }
 
-        var userReleaseRoles = await userReleaseRoleRepository.ListUserReleaseRoles(user!.Id);
-        var userPublicationRoles = await userPublicationRoleRepository.ListUserPublicationRoles(user.Id);
+        var userReleaseRoles = await userReleaseRoleRepository.ListRolesForUser(
+            userId: user!.Id,
+            includeInactiveUsers: true
+        );
+        var userPublicationRoles = await userPublicationRoleRepository.ListRolesForUser(
+            userId: user.Id,
+            includeInactiveUsers: true
+        );
 
         var userReleaseRoleIds = userReleaseRoles.Select(urr => urr.Id).ToHashSet();
         var userPublicationRoleIds = userPublicationRoles.Select(urr => urr.Id).ToHashSet();

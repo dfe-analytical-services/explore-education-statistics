@@ -127,13 +127,13 @@ public class MethodologyApprovalService(
             .SingleAsync();
 
         var userReleaseRoles = await userReleaseRoleService.ListLatestUserReleaseRolesByPublication(
-            ReleaseRole.Approver,
-            owningPublicationId
+            publicationId: owningPublicationId,
+            rolesToInclude: [ReleaseRole.Approver]
         );
 
-        var userPublicationRoles = await userPublicationRoleRepository.ListUserPublicationRoles(
-            owningPublicationId,
-            [PublicationRole.Allower]
+        var userPublicationRoles = await userPublicationRoleRepository.ListRolesForPublication(
+            publicationId: owningPublicationId,
+            rolesToInclude: [PublicationRole.Allower]
         );
 
         var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();
