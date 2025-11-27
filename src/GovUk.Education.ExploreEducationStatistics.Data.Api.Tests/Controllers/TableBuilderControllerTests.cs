@@ -271,9 +271,13 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        BlobCacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel))).ReturnsAsync(null!);
+        PublicBlobCacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+            .ReturnsAsync(null!);
 
-        BlobCacheService.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults)).Returns(Task.CompletedTask);
+        PublicBlobCacheService
+            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+            .Returns(Task.CompletedTask);
 
         var dataBlockService = new Mock<IDataBlockService>();
 
@@ -399,9 +403,13 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        BlobCacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel))).ReturnsAsync(null!);
+        PublicBlobCacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+            .ReturnsAsync(null!);
 
-        BlobCacheService.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults)).Returns(Task.CompletedTask);
+        PublicBlobCacheService
+            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+            .Returns(Task.CompletedTask);
 
         var dataBlockService = new Mock<IDataBlockService>(Strict);
 
@@ -468,9 +476,13 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        BlobCacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel))).ReturnsAsync(null!);
+        PublicBlobCacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+            .ReturnsAsync(null!);
 
-        BlobCacheService.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults)).Returns(Task.CompletedTask);
+        PublicBlobCacheService
+            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+            .Returns(Task.CompletedTask);
 
         var dataBlockService = new Mock<IDataBlockService>(Strict);
 
@@ -537,9 +549,13 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        BlobCacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel))).ReturnsAsync(null!);
+        PublicBlobCacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+            .ReturnsAsync(null!);
 
-        BlobCacheService.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults)).Returns(Task.CompletedTask);
+        PublicBlobCacheService
+            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+            .Returns(Task.CompletedTask);
 
         var dataBlockService = new Mock<IDataBlockService>(Strict);
 
@@ -651,9 +667,13 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        BlobCacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel))).ReturnsAsync(null!);
+        PublicBlobCacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+            .ReturnsAsync(null!);
 
-        BlobCacheService.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults)).Returns(Task.CompletedTask);
+        PublicBlobCacheService
+            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+            .Returns(Task.CompletedTask);
 
         var dataBlockService = new Mock<IDataBlockService>(Strict);
 
@@ -684,7 +704,7 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     {
         return TestApp.ConfigureServices(services =>
         {
-            services.ReplaceService(BlobCacheService);
+            services.ReplaceService(PublicBlobCacheService);
 
             services.AddTransient(_ => dataBlockService ?? Mock.Of<IDataBlockService>(Strict));
             services.AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict));

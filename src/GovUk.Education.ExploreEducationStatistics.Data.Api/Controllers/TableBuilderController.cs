@@ -1,8 +1,8 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
@@ -22,7 +22,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 public class TableBuilderController(
     ContentDbContext contextDbContext,
     IDataBlockService dataBlockService,
-    ITableBuilderService tableBuilderService
+    ITableBuilderService tableBuilderService,
+    IPublicBlobCacheService publicBlobCacheService,
+    ILogger<TableBuilderController> logger
 ) : ControllerBase
 {
     // Change this whenever there is a breaking change
@@ -141,27 +143,38 @@ public class TableBuilderController(
             .HandleFailuresOrOk();
     }
 
-    [BlobCache(typeof(DataBlockTableResultCacheKey))]
     private Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
         DataBlockVersion dataBlockVersion
     )
     {
-        return dataBlockService.GetDataBlockTableResult(
-            releaseVersionId: dataBlockVersion.ReleaseVersionId,
-            dataBlockVersionId: dataBlockVersion.Id
+        return publicBlobCacheService.GetOrCreateAsync(
+            cacheKey: new DataBlockTableResultCacheKey(dataBlockVersion),
+            createIfNotExistsFn: () =>
+                dataBlockService.GetDataBlockTableResult(
+                    releaseVersionId: dataBlockVersion.ReleaseVersionId,
+                    dataBlockVersionId: dataBlockVersion.Id
+                ),
+            logger: logger
         );
     }
 
-    [BlobCache(typeof(LocationsForDataBlockCacheKey))]
     private Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> GetLocations(
         DataBlockVersion dataBlockVersion,
         long boundaryLevelId
     )
     {
-        return dataBlockService.GetLocationsForDataBlock(
-            releaseVersionId: dataBlockVersion.ReleaseVersionId,
-            dataBlockVersionId: dataBlockVersion.Id,
-            boundaryLevelId
+        return publicBlobCacheService.GetOrCreateAsync(
+            cacheKey: new LocationsForDataBlockCacheKey(
+                dataBlockVersion: dataBlockVersion,
+                boundaryLevelId: boundaryLevelId
+            ),
+            createIfNotExistsFn: () =>
+                dataBlockService.GetLocationsForDataBlock(
+                    releaseVersionId: dataBlockVersion.ReleaseVersionId,
+                    dataBlockVersionId: dataBlockVersion.Id,
+                    boundaryLevelId
+                ),
+            logger: logger
         );
     }
 

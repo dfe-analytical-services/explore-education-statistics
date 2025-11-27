@@ -670,8 +670,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             )
         );
 
-        services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
-        services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
         services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(
             _ => new PublisherTableStorageService(configuration.GetRequiredValue("PublisherStorage"))
         );
