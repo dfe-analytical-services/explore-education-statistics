@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Moq;
 using Testcontainers.Azurite;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -96,6 +98,8 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             })
             .ConfigureServices(services =>
             {
+                services.ReplaceService(Mock.Of<IPublicBlobCacheService>());
+
                 services.UseInMemoryDbContext<ContentDbContext>();
 
                 services.AddDbContext<PublicDataDbContext>(options =>
