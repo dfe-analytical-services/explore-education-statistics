@@ -680,6 +680,7 @@ public abstract class ReleaseDataContentServiceTests
         private static void AssertFeaturedTableEqual(FeaturedTable expected, ReleaseDataContentFeaturedTableDto actual)
         {
             Assert.Equal(expected.Id, actual.FeaturedTableId);
+            Assert.Equal(expected.DataBlockId, actual.DataBlockId);
             Assert.Equal(expected.DataBlockParentId, actual.DataBlockParentId);
             Assert.Equal(expected.Description, actual.Summary);
             Assert.Equal(expected.Name, actual.Title);
