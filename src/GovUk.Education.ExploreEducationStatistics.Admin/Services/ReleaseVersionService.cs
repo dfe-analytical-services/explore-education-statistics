@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -63,7 +58,6 @@ public class ReleaseVersionService(
     IProcessorClient processorClient,
     IPrivateBlobCacheService privateCacheService,
     IOrganisationsValidator organisationsValidator,
-    IUserReleaseInviteRepository userReleaseInviteRepository,
     IUserReleaseRoleRepository userReleaseRoleRepository,
     IReleaseSlugValidator releaseSlugValidator,
     IOptions<FeatureFlagsOptions> featureFlags,
@@ -81,17 +75,13 @@ public class ReleaseVersionService(
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(releaseVersion =>
             {
-                var prereleaseRolesOrInvitesAdded =
-                    context.UserReleaseRoles.Any(role =>
-                        role.ReleaseVersionId == releaseVersionId && role.Role == ReleaseRole.PrereleaseViewer
-                    )
-                    || context.UserReleaseInvites.Any(role =>
-                        role.ReleaseVersionId == releaseVersionId && role.Role == ReleaseRole.PrereleaseViewer
-                    );
+                var prereleaseRolesAdded = context.UserReleaseRoles.Any(role =>
+                    role.ReleaseVersionId == releaseVersionId && role.Role == ReleaseRole.PrereleaseViewer
+                );
 
                 return mapper.Map<ReleaseVersionViewModel>(releaseVersion) with
                 {
-                    PreReleaseUsersOrInvitesAdded = prereleaseRolesOrInvitesAdded,
+                    PreReleaseUsersOrInvitesAdded = prereleaseRolesAdded,
                 };
             });
     }
@@ -267,7 +257,7 @@ public class ReleaseVersionService(
             await context.SaveChangesAsync(cancellationToken);
         }
 
-        await RemoveRolesAndInvites(releaseVersion, cancellationToken);
+        await RemoveRoles(releaseVersion, cancellationToken);
     }
 
     private async Task SoftDeleteReleaseVersion(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
@@ -275,18 +265,13 @@ public class ReleaseVersionService(
         releaseVersion.SoftDeleted = true;
         context.ReleaseVersions.Update(releaseVersion);
 
-        await RemoveRolesAndInvites(releaseVersion, cancellationToken);
+        await RemoveRoles(releaseVersion, cancellationToken);
     }
 
-    private async Task RemoveRolesAndInvites(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
+    private async Task RemoveRoles(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
     {
         // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
         await userReleaseRoleRepository.RemoveForReleaseVersion(
-            releaseVersionId: releaseVersion.Id,
-            cancellationToken: cancellationToken
-        );
-
-        await userReleaseInviteRepository.RemoveByReleaseVersion(
             releaseVersionId: releaseVersion.Id,
             cancellationToken: cancellationToken
         );
