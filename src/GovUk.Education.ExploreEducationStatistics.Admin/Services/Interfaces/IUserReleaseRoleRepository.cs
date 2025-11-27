@@ -35,12 +35,16 @@ public interface IUserReleaseRoleRepository
         bool includeInactiveUsers = false
     );
 
-    Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid userId);
+    Task<List<UserReleaseRole>> ListRolesForUser(
+        Guid userId,
+        bool includeInactiveUsers = false,
+        params ReleaseRole[] rolesToInclude
+    );
 
-    Task<List<UserReleaseRole>> ListUserReleaseRoles(
+    Task<List<UserReleaseRole>> ListRolesForReleaseVersion(
         Guid releaseVersionId,
-        ReleaseRole[]? rolesToInclude,
-        bool includeInactiveUsers = false
+        bool includeInactiveUsers = false,
+        params ReleaseRole[] rolesToInclude
     );
 
     Task<bool> HasUserReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role);
