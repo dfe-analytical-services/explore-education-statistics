@@ -70,7 +70,7 @@ public class PublicationCacheService(
 
         return publicBlobCacheService.Update(
             cacheKey: new PublicationTreeCacheKey(),
-            createIfNotExistsFn: publicationService.GetPublicationTree,
+            createFn: publicationService.GetPublicationTree,
             logger: logger
         );
     }

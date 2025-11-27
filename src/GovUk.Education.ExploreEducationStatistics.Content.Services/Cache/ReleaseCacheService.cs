@@ -38,7 +38,7 @@ public class ReleaseCacheService(
     {
         return publicBlobCacheService.Update(
             cacheKey: new ReleaseCacheKey(publicationSlug: publicationSlug, releaseSlug: releaseSlug),
-            createIfNotExistsFn: () => releaseService.GetRelease(releaseVersionId),
+            createFn: () => releaseService.GetRelease(releaseVersionId),
             logger: logger
         );
     }
@@ -52,7 +52,7 @@ public class ReleaseCacheService(
     {
         return publicBlobCacheService.Update(
             cacheKey: new ReleaseStagedCacheKey(publicationSlug: publicationSlug, releaseSlug: releaseSlug),
-            createIfNotExistsFn: () => releaseService.GetRelease(releaseVersionId, expectedPublishDate),
+            createFn: () => releaseService.GetRelease(releaseVersionId, expectedPublishDate),
             logger: logger
         );
     }

@@ -45,17 +45,13 @@ public static class BlobCacheServiceExtensions
     public static Task<TResult> Update<TResult, TLogger>(
         this IBlobCacheService service,
         IBlobCacheKey cacheKey,
-        Func<Task<TResult>> createIfNotExistsFn,
+        Func<Task<TResult>> createFn,
         ILogger<TLogger> logger
     )
         where TLogger : class
         where TResult : class
     {
-        return service.CreateAndSetCacheEntry(
-            cacheKey: cacheKey,
-            createIfNotExistsFn: createIfNotExistsFn,
-            logger: logger
-        );
+        return service.CreateAndSetCacheEntry(cacheKey: cacheKey, createIfNotExistsFn: createFn, logger: logger);
     }
 
     private static async Task<TResult> CreateAndSetCacheEntry<TResult, TLogger>(
