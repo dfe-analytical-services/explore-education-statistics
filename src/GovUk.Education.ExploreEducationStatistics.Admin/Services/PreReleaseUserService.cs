@@ -34,27 +34,15 @@ public class PreReleaseUserService(
             .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
             .OnSuccess(async _ =>
             {
-                var emailsFromRoles = await context
-                    .UserReleaseRoles.Include(r => r.User)
-                    .Where(r => r.Role == ReleaseRole.PrereleaseViewer && r.ReleaseVersionId == releaseVersionId)
+                var emailsWithPrereleaseRole = await context
+                    .UserReleaseRoles.Where(r => r.ReleaseVersionId == releaseVersionId)
+                    .Where(r => r.Role == ReleaseRole.PrereleaseViewer)
                     .Select(r => r.User.Email.ToLower())
                     .Distinct()
+                    .Order()
                     .ToListAsync();
 
-                var emailsFromInvites = await context
-                    .UserReleaseInvites.Where(i =>
-                        i.Role == ReleaseRole.PrereleaseViewer && i.ReleaseVersionId == releaseVersionId
-                    )
-                    .Select(i => i.Email.ToLower())
-                    .Distinct()
-                    .ToListAsync();
-
-                return emailsFromRoles
-                    .Concat(emailsFromInvites)
-                    .Distinct()
-                    .Select(email => new PreReleaseUserViewModel(email))
-                    .OrderBy(model => model.Email)
-                    .ToList();
+                return emailsWithPrereleaseRole.Select(email => new PreReleaseUserViewModel(email)).ToList();
             });
     }
 
@@ -185,7 +173,7 @@ public class PreReleaseUserService(
             if (shouldSendEmail)
             {
                 await userResourceRoleNotificationService.NotifyUserOfNewPreReleaseRole(
-                    userEmail: user.Email,
+                    userId: user.Id,
                     releaseVersionId: releaseVersion.Id
                 );
             }
