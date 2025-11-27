@@ -91,6 +91,8 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
         return base.CreateHostBuilder()
             .ConfigureServices(services =>
             {
+                services.MockService<IPublicBlobCacheService>(MockBehavior.Loose);
+
                 services
                     .UseInMemoryDbContext<ContentDbContext>()
                     .UseInMemoryDbContext<StatisticsDbContext>()
