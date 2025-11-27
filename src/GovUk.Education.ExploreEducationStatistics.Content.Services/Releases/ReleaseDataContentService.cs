@@ -68,7 +68,8 @@ public class ReleaseDataContentService(ContentDbContext contentDbContext) : IRel
             .ReleaseFiles.AsNoTracking()
             .Include(rf => rf.File)
                 .ThenInclude(f => f.DataSetFileVersionGeographicLevels)
-            .Where(rf => rf.ReleaseVersionId == releaseVersion.Id && rf.File.Type == FileType.Data)
+            .Where(rf => rf.ReleaseVersionId == releaseVersion.Id)
+            .Where(rf => rf.File.Type == FileType.Data)
             .OrderBy(rf => rf.Order)
             .ToArrayAsync(cancellationToken);
         return releaseFiles.Select(ReleaseDataContentDataSetDto.FromReleaseFile).ToArray();
@@ -95,7 +96,8 @@ public class ReleaseDataContentService(ContentDbContext contentDbContext) : IRel
         var releaseFiles = await contentDbContext
             .ReleaseFiles.AsNoTracking()
             .Include(rf => rf.File)
-            .Where(rf => rf.ReleaseVersionId == releaseVersion.Id && rf.File.Type == FileType.Ancillary)
+            .Where(rf => rf.ReleaseVersionId == releaseVersion.Id)
+            .Where(rf => rf.File.Type == FileType.Ancillary)
             .OrderBy(rf => rf.Order)
             .ToArrayAsync(cancellationToken);
         return releaseFiles.Select(ReleaseDataContentSupportingFileDto.FromReleaseFile).ToArray();

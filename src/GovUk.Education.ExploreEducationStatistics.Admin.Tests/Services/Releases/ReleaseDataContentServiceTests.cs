@@ -20,6 +20,10 @@ public abstract class ReleaseDataContentServiceTests
 
     public class GetReleaseDataContentTests : ReleaseDataContentServiceTests
     {
+        public static readonly TheoryData<DataImportStatus> IncompleteDataImportStatuses = new(
+            Enum.GetValues<DataImportStatus>().Except([DataImportStatus.COMPLETE])
+        );
+
         [Fact]
         public async Task WhenReleaseVersionExists_ReturnsExpectedDataContent()
         {
@@ -68,6 +72,12 @@ public abstract class ReleaseDataContentServiceTests
                 .WithReleaseVersion(releaseVersion)
                 .GenerateArray(2);
 
+            var dataImports = _dataFixture
+                .DefaultDataImport()
+                .WithFiles(dataSets.Select(rf => rf.File))
+                .WithStatus(DataImportStatus.COMPLETE)
+                .GenerateArray(dataSets.Length);
+
             var supportingFiles = _dataFixture
                 .DefaultReleaseFile()
                 .WithFile(() => _dataFixture.DefaultFile(FileType.Ancillary))
@@ -77,6 +87,7 @@ public abstract class ReleaseDataContentServiceTests
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
+                context.DataImports.AddRange(dataImports);
                 context.Publications.Add(publication);
                 context.ReleaseFiles.AddRange(dataSets);
                 context.ReleaseFiles.AddRange(supportingFiles);
@@ -157,9 +168,15 @@ public abstract class ReleaseDataContentServiceTests
                 )
                 .WithReleaseVersion(releaseVersion);
 
+            DataImport dataImport = _dataFixture
+                .DefaultDataImport()
+                .WithFile(dataSet.File)
+                .WithStatus(DataImportStatus.COMPLETE);
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
+                context.DataImports.Add(dataImport);
                 context.Publications.Add(publication);
                 context.ReleaseFiles.Add(dataSet);
                 await context.SaveChangesAsync();
@@ -229,9 +246,15 @@ public abstract class ReleaseDataContentServiceTests
                 .WithFilterSequence([.. filterSequence])
                 .WithReleaseVersion(releaseVersion);
 
+            DataImport dataImport = _dataFixture
+                .DefaultDataImport()
+                .WithFile(dataSet.File)
+                .WithStatus(DataImportStatus.COMPLETE);
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
+                context.DataImports.Add(dataImport);
                 context.Publications.Add(publication);
                 context.ReleaseFiles.Add(dataSet);
                 await context.SaveChangesAsync();
@@ -293,9 +316,15 @@ public abstract class ReleaseDataContentServiceTests
                 )
                 .WithReleaseVersion(releaseVersion);
 
+            DataImport dataImport = _dataFixture
+                .DefaultDataImport()
+                .WithFile(dataSet.File)
+                .WithStatus(DataImportStatus.COMPLETE);
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
+                context.DataImports.Add(dataImport);
                 context.Publications.Add(publication);
                 context.ReleaseFiles.Add(dataSet);
                 await context.SaveChangesAsync();
@@ -370,9 +399,15 @@ public abstract class ReleaseDataContentServiceTests
                 .WithIndicatorSequence([.. indicatorSequence])
                 .WithReleaseVersion(releaseVersion);
 
+            DataImport dataImport = _dataFixture
+                .DefaultDataImport()
+                .WithFile(dataSet.File)
+                .WithStatus(DataImportStatus.COMPLETE);
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
+                context.DataImports.Add(dataImport);
                 context.Publications.Add(publication);
                 context.ReleaseFiles.Add(dataSet);
                 await context.SaveChangesAsync();
@@ -415,9 +450,15 @@ public abstract class ReleaseDataContentServiceTests
                 )
                 .WithReleaseVersion(releaseVersion);
 
+            DataImport dataImport = _dataFixture
+                .DefaultDataImport()
+                .WithFile(dataSet.File)
+                .WithStatus(DataImportStatus.COMPLETE);
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
+                context.DataImports.Add(dataImport);
                 context.Publications.Add(publication);
                 context.ReleaseFiles.Add(dataSet);
                 await context.SaveChangesAsync();
@@ -456,9 +497,15 @@ public abstract class ReleaseDataContentServiceTests
                 .WithReleaseVersion(releaseVersion)
                 .WithSummary(null);
 
+            DataImport dataImport = _dataFixture
+                .DefaultDataImport()
+                .WithFile(dataSet.File)
+                .WithStatus(DataImportStatus.COMPLETE);
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
+                context.DataImports.Add(dataImport);
                 context.Publications.Add(publication);
                 context.ReleaseFiles.Add(dataSet);
                 await context.SaveChangesAsync();
@@ -496,9 +543,15 @@ public abstract class ReleaseDataContentServiceTests
                     "<div><p>Test paragraph with <strong>bold text</strong> and <em>italic text</em></p></div>"
                 );
 
+            DataImport dataImport = _dataFixture
+                .DefaultDataImport()
+                .WithFile(dataSet.File)
+                .WithStatus(DataImportStatus.COMPLETE);
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
+                context.DataImports.Add(dataImport);
                 context.Publications.Add(publication);
                 context.ReleaseFiles.Add(dataSet);
                 await context.SaveChangesAsync();
@@ -515,6 +568,98 @@ public abstract class ReleaseDataContentServiceTests
                 var result = outcome.AssertRight();
 
                 Assert.Equal("Test paragraph with bold text and italic text", result.DataSets[0].Summary);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(IncompleteDataImportStatuses))]
+        public async Task WhenDataSetImportIsIncomplete_DataSetIsNotReturned(DataImportStatus importStatus)
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            ReleaseFile dataSet = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(releaseVersion);
+
+            DataImport dataImport = _dataFixture.DefaultDataImport().WithFile(dataSet.File).WithStatus(importStatus);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.DataImports.Add(dataImport);
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(dataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Empty(result.DataSets);
+            }
+        }
+
+        [Fact]
+        public async Task WhenDataSetHasReplacementInProgress_ReplacementDataSetIsNotReturned()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            var (originalDataSet, replacementDataSet) = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(releaseVersion)
+                .GenerateTuple2();
+
+            // Set up the relationship between the original data set and its replacement
+            originalDataSet.File.ReplacedBy = replacementDataSet.File;
+            replacementDataSet.File.Replacing = originalDataSet.File;
+
+            var dataImports = _dataFixture
+                .DefaultDataImport()
+                .WithFiles([originalDataSet.File, replacementDataSet.File])
+                .WithStatus(DataImportStatus.COMPLETE)
+                .GenerateArray(2);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.DataImports.AddRange(dataImports);
+                context.Publications.Add(publication);
+                context.ReleaseFiles.AddRange(originalDataSet, replacementDataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                // Only the original data set should be returned as the replacement is still in progress
+                var dataSet = Assert.Single(result.DataSets);
+                AssertDataSetEqual(originalDataSet, dataSet);
             }
         }
 
