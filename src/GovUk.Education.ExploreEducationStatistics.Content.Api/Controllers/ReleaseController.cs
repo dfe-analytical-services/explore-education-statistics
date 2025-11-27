@@ -1,8 +1,9 @@
 #nullable enable
 using System.Net.Mime;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
@@ -14,37 +15,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 
 [Route("api")]
 [Produces(MediaTypeNames.Application.Json)]
-public class ReleaseController : ControllerBase
+public class ReleaseController(
+    IMethodologyCacheService methodologyCacheService,
+    IPublicationCacheService publicationCacheService,
+    IReleaseCacheService releaseCacheService,
+    IReleaseService releaseService,
+    IMemoryCacheService memoryCacheService,
+    ILogger<ReleaseController> logger,
+    DateTimeProvider dateTimeProvider
+) : ControllerBase
 {
-    private readonly IMethodologyCacheService _methodologyCacheService;
-    private readonly IPublicationCacheService _publicationCacheService;
-    private readonly IReleaseCacheService _releaseCacheService;
-    private readonly IReleaseService _releaseService;
-
-    public ReleaseController(
-        IMethodologyCacheService methodologyCacheService,
-        IPublicationCacheService publicationCacheService,
-        IReleaseCacheService releaseCacheService,
-        IReleaseService releaseService
-    )
-    {
-        _methodologyCacheService = methodologyCacheService;
-        _publicationCacheService = publicationCacheService;
-        _releaseCacheService = releaseCacheService;
-        _releaseService = releaseService;
-    }
-
     [HttpGet("publications/{publicationSlug}/releases")]
     public async Task<ActionResult<List<ReleaseSummaryViewModel>>> ListReleases(string publicationSlug)
     {
-        return await _releaseService.List(publicationSlug).HandleFailuresOrOk();
+        return await releaseService.List(publicationSlug).HandleFailuresOrOk();
     }
 
-    [MemoryCache(typeof(GetLatestReleaseCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
     [HttpGet("publications/{publicationSlug}/releases/latest")]
-    public async Task<ActionResult<ReleaseViewModel>> GetLatestRelease(string publicationSlug)
+    public Task<ActionResult<ReleaseViewModel>> GetLatestRelease(string publicationSlug)
     {
-        return await GetReleaseViewModel(publicationSlug).HandleFailuresOrOk();
+        return memoryCacheService.GetOrCreateAsync(
+            cacheKey: new GetLatestReleaseCacheKey(PublicationSlug: publicationSlug),
+            createIfNotExistsFn: () => GetReleaseViewModel(publicationSlug).HandleFailuresOrOk(),
+            durationInSeconds: 10,
+            expiryScheduleCron: HalfHourlyExpirySchedule,
+            dateTimeProvider: dateTimeProvider,
+            logger: logger
+        );
     }
 
     [HttpGet("publications/{publicationSlug}/releases/latest/summary")]
@@ -53,11 +50,17 @@ public class ReleaseController : ControllerBase
         return await GetReleaseSummaryViewModel(publicationSlug).HandleFailuresOrOk();
     }
 
-    [MemoryCache(typeof(GetReleaseCacheKey), durationInSeconds: 15, expiryScheduleCron: HalfHourlyExpirySchedule)]
     [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}")]
-    public async Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
+    public Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
     {
-        return await GetReleaseViewModel(publicationSlug, releaseSlug).HandleFailuresOrOk();
+        return memoryCacheService.GetOrCreateAsync(
+            cacheKey: new GetReleaseCacheKey(PublicationSlug: publicationSlug, ReleaseSlug: releaseSlug),
+            createIfNotExistsFn: () => GetReleaseViewModel(publicationSlug, releaseSlug).HandleFailuresOrOk(),
+            durationInSeconds: 15,
+            expiryScheduleCron: HalfHourlyExpirySchedule,
+            dateTimeProvider: dateTimeProvider,
+            logger: logger
+        );
     }
 
     [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/summary")]
@@ -73,10 +76,10 @@ public class ReleaseController : ControllerBase
         string publicationSlug,
         string? releaseSlug = null
     ) =>
-        _publicationCacheService
+        publicationCacheService
             .GetPublication(publicationSlug)
-            .OnSuccessCombineWith(publication => _methodologyCacheService.GetSummariesByPublication(publication.Id))
-            .OnSuccessCombineWith(_ => _releaseCacheService.GetRelease(publicationSlug, releaseSlug))
+            .OnSuccessCombineWith(publication => methodologyCacheService.GetSummariesByPublication(publication.Id))
+            .OnSuccessCombineWith(_ => releaseCacheService.GetRelease(publicationSlug, releaseSlug))
             .OnSuccess(tuple =>
             {
                 var (publication, methodologySummaries, release) = tuple;
@@ -88,9 +91,9 @@ public class ReleaseController : ControllerBase
         string? releaseSlug = null
     )
     {
-        return _publicationCacheService
+        return publicationCacheService
             .GetPublication(publicationSlug)
-            .OnSuccessCombineWith(_ => _releaseCacheService.GetRelease(publicationSlug, releaseSlug))
+            .OnSuccessCombineWith(_ => releaseCacheService.GetRelease(publicationSlug, releaseSlug))
             .OnSuccess(publicationAndRelease =>
             {
                 var (publication, release) = publicationAndRelease;

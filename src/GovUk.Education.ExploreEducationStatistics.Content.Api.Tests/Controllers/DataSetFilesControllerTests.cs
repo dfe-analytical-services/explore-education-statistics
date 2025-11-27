@@ -6,10 +6,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -45,11 +43,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         private ListDataSetFilesTests(TestApplicationFactory testApp)
             : base(testApp) { }
 
-        public class FilterTests : ListDataSetFilesTests
+        public class FilterTests(TestApplicationFactory testApp) : ListDataSetFilesTests(testApp)
         {
-            public FilterTests(TestApplicationFactory testApp)
-                : base(testApp) { }
-
             [Fact]
             public async Task FilterByReleaseId_Success()
             {
@@ -73,15 +68,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(publication2Release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest(ReleaseId: publication1.Releases[0].Versions[0].Id);
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -124,15 +112,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(publication2Release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest(GeographicLevel: GeographicLevel.Institution.GetEnumValue());
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -163,15 +144,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(publication2Release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest(PublicationId: publication1.Id);
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -205,15 +179,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(publication2Release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest(ThemeId: publication1.ThemeId);
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -249,19 +216,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(release2Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication.Releases[1].Versions[0].Id,
                     LatestOnly = latestOnly,
                 };
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -295,19 +255,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(release2Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication.Releases[1].Versions[0].Id,
                     LatestOnly = true,
                 };
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -350,19 +303,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(publication2Release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication1.Releases[0].Versions[1].Id,
                     LatestOnly = latestOnly,
                 };
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -391,19 +337,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(release1Version2Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication.Releases[0].Versions[0].Id,
                     LatestOnly = latestOnly,
                 };
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -440,15 +379,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(publication2Release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest(PublicationId: publication1.Id);
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -484,15 +416,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(publication2Release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest(ThemeId: publication1.ThemeId);
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -515,11 +440,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     new(release1Version1Files[1].Id, 2),
                 };
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var contentDbContext = ContentDbContextMock(
                     publication.Releases.SelectMany(r => r.Versions),
                     release1Version1Files,
@@ -530,8 +450,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 var query = new DataSetFileListRequest(SearchTerm: "aaa");
                 var response = await ListDataSetFiles(query, client);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -551,11 +469,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[0]);
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var contentDbContext = ContentDbContextMock(
                     publication.Releases.SelectMany(r => r.Versions),
                     release1Version1Files
@@ -565,8 +478,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 var query = new DataSetFileListRequest(SearchTerm: "aaa");
                 var response = await ListDataSetFiles(query, client);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -647,15 +558,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(publication2ReleaseFiles);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest(LatestOnly: latestOnly);
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -739,15 +643,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(publication2ReleaseFiles);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest(LatestOnly: false);
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -791,16 +688,9 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(releaseVersionFiles);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest { DataSetType = DataSetType.Api };
 
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -842,16 +732,9 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(releaseVersionFiles);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest { DataSetType = dataSetType };
 
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -882,15 +765,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(publication2Release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest();
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -929,19 +805,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest
                 {
                     Sort = DataSetsListRequestSortBy.Title,
                     SortDirection = sortDirection,
                 };
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -974,19 +843,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest
                 {
                     Sort = DataSetsListRequestSortBy.Title,
                     SortDirection = SortDirection.Desc,
                 };
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1023,11 +885,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication.Releases[0].Versions[0].Id,
@@ -1035,8 +892,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     SortDirection = sortDirection,
                 };
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1070,11 +925,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication.Releases[0].Versions[0].Id,
@@ -1082,8 +932,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     SortDirection = SortDirection.Desc,
                 };
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1128,19 +976,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(publication2Release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest
                 {
                     Sort = DataSetsListRequestSortBy.Published,
                     SortDirection = SortDirection.Asc,
                 };
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1191,19 +1032,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(publication2Release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest
                 {
                     Sort = DataSetsListRequestSortBy.Published,
                     SortDirection = sortDirection,
                 };
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1240,11 +1074,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     new(release1Version1Files[2].Id, 1),
                 };
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var contentDbContext = ContentDbContextMock(
                     publication.Releases.SelectMany(r => r.Versions),
                     release1Version1Files,
@@ -1260,8 +1089,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     SortDirection = SortDirection.Asc,
                 };
                 var response = await ListDataSetFiles(query, client);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1300,11 +1127,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     new(release1Version1Files[2].Id, 1),
                 };
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var contentDbContext = ContentDbContextMock(
                     publication.Releases.SelectMany(r => r.Versions),
                     release1Version1Files,
@@ -1320,8 +1142,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     SortDirection = sortDirection,
                 };
                 var response = await ListDataSetFiles(query, client);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1366,15 +1186,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest();
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1414,15 +1227,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest(PublicationId: supersededPublication.Id);
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1462,15 +1268,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest();
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1507,14 +1306,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [InlineData(9999)]
             public async Task PageInAllowedRange_Success(int page)
             {
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
                 var query = new DataSetFileListRequest(Page: page);
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1542,15 +1335,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [InlineData(40)]
             public async Task PageSizeInAllowedRange_Success(int pageSize)
             {
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest(PageSize: pageSize);
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1577,19 +1363,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [InlineData("aaaa")]
             public async Task SearchTermAboveMinimumLength_Success(string searchTerm)
             {
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var contentDbContext = ContentDbContextMock();
 
                 var client = BuildApp(contentDbContext.Object).CreateClient();
 
                 var query = new DataSetFileListRequest(SearchTerm: searchTerm);
                 var response = await ListDataSetFiles(query, client);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
             }
@@ -1610,18 +1389,11 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task SortByNaturalWithReleaseId_Success()
             {
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest(
                     ReleaseId: Guid.NewGuid(),
                     Sort: DataSetsListRequestSortBy.Natural
                 );
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
             }
@@ -1631,8 +1403,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             {
                 var query = new DataSetFileListRequest(SearchTerm: null, Sort: DataSetsListRequestSortBy.Relevance);
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var validationProblem = response.AssertValidationProblem();
 
@@ -1644,19 +1414,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task SortByRelevanceWithSearchTerm_Success()
             {
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var contentDbContext = ContentDbContextMock();
 
                 var client = BuildApp(contentDbContext.Object).CreateClient();
 
                 var query = new DataSetFileListRequest(SearchTerm: "aaa", Sort: DataSetsListRequestSortBy.Relevance);
                 var response = await ListDataSetFiles(query, client);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
             }
@@ -1740,15 +1503,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.Add(releaseFile);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest();
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1788,15 +1544,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task NoPublishedDataSets_ReturnsEmpty()
             {
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest();
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -1824,15 +1573,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     context.ReleaseFiles.AddRange(release1Version1Files);
                 });
 
-                MemoryCacheService.SetupNotFoundForAnyKey<
-                    ListDataSetFilesCacheKey,
-                    PaginatedListViewModel<DataSetFileSummaryViewModel>
-                >();
-
                 var query = new DataSetFileListRequest();
                 var response = await ListDataSetFiles(query);
-
-                MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -2266,7 +2008,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 viewModel.File.Meta.TimePeriodRange
             );
 
-            Assert.Equal(dataSetFileMeta.Filters.Select(f => f.Label).ToList(), viewModel.File.Meta.Filters);
+            Assert.Equal(dataSetFileMeta!.Filters.Select(f => f.Label).ToList(), viewModel.File.Meta.Filters);
 
             Assert.Equal(dataSetFileMeta.Indicators.Select(i => i.Label).ToList(), viewModel.File.Meta.Indicators);
 
@@ -2845,7 +2587,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         return BuildWebApplicationFactory(configFuncs)
             .ConfigureServices(services =>
             {
-                services.ReplaceService(MemoryCacheService);
+                // services.ReplaceService(memoryCacheService);
 
                 if (contentDbContext is not null)
                 {

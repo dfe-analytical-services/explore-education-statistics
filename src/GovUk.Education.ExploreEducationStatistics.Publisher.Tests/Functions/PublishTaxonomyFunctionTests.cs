@@ -18,8 +18,7 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
     : PublisherFunctionsIntegrationTest(fixture)
 {
     public class PublishTaxonomyTests(PublisherFunctionsIntegrationTestFixture fixture)
-        : PublishTaxonomyFunctionTests(fixture),
-            IClassFixture<CacheServiceTestFixture>
+        : PublishTaxonomyFunctionTests(fixture)
     {
         [Fact]
         public async Task MethodologyTree()
