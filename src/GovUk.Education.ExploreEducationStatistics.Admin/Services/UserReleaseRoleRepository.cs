@@ -80,15 +80,26 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
             .ToListAsync();
     }
 
-    public async Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid userId)
+    public async Task<List<UserReleaseRole>> ListRolesForUser(
+        Guid userId,
+        bool includeInactiveUsers = false,
+        params ReleaseRole[] rolesToInclude
+    )
     {
-        return await ContentDbContext.UserReleaseRoles.Where(urr => urr.UserId == userId).ToListAsync();
+        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<ReleaseRole>();
+
+        var query = includeInactiveUsers ? ContentDbContext.UserReleaseRoles : ContentDbContext.ActiveUserReleaseRoles;
+
+        return await query
+            .Where(urr => urr.UserId == userId)
+            .Where(urr => rolesToCheck.Contains(urr.Role))
+            .ToListAsync();
     }
 
-    public async Task<List<UserReleaseRole>> ListUserReleaseRoles(
+    public async Task<List<UserReleaseRole>> ListRolesForReleaseVersion(
         Guid releaseVersionId,
-        ReleaseRole[]? rolesToInclude,
-        bool includeInactiveUsers = false
+        bool includeInactiveUsers = false,
+        params ReleaseRole[] rolesToInclude
     )
     {
         var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<ReleaseRole>();

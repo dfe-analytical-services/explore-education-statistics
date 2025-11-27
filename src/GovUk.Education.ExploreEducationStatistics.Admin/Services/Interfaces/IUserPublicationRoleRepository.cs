@@ -23,12 +23,16 @@ public interface IUserPublicationRoleRepository
         bool includeInactiveUsers = false
     );
 
-    Task<List<UserPublicationRole>> ListUserPublicationRoles(Guid userId);
+    Task<List<UserPublicationRole>> ListRolesForUser(
+        Guid userId,
+        bool includeInactiveUsers = false,
+        params PublicationRole[] rolesToInclude
+    );
 
-    Task<List<UserPublicationRole>> ListUserPublicationRoles(
+    Task<List<UserPublicationRole>> ListRolesForPublication(
         Guid publicationId,
-        PublicationRole[]? rolesToInclude,
-        bool includeInactiveUsers = false
+        bool includeInactiveUsers = false,
+        params PublicationRole[] rolesToInclude
     );
 
     Task<UserPublicationRole?> GetUserPublicationRole(Guid userId, Guid publicationId, PublicationRole role);

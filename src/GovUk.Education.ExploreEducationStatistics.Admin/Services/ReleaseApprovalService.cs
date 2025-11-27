@@ -168,9 +168,9 @@ public class ReleaseApprovalService(
             rolesToInclude: [ReleaseRole.Approver]
         );
 
-        var userPublicationRoles = await userPublicationRoleRepository.ListUserPublicationRoles(
-            releaseVersion.Release.PublicationId,
-            [PublicationRole.Allower]
+        var userPublicationRoles = await userPublicationRoleRepository.ListRolesForPublication(
+            publicationId: releaseVersion.Release.PublicationId,
+            rolesToInclude: [PublicationRole.Allower]
         );
 
         var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();

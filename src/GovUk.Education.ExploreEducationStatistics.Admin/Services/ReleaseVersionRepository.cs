@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -9,20 +10,16 @@ using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class ReleaseVersionRepository : IReleaseVersionRepository
+public class ReleaseVersionRepository(
+    ContentDbContext contentDbContext,
+    StatisticsDbContext statisticsDbContext,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
+    IUserReleaseRoleRepository userReleaseRoleRepository
+) : IReleaseVersionRepository
 {
-    private readonly ContentDbContext _contentDbContext;
-    private readonly StatisticsDbContext _statisticsDbContext;
-
-    public ReleaseVersionRepository(ContentDbContext contentDbContext, StatisticsDbContext statisticsDbContext)
-    {
-        _contentDbContext = contentDbContext;
-        _statisticsDbContext = statisticsDbContext;
-    }
-
     public async Task<List<ReleaseVersion>> ListReleases(params ReleaseApprovalStatus[] releaseApprovalStatuses)
     {
-        return await _contentDbContext
+        return await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
                 .ThenInclude(r => r.Publication)
             .Include(rv => rv.ReleaseStatuses)
@@ -35,18 +32,25 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
         params ReleaseApprovalStatus[] releaseApprovalStatuses
     )
     {
-        var releaseRoleReleaseVersionIds = await _contentDbContext
-            .UserReleaseRoles.Where(urr => urr.UserId == userId)
-            .Where(urr => urr.Role != ReleaseRole.PrereleaseViewer)
-            .Select(r => r.ReleaseVersionId)
-            .ToListAsync();
+        var allReleaseRolesExcludingPrerelease = EnumUtil
+            .GetEnumsArray<ReleaseRole>()
+            .Except([ReleaseRole.PrereleaseViewer])
+            .ToArray();
 
-        var publicationRolePublicationIds = await _contentDbContext
-            .UserPublicationRoles.Where(upr => upr.UserId == userId)
+        var releaseRoleReleaseVersionIds = (
+            await userReleaseRoleRepository.ListRolesForUser(
+                userId: userId,
+                rolesToInclude: allReleaseRolesExcludingPrerelease
+            )
+        )
+            .Select(upr => upr.ReleaseVersionId)
+            .ToList();
+
+        var publicationRolePublicationIds = (await userPublicationRoleRepository.ListRolesForUser(userId))
             .Select(upr => upr.PublicationId)
-            .ToListAsync();
+            .ToList();
 
-        var publicationRoleReleaseVersionIds = await _contentDbContext
+        var publicationRoleReleaseVersionIds = await contentDbContext
             .ReleaseVersions.Where(rv => publicationRolePublicationIds.Contains(rv.Release.PublicationId))
             .Select(rv => rv.Id)
             .ToListAsync();
@@ -56,7 +60,7 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
             .Distinct()
             .ToList();
 
-        return await _contentDbContext
+        return await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
                 .ThenInclude(r => r.Publication)
             .Include(rv => rv.ReleaseStatuses)
@@ -67,23 +71,23 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
 
     public async Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(Guid releaseVersionId)
     {
-        var existingStatsReleaseVersion = await _statisticsDbContext.ReleaseVersion.FirstOrDefaultAsync(rv =>
+        var existingStatsReleaseVersion = await statisticsDbContext.ReleaseVersion.FirstOrDefaultAsync(rv =>
             rv.Id == releaseVersionId
         );
 
         if (existingStatsReleaseVersion == null)
         {
-            var releaseVersion = await _contentDbContext.ReleaseVersions.FirstAsync(rv => rv.Id == releaseVersionId);
+            var releaseVersion = await contentDbContext.ReleaseVersions.FirstAsync(rv => rv.Id == releaseVersionId);
 
-            _statisticsDbContext.ReleaseVersion.Add(
+            statisticsDbContext.ReleaseVersion.Add(
                 new Data.Model.ReleaseVersion { Id = releaseVersionId, PublicationId = releaseVersion.PublicationId }
             );
         }
 
         var releaseSubject = new ReleaseSubject { ReleaseVersionId = releaseVersionId, Subject = new Subject() };
 
-        _statisticsDbContext.ReleaseSubject.Add(releaseSubject);
-        await _statisticsDbContext.SaveChangesAsync();
+        statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+        await statisticsDbContext.SaveChangesAsync();
 
         return releaseSubject.SubjectId;
     }

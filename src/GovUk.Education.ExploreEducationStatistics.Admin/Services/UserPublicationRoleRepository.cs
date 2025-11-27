@@ -67,15 +67,28 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext)
             .ToListAsync();
     }
 
-    public async Task<List<UserPublicationRole>> ListUserPublicationRoles(Guid userId)
+    public async Task<List<UserPublicationRole>> ListRolesForUser(
+        Guid userId,
+        bool includeInactiveUsers = false,
+        params PublicationRole[] rolesToInclude
+    )
     {
-        return await ContentDbContext.UserPublicationRoles.Where(upr => upr.UserId == userId).ToListAsync();
+        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<PublicationRole>();
+
+        var query = includeInactiveUsers
+            ? ContentDbContext.UserPublicationRoles
+            : ContentDbContext.ActiveUserPublicationRoles;
+
+        return await query
+            .Where(upr => upr.UserId == userId)
+            .Where(upr => rolesToCheck.Contains(upr.Role))
+            .ToListAsync();
     }
 
-    public async Task<List<UserPublicationRole>> ListUserPublicationRoles(
+    public async Task<List<UserPublicationRole>> ListRolesForPublication(
         Guid publicationId,
-        PublicationRole[]? rolesToInclude,
-        bool includeInactiveUsers = false
+        bool includeInactiveUsers = false,
+        params PublicationRole[] rolesToInclude
     )
     {
         var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<PublicationRole>();
