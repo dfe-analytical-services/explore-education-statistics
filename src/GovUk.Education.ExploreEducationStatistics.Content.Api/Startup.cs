@@ -131,9 +131,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 sasService: provider.GetRequiredService<IBlobSasService>()
             )
         );
-        services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
+        services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new PublicBlobCacheService(
             provider.GetRequiredService<IPublicBlobStorageService>(),
-            provider.GetRequiredService<ILogger<BlobCacheService>>()
+            provider.GetRequiredService<ILogger<PublicBlobCacheService>>()
         ));
         services.AddSingleton<IMemoryCacheService>(provider =>
         {
