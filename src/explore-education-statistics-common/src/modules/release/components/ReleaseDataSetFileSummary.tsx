@@ -7,18 +7,19 @@ import useToggle from '@common/hooks/useToggle';
 import getTimePeriodString from '@common/modules/table-tool/utils/getTimePeriodString';
 import { DataSetItem } from '@common/services/publicationService';
 import formatPretty from '@common/utils/number/formatPretty';
-import Link from '@frontend/components/Link';
 import classNames from 'classnames';
-import React, { useEffect } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 
 interface Props {
   dataSetFile: DataSetItem;
   expanded?: boolean;
+  renderLink?: ReactNode;
 }
 
 export default function ReleaseDataSetFileSummary({
   dataSetFile,
   expanded = false,
+  renderLink,
 }: Props) {
   const {
     dataSetFileId,
@@ -138,14 +139,15 @@ export default function ReleaseDataSetFileSummary({
         )}
       </SummaryList>
 
-      <Link
-        to={`/data-catalogue/data-set/${dataSetFileId}`}
-        className={classNames({
-          'dfe-js-hidden': !showDetails,
-        })}
-      >
-        Data set information page <VisuallyHidden>for {title}</VisuallyHidden>
-      </Link>
+      {renderLink && (
+        <div
+          className={classNames({
+            'dfe-js-hidden': !showDetails,
+          })}
+        >
+          {renderLink}
+        </div>
+      )}
     </div>
   );
 }

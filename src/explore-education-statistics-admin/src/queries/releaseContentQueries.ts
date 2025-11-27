@@ -8,6 +8,12 @@ const releaseContentQueries = createQueryKeys('releaseContent', {
       queryFn: () => releaseContentService.getContent(releaseId),
     };
   },
+  getDataContent(releaseId: string) {
+    return {
+      queryKey: ['dataContent', releaseId],
+      queryFn: () => releaseContentService.getDataContent(releaseId),
+    };
+  },
 });
 
 export default releaseContentQueries;
