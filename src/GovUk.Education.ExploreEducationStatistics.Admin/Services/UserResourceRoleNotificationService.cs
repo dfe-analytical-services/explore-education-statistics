@@ -205,13 +205,7 @@ public class UserResourceRoleNotificationService(
     private async Task<User> FindActiveUser(Guid userId, CancellationToken cancellationToken)
     {
         return await userRepository.FindActiveUserById(userId, cancellationToken)
-            ?? throw new KeyNotFoundException($"Active user with ID {userId} does not exist.");
-    }
-
-    private async Task<User> FindUser(Guid userId, CancellationToken cancellationToken)
-    {
-        return await userRepository.FindUserById(userId, cancellationToken)
-            ?? throw new KeyNotFoundException($"User with ID {userId} does not exist.");
+            ?? throw new ArgumentException($"Active user with ID {userId} does not exist.");
     }
 
     private async Task<User> FindUser(Guid userId, CancellationToken cancellationToken)

@@ -15,6 +15,8 @@ public interface IUserReleaseRoleRepository
 
     Task<UserReleaseRole> CreateIfNotExists(Guid userId, Guid releaseVersionId, ReleaseRole role, Guid createdById);
 
+    Task CreateManyIfNotExists(IReadOnlyList<UserReleaseRole> userReleaseRoles);
+
     Task CreateManyIfNotExists(List<Guid> userIds, Guid releaseVersionId, ReleaseRole role, Guid createdById);
 
     Task CreateManyIfNotExists(Guid userId, List<Guid> releaseVersionIds, ReleaseRole role, Guid createdById);
