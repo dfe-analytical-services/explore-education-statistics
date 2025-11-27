@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
@@ -56,18 +57,18 @@ public class ReleasePermissionService(
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Publication))
             .OnSuccessDo(releaseVersion => userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
             .OnSuccess(async _ =>
-            {
-                var invites = await contentDbContext
-                    .UserReleaseInvites.Where(i =>
-                        i.ReleaseVersionId == releaseVersionId && rolesToCheck.Contains(i.Role)
+                await contentDbContext
+                    .UserReleaseRoles.Where(urr => urr.ReleaseVersionId == releaseVersionId)
+                    .Where(urr => rolesToCheck.Contains(urr.Role))
+                    .Join(
+                        contentDbContext.Users.WhereInvitePending(),
+                        urr => urr.UserId,
+                        u => u.Id,
+                        (urr, u) => new UserReleaseInviteViewModel(u.Email, urr.Role)
                     )
-                    .ToListAsync();
-
-                return invites
-                    .Select(i => new UserReleaseInviteViewModel(i.Email, i.Role))
                     .OrderBy(model => model.Email)
-                    .ToList();
-            });
+                    .ToListAsync()
+            );
     }
 
     public async Task<Either<ActionResult, List<UserReleaseRoleSummaryViewModel>>> ListPublicationContributors(
