@@ -97,7 +97,7 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
 
             var updatedPublication = contentDbContext
                 .Publications.Include(p => p.Releases)
-                .ThenInclude(r => r.Versions)
+                    .ThenInclude(r => r.Versions)
                 .Single(p => p.Id == publication.Id);
 
             Assert.Equal(publication.Id, viewModel.PublicationId);
@@ -216,17 +216,15 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         {
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    [
-                        DataFixture
-                            .DefaultRelease(publishedVersions: 1)
-                            .WithYear(2020)
-                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                            .WithLabel("intermediate")
-                            .WithSlug("2020-21-intermediate")
-                            .WithRedirects([DataFixture.DefaultReleaseRedirect().WithSlug("2020-21-final")]),
-                    ]
-                );
+                .WithReleases([
+                    DataFixture
+                        .DefaultRelease(publishedVersions: 1)
+                        .WithYear(2020)
+                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                        .WithLabel("intermediate")
+                        .WithSlug("2020-21-intermediate")
+                        .WithRedirects([DataFixture.DefaultReleaseRedirect().WithSlug("2020-21-final")]),
+                ]);
 
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
@@ -249,17 +247,15 @@ public abstract class ReleasesControllerIntegrationTests(TestApplicationFactory 
         {
             Publication otherPublication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    [
-                        DataFixture
-                            .DefaultRelease(publishedVersions: 1)
-                            .WithYear(2020)
-                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                            .WithLabel("intermediate")
-                            .WithSlug("2020-21-intermediate")
-                            .WithRedirects([DataFixture.DefaultReleaseRedirect().WithSlug("2020-21-final")]),
-                    ]
-                );
+                .WithReleases([
+                    DataFixture
+                        .DefaultRelease(publishedVersions: 1)
+                        .WithYear(2020)
+                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                        .WithLabel("intermediate")
+                        .WithSlug("2020-21-intermediate")
+                        .WithRedirects([DataFixture.DefaultReleaseRedirect().WithSlug("2020-21-final")]),
+                ]);
 
             Publication targetPublication = DataFixture.DefaultPublication();
 

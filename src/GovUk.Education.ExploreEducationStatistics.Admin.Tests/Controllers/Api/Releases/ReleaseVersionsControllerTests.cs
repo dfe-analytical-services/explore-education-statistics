@@ -692,14 +692,12 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             // Arrange
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    [
-                        DataFixture
-                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
-                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                            .WithLabel(null),
-                    ]
-                );
+                .WithReleases([
+                    DataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
+                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                        .WithLabel(null),
+                ]);
 
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
@@ -725,7 +723,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
 
             var updatedPublication = await contentDbContext
                 .Publications.Include(p => p.Releases)
-                .ThenInclude(r => r.Versions)
+                    .ThenInclude(r => r.Versions)
                 .SingleAsync(p => p.Id == publication.Id);
 
             Assert.Equal(publication.Id, viewModel.PublicationId);
@@ -764,14 +762,12 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             // Arrange
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    [
-                        DataFixture
-                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
-                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                            .WithLabel(null),
-                    ]
-                );
+                .WithReleases([
+                    DataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
+                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                        .WithLabel(null),
+                ]);
 
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
@@ -790,7 +786,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
 
             var updatedPublication = await contentDbContext
                 .Publications.Include(p => p.Releases)
-                .ThenInclude(r => r.Versions)
+                    .ThenInclude(r => r.Versions)
                 .SingleAsync(p => p.Id == publication.Id);
 
             Assert.Equal(expectedNewSlug, viewModel.Slug);
@@ -1188,14 +1184,12 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             // Arrange
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    [
-                        DataFixture
-                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
-                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                            .WithLabel(null),
-                    ]
-                );
+                .WithReleases([
+                    DataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
+                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                        .WithLabel(null),
+                ]);
 
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
@@ -1230,14 +1224,12 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             // Arrange
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    [
-                        DataFixture
-                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
-                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                            .WithLabel(null),
-                    ]
-                );
+                .WithReleases([
+                    DataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
+                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                        .WithLabel(null),
+                ]);
 
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
@@ -1285,14 +1277,12 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             // Arrange
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    [
-                        DataFixture
-                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
-                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                            .WithLabel(null),
-                    ]
-                );
+                .WithReleases([
+                    DataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
+                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                        .WithLabel(null),
+                ]);
 
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 
@@ -1404,14 +1394,12 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             // Arrange
             Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    [
-                        DataFixture
-                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
-                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
-                            .WithLabel(null),
-                    ]
-                );
+                .WithReleases([
+                    DataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2020)
+                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                        .WithLabel(null),
+                ]);
 
             await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
 

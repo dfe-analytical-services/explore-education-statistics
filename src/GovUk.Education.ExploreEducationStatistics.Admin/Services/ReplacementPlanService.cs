@@ -424,7 +424,7 @@ public class ReplacementPlanService(
             .FilterItem.AsQueryable()
             .Where(filterItem => dataBlock.Query.GetFilterItemIds().Contains(filterItem.Id))
             .Include(filterItem => filterItem.FilterGroup)
-            .ThenInclude(filterGroup => filterGroup.Filter)
+                .ThenInclude(filterGroup => filterGroup.Filter)
             .ToList()
             .GroupBy(filterItem => filterItem.FilterGroup.Filter)
             .OrderBy(filter => filter.Key.Label, LabelComparer)

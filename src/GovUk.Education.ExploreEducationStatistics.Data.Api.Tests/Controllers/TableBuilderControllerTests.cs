@@ -503,12 +503,10 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
-                ]
-            );
+            .WithReleases([
+                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
+            ]);
 
         var release = publication.Releases.Single(r => r.Year == 2021);
         var releaseVersion = release.Versions.Single();
@@ -616,12 +614,10 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
-                ]
-            );
+            .WithReleases([
+                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
+            ]);
 
         var release2020 = publication.Releases.Single(r => r.Year == 2020);
         var release2021 = publication.Releases.Single(r => r.Year == 2021);

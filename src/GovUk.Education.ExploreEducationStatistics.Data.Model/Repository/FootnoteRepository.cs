@@ -392,17 +392,17 @@ public class FootnoteRepository : IFootnoteRepository
     {
         return _context
             .Footnote.Include(footnote => footnote.Filters)
-            .ThenInclude(filterFootnote => filterFootnote.Filter)
+                .ThenInclude(filterFootnote => filterFootnote.Filter)
             .Include(footnote => footnote.FilterGroups)
-            .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
-            .ThenInclude(filterGroup => filterGroup.Filter)
+                .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
+                    .ThenInclude(filterGroup => filterGroup.Filter)
             .Include(footnote => footnote.FilterItems)
-            .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
-            .ThenInclude(filterItem => filterItem.FilterGroup)
-            .ThenInclude(filterGroup => filterGroup.Filter)
+                .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
+                    .ThenInclude(filterItem => filterItem.FilterGroup)
+                        .ThenInclude(filterGroup => filterGroup.Filter)
             .Include(footnote => footnote.Indicators)
-            .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
-            .ThenInclude(indicator => indicator.IndicatorGroup)
+                .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
+                    .ThenInclude(indicator => indicator.IndicatorGroup)
             .Include(footnote => footnote.Releases)
             .Include(footnote => footnote.Subjects);
     }

@@ -107,9 +107,11 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     .WithFile(
                         _fixture
                             .DefaultFile(FileType.Data)
-                            .WithDataSetFileVersionGeographicLevels(
-                                [GeographicLevel.Country, GeographicLevel.LocalAuthority, GeographicLevel.Institution]
-                            )
+                            .WithDataSetFileVersionGeographicLevels([
+                                GeographicLevel.Country,
+                                GeographicLevel.LocalAuthority,
+                                GeographicLevel.Institution,
+                            ])
                     );
 
                 var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
@@ -1677,9 +1679,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         _fixture
                             .DefaultFile(FileType.Data)
                             .WithType(FileType.Data)
-                            .WithDataSetFileVersionGeographicLevels(
-                                [GeographicLevel.Country, GeographicLevel.LocalAuthority]
-                            )
+                            .WithDataSetFileVersionGeographicLevels([
+                                GeographicLevel.Country,
+                                GeographicLevel.LocalAuthority,
+                            ])
                             .WithDataSetFileMeta(
                                 _fixture
                                     .DefaultDataSetFileMeta()
@@ -1689,50 +1692,46 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                                             .WithStart("2000", TimeIdentifier.AcademicYear)
                                             .WithEnd("2002", TimeIdentifier.AcademicYear)
                                     )
-                                    .WithFilters(
-                                        [
-                                            new FilterMeta
-                                            {
-                                                Id = Guid.NewGuid(),
-                                                Label = "Filter 1",
-                                                ColumnName = "filter_1",
-                                            },
-                                            new FilterMeta
-                                            {
-                                                Id = Guid.NewGuid(),
-                                                Label = "Filter 2",
-                                                ColumnName = "filter_2",
-                                            },
-                                            new FilterMeta
-                                            {
-                                                Id = Guid.NewGuid(),
-                                                Label = "Filter 3",
-                                                ColumnName = "filter_3",
-                                            },
-                                        ]
-                                    )
-                                    .WithIndicators(
-                                        [
-                                            new IndicatorMeta
-                                            {
-                                                Id = Guid.NewGuid(),
-                                                Label = "Indicator 1",
-                                                ColumnName = "indicator_1",
-                                            },
-                                            new IndicatorMeta
-                                            {
-                                                Id = Guid.NewGuid(),
-                                                Label = "Indicator 2",
-                                                ColumnName = "indicator_2",
-                                            },
-                                            new IndicatorMeta
-                                            {
-                                                Id = Guid.NewGuid(),
-                                                Label = "Indicator 3",
-                                                ColumnName = "indicator_3",
-                                            },
-                                        ]
-                                    )
+                                    .WithFilters([
+                                        new FilterMeta
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            Label = "Filter 1",
+                                            ColumnName = "filter_1",
+                                        },
+                                        new FilterMeta
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            Label = "Filter 2",
+                                            ColumnName = "filter_2",
+                                        },
+                                        new FilterMeta
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            Label = "Filter 3",
+                                            ColumnName = "filter_3",
+                                        },
+                                    ])
+                                    .WithIndicators([
+                                        new IndicatorMeta
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            Label = "Indicator 1",
+                                            ColumnName = "indicator_1",
+                                        },
+                                        new IndicatorMeta
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            Label = "Indicator 2",
+                                            ColumnName = "indicator_2",
+                                        },
+                                        new IndicatorMeta
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            Label = "Indicator 3",
+                                            ColumnName = "indicator_3",
+                                        },
+                                    ])
                             )
                     );
 
@@ -2358,41 +2357,37 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             ReleaseFile releaseFile = _fixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
-                .WithFilterSequence(
-                    [
-                        new FilterSequenceEntry(filter1Id, []),
-                        new FilterSequenceEntry(filter2Id, []),
-                        new FilterSequenceEntry(filter3Id, []),
-                    ]
-                )
+                .WithFilterSequence([
+                    new FilterSequenceEntry(filter1Id, []),
+                    new FilterSequenceEntry(filter2Id, []),
+                    new FilterSequenceEntry(filter3Id, []),
+                ])
                 .WithFile(
                     _fixture
                         .DefaultFile(FileType.Data)
                         .WithDataSetFileMeta(
                             _fixture
                                 .DefaultDataSetFileMeta()
-                                .WithFilters(
-                                    [
-                                        new FilterMeta
-                                        {
-                                            Id = filter3Id,
-                                            Label = "Filter 3",
-                                            ColumnName = "filter_3",
-                                        },
-                                        new FilterMeta
-                                        {
-                                            Id = filter1Id,
-                                            Label = "Filter 1",
-                                            ColumnName = "filter_1",
-                                        },
-                                        new FilterMeta
-                                        {
-                                            Id = filter2Id,
-                                            Label = "Filter 2",
-                                            ColumnName = "filter_2",
-                                        },
-                                    ]
-                                )
+                                .WithFilters([
+                                    new FilterMeta
+                                    {
+                                        Id = filter3Id,
+                                        Label = "Filter 3",
+                                        ColumnName = "filter_3",
+                                    },
+                                    new FilterMeta
+                                    {
+                                        Id = filter1Id,
+                                        Label = "Filter 1",
+                                        ColumnName = "filter_1",
+                                    },
+                                    new FilterMeta
+                                    {
+                                        Id = filter2Id,
+                                        Label = "Filter 2",
+                                        ColumnName = "filter_2",
+                                    },
+                                ])
                         )
                 );
 
@@ -2445,47 +2440,43 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             ReleaseFile releaseFile = _fixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
-                .WithIndicatorSequence(
-                    [
-                        new IndicatorGroupSequenceEntry(Guid.NewGuid(), [indicator1Id]),
-                        new IndicatorGroupSequenceEntry(Guid.NewGuid(), [indicator2Id]),
-                        new IndicatorGroupSequenceEntry(Guid.NewGuid(), [indicator3Id, indicator4Id]),
-                    ]
-                )
+                .WithIndicatorSequence([
+                    new IndicatorGroupSequenceEntry(Guid.NewGuid(), [indicator1Id]),
+                    new IndicatorGroupSequenceEntry(Guid.NewGuid(), [indicator2Id]),
+                    new IndicatorGroupSequenceEntry(Guid.NewGuid(), [indicator3Id, indicator4Id]),
+                ])
                 .WithFile(
                     _fixture
                         .DefaultFile(FileType.Data)
                         .WithDataSetFileMeta(
                             _fixture
                                 .DefaultDataSetFileMeta()
-                                .WithIndicators(
-                                    [
-                                        new IndicatorMeta
-                                        {
-                                            Id = indicator3Id,
-                                            Label = "Indicator 3",
-                                            ColumnName = "indicator_3",
-                                        },
-                                        new IndicatorMeta
-                                        {
-                                            Id = indicator2Id,
-                                            Label = "Indicator 2",
-                                            ColumnName = "indicator_2",
-                                        },
-                                        new IndicatorMeta
-                                        {
-                                            Id = indicator1Id,
-                                            Label = "Indicator 1",
-                                            ColumnName = "indicator_1",
-                                        },
-                                        new IndicatorMeta
-                                        {
-                                            Id = indicator4Id,
-                                            Label = "Indicator 4",
-                                            ColumnName = "indicator_4",
-                                        },
-                                    ]
-                                )
+                                .WithIndicators([
+                                    new IndicatorMeta
+                                    {
+                                        Id = indicator3Id,
+                                        Label = "Indicator 3",
+                                        ColumnName = "indicator_3",
+                                    },
+                                    new IndicatorMeta
+                                    {
+                                        Id = indicator2Id,
+                                        Label = "Indicator 2",
+                                        ColumnName = "indicator_2",
+                                    },
+                                    new IndicatorMeta
+                                    {
+                                        Id = indicator1Id,
+                                        Label = "Indicator 1",
+                                        ColumnName = "indicator_1",
+                                    },
+                                    new IndicatorMeta
+                                    {
+                                        Id = indicator4Id,
+                                        Label = "Indicator 4",
+                                        ColumnName = "indicator_4",
+                                    },
+                                ])
                         )
                 );
 
@@ -2540,58 +2531,54 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         .WithDataSetFileMeta(
                             _fixture
                                 .DefaultDataSetFileMeta()
-                                .WithFilters(
-                                    [
-                                        new FilterMeta
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Label = "Filter 1",
-                                            ColumnName = "A_filter_1",
-                                            Hint = "hint",
-                                        },
-                                        new FilterMeta
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Label = "Filter 2",
-                                            ColumnName = "G_filter_2",
-                                        },
-                                        new FilterMeta
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Label = "Filter 3",
-                                            ColumnName = "C_filter_3",
-                                            Hint = "Another hint",
-                                        },
-                                    ]
-                                )
-                                .WithIndicators(
-                                    [
-                                        new IndicatorMeta
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Label = "Indicator 3",
-                                            ColumnName = "B_indicator_3",
-                                        },
-                                        new IndicatorMeta
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Label = "Indicator 2",
-                                            ColumnName = "E_indicator_2",
-                                        },
-                                        new IndicatorMeta
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Label = "Indicator 1",
-                                            ColumnName = "D_indicator_1",
-                                        },
-                                        new IndicatorMeta
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Label = "Indicator 4",
-                                            ColumnName = "F_indicator_4",
-                                        },
-                                    ]
-                                )
+                                .WithFilters([
+                                    new FilterMeta
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Label = "Filter 1",
+                                        ColumnName = "A_filter_1",
+                                        Hint = "hint",
+                                    },
+                                    new FilterMeta
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Label = "Filter 2",
+                                        ColumnName = "G_filter_2",
+                                    },
+                                    new FilterMeta
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Label = "Filter 3",
+                                        ColumnName = "C_filter_3",
+                                        Hint = "Another hint",
+                                    },
+                                ])
+                                .WithIndicators([
+                                    new IndicatorMeta
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Label = "Indicator 3",
+                                        ColumnName = "B_indicator_3",
+                                    },
+                                    new IndicatorMeta
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Label = "Indicator 2",
+                                        ColumnName = "E_indicator_2",
+                                    },
+                                    new IndicatorMeta
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Label = "Indicator 1",
+                                        ColumnName = "D_indicator_1",
+                                    },
+                                    new IndicatorMeta
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Label = "Indicator 4",
+                                        ColumnName = "F_indicator_4",
+                                    },
+                                ])
                         )
                 );
 

@@ -260,7 +260,7 @@ public class DataBlockService : IDataBlockService
                 query
                     .Include(dataBlockVersion => dataBlockVersion.ReleaseVersion)
                     .Include(dataBlockVersion => dataBlockVersion.ContentBlock)
-                    .ThenInclude(dataBlock => dataBlock.ContentSection)
+                        .ThenInclude(dataBlock => dataBlock.ContentSection)
                     .Where(dataBlockVersion =>
                         dataBlockVersion.ReleaseVersionId == releaseVersionId
                         && dataBlockVersion.Id == dataBlockVersionId

@@ -46,9 +46,10 @@ public abstract class ReleaseDataContentServiceTests
                             _dataFixture
                                 .DefaultFile(FileType.Data)
                                 .WithDataSetFileMeta(_dataFixture.DefaultDataSetFileMeta().WithNumDataFileRows(1000))
-                                .WithDataSetFileVersionGeographicLevels(
-                                    [GeographicLevel.Country, GeographicLevel.LocalAuthority]
-                                )
+                                .WithDataSetFileVersionGeographicLevels([
+                                    GeographicLevel.Country,
+                                    GeographicLevel.LocalAuthority,
+                                ])
                         )
                 )
                 .ForIndex(
@@ -58,9 +59,10 @@ public abstract class ReleaseDataContentServiceTests
                             _dataFixture
                                 .DefaultFile(FileType.Data)
                                 .WithDataSetFileMeta(_dataFixture.DefaultDataSetFileMeta().WithNumDataFileRows(2000))
-                                .WithDataSetFileVersionGeographicLevels(
-                                    [GeographicLevel.Region, GeographicLevel.School]
-                                )
+                                .WithDataSetFileVersionGeographicLevels([
+                                    GeographicLevel.Region,
+                                    GeographicLevel.School,
+                                ])
                         )
                 )
                 .WithReleaseVersion(releaseVersion)
@@ -405,9 +407,11 @@ public abstract class ReleaseDataContentServiceTests
                 .WithFile(
                     _dataFixture
                         .DefaultFile(FileType.Data)
-                        .WithDataSetFileVersionGeographicLevels(
-                            [GeographicLevel.Ward, GeographicLevel.Country, GeographicLevel.LocalAuthority]
-                        )
+                        .WithDataSetFileVersionGeographicLevels([
+                            GeographicLevel.Ward,
+                            GeographicLevel.Country,
+                            GeographicLevel.LocalAuthority,
+                        ])
                 )
                 .WithReleaseVersion(releaseVersion);
 

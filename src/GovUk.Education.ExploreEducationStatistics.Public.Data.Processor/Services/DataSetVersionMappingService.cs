@@ -36,9 +36,9 @@ internal class DataSetVersionMappingService(
     {
         var nextVersion = await publicDataDbContext
             .DataSetVersions.Include(dsv => dsv.DataSet)
-            .ThenInclude(ds => ds.LatestLiveVersion)
+                .ThenInclude(ds => ds.LatestLiveVersion)
             .Include(dataSetVersion => dataSetVersion.DataSet)
-            .ThenInclude(dataSet => dataSet.Versions)
+                .ThenInclude(dataSet => dataSet.Versions)
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
 
         var sourceVersion =
@@ -509,7 +509,7 @@ internal class DataSetVersionMappingService(
         return await publicDataDbContext
             .LocationMetas.AsNoTracking()
             .Include(meta => meta.OptionLinks)
-            .ThenInclude(link => link.Option)
+                .ThenInclude(link => link.Option)
             .Where(meta => meta.DataSetVersionId == dataSetVersionId)
             .ToListAsync(cancellationToken);
     }
@@ -519,7 +519,7 @@ internal class DataSetVersionMappingService(
         return await publicDataDbContext
             .FilterMetas.AsNoTracking()
             .Include(meta => meta.OptionLinks)
-            .ThenInclude(link => link.Option)
+                .ThenInclude(link => link.Option)
             .Where(meta => meta.DataSetVersionId == dataSetVersionId)
             .ToListAsync(cancellationToken);
     }

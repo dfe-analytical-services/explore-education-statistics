@@ -107,7 +107,7 @@ public class ContentService : IContentService
     {
         var releaseVersion = await _contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .SingleAsync(rv => rv.Id == releaseVersionId);
 
         await _releaseCacheService.UpdateRelease(
@@ -135,7 +135,7 @@ public class ContentService : IContentService
         var releaseVersions = await _contentDbContext
             .ReleaseVersions.Where(rv => releaseVersionIds.Contains(rv.Id))
             .Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .ToListAsync();
 
         foreach (var releaseVersion in releaseVersions)

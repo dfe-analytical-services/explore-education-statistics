@@ -117,13 +117,11 @@ public abstract class PublicationServiceTests
 
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    [
-                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
-                    ]
-                )
+                .WithReleases([
+                    _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                ])
                 .WithContact(_contact)
                 .WithExternalMethodology(_externalMethodology)
                 .WithLegacyLinks([legacyLink])

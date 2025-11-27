@@ -397,19 +397,19 @@ public class ContentService : IContentService
     {
         return releaseVersions
             .Include(rv => rv.Content)
-            .ThenInclude(section => section.Content)
-            .ThenInclude(block => block.Comments)
-            .ThenInclude(comment => comment.CreatedBy)
+                .ThenInclude(section => section.Content)
+                    .ThenInclude(block => block.Comments)
+                        .ThenInclude(comment => comment.CreatedBy)
             .Include(rv => rv.Content)
-            .ThenInclude(section => section.Content)
-            .ThenInclude(block => block.Comments)
-            .ThenInclude(comment => comment.ResolvedBy)
+                .ThenInclude(section => section.Content)
+                    .ThenInclude(block => block.Comments)
+                        .ThenInclude(comment => comment.ResolvedBy)
             .Include(rv => rv.Content)
-            .ThenInclude(section => section.Content)
-            .ThenInclude(block => (block as EmbedBlockLink).EmbedBlock)
+                .ThenInclude(section => section.Content)
+                    .ThenInclude(block => (block as EmbedBlockLink).EmbedBlock)
             .Include(rv => rv.Content)
-            .ThenInclude(section => section.Content)
-            .ThenInclude(block => block.LockedBy);
+                .ThenInclude(section => section.Content)
+                    .ThenInclude(block => block.LockedBy);
     }
 
     private Task<Either<ActionResult, Tuple<ReleaseVersion, ContentSection>>> CheckContentSectionExists(

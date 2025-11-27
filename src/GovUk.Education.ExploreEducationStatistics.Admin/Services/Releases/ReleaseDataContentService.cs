@@ -39,7 +39,7 @@ public class ReleaseDataContentService(ContentDbContext contentDbContext, IUserS
         contentDbContext
             .ReleaseVersions.AsNoTracking()
             .Include(rv => rv.Content.Where(cs => cs.Type == ContentSectionType.RelatedDashboards))
-            .ThenInclude(cs => cs.Content)
+                .ThenInclude(cs => cs.Content)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken);
 
     private async Task<ReleaseDataContentDataSetDto[]> GetDataSets(
@@ -50,7 +50,7 @@ public class ReleaseDataContentService(ContentDbContext contentDbContext, IUserS
         var releaseFiles = await contentDbContext
             .ReleaseFiles.AsNoTracking()
             .Include(rf => rf.File)
-            .ThenInclude(f => f.DataSetFileVersionGeographicLevels)
+                .ThenInclude(f => f.DataSetFileVersionGeographicLevels)
             .Where(rf => rf.ReleaseVersionId == releaseVersion.Id && rf.File.Type == FileType.Data)
             .OrderBy(rf => rf.Order)
             .ToArrayAsync(cancellationToken);

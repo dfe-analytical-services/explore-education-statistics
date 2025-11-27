@@ -31,8 +31,8 @@ public class ImportStatusBauService : IImportStatusBauService
             {
                 var releaseFilesQueryable = _contentDbContext
                     .ReleaseFiles.Include(rf => rf.ReleaseVersion)
-                    .ThenInclude(rv => rv.Release)
-                    .ThenInclude(r => r.Publication);
+                        .ThenInclude(rv => rv.Release)
+                            .ThenInclude(r => r.Publication);
 
                 return await _contentDbContext
                     .DataImports.Include(dataImport => dataImport.File)

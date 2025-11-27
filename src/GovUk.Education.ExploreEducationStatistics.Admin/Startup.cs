@@ -161,12 +161,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.AddFluentValidation();
 
-        services.AddValidatorsFromAssemblies(
-            [
-                typeof(UploadDataSetRequest.Validator).Assembly, // Adds *all* validators from Admin
-                typeof(FullTableQueryRequest.Validator).Assembly, // Adds *all* validators from Common
-            ]
-        );
+        services.AddValidatorsFromAssemblies([
+            typeof(UploadDataSetRequest.Validator).Assembly, // Adds *all* validators from Admin
+            typeof(FullTableQueryRequest.Validator).Assembly, // Adds *all* validators from Common
+        ]);
 
         services
             .AddMvc(options =>

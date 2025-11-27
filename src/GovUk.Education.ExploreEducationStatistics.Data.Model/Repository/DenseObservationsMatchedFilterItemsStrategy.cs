@@ -136,7 +136,7 @@ public class DenseObservationsMatchedFilterItemsStrategy(
         var filterItems = await context
             .FilterItem.AsNoTracking()
             .Include(fi => fi.FilterGroup)
-            .ThenInclude(fg => fg.Filter)
+                .ThenInclude(fg => fg.Filter)
             .Join(
                 // This is the contents of the #MatchedFilterItem temp table.
                 inner: context.MatchedFilterItems,

@@ -77,7 +77,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
             var updatedDataSet = Assert.Single(
                 await publicDataDbContext
                     .DataSets.Include(ds => ds.Versions)
-                    .ThenInclude(dsv => dsv.Imports)
+                        .ThenInclude(dsv => dsv.Imports)
                     .ToListAsync()
             );
 
@@ -250,12 +250,10 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
                         .WithRelease(DataFixture.DefaultRelease().WithPublicationId(dataSet.PublicationId))
                         .WithApprovalStatus(ReleaseApprovalStatus.Approved)
                 )
-                .WithFiles(
-                    [
-                        DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
-                        DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
-                    ]
-                )
+                .WithFiles([
+                    DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
+                    DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
+                ])
                 .GenerateTuple2();
 
             await AddTestData<ContentDbContext>(context =>
@@ -484,7 +482,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
             var updatedDataSet = Assert.Single(
                 await publicDataDbContext
                     .DataSets.Include(ds => ds.Versions)
-                    .ThenInclude(dsv => dsv.Imports)
+                        .ThenInclude(dsv => dsv.Imports)
                     .ToListAsync()
             );
 
@@ -581,16 +579,14 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
             // Assert
             if (enableDataSetVersionReplacement)
             {
-                result.AssertBadRequestWithValidationErrors(
-                    [
-                        new ErrorViewModel
-                        {
-                            Code = ValidationMessages.NextDataSetVersionNotFound.Code,
-                            Message = ValidationMessages.NextDataSetVersionNotFound.Message,
-                            Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetId).ToLowerFirst(),
-                        },
-                    ]
-                );
+                result.AssertBadRequestWithValidationErrors([
+                    new ErrorViewModel
+                    {
+                        Code = ValidationMessages.NextDataSetVersionNotFound.Code,
+                        Message = ValidationMessages.NextDataSetVersionNotFound.Message,
+                        Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetId).ToLowerFirst(),
+                    },
+                ]);
             }
             else
             {
@@ -654,12 +650,10 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
         var (nextDataFile, nextMetaFile) = DataFixture
             .DefaultReleaseFile()
             .WithReleaseVersion(releaseAmendment)
-            .WithFiles(
-                [
-                    DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
-                    DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
-                ]
-            )
+            .WithFiles([
+                DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
+                DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
+            ])
             .GenerateTuple2();
 
         await AddTestData<ContentDbContext>(context =>
@@ -712,12 +706,10 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
                     .DefaultReleaseVersion()
                     .WithRelease(DataFixture.DefaultRelease().WithPublicationId(publicationId))
             )
-            .WithFiles(
-                [
-                    DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
-                    DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
-                ]
-            )
+            .WithFiles([
+                DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
+                DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
+            ])
             .GenerateTuple2();
 
         await AddTestData<ContentDbContext>(context => context.ReleaseFiles.AddRange(dataFile, metaFile));
@@ -740,12 +732,10 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
                     .DefaultReleaseVersion()
                     .WithRelease(DataFixture.DefaultRelease().WithPublicationId(publicationId))
             )
-            .WithFiles(
-                [
-                    DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
-                    DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
-                ]
-            )
+            .WithFiles([
+                DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
+                DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
+            ])
             .WithPublicApiDataSetId(dataSetId)
             .WithPublicApiDataSetVersion(version)
             .GenerateTuple2();

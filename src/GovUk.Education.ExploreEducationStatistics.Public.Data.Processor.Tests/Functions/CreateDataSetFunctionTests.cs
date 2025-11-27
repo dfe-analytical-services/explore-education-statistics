@@ -41,12 +41,10 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
             var (releaseFile, releaseMetaFile) = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(release.Versions.Single())
-                .WithFiles(
-                    [
-                        DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
-                        DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
-                    ]
-                )
+                .WithFiles([
+                    DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
+                    DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
+                ])
                 .GenerateTuple2();
 
             await AddTestData<ContentDbContext>(context =>
@@ -93,7 +91,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
             var dataSet = Assert.Single(
                 await publicDataDbContext
                     .DataSets.Include(ds => ds.Versions)
-                    .ThenInclude(dsv => dsv.Imports)
+                        .ThenInclude(dsv => dsv.Imports)
                     .ToListAsync()
             );
 
@@ -219,12 +217,10 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
             var (releaseFile, releaseMetaFile) = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases.Single().Versions.Single())
-                .WithFiles(
-                    [
-                        DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
-                        DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
-                    ]
-                )
+                .WithFiles([
+                    DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
+                    DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
+                ])
                 .GenerateTuple2();
 
             await AddTestData<ContentDbContext>(context =>

@@ -15,7 +15,7 @@ public class AllObservationsMatchedFilterItemsStrategy(StatisticsDbContext conte
         return await context
             .FilterItem.AsNoTracking()
             .Include(fi => fi.FilterGroup)
-            .ThenInclude(fg => fg.Filter)
+                .ThenInclude(fg => fg.Filter)
             .Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId)
             .ToListAsync(cancellationToken);
     }

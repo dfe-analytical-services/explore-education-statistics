@@ -464,7 +464,7 @@ internal class DataSetVersionService(
         var releaseFile = await contentDbContext
             .ReleaseFiles.Include(rf => rf.File)
             .Include(rf => rf.ReleaseVersion)
-            .ThenInclude(r => r.Release)
+                .ThenInclude(r => r.Release)
             .FirstOrDefaultAsync(rf => rf.Id == releaseFileId, cancellationToken);
 
         return releaseFile is null
@@ -490,27 +490,23 @@ internal class DataSetVersionService(
             )
         )
         {
-            return ValidationUtils.ValidationResult(
-                [
-                    CreateReleaseFileIdError(
-                        message: ValidationMessages.FileHasApiDataSetVersion,
-                        releaseFileId: releaseFile.Id
-                    ),
-                ]
-            );
+            return ValidationUtils.ValidationResult([
+                CreateReleaseFileIdError(
+                    message: ValidationMessages.FileHasApiDataSetVersion,
+                    releaseFileId: releaseFile.Id
+                ),
+            ]);
         }
 
         // ReleaseFile must relate to a ReleaseVersion in Draft approval status
         if (releaseFile.ReleaseVersion.ApprovalStatus != ReleaseApprovalStatus.Draft)
         {
-            return ValidationUtils.ValidationResult(
-                [
-                    CreateReleaseFileIdError(
-                        message: ValidationMessages.FileReleaseVersionNotDraft,
-                        releaseFileId: releaseFile.Id
-                    ),
-                ]
-            );
+            return ValidationUtils.ValidationResult([
+                CreateReleaseFileIdError(
+                    message: ValidationMessages.FileReleaseVersionNotDraft,
+                    releaseFileId: releaseFile.Id
+                ),
+            ]);
         }
 
         List<ErrorViewModel> errors = [];

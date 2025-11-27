@@ -3622,7 +3622,7 @@ public class MethodologyServiceTests
         {
             var publicationMethodology = await contentDbContext
                 .PublicationMethodologies.Include(m => m.Methodology)
-                .ThenInclude(m => m.Versions)
+                    .ThenInclude(m => m.Versions)
                 .SingleAsync(m => m.PublicationId == publicationId);
 
             Assert.Equal("New Title", publicationMethodology.Methodology.OwningPublicationTitle);

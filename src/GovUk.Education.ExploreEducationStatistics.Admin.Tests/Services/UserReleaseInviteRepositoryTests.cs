@@ -560,24 +560,22 @@ public abstract class UserReleaseInviteRepositoryTests
 
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
-                allUserReleaseInvites.AddRange(
-                    [
-                        .. targetedUserReleaseInvites,
-                        // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email1)
-                            .WithRole(role)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email2)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    .. targetedUserReleaseInvites,
+                    // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email1)
+                        .WithRole(role)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email2)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -679,70 +677,66 @@ public abstract class UserReleaseInviteRepositoryTests
 
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
-                allUserReleaseInvites.AddRange(
-                    [
-                        .. targetedUserReleaseInvites,
-                        // Create a user release invite for each TARGET role for the OTHER release version and EACH email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email1)
-                            .WithRole(targetRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email2)
-                            .WithRole(targetRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    .. targetedUserReleaseInvites,
+                    // Create a user release invite for each TARGET role for the OTHER release version and EACH email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email1)
+                        .WithRole(targetRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email2)
+                        .WithRole(targetRole)
+                        .Generate(),
+                ]);
             }
 
             foreach (var otherRole in otherRoles)
             {
-                allUserReleaseInvites.AddRange(
-                    [
-                        // Create a user release invite for each OTHER role for each TARGET release version and EACH email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion1)
-                            .WithEmail(email1)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion1)
-                            .WithEmail(email2)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion2)
-                            .WithEmail(email1)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion2)
-                            .WithEmail(email2)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        // Create a user release invite for each OTHER role for the OTHER release version and EACH email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email1)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email2)
-                            .WithRole(otherRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    // Create a user release invite for each OTHER role for each TARGET release version and EACH email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion1)
+                        .WithEmail(email1)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion1)
+                        .WithEmail(email2)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion2)
+                        .WithEmail(email1)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion2)
+                        .WithEmail(email2)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    // Create a user release invite for each OTHER role for the OTHER release version and EACH email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email1)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email2)
+                        .WithRole(otherRole)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -808,23 +802,21 @@ public abstract class UserReleaseInviteRepositoryTests
 
             foreach (var role in allRoles)
             {
-                allUserReleaseInvites.AddRange(
-                    [
-                        // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email1)
-                            .WithRole(role)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email2)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email1)
+                        .WithRole(role)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email2)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -898,38 +890,36 @@ public abstract class UserReleaseInviteRepositoryTests
 
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
-                allUserReleaseInvites.AddRange(
-                    [
-                        .. targetedUserReleaseInvites,
-                        // Create a user release invite for EACH ROLE for each TARGET release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion1)
-                            .WithEmail(otherEmail)
-                            .WithRole(role)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion2)
-                            .WithEmail(otherEmail)
-                            .WithRole(role)
-                            .Generate(),
-                        // Create a user release invite for EACH ROLE for the OTHER release version and TARGET email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(targetEmail)
-                            .WithRole(role)
-                            .Generate(),
-                        // Create a user release invite for EACH ROLE for the OTHER release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(otherEmail)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    .. targetedUserReleaseInvites,
+                    // Create a user release invite for EACH ROLE for each TARGET release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion1)
+                        .WithEmail(otherEmail)
+                        .WithRole(role)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion2)
+                        .WithEmail(otherEmail)
+                        .WithRole(role)
+                        .Generate(),
+                    // Create a user release invite for EACH ROLE for the OTHER release version and TARGET email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(targetEmail)
+                        .WithRole(role)
+                        .Generate(),
+                    // Create a user release invite for EACH ROLE for the OTHER release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(otherEmail)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1019,79 +1009,75 @@ public abstract class UserReleaseInviteRepositoryTests
 
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
-                allUserReleaseInvites.AddRange(
-                    [
-                        .. targetedUserReleaseInvites,
-                        // Create a user release invite for each TARGET role for each TARGET release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion1)
-                            .WithEmail(otherEmail)
-                            .WithRole(targetRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion2)
-                            .WithEmail(otherEmail)
-                            .WithRole(targetRole)
-                            .Generate(),
-                        // Create a user release invite for each TARGET role for the OTHER release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(otherEmail)
-                            .WithRole(targetRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    .. targetedUserReleaseInvites,
+                    // Create a user release invite for each TARGET role for each TARGET release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion1)
+                        .WithEmail(otherEmail)
+                        .WithRole(targetRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion2)
+                        .WithEmail(otherEmail)
+                        .WithRole(targetRole)
+                        .Generate(),
+                    // Create a user release invite for each TARGET role for the OTHER release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(otherEmail)
+                        .WithRole(targetRole)
+                        .Generate(),
+                ]);
             }
 
             foreach (var otherRole in otherRoles)
             {
-                allUserReleaseInvites.AddRange(
-                    [
-                        // Create a user release invite for each OTHER role for each TARGET release version and TARGET email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion1)
-                            .WithEmail(targetEmail)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion2)
-                            .WithEmail(targetEmail)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        // Create a user release invite for each OTHER role for each TARGET release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion1)
-                            .WithEmail(otherEmail)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion2)
-                            .WithEmail(otherEmail)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        // Create a user release invite for each OTHER role for the OTHER release version and TARGET email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(targetEmail)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        // Create a user release invite for each OTHER role for the OTHER release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(otherEmail)
-                            .WithRole(otherRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    // Create a user release invite for each OTHER role for each TARGET release version and TARGET email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion1)
+                        .WithEmail(targetEmail)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion2)
+                        .WithEmail(targetEmail)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    // Create a user release invite for each OTHER role for each TARGET release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion1)
+                        .WithEmail(otherEmail)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion2)
+                        .WithEmail(otherEmail)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    // Create a user release invite for each OTHER role for the OTHER release version and TARGET email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(targetEmail)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    // Create a user release invite for each OTHER role for the OTHER release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(otherEmail)
+                        .WithRole(otherRole)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1158,17 +1144,15 @@ public abstract class UserReleaseInviteRepositoryTests
 
             foreach (var role in allRoles)
             {
-                allUserReleaseInvites.AddRange(
-                    [
-                        // Create a user release invite for EACH ROLE for the OTHER release version and OTHER EMAIL
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(otherEmail)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    // Create a user release invite for EACH ROLE for the OTHER release version and OTHER EMAIL
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(otherEmail)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1248,24 +1232,22 @@ public abstract class UserReleaseInviteRepositoryTests
 
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
-                allUserReleaseInvites.AddRange(
-                    [
-                        .. targetedUserReleaseInvites,
-                        // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email1)
-                            .WithRole(role)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email2)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    .. targetedUserReleaseInvites,
+                    // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email1)
+                        .WithRole(role)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email2)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1349,58 +1331,54 @@ public abstract class UserReleaseInviteRepositoryTests
 
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
-                allUserReleaseInvites.AddRange(
-                    [
-                        .. targetedUserReleaseInvites,
-                        // Create a user release invite for each TARGET role for the OTHER release version and EACH EMAIL
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email1)
-                            .WithRole(targetRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email2)
-                            .WithRole(targetRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    .. targetedUserReleaseInvites,
+                    // Create a user release invite for each TARGET role for the OTHER release version and EACH EMAIL
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email1)
+                        .WithRole(targetRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email2)
+                        .WithRole(targetRole)
+                        .Generate(),
+                ]);
             }
 
             foreach (var otherRole in otherRoles)
             {
-                allUserReleaseInvites.AddRange(
-                    [
-                        // Create a user release invite for each OTHER role for the TARGET release version and EACH EMAIL
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion)
-                            .WithEmail(email1)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion)
-                            .WithEmail(email2)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        // Create a user release invite for each OTHER role for the OTHER release version and EACH EMAIL
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email1)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email2)
-                            .WithRole(otherRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    // Create a user release invite for each OTHER role for the TARGET release version and EACH EMAIL
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion)
+                        .WithEmail(email1)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion)
+                        .WithEmail(email2)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    // Create a user release invite for each OTHER role for the OTHER release version and EACH EMAIL
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email1)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email2)
+                        .WithRole(otherRole)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1460,23 +1438,21 @@ public abstract class UserReleaseInviteRepositoryTests
 
             foreach (var role in allRoles)
             {
-                allUserReleaseInvites.AddRange(
-                    [
-                        // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email1)
-                            .WithRole(role)
-                            .Generate(),
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(email2)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    // Create a user release invite for EACH ROLE for the OTHER release version and EACH EMAIL
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email1)
+                        .WithRole(role)
+                        .Generate(),
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(email2)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1538,32 +1514,30 @@ public abstract class UserReleaseInviteRepositoryTests
 
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
-                allUserReleaseInvites.AddRange(
-                    [
-                        .. targetedUserReleaseInvites,
-                        // Create a user release invite for EACH ROLE for the TARGET release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion)
-                            .WithEmail(otherEmail)
-                            .WithRole(role)
-                            .Generate(),
-                        // Create a user release invite for EACH ROLE for the OTHER release version and TARGET email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(targetEmail)
-                            .WithRole(role)
-                            .Generate(),
-                        // Create a user release invite for EACH ROLE for the OTHER release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(otherEmail)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    .. targetedUserReleaseInvites,
+                    // Create a user release invite for EACH ROLE for the TARGET release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion)
+                        .WithEmail(otherEmail)
+                        .WithRole(role)
+                        .Generate(),
+                    // Create a user release invite for EACH ROLE for the OTHER release version and TARGET email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(targetEmail)
+                        .WithRole(role)
+                        .Generate(),
+                    // Create a user release invite for EACH ROLE for the OTHER release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(otherEmail)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1644,61 +1618,57 @@ public abstract class UserReleaseInviteRepositoryTests
 
                 expectedUserReleaseInvitesToRemove.AddRange(targetedUserReleaseInvites);
 
-                allUserReleaseInvites.AddRange(
-                    [
-                        .. targetedUserReleaseInvites,
-                        // Create a user release invite for each TARGET role for the TARGET release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion)
-                            .WithEmail(otherEmail)
-                            .WithRole(targetRole)
-                            .Generate(),
-                        // Create a user release invite for each TARGET role for the OTHER release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(otherEmail)
-                            .WithRole(targetRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    .. targetedUserReleaseInvites,
+                    // Create a user release invite for each TARGET role for the TARGET release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion)
+                        .WithEmail(otherEmail)
+                        .WithRole(targetRole)
+                        .Generate(),
+                    // Create a user release invite for each TARGET role for the OTHER release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(otherEmail)
+                        .WithRole(targetRole)
+                        .Generate(),
+                ]);
             }
 
             foreach (var otherRole in otherRoles)
             {
-                allUserReleaseInvites.AddRange(
-                    [
-                        // Create a user release invite for each OTHER role for the TARGET release version and TARGET email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion)
-                            .WithEmail(targetEmail)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        // Create a user release invite for each OTHER role for the TARGET release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion)
-                            .WithEmail(otherEmail)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        // Create a user release invite for each OTHER role for the OTHER release version and TARGET email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(targetReleaseVersion)
-                            .WithEmail(targetEmail)
-                            .WithRole(otherRole)
-                            .Generate(),
-                        // Create a user release invite for each OTHER role for the OTHER release version and OTHER email
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(otherEmail)
-                            .WithRole(otherRole)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    // Create a user release invite for each OTHER role for the TARGET release version and TARGET email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion)
+                        .WithEmail(targetEmail)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    // Create a user release invite for each OTHER role for the TARGET release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion)
+                        .WithEmail(otherEmail)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    // Create a user release invite for each OTHER role for the OTHER release version and TARGET email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(targetReleaseVersion)
+                        .WithEmail(targetEmail)
+                        .WithRole(otherRole)
+                        .Generate(),
+                    // Create a user release invite for each OTHER role for the OTHER release version and OTHER email
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(otherEmail)
+                        .WithRole(otherRole)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1759,17 +1729,15 @@ public abstract class UserReleaseInviteRepositoryTests
 
             foreach (var role in allRoles)
             {
-                allUserReleaseInvites.AddRange(
-                    [
-                        // Create a user release invite for EACH ROLE for the OTHER release version and OTHER EMAIL
-                        _fixture
-                            .DefaultUserReleaseInvite()
-                            .WithReleaseVersion(otherReleaseVersion)
-                            .WithEmail(otherEmail)
-                            .WithRole(role)
-                            .Generate(),
-                    ]
-                );
+                allUserReleaseInvites.AddRange([
+                    // Create a user release invite for EACH ROLE for the OTHER release version and OTHER EMAIL
+                    _fixture
+                        .DefaultUserReleaseInvite()
+                        .WithReleaseVersion(otherReleaseVersion)
+                        .WithEmail(otherEmail)
+                        .WithRole(role)
+                        .Generate(),
+                ]);
             }
 
             var contentDbContextId = Guid.NewGuid().ToString();

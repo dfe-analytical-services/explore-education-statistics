@@ -55,7 +55,7 @@ public class ReleaseDataContentService(ContentDbContext contentDbContext) : IRel
         contentDbContext
             .ReleaseVersions.AsNoTracking()
             .Include(rv => rv.Content.Where(cs => cs.Type == ContentSectionType.RelatedDashboards))
-            .ThenInclude(cs => cs.Content)
+                .ThenInclude(cs => cs.Content)
             .LatestReleaseVersions(publication.Id, releaseSlug, publishedOnly: true)
             .SingleOrNotFoundAsync(cancellationToken);
 
@@ -67,7 +67,7 @@ public class ReleaseDataContentService(ContentDbContext contentDbContext) : IRel
         var releaseFiles = await contentDbContext
             .ReleaseFiles.AsNoTracking()
             .Include(rf => rf.File)
-            .ThenInclude(f => f.DataSetFileVersionGeographicLevels)
+                .ThenInclude(f => f.DataSetFileVersionGeographicLevels)
             .Where(rf => rf.ReleaseVersionId == releaseVersion.Id && rf.File.Type == FileType.Data)
             .OrderBy(rf => rf.Order)
             .ToArrayAsync(cancellationToken);

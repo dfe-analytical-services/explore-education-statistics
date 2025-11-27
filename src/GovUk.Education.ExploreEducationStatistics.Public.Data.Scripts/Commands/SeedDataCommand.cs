@@ -170,24 +170,22 @@ public class SeedDataCommand : ICommand
         var sqlFilePath = Path.Combine(outputDir, "01-public_data.sql");
 
         await Cli.Wrap("pg_dump")
-            .WithArguments(
-                [
-                    "--dbname",
-                    "public_data",
-                    "--file",
-                    sqlFilePath,
-                    "--schema",
-                    "public",
-                    "--username",
-                    "postgres",
-                    "--host",
-                    "db",
-                    "--port",
-                    "5432",
-                    "--clean",
-                    "--if-exists",
-                ]
-            )
+            .WithArguments([
+                "--dbname",
+                "public_data",
+                "--file",
+                sqlFilePath,
+                "--schema",
+                "public",
+                "--username",
+                "postgres",
+                "--host",
+                "db",
+                "--port",
+                "5432",
+                "--clean",
+                "--if-exists",
+            ])
             .WithEnvironmentVariables(env => env.Set("PGPASSWORD", "password"))
             .WithStandardOutputPipe(PipeTarget.ToStream(console.Output.BaseStream))
             .WithStandardErrorPipe(PipeTarget.ToStream(console.Error.BaseStream))
@@ -782,10 +780,10 @@ public class SeedDataCommand : ICommand
             var version = await _dbContext
                 .DataSetVersions.AsSplitQuery()
                 .Include(v => v.FilterMetas)
-                .ThenInclude(m => m.Options)
+                    .ThenInclude(m => m.Options)
                 .Include(v => v.IndicatorMetas)
                 .Include(v => v.LocationMetas)
-                .ThenInclude(m => m.Options)
+                    .ThenInclude(m => m.Options)
                 .Include(v => v.TimePeriodMetas)
                 .FirstAsync(v => v.Id == _seed.DataSetVersionId, cancellationToken: _cancellationToken);
 

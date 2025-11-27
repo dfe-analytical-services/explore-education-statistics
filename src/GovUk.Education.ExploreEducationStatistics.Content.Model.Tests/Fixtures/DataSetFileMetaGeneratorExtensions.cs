@@ -29,26 +29,22 @@ public static class DataSetFileMetaGeneratorExtensions
                     },
                 }
             )
-            .SetFilters(
-                [
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Filter 1",
-                        ColumnName = "filter_1",
-                    },
-                ]
-            )
-            .SetIndicators(
-                [
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator 1",
-                        ColumnName = "indicator_1",
-                    },
-                ]
-            );
+            .SetFilters([
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Filter 1",
+                    ColumnName = "filter_1",
+                },
+            ])
+            .SetIndicators([
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Indicator 1",
+                    ColumnName = "indicator_1",
+                },
+            ]);
 
     public static Generator<DataSetFileMeta> WithNumDataFileRows(
         this Generator<DataSetFileMeta> generator,
