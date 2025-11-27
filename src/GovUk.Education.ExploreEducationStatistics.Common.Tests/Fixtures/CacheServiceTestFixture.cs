@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 public class CacheServiceTestFixture : IDisposable
 {
     public readonly Mock<IBlobCacheService> BlobCacheService = new(MockBehavior.Strict);
-    public readonly Mock<IBlobCacheService> PublicBlobCacheService = new(MockBehavior.Strict);
+    public readonly Mock<IPublicBlobCacheService> PublicBlobCacheService = new(MockBehavior.Strict);
     public readonly Mock<IMemoryCacheService> MemoryCacheService = new(MockBehavior.Strict);
 
     // ReSharper disable once MemberCanBeProtected.Global
