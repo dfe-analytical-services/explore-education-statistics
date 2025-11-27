@@ -33,7 +33,88 @@ describe('UkTimeHelper', () => {
     );
   });
 
-  describe('UkTimeHelper.dateTimeInLondonTimeZone — BST → GMT edge cases', () => {
+  describe('UkTimeHelper.getDateRangeFromDate', () => {
+    test('should return date range from today with default parameters', () => {
+      const result = UkTimeHelper.getDateRangeFromDate(0);
+
+      expect(result.startDate).toBeInstanceOf(Date);
+      expect(result.endDate).toBeInstanceOf(Date);
+      expect(result.endDate.getTime()).toBeGreaterThan(
+        result.startDate.getTime(),
+      );
+    });
+
+    test('should return same day range when adding 0 days', () => {
+      const startDate = new Date('2025-06-15T10:30:00Z');
+      const result = UkTimeHelper.getDateRangeFromDate(0, startDate);
+
+      expect(result.startDate).toBe(startDate);
+      expect(result.endDate.toISOString()).toBe('2025-06-15T22:59:59.000Z'); // End of day in BST
+    });
+
+    test('should correctly add days during BST period', () => {
+      const startDate = new Date('2025-06-15T14:30:00Z'); // BST period
+      const result = UkTimeHelper.getDateRangeFromDate(3, startDate);
+
+      expect(result.startDate).toBe(startDate);
+      expect(result.endDate.toISOString()).toBe('2025-06-18T22:59:59.000Z'); // 3 days later, end of day in BST
+    });
+
+    test('should correctly add days during GMT period', () => {
+      const startDate = new Date('2025-01-15T14:30:00Z'); // GMT period
+      const result = UkTimeHelper.getDateRangeFromDate(5, startDate);
+
+      expect(result.startDate).toBe(startDate);
+      expect(result.endDate.toISOString()).toBe('2025-01-20T23:59:59.000Z'); // 5 days later, end of day in GMT
+    });
+
+    test('should handle transition from GMT to BST', () => {
+      const startDate = new Date('2025-03-29T12:00:00Z'); // Day before BST starts
+      const result = UkTimeHelper.getDateRangeFromDate(2, startDate);
+
+      expect(result.startDate).toBe(startDate);
+      expect(result.endDate.toISOString()).toBe('2025-03-31T22:59:59.000Z'); // End of day in BST after transition
+    });
+
+    test('should handle transition from BST to GMT', () => {
+      const startDate = new Date('2025-10-25T12:00:00Z'); // Day before GMT starts
+      const result = UkTimeHelper.getDateRangeFromDate(2, startDate);
+
+      expect(result.startDate).toBe(startDate);
+      expect(result.endDate.toISOString()).toBe('2025-10-27T23:59:59.000Z'); // End of day in GMT after transition
+    });
+
+    test('should handle negative days (past dates)', () => {
+      const startDate = new Date('2025-06-15T14:30:00Z');
+      const result = UkTimeHelper.getDateRangeFromDate(-3, startDate);
+
+      expect(result.startDate).toBe(startDate);
+      expect(result.endDate.toISOString()).toBe('2025-06-12T22:59:59.000Z'); // 3 days earlier, end of day
+    });
+
+    test('should handle edge case of adding many days', () => {
+      const startDate = new Date('2025-01-01T00:00:00Z');
+      const result = UkTimeHelper.getDateRangeFromDate(365, startDate);
+
+      expect(result.startDate).toBe(startDate);
+      expect(result.endDate.toISOString()).toBe('2026-01-01T23:59:59.000Z'); // One year later
+    });
+
+    test('should handle start date at different times of day consistently', () => {
+      const morning = new Date('2025-06-15T08:00:00Z');
+      const evening = new Date('2025-06-15T20:00:00Z');
+
+      const morningResult = UkTimeHelper.getDateRangeFromDate(1, morning);
+      const eveningResult = UkTimeHelper.getDateRangeFromDate(1, evening);
+
+      // Both should end at the same time regardless of start time within the day
+      expect(morningResult.endDate.toISOString()).toBe(
+        eveningResult.endDate.toISOString(),
+      );
+    });
+  });
+
+  describe('UkTimeHelper start and end day — BST → GMT edge cases', () => {
     test.each([
       // [inputDateString, expected]
       ['2025-10-26T01:00:00+01:00', '2025-10-25T23:00:00.000Z'],
