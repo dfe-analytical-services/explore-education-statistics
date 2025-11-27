@@ -16,7 +16,7 @@
     <!-- Required for AspectInjector tests within this test project -->
     <PackageReference Include="Bogus" Version="35.6.5" />
     <PackageReference Include="CompareNETObjects" Version="4.84.0" />
-    <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
+    <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.22" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.22" PrivateAssets="all" />
