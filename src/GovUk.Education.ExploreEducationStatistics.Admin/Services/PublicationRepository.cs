@@ -26,9 +26,10 @@ public class PublicationRepository : Content.Model.Repository.PublicationReposit
 
     public async Task<List<Publication>> ListPublicationsForUser(Guid userId, Guid? themeId = null)
     {
-        var publicationsGrantedByPublicationRoleQueryable = _context.UserPublicationRoles.Where(userPublicationRole =>
-            userPublicationRole.UserId == userId
-            && ListOf(PublicationRole.Owner, PublicationRole.Allower).Contains(userPublicationRole.Role)
+        var publicationsGrantedByPublicationRoleQueryable = _context.ActiveUserPublicationRoles.Where(
+            userPublicationRole =>
+                userPublicationRole.UserId == userId
+                && ListOf(PublicationRole.Owner, PublicationRole.Allower).Contains(userPublicationRole.Role)
         );
 
         if (themeId.HasValue)
@@ -47,9 +48,9 @@ public class PublicationRepository : Content.Model.Repository.PublicationReposit
             .ToList();
 
         var releasesGrantedByReleaseRolesQueryable = _context
-            .UserReleaseRoles.Include(userReleaseRole => userReleaseRole.ReleaseVersion)
-                .ThenInclude(rv => rv.Release)
-                    .ThenInclude(r => r.Publication)
+            .ActiveUserReleaseRoles.Include(userReleaseRole => userReleaseRole.ReleaseVersion)
+            .ThenInclude(rv => rv.Release)
+            .ThenInclude(r => r.Publication)
             .Where(userReleaseRole =>
                 userReleaseRole.UserId == userId && userReleaseRole.Role != ReleaseRole.PrereleaseViewer
             );
