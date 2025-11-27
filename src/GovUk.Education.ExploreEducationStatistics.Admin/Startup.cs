@@ -473,8 +473,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
         services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
         services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
-        services.AddTransient<IUserReleaseInviteRepository, UserReleaseInviteRepository>();
-        services.AddTransient<IUserPublicationInviteRepository, UserPublicationInviteRepository>();
         services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
         services.AddTransient<IRedirectsService, RedirectsService>();
         services.AddTransient<IDataSetCandidateService, DataSetCandidateService>();
