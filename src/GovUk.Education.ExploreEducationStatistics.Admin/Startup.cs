@@ -669,6 +669,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 sasService: provider.GetRequiredService<IBlobSasService>()
             )
         );
+
+        services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
+        services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
         services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(
             _ => new PublisherTableStorageService(configuration.GetRequiredValue("PublisherStorage"))
         );
@@ -744,13 +747,13 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         // Enable caching and register any caching services.
         CacheAspect.Enabled = true;
-        var privateCacheService = new BlobCacheService(
+        var privateCacheService = new PrivateBlobCacheService(
             app.ApplicationServices.GetRequiredService<IPrivateBlobStorageService>(),
-            provider.GetRequiredService<ILogger<BlobCacheService>>()
+            provider.GetRequiredService<ILogger<PrivateBlobCacheService>>()
         );
-        var publicCacheService = new BlobCacheService(
+        var publicCacheService = new PublicBlobCacheService(
             app.ApplicationServices.GetRequiredService<IPublicBlobStorageService>(),
-            provider.GetRequiredService<ILogger<BlobCacheService>>()
+            provider.GetRequiredService<ILogger<PublicBlobCacheService>>()
         );
         BlobCacheAttribute.AddService("default", privateCacheService);
         BlobCacheAttribute.AddService("public", publicCacheService);

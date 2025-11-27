@@ -2,12 +2,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -17,7 +17,7 @@ using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInf
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cache;
 
-public class ReleaseCacheServiceTests : CacheServiceTestFixture
+public class ReleaseCacheServiceTests
 {
     private const string PublicationSlug = "publication-slug";
     private const string ReleaseSlug = "2022";
@@ -75,11 +75,13 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
     {
         var cacheKey = new ReleaseCacheKey(PublicationSlug, ReleaseSlug);
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync((object?)null);
 
-        PublicBlobCacheService
+        publicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(cacheKey, _releaseViewModel))
             .Returns(Task.CompletedTask);
 
@@ -87,11 +89,14 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         releaseService.Setup(s => s.GetRelease(PublicationSlug, ReleaseSlug)).ReturnsAsync(_releaseViewModel);
 
-        var service = BuildService(releaseService: releaseService.Object);
+        var service = BuildService(
+            releaseService: releaseService.Object,
+            publicBlobCacheService: publicBlobCacheService.Object
+        );
 
         var result = await service.GetRelease(PublicationSlug, ReleaseSlug);
 
-        VerifyAllMocks(releaseService, PublicBlobCacheService);
+        VerifyAllMocks(releaseService, publicBlobCacheService);
 
         result.AssertRight(_releaseViewModel);
     }
@@ -101,15 +106,17 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
     {
         var cacheKey = new ReleaseCacheKey(PublicationSlug, ReleaseSlug);
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(_releaseViewModel);
 
-        var service = BuildService();
+        var service = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
 
         var result = await service.GetRelease(PublicationSlug, ReleaseSlug);
 
-        VerifyAllMocks(PublicBlobCacheService);
+        VerifyAllMocks(publicBlobCacheService);
 
         result.AssertRight(_releaseViewModel);
     }
@@ -119,7 +126,9 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
     {
         var cacheKey = new ReleaseCacheKey(PublicationSlug, ReleaseSlug);
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync((object?)null);
 
@@ -127,11 +136,14 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         releaseService.Setup(s => s.GetRelease(PublicationSlug, ReleaseSlug)).ReturnsAsync(new NotFoundResult());
 
-        var service = BuildService(releaseService: releaseService.Object);
+        var service = BuildService(
+            releaseService: releaseService.Object,
+            publicBlobCacheService: publicBlobCacheService.Object
+        );
 
         var result = await service.GetRelease(PublicationSlug, ReleaseSlug);
 
-        VerifyAllMocks(releaseService, PublicBlobCacheService);
+        VerifyAllMocks(releaseService, publicBlobCacheService);
 
         result.AssertNotFound();
     }
@@ -141,11 +153,13 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
     {
         var cacheKey = new ReleaseCacheKey(PublicationSlug);
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync((object?)null);
 
-        PublicBlobCacheService
+        publicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(cacheKey, _releaseViewModel))
             .Returns(Task.CompletedTask);
 
@@ -153,11 +167,14 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         releaseService.Setup(s => s.GetRelease(PublicationSlug, null)).ReturnsAsync(_releaseViewModel);
 
-        var service = BuildService(releaseService: releaseService.Object);
+        var service = BuildService(
+            releaseService: releaseService.Object,
+            publicBlobCacheService: publicBlobCacheService.Object
+        );
 
         var result = await service.GetRelease(PublicationSlug);
 
-        VerifyAllMocks(releaseService, PublicBlobCacheService);
+        VerifyAllMocks(releaseService, publicBlobCacheService);
 
         result.AssertRight(_releaseViewModel);
     }
@@ -167,15 +184,17 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
     {
         var cacheKey = new ReleaseCacheKey(PublicationSlug);
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(_releaseViewModel);
 
-        var service = BuildService();
+        var service = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
 
         var result = await service.GetRelease(PublicationSlug);
 
-        VerifyAllMocks(PublicBlobCacheService);
+        VerifyAllMocks(publicBlobCacheService);
 
         result.AssertRight(_releaseViewModel);
     }
@@ -185,7 +204,9 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
     {
         var cacheKey = new ReleaseCacheKey(PublicationSlug);
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync((object?)null);
 
@@ -193,11 +214,14 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         releaseService.Setup(s => s.GetRelease(PublicationSlug, null)).ReturnsAsync(new NotFoundResult());
 
-        var service = BuildService(releaseService: releaseService.Object);
+        var service = BuildService(
+            releaseService: releaseService.Object,
+            publicBlobCacheService: publicBlobCacheService.Object
+        );
 
         var result = await service.GetRelease(PublicationSlug);
 
-        VerifyAllMocks(releaseService, PublicBlobCacheService);
+        VerifyAllMocks(releaseService, publicBlobCacheService);
 
         result.AssertNotFound();
     }
@@ -211,11 +235,16 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         releaseService.Setup(s => s.GetRelease(ReleaseVersionId, null)).ReturnsAsync(_releaseViewModel);
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(cacheKey, _releaseViewModel))
             .Returns(Task.CompletedTask);
 
-        var service = BuildService(releaseService: releaseService.Object);
+        var service = BuildService(
+            releaseService: releaseService.Object,
+            publicBlobCacheService: publicBlobCacheService.Object
+        );
 
         var result = await service.UpdateRelease(
             ReleaseVersionId,
@@ -225,7 +254,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         // There should be no attempt on the cache service to get the cached resource
 
-        VerifyAllMocks(releaseService, PublicBlobCacheService);
+        VerifyAllMocks(releaseService, publicBlobCacheService);
 
         result.AssertRight(_releaseViewModel);
     }
@@ -239,17 +268,22 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         releaseService.Setup(s => s.GetRelease(ReleaseVersionId, null)).ReturnsAsync(_releaseViewModel);
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(cacheKey, _releaseViewModel))
             .Returns(Task.CompletedTask);
 
-        var service = BuildService(releaseService: releaseService.Object);
+        var service = BuildService(
+            releaseService: releaseService.Object,
+            publicBlobCacheService: publicBlobCacheService.Object
+        );
 
         var result = await service.UpdateRelease(ReleaseVersionId, publicationSlug: PublicationSlug);
 
         // There should be no attempt on the cache service to get the cached resource
 
-        VerifyAllMocks(releaseService, PublicBlobCacheService);
+        VerifyAllMocks(releaseService, publicBlobCacheService);
 
         result.AssertRight(_releaseViewModel);
     }
@@ -264,11 +298,16 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         releaseService.Setup(s => s.GetRelease(ReleaseVersionId, expectedPublishDate)).ReturnsAsync(_releaseViewModel);
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(cacheKey, _releaseViewModel))
             .Returns(Task.CompletedTask);
 
-        var service = BuildService(releaseService: releaseService.Object);
+        var service = BuildService(
+            releaseService: releaseService.Object,
+            publicBlobCacheService: publicBlobCacheService.Object
+        );
 
         var result = await service.UpdateReleaseStaged(
             ReleaseVersionId,
@@ -279,7 +318,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         // There should be no attempt on the cache service to get the cached resource
 
-        VerifyAllMocks(releaseService, PublicBlobCacheService);
+        VerifyAllMocks(releaseService, publicBlobCacheService);
 
         result.AssertRight(_releaseViewModel);
     }
@@ -294,11 +333,16 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         releaseService.Setup(s => s.GetRelease(ReleaseVersionId, expectedPublishDate)).ReturnsAsync(_releaseViewModel);
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(cacheKey, _releaseViewModel))
             .Returns(Task.CompletedTask);
 
-        var service = BuildService(releaseService: releaseService.Object);
+        var service = BuildService(
+            releaseService: releaseService.Object,
+            publicBlobCacheService: publicBlobCacheService.Object
+        );
 
         var result = await service.UpdateReleaseStaged(
             ReleaseVersionId,
@@ -308,7 +352,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         // There should be no attempt on the cache service to get the cached resource
 
-        VerifyAllMocks(releaseService, PublicBlobCacheService);
+        VerifyAllMocks(releaseService, publicBlobCacheService);
 
         result.AssertRight(_releaseViewModel);
     }
@@ -333,12 +377,15 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
     private static ReleaseCacheService BuildService(
         IReleaseService? releaseService = null,
-        IPublicBlobStorageService? publicBlobStorageService = null
+        IPublicBlobStorageService? publicBlobStorageService = null,
+        IPublicBlobCacheService? publicBlobCacheService = null
     )
     {
         return new ReleaseCacheService(
             releaseService: releaseService ?? Mock.Of<IReleaseService>(Strict),
-            publicBlobStorageService: publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(Strict)
+            publicBlobStorageService: publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(Strict),
+            publicBlobCacheService: publicBlobCacheService ?? Mock.Of<IPublicBlobCacheService>(Strict),
+            logger: Mock.Of<ILogger<ReleaseCacheService>>(Loose)
         );
     }
 }
