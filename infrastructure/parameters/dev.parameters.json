@@ -134,7 +134,7 @@
       ]
     },
     "publicAppCompressionDisable": {
-      "value": true
+      "value": false
     }
   }
 }
