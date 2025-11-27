@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
@@ -14,22 +15,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 [Route("api")]
 [ApiController]
 [Authorize]
-public class TableBuilderMetaController : ControllerBase
+public class TableBuilderMetaController(
+    ISubjectMetaService subjectMetaService,
+    IPrivateBlobCacheService privateBlobCacheService,
+    ILogger<TableBuilderMetaController> logger
+) : ControllerBase
 {
-    private readonly ISubjectMetaService _subjectMetaService;
-
-    public TableBuilderMetaController(ISubjectMetaService subjectMetaService)
-    {
-        _subjectMetaService = subjectMetaService;
-    }
-
     [HttpGet("data/release/{releaseVersionId:guid}/meta/subject/{subjectId:guid}")]
-    [BlobCache(typeof(PrivateSubjectMetaCacheKey))]
     public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid releaseVersionId, Guid subjectId)
     {
-        return _subjectMetaService
-            .GetSubjectMeta(releaseVersionId: releaseVersionId, subjectId: subjectId)
-            .HandleFailuresOrOk();
+        return privateBlobCacheService.GetOrCreateAsync(
+            cacheKey: new PrivateSubjectMetaCacheKey(releaseVersionId: releaseVersionId, subjectId: subjectId),
+            createIfNotExistsFn: () =>
+                subjectMetaService
+                    .GetSubjectMeta(releaseVersionId: releaseVersionId, subjectId: subjectId)
+                    .HandleFailuresOrOk(),
+            logger: logger
+        );
     }
 
     [HttpPost("data/release/{releaseVersionId:guid}/meta/subject")]
@@ -39,7 +41,7 @@ public class TableBuilderMetaController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        return _subjectMetaService.FilterSubjectMeta(releaseVersionId, request, cancellationToken).HandleFailuresOrOk();
+        return subjectMetaService.FilterSubjectMeta(releaseVersionId, request, cancellationToken).HandleFailuresOrOk();
     }
 
     [HttpPatch("data/release/{releaseVersionId:guid}/meta/subject/{subjectId:guid}/filters")]
@@ -49,7 +51,7 @@ public class TableBuilderMetaController : ControllerBase
         List<FilterUpdateViewModel> request
     )
     {
-        return _subjectMetaService
+        return subjectMetaService
             .UpdateSubjectFilters(releaseVersionId: releaseVersionId, subjectId: subjectId, request)
             .HandleFailuresOrOk();
     }
@@ -61,7 +63,7 @@ public class TableBuilderMetaController : ControllerBase
         List<IndicatorGroupUpdateViewModel> request
     )
     {
-        return _subjectMetaService
+        return subjectMetaService
             .UpdateSubjectIndicators(releaseVersionId: releaseVersionId, subjectId: subjectId, request)
             .HandleFailuresOrOk();
     }
