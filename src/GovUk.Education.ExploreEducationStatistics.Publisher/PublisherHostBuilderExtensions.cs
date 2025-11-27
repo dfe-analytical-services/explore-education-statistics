@@ -98,6 +98,7 @@ public static class PublisherHostBuilderExtensions
                     ))
                     .AddScoped<IPublishingService, PublishingService>()
                     .AddSingleton<IBlobSasService, BlobSasService>()
+                    .AddScoped<IPublicBlobCacheService, PublicBlobCacheService>()
                     .AddScoped<IPublicBlobStorageService, PublicBlobStorageService>(
                         provider => new PublicBlobStorageService(
                             connectionString: provider

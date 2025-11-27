@@ -17,11 +17,4 @@ void EnableCaching()
 {
     // Enable caching and register any caching services
     CacheAspect.Enabled = true;
-    BlobCacheAttribute.AddService(
-        "public",
-        new BlobCacheService(
-            host.Services.GetRequiredService<IPublicBlobStorageService>(),
-            host.Services.GetRequiredService<ILogger<BlobCacheService>>()
-        )
-    );
 }
