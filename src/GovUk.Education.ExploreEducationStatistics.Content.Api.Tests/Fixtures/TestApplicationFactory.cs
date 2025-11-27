@@ -49,6 +49,8 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
             )
             .ConfigureServices(services =>
             {
+                services.MockService<IMemoryCacheService>(MockBehavior.Loose);
+
                 services
                     .UseInMemoryDbContext<ContentDbContext>()
                     .UseInMemoryDbContext<StatisticsDbContext>()

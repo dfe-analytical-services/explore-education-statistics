@@ -690,6 +690,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
 
         services.AddSingleton<IFileTypeService, FileTypeService>();
+        services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
         services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
         services.AddTransient<ICacheKeyService, CacheKeyService>();
         services.AddSingleton<IDataProcessorClient, DataProcessorClient>(_ => new DataProcessorClient(
@@ -741,20 +742,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        var provider = app.ApplicationServices;
-
         // Enable caching and register any caching services.
         CacheAspect.Enabled = true;
-        var privateCacheService = new PrivateBlobCacheService(
-            app.ApplicationServices.GetRequiredService<IPrivateBlobStorageService>(),
-            provider.GetRequiredService<ILogger<PrivateBlobCacheService>>()
-        );
-        var publicCacheService = new PublicBlobCacheService(
-            app.ApplicationServices.GetRequiredService<IPublicBlobStorageService>(),
-            provider.GetRequiredService<ILogger<PublicBlobCacheService>>()
-        );
-        BlobCacheAttribute.AddService("default", privateCacheService);
-        BlobCacheAttribute.AddService("public", publicCacheService);
 
         if (!env.IsIntegrationTest())
         {

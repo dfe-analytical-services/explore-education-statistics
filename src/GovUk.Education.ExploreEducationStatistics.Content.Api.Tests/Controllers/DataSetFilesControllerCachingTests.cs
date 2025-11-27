@@ -2,14 +2,17 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NCrontab;
 using Newtonsoft.Json;
@@ -20,7 +23,7 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixture
+public abstract class DataSetFilesControllerCachingTests
 {
     public class ListDataSetsTests : DataSetFilesControllerCachingTests
     {
@@ -85,7 +88,13 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
         {
             var dataSetFileService = new Mock<IDataSetFileService>(Strict);
 
-            MemoryCacheService
+            var memoryCacheService = new Mock<IMemoryCacheService>(Strict);
+
+            memoryCacheService
+                .Setup(s => s.GetMemoryCacheOptions())
+                .Returns(new MemoryCacheServiceOptions { Enabled = true });
+
+            memoryCacheService
                 .Setup(s =>
                     s.GetItem(
                         new ListDataSetFilesCacheKey(_query),
@@ -99,12 +108,14 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
                 CrontabSchedule.Parse(HalfHourlyExpirySchedule)
             );
 
-            MemoryCacheService.Setup(s =>
+            var cachingDate = DateTime.UtcNow;
+
+            memoryCacheService.Setup(s =>
                 s.SetItem<object>(
                     new ListDataSetFilesCacheKey(_query),
                     _dataSetFiles,
                     ItIs.DeepEqualTo(expectedCacheConfiguration),
-                    null
+                    cachingDate
                 )
             );
 
@@ -127,11 +138,15 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
                 )
                 .ReturnsAsync(_dataSetFiles);
 
-            var controller = BuildController(dataSetFileService.Object);
+            var controller = BuildController(
+                dataSetFileService.Object,
+                memoryCacheService: memoryCacheService.Object,
+                dateTimeProvider: new DateTimeProvider(cachingDate)
+            );
 
             var result = await controller.ListDataSetFiles(_query);
 
-            VerifyAllMocks(MemoryCacheService, dataSetFileService);
+            VerifyAllMocks(memoryCacheService, dataSetFileService);
 
             result.AssertOkResult(_dataSetFiles);
         }
@@ -139,7 +154,13 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
         [Fact]
         public async Task CachedEntryExists_ReturnsCache()
         {
-            MemoryCacheService
+            var memoryCacheService = new Mock<IMemoryCacheService>(Strict);
+
+            memoryCacheService
+                .Setup(s => s.GetMemoryCacheOptions())
+                .Returns(new MemoryCacheServiceOptions { Enabled = true });
+
+            memoryCacheService
                 .Setup(s =>
                     s.GetItem(
                         new ListDataSetFilesCacheKey(_query),
@@ -148,11 +169,11 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
                 )
                 .Returns(_dataSetFiles);
 
-            var controller = BuildController();
+            var controller = BuildController(memoryCacheService: memoryCacheService.Object);
 
             var result = await controller.ListDataSetFiles(_query);
 
-            VerifyAllMocks(MemoryCacheService);
+            VerifyAllMocks(memoryCacheService);
 
             result.AssertOkResult(_dataSetFiles);
         }
@@ -168,8 +189,17 @@ public abstract class DataSetFilesControllerCachingTests : CacheServiceTestFixtu
         }
     }
 
-    private static DataSetFilesController BuildController(IDataSetFileService? dataSetFileService = null)
+    private static DataSetFilesController BuildController(
+        IDataSetFileService? dataSetFileService = null,
+        IMemoryCacheService? memoryCacheService = null,
+        DateTimeProvider? dateTimeProvider = null
+    )
     {
-        return new DataSetFilesController(dataSetFileService ?? Mock.Of<IDataSetFileService>(Strict));
+        return new DataSetFilesController(
+            dataSetFileService: dataSetFileService ?? Mock.Of<IDataSetFileService>(Strict),
+            memoryCacheService: memoryCacheService ?? Mock.Of<IMemoryCacheService>(Strict),
+            Mock.Of<ILogger<DataSetFilesController>>(),
+            dateTimeProvider: dateTimeProvider ?? new DateTimeProvider(DateTime.UtcNow)
+        );
     }
 }

@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -295,8 +296,9 @@ public class MemoryCacheServiceTests
     )
     {
         return new MemoryCacheService(
-            memoryCache ?? new MemoryCache(new MemoryCacheOptions()),
-            logger ?? Mock.Of<ILogger<MemoryCacheService>>()
+            cache: memoryCache ?? new MemoryCache(new MemoryCacheOptions()),
+            logger: logger ?? Mock.Of<ILogger<MemoryCacheService>>(),
+            options: new MemoryCacheServiceOptions()
         );
     }
 

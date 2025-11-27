@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -135,19 +136,21 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             provider.GetRequiredService<IPublicBlobStorageService>(),
             provider.GetRequiredService<ILogger<PublicBlobCacheService>>()
         ));
+        services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
         services.AddSingleton<IMemoryCacheService>(provider =>
         {
-            var memoryCacheConfig = configuration.GetSection("MemoryCache");
-            var maxCacheSizeMb = memoryCacheConfig.GetValue<int>("MaxCacheSizeMb");
-            var expirationScanFrequencySeconds = memoryCacheConfig.GetValue<int>("ExpirationScanFrequencySeconds");
+            var options = new MemoryCacheServiceOptions();
+            configuration.GetRequiredSection(MemoryCacheServiceOptions.Section).Bind(options);
+
             return new MemoryCacheService(
                 new MemoryCache(
                     new MemoryCacheOptions
                     {
-                        SizeLimit = maxCacheSizeMb * 1000000,
-                        ExpirationScanFrequency = TimeSpan.FromSeconds(expirationScanFrequencySeconds),
+                        SizeLimit = options.MaxCacheSizeMb * 1000000,
+                        ExpirationScanFrequency = TimeSpan.FromSeconds(options.ExpirationScanFrequencySeconds),
                     }
                 ),
+                options: options,
                 provider.GetRequiredService<ILogger<MemoryCacheService>>()
             );
         });
@@ -208,15 +211,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     {
         // Enable caching and register any caching services
         CacheAspect.Enabled = true;
-        BlobCacheAttribute.AddService("public", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
-
-        // Register the MemoryCacheService only if the Memory Caching is enabled.
-        var memoryCacheConfig = configuration.GetSection("MemoryCache");
-        if (memoryCacheConfig.GetValue("Enabled", false))
-        {
-            MemoryCacheAttribute.SetOverrideConfiguration(memoryCacheConfig.GetSection("Overrides"));
-            MemoryCacheAttribute.AddService("default", app.ApplicationServices.GetService<IMemoryCacheService>()!);
-        }
 
         if (env.IsDevelopment())
         {
