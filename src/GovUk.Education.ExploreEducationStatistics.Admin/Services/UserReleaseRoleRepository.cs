@@ -14,6 +14,23 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
     ),
         IUserReleaseRoleRepository
 {
+    public async Task CreateManyIfNotExists(IReadOnlyList<UserReleaseRole> userReleaseRoles)
+    {
+        var newUserReleaseRoles = await userReleaseRoles
+            .ToAsyncEnumerable()
+            .WhereAwait(async userReleaseRole =>
+                !await UserHasRoleOnReleaseVersion(
+                    userId: userReleaseRole.UserId,
+                    releaseVersionId: userReleaseRole.ReleaseVersionId,
+                    role: userReleaseRole.Role
+                )
+            )
+            .ToListAsync();
+
+        await contentDbContext.UserReleaseRoles.AddRangeAsync(newUserReleaseRoles);
+        await contentDbContext.SaveChangesAsync();
+    }
+
     protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(Guid releaseVersionId)
     {
         return ContentDbContext.UserReleaseRoles.Where(role => role.ReleaseVersionId == releaseVersionId);
@@ -91,6 +108,11 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
     }
 
     public async Task<bool> HasUserReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role)
+    {
+        return await UserHasRoleOnResource(userId, releaseVersionId, role);
+    }
+
+    public async Task<bool> UserHasRoleOnReleaseVersion(Guid userId, Guid releaseVersionId, ReleaseRole role)
     {
         return await UserHasRoleOnResource(userId, releaseVersionId, role);
     }

@@ -33,7 +33,6 @@ public enum ValidationErrorMessages
     InvalidUserRole,
     NoInvitableEmails,
     NotAllReleasesBelongToPublication,
-    UserAlreadyHasReleaseRoles,
 
     // Methodology
     MethodologyCannotDependOnPublishedRelease,
