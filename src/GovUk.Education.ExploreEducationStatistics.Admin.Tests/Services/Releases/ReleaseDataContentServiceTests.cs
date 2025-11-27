@@ -613,6 +613,57 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
+        public async Task WhenDataSetHasReplacementInProgress_ReplacementDataSetIsNotReturned()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            var (originalDataSet, replacementDataSet) = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(releaseVersion)
+                .GenerateTuple2();
+
+            // Set up the relationship between the original data set and its replacement
+            originalDataSet.File.ReplacedBy = replacementDataSet.File;
+            replacementDataSet.File.Replacing = originalDataSet.File;
+
+            var dataImports = _dataFixture
+                .DefaultDataImport()
+                .WithFiles([originalDataSet.File, replacementDataSet.File])
+                .WithStatus(DataImportStatus.COMPLETE)
+                .GenerateArray(2);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.DataImports.AddRange(dataImports);
+                context.Publications.Add(publication);
+                context.ReleaseFiles.AddRange(originalDataSet, replacementDataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                // Only the original data set should be returned as the replacement is still in progress
+                var dataSet = Assert.Single(result.DataSets);
+                AssertDataSetEqual(originalDataSet, dataSet);
+            }
+        }
+
+        [Fact]
         public async Task WhenReleaseVersionHasNoDataGuidance_ReturnsNullDataGuidance()
         {
             // Arrange

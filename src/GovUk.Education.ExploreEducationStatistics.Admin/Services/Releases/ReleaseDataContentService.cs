@@ -53,6 +53,7 @@ public class ReleaseDataContentService(ContentDbContext contentDbContext, IUserS
                 .ThenInclude(f => f.DataSetFileVersionGeographicLevels)
             .Where(rf => rf.ReleaseVersionId == releaseVersion.Id)
             .Where(rf => rf.File.Type == FileType.Data)
+            .Where(rf => rf.File.ReplacingId == null)
             .Join(
                 contentDbContext.DataImports.Where(di => di.Status == DataImportStatus.COMPLETE),
                 rf => rf.FileId,
