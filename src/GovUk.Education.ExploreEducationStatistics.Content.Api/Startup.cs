@@ -1,7 +1,6 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
 using FluentValidation;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
@@ -209,9 +208,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> _)
     {
-        // Enable caching and register any caching services
-        CacheAspect.Enabled = true;
-
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();

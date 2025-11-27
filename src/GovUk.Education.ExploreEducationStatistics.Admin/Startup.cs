@@ -26,7 +26,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
@@ -87,6 +86,7 @@ using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Con
 using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using DataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.DataSetService;
+using EducationInNumbersService = GovUk.Education.ExploreEducationStatistics.Admin.Services.EducationInNumbersService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
 using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
 using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
@@ -94,6 +94,7 @@ using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Co
 using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
 using IDataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data.IDataSetService;
+using IEducationInNumbersService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IEducationInNumbersService;
 using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
 using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
@@ -455,10 +456,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
         services.AddTransient<IPreReleaseService, PreReleaseService>();
         services.AddTransient<IPreReleaseSummaryService, PreReleaseSummaryService>();
-        services.AddTransient<
-            Admin.Services.Interfaces.IEducationInNumbersService,
-            Admin.Services.EducationInNumbersService
-        >();
+        services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
         services.AddTransient<IEducationInNumbersContentService, EducationInNumbersContentService>();
 
         services.AddTransient<IManageContentPageService, ManageContentPageService>();
@@ -742,9 +740,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        // Enable caching and register any caching services.
-        CacheAspect.Enabled = true;
-
         if (!env.IsIntegrationTest())
         {
             UpdateDatabase(app, env);

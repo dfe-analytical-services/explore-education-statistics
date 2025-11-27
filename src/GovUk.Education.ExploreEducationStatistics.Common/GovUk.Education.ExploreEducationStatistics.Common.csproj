@@ -14,7 +14,6 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="AngleSharp" Version="1.4.0" />
-    <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
     <PackageReference Include="Aspects.Universal" Version="1.0.2" />
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
