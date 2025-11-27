@@ -105,10 +105,11 @@ export default function EditablePageModeToggle({
                 );
                 const button =
                   accordionSection?.previousElementSibling?.querySelector(
-                    'button',
+                    '.govuk-accordion__section-heading button',
                   );
 
                 if (
+                  event.target.value === 'edit' &&
                   button &&
                   !(button.getAttribute('aria-expanded') === 'true')
                 ) {
