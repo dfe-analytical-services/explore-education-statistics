@@ -17,6 +17,12 @@ public interface IEmailTemplateService
 
     Either<ActionResult, Unit> SendReleaseRoleEmail(string email, ReleaseVersion releaseVersion, ReleaseRole role);
 
+    Task<Either<ActionResult, Unit>> SendContributorInviteEmail(
+        string email,
+        string publicationTitle,
+        HashSet<Guid> releaseVersionIds
+    );
+
     Task<Either<ActionResult, Unit>> SendPreReleaseInviteEmail(string email, Guid releaseVersionId, bool isNewUser);
 
     Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email, ReleaseVersion releaseVersion);

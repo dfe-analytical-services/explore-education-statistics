@@ -21,6 +21,13 @@ public interface IUserResourceRoleNotificationService
         CancellationToken cancellationToken = default
     );
 
+    Task NotifyUserOfNewContributorRoles(
+        Guid userId,
+        string publicationTitle,
+        HashSet<Guid> releaseVersionIds,
+        CancellationToken cancellationToken = default
+    );
+
     Task NotifyUserOfNewPreReleaseRole(
         Guid userId,
         Guid releaseVersionId,
