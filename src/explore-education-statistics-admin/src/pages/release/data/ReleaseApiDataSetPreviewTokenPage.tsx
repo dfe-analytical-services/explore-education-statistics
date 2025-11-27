@@ -115,7 +115,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                         <FormattedDate usingGmt>
                           {previewToken.activates}
                         </FormattedDate>{' '}
-                        (GMT/BST){' '}
+                        (UK time){' '}
                       </strong>
                       and expires:
                     </>
@@ -127,7 +127,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                     >
                       {previewToken.expires}
                     </FormattedDate>{' '}
-                    (GMT/BST)
+                    (UK time)
                   </strong>
                 </p>
 

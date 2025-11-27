@@ -14,7 +14,11 @@ public class PreviewTokenCreateRequestValidatorTests
 
     [Theory]
     [InlineData("2025-09-30T14:00:00 +01:00")]
+    [InlineData("2025-09-30T17:00:00 +04:00")]
+    [InlineData("2025-09-30T09:00:00 -04:00")]
     [InlineData("2025-10-01T13:59:49 +01:00")] // 1 second outside the 10-second tolerance
+    [InlineData("2025-10-01T16:59:49 +04:00")]
+    [InlineData("2025-10-01T08:59:49 -04:00")]
     public void ActivatesInPast_Fails(string activates)
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
@@ -34,7 +38,11 @@ public class PreviewTokenCreateRequestValidatorTests
 
     [Theory]
     [InlineData("2025-10-01T14:00:00 +01:00")]
+    [InlineData("2025-10-01T17:00:00 +04:00")]
+    [InlineData("2025-10-01T09:00:00 -04:00")]
     [InlineData("2025-10-01T13:59:55 +01:00")] // inside 10 second tolerance
+    [InlineData("2025-10-01T16:59:55 +04:00")]
+    [InlineData("2025-10-01T08:59:55 -04:00")]
     public void ActivatesIsNow_Passes(string activates)
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
@@ -52,7 +60,8 @@ public class PreviewTokenCreateRequestValidatorTests
 
     [Theory]
     [InlineData("2025-10-09T00:00:00 +01:00")]
-    [InlineData("2025-10-09T00:00:00 +00:00")]
+    [InlineData("2025-10-09T03:00:00 +04:00")] // same instant as +01:00
+    [InlineData("2025-10-08T19:00:00 -04:00")] // same instant as +01:00
     public void ActivatesAfter7Days_Fails(string activatesInput)
     {
         var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
@@ -77,12 +86,24 @@ public class PreviewTokenCreateRequestValidatorTests
     {
         [Theory]
         [InlineData("2025-10-01T14:00:00 +00:00")]
+        [InlineData("2025-10-01T18:00:00 +04:00")]
+        [InlineData("2025-10-01T10:00:00 -04:00")]
         [InlineData("2025-10-01T14:00:01 +00:00")]
+        [InlineData("2025-10-01T18:00:01 +04:00")]
+        [InlineData("2025-10-01T10:00:01 -04:00")]
         [InlineData("2025-10-07T23:00:00 +00:00")] // This, in BST is 2025-10-08T00:00:00
         [InlineData("2025-10-08T00:00:00 +01:00")]
+        [InlineData("2025-10-08T03:00:00 +04:00")]
+        [InlineData("2025-10-07T19:00:00 -04:00")]
         [InlineData("2025-10-08T13:59:59 +00:00")]
+        [InlineData("2025-10-08T17:59:59 +04:00")]
+        [InlineData("2025-10-08T09:59:59 -04:00")]
         [InlineData("2025-10-08T14:00:00 +00:00")]
+        [InlineData("2025-10-08T18:00:00 +04:00")]
+        [InlineData("2025-10-08T10:00:00 -04:00")]
         [InlineData("2025-10-01T16:00:00 +01:00")]
+        [InlineData("2025-10-01T19:00:00 +04:00")]
+        [InlineData("2025-10-01T11:00:00 -04:00")]
         public void ActivatesWithin7Days_Passes(string activates)
         {
             var validator = new PreviewTokenCreateRequest.Validator(GetTimeProvider());
@@ -217,13 +238,29 @@ public class PreviewTokenCreateRequestValidatorTests
     {
         [Theory]
         [InlineData(null, "2025-10-01T14:00:00 +00:00", true)]
+        [InlineData(null, "2025-10-01T18:00:00 +04:00", true)] // 14:00Z == 18:00(+04)
+        [InlineData(null, "2025-10-01T10:00:00 -04:00", true)] // 14:00Z == 10:00(-04)
         [InlineData(null, "2025-10-01T14:00:01 +00:00", true)]
+        [InlineData(null, "2025-10-01T18:00:01 +04:00", true)] // 14:00:01Z == 18:00:01(+04)
+        [InlineData(null, "2025-10-01T10:00:01 -04:00", true)] // 14:00:01Z == 10:00:01(-04)
         [InlineData(null, "2025-10-08T13:59:59 +00:00", true)]
+        [InlineData(null, "2025-10-08T17:59:59 +04:00", true)] // 13:59:59Z == 17:59:59(+04)
+        [InlineData(null, "2025-10-08T09:59:59 -04:00", true)] // 13:59:59Z == 09:59:59(-04)
         [InlineData(null, "2025-10-08T14:00:00 +00:00", true)]
+        [InlineData(null, "2025-10-08T18:00:00 +04:00", true)] // 14:00Z == 18:00(+04)
+        [InlineData(null, "2025-10-08T10:00:00 -04:00", true)] // 14:00Z == 10:00(-04)
         [InlineData(null, "2025-10-08T23:00:00 +00:00", false)] // Expires at 23:00 UTC, which is 00:00 on 9 Oct in UK (BST).
         // Since this falls at the start of 9 Oct, it is *not* within the end-of-day window for 8 Oct.
+        [InlineData(null, "2025-10-09T03:00:00 +04:00", false)] // 23:00Z == 03:00(+04) on 9 Oct
+        [InlineData(null, "2025-10-08T19:00:00 -04:00", false)] // 23:00Z == 19:00(-04) on 8 Oct
         [InlineData("2025-01-01T00:00:00 +00:00", "2025-01-09T00:00:00 +00:00", false)]
+        // Same instants in +04:00 / -04:00
+        [InlineData("2025-01-01T04:00:00 +04:00", "2025-01-09T04:00:00 +04:00", false)] // 00:00Z == 04:00(+04)
+        [InlineData("2024-12-31T20:00:00 -04:00", "2025-01-08T20:00:00 -04:00", false)] // 00:00Z == 20:00(-04) prev day
         [InlineData("2025-01-01T00:00:00 +00:00", "2025-01-08T23:59:59 +00:00", true)]
+        // Same instants in +04:00 / -04:00
+        [InlineData("2025-01-01T04:00:00 +04:00", "2025-01-09T03:59:59 +04:00", true)] // 23:59:59Z == 03:59:59(+04) on 9 Jan
+        [InlineData("2024-12-31T20:00:00 -04:00", "2025-01-08T19:59:59 -04:00", true)] // 23:59:59Z == 19:59:59(-04) on 8 Jan
         public void ExpiresWithin7Days_PassesIfInBoundary([CanBeNull] string mockNow, string expires, bool passes)
         {
             var timeProvider = mockNow is null ? GetTimeProvider() : GetTimeProvider(DateTimeOffset.Parse(mockNow));
@@ -304,6 +341,31 @@ public class PreviewTokenCreateRequestValidatorTests
             false,
             "GMT->GMT (Boundary): First moment of Day 8 (Invalid)"
         )]
+        // +04:00 / -04:00 variants of the same instants
+        [InlineData(
+            "2025-01-01T04:00:00 +04:00",
+            "2025-01-09T03:59:59 +04:00",
+            true,
+            "GMT->GMT as +04:00 offset: Last moment of the 7th day (Valid, same instant)"
+        )]
+        [InlineData(
+            "2025-01-01T04:00:00 +04:00",
+            "2025-01-09T04:00:00 +04:00",
+            false,
+            "GMT->GMT as +04:00 offset: First moment of Day 8 (Invalid, same instant)"
+        )]
+        [InlineData(
+            "2024-12-31T20:00:00 -04:00",
+            "2025-01-08T19:59:59 -04:00",
+            true,
+            "GMT->GMT as -04:00 offset: Last moment of the 7th day (Valid, same instant)"
+        )]
+        [InlineData(
+            "2024-12-31T20:00:00 -04:00",
+            "2025-01-08T20:00:00 -04:00",
+            false,
+            "GMT->GMT as -04:00 offset: First moment of Day 8 (Invalid, same instant)"
+        )]
         // === 2. BST -> BST (Summer):
         // Activates: 2025-10-03. Max Valid Date: 2025-10-10 (until 23:59:59 +01:00).
         [InlineData(
@@ -317,6 +379,31 @@ public class PreviewTokenCreateRequestValidatorTests
             "2025-10-11T00:00:00 +01:00",
             false,
             "BST->BST (Boundary): First moment of Day 8 (Invalid)"
+        )]
+        // +04:00 / -04:00 variants of the same instants
+        [InlineData(
+            "2025-10-03T03:00:00 +04:00",
+            "2025-10-11T02:59:59 +04:00",
+            true,
+            "BST->BST as +04:00 offset: Last moment of the 7th day (Valid, same instant)"
+        )]
+        [InlineData(
+            "2025-10-03T03:00:00 +04:00",
+            "2025-10-11T03:00:00 +04:00",
+            false,
+            "BST->BST as +04:00 offset: First moment of Day 8 (Invalid, same instant)"
+        )]
+        [InlineData(
+            "2025-10-02T19:00:00 -04:00",
+            "2025-10-10T18:59:59 -04:00",
+            true,
+            "BST->BST as -04:00 offset: Last moment of the 7th day (Valid, same instant)"
+        )]
+        [InlineData(
+            "2025-10-02T19:00:00 -04:00",
+            "2025-10-10T19:00:00 -04:00",
+            false,
+            "BST->BST as -04:00 offset: First moment of Day 8 (Invalid, same instant)"
         )]
         // === 3. Spring forward (GMT -> BST):
         // Activates: 2025-03-28 (GMT). Max Valid Date: 2025-04-04 (BST).
@@ -333,6 +420,31 @@ public class PreviewTokenCreateRequestValidatorTests
             false,
             "GMT->BST (Boundary): First moment of Day 8 (Invalid in BST)"
         )]
+        // +04:00 / -04:00 variants of the same instants
+        [InlineData(
+            "2025-03-28T04:00:00 +04:00",
+            "2025-04-05T02:59:59 +04:00",
+            true,
+            "GMT->BST as +04:00 offset: Last moment of the 7th day (Valid, same instant)"
+        )]
+        [InlineData(
+            "2025-03-28T04:00:00 +04:00",
+            "2025-04-05T03:00:00 +04:00",
+            false,
+            "GMT->BST as +04:00 offset: First moment of Day 8 (Invalid, same instant)"
+        )]
+        [InlineData(
+            "2025-03-27T20:00:00 -04:00",
+            "2025-04-04T18:59:59 -04:00",
+            true,
+            "GMT->BST as -04:00 offset: Last moment of the 7th day (Valid, same instant)"
+        )]
+        [InlineData(
+            "2025-03-27T20:00:00 -04:00",
+            "2025-04-04T19:00:00 -04:00",
+            false,
+            "GMT->BST as -04:00 offset: First moment of Day 8 (Invalid, same instant)"
+        )]
         // === 4. Autumn back (BST -> GMT):
         // Activates: 2025-10-20 (BST). Max Valid Date: 2025-10-27 (GMT).
         [InlineData(
@@ -346,6 +458,31 @@ public class PreviewTokenCreateRequestValidatorTests
             "2025-10-28T00:00:00 +00:00",
             false,
             "BST->GMT (Boundary): First moment of Day 8 (Invalid in GMT)"
+        )]
+        // +04:00 / -04:00 variants of the same instants
+        [InlineData(
+            "2025-10-20T03:00:00 +04:00",
+            "2025-10-28T03:59:59 +04:00",
+            true,
+            "BST->GMT as +04:00 offset: Last moment of the 7th day (Valid, same instant)"
+        )]
+        [InlineData(
+            "2025-10-20T03:00:00 +04:00",
+            "2025-10-28T04:00:00 +04:00",
+            false,
+            "BST->GMT as +04:00 offset: First moment of Day 8 (Invalid, same instant)"
+        )]
+        [InlineData(
+            "2025-10-19T19:00:00 -04:00",
+            "2025-10-27T19:59:59 -04:00",
+            true,
+            "BST->GMT as -04:00 offset: Last moment of the 7th day (Valid, same instant)"
+        )]
+        [InlineData(
+            "2025-10-19T19:00:00 -04:00",
+            "2025-10-27T20:00:00 -04:00",
+            false,
+            "BST->GMT as -04:00 offset: First moment of Day 8 (Invalid, same instant)"
         )]
         public void ExpiresValidUpTo7DaysAfterActivates(string activates, string expires, bool passes, string _)
         {

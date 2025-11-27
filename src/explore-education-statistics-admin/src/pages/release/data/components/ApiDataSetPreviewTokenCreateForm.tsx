@@ -96,16 +96,14 @@ export default function ApiDataSetPreviewTokenCreateForm({
               test(value) {
                 if (value == null) return false;
                 // Start of activates day in UK (UTC instant)
-                const activatesMidnightUk = UkTimeHelper.toUkStartOfDay(value);
-
-                const range = UkTimeHelper.getDateRangeFromDate(
-                  7,
-                  activatesMidnightUk,
+                const todayMidnightUk = new Date(
+                  UkTimeHelper.todayStartOfDayUk(),
                 );
+                const activatesMidnightUk = UkTimeHelper.toUkStartOfDay(value);
 
                 return endDateIsLaterThanOrEqualToStartDate(
                   activatesMidnightUk,
-                  range.endDate,
+                  UkTimeHelper.getDateRangeFromDate(7, todayMidnightUk).endDate,
                 );
               },
             }),
@@ -123,12 +121,13 @@ export default function ApiDataSetPreviewTokenCreateForm({
 
               const activatesStartOfDayUtc =
                 UkTimeHelper.toUkStartOfDay(activates);
-              const range = UkTimeHelper.getDateRangeFromDate(
-                7,
-                activatesStartOfDayUtc,
-              );
 
-              return value >= activates && value <= range.endDate;
+              return (
+                value >= activates &&
+                value <=
+                  UkTimeHelper.getDateRangeFromDate(7, activatesStartOfDayUtc)
+                    .endDate
+              );
             },
           }),
       }),
@@ -149,15 +148,15 @@ export default function ApiDataSetPreviewTokenCreateForm({
                 datePresetSpan:
                   values.selectionMethod === 'presetDays'
                     ? values.datePresetSpan
-                    : null,
+                    : undefined,
                 activates:
                   values.selectionMethod === 'customDates'
                     ? values.activates
-                    : null,
+                    : undefined,
                 expires:
                   values.selectionMethod === 'customDates'
                     ? values.expires
-                    : null,
+                    : undefined,
               })
             }
           >

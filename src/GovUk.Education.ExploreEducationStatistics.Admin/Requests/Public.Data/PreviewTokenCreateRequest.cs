@@ -54,7 +54,7 @@ public record PreviewTokenCreateRequest
                             var startOfDayOnActivatesDateUk = activates!.Value.GetUkStartOfDayOn();
                             var activatesIsStartOfDayUk = startOfDayOnActivatesDateUk == activates;
 
-                            return activates.Value.IsSameCalendarDay(nowUk) || activatesIsStartOfDayUk;
+                            return activates.Value.IsSameUkDay(nowUk) || activatesIsStartOfDayUk;
                         })
                         .WithMessage(
                             "Activates time must be set to midnight UK local time when it's not today's date."

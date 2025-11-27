@@ -130,7 +130,7 @@ public static class DateTimeOffsetExtensions
         );
     }
 
-    public static bool IsSameCalendarDay(this DateTimeOffset dateTime1, DateTimeOffset dateTime2) =>
+    public static bool IsSameUkDay(this DateTimeOffset dateTime1, DateTimeOffset dateTime2) =>
         dateTime1.ConvertToUkTimeZone().Date == dateTime2.ConvertToUkTimeZone().Date;
 
     public static DateTimeOffset ConvertToUkTimeZone(this DateTimeOffset dateTime) =>
