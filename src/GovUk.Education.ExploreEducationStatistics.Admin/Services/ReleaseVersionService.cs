@@ -479,18 +479,20 @@ public class ReleaseVersionService(
     {
         var userId = userService.GetUserId();
 
-        var directReleasesWithApprovalRole = await context
-            .UserReleaseRoles.Where(role => role.UserId == userId && role.Role == ReleaseRole.Approver)
-            .Select(role => role.ReleaseVersionId)
+        var directReleaseVersionsWithApprovalRole = (
+            await userReleaseRoleRepository.ListRolesForUser(userId: userId, rolesToInclude: ReleaseRole.Approver)
+        )
+            .Select(urr => urr.ReleaseVersionId)
+            .ToList();
+
+        var indirectReleaseVersionsWithApprovalRole = await context
+            .ActiveUserPublicationRoles.Where(upr => upr.UserId == userId)
+            .Where(upr => upr.Role == PublicationRole.Allower)
+            .SelectMany(upr => upr.Publication.Releases.SelectMany(r => r.Versions.Select(rv => rv.Id)))
             .ToListAsync();
 
-        var indirectReleasesWithApprovalRole = await context
-            .UserPublicationRoles.Where(role => role.UserId == userId && role.Role == PublicationRole.Allower)
-            .SelectMany(role => role.Publication.ReleaseVersions.Select(releaseVersion => releaseVersion.Id))
-            .ToListAsync();
-
-        var releaseVersionIdsForApproval = directReleasesWithApprovalRole
-            .Concat(indirectReleasesWithApprovalRole)
+        var releaseVersionIdsForApproval = directReleaseVersionsWithApprovalRole
+            .Concat(indirectReleaseVersionsWithApprovalRole)
             .Distinct();
 
         var releaseVersionsForApproval = await context
