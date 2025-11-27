@@ -28,7 +28,7 @@ public class RedirectsCacheService(
     {
         return publicBlobCacheService.Update(
             cacheKey: new RedirectsCacheKey(),
-            createIfNotExistsFn: redirectsService.List,
+            createFn: redirectsService.List,
             logger: logger
         );
     }
