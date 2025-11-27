@@ -54,11 +54,8 @@ public class ReleaseDataContentService(ContentDbContext contentDbContext, IUserS
             .Where(rf => rf.ReleaseVersionId == releaseVersion.Id)
             .Where(rf => rf.File.Type == FileType.Data)
             .Where(rf => rf.File.ReplacingId == null)
-            .Join(
-                contentDbContext.DataImports.Where(di => di.Status == DataImportStatus.COMPLETE),
-                rf => rf.FileId,
-                di => di.FileId,
-                (rf, di) => rf
+            .Where(rf =>
+                contentDbContext.DataImports.Any(di => di.FileId == rf.FileId && di.Status == DataImportStatus.COMPLETE)
             )
             .OrderBy(rf => rf.Order)
             .ToArrayAsync(cancellationToken);
