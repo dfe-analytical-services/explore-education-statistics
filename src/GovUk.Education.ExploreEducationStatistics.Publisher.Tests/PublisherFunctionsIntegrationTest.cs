@@ -98,7 +98,7 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             })
             .ConfigureServices(services =>
             {
-                services.ReplaceService(Mock.Of<IPublicBlobCacheService>());
+                services.MockService<IPublicBlobCacheService>(MockBehavior.Loose);
 
                 services.UseInMemoryDbContext<ContentDbContext>();
 
