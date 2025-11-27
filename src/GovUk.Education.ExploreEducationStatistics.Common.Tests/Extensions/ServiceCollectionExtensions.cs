@@ -53,7 +53,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection ReplaceService<TService>(
         this IServiceCollection services,
         Func<IServiceProvider, TService> replacement,
-        bool optional = false
+        bool optional = false,
+        ServiceLifetime? serviceLifetime = null
     )
         where TService : class
     {
@@ -73,7 +74,7 @@ public static class ServiceCollectionExtensions
         services.Remove(descriptor);
 
         // Add the replacement.
-        return descriptor.Lifetime switch
+        return (serviceLifetime ?? descriptor.Lifetime) switch
         {
             ServiceLifetime.Singleton => services.AddSingleton(replacement),
             ServiceLifetime.Scoped => services.AddScoped(replacement),
@@ -109,7 +110,7 @@ public static class ServiceCollectionExtensions
     )
         where TService : class
     {
-        return services.ReplaceService(_ => Mock.Of<TService>(behavior));
+        return services.ReplaceService(_ => Mock.Of<TService>(behavior), serviceLifetime: ServiceLifetime.Singleton);
     }
 
     /// <summary>
