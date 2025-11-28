@@ -70,7 +70,7 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
     }
 
     public IQueryable<UserReleaseRole> Query(bool includeInactiveUsers = false) =>
-        includeInactiveUsers ? contentDbContext.UserReleaseRoles : contentDbContext.UserReleaseRolesActive;
+        includeInactiveUsers ? contentDbContext.UserReleaseRoles : contentDbContext.UserReleaseRolesForActiveUsers;
 
     public async Task Remove(UserReleaseRole userReleaseRole, CancellationToken cancellationToken = default)
     {

@@ -55,7 +55,9 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
     }
 
     public IQueryable<UserPublicationRole> Query(bool includeInactiveUsers = false) =>
-        includeInactiveUsers ? contentDbContext.UserPublicationRoles : contentDbContext.UserPublicationRolesActive;
+        includeInactiveUsers
+            ? contentDbContext.UserPublicationRoles
+            : contentDbContext.UserPublicationRolesForActiveUsers;
 
     public async Task<UserPublicationRole?> GetUserPublicationRole(
         Guid userId,
