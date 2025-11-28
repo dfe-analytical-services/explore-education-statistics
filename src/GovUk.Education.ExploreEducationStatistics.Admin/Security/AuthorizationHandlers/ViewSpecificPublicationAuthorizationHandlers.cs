@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -60,9 +61,8 @@ public class ViewSpecificPublicationAuthorizationHandler
         // If the user has any ReleaseRoles on any of the Publication's Releases, they can see it.
         if (
             await _contentDbContext
-                .UserReleaseRoles.Include(r => r.ReleaseVersion)
-                .Where(r => r.UserId == context.User.GetUserId())
-                .AnyAsync(r => r.ReleaseVersion.PublicationId == publication.Id)
+                .UserReleaseRolesForActiveUsers.WhereForUser(context.User.GetUserId())
+                .AnyAsync(r => r.ReleaseVersion.Release.PublicationId == publication.Id)
         )
         {
             context.Succeed(requirement);
