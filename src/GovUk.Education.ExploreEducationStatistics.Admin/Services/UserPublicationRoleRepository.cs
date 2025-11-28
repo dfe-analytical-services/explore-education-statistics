@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -54,10 +55,20 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public IQueryable<UserPublicationRole> Query(bool includeInactiveUsers = false) =>
-        includeInactiveUsers
-            ? contentDbContext.UserPublicationRoles
-            : contentDbContext.UserPublicationRolesForActiveUsers;
+    public IQueryable<UserPublicationRole> Query(
+        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.Active
+    ) =>
+        resourceRoleStatusFilter switch
+        {
+            ResourceRoleStatusFilter.Active => contentDbContext.UserPublicationRolesForActiveUsers,
+            ResourceRoleStatusFilter.Pending => contentDbContext.UserPublicationRolesForPendingInvites,
+            ResourceRoleStatusFilter.All => contentDbContext.UserPublicationRolesForActiveOrPending,
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(resourceRoleStatusFilter),
+                resourceRoleStatusFilter,
+                null
+            ),
+        };
 
     public async Task<UserPublicationRole?> GetUserPublicationRole(
         Guid userId,
@@ -107,11 +118,11 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
         Guid userId,
         Guid publicationId,
         PublicationRole role,
-        bool includeInactiveUsers = false,
+        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.Active,
         CancellationToken cancellationToken = default
     )
     {
-        return await Query(includeInactiveUsers)
+        return await Query(resourceRoleStatusFilter)
             .WhereForUser(userId)
             .WhereForPublication(publicationId)
             .WhereRolesIn(role)
@@ -121,14 +132,14 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
     public async Task<bool> UserHasAnyRoleOnPublication(
         Guid userId,
         Guid publicationId,
-        bool includeInactiveUsers = false,
+        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.Active,
         CancellationToken cancellationToken = default,
         params PublicationRole[] rolesToInclude
     )
     {
         var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<PublicationRole>();
 
-        return await Query(includeInactiveUsers)
+        return await Query(resourceRoleStatusFilter)
             .WhereForUser(userId)
             .WhereForPublication(publicationId)
             .WhereRolesIn(rolesToCheck)
