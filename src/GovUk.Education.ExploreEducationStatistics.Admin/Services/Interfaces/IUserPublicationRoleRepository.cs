@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -26,7 +27,9 @@ public interface IUserPublicationRoleRepository
         CancellationToken cancellationToken = default
     );
 
-    IQueryable<UserPublicationRole> Query(bool includeInactiveUsers = false);
+    IQueryable<UserPublicationRole> Query(
+        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.Active
+    );
 
     Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default);
 
@@ -41,14 +44,14 @@ public interface IUserPublicationRoleRepository
         Guid userId,
         Guid publicationId,
         PublicationRole role,
-        bool includeInactiveUsers = false,
+        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.Active,
         CancellationToken cancellationToken = default
     );
 
     Task<bool> UserHasAnyRoleOnPublication(
         Guid userId,
         Guid publicationId,
-        bool includeInactiveUsers = false,
+        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.Active,
         CancellationToken cancellationToken = default,
         params PublicationRole[] rolesToInclude
     );

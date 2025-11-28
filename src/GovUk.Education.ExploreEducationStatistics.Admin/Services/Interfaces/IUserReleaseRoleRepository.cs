@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -26,7 +27,9 @@ public interface IUserReleaseRoleRepository
         CancellationToken cancellationToken = default
     );
 
-    IQueryable<UserReleaseRole> Query(bool includeInactiveUsers = false);
+    IQueryable<UserReleaseRole> Query(
+        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.Active
+    );
 
     Task Remove(UserReleaseRole userReleaseRole, CancellationToken cancellationToken = default);
 
@@ -38,14 +41,14 @@ public interface IUserReleaseRoleRepository
         Guid userId,
         Guid releaseVersionId,
         ReleaseRole role,
-        bool includeInactiveUsers = false,
+        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.Active,
         CancellationToken cancellationToken = default
     );
 
     Task<bool> UserHasAnyRoleOnReleaseVersion(
         Guid userId,
         Guid releaseVersionId,
-        bool includeInactiveUsers = false,
+        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.Active,
         CancellationToken cancellationToken = default,
         params ReleaseRole[] rolesToInclude
     );
@@ -53,7 +56,7 @@ public interface IUserReleaseRoleRepository
     Task<bool> UserHasAnyRoleOnPublication(
         Guid userId,
         Guid publicationId,
-        bool includeInactiveUsers = false,
+        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.Active,
         CancellationToken cancellationToken = default,
         params ReleaseRole[] rolesToInclude
     );
