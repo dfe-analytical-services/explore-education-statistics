@@ -1,11 +1,14 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NCrontab;
 using Xunit;
@@ -15,7 +18,7 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public class ReleaseControllerCachingTests : CacheServiceTestFixture
+public class ReleaseControllerCachingTests
 {
     private const string PublicationSlug = "publication-a";
     private const string ReleaseSlug = "200";
@@ -27,7 +30,13 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
         var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
         var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
 
-        MemoryCacheService
+        var memoryCacheService = new Mock<IMemoryCacheService>(Strict);
+
+        memoryCacheService
+            .Setup(s => s.GetMemoryCacheOptions())
+            .Returns(new MemoryCacheServiceOptions { Enabled = true });
+
+        memoryCacheService
             .Setup(s => s.GetItem(new GetLatestReleaseCacheKey(PublicationSlug), typeof(ReleaseViewModel)))
             .Returns((object?)null);
 
@@ -50,24 +59,28 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             CrontabSchedule.Parse(HalfHourlyExpirySchedule)
         );
 
-        MemoryCacheService.Setup(s =>
+        var cachedTime = DateTime.UtcNow;
+
+        memoryCacheService.Setup(s =>
             s.SetItem<object>(
                 new GetLatestReleaseCacheKey(PublicationSlug),
                 It.IsAny<ReleaseViewModel>(),
                 ItIs.DeepEqualTo(expectedCacheConfiguration),
-                null
+                cachedTime
             )
         );
 
         var controller = BuildReleaseController(
             methodologyCacheService: methodologyCacheService.Object,
             publicationCacheService: publicationCacheService.Object,
-            releaseCacheService: releaseCacheService.Object
+            releaseCacheService: releaseCacheService.Object,
+            memoryCacheService: memoryCacheService.Object,
+            dateTimeProvider: new DateTimeProvider(cachedTime)
         );
 
         var result = await controller.GetLatestRelease(PublicationSlug);
 
-        VerifyAllMocks(methodologyCacheService, publicationCacheService, releaseCacheService, MemoryCacheService);
+        VerifyAllMocks(methodologyCacheService, publicationCacheService, releaseCacheService, memoryCacheService);
 
         result.AssertOkResult(
             new ReleaseViewModel(
@@ -82,14 +95,20 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
     {
         var releaseViewModel = new ReleaseViewModel(BuildReleaseCacheViewModel(), new PublicationViewModel());
 
-        MemoryCacheService
+        var memoryCacheService = new Mock<IMemoryCacheService>(Strict);
+
+        memoryCacheService
+            .Setup(s => s.GetMemoryCacheOptions())
+            .Returns(new MemoryCacheServiceOptions { Enabled = true });
+
+        memoryCacheService
             .Setup(s => s.GetItem(new GetLatestReleaseCacheKey(PublicationSlug), typeof(ReleaseViewModel)))
             .Returns(releaseViewModel);
 
-        var controller = BuildReleaseController();
+        var controller = BuildReleaseController(memoryCacheService: memoryCacheService.Object);
 
         var result = await controller.GetLatestRelease(PublicationSlug);
-        VerifyAllMocks(MemoryCacheService);
+        VerifyAllMocks(memoryCacheService);
 
         result.AssertOkResult(releaseViewModel);
     }
@@ -101,7 +120,13 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
         var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
         var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
 
-        MemoryCacheService
+        var memoryCacheService = new Mock<IMemoryCacheService>(Strict);
+
+        memoryCacheService
+            .Setup(s => s.GetMemoryCacheOptions())
+            .Returns(new MemoryCacheServiceOptions { Enabled = true });
+
+        memoryCacheService
             .Setup(s => s.GetItem(new GetReleaseCacheKey(PublicationSlug, ReleaseSlug), typeof(ReleaseViewModel)))
             .Returns((object?)null);
 
@@ -126,24 +151,28 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             CrontabSchedule.Parse(HalfHourlyExpirySchedule)
         );
 
-        MemoryCacheService.Setup(s =>
+        var cachedTime = DateTime.UtcNow;
+
+        memoryCacheService.Setup(s =>
             s.SetItem<object>(
                 new GetReleaseCacheKey(PublicationSlug, ReleaseSlug),
                 It.IsAny<ReleaseViewModel>(),
                 ItIs.DeepEqualTo(expectedCacheConfiguration),
-                null
+                cachedTime
             )
         );
 
         var controller = BuildReleaseController(
             methodologyCacheService: methodologyCacheService.Object,
             publicationCacheService: publicationCacheService.Object,
-            releaseCacheService: releaseCacheService.Object
+            releaseCacheService: releaseCacheService.Object,
+            memoryCacheService: memoryCacheService.Object,
+            dateTimeProvider: new DateTimeProvider(cachedTime)
         );
 
         var result = await controller.GetRelease(PublicationSlug, ReleaseSlug);
 
-        VerifyAllMocks(methodologyCacheService, publicationCacheService, releaseCacheService, MemoryCacheService);
+        VerifyAllMocks(methodologyCacheService, publicationCacheService, releaseCacheService, memoryCacheService);
 
         result.AssertOkResult(
             new ReleaseViewModel(
@@ -158,14 +187,20 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
     {
         var releaseViewModel = new ReleaseViewModel(BuildReleaseCacheViewModel(), new PublicationViewModel());
 
-        MemoryCacheService
+        var memoryCacheService = new Mock<IMemoryCacheService>(Strict);
+
+        memoryCacheService
+            .Setup(s => s.GetMemoryCacheOptions())
+            .Returns(new MemoryCacheServiceOptions { Enabled = true });
+
+        memoryCacheService
             .Setup(s => s.GetItem(new GetReleaseCacheKey(PublicationSlug, ReleaseSlug), typeof(ReleaseViewModel)))
             .Returns(releaseViewModel);
 
-        var controller = BuildReleaseController();
+        var controller = BuildReleaseController(memoryCacheService: memoryCacheService.Object);
 
         var result = await controller.GetRelease(PublicationSlug, ReleaseSlug);
-        VerifyAllMocks(MemoryCacheService);
+        VerifyAllMocks(memoryCacheService);
 
         result.AssertOkResult(releaseViewModel);
     }
@@ -179,14 +214,19 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
         IMethodologyCacheService? methodologyCacheService = null,
         IPublicationCacheService? publicationCacheService = null,
         IReleaseCacheService? releaseCacheService = null,
-        IReleaseService? releaseService = null
+        IReleaseService? releaseService = null,
+        IMemoryCacheService? memoryCacheService = null,
+        DateTimeProvider? dateTimeProvider = null
     )
     {
         return new(
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
             releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
-            releaseService ?? Mock.Of<IReleaseService>(Strict)
+            releaseService ?? Mock.Of<IReleaseService>(Strict),
+            memoryCacheService ?? Mock.Of<IMemoryCacheService>(Strict),
+            logger: Mock.Of<ILogger<ReleaseController>>(),
+            dateTimeProvider: dateTimeProvider ?? new DateTimeProvider(DateTime.UtcNow)
         );
     }
 }

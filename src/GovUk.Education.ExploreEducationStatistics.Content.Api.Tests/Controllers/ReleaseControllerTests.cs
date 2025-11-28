@@ -1,38 +1,22 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public class ReleaseControllerTests : CacheServiceTestFixture
+public class ReleaseControllerTests
 {
     private const string PublicationSlug = "publication-a";
     private const string ReleaseSlug = "200";
-
-    public ReleaseControllerTests()
-    {
-        MemoryCacheService
-            .Setup(s => s.GetItem(It.IsAny<IMemoryCacheKey>(), typeof(ReleaseViewModel)))
-            .Returns((object?)null);
-
-        MemoryCacheService.Setup(s =>
-            s.SetItem<object>(
-                It.IsAny<IMemoryCacheKey>(),
-                It.IsAny<ReleaseViewModel>(),
-                It.IsAny<MemoryCacheConfiguration>(),
-                null
-            )
-        );
-    }
 
     [Fact]
     public async Task GetLatestRelease()
@@ -359,14 +343,18 @@ public class ReleaseControllerTests : CacheServiceTestFixture
         IMethodologyCacheService? methodologyCacheService = null,
         IPublicationCacheService? publicationCacheService = null,
         IReleaseCacheService? releaseCacheService = null,
-        IReleaseService? releaseService = null
+        IReleaseService? releaseService = null,
+        IMemoryCacheService? memoryCacheService = null
     )
     {
         return new(
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(MockBehavior.Strict),
             publicationCacheService ?? Mock.Of<IPublicationCacheService>(MockBehavior.Strict),
             releaseCacheService ?? Mock.Of<IReleaseCacheService>(MockBehavior.Strict),
-            releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict)
+            releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict),
+            memoryCacheService ?? Mock.Of<IMemoryCacheService>(MockBehavior.Loose),
+            logger: Mock.Of<ILogger<ReleaseController>>(),
+            dateTimeProvider: new DateTimeProvider(DateTime.UtcNow)
         );
     }
 }
