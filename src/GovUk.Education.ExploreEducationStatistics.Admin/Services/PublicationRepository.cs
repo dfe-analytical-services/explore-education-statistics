@@ -26,7 +26,7 @@ public class PublicationRepository : Content.Model.Repository.PublicationReposit
 
     public async Task<List<Publication>> ListPublicationsForUser(Guid userId, Guid? themeId = null)
     {
-        var publicationsGrantedByPublicationRoleQueryable = _context.ActiveUserPublicationRoles.Where(
+        var publicationsGrantedByPublicationRoleQueryable = _context.UserPublicationRolesActive.Where(
             userPublicationRole =>
                 userPublicationRole.UserId == userId
                 && ListOf(PublicationRole.Owner, PublicationRole.Allower).Contains(userPublicationRole.Role)
@@ -48,7 +48,7 @@ public class PublicationRepository : Content.Model.Repository.PublicationReposit
             .ToList();
 
         var releasesGrantedByReleaseRolesQueryable = _context
-            .ActiveUserReleaseRoles.Include(userReleaseRole => userReleaseRole.ReleaseVersion)
+            .UserReleaseRolesActive.Include(userReleaseRole => userReleaseRole.ReleaseVersion)
             .ThenInclude(rv => rv.Release)
             .ThenInclude(r => r.Publication)
             .Where(userReleaseRole =>

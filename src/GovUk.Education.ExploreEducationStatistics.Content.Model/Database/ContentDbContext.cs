@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -94,10 +95,14 @@ public class ContentDbContext : DbContext
     public virtual DbSet<EinContentBlock> EinContentBlocks { get; set; }
     public virtual DbSet<EinTile> EinTiles { get; set; }
 
-    public IQueryable<UserPublicationRole> ActiveUserPublicationRoles =>
-        UserPublicationRoles.Where(upr => upr.User.Active);
+    public IQueryable<UserPublicationRole> UserPublicationRolesActive => UserPublicationRoles.WhereUserIsActive();
 
-    public IQueryable<UserReleaseRole> ActiveUserReleaseRoles => UserReleaseRoles.Where(urr => urr.User.Active);
+    public IQueryable<UserPublicationRole> UserPublicationRolesPendingInvites =>
+        UserPublicationRoles.WhereUserHasPendingInvite();
+
+    public IQueryable<UserReleaseRole> UserReleaseRolesActive => UserReleaseRoles.WhereUserIsActive();
+
+    public IQueryable<UserReleaseRole> UserReleaseRolesPendingInvites => UserReleaseRoles.WhereUserHasPendingInvite();
 
     [DbFunction]
     public virtual IQueryable<FreeTextRank> ReleaseFilesFreeTextTable(string searchTerm) =>

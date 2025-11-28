@@ -493,7 +493,7 @@ public class ReleaseVersionService(
             .ToListAsync();
 
         var indirectReleaseVersionsWithApprovalRole = await context
-            .ActiveUserPublicationRoles.Where(upr => upr.UserId == userId)
+            .UserPublicationRolesActive.Where(upr => upr.UserId == userId)
             .Where(upr => upr.Role == PublicationRole.Allower)
             .SelectMany(upr => upr.Publication.Releases.SelectMany(r => r.Versions.Select(rv => rv.Id)))
             .ToListAsync();

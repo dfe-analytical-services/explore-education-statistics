@@ -16,4 +16,15 @@ public static class UserPublicationRoleQueries
         this IQueryable<UserPublicationRole> query,
         params PublicationRole[] roles
     ) => query.Where(upr => roles.Contains(upr.Role));
+
+    public static IQueryable<UserPublicationRole> WhereUserIsActive(this IQueryable<UserPublicationRole> query) =>
+        query.Where(upr => upr.User.Active);
+
+    public static IQueryable<UserPublicationRole> WhereUserHasPendingInvite(
+        this IQueryable<UserPublicationRole> query
+    ) =>
+        query
+            .Where(upr => !upr.User.Active)
+            .Where(upr => !upr.User.SoftDeleted.HasValue)
+            .Where(upr => upr.User.Created >= DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays));
 }
