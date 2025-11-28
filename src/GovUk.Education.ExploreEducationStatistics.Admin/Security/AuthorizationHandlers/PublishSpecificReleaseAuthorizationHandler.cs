@@ -40,8 +40,8 @@ public class PublishSpecificReleaseAuthorizationHandler
                 context.User.GetUserId(),
                 releaseVersion.PublicationId,
                 releaseVersion.Id,
-                ListOf(PublicationRole.Owner),
-                ListOf(ReleaseRole.Approver)
+                SetOf(PublicationRole.Owner),
+                SetOf(ReleaseRole.Approver)
             )
         )
         {

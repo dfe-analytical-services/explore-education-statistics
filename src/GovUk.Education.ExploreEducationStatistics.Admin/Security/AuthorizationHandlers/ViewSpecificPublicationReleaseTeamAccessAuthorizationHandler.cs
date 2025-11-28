@@ -33,7 +33,7 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler
         }
 
         if (
-            await _authorizationHandlerService.HasRolesOnPublication(
+            await _authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
                 context.User.GetUserId(),
                 publication.Id,
                 PublicationRole.Owner,

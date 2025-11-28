@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
@@ -70,7 +71,7 @@ public class PreReleaseUserService(
                             return;
                         }
 
-                        var userHasPreReleaseRole = await userReleaseRoleRepository.HasUserReleaseRole(
+                        var userHasPreReleaseRole = await userReleaseRoleRepository.UserHasRoleOnReleaseVersion(
                             userId: existingUser.Id,
                             releaseVersionId: releaseVersionId,
                             role: ReleaseRole.PrereleaseViewer
@@ -132,12 +133,16 @@ public class PreReleaseUserService(
             .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
             .OnSuccess(async () => await FindUserByEmail(email))
             .OnSuccessVoid(async user =>
-                await userReleaseRoleRepository.RemoveForReleaseVersionAndUser(
-                    userId: user.Id,
-                    releaseVersionId: releaseVersionId,
-                    rolesToInclude: ReleaseRole.PrereleaseViewer
-                )
-            );
+            {
+                var releaseRolesToRemove = await userReleaseRoleRepository
+                    .Query(includeInactiveUsers: true)
+                    .WhereForUser(user!.Id)
+                    .WhereForReleaseVersion(releaseVersionId)
+                    .WhereRolesIn(ReleaseRole.PrereleaseViewer)
+                    .ToListAsync();
+
+                await userReleaseRoleRepository.RemoveMany(releaseRolesToRemove);
+            });
     }
 
     private async Task<Either<ActionResult, User>> FindUserByEmail(string email)
@@ -161,7 +166,7 @@ public class PreReleaseUserService(
                     createdById: userService.GetUserId()
                 );
 
-            await userReleaseRoleRepository.CreateIfNotExists(
+            await userReleaseRoleRepository.Create(
                 userId: user.Id,
                 releaseVersionId: releaseVersion.Id,
                 role: ReleaseRole.PrereleaseViewer,
