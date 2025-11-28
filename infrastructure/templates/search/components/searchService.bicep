@@ -78,6 +78,9 @@ param alerts {
   alertsGroupName: string
 }?
 
+@description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
+param logAnalyticsWorkspaceId string
+
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
@@ -116,6 +119,27 @@ resource searchService 'Microsoft.Search/searchServices@2025-05-01' = {
     hostingMode: hostingMode
   }
   tags: tagValues
+}
+
+resource searchDiagnosticSetting 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: 'Send all logs and metrics to Log Analytics'
+  scope: searchService
+  properties: {
+    logAnalyticsDestinationType: null
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+    workspaceId: logAnalyticsWorkspaceId
+  }
 }
 
 module searchLatencyAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null) {
