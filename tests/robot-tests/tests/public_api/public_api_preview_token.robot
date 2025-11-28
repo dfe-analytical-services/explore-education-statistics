@@ -179,7 +179,7 @@ User verifies created preview token details expires in 7 days
 
     ${date_in_7_days}=    get local browser date and time    offset_days=7    format_string=%m/%d/%Y
     user checks page contains
-    ...    The token expires: ${date_in_7_days} (GMT/BST)
+    ...    The token expires: ${date_in_7_days} (UK time)
 
     user checks page contains button    Copy preview token
     user checks page contains button    Revoke preview token
@@ -235,7 +235,7 @@ User verifies created preview token details for custom dates
     ${date_tomorrow}=    get local browser date and time    offset_days=1    format_string=%d %B %Y
     ${date_after_tomorrow}=    get local browser date and time    offset_days=2    format_string=%d %B %Y
     user checks page contains
-    ...    The token is active from: ${date_tomorrow} (GMT/BST) and expires: ${date_after_tomorrow} (GMT/BST)
+    ...    The token is active from: ${date_tomorrow} (UK time) and expires: ${date_after_tomorrow} (UK time)
 
     user checks page contains button    Copy preview token
     user checks page contains button    Revoke preview token
@@ -329,7 +329,7 @@ User verifies the relevant fields on the active preview token page
 
     ${current_time_tomorrow}=    get local browser date and time    offset_days=1    format_string=%-I:%M %p
     user checks page contains
-    ...    The token expires: tomorrow at ${current_time_tomorrow} (GMT/BST)
+    ...    The token expires: tomorrow at ${current_time_tomorrow} (UK time)
 
     user checks page contains button    Copy preview token
     user checks page contains button    Revoke preview token
