@@ -164,9 +164,9 @@ public class ReleaseApprovalService(
         ReleaseVersion releaseVersion
     )
     {
-        var userReleaseRoles = await userReleaseRoleService.ListLatestUserReleaseRolesByPublication(
+        var userReleaseRoles = await userReleaseRoleService.ListLatestActiveUserReleaseRolesByPublication(
             publicationId: releaseVersion.Release.PublicationId,
-            rolesToInclude: [ReleaseRole.Approver]
+            rolesToInclude: ReleaseRole.Approver
         );
 
         var userPublicationRoles = await userPublicationRoleRepository

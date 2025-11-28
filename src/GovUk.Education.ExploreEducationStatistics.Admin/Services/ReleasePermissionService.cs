@@ -7,19 +7,17 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class ReleasePermissionService(
     ContentDbContext contentDbContext,
     IPersistenceHelper<ContentDbContext> persistenceHelper,
-    IReleaseVersionRepository releaseVersionRepository,
     IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserReleaseRoleService userReleaseRoleService,
     IUserService userService
 ) : IReleasePermissionService
 {
@@ -63,15 +61,11 @@ public class ReleasePermissionService(
             .OnSuccessDo(releaseVersion => userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
             .OnSuccess(async _ =>
                 await contentDbContext
-                    .UserReleaseRoles.Where(urr => urr.ReleaseVersionId == releaseVersionId)
+                    .UserReleaseRolesForPendingInvites.WhereForReleaseVersion(releaseVersionId)
+                    .WhereRolesIn(rolesToCheck)
                     .Where(urr => rolesToCheck.Contains(urr.Role))
-                    .Join(
-                        contentDbContext.Users.WhereInvitePending(),
-                        urr => urr.UserId,
-                        u => u.Id,
-                        (urr, u) => new UserReleaseInviteViewModel(u.Email, urr.Role)
-                    )
-                    .OrderBy(model => model.Email)
+                    .Select(urr => new UserReleaseInviteViewModel(urr.User.Email, urr.Role))
+                    .OrderBy(viewModel => viewModel.Email)
                     .ToListAsync()
             );
     }
@@ -85,17 +79,15 @@ public class ReleasePermissionService(
             .OnSuccessDo(publication => userService.CheckCanUpdateReleaseRole(publication, ReleaseRole.Contributor))
             .OnSuccess(async () =>
             {
-                var releaseVersionIds = await releaseVersionRepository.ListLatestReleaseVersionIds(publicationId);
-
-                var users = await contentDbContext
-                    .UserReleaseRoles.Include(releaseRole => releaseRole.User)
-                    .Where(userReleaseRole =>
-                        releaseVersionIds.Contains(userReleaseRole.ReleaseVersionId)
-                        && userReleaseRole.Role == ReleaseRole.Contributor
+                var users = (
+                    await userReleaseRoleService.ListLatestActiveUserReleaseRolesByPublication(
+                        publicationId: publicationId,
+                        rolesToInclude: ReleaseRole.Contributor
                     )
+                )
                     .Select(userReleaseRole => userReleaseRole.User)
                     .Distinct()
-                    .ToListAsync();
+                    .ToList();
 
                 return users
                     .Select(user => new UserReleaseRoleSummaryViewModel(
@@ -122,9 +114,8 @@ public class ReleasePermissionService(
             .OnSuccessVoid(async releaseVersion =>
             {
                 var releaseContributorReleaseRolesByUserId = await contentDbContext
-                    .UserReleaseRoles.Include(releaseRole => releaseRole.User)
-                    .Where(urr => urr.ReleaseVersionId == releaseVersion.Id)
-                    .Where(urr => urr.Role == ReleaseRole.Contributor)
+                    .UserReleaseRolesForActiveUsers.WhereForReleaseVersion(releaseVersion.Id)
+                    .WhereRolesIn(ReleaseRole.Contributor)
                     .ToDictionaryAsync(urr => urr.UserId);
 
                 var releaseRolesToBeRemoved = releaseContributorReleaseRolesByUserId

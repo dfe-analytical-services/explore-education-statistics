@@ -127,9 +127,9 @@ public class MethodologyApprovalService(
             .Select(pm => pm.PublicationId)
             .SingleAsync();
 
-        var userReleaseRoles = await userReleaseRoleService.ListLatestUserReleaseRolesByPublication(
+        var userReleaseRoles = await userReleaseRoleService.ListLatestActiveUserReleaseRolesByPublication(
             publicationId: owningPublicationId,
-            rolesToInclude: [ReleaseRole.Approver]
+            rolesToInclude: ReleaseRole.Approver
         );
 
         var userPublicationRoles = await userPublicationRoleRepository
