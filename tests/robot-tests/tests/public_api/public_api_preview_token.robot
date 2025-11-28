@@ -177,7 +177,7 @@ User creates preview token through 'Generate preview token' modal window selecti
 User verifies created preview token details expires in 7 days
     user checks page contains    Reference: ${PREVIEW_TOKEN_NAME}
 
-    ${date_in_7_days}=    get local browser date and time    offset_days=7    format_string=%m/%d/%Y
+    ${date_in_7_days}=    get local browser date and time    offset_days=7    format_string=%-d %B %Y
     user checks page contains
     ...    The token expires: ${date_in_7_days} (UK time)
 
@@ -327,9 +327,8 @@ User verifies the relevant fields on the active preview token page
     user waits until h2 is visible    ${SUBJECT_NAME_1}
     user checks page contains    Reference: ${PREVIEW_TOKEN_NAME}
 
-    ${current_time_tomorrow}=    get local browser date and time    offset_days=1    format_string=%-I:%M %p
     user checks page contains
-    ...    The token expires: tomorrow at ${current_time_tomorrow} (UK time)
+    ...    The token expires: tomorrow at 11:59 PM (UK time)
 
     user checks page contains button    Copy preview token
     user checks page contains button    Revoke preview token

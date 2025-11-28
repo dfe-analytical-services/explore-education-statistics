@@ -42,11 +42,11 @@ const FormattedDate = ({
   }
 
   const formatRelativeLocale = {
-    lastWeek: "'Last' eeee",
-    yesterday: "'Yesterday'",
-    today: "'Today'",
-    tomorrow: "'Tomorrow'",
-    nextWeek: "'Next' eeee",
+    lastWeek: "'last' eeee",
+    yesterday: "'yesterday'",
+    today: "'today at' h:mm a",
+    tomorrow: "'tomorrow at' h:mm a",
+    nextWeek: "'next' eeee",
   };
   const locale = {
     ...enGB,
