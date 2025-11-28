@@ -14,7 +14,7 @@ import Pagination from '@frontend/components/Pagination';
 import Link from '@frontend/components/Link';
 import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import ButtonText from '@common/components/ButtonText';
-import GoToTopLink from '@common/components/GoToTopLink';
+import BackToTopLink from '@common/components/BackToTopLink';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
@@ -634,7 +634,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
           </LoadingSpinner>
 
           {dataSets.length > 0 && (
-            <GoToTopLink className="govuk-!-margin-top-7" />
+            <BackToTopLink className="govuk-!-margin-top-7" />
           )}
         </div>
       </div>

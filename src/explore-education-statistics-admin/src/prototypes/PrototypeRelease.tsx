@@ -232,7 +232,7 @@ const PrototypeRelease = () => {
         <Accordion id="data">
           <AccordionSection
             heading="Download data and metadata"
-            goToTop={false}
+            backToTop={false}
           >
             <p>
               Find and download files used in the production of this release.
@@ -246,25 +246,25 @@ const PrototypeRelease = () => {
         <Accordion id="content">
           <AccordionSection
             heading="Children looked after on 31 March"
-            goToTop={false}
+            backToTop={false}
           >
             This is a test
           </AccordionSection>
           <AccordionSection
             heading="Children starting to be looked after"
-            goToTop={false}
+            backToTop={false}
           >
             This is a test
           </AccordionSection>
           <AccordionSection
             heading="Health outcomes for children looked after for at least 12 months on 31 March"
-            goToTop={false}
+            backToTop={false}
           >
             This is a test
           </AccordionSection>
           <AccordionSection
             heading="Children looked after who were missing"
-            goToTop={false}
+            backToTop={false}
           >
             This is a test
           </AccordionSection>
@@ -276,7 +276,10 @@ const PrototypeRelease = () => {
           Downloads, help and support
         </h2>
         <Accordion id="downloads">
-          <AccordionSection heading="Download associated files" goToTop={false}>
+          <AccordionSection
+            heading="Download associated files"
+            backToTop={false}
+          >
             <PrototypeDownloadPopular />
             <PrototypeDownloadUnderlying />
             <PrototypeDownloadAncillary />
@@ -284,7 +287,7 @@ const PrototypeRelease = () => {
           </AccordionSection>
           <AccordionSection
             heading="Download associated files (Example 2)"
-            goToTop={false}
+            backToTop={false}
           >
             <PrototypeDownloadPopular viewAsList />
             <PrototypeDownloadUnderlying viewAsList />
@@ -293,7 +296,7 @@ const PrototypeRelease = () => {
           </AccordionSection>
           <AccordionSection
             heading="Download associated files (Example 3)"
-            goToTop={false}
+            backToTop={false}
           >
             <Tabs id="download">
               <TabsSection title="Featured tables">
@@ -315,13 +318,13 @@ const PrototypeRelease = () => {
               Create table
             </a>
           </AccordionSection>
-          <AccordionSection heading="Methodology" goToTop={false}>
+          <AccordionSection heading="Methodology" backToTop={false}>
             Methodology section
           </AccordionSection>
-          <AccordionSection heading="National statistics" goToTop={false}>
+          <AccordionSection heading="National statistics" backToTop={false}>
             National statistics
           </AccordionSection>
-          <AccordionSection heading="Contact us" goToTop={false}>
+          <AccordionSection heading="Contact us" backToTop={false}>
             Contact us
           </AccordionSection>
         </Accordion>

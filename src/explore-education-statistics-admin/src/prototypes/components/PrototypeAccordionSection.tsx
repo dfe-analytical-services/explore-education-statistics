@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import React, { createElement, memo, ReactNode } from 'react';
 import styles from '@common/components/AccordionSection.module.scss';
 import stylesProt from '@admin/prototypes/PrototypePublicPage.module.scss';
-import GoToTopLink from '@common/components/GoToTopLink';
+import BackToTopLink from '@common/components/BackToTopLink';
 
 export type ToggleHandler = (open: boolean, id: string) => void;
 
@@ -20,7 +20,7 @@ export interface AccordionSectionProps {
       }) => ReactNode);
   className?: string;
   anchorLinkUrl?: string;
-  goToTop?: boolean;
+  backToTop?: boolean;
   header?: ReactNode;
   heading: string;
   /**
@@ -48,7 +48,7 @@ const AccordionSection = ({
   caption,
   className,
   children,
-  goToTop = true,
+  backToTop = true,
   header,
   heading,
   headingTag = 'h2',
@@ -140,7 +140,7 @@ const AccordionSection = ({
           ? children({ open, contentId, headingId })
           : children}
 
-        {goToTop && <GoToTopLink />}
+        {backToTop && <BackToTopLink />}
       </div>
     </div>
   );

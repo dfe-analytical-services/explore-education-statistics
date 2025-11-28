@@ -65,7 +65,7 @@ const PrototypeMetaPreview = () => {
 
       <h2 className="govuk-heading-m govuk-!-margin-top-9">Data files</h2>
       <Accordion id="dataFiles">
-        <AccordionSection heading="Data example 1" goToTop={false}>
+        <AccordionSection heading="Data example 1" backToTop={false}>
           <SummaryList className="govuk-!-margin-bottom-9">
             <SummaryListItem term="Title">Data example 1</SummaryListItem>
             <SummaryListItem term="Data title">

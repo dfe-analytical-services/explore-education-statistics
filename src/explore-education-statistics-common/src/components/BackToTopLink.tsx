@@ -5,11 +5,11 @@ interface Props {
   className?: string;
 }
 
-export default function GoToTopLink({ className }: Props) {
+export default function BackToTopLink({ className }: Props) {
   return (
     <div className={classNames('govuk-!-display-none-print', className)}>
       <a href="#top" className="govuk-link govuk-link--no-visited-state">
-        Go to top
+        Back to top
       </a>
     </div>
   );

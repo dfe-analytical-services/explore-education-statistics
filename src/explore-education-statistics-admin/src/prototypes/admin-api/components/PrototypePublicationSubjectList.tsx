@@ -54,7 +54,7 @@ const PrototypePublicationSubjectList = ({
               if (subject) {
                 return (
                   <AccordionSection
-                    goToTop={false}
+                    backToTop={false}
                     heading={
                       isCurrentReleasePublished && nextSubject
                         ? nextSubject.title
