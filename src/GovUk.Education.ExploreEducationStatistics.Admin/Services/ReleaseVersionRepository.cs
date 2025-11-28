@@ -34,7 +34,7 @@ public class ReleaseVersionRepository(
     )
     {
         var allReleaseRolesExcludingPrerelease = EnumUtil
-            .GetEnumsArray<ReleaseRole>()
+            .GetEnums<ReleaseRole>()
             .Except([ReleaseRole.PrereleaseViewer])
             .ToArray();
 
