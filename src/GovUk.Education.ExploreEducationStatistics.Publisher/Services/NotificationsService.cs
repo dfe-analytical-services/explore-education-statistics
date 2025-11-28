@@ -42,7 +42,7 @@ public class NotificationsService(ContentDbContext context, INotifierClient noti
             .SelectManyAwait(async releaseVersion =>
             {
                 var publicationRoles = await context
-                    .ActiveUserPublicationRoles.Include(upr => upr.User)
+                    .UserPublicationRolesActive.Include(upr => upr.User)
                     .Where(upr => upr.PublicationId == releaseVersion.Release.PublicationId)
                     .ToListAsync();
 
