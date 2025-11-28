@@ -8,17 +8,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 /// Class fixture for enabling/disabling caching and making available various Caching Services
 /// for tests needing to check caching annotations that use these services.
 /// </summary>
+/// TODO EES-6450 - remove in follow-up PR.
 [Collection(CacheTestFixture.CollectionName)]
 public class CacheServiceTestFixture : IDisposable
 {
-    // ReSharper disable once MemberCanBeProtected.Global
-    public CacheServiceTestFixture()
-    {
-        CacheAspect.Enabled = true;
-    }
-
-    public void Dispose()
-    {
-        CacheAspect.Enabled = false;
-    }
+    public void Dispose() { }
 }

@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
@@ -13,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.RequestTimeoutConfigurationKeys;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 
@@ -33,12 +31,14 @@ public class TableBuilderController(
 
     [HttpPost("tablebuilder")]
     [Produces("application/json", "text/csv")]
-    [CancellationTokenTimeout(TableBuilderQuery)]
     public async Task<ActionResult> Query(
         [FromBody] FullTableQueryRequest request,
         CancellationToken cancellationToken = default
     )
     {
+        using var cancellationTokenWithTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cancellationTokenWithTimeout.CancelAfter(TimeSpan.FromSeconds(210000));
+
         if (Request.AcceptsCsv(exact: true))
         {
             Response.ContentDispositionAttachment(ContentTypes.Csv);
@@ -47,23 +47,27 @@ public class TableBuilderController(
                 .QueryToCsvStream(
                     query: request.AsFullTableQuery(),
                     stream: Response.BodyWriter.AsStream(),
-                    cancellationToken: cancellationToken
+                    cancellationToken: cancellationTokenWithTimeout.Token
                 )
                 .HandleFailuresOrNoOp();
         }
 
-        return await tableBuilderService.Query(request.AsFullTableQuery(), cancellationToken).HandleFailuresOr(Ok);
+        return await tableBuilderService
+            .Query(request.AsFullTableQuery(), cancellationTokenWithTimeout.Token)
+            .HandleFailuresOr(Ok);
     }
 
     [HttpPost("tablebuilder/release/{releaseVersionId:guid}")]
     [Produces("application/json", "text/csv")]
-    [CancellationTokenTimeout(TableBuilderQuery)]
     public async Task<ActionResult> Query(
         Guid releaseVersionId,
         [FromBody] FullTableQueryRequest request,
         CancellationToken cancellationToken = default
     )
     {
+        using var cancellationTokenWithTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cancellationTokenWithTimeout.CancelAfter(TimeSpan.FromSeconds(210000));
+
         if (Request.AcceptsCsv(exact: true))
         {
             Response.ContentDispositionAttachment(contentType: ContentTypes.Csv, filename: $"{releaseVersionId}.csv");
@@ -73,13 +77,13 @@ public class TableBuilderController(
                     releaseVersionId: releaseVersionId,
                     query: request.AsFullTableQuery(),
                     stream: Response.BodyWriter.AsStream(),
-                    cancellationToken: cancellationToken
+                    cancellationToken: cancellationTokenWithTimeout.Token
                 )
                 .HandleFailuresOrNoOp();
         }
 
         return await tableBuilderService
-            .Query(releaseVersionId, request.AsFullTableQuery(), cancellationToken)
+            .Query(releaseVersionId, request.AsFullTableQuery(), cancellationTokenWithTimeout.Token)
             .HandleFailuresOr(Ok);
     }
 
