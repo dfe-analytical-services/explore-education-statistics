@@ -310,15 +310,10 @@ public class ThemeService(
     {
         var userId = userService.GetUserId();
 
-        var allReleaseRolesExcludingPrerelease = EnumUtil
-            .GetEnums<ReleaseRole>()
-            .Except([ReleaseRole.PrereleaseViewer])
-            .ToArray();
-
         return await userReleaseRoleRepository
             .Query()
             .WhereForUser(userId)
-            .WhereRolesIn(allReleaseRolesExcludingPrerelease)
+            .WhereRolesNotIn(ReleaseRole.PrereleaseViewer)
             .Select(userReleaseRole => userReleaseRole.ReleaseVersion.Release.Publication.Theme)
             .Concat(
                 userPublicationRoleRepository
