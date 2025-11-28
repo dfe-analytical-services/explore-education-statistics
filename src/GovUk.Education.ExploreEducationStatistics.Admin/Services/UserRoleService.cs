@@ -345,22 +345,22 @@ public class UserRoleService(
             .CheckCanManageAllUsers()
             .OnSuccess(_ => contentPersistenceHelper.CheckEntityExists<User>(userId))
             .OnSuccess(async () =>
-            {
-                return await contentDbContext
-                    .UserPublicationRoles.Include(userPublicationRole => userPublicationRole.Publication)
-                    .Include(userPublicationRole => userPublicationRole.User)
-                    .Where(userPublicationRole => userPublicationRole.UserId == userId)
-                    .OrderBy(userPublicationRole => userPublicationRole.Publication.Title)
-                    .Select(userPublicationRole => new UserPublicationRoleViewModel
+                await userPublicationRoleRepository
+                    .Query()
+                    .WhereForUser(userId)
+                    .Include(upr => upr.User)
+                    .Include(upr => upr.Publication)
+                    .OrderBy(upr => upr.Publication.Title)
+                    .Select(upr => new UserPublicationRoleViewModel
                     {
-                        Id = userPublicationRole.Id,
-                        Publication = userPublicationRole.Publication.Title,
-                        Role = userPublicationRole.Role,
-                        UserName = userPublicationRole.User.DisplayName,
-                        Email = userPublicationRole.User.Email,
+                        Id = upr.Id,
+                        Publication = upr.Publication.Title,
+                        Role = upr.Role,
+                        UserName = upr.User.DisplayName,
+                        Email = upr.User.Email,
                     })
-                    .ToListAsync();
-            });
+                    .ToListAsync()
+            );
     }
 
     public async Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForPublication(
@@ -371,23 +371,22 @@ public class UserRoleService(
             .CheckEntityExists<Publication>(publicationId)
             .OnSuccess(userService.CheckCanViewPublication)
             .OnSuccess(async () =>
-            {
-                return (
-                    await contentDbContext
-                        .UserPublicationRoles.Include(userPublicationRole => userPublicationRole.Publication)
-                        .Include(userPublicationRole => userPublicationRole.User)
-                        .Where(userPublicationRole => userPublicationRole.PublicationId == publicationId)
-                        .Select(userPublicationRole => new UserPublicationRoleViewModel
-                        {
-                            Id = userPublicationRole.Id,
-                            Publication = userPublicationRole.Publication.Title,
-                            Role = userPublicationRole.Role,
-                            UserName = userPublicationRole.User.DisplayName,
-                            Email = userPublicationRole.User.Email,
-                        })
-                        .ToListAsync()
-                ).OrderBy(userPublicationRole => userPublicationRole.UserName).ToList();
-            });
+                await userPublicationRoleRepository
+                    .Query()
+                    .WhereForPublication(publicationId)
+                    .Include(upr => upr.User)
+                    .Include(upr => upr.Publication)
+                    .OrderBy(upr => upr.User.DisplayName)
+                    .Select(upr => new UserPublicationRoleViewModel
+                    {
+                        Id = upr.Id,
+                        Publication = upr.Publication.Title,
+                        Role = upr.Role,
+                        UserName = upr.User.DisplayName,
+                        Email = upr.User.Email,
+                    })
+                    .ToListAsync()
+            );
     }
 
     public async Task<Either<ActionResult, List<UserReleaseRoleViewModel>>> GetReleaseRoles(Guid userId)
@@ -397,11 +396,12 @@ public class UserRoleService(
             .OnSuccess(_ => contentPersistenceHelper.CheckEntityExists<User>(userId))
             .OnSuccess(async () =>
             {
-                var allReleaseRoles = await contentDbContext
-                    .UserReleaseRoles.Include(userReleaseRole => userReleaseRole.ReleaseVersion)
-                        .ThenInclude(releaseVersion => releaseVersion.Release)
-                            .ThenInclude(release => release.Publication)
-                    .Where(userReleaseRole => userReleaseRole.UserId == userId)
+                var allReleaseRoles = await userReleaseRoleRepository
+                    .Query()
+                    .WhereForUser(userId)
+                    .Include(urr => urr.ReleaseVersion)
+                    .ThenInclude(rv => rv.Release)
+                    .ThenInclude(r => r.Publication)
                     .ToListAsync();
 
                 var latestReleaseRoles = await allReleaseRoles
