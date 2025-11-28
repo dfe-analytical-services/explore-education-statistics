@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Microsoft.EntityFrameworkCore;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
@@ -16,24 +17,26 @@ public class AuthorizationHandlerService(
     IPreReleaseService preReleaseService
 )
 {
-    private static readonly ReleaseRole[] ReleaseEditorRoles = { ReleaseRole.Contributor };
+    private static readonly HashSet<ReleaseRole> ReleaseEditorRoles = [ReleaseRole.Contributor];
 
-    public static readonly ReleaseRole[] UnrestrictedReleaseViewerRoles =
-    {
+    public static readonly HashSet<ReleaseRole> UnrestrictedReleaseViewerRoles =
+    [
         ReleaseRole.Contributor,
         ReleaseRole.Approver,
-    };
+    ];
 
-    public static readonly List<ReleaseRole> ReleaseEditorAndApproverRoles = ReleaseEditorRoles
-        .Append(ReleaseRole.Approver)
-        .ToList();
+    public static readonly HashSet<ReleaseRole> ReleaseEditorAndApproverRoles =
+    [
+        .. ReleaseEditorRoles,
+        ReleaseRole.Approver,
+    ];
 
     public Task<bool> HasRolesOnPublicationOrReleaseVersion(
         Guid userId,
         Guid publicationId,
         Guid releaseVersionId,
-        IEnumerable<PublicationRole> publicationRoles,
-        IEnumerable<ReleaseRole> releaseRoles
+        HashSet<PublicationRole> publicationRoles,
+        HashSet<ReleaseRole> releaseRoles
     )
     {
         return HasRolesOnPublicationOrReleaseVersion(
@@ -49,16 +52,17 @@ public class AuthorizationHandlerService(
         Guid userId,
         Guid publicationId,
         Func<Task<Guid?>> releaseVersionIdSupplier,
-        IEnumerable<PublicationRole> publicationRoles,
-        IEnumerable<ReleaseRole> releaseRoles
+        HashSet<PublicationRole> publicationRoles,
+        HashSet<ReleaseRole> releaseRoles
     )
     {
-        var usersPublicationRoles = await userPublicationRoleRepository.ListRolesByUserAndPublication(
-            userId,
-            publicationId
-        );
-
-        if (usersPublicationRoles.Any(publicationRoles.Contains))
+        if (
+            await UserHasAnyPublicationRoleOnPublication(
+                userId: userId,
+                publicationId: publicationId,
+                rolesToInclude: [.. publicationRoles]
+            )
+        )
         {
             return true;
         }
@@ -70,63 +74,70 @@ public class AuthorizationHandlerService(
             return false;
         }
 
-        var usersReleaseRoles = await userReleaseRoleRepository.ListRolesByUserAndReleaseVersion(
+        return await UserHasAnyReleaseRoleOnReleaseVersion(
             userId: userId,
-            releaseVersionId: releaseVersionId.Value
+            releaseVersionId: releaseVersionId.Value,
+            rolesToInclude: [.. releaseRoles]
         );
-
-        return usersReleaseRoles.Any(releaseRoles.Contains);
     }
 
-    public async Task<bool> HasRolesOnPublicationOrAnyReleaseVersion(
+    public async Task<bool> UserHasAnyRoleOnPublicationOrAnyReleaseVersion(
         Guid userId,
         Guid publicationId,
-        IEnumerable<PublicationRole> publicationRoles,
-        IEnumerable<ReleaseRole> releaseRoles
+        HashSet<PublicationRole> publicationRoles,
+        HashSet<ReleaseRole> releaseRoles
     )
     {
-        var usersPublicationRoles = await userPublicationRoleRepository.ListRolesByUserAndPublication(
-            userId,
-            publicationId
-        );
-
-        if (usersPublicationRoles.Any(publicationRoles.Contains))
+        if (
+            await UserHasAnyPublicationRoleOnPublication(
+                userId: userId,
+                publicationId: publicationId,
+                rolesToInclude: [.. publicationRoles]
+            )
+        )
         {
             return true;
         }
 
-        var usersReleaseRoles = await userReleaseRoleRepository.ListRolesByUserAndPublication(userId, publicationId);
-
-        return usersReleaseRoles.Any(releaseRoles.Contains);
+        return await UserHasAnyReleaseRoleOnPublication(
+            userId: userId,
+            publicationId: publicationId,
+            rolesToInclude: [.. releaseRoles]
+        );
     }
 
-    public async Task<bool> HasRolesOnPublication(
+    public async Task<bool> UserHasAnyPublicationRoleOnPublication(
         Guid userId,
         Guid publicationId,
-        params PublicationRole[] publicationRoles
-    )
-    {
-        var usersPublicationRoles = await userPublicationRoleRepository.ListRolesByUserAndPublication(
-            userId,
-            publicationId
+        params PublicationRole[] rolesToInclude
+    ) =>
+        await userPublicationRoleRepository.UserHasAnyRoleOnPublication(
+            userId: userId,
+            publicationId: publicationId,
+            rolesToInclude: [.. rolesToInclude]
         );
 
-        return usersPublicationRoles.Any(publicationRoles.Contains);
-    }
-
-    public async Task<bool> HasRolesOnReleaseVersion(
+    public async Task<bool> UserHasAnyReleaseRoleOnReleaseVersion(
         Guid userId,
         Guid releaseVersionId,
-        params ReleaseRole[] releaseRoles
-    )
-    {
-        var usersReleaseRoles = await userReleaseRoleRepository.ListRolesByUserAndReleaseVersion(
+        params ReleaseRole[] rolesToInclude
+    ) =>
+        await userReleaseRoleRepository.UserHasAnyRoleOnReleaseVersion(
             userId: userId,
-            releaseVersionId: releaseVersionId
+            releaseVersionId: releaseVersionId,
+            rolesToInclude: [.. rolesToInclude]
         );
 
-        return usersReleaseRoles.Any(releaseRoles.Contains);
-    }
+    public async Task<bool> UserHasAnyReleaseRoleOnPublication(
+        Guid userId,
+        Guid publicationId,
+        params ReleaseRole[] rolesToInclude
+    ) =>
+        await userReleaseRoleRepository.UserHasAnyRoleOnPublication(
+            userId: userId,
+            publicationId: publicationId,
+            rolesToInclude: [.. rolesToInclude]
+        );
 
     public async Task<bool> IsReleaseVersionViewableByUser(ReleaseVersion releaseVersion, ClaimsPrincipal user)
     {
@@ -145,7 +156,7 @@ public class AuthorizationHandlerService(
 
         // If the user has any PublicationRoles on the owning Publication, they can see its child release versions.
         if (
-            await HasRolesOnPublication(
+            await UserHasAnyPublicationRoleOnPublication(
                 userId: user.GetUserId(),
                 publicationId: releaseVersion.PublicationId,
                 [.. validPublicationRoles]
@@ -157,10 +168,10 @@ public class AuthorizationHandlerService(
 
         // If the user has any non-Pre-release Viewer roles on the Release, they can see it at any time.
         if (
-            await HasRolesOnReleaseVersion(
+            await UserHasAnyReleaseRoleOnReleaseVersion(
                 userId: user.GetUserId(),
                 releaseVersionId: releaseVersion.Id,
-                UnrestrictedReleaseViewerRoles
+                [.. UnrestrictedReleaseViewerRoles]
             )
         )
         {
@@ -170,7 +181,7 @@ public class AuthorizationHandlerService(
         // If the user has the Pre-release Viewer role on this Release and the Release is within its open
         // Pre-release window, they can see the release version.
         if (
-            await HasRolesOnReleaseVersion(
+            await UserHasAnyReleaseRoleOnReleaseVersion(
                 userId: user.GetUserId(),
                 releaseVersionId: releaseVersion.Id,
                 ReleaseRole.PrereleaseViewer

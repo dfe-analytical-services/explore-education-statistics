@@ -50,7 +50,13 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandler
             return;
         }
 
-        if (await _authorizationHandlerService.HasRolesOnPublication(context.User.GetUserId(), publication.Id, Owner))
+        if (
+            await _authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
+                context.User.GetUserId(),
+                publication.Id,
+                Owner
+            )
+        )
         {
             context.Succeed(requirement);
         }

@@ -672,7 +672,7 @@ public abstract class UserRoleServiceTests
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository
-                .Setup(mock => mock.HasUserReleaseRole(_user.Id, releaseVersion.Id, ReleaseRole.Contributor))
+                .Setup(mock => mock.UserHasRoleOnReleaseVersion(_user.Id, releaseVersion.Id, ReleaseRole.Contributor))
                 .ReturnsAsync(false);
             userReleaseRoleRepository
                 .Setup(s => s.Create(_user.Id, releaseVersion.Id, ReleaseRole.Contributor, _user.Id))
@@ -739,7 +739,9 @@ public abstract class UserRoleServiceTests
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
             userReleaseRoleRepository
-                .Setup(mock => mock.HasUserReleaseRole(_user.Id, release.Versions[0].Id, ReleaseRole.Contributor))
+                .Setup(mock =>
+                    mock.UserHasRoleOnReleaseVersion(_user.Id, release.Versions[0].Id, ReleaseRole.Contributor)
+                )
                 .ReturnsAsync(true);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -783,7 +785,9 @@ public abstract class UserRoleServiceTests
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
             userReleaseRoleRepository
-                .Setup(mock => mock.HasUserReleaseRole(_user.Id, release.Versions[0].Id, ReleaseRole.Contributor))
+                .Setup(mock =>
+                    mock.UserHasRoleOnReleaseVersion(_user.Id, release.Versions[0].Id, ReleaseRole.Contributor)
+                )
                 .ReturnsAsync(false);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

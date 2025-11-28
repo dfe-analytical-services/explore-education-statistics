@@ -78,8 +78,8 @@ public abstract class ReleaseStatusAuthorizationHandler<TRequirement>
                 userId: context.User.GetUserId(),
                 publicationId: releaseVersion.PublicationId,
                 releaseVersionId: releaseVersion.Id,
-                ListOf(PublicationRole.Allower),
-                ListOf(ReleaseRole.Approver)
+                SetOf(PublicationRole.Allower),
+                SetOf(ReleaseRole.Approver)
             )
         )
         {
@@ -101,11 +101,11 @@ public abstract class ReleaseStatusAuthorizationHandler<TRequirement>
 
         var allowedPublicationRoles =
             releaseVersion.ApprovalStatus == Approved
-                ? ListOf(PublicationRole.Allower)
-                : ListOf(PublicationRole.Owner, PublicationRole.Allower);
+                ? SetOf(PublicationRole.Allower)
+                : SetOf(PublicationRole.Owner, PublicationRole.Allower);
 
         var allowedReleaseRoles =
-            releaseVersion.ApprovalStatus == Approved ? ListOf(ReleaseRole.Approver) : ReleaseEditorAndApproverRoles;
+            releaseVersion.ApprovalStatus == Approved ? SetOf(ReleaseRole.Approver) : ReleaseEditorAndApproverRoles;
 
         if (
             await _authorizationHandlerService.HasRolesOnPublicationOrReleaseVersion(
@@ -135,11 +135,11 @@ public abstract class ReleaseStatusAuthorizationHandler<TRequirement>
 
         var allowedPublicationRoles =
             releaseVersion.ApprovalStatus == Approved
-                ? ListOf(PublicationRole.Allower)
-                : ListOf(PublicationRole.Owner, PublicationRole.Allower);
+                ? SetOf(PublicationRole.Allower)
+                : SetOf(PublicationRole.Owner, PublicationRole.Allower);
 
         var allowedReleaseRoles =
-            releaseVersion.ApprovalStatus == Approved ? ListOf(ReleaseRole.Approver) : ReleaseEditorAndApproverRoles;
+            releaseVersion.ApprovalStatus == Approved ? SetOf(ReleaseRole.Approver) : ReleaseEditorAndApproverRoles;
 
         if (
             await _authorizationHandlerService.HasRolesOnPublicationOrReleaseVersion(

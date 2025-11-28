@@ -36,7 +36,7 @@ public class UpdateReleaseRoleAuthorizationHandler
         if (releaseRole == ReleaseRole.Contributor)
         {
             if (
-                await _authorizationHandlerService.HasRolesOnPublication(
+                await _authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
                     context.User.GetUserId(),
                     publication.Id,
                     Owner

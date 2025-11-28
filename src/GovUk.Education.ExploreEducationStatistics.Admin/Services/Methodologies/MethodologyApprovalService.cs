@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -131,10 +132,12 @@ public class MethodologyApprovalService(
             rolesToInclude: [ReleaseRole.Approver]
         );
 
-        var userPublicationRoles = await userPublicationRoleRepository.ListRolesForPublication(
-            publicationId: owningPublicationId,
-            rolesToInclude: [PublicationRole.Allower]
-        );
+        var userPublicationRoles = await userPublicationRoleRepository
+            .Query()
+            .WhereForPublication(owningPublicationId)
+            .WhereRolesIn(PublicationRole.Allower)
+            .Include(upr => upr.User)
+            .ToListAsync();
 
         var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();
         if (notifyHigherReviewers)
