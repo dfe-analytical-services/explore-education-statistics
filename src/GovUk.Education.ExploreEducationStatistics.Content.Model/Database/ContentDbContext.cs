@@ -95,14 +95,16 @@ public class ContentDbContext : DbContext
     public virtual DbSet<EinContentBlock> EinContentBlocks { get; set; }
     public virtual DbSet<EinTile> EinTiles { get; set; }
 
-    public IQueryable<UserPublicationRole> UserPublicationRolesActive => UserPublicationRoles.WhereUserIsActive();
+    public IQueryable<UserPublicationRole> UserPublicationRolesForActiveUsers =>
+        UserPublicationRoles.WhereUserIsActive();
 
-    public IQueryable<UserPublicationRole> UserPublicationRolesPendingInvites =>
+    public IQueryable<UserPublicationRole> UserPublicationRolesForPendingInvites =>
         UserPublicationRoles.WhereUserHasPendingInvite();
 
-    public IQueryable<UserReleaseRole> UserReleaseRolesActive => UserReleaseRoles.WhereUserIsActive();
+    public IQueryable<UserReleaseRole> UserReleaseRolesForActiveUsers => UserReleaseRoles.WhereUserIsActive();
 
-    public IQueryable<UserReleaseRole> UserReleaseRolesPendingInvites => UserReleaseRoles.WhereUserHasPendingInvite();
+    public IQueryable<UserReleaseRole> UserReleaseRolesForPendingInvites =>
+        UserReleaseRoles.WhereUserHasPendingInvite();
 
     [DbFunction]
     public virtual IQueryable<FreeTextRank> ReleaseFilesFreeTextTable(string searchTerm) =>
