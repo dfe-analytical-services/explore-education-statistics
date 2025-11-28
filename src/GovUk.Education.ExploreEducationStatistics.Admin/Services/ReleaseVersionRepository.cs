@@ -33,15 +33,10 @@ public class ReleaseVersionRepository(
         params ReleaseApprovalStatus[] releaseApprovalStatuses
     )
     {
-        var allReleaseRolesExcludingPrerelease = EnumUtil
-            .GetEnums<ReleaseRole>()
-            .Except([ReleaseRole.PrereleaseViewer])
-            .ToArray();
-
         var releaseRoleReleaseVersionIds = await userReleaseRoleRepository
             .Query()
             .WhereForUser(userId)
-            .WhereRolesIn(allReleaseRolesExcludingPrerelease)
+            .WhereRolesNotIn(ReleaseRole.PrereleaseViewer)
             .Select(urr => urr.ReleaseVersionId)
             .ToListAsync();
 

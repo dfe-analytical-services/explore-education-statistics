@@ -17,6 +17,11 @@ public static class UserPublicationRoleQueries
         params PublicationRole[] roles
     ) => query.Where(upr => roles.Contains(upr.Role));
 
+    public static IQueryable<UserPublicationRole> WhereRolesNotIn(
+        this IQueryable<UserPublicationRole> query,
+        params PublicationRole[] roles
+    ) => query.Where(upr => !roles.Contains(upr.Role));
+
     public static IQueryable<UserPublicationRole> WhereEmailNotSent(this IQueryable<UserPublicationRole> query) =>
         query.Where(upr => upr.EmailSent == null);
 

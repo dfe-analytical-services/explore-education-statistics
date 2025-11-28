@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -539,29 +540,26 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
     )
     {
         // Copy all current roles apart from Prerelease Users to the Release amendment.
-        var newRoles = _context
-            .UserReleaseRoles.Where(releaseRole =>
-                releaseRole.ReleaseVersionId == originalReleaseId && releaseRole.Role != ReleaseRole.PrereleaseViewer
-            )
-            .Select(originalReleaseRole => new UserReleaseRole
+        var newRoles = await _context
+            .UserReleaseRolesForActiveUsers.WhereForReleaseVersion(originalReleaseId)
+            .WhereRolesNotIn(ReleaseRole.PrereleaseViewer)
+            .Select(urr => new UserReleaseRole
             {
                 // Assign a new Id.
                 Id = Guid.NewGuid(),
-
                 // Assign it to the amended release version.
                 ReleaseVersionId = amendmentReleaseVersionId,
-
                 // Copy certain fields from the original.
-                Role = originalReleaseRole.Role,
-                UserId = originalReleaseRole.UserId,
-
+                Role = urr.Role,
+                UserId = urr.UserId,
                 // Assign the new created date.
                 Created = createdDate,
             })
-            .ToList();
+            .ToListAsync();
 
-        await _context.AddRangeAsync(newRoles);
+        _context.AddRange(newRoles);
         await _context.SaveChangesAsync();
+
         return Unit.Instance;
     }
 
