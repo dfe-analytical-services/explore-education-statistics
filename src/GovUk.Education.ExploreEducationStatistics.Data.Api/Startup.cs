@@ -154,6 +154,9 @@ public class Startup
         );
 
         services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
+        // Some shared services allow for either a public or private BlobCacheService to be injected.
+        // In the case of the Data API, it will always be using the public cache.
+        services.AddTransient<IBlobCacheService, PublicBlobCacheService>();
         services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
         services.AddTransient<ITableBuilderService, TableBuilderService>();
         services.AddTransient<IDataBlockService, DataBlockService>();
