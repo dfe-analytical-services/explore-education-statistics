@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
@@ -32,14 +33,18 @@ public class ReleasePermissionService(
             .OnSuccessDo(releaseVersion => userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
             .OnSuccess(async _ =>
             {
-                var users = await userReleaseRoleRepository.ListUserReleaseRoles(releaseVersionId, rolesToInclude);
+                var userReleaseRoles = await userReleaseRoleRepository
+                    .Query()
+                    .WhereForReleaseVersion(releaseVersionId)
+                    .WhereRolesIn(rolesToInclude)
+                    .ToListAsync();
 
-                return users
-                    .Select(userReleaseRole => new UserReleaseRoleSummaryViewModel(
-                        userReleaseRole.UserId,
-                        userReleaseRole.User.DisplayName,
-                        userReleaseRole.User.Email,
-                        userReleaseRole.Role
+                return userReleaseRoles
+                    .Select(urr => new UserReleaseRoleSummaryViewModel(
+                        urr.UserId,
+                        urr.User.DisplayName,
+                        urr.User.Email,
+                        urr.Role
                     ))
                     .OrderBy(model => model.UserDisplayName)
                     .ToList();
@@ -133,12 +138,18 @@ public class ReleasePermissionService(
 
                 await userReleaseRoleRepository.RemoveMany(releaseRolesToBeRemoved);
 
-                await userReleaseRoleRepository.CreateManyIfNotExists(
-                    userIds: usersToBeAdded,
-                    releaseVersionId: releaseVersion.Id,
-                    role: ReleaseRole.Contributor,
-                    createdById: userService.GetUserId()
-                );
+                var newUserReleaseRoles = usersToBeAdded
+                    .Select(userId => new UserReleaseRole
+                    {
+                        UserId = userId,
+                        ReleaseVersionId = releaseVersion.Id,
+                        Role = ReleaseRole.Contributor,
+                        CreatedById = userService.GetUserId(),
+                        Created = DateTime.UtcNow,
+                    })
+                    .ToList();
+
+                await userReleaseRoleRepository.CreateManyIfNotExists(newUserReleaseRoles);
             });
     }
 
@@ -152,11 +163,14 @@ public class ReleasePermissionService(
             .OnSuccessDo(publication => userService.CheckCanUpdateReleaseRole(publication, ReleaseRole.Contributor))
             .OnSuccessVoid(async publication =>
             {
-                await userReleaseRoleRepository.RemoveForPublicationAndUser(
-                    userId: userId,
-                    publicationId: publicationId,
-                    rolesToInclude: ReleaseRole.Contributor
-                );
+                var releaseRolesToRemove = await userReleaseRoleRepository
+                    .Query()
+                    .WhereForUser(userId)
+                    .WhereForPublication(publicationId)
+                    .WhereRolesIn(ReleaseRole.Contributor)
+                    .ToListAsync();
+
+                await userReleaseRoleRepository.RemoveMany(releaseRolesToRemove);
             });
     }
 }

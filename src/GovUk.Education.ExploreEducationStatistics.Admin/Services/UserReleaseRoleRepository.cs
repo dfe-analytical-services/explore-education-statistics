@@ -1,20 +1,44 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogger<UserReleaseRoleRepository> logger)
-    : UserResourceRoleRepositoryBase<UserReleaseRoleRepository, UserReleaseRole, ReleaseVersion, ReleaseRole>(
-        contentDbContext
-    ),
-        IUserReleaseRoleRepository
+    : IUserReleaseRoleRepository
 {
-    public async Task CreateManyIfNotExists(IReadOnlyList<UserReleaseRole> userReleaseRoles)
+    public async Task<UserReleaseRole> Create(
+        Guid userId,
+        Guid releaseVersionId,
+        ReleaseRole role,
+        Guid createdById,
+        DateTime? createdDate = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var newUserReleaseRole = new UserReleaseRole
+        {
+            UserId = userId,
+            ReleaseVersionId = releaseVersionId,
+            Role = role,
+            Created = createdDate?.ToUniversalTime() ?? DateTime.UtcNow,
+            CreatedById = createdById,
+        };
+
+        contentDbContext.UserReleaseRoles.Add(newUserReleaseRole);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
+
+        return newUserReleaseRole;
+    }
+
+    public async Task CreateManyIfNotExists(
+        IReadOnlyList<UserReleaseRole> userReleaseRoles,
+        CancellationToken cancellationToken = default
+    )
     {
         var newUserReleaseRoles = await userReleaseRoles
             .ToAsyncEnumerable()
@@ -27,248 +51,104 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
             )
             .ToListAsync();
 
-        await contentDbContext.UserReleaseRoles.AddRangeAsync(newUserReleaseRoles);
-        await contentDbContext.SaveChangesAsync();
+        contentDbContext.UserReleaseRoles.AddRange(newUserReleaseRoles);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(Guid releaseVersionId)
-    {
-        return ContentDbContext.UserReleaseRoles.Where(role => role.ReleaseVersionId == releaseVersionId);
-    }
-
-    protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceIds(List<Guid> releaseVersionIds)
-    {
-        return ContentDbContext.UserReleaseRoles.Where(role => releaseVersionIds.Contains(role.ReleaseVersionId));
-    }
-
-    public async Task<List<ReleaseRole>> ListDistinctRolesByUser(Guid userId, bool includeInactiveUsers = false)
-    {
-        var query = includeInactiveUsers ? ContentDbContext.UserReleaseRoles : ContentDbContext.ActiveUserReleaseRoles;
-
-        return await query.Where(r => r.UserId == userId).Select(r => r.Role).Distinct().ToListAsync();
-    }
-
-    public async Task<List<ReleaseRole>> ListRolesByUserAndReleaseVersion(
+    public async Task<UserReleaseRole?> GetUserReleaseRole(
         Guid userId,
         Guid releaseVersionId,
-        bool includeInactiveUsers = false
+        ReleaseRole role,
+        CancellationToken cancellationToken = default
     )
     {
-        var query = includeInactiveUsers ? ContentDbContext.UserReleaseRoles : ContentDbContext.ActiveUserReleaseRoles;
-
-        return await query
-            .Where(urr => urr.UserId == userId)
-            .Where(urr => urr.ReleaseVersionId == releaseVersionId)
-            .Select(urr => urr.Role)
-            .Distinct()
-            .ToListAsync();
+        return await Query()
+            .WhereForUser(userId)
+            .WhereForReleaseVersion(releaseVersionId)
+            .WhereRolesIn(role)
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<List<ReleaseRole>> ListRolesByUserAndPublication(
-        Guid userId,
-        Guid publicationId,
-        bool includeInactiveUsers = false
-    )
-    {
-        var query = includeInactiveUsers ? ContentDbContext.UserReleaseRoles : ContentDbContext.ActiveUserReleaseRoles;
-
-        return await query
-            .Where(urr => urr.UserId == userId)
-            .Where(urr => urr.ReleaseVersion.Release.PublicationId == publicationId)
-            .Select(urr => urr.Role)
-            .Distinct()
-            .ToListAsync();
-    }
-
-    public async Task<List<UserReleaseRole>> ListRolesForUser(
-        Guid userId,
-        bool includeInactiveUsers = false,
-        params ReleaseRole[] rolesToInclude
-    )
-    {
-        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<ReleaseRole>();
-
-        var query = includeInactiveUsers ? ContentDbContext.UserReleaseRoles : ContentDbContext.ActiveUserReleaseRoles;
-
-        return await query
-            .Where(urr => urr.UserId == userId)
-            .Where(urr => rolesToCheck.Contains(urr.Role))
-            .ToListAsync();
-    }
-
-    public async Task<List<UserReleaseRole>> ListRolesForReleaseVersion(
-        Guid releaseVersionId,
-        bool includeInactiveUsers = false,
-        params ReleaseRole[] rolesToInclude
-    )
-    {
-        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<ReleaseRole>();
-
-        var query = includeInactiveUsers ? ContentDbContext.UserReleaseRoles : ContentDbContext.ActiveUserReleaseRoles;
-
-        return await query
-            .Include(urr => urr.User)
-            .Where(urr => urr.ReleaseVersionId == releaseVersionId)
-            .Where(urr => rolesToCheck.Contains(urr.Role))
-            .ToListAsync();
-    }
-
-    public async Task<UserReleaseRole?> GetUserReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role)
-    {
-        return await GetResourceRole(userId, releaseVersionId, role);
-    }
-
-    public async Task<bool> HasUserReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role)
-    {
-        return await UserHasRoleOnResource(userId, releaseVersionId, role);
-    }
-
-    public async Task<bool> UserHasRoleOnReleaseVersion(Guid userId, Guid releaseVersionId, ReleaseRole role)
-    {
-        return await UserHasRoleOnResource(userId, releaseVersionId, role);
-    }
+    public IQueryable<UserReleaseRole> Query(bool includeInactiveUsers = false) =>
+        includeInactiveUsers ? contentDbContext.UserReleaseRoles : contentDbContext.ActiveUserReleaseRoles;
 
     public async Task Remove(UserReleaseRole userReleaseRole, CancellationToken cancellationToken = default)
     {
-        ContentDbContext.UserReleaseRoles.Remove(userReleaseRole);
+        contentDbContext.UserReleaseRoles.Remove(userReleaseRole);
 
-        await ContentDbContext.SaveChangesAsync(cancellationToken);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public new async Task RemoveMany(
+    public async Task RemoveMany(
         IReadOnlyList<UserReleaseRole> userReleaseRoles,
         CancellationToken cancellationToken = default
     )
     {
-        await base.RemoveMany(userReleaseRoles, cancellationToken);
-    }
-
-    public async Task RemoveForPublication(
-        Guid publicationId,
-        CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude
-    )
-    {
-        await RemoveForPublication(
-            publicationId: publicationId,
-            userId: null,
-            cancellationToken: cancellationToken,
-            rolesToInclude: rolesToInclude
-        );
-    }
-
-    public async Task RemoveForPublicationAndUser(
-        Guid publicationId,
-        Guid userId,
-        CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude
-    )
-    {
-        if (userId.IsEmpty())
+        if (!userReleaseRoles.Any())
         {
-            logger.LogError(
-                "Trying to remove roles/invites for a publication and user combination, "
-                    + $"but the supplied '{nameof(userId)}' is EMPTY. '{nameof(userId)}' must not be EMPTY."
-            );
-
-            throw new ArgumentException($"{nameof(userId)} must not be EMPTY.", nameof(userId));
+            return;
         }
 
-        await RemoveForPublication(
-            publicationId: publicationId,
-            userId: userId,
-            cancellationToken: cancellationToken,
-            rolesToInclude: rolesToInclude
-        );
-    }
-
-    public async Task RemoveForReleaseVersion(
-        Guid releaseVersionId,
-        CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude
-    )
-    {
-        await RemoveForReleaseVersion(
-            releaseVersionId: releaseVersionId,
-            userId: null,
-            cancellationToken: cancellationToken,
-            rolesToInclude: rolesToInclude
-        );
-    }
-
-    public async Task RemoveForReleaseVersionAndUser(
-        Guid releaseVersionId,
-        Guid userId,
-        CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude
-    )
-    {
-        if (userId == Guid.Empty)
-        {
-            logger.LogError(
-                "Trying to remove roles/invites for a release version and user combination, "
-                    + $"but the supplied '{nameof(userId)}' is EMPTY. '{nameof(userId)}' must not be EMPTY."
-            );
-
-            throw new ArgumentException($"{nameof(userId)} must not be EMPTY.", nameof(userId));
-        }
-
-        await RemoveForReleaseVersion(
-            releaseVersionId: releaseVersionId,
-            userId: userId,
-            cancellationToken: cancellationToken,
-            rolesToInclude: rolesToInclude
-        );
+        contentDbContext.UserReleaseRoles.RemoveRange(userReleaseRoles);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default)
     {
-        var userReleaseRoles = await ContentDbContext
+        var userReleaseRoles = await contentDbContext
             .UserReleaseRoles.Where(urr => urr.UserId == userId)
             .ToListAsync(cancellationToken);
 
-        await base.RemoveMany(userReleaseRoles, cancellationToken);
+        await RemoveMany(userReleaseRoles, cancellationToken);
     }
 
-    private async Task RemoveForPublication(
-        Guid publicationId,
-        Guid? userId = null,
-        CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude
-    )
-    {
-        var allReleaseVersionIds = ContentDbContext
-            .ReleaseVersions.Where(rv => rv.Release.PublicationId == publicationId)
-            .Select(rv => rv.Id)
-            .ToHashSet();
-
-        var userReleaseRoles = await ContentDbContext
-            .UserReleaseRoles.Where(urr => allReleaseVersionIds.Contains(urr.ReleaseVersionId))
-            .If(userId.HasValue)
-            .ThenWhere(urr => urr.UserId == userId)
-            .If(rolesToInclude.Any())
-            .ThenWhere(i => rolesToInclude.Contains(i.Role))
-            .ToListAsync(cancellationToken);
-
-        await base.RemoveMany(userReleaseRoles, cancellationToken);
-    }
-
-    private async Task RemoveForReleaseVersion(
+    public async Task<bool> UserHasRoleOnReleaseVersion(
+        Guid userId,
         Guid releaseVersionId,
-        Guid? userId = null,
+        ReleaseRole role,
+        bool includeInactiveUsers = false,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await Query(includeInactiveUsers)
+            .WhereForUser(userId)
+            .WhereForReleaseVersion(releaseVersionId)
+            .WhereRolesIn(role)
+            .AnyAsync(cancellationToken);
+    }
+
+    public async Task<bool> UserHasAnyRoleOnReleaseVersion(
+        Guid userId,
+        Guid releaseVersionId,
+        bool includeInactiveUsers = false,
         CancellationToken cancellationToken = default,
         params ReleaseRole[] rolesToInclude
     )
     {
-        var userReleaseRoles = await ContentDbContext
-            .UserReleaseRoles.Where(urr => urr.ReleaseVersionId == releaseVersionId)
-            .If(userId.HasValue)
-            .ThenWhere(urr => urr.UserId == userId)
-            .If(rolesToInclude.Any())
-            .ThenWhere(i => rolesToInclude.Contains(i.Role))
-            .ToListAsync(cancellationToken);
+        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<ReleaseRole>();
 
-        await base.RemoveMany(userReleaseRoles, cancellationToken);
+        return await Query(includeInactiveUsers)
+            .WhereForUser(userId)
+            .WhereForReleaseVersion(releaseVersionId)
+            .WhereRolesIn(rolesToCheck)
+            .AnyAsync(cancellationToken);
+    }
+
+    public async Task<bool> UserHasAnyRoleOnPublication(
+        Guid userId,
+        Guid publicationId,
+        bool includeInactiveUsers = false,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude
+    )
+    {
+        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<ReleaseRole>();
+
+        return await Query(includeInactiveUsers)
+            .WhereForUser(userId)
+            .WhereForPublication(publicationId)
+            .WhereRolesIn(rolesToCheck)
+            .AnyAsync(cancellationToken);
     }
 
     // The optional 'emailSent' date parameter will be removed in EES-6511 when we stop using UserReleaseRoleInvites/UserPublicationRoleInvites
@@ -282,7 +162,12 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
         CancellationToken cancellationToken = default
     )
     {
-        var userReleaseRole = await GetUserReleaseRole(userId: userId, releaseVersionId: releaseVersionId, role: role);
+        var userReleaseRole = await GetUserReleaseRole(
+            userId: userId,
+            releaseVersionId: releaseVersionId,
+            role: role,
+            cancellationToken: cancellationToken
+        );
 
         if (userReleaseRole is null)
         {
@@ -293,6 +178,6 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
 
         userReleaseRole.EmailSent = emailSent?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
 
-        await ContentDbContext.SaveChangesAsync(cancellationToken);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 }

@@ -3,17 +3,41 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserPublicationRoleRepository(ContentDbContext contentDbContext)
-    : UserResourceRoleRepositoryBase<UserPublicationRoleRepository, UserPublicationRole, Publication, PublicationRole>(
-        contentDbContext
-    ),
-        IUserPublicationRoleRepository
+public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : IUserPublicationRoleRepository
 {
-    public async Task CreateManyIfNotExists(IReadOnlyList<UserPublicationRole> userPublicationRoles)
+    public async Task<UserPublicationRole> Create(
+        Guid userId,
+        Guid publicationId,
+        PublicationRole role,
+        Guid createdById,
+        DateTime? createdDate = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var newUserPublicationRole = new UserPublicationRole
+        {
+            UserId = userId,
+            PublicationId = publicationId,
+            Role = role,
+            Created = createdDate?.ToUniversalTime() ?? DateTime.UtcNow,
+            CreatedById = createdById,
+        };
+
+        contentDbContext.UserPublicationRoles.Add(newUserPublicationRole);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
+
+        return newUserPublicationRole;
+    }
+
+    public async Task CreateManyIfNotExists(
+        IReadOnlyList<UserPublicationRole> userPublicationRoles,
+        CancellationToken cancellationToken = default
+    )
     {
         var newUserPublicationRoles = await userPublicationRoles
             .ToAsyncEnumerable()
@@ -24,122 +48,89 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext)
                     role: userPublicationRole.Role
                 )
             )
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
-        await contentDbContext.UserPublicationRoles.AddRangeAsync(newUserPublicationRoles);
-        await contentDbContext.SaveChangesAsync();
+        contentDbContext.UserPublicationRoles.AddRange(newUserPublicationRoles);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    protected override IQueryable<UserPublicationRole> GetResourceRolesQueryByResourceId(Guid publicationId)
-    {
-        return ContentDbContext.UserPublicationRoles.Where(role => role.PublicationId == publicationId);
-    }
-
-    protected override IQueryable<UserPublicationRole> GetResourceRolesQueryByResourceIds(List<Guid> publicationIds)
-    {
-        return ContentDbContext.UserPublicationRoles.Where(role => publicationIds.Contains(role.PublicationId));
-    }
-
-    public async Task<List<PublicationRole>> ListDistinctRolesByUser(Guid userId, bool includeInactiveUsers = false)
-    {
-        var query = includeInactiveUsers
-            ? ContentDbContext.UserPublicationRoles
-            : ContentDbContext.ActiveUserPublicationRoles;
-
-        return await query.Where(r => r.UserId == userId).Select(r => r.Role).Distinct().ToListAsync();
-    }
-
-    public async Task<List<PublicationRole>> ListRolesByUserAndPublication(
-        Guid userId,
-        Guid publicationId,
-        bool includeInactiveUsers = false
-    )
-    {
-        var query = includeInactiveUsers
-            ? ContentDbContext.UserPublicationRoles
-            : ContentDbContext.ActiveUserPublicationRoles;
-
-        return await query
-            .Where(r => r.UserId == userId)
-            .Where(upr => upr.PublicationId == publicationId)
-            .Select(r => r.Role)
-            .Distinct()
-            .ToListAsync();
-    }
-
-    public async Task<List<UserPublicationRole>> ListRolesForUser(
-        Guid userId,
-        bool includeInactiveUsers = false,
-        params PublicationRole[] rolesToInclude
-    )
-    {
-        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<PublicationRole>();
-
-        var query = includeInactiveUsers
-            ? ContentDbContext.UserPublicationRoles
-            : ContentDbContext.ActiveUserPublicationRoles;
-
-        return await query
-            .Where(upr => upr.UserId == userId)
-            .Where(upr => rolesToCheck.Contains(upr.Role))
-            .ToListAsync();
-    }
-
-    public async Task<List<UserPublicationRole>> ListRolesForPublication(
-        Guid publicationId,
-        bool includeInactiveUsers = false,
-        params PublicationRole[] rolesToInclude
-    )
-    {
-        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<PublicationRole>();
-
-        var query = includeInactiveUsers
-            ? ContentDbContext.UserPublicationRoles
-            : ContentDbContext.ActiveUserPublicationRoles;
-
-        return await query
-            .Include(upr => upr.User)
-            .Where(upr => upr.PublicationId == publicationId)
-            .Where(upr => rolesToCheck.Contains(upr.Role))
-            .ToListAsync();
-    }
+    public IQueryable<UserPublicationRole> Query(bool includeInactiveUsers = false) =>
+        includeInactiveUsers ? contentDbContext.UserPublicationRoles : contentDbContext.ActiveUserPublicationRoles;
 
     public async Task<UserPublicationRole?> GetUserPublicationRole(
         Guid userId,
         Guid publicationId,
-        PublicationRole role
+        PublicationRole role,
+        CancellationToken cancellationToken = default
     )
     {
-        return await GetResourceRole(userId, publicationId, role);
-    }
-
-    public async Task<bool> UserHasRoleOnPublication(Guid userId, Guid publicationId, PublicationRole role)
-    {
-        return await UserHasRoleOnResource(userId, publicationId, role);
+        return await Query()
+            .WhereForUser(userId)
+            .WhereForPublication(publicationId)
+            .WhereRolesIn(role)
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
     public async Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default)
     {
-        ContentDbContext.UserPublicationRoles.Remove(userPublicationRole);
+        contentDbContext.UserPublicationRoles.Remove(userPublicationRole);
 
-        await ContentDbContext.SaveChangesAsync(cancellationToken);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public new async Task RemoveMany(
+    public async Task RemoveMany(
         IReadOnlyList<UserPublicationRole> userPublicationRoles,
         CancellationToken cancellationToken = default
     )
     {
-        await base.RemoveMany(userPublicationRoles, cancellationToken);
+        if (!userPublicationRoles.Any())
+        {
+            return;
+        }
+
+        contentDbContext.UserPublicationRoles.RemoveRange(userPublicationRoles);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default)
     {
-        var userPublicationRoles = await ContentDbContext
+        var userPublicationRoles = await contentDbContext
             .UserPublicationRoles.Where(urr => urr.UserId == userId)
             .ToListAsync(cancellationToken);
 
-        await base.RemoveMany(userPublicationRoles, cancellationToken);
+        await RemoveMany(userPublicationRoles, cancellationToken);
+    }
+
+    public async Task<bool> UserHasRoleOnPublication(
+        Guid userId,
+        Guid publicationId,
+        PublicationRole role,
+        bool includeInactiveUsers = false,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await Query(includeInactiveUsers)
+            .WhereForUser(userId)
+            .WhereForPublication(publicationId)
+            .WhereRolesIn(role)
+            .AnyAsync(cancellationToken);
+    }
+
+    public async Task<bool> UserHasAnyRoleOnPublication(
+        Guid userId,
+        Guid publicationId,
+        bool includeInactiveUsers = false,
+        CancellationToken cancellationToken = default,
+        params PublicationRole[] rolesToInclude
+    )
+    {
+        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<PublicationRole>();
+
+        return await Query(includeInactiveUsers)
+            .WhereForUser(userId)
+            .WhereForPublication(publicationId)
+            .WhereRolesIn(rolesToCheck)
+            .AnyAsync(cancellationToken);
     }
 
     // The optional 'emailSent' date parameter will be removed in EES-6511 when we stop using UserReleaseRoleInvites/UserPublicationRoleInvites
@@ -156,7 +147,8 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext)
         var userPublicationRole = await GetUserPublicationRole(
             userId: userId,
             publicationId: publicationId,
-            role: role
+            role: role,
+            cancellationToken: cancellationToken
         );
 
         if (userPublicationRole is null)
@@ -168,6 +160,6 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext)
 
         userPublicationRole.EmailSent = emailSent?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
 
-        await ContentDbContext.SaveChangesAsync(cancellationToken);
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 }

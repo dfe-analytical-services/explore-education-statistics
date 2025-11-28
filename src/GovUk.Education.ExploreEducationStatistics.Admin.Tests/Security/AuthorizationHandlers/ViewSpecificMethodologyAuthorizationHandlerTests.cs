@@ -264,7 +264,11 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
 
             userReleaseRoleRepository
                 .Setup(s =>
-                    s.HasUserReleaseRole(UserId, preReleaseForConnectedPublication.Id, ReleaseRole.PrereleaseViewer)
+                    s.UserHasRoleOnReleaseVersion(
+                        UserId,
+                        preReleaseForConnectedPublication.Id,
+                        ReleaseRole.PrereleaseViewer
+                    )
                 )
                 .ReturnsAsync(true);
 
@@ -344,7 +348,11 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
 
             userReleaseRoleRepository
                 .Setup(s =>
-                    s.HasUserReleaseRole(UserId, preReleaseForConnectedPublication.Id, ReleaseRole.PrereleaseViewer)
+                    s.UserHasRoleOnReleaseVersion(
+                        UserId,
+                        preReleaseForConnectedPublication.Id,
+                        ReleaseRole.PrereleaseViewer
+                    )
                 )
                 .ReturnsAsync(true);
 
