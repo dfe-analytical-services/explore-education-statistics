@@ -48,7 +48,7 @@ public class MakeAmendmentOfSpecificReleaseAuthorizationHandler
         }
 
         if (
-            await _authorizationHandlerService.HasRolesOnPublication(
+            await _authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
                 context.User.GetUserId(),
                 releaseVersion.PublicationId,
                 Owner

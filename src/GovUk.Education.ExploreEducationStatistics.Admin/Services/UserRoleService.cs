@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -205,8 +206,20 @@ public class UserRoleService(
 
     private async Task<List<string>> GetRequiredGlobalRoleNamesForResourceRoles(ApplicationUser user)
     {
-        var releaseRoles = await userReleaseRoleRepository.ListDistinctRolesByUser(Guid.Parse(user.Id));
-        var publicationRoles = await userPublicationRoleRepository.ListDistinctRolesByUser(Guid.Parse(user.Id));
+        var releaseRoles = await userReleaseRoleRepository
+            .Query()
+            .WhereForUser(Guid.Parse(user.Id))
+            .Select(upr => upr.Role)
+            .Distinct()
+            .ToListAsync();
+
+        var publicationRoles = await userPublicationRoleRepository
+            .Query()
+            .WhereForUser(Guid.Parse(user.Id))
+            .Select(upr => upr.Role)
+            .Distinct()
+            .ToListAsync();
+
         var requiredGlobalRoleNames = releaseRoles
             .Select(GetAssociatedGlobalRoleNameForReleaseRole)
             .Concat(publicationRoles.Select(GetAssociatedGlobalRoleNameForPublicationRole))
@@ -507,7 +520,7 @@ public class UserRoleService(
         ReleaseRole role
     )
     {
-        if (await userReleaseRoleRepository.HasUserReleaseRole(userId, releaseVersionId, role))
+        if (await userReleaseRoleRepository.UserHasRoleOnReleaseVersion(userId, releaseVersionId, role))
         {
             return ValidationActionResult(UserAlreadyHasResourceRole);
         }

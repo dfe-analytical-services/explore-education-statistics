@@ -10,76 +10,53 @@ public interface IUserReleaseRoleRepository
         Guid releaseVersionId,
         ReleaseRole role,
         Guid createdById,
-        DateTime? createdDate = null
+        DateTime? createdDate = null,
+        CancellationToken cancellationToken = default
     );
 
-    Task<UserReleaseRole> CreateIfNotExists(Guid userId, Guid releaseVersionId, ReleaseRole role, Guid createdById);
+    Task CreateManyIfNotExists(
+        IReadOnlyList<UserReleaseRole> userReleaseRoles,
+        CancellationToken cancellationToken = default
+    );
 
-    Task CreateManyIfNotExists(IReadOnlyList<UserReleaseRole> userReleaseRoles);
-
-    Task CreateManyIfNotExists(List<Guid> userIds, Guid releaseVersionId, ReleaseRole role, Guid createdById);
-
-    Task CreateManyIfNotExists(Guid userId, List<Guid> releaseVersionIds, ReleaseRole role, Guid createdById);
-
-    Task<List<ReleaseRole>> ListDistinctRolesByUser(Guid userId, bool includeInactiveUsers = false);
-
-    Task<List<ReleaseRole>> ListRolesByUserAndReleaseVersion(
+    Task<UserReleaseRole?> GetUserReleaseRole(
         Guid userId,
         Guid releaseVersionId,
-        bool includeInactiveUsers = false
+        ReleaseRole role,
+        CancellationToken cancellationToken = default
     );
 
-    Task<List<ReleaseRole>> ListRolesByUserAndPublication(
-        Guid userId,
-        Guid publicationId,
-        bool includeInactiveUsers = false
-    );
-
-    Task<List<UserReleaseRole>> ListRolesForUser(
-        Guid userId,
-        bool includeInactiveUsers = false,
-        params ReleaseRole[] rolesToInclude
-    );
-
-    Task<List<UserReleaseRole>> ListRolesForReleaseVersion(
-        Guid releaseVersionId,
-        bool includeInactiveUsers = false,
-        params ReleaseRole[] rolesToInclude
-    );
-
-    Task<bool> HasUserReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role);
+    IQueryable<UserReleaseRole> Query(bool includeInactiveUsers = false);
 
     Task Remove(UserReleaseRole userReleaseRole, CancellationToken cancellationToken = default);
 
     Task RemoveMany(IReadOnlyList<UserReleaseRole> userReleaseRoles, CancellationToken cancellationToken = default);
 
-    Task RemoveForPublication(
-        Guid publicationId,
-        CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude
-    );
-
-    Task RemoveForPublicationAndUser(
-        Guid publicationId,
-        Guid userId,
-        CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude
-    );
-
-    Task RemoveForReleaseVersion(
-        Guid releaseVersionId,
-        CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude
-    );
-
-    Task RemoveForReleaseVersionAndUser(
-        Guid releaseVersionId,
-        Guid userId,
-        CancellationToken cancellationToken = default,
-        params ReleaseRole[] rolesToInclude
-    );
-
     Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default);
+
+    Task<bool> UserHasRoleOnReleaseVersion(
+        Guid userId,
+        Guid releaseVersionId,
+        ReleaseRole role,
+        bool includeInactiveUsers = false,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<bool> UserHasAnyRoleOnReleaseVersion(
+        Guid userId,
+        Guid releaseVersionId,
+        bool includeInactiveUsers = false,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude
+    );
+
+    Task<bool> UserHasAnyRoleOnPublication(
+        Guid userId,
+        Guid publicationId,
+        bool includeInactiveUsers = false,
+        CancellationToken cancellationToken = default,
+        params ReleaseRole[] rolesToInclude
+    );
 
     Task MarkEmailAsSent(
         Guid userId,

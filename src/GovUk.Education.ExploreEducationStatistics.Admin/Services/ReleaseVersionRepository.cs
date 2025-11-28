@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -37,18 +38,18 @@ public class ReleaseVersionRepository(
             .Except([ReleaseRole.PrereleaseViewer])
             .ToArray();
 
-        var releaseRoleReleaseVersionIds = (
-            await userReleaseRoleRepository.ListRolesForUser(
-                userId: userId,
-                rolesToInclude: allReleaseRolesExcludingPrerelease
-            )
-        )
-            .Select(upr => upr.ReleaseVersionId)
-            .ToList();
+        var releaseRoleReleaseVersionIds = await userReleaseRoleRepository
+            .Query()
+            .WhereForUser(userId)
+            .WhereRolesIn(allReleaseRolesExcludingPrerelease)
+            .Select(urr => urr.ReleaseVersionId)
+            .ToListAsync();
 
-        var publicationRolePublicationIds = (await userPublicationRoleRepository.ListRolesForUser(userId))
+        var publicationRolePublicationIds = await userPublicationRoleRepository
+            .Query()
+            .WhereForUser(userId)
             .Select(upr => upr.PublicationId)
-            .ToList();
+            .ToListAsync();
 
         var publicationRoleReleaseVersionIds = await contentDbContext
             .ReleaseVersions.Where(rv => publicationRolePublicationIds.Contains(rv.Release.PublicationId))

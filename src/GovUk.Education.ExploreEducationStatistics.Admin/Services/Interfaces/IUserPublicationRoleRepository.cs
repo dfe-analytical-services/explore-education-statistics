@@ -10,34 +10,23 @@ public interface IUserPublicationRoleRepository
         Guid publicationId,
         PublicationRole role,
         Guid createdById,
-        DateTime? createdDate = null
+        DateTime? createdDate = null,
+        CancellationToken cancellationToken = default
     );
 
-    Task CreateManyIfNotExists(IReadOnlyList<UserPublicationRole> userPublicationRoles);
+    Task CreateManyIfNotExists(
+        IReadOnlyList<UserPublicationRole> userPublicationRoles,
+        CancellationToken cancellationToken = default
+    );
 
-    Task<List<PublicationRole>> ListDistinctRolesByUser(Guid userId, bool includeInactiveUsers = false);
-
-    Task<List<PublicationRole>> ListRolesByUserAndPublication(
+    Task<UserPublicationRole?> GetUserPublicationRole(
         Guid userId,
         Guid publicationId,
-        bool includeInactiveUsers = false
+        PublicationRole role,
+        CancellationToken cancellationToken = default
     );
 
-    Task<List<UserPublicationRole>> ListRolesForUser(
-        Guid userId,
-        bool includeInactiveUsers = false,
-        params PublicationRole[] rolesToInclude
-    );
-
-    Task<List<UserPublicationRole>> ListRolesForPublication(
-        Guid publicationId,
-        bool includeInactiveUsers = false,
-        params PublicationRole[] rolesToInclude
-    );
-
-    Task<UserPublicationRole?> GetUserPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
-
-    Task<bool> UserHasRoleOnPublication(Guid userId, Guid publicationId, PublicationRole role);
+    IQueryable<UserPublicationRole> Query(bool includeInactiveUsers = false);
 
     Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default);
 
@@ -47,6 +36,22 @@ public interface IUserPublicationRoleRepository
     );
 
     Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default);
+
+    Task<bool> UserHasRoleOnPublication(
+        Guid userId,
+        Guid publicationId,
+        PublicationRole role,
+        bool includeInactiveUsers = false,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<bool> UserHasAnyRoleOnPublication(
+        Guid userId,
+        Guid publicationId,
+        bool includeInactiveUsers = false,
+        CancellationToken cancellationToken = default,
+        params PublicationRole[] rolesToInclude
+    );
 
     Task MarkEmailAsSent(
         Guid userId,

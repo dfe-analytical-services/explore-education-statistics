@@ -8,8 +8,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Security;
 
@@ -172,15 +174,19 @@ public class PermissionsController(
 
     private async Task<bool> IsReleaseApprover()
     {
-        return (await userReleaseRoleRepository.ListDistinctRolesByUser(userService.GetUserId())).Contains(
-            ReleaseRole.Approver
-        );
+        return await userReleaseRoleRepository
+            .Query()
+            .WhereForUser(userService.GetUserId())
+            .WhereRolesIn(ReleaseRole.Approver)
+            .AnyAsync();
     }
 
     private async Task<bool> IsPublicationApprover()
     {
-        return (await userPublicationRoleRepository.ListDistinctRolesByUser(userService.GetUserId())).Contains(
-            PublicationRole.Allower
-        );
+        return await userPublicationRoleRepository
+            .Query()
+            .WhereForUser(userService.GetUserId())
+            .WhereRolesIn(PublicationRole.Allower)
+            .AnyAsync();
     }
 }

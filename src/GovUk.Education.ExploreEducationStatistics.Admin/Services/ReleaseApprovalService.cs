@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -168,10 +169,12 @@ public class ReleaseApprovalService(
             rolesToInclude: [ReleaseRole.Approver]
         );
 
-        var userPublicationRoles = await userPublicationRoleRepository.ListRolesForPublication(
-            publicationId: releaseVersion.Release.PublicationId,
-            rolesToInclude: [PublicationRole.Allower]
-        );
+        var userPublicationRoles = await userPublicationRoleRepository
+            .Query()
+            .WhereForPublication(releaseVersion.Release.PublicationId)
+            .WhereRolesIn(PublicationRole.Allower)
+            .Include(upr => upr.User)
+            .ToListAsync();
 
         var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();
 

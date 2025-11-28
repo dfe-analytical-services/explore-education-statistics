@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -266,10 +267,13 @@ public class ReleaseVersionService(
     private async Task RemoveRoles(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
     {
         // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
-        await userReleaseRoleRepository.RemoveForReleaseVersion(
-            releaseVersionId: releaseVersion.Id,
-            cancellationToken: cancellationToken
-        );
+
+        var releaseRolesToRemove = await userReleaseRoleRepository
+            .Query(includeInactiveUsers: true)
+            .WhereForReleaseVersion(releaseVersion.Id)
+            .ToListAsync(cancellationToken);
+
+        await userReleaseRoleRepository.RemoveMany(releaseRolesToRemove, cancellationToken);
     }
 
     private async Task DeleteReleaseSeriesItem(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
@@ -479,11 +483,12 @@ public class ReleaseVersionService(
     {
         var userId = userService.GetUserId();
 
-        var directReleaseVersionsWithApprovalRole = (
-            await userReleaseRoleRepository.ListRolesForUser(userId: userId, rolesToInclude: ReleaseRole.Approver)
-        )
+        var directReleaseVersionsWithApprovalRole = await userReleaseRoleRepository
+            .Query()
+            .WhereForUser(userId)
+            .WhereRolesIn(ReleaseRole.Approver)
             .Select(urr => urr.ReleaseVersionId)
-            .ToList();
+            .ToListAsync();
 
         var indirectReleaseVersionsWithApprovalRole = await context
             .ActiveUserPublicationRoles.Where(upr => upr.UserId == userId)

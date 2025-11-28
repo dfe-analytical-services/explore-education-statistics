@@ -5,6 +5,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
+using LinqToDB;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -25,14 +27,15 @@ public class UserResourceRoleNotificationService(
             throw new ArgumentException($"User with ID {userId} is already active and does not need notifying.");
         }
 
-        var userReleaseRoles = await userReleaseRoleRepository.ListRolesForUser(
-            userId: user!.Id,
-            includeInactiveUsers: true
-        );
-        var userPublicationRoles = await userPublicationRoleRepository.ListRolesForUser(
-            userId: user.Id,
-            includeInactiveUsers: true
-        );
+        var userReleaseRoles = await userReleaseRoleRepository
+            .Query(includeInactiveUsers: true)
+            .WhereForUser(user.Id)
+            .ToListAsync(cancellationToken);
+
+        var userPublicationRoles = await userPublicationRoleRepository
+            .Query(includeInactiveUsers: true)
+            .WhereForUser(user.Id)
+            .ToListAsync(cancellationToken);
 
         var userReleaseRoleIds = userReleaseRoles.Select(urr => urr.Id).ToHashSet();
         var userPublicationRoleIds = userPublicationRoles.Select(urr => urr.Id).ToHashSet();

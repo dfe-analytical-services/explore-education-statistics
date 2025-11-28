@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
@@ -62,11 +63,15 @@ public class ReleaseInviteService(
             .OnSuccessDo(tuple => userService.CheckCanUpdateReleaseRole(tuple.publication, releaseRole))
             .OnSuccess(async tuple =>
             {
-                await userReleaseRoleRepository.RemoveForPublicationAndUser(
-                    publicationId: publicationId,
-                    userId: tuple.user.Id,
-                    rolesToInclude: releaseRole
-                );
+                var releaseRolesToRemove = await userReleaseRoleRepository
+                    .Query(includeInactiveUsers: true)
+                    .WhereForUser(tuple.user.Id)
+                    .WhereForPublication(publicationId)
+                    .WhereRolesIn(releaseRole)
+                    .ToListAsync();
+
+                await userReleaseRoleRepository.RemoveMany(releaseRolesToRemove);
+
                 return Unit.Instance;
             });
     }

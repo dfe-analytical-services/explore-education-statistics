@@ -38,7 +38,7 @@ public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler
                 context.User.GetUserId(),
                 releaseVersion.PublicationId,
                 releaseVersion.Id,
-                ListOf(PublicationRole.Owner, PublicationRole.Allower),
+                SetOf(PublicationRole.Owner, PublicationRole.Allower),
                 ReleaseEditorAndApproverRoles
             )
         )

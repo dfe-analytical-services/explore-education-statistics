@@ -39,7 +39,7 @@ public class DropMethodologyLinkAuthorizationHandler
         }
 
         if (
-            await _authorizationHandlerService.HasRolesOnPublication(
+            await _authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
                 context.User.GetUserId(),
                 link.PublicationId,
                 Owner

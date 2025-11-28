@@ -46,7 +46,7 @@ public class ViewSpecificPublicationAuthorizationHandler
 
         // If the user has any PublicationRole on the Publication, they can see it.
         if (
-            await _authorizationHandlerService.HasRolesOnPublication(
+            await _authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
                 context.User.GetUserId(),
                 publication.Id,
                 [.. validPublicationRoles]
