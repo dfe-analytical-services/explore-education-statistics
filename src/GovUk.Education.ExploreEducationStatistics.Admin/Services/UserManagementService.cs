@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -195,9 +196,10 @@ public class UserManagementService(
                     .ToAsyncEnumerable()
                     .SelectAwait(async pendingUserInvite =>
                     {
-                        var userReleaseRoles = await contentDbContext
-                            .UserReleaseRoles.AsNoTracking()
-                            .Where(urr => urr.UserId == pendingUserInvite.Id)
+                        var userReleaseRoles = await userReleaseRoleRepository
+                            .Query(includeInactiveUsers: true)
+                            .AsNoTracking()
+                            .WhereForUser(pendingUserInvite.Id)
                             .Select(urr => new UserReleaseRoleViewModel
                             {
                                 Id = urr.Id,
@@ -207,9 +209,10 @@ public class UserManagementService(
                             })
                             .ToListAsync();
 
-                        var userPublicationRoles = await contentDbContext
-                            .UserPublicationRoles.AsNoTracking()
-                            .Where(upr => upr.UserId == pendingUserInvite.Id)
+                        var userPublicationRoles = await userPublicationRoleRepository
+                            .Query(includeInactiveUsers: true)
+                            .AsNoTracking()
+                            .WhereForUser(pendingUserInvite.Id)
                             .Select(upr => new UserPublicationRoleViewModel
                             {
                                 Id = upr.Id,
