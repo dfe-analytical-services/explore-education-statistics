@@ -19,4 +19,13 @@ public static class UserReleaseRoleQueries
         this IQueryable<UserReleaseRole> query,
         params ReleaseRole[] roles
     ) => query.Where(upr => roles.Contains(upr.Role));
+
+    public static IQueryable<UserReleaseRole> WhereUserIsActive(this IQueryable<UserReleaseRole> query) =>
+        query.Where(upr => upr.User.Active);
+
+    public static IQueryable<UserReleaseRole> WhereUserHasPendingInvite(this IQueryable<UserReleaseRole> query) =>
+        query
+            .Where(upr => !upr.User.Active)
+            .Where(upr => !upr.User.SoftDeleted.HasValue)
+            .Where(upr => upr.User.Created >= DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays));
 }
