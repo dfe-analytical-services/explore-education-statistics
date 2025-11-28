@@ -16,7 +16,9 @@ public class EmailTemplateService(
     IPreReleaseService preReleaseService,
     IEmailService emailService,
     IOptions<AppOptions> appOptions,
-    IOptions<NotifyOptions> notifyOptions
+    IOptions<NotifyOptions> notifyOptions,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
+    IUserReleaseRoleRepository userReleaseRoleRepository
 ) : IEmailTemplateService
 {
     public async Task<Either<ActionResult, Unit>> SendInviteEmail(
@@ -229,21 +231,21 @@ public class EmailTemplateService(
 
     private async Task<List<UserReleaseRole>> GetUserReleaseRoles(HashSet<Guid> userReleaseRoleIds)
     {
-        return await contentDbContext
-            .UserReleaseRoles.AsNoTracking()
+        return await userReleaseRoleRepository
+            .Query(includeInactiveUsers: true)
+            .Where(urr => userReleaseRoleIds.Contains(urr.Id))
             .Include(urr => urr.ReleaseVersion)
             .ThenInclude(rv => rv.Release)
             .ThenInclude(r => r.Publication)
-            .Where(urr => userReleaseRoleIds.Contains(urr.Id))
             .ToListAsync();
     }
 
     private async Task<List<UserPublicationRole>> GetUserPublicationRoles(HashSet<Guid> userPublicationRoleIds)
     {
-        return await contentDbContext
-            .UserPublicationRoles.AsNoTracking()
-            .Include(upr => upr.Publication)
+        return await userPublicationRoleRepository
+            .Query(includeInactiveUsers: true)
             .Where(upr => userPublicationRoleIds.Contains(upr.Id))
+            .Include(upr => upr.Publication)
             .ToListAsync();
     }
 
