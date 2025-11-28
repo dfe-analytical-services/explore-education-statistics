@@ -69,11 +69,13 @@ public class ReleaseVersionService(
             .Include(rv => rv.ReleaseStatuses)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanViewReleaseVersion)
-            .OnSuccess(releaseVersion =>
+            .OnSuccess(async releaseVersion =>
             {
-                var prereleaseRolesAdded = context.UserReleaseRoles.Any(role =>
-                    role.ReleaseVersionId == releaseVersionId && role.Role == ReleaseRole.PrereleaseViewer
-                );
+                var prereleaseRolesAdded = await userReleaseRoleRepository
+                    .Query(includeInactiveUsers: true)
+                    .WhereForReleaseVersion(releaseVersionId)
+                    .WhereRolesIn(ReleaseRole.PrereleaseViewer)
+                    .AnyAsync();
 
                 return mapper.Map<ReleaseVersionViewModel>(releaseVersion) with
                 {
