@@ -83,12 +83,4 @@ export default class UkTimeHelper {
 
     return { startDate, endDate };
   }
-
-  public static todayStartOfDayUk(): Date {
-    return this.toUkStartOfDay(new Date());
-  }
-
-  public static todayEndOfDayUk(): Date {
-    return this.toUkEndOfDay(new Date());
-  }
 }

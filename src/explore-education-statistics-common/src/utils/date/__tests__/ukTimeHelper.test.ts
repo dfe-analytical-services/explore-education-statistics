@@ -18,7 +18,7 @@ describe('UkTimeHelper', () => {
   });
 
   test('should return today midnight in UK', () => {
-    const result = UkTimeHelper.todayStartOfDayUk();
+    const result = UkTimeHelper.toUkStartOfDay(new Date());
 
     expect(result.toISOString()).toMatch(
       /^\d{4}-\d{2}-\d{2}T00:00:00.000(Z|[+-]\d{2}:\d{2})$/,
@@ -26,7 +26,7 @@ describe('UkTimeHelper', () => {
   });
 
   test('should return today midnight in UK', () => {
-    const result = UkTimeHelper.todayEndOfDayUk();
+    const result = UkTimeHelper.toUkEndOfDay(new Date());
 
     expect(result.toISOString()).toMatch(
       /^\d{4}-\d{2}-\d{2}T23:59:59.000(Z|[+-]\d{2}:\d{2})$/,

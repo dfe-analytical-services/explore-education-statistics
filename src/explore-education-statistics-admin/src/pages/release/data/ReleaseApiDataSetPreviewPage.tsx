@@ -122,19 +122,6 @@ export default function ReleaseApiDataSetPreviewPage() {
                 </Button>
               }
             >
-              <p>
-                Preview tokens are valid for <strong>24 hours</strong> by
-                default to meet pre-release access needs.
-              </p>
-              <p>
-                If you require a longer duration preview token for testing of
-                secondary products such as data dashboards, contact{' '}
-                <a href="mailto:explore.statistics@education.gov.uk">
-                  {' '}
-                  explore.statistics@education.gov.uk
-                </a>
-                .
-              </p>
               <ApiDataSetPreviewTokenCreateForm
                 onCancel={toggleModalOpen.off}
                 onSubmit={handleCreate}

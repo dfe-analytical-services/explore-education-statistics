@@ -86,7 +86,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
               test(value) {
                 if (value == null) return false;
                 const activatesMidnightUk = UkTimeHelper.toUkStartOfDay(value);
-                const todayMidnightUk = UkTimeHelper.todayStartOfDayUk();
+                const todayMidnightUk = UkTimeHelper.toUkStartOfDay(new Date());
                 return !isBefore(activatesMidnightUk, todayMidnightUk);
               },
             })
@@ -97,7 +97,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
                 if (value == null) return false;
                 // Start of activates day in UK (UTC instant)
                 const todayMidnightUk = new Date(
-                  UkTimeHelper.todayStartOfDayUk(),
+                  UkTimeHelper.toUkStartOfDay(new Date()),
                 );
                 const activatesMidnightUk = UkTimeHelper.toUkStartOfDay(value);
 
@@ -119,13 +119,13 @@ export default function ApiDataSetPreviewTokenCreateForm({
               const activates = context.parent.activates as Date | null;
               if (!activates || !value) return false;
 
-              const activatesStartOfDayUtc =
+              const activatesMidnightUk =
                 UkTimeHelper.toUkStartOfDay(activates);
 
               return (
                 value >= activates &&
                 value <=
-                  UkTimeHelper.getDateRangeFromDate(7, activatesStartOfDayUtc)
+                  UkTimeHelper.getDateRangeFromDate(7, activatesMidnightUk)
                     .endDate
               );
             },
@@ -192,7 +192,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
                       conditional: (
                         <>
                           <FormFieldDateInput<FormValues>
-                            hint="The date the preview token activates for use"
+                            hint="The date the preview token activates for use. This can not be more than 7 days from today."
                             legend="Activates on"
                             legendSize="s"
                             name="activates"
@@ -200,7 +200,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
                           />
                           <br />
                           <FormFieldDateInput<FormValues>
-                            hint="The date the preview token expires"
+                            hint="The date the preview token expires. This can not be more than 7 days from activates on date."
                             legend="Expires on"
                             legendSize="s"
                             name="expires"

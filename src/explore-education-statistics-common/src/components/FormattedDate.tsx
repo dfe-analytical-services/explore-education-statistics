@@ -7,6 +7,7 @@ import {
 } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 import React from 'react';
+import { enGB } from 'date-fns/locale';
 
 interface Props {
   children: Date | number | string;
@@ -40,12 +41,27 @@ const FormattedDate = ({
     return null;
   }
 
+  const formatRelativeLocale = {
+    lastWeek: "'Last' eeee",
+    yesterday: "'Yesterday'",
+    today: "'Today'",
+    tomorrow: "'Tomorrow'",
+    nextWeek: "'Next' eeee",
+  };
+  const locale = {
+    ...enGB,
+    formatRelative: (token: string | number) =>
+      formatRelativeLocale[token as keyof typeof formatRelativeLocale] ||
+      format,
+  };
   const dateFormattedRelativeToNow = usingGmt
     ? formatRelative(
         toZonedTime(parsedDate, 'Europe/London'),
         toZonedTime(new Date(), 'Europe/London'),
+        { locale },
       )
-    : formatRelative(parsedDate, new Date());
+    : formatRelative(parsedDate, new Date(), { locale });
+
   const dateFormatted = usingGmt
     ? formatter(toZonedTime(parsedDate, 'Europe/London'), format)
     : formatter(parsedDate, format);
