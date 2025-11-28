@@ -36,4 +36,16 @@ public static class UserReleaseRoleQueries
             .Where(upr => !upr.User.Active)
             .Where(upr => !upr.User.SoftDeleted.HasValue)
             .Where(upr => upr.User.Created >= DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays));
+
+    public static IQueryable<UserReleaseRole> WhereUserIsActiveOrHasPendingInvite(
+        this IQueryable<UserReleaseRole> query
+    ) =>
+        query.Where(upr =>
+            upr.User.Active
+            || (
+                !upr.User.Active
+                && !upr.User.SoftDeleted.HasValue
+                && upr.User.Created >= DateTimeOffset.UtcNow.AddDays(-User.InviteExpiryDurationDays)
+            )
+        );
 }

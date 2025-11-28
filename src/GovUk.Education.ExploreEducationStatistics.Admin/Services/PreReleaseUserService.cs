@@ -34,17 +34,14 @@ public class PreReleaseUserService(
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
             .OnSuccess(async _ =>
-            {
-                var emailsWithPrereleaseRole = await context
-                    .UserReleaseRoles.Where(r => r.ReleaseVersionId == releaseVersionId)
-                    .Where(r => r.Role == ReleaseRole.PrereleaseViewer)
-                    .Select(r => r.User.Email.ToLower())
+                await context
+                    .UserReleaseRolesForActiveOrPending.WhereForReleaseVersion(releaseVersionId)
+                    .WhereRolesIn(ReleaseRole.PrereleaseViewer)
+                    .Select(r => new PreReleaseUserViewModel(r.User.Email.ToLower()))
                     .Distinct()
-                    .Order()
-                    .ToListAsync();
-
-                return emailsWithPrereleaseRole.Select(email => new PreReleaseUserViewModel(email)).ToList();
-            });
+                    .OrderBy(a => a.Email)
+                    .ToListAsync()
+            );
     }
 
     public async Task<Either<ActionResult, PreReleaseUserInvitePlan>> GetPreReleaseUsersInvitePlan(
