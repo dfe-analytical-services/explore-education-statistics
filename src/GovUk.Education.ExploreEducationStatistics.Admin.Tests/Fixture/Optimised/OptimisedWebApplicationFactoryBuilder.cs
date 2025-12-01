@@ -37,8 +37,6 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
         return factory.WithWebHostBuilder(builder =>
         {
             builder
-                // TODO EES-6450 - why did I remove this?
-                // .UseStartup<TStartup>()
                 .UseIntegrationTestEnvironment()
                 .UseTestServer()
                 .ConfigureServices(services =>
