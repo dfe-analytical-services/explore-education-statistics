@@ -23,7 +23,7 @@ import UkTimeHelper from '@common/utils/date/ukTimeHelper';
 
 interface FormValues extends PreviewTokenCreateValues {
   agreeTerms: boolean;
-  selectionMethod?: 'presetDays' | 'customDates';
+  selectionMethod?: 'presetDays' | 'customDates' | 'oneDay';
 }
 
 interface Props {
@@ -132,12 +132,17 @@ export default function ApiDataSetPreviewTokenCreateForm({
           }),
       }),
       selectionMethod: Yup.string()
-        .oneOf(['presetDays', 'customDates'] as const)
-        .notRequired() as Schema<'presetDays' | 'customDates' | undefined>,
+        .oneOf(['presetDays', 'customDates', 'oneDay'] as const)
+        .notRequired() as Schema<
+        'presetDays' | 'customDates' | 'oneDay' | undefined
+      >,
     });
   }, []);
   return (
-    <FormProvider validationSchema={validationSchema}>
+    <FormProvider
+      initialValues={{ selectionMethod: 'oneDay' }}
+      validationSchema={validationSchema}
+    >
       {({ formState }) => {
         return (
           <Form
@@ -172,10 +177,17 @@ export default function ApiDataSetPreviewTokenCreateForm({
                   legend="Select a custom duration"
                   legendSize="s"
                   hint="Select a number of days"
+                  order={[]}
                   options={[
+                    {
+                      label: 'Set the duration to 1 day',
+                      value: 'oneDay',
+                      hint: 'This sets the preview token to expire tomorrow at 23:59:59 UK time.',
+                    },
                     {
                       label: 'Choose number of days',
                       value: 'presetDays',
+                      hint: 'Pick a preset number of days',
                       conditional: (
                         <FormFieldRadioGroup<FormValues>
                           legend="Select a duration"
@@ -188,6 +200,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
                     },
                     {
                       label: 'Enter specific start and end dates',
+                      hint: 'Select a duration of at most 7 days',
                       value: 'customDates',
                       conditional: (
                         <>

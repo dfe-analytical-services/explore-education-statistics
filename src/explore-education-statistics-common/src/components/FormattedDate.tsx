@@ -16,7 +16,7 @@ interface Props {
   formatRelativeToNow?: boolean;
   testId?: string;
   parseFormat?: string;
-  usingGmt?: boolean;
+  usingUkTime?: boolean;
 }
 
 const FormattedDate = ({
@@ -26,7 +26,7 @@ const FormattedDate = ({
   formatRelativeToNow = false,
   testId,
   parseFormat,
-  usingGmt = false,
+  usingUkTime = false,
 }: Props) => {
   let parsedDate: Date;
   if (typeof children === 'string') {
@@ -54,7 +54,7 @@ const FormattedDate = ({
       formatRelativeLocale[token as keyof typeof formatRelativeLocale] ||
       format,
   };
-  const dateFormattedRelativeToNow = usingGmt
+  const dateFormattedRelativeToNow = usingUkTime
     ? formatRelative(
         toZonedTime(parsedDate, 'Europe/London'),
         toZonedTime(new Date(), 'Europe/London'),
@@ -62,7 +62,7 @@ const FormattedDate = ({
       )
     : formatRelative(parsedDate, new Date(), { locale });
 
-  const dateFormatted = usingGmt
+  const dateFormatted = usingUkTime
     ? formatter(toZonedTime(parsedDate, 'Europe/London'), format)
     : formatter(parsedDate, format);
 

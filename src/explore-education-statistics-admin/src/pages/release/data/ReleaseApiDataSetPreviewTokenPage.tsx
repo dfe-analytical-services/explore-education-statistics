@@ -112,7 +112,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                     <>
                       The token is active from:{' '}
                       <strong>
-                        <FormattedDate usingGmt>
+                        <FormattedDate usingUkTime>
                           {previewToken.activates}
                         </FormattedDate>{' '}
                         (UK time){' '}
@@ -122,7 +122,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
                   )}{' '}
                   <strong>
                     <FormattedDate
-                      usingGmt
+                      usingUkTime
                       formatRelativeToNow={displayActivatedDate}
                     >
                       {previewToken.expires}
