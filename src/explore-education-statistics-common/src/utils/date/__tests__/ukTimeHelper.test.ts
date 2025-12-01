@@ -164,7 +164,7 @@ describe('UkTimeHelper', () => {
     });
   });
 
-  describe('UkTimeHelper.dateTimeInLondonTimeZone — GMT → BST edge cases', () => {
+  describe('UkTimeHelper — GMT → BST edge cases', () => {
     test.each([
       // [inputDateString, expected]
       ['2025-03-30T00:00:00+00:00', '2025-03-30T00:00:00.000Z'],
