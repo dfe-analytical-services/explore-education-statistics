@@ -26,7 +26,7 @@ public interface IMemoryCacheService
         IMemoryCacheKey cacheKey,
         TItem item,
         MemoryCacheConfiguration configuration,
-        DateTime? nowUtc = null
+        DateTimeOffset nowUtc
     );
 
     MemoryCacheServiceOptions? GetMemoryCacheOptions();

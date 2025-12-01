@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class ReleaseApprovalService(
     ContentDbContext context,
-    DateTimeProvider dateTimeProvider,
+    TimeProvider timeProvider,
     IUserService userService,
     IPublishingService publishingService,
     IReleaseChecklistService releaseChecklistService,
@@ -91,7 +91,7 @@ public class ReleaseApprovalService(
                 releaseVersion.UpdatePublishedDate = request.UpdatePublishedDate ?? false;
                 releaseVersion.PublishScheduled =
                     request.PublishMethod == PublishMethod.Immediate
-                        ? dateTimeProvider.UtcNow
+                        ? timeProvider.GetUtcNow().DateTime
                         : request.PublishScheduledDate;
 
                 var releaseStatus = new ReleaseStatus
@@ -300,15 +300,17 @@ public class ReleaseApprovalService(
         var toUtc = fromUtc.AddDays(1).AddTicks(-1);
 
         // The publish date cannot be scheduled if it's already passed
-        if (dateTimeProvider.UtcNow > toUtc)
+        var nowUtc = timeProvider.GetUtcNow().DateTime;
+
+        if (nowUtc > toUtc)
         {
             return false;
         }
 
         // The range should begin now rather than at midnight if the publish date is today
-        if (dateTimeProvider.UtcNow > fromUtc)
+        if (nowUtc > fromUtc)
         {
-            fromUtc = dateTimeProvider.UtcNow;
+            fromUtc = nowUtc;
         }
 
         // Publishing won't occur unless there's an occurrence of (1) between the publishing range

@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
@@ -9,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using NCrontab;
 using Xunit;
@@ -75,7 +75,7 @@ public class ReleaseControllerCachingTests
             publicationCacheService: publicationCacheService.Object,
             releaseCacheService: releaseCacheService.Object,
             memoryCacheService: memoryCacheService.Object,
-            dateTimeProvider: new DateTimeProvider(cachedTime)
+            timeProvider: new FakeTimeProvider(cachedTime)
         );
 
         var result = await controller.GetLatestRelease(PublicationSlug);
@@ -167,7 +167,7 @@ public class ReleaseControllerCachingTests
             publicationCacheService: publicationCacheService.Object,
             releaseCacheService: releaseCacheService.Object,
             memoryCacheService: memoryCacheService.Object,
-            dateTimeProvider: new DateTimeProvider(cachedTime)
+            timeProvider: new FakeTimeProvider(cachedTime)
         );
 
         var result = await controller.GetRelease(PublicationSlug, ReleaseSlug);
@@ -216,7 +216,7 @@ public class ReleaseControllerCachingTests
         IReleaseCacheService? releaseCacheService = null,
         IReleaseService? releaseService = null,
         IMemoryCacheService? memoryCacheService = null,
-        DateTimeProvider? dateTimeProvider = null
+        TimeProvider? timeProvider = null
     )
     {
         return new(
@@ -226,7 +226,7 @@ public class ReleaseControllerCachingTests
             releaseService ?? Mock.Of<IReleaseService>(Strict),
             memoryCacheService ?? Mock.Of<IMemoryCacheService>(Strict),
             logger: Mock.Of<ILogger<ReleaseController>>(),
-            dateTimeProvider: dateTimeProvider ?? new DateTimeProvider(DateTime.UtcNow)
+            timeProvider: timeProvider ?? new FakeTimeProvider(DateTime.UtcNow)
         );
     }
 }

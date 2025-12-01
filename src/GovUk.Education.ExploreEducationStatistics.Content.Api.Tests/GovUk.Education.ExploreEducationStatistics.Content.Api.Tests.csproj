@@ -33,4 +33,9 @@
   <ItemGroup>
     <Folder Include="Controllers\__snapshots__\" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Extensions.TimeProvider.Testing">
+      <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.timeprovider.testing\9.10.0\lib\net8.0\Microsoft.Extensions.TimeProvider.Testing.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

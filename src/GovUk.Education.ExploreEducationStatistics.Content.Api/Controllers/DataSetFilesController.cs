@@ -1,7 +1,6 @@
 #nullable enable
 using System.Net.Mime;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
@@ -20,7 +19,7 @@ public class DataSetFilesController(
     IDataSetFileService dataSetFileService,
     IMemoryCacheService memoryCacheService,
     ILogger<DataSetFilesController> logger,
-    DateTimeProvider dateTimeProvider
+    TimeProvider timeProvider
 ) : ControllerBase
 {
     [HttpGet("data-set-files")]
@@ -50,7 +49,7 @@ public class DataSetFilesController(
                     .HandleFailuresOrOk(),
             durationInSeconds: 10,
             expiryScheduleCron: HalfHourlyExpirySchedule,
-            dateTimeProvider: dateTimeProvider,
+            timeProvider: timeProvider,
             logger: logger
         );
     }

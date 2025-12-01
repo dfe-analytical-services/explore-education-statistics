@@ -72,15 +72,13 @@ public class MemoryCacheService(
         IMemoryCacheKey cacheKey,
         TItem item,
         MemoryCacheConfiguration configuration,
-        DateTime? nowUtc = null
+        DateTimeOffset nowUtc
     )
     {
         try
         {
-            var now = nowUtc ?? DateTime.UtcNow;
-
-            DateTime absoluteExpiryTime;
-            var targetAbsoluteExpiryDateTime = now.AddSeconds(configuration.DurationInSeconds);
+            DateTimeOffset absoluteExpiryTime;
+            var targetAbsoluteExpiryDateTime = nowUtc.AddSeconds(configuration.DurationInSeconds);
 
             if (configuration.ExpirySchedule == null)
             {
@@ -88,7 +86,7 @@ public class MemoryCacheService(
             }
             else
             {
-                var nextExpiryTime = configuration.ExpirySchedule.GetNextOccurrence(now);
+                var nextExpiryTime = configuration.ExpirySchedule.GetNextOccurrence(nowUtc.DateTime);
 
                 absoluteExpiryTime =
                     targetAbsoluteExpiryDateTime < nextExpiryTime ? targetAbsoluteExpiryDateTime : nextExpiryTime;
@@ -99,20 +97,18 @@ public class MemoryCacheService(
             var json = JsonConvert.SerializeObject(item, null, _jsonSerializerSettings);
             var approximateSizeInBytes = Encoding.GetEncoding("utf-8").GetByteCount(json);
 
-            var expiryTime = new DateTimeOffset(absoluteExpiryTime);
-
             cache.Set(
                 cacheKey,
                 item,
-                new MemoryCacheEntryOptions { Size = approximateSizeInBytes, AbsoluteExpiration = expiryTime }
+                new MemoryCacheEntryOptions { Size = approximateSizeInBytes, AbsoluteExpiration = absoluteExpiryTime }
             );
 
             logger.LogInformation(
                 "Setting cached item with cache key {CacheKeyDescription}, "
-                    + "approx size {Size} bytes, expiry time {ExpiryTime}",
+                    + "approx size {Size} bytes, expiry time {AbsoluteExpiryTime}",
                 GetCacheKeyDescription(cacheKey),
                 approximateSizeInBytes,
-                expiryTime
+                absoluteExpiryTime
             );
         }
         catch (Exception e)

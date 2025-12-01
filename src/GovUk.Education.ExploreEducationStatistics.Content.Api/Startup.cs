@@ -198,6 +198,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddAnalytics(configuration);
 
         services.AddSingleton<DateTimeProvider>();
+        services.AddSingleton(TimeProvider.System);
 
         StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
         StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);

@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -13,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using NCrontab;
 using Newtonsoft.Json;
@@ -141,7 +141,7 @@ public abstract class DataSetFilesControllerCachingTests
             var controller = BuildController(
                 dataSetFileService.Object,
                 memoryCacheService: memoryCacheService.Object,
-                dateTimeProvider: new DateTimeProvider(cachingDate)
+                timeProvider: new FakeTimeProvider(cachingDate)
             );
 
             var result = await controller.ListDataSetFiles(_query);
@@ -192,14 +192,14 @@ public abstract class DataSetFilesControllerCachingTests
     private static DataSetFilesController BuildController(
         IDataSetFileService? dataSetFileService = null,
         IMemoryCacheService? memoryCacheService = null,
-        DateTimeProvider? dateTimeProvider = null
+        TimeProvider? timeProvider = null
     )
     {
         return new DataSetFilesController(
             dataSetFileService: dataSetFileService ?? Mock.Of<IDataSetFileService>(Strict),
             memoryCacheService: memoryCacheService ?? Mock.Of<IMemoryCacheService>(Strict),
             Mock.Of<ILogger<DataSetFilesController>>(),
-            dateTimeProvider: dateTimeProvider ?? new DateTimeProvider(DateTime.UtcNow)
+            timeProvider: timeProvider ?? new FakeTimeProvider(DateTime.UtcNow)
         );
     }
 }

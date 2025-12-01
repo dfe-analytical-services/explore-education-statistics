@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Options;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
@@ -9,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using NCrontab;
 using Xunit;
@@ -75,7 +75,7 @@ public class ThemeControllerCachingTests
         var controller = BuildController(
             themeService.Object,
             memoryCacheService: memoryCacheService.Object,
-            dateTimeProvider: new DateTimeProvider(cachingTime)
+            timeProvider: new FakeTimeProvider(cachingTime)
         );
 
         var result = await controller.ListThemes();
@@ -117,7 +117,7 @@ public class ThemeControllerCachingTests
     private static ThemeController BuildController(
         IThemeService? themeService = null,
         IMemoryCacheService? memoryCacheService = null,
-        DateTimeProvider? dateTimeProvider = null
+        TimeProvider? timeProvider = null
     )
     {
         return new(
@@ -125,7 +125,7 @@ public class ThemeControllerCachingTests
             themeService ?? Mock.Of<IThemeService>(Strict),
             memoryCacheService ?? Mock.Of<IMemoryCacheService>(Strict),
             logger: Mock.Of<ILogger<ThemeController>>(),
-            dateTimeProvider: dateTimeProvider ?? new DateTimeProvider(DateTime.UtcNow)
+            timeProvider: timeProvider ?? new FakeTimeProvider(DateTime.UtcNow)
         );
     }
 }

@@ -1995,7 +1995,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 viewModel.File.Meta.GeographicLevels
             );
 
-            var dataSetFileMeta = file.DataSetFileMeta;
+            var dataSetFileMeta = file.DataSetFileMeta!;
 
             Assert.Equal(0, viewModel.File.Meta.NumDataFileRows);
 
@@ -2008,7 +2008,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 viewModel.File.Meta.TimePeriodRange
             );
 
-            Assert.Equal(dataSetFileMeta!.Filters.Select(f => f.Label).ToList(), viewModel.File.Meta.Filters);
+            Assert.Equal(dataSetFileMeta.Filters.Select(f => f.Label).ToList(), viewModel.File.Meta.Filters);
 
             Assert.Equal(dataSetFileMeta.Indicators.Select(i => i.Label).ToList(), viewModel.File.Meta.Indicators);
 
@@ -2587,8 +2587,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         return BuildWebApplicationFactory(configFuncs)
             .ConfigureServices(services =>
             {
-                // services.ReplaceService(memoryCacheService);
-
                 if (contentDbContext is not null)
                 {
                     services.ReplaceService(contentDbContext);

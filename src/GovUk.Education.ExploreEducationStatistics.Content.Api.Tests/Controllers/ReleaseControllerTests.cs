@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -8,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using Xunit;
 
@@ -352,9 +352,9 @@ public class ReleaseControllerTests
             publicationCacheService ?? Mock.Of<IPublicationCacheService>(MockBehavior.Strict),
             releaseCacheService ?? Mock.Of<IReleaseCacheService>(MockBehavior.Strict),
             releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict),
-            memoryCacheService ?? Mock.Of<IMemoryCacheService>(MockBehavior.Loose),
+            memoryCacheService ?? Mock.Of<IMemoryCacheService>(),
             logger: Mock.Of<ILogger<ReleaseController>>(),
-            dateTimeProvider: new DateTimeProvider(DateTime.UtcNow)
+            timeProvider: new FakeTimeProvider(DateTime.UtcNow)
         );
     }
 }

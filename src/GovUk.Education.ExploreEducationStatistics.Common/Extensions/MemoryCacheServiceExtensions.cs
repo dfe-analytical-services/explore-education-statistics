@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using NCrontab;
@@ -14,7 +13,7 @@ public static class MemoryCacheServiceExtensions
         IMemoryCacheKey cacheKey,
         Func<Task<TResult>> createIfNotExistsFn,
         int durationInSeconds,
-        DateTimeProvider dateTimeProvider,
+        TimeProvider timeProvider,
         ILogger<TLogger> logger,
         string? expiryScheduleCron = null
     )
@@ -53,7 +52,7 @@ public static class MemoryCacheServiceExtensions
             createIfNotExistsFn: createIfNotExistsFn,
             durationInSeconds: durationInSeconds,
             expiryScheduleCron: expiryScheduleCron,
-            dateTimeProvider: dateTimeProvider,
+            timeProvider: timeProvider,
             logger: logger
         );
     }
@@ -63,7 +62,7 @@ public static class MemoryCacheServiceExtensions
         IMemoryCacheKey cacheKey,
         Func<Task<TResult>> createIfNotExistsFn,
         int durationInSeconds,
-        DateTimeProvider dateTimeProvider,
+        TimeProvider timeProvider,
         ILogger<TLogger> logger,
         string? expiryScheduleCron = null
     )
@@ -103,7 +102,7 @@ public static class MemoryCacheServiceExtensions
             cacheKey: cacheKey,
             item: unboxedEntry,
             configuration: new MemoryCacheConfiguration(DurationInSeconds: duration, ExpirySchedule: crontabSchedule),
-            nowUtc: dateTimeProvider.UtcNow
+            nowUtc: timeProvider.GetUtcNow()
         );
 
         return newCacheEntry;

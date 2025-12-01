@@ -679,6 +679,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         AddPersistenceHelper<UsersAndRolesDbContext>(services);
         services.AddTransient<AuthorizationHandlerService>();
         services.AddSingleton<DateTimeProvider>();
+        services.AddSingleton(TimeProvider.System);
 
         // This service allows a set of users to be pre-invited to the service on startup.
         if (hostEnvironment.IsDevelopment())

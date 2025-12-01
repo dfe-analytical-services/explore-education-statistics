@@ -1,7 +1,6 @@
 #nullable enable
 using System.Net.Mime;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -19,7 +18,7 @@ public class ThemeController(
     IThemeService themeService,
     IMemoryCacheService memoryCacheService,
     ILogger<ThemeController> logger,
-    DateTimeProvider dateTimeProvider
+    TimeProvider timeProvider
 ) : ControllerBase
 {
     [HttpGet("methodology-themes")]
@@ -36,7 +35,7 @@ public class ThemeController(
             createIfNotExistsFn: themeService.ListThemes,
             durationInSeconds: 10,
             expiryScheduleCron: HalfHourlyExpirySchedule,
-            dateTimeProvider: dateTimeProvider,
+            timeProvider: timeProvider,
             logger: logger
         );
     }

@@ -164,6 +164,7 @@ public static class PublisherHostBuilderExtensions
                         provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString
                     ))
                     .AddSingleton<DateTimeProvider>()
+                    .AddSingleton(TimeProvider.System)
                     .Configure<AppOptions>(configuration.GetSection(AppOptions.Section));
 
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.

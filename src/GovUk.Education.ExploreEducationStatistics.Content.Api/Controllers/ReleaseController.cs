@@ -2,7 +2,6 @@
 using System.Net.Mime;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -22,7 +21,7 @@ public class ReleaseController(
     IReleaseService releaseService,
     IMemoryCacheService memoryCacheService,
     ILogger<ReleaseController> logger,
-    DateTimeProvider dateTimeProvider
+    TimeProvider timeProvider
 ) : ControllerBase
 {
     [HttpGet("publications/{publicationSlug}/releases")]
@@ -39,7 +38,7 @@ public class ReleaseController(
             createIfNotExistsFn: () => GetReleaseViewModel(publicationSlug).HandleFailuresOrOk(),
             durationInSeconds: 10,
             expiryScheduleCron: HalfHourlyExpirySchedule,
-            dateTimeProvider: dateTimeProvider,
+            timeProvider: timeProvider,
             logger: logger
         );
     }
@@ -58,7 +57,7 @@ public class ReleaseController(
             createIfNotExistsFn: () => GetReleaseViewModel(publicationSlug, releaseSlug).HandleFailuresOrOk(),
             durationInSeconds: 15,
             expiryScheduleCron: HalfHourlyExpirySchedule,
-            dateTimeProvider: dateTimeProvider,
+            timeProvider: timeProvider,
             logger: logger
         );
     }
