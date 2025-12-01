@@ -1,5 +1,6 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
@@ -25,6 +26,8 @@ public interface IMemoryCacheService
         IMemoryCacheKey cacheKey,
         TItem item,
         MemoryCacheConfiguration configuration,
-        DateTime? nowUtc = null
+        DateTimeOffset nowUtc
     );
+
+    MemoryCacheServiceOptions? GetMemoryCacheOptions();
 }

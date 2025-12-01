@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -18,8 +17,7 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
     : PublisherFunctionsIntegrationTest(fixture)
 {
     public class PublishTaxonomyTests(PublisherFunctionsIntegrationTestFixture fixture)
-        : PublishTaxonomyFunctionTests(fixture),
-            IClassFixture<CacheServiceTestFixture>
+        : PublishTaxonomyFunctionTests(fixture)
     {
         [Fact]
         public async Task MethodologyTree()

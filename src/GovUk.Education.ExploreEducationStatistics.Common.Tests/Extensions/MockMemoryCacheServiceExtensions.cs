@@ -33,7 +33,12 @@ public static class MockMemoryCacheServiceExtensions
         where TItem : class
     {
         return service.Setup(s =>
-            s.SetItem<object>(It.IsAny<TCacheKey>(), It.IsAny<TItem>(), It.IsAny<MemoryCacheConfiguration>(), null)
+            s.SetItem<object>(
+                It.IsAny<TCacheKey>(),
+                It.IsAny<TItem>(),
+                It.IsAny<MemoryCacheConfiguration>(),
+                It.IsAny<DateTimeOffset>()
+            )
         );
     }
 }

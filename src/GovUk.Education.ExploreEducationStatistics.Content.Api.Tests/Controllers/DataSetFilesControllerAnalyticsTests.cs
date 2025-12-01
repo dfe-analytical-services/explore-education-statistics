@@ -107,8 +107,6 @@ public abstract class DataSetFilesControllerAnalyticsTests : IntegrationTestFixt
         return BuildWebApplicationFactory(configFuncs)
             .ConfigureServices(services =>
             {
-                services.ReplaceService(MemoryCacheService);
-
                 if (contentDbContext is not null)
                 {
                     services.ReplaceService(contentDbContext);
