@@ -13,8 +13,6 @@ public class OptimisedPsqlContainerWrapper
 {
     private readonly PostgreSqlContainer _psqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16.1-alpine")
-        // TODO EES-6450 - is this useful to keep?
-        // .WithReuse(true)
         .Build();
 
     internal PostgreSqlContainer GetContainer()
