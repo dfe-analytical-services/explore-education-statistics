@@ -165,6 +165,7 @@ describe('getInitialStepSubjectMeta', () => {
         publicationName: 'Test publication',
         subjectName: 'Test subject',
         geoJsonAvailable: false,
+        isCroppedTable: false,
         footnotes: [],
         boundaryLevels: [],
         locations: {},
@@ -275,6 +276,7 @@ describe('getInitialStepSubjectMeta', () => {
         publicationName: 'Test publication',
         subjectName: 'Test subject',
         geoJsonAvailable: false,
+        isCroppedTable: false,
         footnotes: [],
         boundaryLevels: [],
         locations: {
