@@ -65,9 +65,9 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
         });
     }
 
-    public OptimisedWebApplicationFactoryBuilder<TStartup> WithReconfiguredAdmin(Type[] additionalControllers)
+    public OptimisedWebApplicationFactoryBuilder<TStartup> WithReconfiguredAdmin()
     {
-        _serviceRegistrations.Add(services => ReconfigureAdminServices(services, additionalControllers));
+        _serviceRegistrations.Add(ReconfigureAdminServices);
         return this;
     }
 
@@ -88,18 +88,19 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
 
     public OptimisedWebApplicationFactoryBuilder<TStartup> WithTestUserAuthentication()
     {
-        return WithServiceCollectionModification(RegisterTestUserAuthentication);
-    }
-
-    public OptimisedWebApplicationFactoryBuilder<TStartup> WithServiceCollectionModification(
-        Action<IServiceCollection> modification
-    )
-    {
-        _serviceRegistrations.Add(modification);
+        _serviceRegistrations.Add(RegisterTestUserAuthentication);
         return this;
     }
 
-    private void ReconfigureAdminServices(IServiceCollection services, Type[] additionalControllers)
+    public OptimisedWebApplicationFactoryBuilder<TStartup> WithServiceCollectionModification(
+        OptimisedServiceCollectionModifications modifications
+    )
+    {
+        _serviceRegistrations.AddRange(modifications.Actions);
+        return this;
+    }
+
+    private void ReconfigureAdminServices(IServiceCollection services)
     {
         services
             .UseInMemoryDbContext<ContentDbContext>(databaseName: $"{nameof(ContentDbContext)}_{Guid.NewGuid()}")
@@ -116,7 +117,7 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
             .MockService<IPrivateBlobStorageService>()
             .MockService<IPublicBlobStorageService>()
             .MockService<IAdminEventRaiser>(MockBehavior.Loose) // Ignore calls to publish events
-            .RegisterControllers<Startup>(additionalControllers);
+            .RegisterControllers<Startup>();
     }
 
     private void RegisterPostgres(IServiceCollection services, string connectionString)
@@ -216,10 +217,9 @@ public static class OptimisedWebApplicationFactoryExtensions
     ///
     /// </summary>
     public static OptimisedWebApplicationFactoryBuilder<Startup> WithReconfiguredAdmin(
-        this WebApplicationFactory<Startup> testApp,
-        Type[] additionalControllers
+        this WebApplicationFactory<Startup> testApp
     )
     {
-        return new OptimisedWebApplicationFactoryBuilder<Startup>(testApp).WithReconfiguredAdmin(additionalControllers);
+        return new OptimisedWebApplicationFactoryBuilder<Startup>(testApp).WithReconfiguredAdmin();
     }
 }

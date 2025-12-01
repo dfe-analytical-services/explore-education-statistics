@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -237,9 +236,8 @@ public class TestController(IUserService userService) : ControllerBase
 public class ClaimsPrincipalTransformationServiceTestsFixture()
     : OptimisedAdminCollectionFixture(capabilities: [AdminIntegrationTestCapability.UserAuth])
 {
-    protected override Action<IServiceCollection> GetServiceCollectionModifications()
+    protected override void ModifyServices(OptimisedServiceCollectionModifications modifications)
     {
-        return services =>
-            services.AddControllers().AddApplicationPart(typeof(TestController).Assembly).AddControllersAsServices();
+        modifications.AddController(typeof(TestController));
     }
 }
