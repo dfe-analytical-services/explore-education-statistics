@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
 public class ReleasesControllerUnitTests
 {
-    [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+    [Fact]
     public async Task Create_Release_Returns_Ok()
     {
         var returnedViewModel = new ReleaseVersionViewModel();
@@ -66,7 +66,7 @@ public abstract class ReleasesControllerIntegrationTests
     public class CreateReleaseTests(ReleasesControllerIntegrationTestsFixture fixture)
         : ReleasesControllerIntegrationTests
     {
-        [Theory(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Theory]
         [InlineData(2020, TimeIdentifier.AcademicYear, "initial", "initial", "2020-21-initial")]
         [InlineData(2020, TimeIdentifier.AcademicYear, "Initial", "Initial", "2020-21-initial")]
         [InlineData(2020, TimeIdentifier.AcademicYear, " initial", "initial", "2020-21-initial")]
@@ -124,7 +124,7 @@ public abstract class ReleasesControllerIntegrationTests
             Assert.Equal(release.Id, releaseSeriesItem.ReleaseId);
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task PublicationNotFound()
         {
             var response = await CreateRelease(
@@ -137,7 +137,7 @@ public abstract class ReleasesControllerIntegrationTests
             response.AssertNotFound();
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task UserDoesNotHavePermission()
         {
             Publication publication = DataFixture.DefaultPublication();
@@ -155,7 +155,7 @@ public abstract class ReleasesControllerIntegrationTests
             response.AssertForbidden();
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task ReleaseTypeInvalid()
         {
             Publication publication = DataFixture.DefaultPublication();
@@ -177,7 +177,7 @@ public abstract class ReleasesControllerIntegrationTests
             Assert.Equal(ValidationErrorMessages.ReleaseTypeInvalid.ToString(), error.Code);
         }
 
-        [Theory(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Theory]
         [InlineData(2020, TimeIdentifier.AcademicYear, "initial", "2020-21-initial")]
         [InlineData(2020, TimeIdentifier.AcademicYear, "Initial", "2020-21-initial")]
         [InlineData(2020, TimeIdentifier.AcademicYear, " initial ", "2020-21-initial")]
@@ -213,7 +213,7 @@ public abstract class ReleasesControllerIntegrationTests
             Assert.Equal(SlugNotUnique.ToString(), error.Code);
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task ReleaseRedirectExistsForSlugForDifferentReleaseInSamePublication()
         {
             Publication publication = DataFixture
@@ -244,7 +244,7 @@ public abstract class ReleasesControllerIntegrationTests
             Assert.Equal(ReleaseSlugUsedByRedirect.ToString(), error.Code);
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task ReleaseRedirectExistsForSlugForReleaseInDifferentPublication()
         {
             Publication otherPublication = DataFixture
@@ -275,7 +275,7 @@ public abstract class ReleasesControllerIntegrationTests
             response.AssertOk();
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task LabelOver20Characters()
         {
             Publication publication = DataFixture.DefaultPublication();
@@ -327,7 +327,7 @@ public abstract class ReleasesControllerIntegrationTests
     public class UpdateReleaseTests(ReleasesControllerIntegrationTestsFixture fixture)
         : ReleasesControllerIntegrationTests
     {
-        [Theory(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Theory]
         [InlineData(
             2020,
             TimeIdentifier.AcademicYear,
@@ -425,7 +425,7 @@ public abstract class ReleasesControllerIntegrationTests
             Assert.Equal(expectedSlug, updatedRelease.Slug);
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task SlugChanged_OldCacheIsRemovedAndUpdatedForLiveRelease()
         {
             var oldSlug = "2020-21-initial";
@@ -586,7 +586,7 @@ public abstract class ReleasesControllerIntegrationTests
             Assert.Null(oldReleaseParentPathTestDataCachedValue2);
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task SlugUnchanged_CacheIsUpdatedOnSameBlobPathsForLiveRelease()
         {
             var oldLabel = "initial";
@@ -732,7 +732,7 @@ public abstract class ReleasesControllerIntegrationTests
             Assert.Equal(oldReleaseParentPathTestDataCachedViewModel2, oldReleaseParentPathTestDataCachedValue2);
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task SlugChanged_CacheIsUntouchedForUnpublishedRelease()
         {
             var oldSlug = "2020-21-initial";
@@ -795,7 +795,7 @@ public abstract class ReleasesControllerIntegrationTests
             Assert.Null(publicationCacheValue);
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task SlugChanged_ReleaseRedirectNotCreatedForUnpublishedRelease_RedirectCacheUntouched()
         {
             var oldSlug = "2020-21-initial";
@@ -848,7 +848,7 @@ public abstract class ReleasesControllerIntegrationTests
             );
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task SlugChanged_ReleaseRedirectCreatedForLiveRelease_RedirectsCacheUpdated()
         {
             var oldLabel = "initial";
@@ -906,7 +906,7 @@ public abstract class ReleasesControllerIntegrationTests
             Assert.Equal($"2020-21-{newLabel}", releaseRedirectViewModel.ToSlug);
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task SlugUnchanged_ReleaseRedirectNotCreatedForLiveRelease_RedirectCacheUntouched()
         {
             var oldLabel = "initial";
@@ -957,7 +957,7 @@ public abstract class ReleasesControllerIntegrationTests
             Assert.Empty(newRedirectsCachedViewModel.ReleaseRedirectsByPublicationSlug);
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task ReleaseNotFound()
         {
             var response = await UpdateRelease(releaseId: Guid.NewGuid(), label: null);
@@ -965,7 +965,7 @@ public abstract class ReleasesControllerIntegrationTests
             response.AssertNotFound();
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task UserDoesNotHavePermission()
         {
             Release release = DataFixture
@@ -983,7 +983,7 @@ public abstract class ReleasesControllerIntegrationTests
             response.AssertForbidden();
         }
 
-        [Theory(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Theory]
         [InlineData(2020, TimeIdentifier.AcademicYear, "initial", "2020-21-initial")]
         [InlineData(2020, TimeIdentifier.AcademicYear, "Initial", "2020-21-initial")]
         [InlineData(2020, TimeIdentifier.AcademicYear, " initial ", "2020-21-initial")]
@@ -1023,7 +1023,7 @@ public abstract class ReleasesControllerIntegrationTests
             Assert.Equal(SlugNotUnique.ToString(), error.Code);
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task ReleaseIsUndergoingPublishing()
         {
             Release release = DataFixture
@@ -1070,7 +1070,7 @@ public abstract class ReleasesControllerIntegrationTests
             Assert.Equal(ReleaseUndergoingPublishing.ToString(), error.Code);
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task ReleaseRedirectExistsForNewSlugForSameRelease()
         {
             Release release = DataFixture
@@ -1093,7 +1093,7 @@ public abstract class ReleasesControllerIntegrationTests
             Assert.Equal(ReleaseSlugUsedByRedirect.ToString(), error.Code);
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task ReleaseRedirectExistsForNewSlugForDifferentReleaseInSamePublication()
         {
             Publication publication = DataFixture.DefaultPublication();
@@ -1128,7 +1128,7 @@ public abstract class ReleasesControllerIntegrationTests
             Assert.Equal(ReleaseSlugUsedByRedirect.ToString(), error.Code);
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task ReleaseRedirectExistsForNewSlugForReleaseInDifferentPublication()
         {
             Release targetRelease = DataFixture
@@ -1157,7 +1157,7 @@ public abstract class ReleasesControllerIntegrationTests
             response.AssertOk();
         }
 
-        [Fact(Skip = "TODO EES-6450 - CacheAspect clashes")]
+        [Fact]
         public async Task LabelOver20Characters()
         {
             Release release = DataFixture
