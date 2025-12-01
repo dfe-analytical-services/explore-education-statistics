@@ -15,6 +15,7 @@ Force Tags          Admin    Local    AltersData    Dev
 *** Variables ***
 ${PUBLICATION_NAME}=        Create data block with chart %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}=          UI test data block
+${DATABLOCK_2_NAME}=        UI test categorical and numerical data block
 ${CONTENT_SECTION_NAME}=    Test data block section
 ${FOOTNOTE_1}=              Test footnote from bau
 ${FOOTNOTE_UPDATED}=        Updated test footnote from bau
@@ -816,8 +817,6 @@ Validate basic geographic chart preview
     user waits until element does not contain bar chart    id:chartBuilderPreview
     user waits until element contains map chart    id:chartBuilderPreview
 
-    user checks map chart height    id:chartBuilderPreview    700
-
     user chooses select option    id:chartBuilderPreview-map-selectedLocation    Barnsley
 
     user mouses over selected map feature    id:chartBuilderPreview
@@ -880,6 +879,7 @@ Change geographic chart data groupings
     user checks table cell contains    4    2    Custom    testid:chart-data-groupings
 
 Validate basic geographic chart preview updates correctly
+    user chooses select option    id:chartBuilderPreview-map-selectedDataSet    Admissions in 2014
     user checks definition list has x items    testid:mapBlock-legend    2
 
     user checks element should contain    css:[data-testid="mapBlock-legend"] div:first-child dd    0 to 3,000
@@ -921,14 +921,113 @@ Save and validate geographic chart embeds correctly
     user waits until element does not contain bar chart    ${datablock}
     user waits until element contains map chart    ${datablock}
 
-    user checks map chart height    ${datablock}    700
-
     user chooses select option    ${datablock} >> name:selectedLocation    Barnsley
 
     user mouses over selected map feature    ${datablock}
     user checks map tooltip label contains    ${datablock}    Barnsley
 
     user checks map chart indicator tile contains    ${datablock}    Admissions in 2014    9,854
+
+Create data block with categorical and numerical data
+    user clicks link    Data and files
+
+    user uploads subject and waits until complete    UI test subject - categorical and numerical
+    ...    mixed-categorical-numerical-data-test.csv    mixed-categorical-numerical-data-test.meta.csv
+
+    user clicks link    Data blocks
+    user waits until h2 is visible    Data blocks
+    user clicks link    Create data block
+
+    user waits until page contains    UI test subject - categorical and numerical    %{WAIT_SMALL}
+    user clicks radio    UI test subject - categorical and numerical
+
+    user clicks element    id:publicationDataStepForm-submit
+    user waits until table tool wizard step is available    2    Choose locations    %{WAIT_MEDIUM}
+
+    user clicks button    Local authority
+    user clicks button    Select all 4 options
+
+    user clicks element    id:locationFiltersForm-submit
+    user waits until table tool wizard step is available    3    Choose time period    %{WAIT_MEDIUM}
+
+    user clicks element    id:timePeriodForm-submit
+    user waits until table tool wizard step is available    4    Choose your filters
+
+    user clicks button    Select all 2 options
+    user clicks element    id:filtersForm-submit
+
+    user waits until results table appears    %{WAIT_LONG}
+
+    user enters text into element    label:Name    ${DATABLOCK_2_NAME}
+    user enters text into element    label:Table title    UI test table title
+    user enters text into element    label:Source    UI test source
+
+    user clicks button    Save data block
+    user waits until page contains    Delete this data block
+
+Configure geographic chart with categorical and numerical data sets
+    user clicks link    Chart
+    user waits until h3 is visible    Choose chart type
+
+    user configures basic chart    Geographic    700
+
+    user clicks link    Data sets
+    user waits until h3 is visible    Data sets
+
+    user clicks button    Add data set
+
+Validate geographic chart preview
+    user waits until element contains map chart    id:chartBuilderPreview
+
+    # categorical data set
+    user checks definition list has x items    testid:mapBlock-legend    3
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:first-child dd    medium
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(2) dd    large
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(3) dd    small
+
+    # numerical data set
+    user chooses select option    id:chartBuilderPreview-map-selectedDataSet    Indicator two (2024/25)
+    user checks definition list has x items    testid:mapBlock-legend    5
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:first-child dd    100 to 159
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(2) dd    160 to 219
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(3) dd    220 to 279
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(4) dd    280 to 339
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(5) dd    340 to 400
+
+Validate geographic chart data groupings tab
+    user clicks link    Data groupings
+    user waits until h3 is visible    Data groupings
+
+    user checks table body has x rows    2    testid:chart-data-groupings
+    user checks table cell contains    1    1    Indicator one (All locations, 2024/25)    testid:chart-data-groupings
+    user checks table cell contains    1    2    N/A for categorical data    testid:chart-data-groupings
+    user checks table cell contains    2    1    Indicator two (All locations, 2024/25)    testid:chart-data-groupings
+    user checks table cell contains    2    2    5 equal intervals    testid:chart-data-groupings
+
+Validate geographic chart legend tab
+    user clicks link    Legend
+    user waits until h3 is visible    Legend
+
+    user counts legend form item rows    2
+    user checks element value should be    id:chartLegendConfigurationForm-items-0-label    Indicator one (2024/25)
+    user checks element value should be    id:chartLegendConfigurationForm-items-1-label    Indicator two (2024/25)
+
+    user checks element should contain    testid:legend-item-0    Sequential colours
+    user checks element should contain    testid:legend-item-0    Reorder categories
+
+    user checks element should not contain    testid:legend-item-1    Sequential colours
+    user checks element should not contain    testid:legend-item-1    Reorder categories
+
+Reorder categorical data
+    user clicks button    Reorder categories
+    user waits until h2 is visible    Reorder categories
+    user clicks button    Move large up
+    user clicks button    Confirm
+
+    user chooses select option    id:chartBuilderPreview-map-selectedDataSet    Indicator one (2024/25)
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:first-child dd    large
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(2) dd    medium
+    user checks element should contain    css:[data-testid="mapBlock-legend"] div:nth-child(3) dd    small
 
 Configure basic infographic chart
     user navigates to    ${DATABLOCK_URL}

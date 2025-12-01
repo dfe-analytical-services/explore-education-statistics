@@ -20,6 +20,7 @@ import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
+import { FormFieldCheckbox } from '@common/components/form';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import {
@@ -84,7 +85,10 @@ export default function ChartLegendItems({
     }
   }, 200);
 
-  const getMapDataSetConfig = (dataSet: DataSet) => {
+  const getMapDataSetConfig = (dataSet?: DataSet) => {
+    if (!dataSet) {
+      return undefined;
+    }
     const key = generateDataSetKey(dataSet);
     return mapDataSetConfigs?.find(config => config.dataSetKey === key);
   };
@@ -108,13 +112,18 @@ export default function ChartLegendItems({
               ? Object.values(fieldErrors as Dictionary<{ message: string }>)
               : [];
             const mapDataSetConfig = getMapDataSetConfig(
-              currentItems[index].dataSet,
+              currentItems[index]?.dataSet,
             );
             const allowColourSelection =
-              !mapDataSetConfig?.categoricalDataConfig?.length;
+              !mapDataSetConfig?.categoricalDataConfig?.length ||
+              currentItems[index].sequentialCategoryColours;
 
             return (
-              <div key={item.id} className={styles.item}>
+              <div
+                key={item.id}
+                className={styles.item}
+                data-testid={`legend-item-${index}`}
+              >
                 <FormFieldset
                   id={`items-${item.id}`}
                   legend={`Legend item ${index + 1}`}
@@ -132,6 +141,15 @@ export default function ChartLegendItems({
                         showError={false}
                       />
                     </div>
+                    {mapDataSetConfig?.categoricalDataConfig && (
+                      <div className={styles.labelInput}>
+                        <FormFieldCheckbox
+                          label="Sequential colours"
+                          name={`items.${index}.sequentialCategoryColours`}
+                          formGroup={false}
+                        />
+                      </div>
+                    )}
                     {allowColourSelection && (
                       <div className={styles.colourInput}>
                         <FormFieldColourInput

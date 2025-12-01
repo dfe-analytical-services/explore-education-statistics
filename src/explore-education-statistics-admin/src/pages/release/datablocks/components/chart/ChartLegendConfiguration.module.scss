@@ -13,11 +13,16 @@
   margin-right: govuk-spacing(6);
 
   label {
-    margin-right: govuk-spacing(2);
+    margin: 0 govuk-spacing(2) 0 0;
   }
 
   select {
     min-width: 6em;
+  }
+
+  :global(.govuk-checkboxes__label) {
+    margin: 0;
+    max-width: none;
   }
 }
 

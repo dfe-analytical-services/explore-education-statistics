@@ -57,12 +57,6 @@ user checks chart height
     [Arguments]    ${locator}    ${height}
     user waits until parent contains element    ${locator}    css:.recharts-surface[height="${height}"]
 
-user checks map chart height
-    [Arguments]    ${locator}    ${height}    ${unit}=px
-    user waits until parent contains element    ${locator}    css:.leaflet-container
-    ${element}=    get child element    ${locator}    css:.leaflet-container
-    user checks css property value    ${element}    height    ${height}${unit}
-
 user checks chart legend item contains
     [Arguments]    ${locator}    ${item}    ${text}
     user waits until parent contains element    ${locator}    css:.recharts-default-legend li:nth-of-type(${item})

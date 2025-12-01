@@ -47,4 +47,6 @@ public class ChartLegendItem
     public ChartInlinePosition? InlinePosition;
 
     public int? InlinePositionOffset;
+
+    public bool? SequentialCategoryColours;
 }
