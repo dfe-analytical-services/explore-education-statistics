@@ -472,6 +472,7 @@ export const testMapTableData: TableDataResponse & {
     subjectName: 'Absence by characteristic',
     timePeriodRange: [{ code: 'AY', label: '2016/17', year: 2016 }],
     geoJsonAvailable: true,
+    isCroppedTable: false,
   },
   results: [
     {
@@ -1040,6 +1041,7 @@ export const testSubjectMeta: FullTableMeta = {
   },
   footnotes: [],
   geoJsonAvailable: false,
+  isCroppedTable: false,
   indicators: [testIndicator1],
   locations: [testLocation1, testLocation2, testLocation3],
   publicationName: 'Publication 1',

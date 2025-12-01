@@ -30,7 +30,7 @@ public class MatchingObservationQueryGeneratorTests
         var subjectId = Guid.NewGuid();
         await using var context = InMemoryStatisticsDbContext();
 
-        var cancellationTokenSource = new CancellationTokenSource();
+        using var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
         var tempTableCreator = new Mock<ITemporaryTableCreator>();
@@ -88,7 +88,7 @@ public class MatchingObservationQueryGeneratorTests
         var subjectId = Guid.NewGuid();
         await using var context = InMemoryStatisticsDbContext();
 
-        var cancellationTokenSource = new CancellationTokenSource();
+        using var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
         var tempTableCreator = new Mock<ITemporaryTableCreator>();
@@ -152,6 +152,75 @@ public class MatchingObservationQueryGeneratorTests
     }
 
     [Fact]
+    public async Task TimePeriodsSupplied_ExceedingLimit_ReducedQueryGenerated()
+    {
+        var subjectId = Guid.NewGuid();
+        await using var context = InMemoryStatisticsDbContext();
+
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var cancellationToken = cancellationTokenSource.Token;
+
+        var tempTableCreator = new Mock<ITemporaryTableCreator>();
+
+        var matchingObservationsTable = new Mock<ITempTableReference>(Strict);
+        matchingObservationsTable.SetupGet(t => t.Name).Returns("#MatchedObservation");
+
+        tempTableCreator
+            .Setup(s => s.CreateTemporaryTable<MatchedObservation, StatisticsDbContext>(context, cancellationToken))
+            .ReturnsAsync(matchingObservationsTable.Object);
+
+        var sqlHelper = new Mock<ISqlStatementsHelper>(Strict);
+
+        sqlHelper
+            .Setup(s => s.CreateRandomIndexName("#MatchedObservation", "Id"))
+            .Returns("IX_#MatchedObservation_Id_1234");
+
+        var queryGenerator = new MatchingObservationsQueryGenerator(
+            tempTableCreator: tempTableCreator.Object,
+            sqlHelper: sqlHelper.Object
+        );
+
+        var (sql, sqlParameters, _) = await queryGenerator.GetMatchingObservationsQuery(
+            context,
+            subjectId,
+            [],
+            [],
+            new TimePeriodQuery
+            {
+                StartCode = TimeIdentifier.AcademicYear,
+                StartYear = 2015,
+                EndCode = TimeIdentifier.AcademicYear,
+                EndYear = 2017,
+                Limit = 2,
+            },
+            cancellationToken
+        );
+
+        VerifyAllMocks(tempTableCreator, sqlHelper);
+
+        const string expectedSql =
+            @"
+                INSERT INTO #MatchedObservation WITH (TABLOCK)
+                SELECT o.id FROM Observation o
+                WHERE o.SubjectId = @subjectId
+                AND (
+                  (o.TimeIdentifier = 'AY' AND o.Year = 2015) OR
+                  (o.TimeIdentifier = 'AY' AND o.Year = 2016)
+                )
+                OPTION(RECOMPILE, MAXDOP 4);
+                
+                CREATE UNIQUE CLUSTERED INDEX [IX_#MatchedObservation_Id_1234]
+                ON #MatchedObservation(Id) WITH (MAXDOP = 4);
+
+                UPDATE STATISTICS #MatchedObservation WITH FULLSCAN;
+            ";
+
+        Assert.Equal(NormaliseSqlFormatting(expectedSql), NormaliseSqlFormatting(sql));
+
+        sqlParameters.ToArray().AssertDeepEqualTo([new SqlParameter("subjectId", subjectId)]);
+    }
+
+    [Fact]
     public async Task LocationsSupplied_ObservationsForSubjectAndLocationsMatched()
     {
         Guid[] locationIds = [Guid.NewGuid(), Guid.NewGuid()];
@@ -160,7 +229,7 @@ public class MatchingObservationQueryGeneratorTests
         var subjectId = Guid.NewGuid();
         await using var context = InMemoryStatisticsDbContext();
 
-        var cancellationTokenSource = new CancellationTokenSource();
+        using var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
         var tempTableCreator = new Mock<ITemporaryTableCreator>();
@@ -258,7 +327,7 @@ public class MatchingObservationQueryGeneratorTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
 
             // We are selecting half or less of the Filter Items out of the
@@ -375,7 +444,7 @@ public class MatchingObservationQueryGeneratorTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
 
             // We are selecting more than half of the Filter Items out of the
@@ -505,7 +574,7 @@ public class MatchingObservationQueryGeneratorTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
 
             // Set up some selected Filter Item Ids for only 1 Filter from this Subject.
@@ -630,7 +699,7 @@ public class MatchingObservationQueryGeneratorTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
 
             // Set up ALL selected Filter Item Ids for Filter1, and select just some
@@ -793,7 +862,7 @@ public class MatchingObservationQueryGeneratorTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
 
             // Set up some selected Filter Item Ids from 3 of the 4 Filters on this Subject.
@@ -1025,7 +1094,7 @@ public class MatchingObservationQueryGeneratorTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
 
             Guid[] selectedFilterItemIds =
