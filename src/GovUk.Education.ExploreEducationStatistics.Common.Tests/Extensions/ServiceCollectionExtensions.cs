@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -119,23 +118,16 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// This method registers all Controllers found in the <see cref="TStartup"/> class's assembly.
     /// </summary>
-    public static IServiceCollection RegisterControllers<TStartup>(
-        this IServiceCollection services,
-        Type[] additionalControllers = default
-    )
+    public static IServiceCollection RegisterControllers<TStartup>(this IServiceCollection services)
         where TStartup : class
     {
-        var servicesWithMainControllers = services
+        services
             .AddControllers(options =>
                 options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(","))
             )
-            .AddApplicationPart(typeof(TStartup).Assembly);
+            .AddApplicationPart(typeof(TStartup).Assembly)
+            .AddControllersAsServices();
 
-        additionalControllers?.ForEach(controllerType =>
-            servicesWithMainControllers = servicesWithMainControllers.AddApplicationPart(controllerType.Assembly)
-        );
-
-        servicesWithMainControllers.AddControllersAsServices();
         return services;
     }
 }

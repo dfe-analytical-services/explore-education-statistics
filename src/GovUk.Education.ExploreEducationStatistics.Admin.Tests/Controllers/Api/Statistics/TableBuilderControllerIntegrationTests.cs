@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -123,16 +122,13 @@ public class TableBuilderControllerIntegrationTestsFixture()
 {
     public Mock<ITableBuilderService> TableBuilderServiceMock = null!;
 
-    protected override Action<IServiceCollection> GetServiceCollectionModifications()
+    protected override void ModifyServices(OptimisedServiceCollectionModifications modifications)
     {
-        return services =>
-        {
-            services.MockService<ITableBuilderService>();
-        };
+        modifications.ReplaceServiceWithMock<ITableBuilderService>();
     }
 
-    protected override void AfterFactoryConstructed()
+    protected override void AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
     {
-        TableBuilderServiceMock = GetServiceMock<ITableBuilderService>();
+        TableBuilderServiceMock = lookups.GetMockService<ITableBuilderService>();
     }
 }
