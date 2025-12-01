@@ -21,7 +21,7 @@ public class ClaimsPrincipalTransformationServiceTestsCollection
 [Collection(nameof(ClaimsPrincipalTransformationServiceTestsFixture))]
 public class ClaimsPrincipalTransformationServiceTests(ClaimsPrincipalTransformationServiceTestsFixture fixture)
 {
-    private static readonly DataFixture DataFixture = new(new Random().Next());
+    private static readonly DataFixture DataFixture = new();
 
     [Theory]
     [InlineData("unknown-scope-claim", "access-admin-api", false)]

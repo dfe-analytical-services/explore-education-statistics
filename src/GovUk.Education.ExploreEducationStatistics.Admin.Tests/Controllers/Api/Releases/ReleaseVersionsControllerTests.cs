@@ -686,7 +686,7 @@ public class ReleaseVersionsControllerIntegrationTestsCollection
 [Collection(nameof(ReleaseVersionsControllerIntegrationTestsFixture))]
 public abstract class ReleaseVersionsControllerIntegrationTests
 {
-    private static readonly DataFixture DataFixture = new(new Random().Next());
+    private static readonly DataFixture DataFixture = new();
 
     public class UpdateReleaseTests(ReleaseVersionsControllerIntegrationTestsFixture fixture)
         : ReleaseVersionsControllerIntegrationTests

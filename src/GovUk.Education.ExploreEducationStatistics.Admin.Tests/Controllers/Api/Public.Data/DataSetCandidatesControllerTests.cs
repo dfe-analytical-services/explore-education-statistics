@@ -27,7 +27,7 @@ public class DataSetCandidatesControllerTestsCollection : ICollectionFixture<Dat
 [Collection(nameof(DataSetCandidatesControllerTestsFixture))]
 public abstract class DataSetCandidatesControllerTests
 {
-    private static readonly DataFixture DataFixture = new(new Random().Next());
+    private static readonly DataFixture DataFixture = new();
     private const string BaseUrl = "api/public-data/data-set-candidates";
 
     public class ListDataSetCandidatesTests(DataSetCandidatesControllerTestsFixture fixture)

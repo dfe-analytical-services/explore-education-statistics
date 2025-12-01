@@ -40,7 +40,7 @@ public class DataSetVersionsControllerTestsCollection : ICollectionFixture<DataS
 public abstract class DataSetVersionsControllerTests
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
-    private static readonly DataFixture DataFixture = new(new Random().Next());
+    private static readonly DataFixture DataFixture = new();
 
     public class ListVersionsTests(DataSetVersionsControllerTestsFixture fixture) : DataSetVersionsControllerTests
     {

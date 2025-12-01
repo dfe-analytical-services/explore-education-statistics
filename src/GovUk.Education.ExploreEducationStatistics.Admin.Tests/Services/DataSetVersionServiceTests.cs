@@ -19,7 +19,7 @@ public class DataSetVersionServiceTestsCollection : ICollectionFixture<DataSetVe
 [Collection(nameof(DataSetVersionServiceTestsFixture))]
 public abstract class DataSetVersionServiceTests
 {
-    private static readonly DataFixture DataFixture = new(new Random().Next());
+    private static readonly DataFixture DataFixture = new();
 
     public class GetStatusesForReleaseVersionTests(DataSetVersionServiceTestsFixture fixture)
         : DataSetVersionServiceTests

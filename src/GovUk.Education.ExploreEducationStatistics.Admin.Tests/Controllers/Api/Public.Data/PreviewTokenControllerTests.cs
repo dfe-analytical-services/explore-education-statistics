@@ -35,7 +35,7 @@ public class PreviewTokenControllerTestsCollection : ICollectionFixture<PreviewT
 public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFixture fixture) : IAsyncLifetime
 {
     private const string BaseUrl = "api/public-data/preview-tokens";
-    private static readonly DataFixture DataFixture = new(new Random().Next());
+    private static readonly DataFixture DataFixture = new();
 
     private static bool _commonDataInitialized;
 

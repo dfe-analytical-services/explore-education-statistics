@@ -19,7 +19,7 @@ public class PermissionsControllerTestsCollection : ICollectionFixture<Permissio
 [Collection(nameof(PermissionsControllerTestsFixture))]
 public class PermissionsControllerTests(PermissionsControllerTestsFixture fixture)
 {
-    private static readonly DataFixture DataFixture = new(new Random().Next());
+    private static readonly DataFixture DataFixture = new();
 
     [Fact]
     public async Task GetGlobalPermissions_AuthenticatedUser()
