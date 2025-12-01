@@ -34,7 +34,7 @@ public class DataSetVersionMappingControllerTestsCollection
 public abstract class DataSetVersionMappingControllerTests
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
-    private static readonly DataFixture DataFixture = new(new Random().Next());
+    private static readonly DataFixture DataFixture = new();
 
     public class OptimisedGetLocationMappingsTests(DataSetVersionMappingControllerTestsFixture fixture)
         : DataSetVersionMappingControllerTests

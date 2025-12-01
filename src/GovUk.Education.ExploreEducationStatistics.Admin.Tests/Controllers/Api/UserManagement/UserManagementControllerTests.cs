@@ -16,7 +16,7 @@ public class UserManagementControllerTestsCollection : ICollectionFixture<UserMa
 [Collection(nameof(UserManagementControllerTestsFixture))]
 public class UserManagementControllerTests
 {
-    private static readonly DataFixture DataFixture = new(new Random().Next());
+    private static readonly DataFixture DataFixture = new();
 
     public class DeleteUserTests(UserManagementControllerTestsFixture fixture) : UserManagementControllerTests
     {

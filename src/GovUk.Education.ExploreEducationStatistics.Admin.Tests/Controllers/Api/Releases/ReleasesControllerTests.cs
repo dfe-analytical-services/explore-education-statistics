@@ -61,7 +61,7 @@ public class ReleasesControllerIntegrationTestsCollection
 [Collection(nameof(ReleasesControllerIntegrationTestsFixture))]
 public abstract class ReleasesControllerIntegrationTests
 {
-    private static readonly DataFixture DataFixture = new(new Random().Next());
+    private static readonly DataFixture DataFixture = new();
 
     public class CreateReleaseTests(ReleasesControllerIntegrationTestsFixture fixture)
         : ReleasesControllerIntegrationTests

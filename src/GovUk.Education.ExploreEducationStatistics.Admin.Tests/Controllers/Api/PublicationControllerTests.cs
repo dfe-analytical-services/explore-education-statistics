@@ -25,7 +25,7 @@ public class PublicationControllerTestsCollection : ICollectionFixture<Publicati
 [Collection(nameof(PublicationControllerTestsFixture))]
 public class PublicationControllerTests
 {
-    private static readonly DataFixture DataFixture = new(new Random().Next());
+    private static readonly DataFixture DataFixture = new();
 
     public class CreatePublicationTests(PublicationControllerTestsFixture fixture) : PublicationControllerTests
     {
