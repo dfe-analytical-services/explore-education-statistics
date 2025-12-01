@@ -131,10 +131,11 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 sasService: provider.GetRequiredService<IBlobSasService>()
             )
         );
-        services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
+        services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new PublicBlobCacheService(
             provider.GetRequiredService<IPublicBlobStorageService>(),
-            provider.GetRequiredService<ILogger<BlobCacheService>>()
+            provider.GetRequiredService<ILogger<PublicBlobCacheService>>()
         ));
+        services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
         services.AddSingleton<IMemoryCacheService>(provider =>
         {
             var memoryCacheConfig = configuration.GetSection("MemoryCache");
@@ -208,7 +209,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     {
         // Enable caching and register any caching services
         CacheAspect.Enabled = true;
-        BlobCacheAttribute.AddService("public", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
 
         // Register the MemoryCacheService only if the Memory Caching is enabled.
         var memoryCacheConfig = configuration.GetSection("MemoryCache");

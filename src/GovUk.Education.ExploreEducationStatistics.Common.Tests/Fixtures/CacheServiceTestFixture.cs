@@ -13,26 +13,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 [Collection(CacheTestFixture.CollectionName)]
 public class CacheServiceTestFixture : IDisposable
 {
-    public readonly Mock<IBlobCacheService> BlobCacheService = new(MockBehavior.Strict);
-    public readonly Mock<IBlobCacheService> PublicBlobCacheService = new(MockBehavior.Strict);
     public readonly Mock<IMemoryCacheService> MemoryCacheService = new(MockBehavior.Strict);
 
     // ReSharper disable once MemberCanBeProtected.Global
     public CacheServiceTestFixture()
     {
         CacheAspect.Enabled = true;
-        BlobCacheAttribute.AddService("default", BlobCacheService.Object);
-        BlobCacheAttribute.AddService("public", PublicBlobCacheService.Object);
         MemoryCacheAttribute.AddService("default", MemoryCacheService.Object);
     }
 
     public void Dispose()
     {
         CacheAspect.Enabled = false;
-
-        BlobCacheAttribute.ClearServices();
-        BlobCacheService.Reset();
-        PublicBlobCacheService.Reset();
 
         MemoryCacheAttribute.ClearServices();
         MemoryCacheService.Reset();

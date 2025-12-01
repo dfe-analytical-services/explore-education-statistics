@@ -1,28 +1,33 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 
-public class GlossaryCacheService : IGlossaryCacheService
+public class GlossaryCacheService(
+    IGlossaryService glossaryService,
+    IPublicBlobCacheService publicBlobCacheService,
+    ILogger<GlossaryCacheService> logger
+) : IGlossaryCacheService
 {
-    private readonly IGlossaryService _glossaryService;
-
-    public GlossaryCacheService(IGlossaryService glossaryService)
-    {
-        _glossaryService = glossaryService;
-    }
-
-    [BlobCache(typeof(GlossaryCacheKey), ServiceName = "public")]
     public Task<List<GlossaryCategoryViewModel>> GetGlossary()
     {
-        return _glossaryService.GetGlossary();
+        return publicBlobCacheService.GetOrCreateAsync(
+            cacheKey: new GlossaryCacheKey(),
+            createIfNotExistsFn: glossaryService.GetGlossary,
+            logger: logger
+        );
     }
 
-    [BlobCache(typeof(GlossaryCacheKey), forceUpdate: true, ServiceName = "public")]
     public Task<List<GlossaryCategoryViewModel>> UpdateGlossary()
     {
-        return _glossaryService.GetGlossary();
+        return publicBlobCacheService.Update(
+            cacheKey: new GlossaryCacheKey(),
+            createFn: glossaryService.GetGlossary,
+            logger: logger
+        );
     }
 }

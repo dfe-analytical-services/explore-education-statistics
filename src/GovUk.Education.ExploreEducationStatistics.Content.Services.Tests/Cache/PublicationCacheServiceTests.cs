@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -17,7 +16,7 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cache;
 
-public class PublicationCacheServiceTests : CacheServiceTestFixture
+public class PublicationCacheServiceTests
 {
     private const string PublicationSlug = "publication-slug";
 
@@ -67,11 +66,13 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     {
         var cacheKey = new PublicationCacheKey(PublicationSlug);
 
-        PublicBlobCacheService
-            .Setup(s => s.GetItemAsync(cacheKey, typeof(PublicationCacheViewModel)))
-            .ReturnsAsync((object?)null);
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
 
-        PublicBlobCacheService
+        publicBlobCacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(PublicationCacheViewModel)))
+            .ReturnsAsync(null!);
+
+        publicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(cacheKey, _publicationViewModel))
             .Returns(Task.CompletedTask);
 
@@ -79,11 +80,14 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         publicationService.Setup(s => s.Get(PublicationSlug)).ReturnsAsync(_publicationViewModel);
 
-        var service = BuildService(publicationService: publicationService.Object);
+        var service = BuildService(
+            publicationService: publicationService.Object,
+            publicBlobCacheService: publicBlobCacheService.Object
+        );
 
         var result = await service.GetPublication(PublicationSlug);
 
-        VerifyAllMocks(publicationService, PublicBlobCacheService);
+        VerifyAllMocks(publicationService, publicBlobCacheService);
 
         result.AssertRight(_publicationViewModel);
     }
@@ -93,15 +97,17 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     {
         var cacheKey = new PublicationCacheKey(PublicationSlug);
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(PublicationCacheViewModel)))
             .ReturnsAsync(_publicationViewModel);
 
-        var service = BuildService();
+        var service = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
 
         var result = await service.GetPublication(PublicationSlug);
 
-        VerifyAllMocks(PublicBlobCacheService);
+        VerifyAllMocks(publicBlobCacheService);
 
         result.AssertRight(_publicationViewModel);
     }
@@ -111,7 +117,9 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     {
         var cacheKey = new PublicationCacheKey(PublicationSlug);
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(PublicationCacheViewModel)))
             .ReturnsAsync((object?)null);
 
@@ -119,11 +127,14 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         publicationService.Setup(s => s.Get(PublicationSlug)).ReturnsAsync(new NotFoundResult());
 
-        var service = BuildService(publicationService: publicationService.Object);
+        var service = BuildService(
+            publicationService: publicationService.Object,
+            publicBlobCacheService: publicBlobCacheService.Object
+        );
 
         var result = await service.GetPublication(PublicationSlug);
 
-        VerifyAllMocks(publicationService, PublicBlobCacheService);
+        VerifyAllMocks(publicationService, publicBlobCacheService);
 
         result.AssertNotFound();
     }
@@ -141,7 +152,9 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
             }
         );
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.GetItemAsync(new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
             .ReturnsAsync((object?)null);
 
@@ -149,15 +162,15 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         publicationService.Setup(s => s.GetPublicationTree()).ReturnsAsync(publicationTree);
 
-        PublicBlobCacheService
+        publicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(new PublicationTreeCacheKey(), publicationTree))
             .Returns(Task.CompletedTask);
 
-        var service = BuildService(publicationService.Object);
+        var service = BuildService(publicationService.Object, publicBlobCacheService: publicBlobCacheService.Object);
 
         var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
 
-        VerifyAllMocks(PublicBlobCacheService);
+        VerifyAllMocks(publicBlobCacheService);
 
         var filteredTree = result.AssertRight();
         filteredTree.AssertDeepEqualTo(publicationTree);
@@ -174,15 +187,17 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
             ),
         };
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.GetItemAsync(new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
             .ReturnsAsync(ListOf(publicationTree));
 
-        var service = BuildService();
+        var service = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
 
         var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
 
-        VerifyAllMocks(PublicBlobCacheService);
+        VerifyAllMocks(publicBlobCacheService);
 
         var filteredTree = result.AssertRight();
         filteredTree.AssertDeepEqualTo(ListOf(publicationTree));
@@ -310,17 +325,22 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         publicationService.Setup(s => s.Get(PublicationSlug)).ReturnsAsync(_publicationViewModel);
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(cacheKey, _publicationViewModel))
             .Returns(Task.CompletedTask);
 
-        var service = BuildService(publicationService: publicationService.Object);
+        var service = BuildService(
+            publicationService: publicationService.Object,
+            publicBlobCacheService: publicBlobCacheService.Object
+        );
 
         var result = await service.UpdatePublication(PublicationSlug);
 
         // There should be no attempt on the cache service to get the cached resource
 
-        VerifyAllMocks(publicationService, PublicBlobCacheService);
+        VerifyAllMocks(publicationService, publicBlobCacheService);
 
         result.AssertRight(_publicationViewModel);
     }
@@ -334,17 +354,19 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         publicationService.Setup(s => s.GetPublicationTree()).ReturnsAsync(publicationTree);
 
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
         // We should not see any attempt to "get" the cached tree, but rather only see a fresh fetching
         // of the latest tree and then it being cached.
-        PublicBlobCacheService
+        publicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(new PublicationTreeCacheKey(), publicationTree))
             .Returns(Task.CompletedTask);
 
-        var service = BuildService(publicationService.Object);
+        var service = BuildService(publicationService.Object, publicBlobCacheService: publicBlobCacheService.Object);
 
         var filteredTree = await service.UpdatePublicationTree();
 
-        VerifyAllMocks(PublicBlobCacheService);
+        VerifyAllMocks(publicBlobCacheService);
 
         publicationTree.AssertDeepEqualTo(filteredTree);
     }
@@ -373,15 +395,17 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         PublicationTreeFilter filter
     )
     {
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.GetItemAsync(new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
             .ReturnsAsync(ListOf(publicationTree));
 
-        var service = BuildService();
+        var service = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
 
         var result = await service.GetPublicationTree(filter);
 
-        VerifyAllMocks(PublicBlobCacheService);
+        VerifyAllMocks(publicBlobCacheService);
 
         var filteredTree = result.AssertRight();
         filteredTree.AssertDeepEqualTo(ListOf(publicationTree));
@@ -392,15 +416,17 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         PublicationTreeFilter filter
     )
     {
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.GetItemAsync(new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
             .ReturnsAsync(ListOf(publicationTree));
 
-        var service = BuildService();
+        var service = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
 
         var result = await service.GetPublicationTree(filter);
 
-        VerifyAllMocks(PublicBlobCacheService);
+        VerifyAllMocks(publicBlobCacheService);
 
         var filteredTree = result.AssertRight();
         Assert.Empty(filteredTree);
@@ -408,12 +434,14 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
     private static PublicationCacheService BuildService(
         IPublicationService? publicationService = null,
-        IPublicBlobStorageService? publicBlobStorageService = null
+        IPublicBlobStorageService? publicBlobStorageService = null,
+        IPublicBlobCacheService? publicBlobCacheService = null
     )
     {
         return new PublicationCacheService(
             publicationService: publicationService ?? Mock.Of<IPublicationService>(Strict),
             publicBlobStorageService: publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(Strict),
+            publicBlobCacheService: publicBlobCacheService ?? Mock.Of<IPublicBlobCacheService>(Strict),
             Mock.Of<ILogger<PublicationCacheService>>()
         );
     }

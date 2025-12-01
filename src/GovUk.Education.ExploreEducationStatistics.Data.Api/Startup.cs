@@ -46,7 +46,6 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.ObservationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api;
 
@@ -153,10 +152,8 @@ public class Startup
                 sasService: provider.GetRequiredService<IBlobSasService>()
             )
         );
-        services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
-            provider.GetRequiredService<IPublicBlobStorageService>(),
-            provider.GetRequiredService<ILogger<BlobCacheService>>()
-        ));
+
+        services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
         services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
         services.AddTransient<ITableBuilderService, TableBuilderService>();
         services.AddTransient<IDataBlockService, DataBlockService>();
@@ -264,7 +261,7 @@ public class Startup
     {
         // Enable caching and register any caching services.
         CacheAspect.Enabled = true;
-        BlobCacheAttribute.AddService("default", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
+
         // Enable cancellation aspects and register request timeout configuration.
         CancellationTokenTimeoutAspect.Enabled = true;
         CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));

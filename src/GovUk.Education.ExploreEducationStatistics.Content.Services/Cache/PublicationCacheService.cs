@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -12,27 +12,20 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 
-public class PublicationCacheService : IPublicationCacheService
+public class PublicationCacheService(
+    IPublicationService publicationService,
+    IPublicBlobStorageService publicBlobStorageService,
+    IPublicBlobCacheService publicBlobCacheService,
+    ILogger<PublicationCacheService> logger
+) : IPublicationCacheService
 {
-    private readonly IPublicationService _publicationService;
-    private readonly IPublicBlobStorageService _publicBlobStorageService;
-    private readonly ILogger<PublicationCacheService> _logger;
-
-    public PublicationCacheService(
-        IPublicationService publicationService,
-        IPublicBlobStorageService publicBlobStorageService,
-        ILogger<PublicationCacheService> logger
-    )
-    {
-        _publicationService = publicationService;
-        _publicBlobStorageService = publicBlobStorageService;
-        _logger = logger;
-    }
-
-    [BlobCache(typeof(PublicationCacheKey), ServiceName = "public")]
     public Task<Either<ActionResult, PublicationCacheViewModel>> GetPublication(string publicationSlug)
     {
-        return _publicationService.Get(publicationSlug);
+        return publicBlobCacheService.GetOrCreateAsync(
+            new PublicationCacheKey(PublicationSlug: publicationSlug),
+            () => publicationService.Get(publicationSlug),
+            logger: logger
+        );
     }
 
     public async Task<Either<ActionResult, IList<PublicationTreeThemeViewModel>>> GetPublicationTree(
@@ -49,15 +42,18 @@ public class PublicationCacheService : IPublicationCacheService
             .ToListAsync();
     }
 
-    [BlobCache(typeof(PublicationCacheKey), forceUpdate: true, ServiceName = "public")]
     public Task<Either<ActionResult, PublicationCacheViewModel>> UpdatePublication(string publicationSlug)
     {
-        return _publicationService.Get(publicationSlug);
+        return publicBlobCacheService.Update(
+            new PublicationCacheKey(PublicationSlug: publicationSlug),
+            () => publicationService.Get(publicationSlug),
+            logger: logger
+        );
     }
 
     public async Task<Either<ActionResult, Unit>> RemovePublication(string publicationSlug)
     {
-        await _publicBlobStorageService.DeleteBlobs(
+        await publicBlobStorageService.DeleteBlobs(
             containerName: BlobContainers.PublicContent,
             options: new IBlobStorageService.DeleteBlobsOptions
             {
@@ -68,17 +64,24 @@ public class PublicationCacheService : IPublicationCacheService
         return Unit.Instance;
     }
 
-    [BlobCache(typeof(PublicationTreeCacheKey), forceUpdate: true, ServiceName = "public")]
     public Task<IList<PublicationTreeThemeViewModel>> UpdatePublicationTree()
     {
-        _logger.LogInformation("Updating cached Publication Tree");
-        return _publicationService.GetPublicationTree();
+        logger.LogInformation("Updating cached Publication Tree");
+
+        return publicBlobCacheService.Update(
+            cacheKey: new PublicationTreeCacheKey(),
+            createFn: publicationService.GetPublicationTree,
+            logger: logger
+        );
     }
 
-    [BlobCache(typeof(PublicationTreeCacheKey), ServiceName = "public")]
     private Task<IList<PublicationTreeThemeViewModel>> GetFullPublicationTree()
     {
-        return _publicationService.GetPublicationTree();
+        return publicBlobCacheService.GetOrCreateAsync(
+            cacheKey: new PublicationTreeCacheKey(),
+            createIfNotExistsFn: publicationService.GetPublicationTree,
+            logger: logger
+        );
     }
 
     private static async Task<PublicationTreeThemeViewModel> FilterPublicationTreeTheme(
