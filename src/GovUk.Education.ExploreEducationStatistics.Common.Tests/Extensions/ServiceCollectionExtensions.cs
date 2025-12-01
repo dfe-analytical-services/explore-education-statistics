@@ -99,8 +99,10 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// This method replaces a service that has been registered in Startup with a Mock. The same
-    /// lifecycle that was registered in Startup will be used to register the new service.
+    /// This method replaces a service that has been registered in Startup with a Mock. The Mock is registered as a
+    /// singleton so that we can be assured that a mock that is looked up in order to set setups and perform
+    /// verifications on is the same instance as the mocked service that the production code will be using during test
+    /// execution.
     ///
     /// The Mock will be setup with Strict behavior by default.
     /// </summary>
