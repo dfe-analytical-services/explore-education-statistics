@@ -193,11 +193,10 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     /// </summary>
     public async Task DisposeAsync()
     {
-        // TODO EES-6450 - do we need this?
-        // if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
-        // {
-        //     await _psql.Stop();
-        // }
+        if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
+        {
+            await _psql.Stop();
+        }
 
         await DisposeReusableDbContexts();
     }

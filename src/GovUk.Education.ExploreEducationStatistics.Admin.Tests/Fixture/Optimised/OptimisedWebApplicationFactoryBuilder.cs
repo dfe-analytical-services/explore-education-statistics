@@ -1,4 +1,5 @@
 #nullable enable
+using DotNet.Testcontainers.Containers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -72,9 +73,7 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
     public OptimisedWebApplicationFactoryBuilder<TStartup> WithAzurite(AzuriteContainer testContainer)
     {
         _serviceRegistrations.Add(services => RegisterAzuriteServices(services, testContainer.GetConnectionString()));
-        _configRegistrations.Add(config =>
-            RegisterAzuriteAppConfiguration(config, testContainer.GetConnectionString())
-        );
+        _configRegistrations.Add(config => RegisterAzuriteAppConfiguration(config, testContainer));
         return this;
     }
 
@@ -128,11 +127,7 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
         }
 
         services.AddDbContext<PublicDataDbContext>(options =>
-            options
-                // TODO EES-6450 - remove manual setting?
-                .UseNpgsql(connectionString + ";Include Error Detail=true")
-                .EnableSensitiveDataLogging()
-                .EnableDetailedErrors()
+            options.UseNpgsql(connectionString).EnableSensitiveDataLogging().EnableDetailedErrors()
         );
 
         using var serviceScope = services
@@ -144,19 +139,17 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
         context.Database.Migrate();
     }
 
-    private static void RegisterAzuriteAppConfiguration(IConfigurationBuilder config, string connectionString)
+    private static void RegisterAzuriteAppConfiguration(IConfigurationBuilder config, AzuriteContainer container)
     {
-        // TODO EES-6450 - what to do with this?
-        // if (_azuriteContainer.State != TestcontainersStates.Running)
-        // {
-        //     throw new InvalidOperationException(
-        //         $"Azurite container must be started via '{nameof(InitializeWithAzurite)}' method first");
-        // }
+        if (container.State != TestcontainersStates.Running)
+        {
+            throw new InvalidOperationException($"Azurite container must be started first");
+        }
 
         config.AddInMemoryCollection(
             [
-                new KeyValuePair<string, string?>("PublicStorage", connectionString),
-                new KeyValuePair<string, string?>("PublisherStorage", connectionString),
+                new KeyValuePair<string, string?>("PublicStorage", container.GetConnectionString()),
+                new KeyValuePair<string, string?>("PublisherStorage", container.GetConnectionString()),
             ]
         );
     }
