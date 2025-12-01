@@ -1,8 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
-using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
@@ -14,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.RequestTimeoutConfigurationKeys;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
 
@@ -31,13 +28,15 @@ public class TableBuilderController(
 {
     [HttpPost("data/tablebuilder/release/{releaseVersionId:guid}")]
     [Produces("application/json", "text/csv")]
-    [CancellationTokenTimeout(TableBuilderQuery)]
     public async Task<ActionResult> Query(
         Guid releaseVersionId,
         [FromBody] FullTableQueryRequest request,
         CancellationToken cancellationToken = default
     )
     {
+        using var cancellationTokenWithTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cancellationTokenWithTimeout.CancelAfter(TimeSpan.FromMinutes(3.5));
+
         if (Request.AcceptsCsv(exact: true))
         {
             Response.ContentDispositionAttachment(contentType: ContentTypes.Csv, filename: $"{releaseVersionId}.csv");
@@ -47,13 +46,13 @@ public class TableBuilderController(
                     releaseVersionId: releaseVersionId,
                     query: request.AsFullTableQuery(),
                     stream: Response.BodyWriter.AsStream(),
-                    cancellationToken: cancellationToken
+                    cancellationToken: cancellationTokenWithTimeout.Token
                 )
                 .HandleFailuresOrNoOp();
         }
 
         return await tableBuilderService
-            .Query(releaseVersionId, request.AsFullTableQuery(), cancellationToken)
+            .Query(releaseVersionId, request.AsFullTableQuery(), cancellationTokenWithTimeout.Token)
             .HandleFailuresOr(Ok);
     }
 

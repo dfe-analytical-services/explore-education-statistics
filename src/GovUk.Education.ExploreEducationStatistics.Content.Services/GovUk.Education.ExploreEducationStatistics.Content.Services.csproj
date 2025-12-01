@@ -9,8 +9,6 @@
     <CompilerVisibleProperty Include="ProjectDir" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
-    <!-- v2.8.1 is compatible with MacOS -->
     <PackageReference Include="System.Linq.Async.Queryable" Version="6.0.3" />
   </ItemGroup>
   <ItemGroup>

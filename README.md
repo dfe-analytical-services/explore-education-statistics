@@ -738,14 +738,8 @@ The backend c# projects have a number of unit and integration tests. From the pr
 
 ```sh
 cd src
-dotnet clean
 dotnet test
 ```
-
-Note that the `clean` is necessary due to an issue with [AspectInjector](https://github.com/pamidur/aspect-injector)
-whereby compilation of code over already-compiled code will add AOP execution code on top of existing AOP execution
-code, leading to AOP code being invoked multiple times rather than just once. This would result in test failures, as we 
-assert that AOP code is executed only once.
 
 #### Configuring Linux for running unit and integration tests
 

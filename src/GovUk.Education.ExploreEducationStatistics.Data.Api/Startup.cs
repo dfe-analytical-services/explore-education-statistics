@@ -154,6 +154,9 @@ public class Startup
         );
 
         services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
+        // Some shared services allow for either a public or private BlobCacheService to be injected.
+        // In the case of the Data API, it will always be using the public cache.
+        services.AddTransient<IBlobCacheService, PublicBlobCacheService>();
         services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
         services.AddTransient<ITableBuilderService, TableBuilderService>();
         services.AddTransient<IDataBlockService, DataBlockService>();
@@ -259,13 +262,6 @@ public class Startup
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        // Enable caching and register any caching services.
-        CacheAspect.Enabled = true;
-
-        // Enable cancellation aspects and register request timeout configuration.
-        CancellationTokenTimeoutAspect.Enabled = true;
-        CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));
-
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();

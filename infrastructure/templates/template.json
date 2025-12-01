@@ -594,13 +594,6 @@
         "description": "Override cron expression for all entities cached in memory"
       }
     },
-    "requestTimeoutsTableBuilderQuery": {
-      "type": "int",
-      "defaultValue": 210000,
-      "metadata": {
-        "description": "Timeout in milliseconds for a table builder query to return results before cancelling the request in the API"
-      }
-    },
     "tableBuilderMaxTableCellsAllowed": {
       "type": "int",
       "defaultValue": 25000,
@@ -1511,7 +1504,6 @@
         "PublicApp__BasicAuthPassword": "[parameters('publicAppBasicAuthPassword')]",
         "Analytics__Enabled": "[parameters('analyticsEnabled')]",
         "Analytics__BasePath": "[parameters('analyticsFileShareMountPath')]",
-        "RequestTimeouts__TableBuilderQuery": "[parameters('requestTimeoutsTableBuilderQuery')]",
         "TableBuilder__MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
       }
     },
