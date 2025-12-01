@@ -35,7 +35,7 @@ public class TableBuilderController(
     )
     {
         using var cancellationTokenWithTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        cancellationTokenWithTimeout.CancelAfter(TimeSpan.FromSeconds(210000));
+        cancellationTokenWithTimeout.CancelAfter(TimeSpan.FromMinutes(3.5));
 
         if (Request.AcceptsCsv(exact: true))
         {
