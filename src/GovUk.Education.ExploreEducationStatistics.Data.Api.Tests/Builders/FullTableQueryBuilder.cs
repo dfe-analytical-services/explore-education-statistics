@@ -1,15 +1,51 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Model;
+﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Builders;
 
-public class FullTableQueryRequestBuilder
+public class FullTableQueryBuilder
 {
-    public FullTableQueryRequest Build() =>
-        new()
+    private List<Guid>? _locationIds;
+    private int? _endYear;
+
+    public FullTableQuery Build()
+    {
+        return new()
         {
-            LocationIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() },
+            LocationIds = _locationIds ?? MockUtils.GenerateGuids(2),
+            TimePeriod = new TimePeriodQuery
+            {
+                StartYear = 2000,
+                StartCode = TimeIdentifier.AcademicYear,
+                EndYear = _endYear ?? 2001,
+                EndCode = TimeIdentifier.AcademicYear,
+            },
+            Indicators = MockUtils.GenerateGuids(2),
+            Filters = MockUtils.GenerateGuids(2),
+            SubjectId = Guid.NewGuid(),
+        };
+    }
+
+    public FullTableQueryBuilder WithLocationIds(List<Guid> locationIds)
+    {
+        _locationIds = locationIds;
+        return this;
+    }
+
+    public FullTableQueryBuilder WithEndYear(int endYear)
+    {
+        _endYear = endYear;
+        return this;
+    }
+
+    public FullTableQueryRequest BuildRequest()
+    {
+        return new()
+        {
+            LocationIds = _locationIds ?? MockUtils.GenerateGuids(2),
             TimePeriod = new TimePeriodQuery
             {
                 StartYear = 2000,
@@ -17,13 +53,14 @@ public class FullTableQueryRequestBuilder
                 EndYear = 2001,
                 EndCode = TimeIdentifier.AcademicYear,
             },
-            Indicators = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() },
-            Filters = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() },
+            Indicators = MockUtils.GenerateGuids(2),
+            Filters = MockUtils.GenerateGuids(2),
             SubjectId = Guid.NewGuid(),
             FilterHierarchiesOptions = new Dictionary<Guid, List<FilterHierarchyOption>>
             {
-                { Guid.NewGuid(), [new FilterHierarchyOption([Guid.NewGuid(), Guid.NewGuid()])] },
-                { Guid.NewGuid(), [new FilterHierarchyOption([Guid.NewGuid(), Guid.NewGuid()])] },
+                { Guid.NewGuid(), [new FilterHierarchyOption(MockUtils.GenerateGuids(2))] },
+                { Guid.NewGuid(), [new FilterHierarchyOption(MockUtils.GenerateGuids(2))] },
             },
         };
+    }
 }

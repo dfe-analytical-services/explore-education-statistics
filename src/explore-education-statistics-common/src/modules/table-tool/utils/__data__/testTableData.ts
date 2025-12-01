@@ -33,6 +33,7 @@ export const testInitialTableSubjectMeta: FullTable['subjectMeta'] = {
   subjectName: 'Subject name',
   timePeriodRange: [],
   geoJsonAvailable: true,
+  isCroppedTable: false,
 };
 
 const category1Group1Filter3 = new CategoryFilter({

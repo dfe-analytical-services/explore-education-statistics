@@ -266,6 +266,7 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
+        isCroppedTable: false,
       },
       results: [
         {
@@ -370,6 +371,7 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
+        isCroppedTable: false,
       },
       results: [
         {
@@ -466,6 +468,7 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
+        isCroppedTable: false,
       },
       results: [
         {
@@ -590,6 +593,7 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
+        isCroppedTable: false,
       },
       results: [
         {
@@ -775,6 +779,7 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
+        isCroppedTable: false,
       },
       results: [
         {
@@ -951,6 +956,7 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
+        isCroppedTable: false,
       },
       results: [
         {
@@ -1134,6 +1140,7 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
+        isCroppedTable: false,
       },
       results: [
         {
@@ -1277,6 +1284,7 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
+        isCroppedTable: false,
       },
       results: [
         {

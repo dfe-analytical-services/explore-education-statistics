@@ -46,7 +46,6 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.ObservationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api;
 
@@ -159,6 +158,7 @@ public class Startup
         ));
         services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
         services.AddTransient<ITableBuilderService, TableBuilderService>();
+        services.AddTransient<ITableBuilderQueryOptimiser, TableBuilderQueryOptimiser>();
         services.AddTransient<IDataBlockService, DataBlockService>();
         services.AddTransient<IReleaseService, ReleaseService>();
         services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();

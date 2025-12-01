@@ -6,4 +6,6 @@ public class TableBuilderOptions
     public const string Section = "TableBuilder";
 
     public int MaxTableCellsAllowed { get; set; }
+
+    public int CroppedTableMaxRows { get; set; }
 }
