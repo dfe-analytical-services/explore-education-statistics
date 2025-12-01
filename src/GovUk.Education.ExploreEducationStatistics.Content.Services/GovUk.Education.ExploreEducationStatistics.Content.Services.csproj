@@ -9,7 +9,6 @@
     <CompilerVisibleProperty Include="ProjectDir" />
   </ItemGroup>
   <ItemGroup>
-    <!-- v2.8.1 is compatible with MacOS -->
     <PackageReference Include="System.Linq.Async.Queryable" Version="6.0.3" />
   </ItemGroup>
   <ItemGroup>

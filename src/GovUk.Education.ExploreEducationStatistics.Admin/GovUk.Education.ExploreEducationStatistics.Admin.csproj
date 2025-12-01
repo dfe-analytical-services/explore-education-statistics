@@ -20,7 +20,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <!-- v2.8.1 is compatible with MacOS -->
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.22" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.22" PrivateAssets="all" />
