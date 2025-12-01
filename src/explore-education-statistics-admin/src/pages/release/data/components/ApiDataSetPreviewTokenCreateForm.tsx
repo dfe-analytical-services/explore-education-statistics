@@ -82,7 +82,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
             .required('Activates date must be a valid date')
             .test({
               name: 'not-in-past',
-              message: 'Activates date must not be in the past',
+              message: 'Activates date must not be in the past.',
               test(value) {
                 if (value == null) return false;
                 const activatesMidnightUk = UkTimeHelper.toUkStartOfDay(value);
@@ -92,7 +92,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
             })
             .test({
               name: 'within-7-days',
-              message: 'Activates date must be within 7 days from today',
+              message: 'Activates date must be within 7 days from today.',
               test(value) {
                 if (value == null) return false;
                 // Start of activates day in UK (UTC instant)
@@ -114,7 +114,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
           s.required('Expires date must be a valid date').test({
             name: 'after-activates',
             message:
-              'Expires date must be later than Activates date by at most 7 days',
+              'Expires date must be later than Activates date by at most 7 days.',
             test(value, context) {
               const activates = context.parent.activates as Date | null;
               if (!activates || !value) return false;
@@ -168,7 +168,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
             <FormFieldTextInput<FormValues>
               name="label"
               label="Token name"
-              hint="Add a name so you can easily reference this token"
+              hint="Add a name so you can easily reference this token."
             />
             {isBau && (
               <>
@@ -187,7 +187,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
                     {
                       label: 'Choose number of days',
                       value: 'presetDays',
-                      hint: 'Pick a preset number of days',
+                      hint: 'Pick a preset number of days.',
                       conditional: (
                         <FormFieldRadioGroup<FormValues>
                           legend="Select a duration"
@@ -200,7 +200,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
                     },
                     {
                       label: 'Enter specific start and end dates',
-                      hint: 'Select a duration of at most 7 days',
+                      hint: 'Select a duration of at most 7 days.',
                       value: 'customDates',
                       conditional: (
                         <>
