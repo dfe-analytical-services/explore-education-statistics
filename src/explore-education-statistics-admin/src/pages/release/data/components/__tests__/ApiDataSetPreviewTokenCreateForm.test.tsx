@@ -180,7 +180,7 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
     await renderWithCustomDatesSelected(yesterday, today, handleSubmit);
 
     expect(
-      await screen.findByText('Activates date must not be in the past', {
+      await screen.findByText('Activates date must not be in the past.', {
         selector: '#apiDataSetTokenCreateForm-activates-error',
       }),
     ).toBeInTheDocument();
@@ -202,7 +202,7 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
 
     expect(
       await screen.findByText(
-        'Activates date must be within 7 days from today',
+        'Activates date must be within 7 days from today.',
         {
           selector: '#apiDataSetTokenCreateForm-activates-error',
         },
@@ -220,7 +220,7 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
 
     expect(
       await screen.findByText(
-        'Expires date must be later than Activates date by at most 7 days',
+        'Expires date must be later than Activates date by at most 7 days.',
         {
           selector: '#apiDataSetTokenCreateForm-expires-error',
         },
