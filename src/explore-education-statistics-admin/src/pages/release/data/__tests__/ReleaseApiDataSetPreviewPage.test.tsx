@@ -78,8 +78,7 @@ describe('ReleaseApiDataSetPreviewPage', () => {
   });
 
   test('generating a preview token', async () => {
-    mockDate.set('2025-10-08 14:00');
-
+    mockDate.set('2025-10-08T13:00:00.000Z');
     const history = createMemoryHistory();
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
     previewTokenService.createPreviewToken.mockResolvedValue(testToken);

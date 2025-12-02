@@ -44,12 +44,11 @@ describe('UkTimeHelper', () => {
       );
     });
 
-    test('should return same day range when adding 0 days', () => {
+    test('should not allow adding 0 days', () => {
       const startDate = new Date('2025-06-15T10:30:00Z');
-      const result = UkTimeHelper.getDateRangeFromDate(0, startDate);
-
-      expect(result.startDate).toBe(startDate);
-      expect(result.endDate.toISOString()).toBe('2025-06-15T22:59:59.000Z'); // End of day in BST
+      expect(() => UkTimeHelper.getDateRangeFromDate(0, startDate)).toThrow(
+        'Please specify a number greater than 0 to create a date range.',
+      );
     });
 
     test('should correctly add days during BST period', () => {
@@ -84,12 +83,11 @@ describe('UkTimeHelper', () => {
       expect(result.endDate.toISOString()).toBe('2025-10-27T23:59:59.000Z'); // End of day in GMT after transition
     });
 
-    test('should handle negative days (past dates)', () => {
+    test('should throw error when supplied with negative days (past dates)', () => {
       const startDate = new Date('2025-06-15T14:30:00Z');
-      const result = UkTimeHelper.getDateRangeFromDate(-3, startDate);
-
-      expect(result.startDate).toBe(startDate);
-      expect(result.endDate.toISOString()).toBe('2025-06-12T22:59:59.000Z'); // 3 days earlier, end of day
+      expect(() => UkTimeHelper.getDateRangeFromDate(-3, startDate)).toThrow(
+        'Cannot add negative days to a date.',
+      );
     });
 
     test('should handle edge case of adding many days', () => {

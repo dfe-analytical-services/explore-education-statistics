@@ -3,14 +3,10 @@ import UkTimeHelper, { DateRange } from '@common/utils/date/ukTimeHelper';
 
 export default class PreviewTokenDateHelper {
   public setDateRangeBasedOnCustomDates(
-    activates?: Date | null,
-    expires?: Date | null,
+    activates?: Date,
+    expires?: Date,
   ): DateRange {
-    // Validate that either both parameters have values or both are null/undefined
-    const hasActivates = activates != null;
-    const hasExpires = expires != null;
-
-    if (hasActivates !== hasExpires) {
+    if (!!activates !== !!expires) {
       throw new Error(
         'Both activates and expires dates must be provided together, or both must be null/undefined',
       );

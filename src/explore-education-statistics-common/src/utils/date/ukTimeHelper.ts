@@ -64,6 +64,14 @@ export default class UkTimeHelper {
     daysToAdd: number,
     startDate: Date = new Date(),
   ): DateRange {
+    if (daysToAdd < 0) {
+      throw new Error('Cannot add negative days to a date.');
+    } else if (daysToAdd === 0) {
+      throw new Error(
+        'Please specify a number greater than 0 to create a date range.',
+      );
+    }
+
     const TZ = UkTimeHelper.europeLondonTimeZoneId;
 
     // 1) "Today" in London as a calendar date (no time)
