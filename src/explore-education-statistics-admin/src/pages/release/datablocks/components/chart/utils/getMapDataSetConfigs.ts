@@ -52,7 +52,9 @@ export default function getMapDataSetConfigs({
   return dataSetCategoryConfigs.map(config => {
     const categoricalDataConfig = getCategoricalDataConfig({
       dataSetCategoryConfig: config,
-      dataSetCategories,
+      dataSetCategories: dataSetCategories.filter(
+        category => category.dataSets[config.dataKey],
+      ),
     });
 
     return {

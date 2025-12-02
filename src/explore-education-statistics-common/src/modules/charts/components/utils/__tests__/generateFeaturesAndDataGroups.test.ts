@@ -58,7 +58,7 @@ describe('generateFeaturesAndDataGroups', () => {
         geoJson: testGeoJsonFeature3,
       },
     ];
-    const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
+    const testDataSetConfig: MapDataSetCategoryConfig = {
       config: {
         label: 'Indicator 1 (Time period 1)',
         colour: '#12436D',
@@ -71,7 +71,7 @@ describe('generateFeaturesAndDataGroups', () => {
 
     const result = generateFeaturesAndDataGroups({
       dataSetCategories: testDataSetCategories,
-      selectedDataSetConfig: testSelectedDataSetConfig,
+      dataSetConfig: testDataSetConfig,
     });
 
     const expectedFeatures: MapFeatureCollection = {
@@ -186,7 +186,7 @@ describe('generateFeaturesAndDataGroups', () => {
       ],
     };
 
-    const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
+    const testDataSetConfig: MapDataSetCategoryConfig = {
       config: {
         label: 'Indicator 1 (Time period 1)',
         colour: '#12436D',
@@ -199,7 +199,7 @@ describe('generateFeaturesAndDataGroups', () => {
 
     const result = generateFeaturesAndDataGroups({
       dataSetCategories: testDataSetCategories,
-      selectedDataSetConfig: testSelectedDataSetConfig,
+      dataSetConfig: testDataSetConfig,
     });
 
     const expectedLegendItems: MapLegendItem[] = [
@@ -275,7 +275,7 @@ describe('generateFeaturesAndDataGroups', () => {
       ],
     };
 
-    const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
+    const testDataSetConfig: MapDataSetCategoryConfig = {
       config: {
         label: 'Indicator 1 (Time period 1)',
         colour: '#12436D',
@@ -288,7 +288,7 @@ describe('generateFeaturesAndDataGroups', () => {
 
     const result = generateFeaturesAndDataGroups({
       dataSetCategories: testDataSetCategories,
-      selectedDataSetConfig: testSelectedDataSetConfig,
+      dataSetConfig: testDataSetConfig,
     });
 
     const expectedLegendItems: MapLegendItem[] = [
@@ -364,7 +364,7 @@ describe('generateFeaturesAndDataGroups', () => {
       ],
     };
 
-    const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
+    const testDataSetConfig: MapDataSetCategoryConfig = {
       config: {
         label: 'Indicator 1 (Time period 1)',
         colour: '#4763a5',
@@ -377,7 +377,7 @@ describe('generateFeaturesAndDataGroups', () => {
 
     const result = generateFeaturesAndDataGroups({
       dataSetCategories: testDataSetCategories,
-      selectedDataSetConfig: testSelectedDataSetConfig,
+      dataSetConfig: testDataSetConfig,
     });
 
     const expectedLegendItems: MapLegendItem[] = [
@@ -441,7 +441,7 @@ describe('generateFeaturesAndDataGroups', () => {
     ];
 
     test('generates the correct features and legend items for categorical data', () => {
-      const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
+      const testDataSetConfig: MapDataSetCategoryConfig = {
         config: {
           label: 'Indicator 1 (Time period 1)',
           colour: '#12436D',
@@ -461,7 +461,7 @@ describe('generateFeaturesAndDataGroups', () => {
 
       const result = generateFeaturesAndDataGroups({
         dataSetCategories: testCategoricalDataSetCategories,
-        selectedDataSetConfig: testSelectedDataSetConfig,
+        dataSetConfig: testDataSetConfig,
       });
 
       const expectedFeatures: MapFeatureCollection = {
@@ -522,7 +522,7 @@ describe('generateFeaturesAndDataGroups', () => {
     });
 
     test('generates the correct features and legend items for categorical data when sequential category colours is selected', () => {
-      const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
+      const testDataSetConfig: MapDataSetCategoryConfig = {
         config: {
           label: 'Indicator 1 (Time period 1)',
           colour: '#12436D',
@@ -543,7 +543,7 @@ describe('generateFeaturesAndDataGroups', () => {
 
       const result = generateFeaturesAndDataGroups({
         dataSetCategories: testCategoricalDataSetCategories,
-        selectedDataSetConfig: testSelectedDataSetConfig,
+        dataSetConfig: testDataSetConfig,
       });
 
       const expectedFeatures: MapFeatureCollection = {
@@ -604,7 +604,7 @@ describe('generateFeaturesAndDataGroups', () => {
     });
 
     test('generates the correct features and legend items for categorical data using deprecatedCategoricalDataConfig', () => {
-      const testSelectedDataSetConfig: MapDataSetCategoryConfig = {
+      const testDataSetConfig: MapDataSetCategoryConfig = {
         config: {
           label: 'Indicator 1 (Time period 1)',
           colour: '#12436D',
@@ -637,7 +637,7 @@ describe('generateFeaturesAndDataGroups', () => {
       const result = generateFeaturesAndDataGroups({
         deprecatedCategoricalDataConfig: testDeprecatedCategoricalDataConfig,
         dataSetCategories: testCategoricalDataSetCategories,
-        selectedDataSetConfig: testSelectedDataSetConfig,
+        dataSetConfig: testDataSetConfig,
       });
 
       const expectedFeatures: MapFeatureCollection = {
