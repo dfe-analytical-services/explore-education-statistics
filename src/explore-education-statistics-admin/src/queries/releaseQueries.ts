@@ -20,6 +20,12 @@ const releaseQueries = createQueryKeys('release', {
       queryFn: () => releaseVersionService.getReleaseVersion(id),
     };
   },
+  getChecklist(id: string) {
+    return {
+      queryKey: [id],
+      queryFn: () => releaseVersionService.getReleaseVersionChecklist(id),
+    };
+  },
 });
 
 export default releaseQueries;

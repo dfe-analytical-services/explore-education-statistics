@@ -7,17 +7,19 @@ import releaseVersionService, {
   ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseVersionService';
 import {
+  releaseChecklistRoute,
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
+import DeleteDraftModal from '@admin/pages/admin-dashboard/components/DeleteDraftModal';
+import releaseQueries from '@admin/queries/releaseQueries';
 import ButtonText from '@common/components/ButtonText';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useState } from 'react';
 import { generatePath } from 'react-router';
-import DeleteDraftModal from '@admin/pages/admin-dashboard/components/DeleteDraftModal';
+import { useQuery } from '@tanstack/react-query';
 
 interface Props {
   publicationId: string;
@@ -30,10 +32,12 @@ const DraftReleaseRow = ({
   release,
   onAmendmentDelete,
 }: Props) => {
-  const { value: checklist, isLoading: isLoadingChecklist } =
-    useAsyncHandledRetry(() =>
-      releaseVersionService.getReleaseVersionChecklist(release.id),
-    );
+  const { data: checklist, isFetching } = useQuery(
+    releaseQueries.getChecklist(release.id),
+  );
+
+  const { errors = [], warnings = [] } = checklist ?? {};
+  const totalIssues = errors.length + warnings.length;
 
   const [deleteReleasePlan, setDeleteReleasePlan] = useState<
     DeleteReleasePlan & {
@@ -52,13 +56,13 @@ const DraftReleaseRow = ({
         </Tag>
       </td>
       <td>
-        <LoadingSpinner inline loading={isLoadingChecklist} size="sm">
-          {checklist?.errors.length}
+        <LoadingSpinner inline loading={isFetching} size="sm">
+          {errors.length}
         </LoadingSpinner>
       </td>
       <td>
-        <LoadingSpinner inline loading={isLoadingChecklist} size="sm">
-          {checklist?.warnings.length}
+        <LoadingSpinner inline loading={isFetching} size="sm">
+          {warnings.length}
         </LoadingSpinner>
       </td>
       <td>
@@ -126,6 +130,17 @@ const DraftReleaseRow = ({
                 onCancel={() => setDeleteReleasePlan(undefined)}
               />
             )}
+          {totalIssues > 0 && (
+            <Link
+              to={generatePath<ReleaseRouteParams>(releaseChecklistRoute.path, {
+                publicationId,
+                releaseVersionId: release.id,
+              })}
+            >
+              View issues
+              <VisuallyHidden> for {release.title}</VisuallyHidden>
+            </Link>
+          )}
         </div>
       </td>
     </tr>

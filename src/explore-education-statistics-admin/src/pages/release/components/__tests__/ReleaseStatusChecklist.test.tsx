@@ -1,13 +1,40 @@
 import ReleaseStatusChecklist from '@admin/pages/release/components/ReleaseStatusChecklist';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
-import { render, screen } from '@testing-library/react';
-import React from 'react';
-import { MemoryRouter } from 'react-router';
+import _releaseVersionService, {
+  ReleaseVersionChecklist,
+} from '@admin/services/releaseVersionService';
 import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 import { GlobalPermissions } from '@admin/services/authService';
+import { screen } from '@testing-library/react';
+import React from 'react';
+import { MemoryRouter } from 'react-router';
+import render from '@common-test/render';
+
+jest.mock('@admin/services/releaseVersionService');
+const releaseVersionService = jest.mocked(_releaseVersionService);
 
 describe('ReleaseStatusChecklist', () => {
-  test('renders correctly with errors', () => {
+  const testChecklist: ReleaseVersionChecklist = {
+    valid: false,
+    warnings: [],
+    errors: [
+      { code: 'DataFileImportsMustBeCompleted' },
+      { code: 'DataFileReplacementsMustBeCompleted' },
+      { code: 'PublicDataGuidanceRequired' },
+      { code: 'ReleaseNoteRequired' },
+      { code: 'SummarySectionContainsEmptyHtmlBlock' },
+      { code: 'EmptyContentSectionExists' },
+      { code: 'GenericSectionsContainEmptyHtmlBlock' },
+      { code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock' },
+      { code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock' },
+      { code: 'PublicApiDataSetImportsMustBeCompleted' },
+      { code: 'PublicApiDataSetCancellationsMustBeResolved' },
+      { code: 'PublicApiDataSetFailuresMustBeResolved' },
+      { code: 'PublicApiDataSetMappingsMustBeCompleted' },
+    ],
+  };
+
+  test('renders correctly with errors', async () => {
     const bauUser: User = {
       id: 'user-id',
       name: 'BAU',
@@ -16,35 +43,20 @@ describe('ReleaseStatusChecklist', () => {
       } as GlobalPermissions,
     };
 
+    releaseVersionService.getReleaseVersionChecklist.mockResolvedValue(
+      testChecklist,
+    );
+
     render(
       <AuthContextTestProvider user={bauUser}>
         <MemoryRouter>
-          <ReleaseStatusChecklist
-            checklist={{
-              valid: false,
-              warnings: [],
-              errors: [
-                { code: 'DataFileImportsMustBeCompleted' },
-                { code: 'DataFileReplacementsMustBeCompleted' },
-                { code: 'PublicDataGuidanceRequired' },
-                { code: 'ReleaseNoteRequired' },
-                { code: 'SummarySectionContainsEmptyHtmlBlock' },
-                { code: 'EmptyContentSectionExists' },
-                { code: 'GenericSectionsContainEmptyHtmlBlock' },
-                { code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock' },
-                { code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock' },
-                { code: 'PublicApiDataSetImportsMustBeCompleted' },
-                { code: 'PublicApiDataSetCancellationsMustBeResolved' },
-                { code: 'PublicApiDataSetFailuresMustBeResolved' },
-                { code: 'PublicApiDataSetMappingsMustBeCompleted' },
-              ],
-            }}
-            releaseVersion={testRelease}
-          />
+          <ReleaseStatusChecklist releaseVersion={testRelease} />
         </MemoryRouter>
         ,
       </AuthContextTestProvider>,
     );
+
+    expect(await screen.findByText('Errors')).toBeInTheDocument();
 
     expect(
       screen.queryByRole('heading', { name: 'All checks passed' }),
@@ -174,7 +186,7 @@ describe('ReleaseStatusChecklist', () => {
     );
   });
 
-  test('does not render api data set links for non-BAU users', () => {
+  test('does not render api data set links for non-BAU users', async () => {
     const nonBauUser: User = {
       id: 'user-id',
       name: 'BAU',
@@ -183,35 +195,19 @@ describe('ReleaseStatusChecklist', () => {
       } as GlobalPermissions,
     };
 
+    releaseVersionService.getReleaseVersionChecklist.mockResolvedValue(
+      testChecklist,
+    );
+
     render(
       <AuthContextTestProvider user={nonBauUser}>
         <MemoryRouter>
-          <ReleaseStatusChecklist
-            checklist={{
-              valid: false,
-              warnings: [],
-              errors: [
-                { code: 'DataFileImportsMustBeCompleted' },
-                { code: 'DataFileReplacementsMustBeCompleted' },
-                { code: 'PublicDataGuidanceRequired' },
-                { code: 'ReleaseNoteRequired' },
-                { code: 'SummarySectionContainsEmptyHtmlBlock' },
-                { code: 'EmptyContentSectionExists' },
-                { code: 'GenericSectionsContainEmptyHtmlBlock' },
-                { code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock' },
-                { code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock' },
-                { code: 'PublicApiDataSetImportsMustBeCompleted' },
-                { code: 'PublicApiDataSetCancellationsMustBeResolved' },
-                { code: 'PublicApiDataSetFailuresMustBeResolved' },
-                { code: 'PublicApiDataSetMappingsMustBeCompleted' },
-              ],
-            }}
-            releaseVersion={testRelease}
-          />
+          <ReleaseStatusChecklist releaseVersion={testRelease} />
         </MemoryRouter>
-        ,
       </AuthContextTestProvider>,
     );
+
+    expect(await screen.findByText('Errors')).toBeInTheDocument();
 
     expect(
       screen.getByText('All public API data set processing must be completed'),
@@ -258,34 +254,39 @@ describe('ReleaseStatusChecklist', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders correctly with warnings', () => {
+  test('renders correctly with warnings', async () => {
+    const testChecklistWithWarnings: ReleaseVersionChecklist = {
+      valid: true,
+      warnings: [
+        { code: 'NoMethodology' },
+        {
+          code: 'MethodologyNotApproved',
+          methodologyId: 'methodology-1',
+        },
+        {
+          code: 'MethodologyNotApproved',
+          methodologyId: 'methodology-2',
+        },
+        { code: 'NoNextReleaseDate' },
+        { code: 'NoFootnotesOnSubjects', totalSubjects: 3 },
+        { code: 'NoFeaturedTables' },
+        { code: 'NoDataFiles' },
+        { code: 'NoPublicPreReleaseAccessList' },
+      ],
+      errors: [],
+    };
+
+    releaseVersionService.getReleaseVersionChecklist.mockResolvedValue(
+      testChecklistWithWarnings,
+    );
+
     render(
       <MemoryRouter>
-        <ReleaseStatusChecklist
-          checklist={{
-            valid: true,
-            warnings: [
-              { code: 'NoMethodology' },
-              {
-                code: 'MethodologyNotApproved',
-                methodologyId: 'methodology-1',
-              },
-              {
-                code: 'MethodologyNotApproved',
-                methodologyId: 'methodology-2',
-              },
-              { code: 'NoNextReleaseDate' },
-              { code: 'NoFootnotesOnSubjects', totalSubjects: 3 },
-              { code: 'NoFeaturedTables' },
-              { code: 'NoDataFiles' },
-              { code: 'NoPublicPreReleaseAccessList' },
-            ],
-            errors: [],
-          }}
-          releaseVersion={testRelease}
-        />
+        <ReleaseStatusChecklist releaseVersion={testRelease} />
       </MemoryRouter>,
     );
+
+    expect(await screen.findByText('Warnings')).toBeInTheDocument();
 
     expect(
       screen.queryByRole('heading', { name: 'All checks passed' }),
@@ -321,7 +322,10 @@ describe('ReleaseStatusChecklist', () => {
       screen.getByRole('link', {
         name: 'No next expected release date has been added',
       }),
-    ).toHaveAttribute('href', '#releaseStatusForm-nextReleaseDate-month');
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/status',
+    );
 
     expect(
       screen.getByRole('link', {
@@ -360,19 +364,24 @@ describe('ReleaseStatusChecklist', () => {
     );
   });
 
-  test('renders correctly with both warnings and errors', () => {
+  test('renders correctly with both warnings and errors', async () => {
+    const testChecklistWithErrorsAndWarnings: ReleaseVersionChecklist = {
+      valid: true,
+      warnings: [{ code: 'NoMethodology' }],
+      errors: [{ code: 'PublicDataGuidanceRequired' }],
+    };
+
+    releaseVersionService.getReleaseVersionChecklist.mockResolvedValue(
+      testChecklistWithErrorsAndWarnings,
+    );
+
     render(
       <MemoryRouter>
-        <ReleaseStatusChecklist
-          checklist={{
-            valid: true,
-            warnings: [{ code: 'NoMethodology' }],
-            errors: [{ code: 'PublicDataGuidanceRequired' }],
-          }}
-          releaseVersion={testRelease}
-        />
+        <ReleaseStatusChecklist releaseVersion={testRelease} />
       </MemoryRouter>,
     );
+
+    expect(await screen.findByText('Errors')).toBeInTheDocument();
 
     expect(
       screen.queryByRole('heading', { name: 'All checks passed' }),
@@ -398,19 +407,24 @@ describe('ReleaseStatusChecklist', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders correctly with no warnings or errors', () => {
+  test('renders correctly with no warnings or errors', async () => {
+    const testChecklistWithNoErrorsOrWarnings: ReleaseVersionChecklist = {
+      valid: true,
+      warnings: [],
+      errors: [],
+    };
+
+    releaseVersionService.getReleaseVersionChecklist.mockResolvedValue(
+      testChecklistWithNoErrorsOrWarnings,
+    );
+
     render(
       <MemoryRouter>
-        <ReleaseStatusChecklist
-          checklist={{
-            valid: true,
-            warnings: [],
-            errors: [],
-          }}
-          releaseVersion={testRelease}
-        />
+        <ReleaseStatusChecklist releaseVersion={testRelease} />
       </MemoryRouter>,
     );
+
+    expect(await screen.findByText('All checks passed')).toBeInTheDocument();
 
     expect(
       screen.getByRole('heading', { name: 'All checks passed' }),

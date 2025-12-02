@@ -36,6 +36,7 @@ import {
   releaseApiDataSetPreviewTokenLogRoute,
   releaseApiDataSetVersionHistoryRoute,
   releaseApiDataSetChangelogRoute,
+  releaseChecklistRoute,
 } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
@@ -52,6 +53,7 @@ const allNavRoutes = [
   releaseFootnotesRoute,
   releaseDataBlocksRoute,
   releaseContentRoute,
+  releaseChecklistRoute,
   releaseStatusRoute,
   releasePreReleaseAccessRoute,
 ];
