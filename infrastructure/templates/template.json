@@ -337,6 +337,13 @@
         "description": "Google Analytics tracking ID for the public app. Leave as empty string to disable Google Analytics"
       }
     },
+    "publicAppCompressionDisable": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Disables response compression for the public app. This is required to prevent double compression in conjunction with the CDN. WARN: Also used in next config!"
+      }
+    },
     "notifyInviteWithRolesTemplateId": {
       "type": "securestring",
       "defaultValue": "change-me",
@@ -2342,7 +2349,8 @@
         "PUBLIC_API_BASE_URL": "[concat('https://', parameters('publicApiUrl'))]",
         "PUBLIC_API_DOCS_URL": "[concat('https://', parameters('publicApiDocsUrl'))]",
         "WEBSITE_NODE_DEFAULT_VERSION": "22.20.0",
-        "WEBSITES_PORT": 3000
+        "WEBSITES_PORT": 3000,
+        "WEBSITES_DISABLE_CONTENT_COMPRESSION": "[parameters('publicAppCompressionDisable')]"
       }
     },
     {
