@@ -1915,7 +1915,7 @@ public class ReleaseApprovalServiceTests
 
         return new ReleaseApprovalService(
             contentDbContext,
-            timeProvider ?? new FakeTimeProvider(),
+            timeProvider ?? new FakeTimeProvider(DateTime.UtcNow),
             userService.Object,
             publishingService ?? Mock.Of<IPublishingService>(MockBehavior.Strict),
             releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(MockBehavior.Strict),
