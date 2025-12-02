@@ -378,7 +378,7 @@ const PrototypeReleaseData = () => {
           </div>
         </div>
         <Accordion id="data">
-          <AccordionSection heading="Other supporting files" goToTop={false}>
+          <AccordionSection heading="Other supporting files" backToTop={false}>
             <p>
               All supporting files from this release are listed for individual
               download below:
@@ -723,7 +723,7 @@ const PrototypeReleaseData = () => {
               <AccordionSection
                 open
                 heading="About these statistics"
-                goToTop={false}
+                backToTop={false}
               >
                 <div className="dfe-content">
                   <p>
@@ -819,7 +819,7 @@ const PrototypeReleaseData = () => {
               </AccordionSection>
               <AccordionSection
                 heading="How to use this release and find data"
-                goToTop={false}
+                backToTop={false}
               >
                 <div className="dfe-content">
                   <p>
@@ -953,62 +953,62 @@ const PrototypeReleaseData = () => {
               </AccordionSection>
               <AccordionSection
                 heading="Interactive data visualisation tool"
-                goToTop={false}
+                backToTop={false}
               >
                 This is a test
               </AccordionSection>
               <AccordionSection
                 heading="Latest headline statistics"
-                goToTop={false}
+                backToTop={false}
               >
                 This is a test
               </AccordionSection>
-              <AccordionSection heading="Annual time series" goToTop={false}>
+              <AccordionSection heading="Annual time series" backToTop={false}>
                 This is a test
               </AccordionSection>
               <AccordionSection
                 heading="Learner characteristics"
-                goToTop={false}
+                backToTop={false}
               >
                 This is a test
               </AccordionSection>
-              <AccordionSection heading="Subjects and levels" goToTop={false}>
+              <AccordionSection heading="Subjects and levels" backToTop={false}>
                 This is a test
               </AccordionSection>
               <AccordionSection
                 heading="Geographical breakdowns"
-                goToTop={false}
+                backToTop={false}
               >
                 This is a test
               </AccordionSection>
-              <AccordionSection heading="Providers" goToTop={false}>
+              <AccordionSection heading="Providers" backToTop={false}>
                 This is a test
               </AccordionSection>
               <AccordionSection
                 heading="Public sector apprenticeships"
-                goToTop={false}
+                backToTop={false}
               >
                 This is a test
               </AccordionSection>
-              <AccordionSection heading="Traineeships" goToTop={false}>
+              <AccordionSection heading="Traineeships" backToTop={false}>
                 This is a test
               </AccordionSection>
               <AccordionSection
                 heading="National achievement rate tables"
-                goToTop={false}
+                backToTop={false}
               >
                 This is a test
               </AccordionSection>
               <AccordionSection
                 heading="Apprenticeship Service and monthly transparency data"
-                goToTop={false}
+                backToTop={false}
               >
                 This is a test
               </AccordionSection>
-              <AccordionSection heading="Additional analysis" goToTop={false}>
+              <AccordionSection heading="Additional analysis" backToTop={false}>
                 This is a test
               </AccordionSection>
-              <AccordionSection heading="Future changes" goToTop={false}>
+              <AccordionSection heading="Future changes" backToTop={false}>
                 This is a test
               </AccordionSection>
             </Accordion>
@@ -1022,7 +1022,10 @@ const PrototypeReleaseData = () => {
           Help and support
         </h2>
         <Accordion id="downloads">
-          <AccordionSection heading="Download associated files" goToTop={false}>
+          <AccordionSection
+            heading="Download associated files"
+            backToTop={false}
+          >
             <PrototypeDownloadPopular />
             <PrototypeDownloadUnderlying />
             <PrototypeDownloadAncillary />
@@ -1030,7 +1033,7 @@ const PrototypeReleaseData = () => {
           </AccordionSection>
           <AccordionSection
             heading="Download associated files (Example 2)"
-            goToTop={false}
+            backToTop={false}
           >
             <PrototypeDownloadPopular viewAsList />
             <PrototypeDownloadUnderlying viewAsList />
@@ -1039,7 +1042,7 @@ const PrototypeReleaseData = () => {
           </AccordionSection>
           <AccordionSection
             heading="Download associated files (Example 3)"
-            goToTop={false}
+            backToTop={false}
           >
             <Tabs id="download">
               <TabsSection title="Featured tables">
@@ -1061,13 +1064,13 @@ const PrototypeReleaseData = () => {
               Create table
             </a>
           </AccordionSection>
-          <AccordionSection heading="Methodology" goToTop={false}>
+          <AccordionSection heading="Methodology" backToTop={false}>
             Methodology section
           </AccordionSection>
-          <AccordionSection heading="National statistics" goToTop={false}>
+          <AccordionSection heading="National statistics" backToTop={false}>
             National statistics
           </AccordionSection>
-          <AccordionSection heading="Contact us" goToTop={false}>
+          <AccordionSection heading="Contact us" backToTop={false}>
             Contact us
           </AccordionSection>
         </Accordion>

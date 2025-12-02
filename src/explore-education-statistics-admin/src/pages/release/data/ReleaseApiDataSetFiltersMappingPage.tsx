@@ -430,12 +430,12 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
 
                     return (
                       <AccordionSection
+                        backToTop={false}
                         caption={
                           <>
                             <strong>Column:</strong> <code>{filterKey}</code>
                           </>
                         }
-                        goToTop={false}
                         heading={`${filterLabel} (${newFilterOptions[filterKey].length})`}
                         headingTag="h4"
                         id={sectionIds.newFilterOptionsGroup(filterKey)}
@@ -487,12 +487,12 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
 
                       return (
                         <AccordionSection
+                          backToTop={false}
                           caption={
                             <>
                               <strong>Column:</strong> <code>{filterKey}</code>
                             </>
                           }
-                          goToTop={false}
                           heading={`${filterLabel} (${autoMappedFilterOptions[filterKey].length})`}
                           headingTag="h4"
                           id={sectionIds.autoMappedFilterOptionsGroup(

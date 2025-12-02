@@ -38,7 +38,7 @@ const PrototypeMetaPreview = ({ description, showDialog }: Props) => {
 
       <h2 className="govuk-heading-m govuk-!-margin-top-9">Data files</h2>
       <Accordion id="dataFiles">
-        <AccordionSection heading="Absence by geography" goToTop={false}>
+        <AccordionSection heading="Absence by geography" backToTop={false}>
           <SummaryList className="govuk-!-margin-bottom-9">
             <SummaryListItem term="Filename">
               Absence_3term201819_nat_reg_la_sch
@@ -61,7 +61,7 @@ const PrototypeMetaPreview = ({ description, showDialog }: Props) => {
         </AccordionSection>
         <AccordionSection
           heading="Absence by Local Authority by characteristics"
-          goToTop={false}
+          backToTop={false}
         >
           <SummaryList className="govuk-!-margin-bottom-9">
             <SummaryListItem term="Geographical levels">
@@ -79,7 +79,7 @@ const PrototypeMetaPreview = ({ description, showDialog }: Props) => {
         </AccordionSection>
         <AccordionSection
           heading="Absence by Local Authority District by characteristics"
-          goToTop={false}
+          backToTop={false}
         >
           <SummaryList className="govuk-!-margin-bottom-9">
             <SummaryListItem term="Geographical levels">

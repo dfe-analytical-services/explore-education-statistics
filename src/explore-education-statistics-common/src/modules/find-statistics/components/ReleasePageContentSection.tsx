@@ -1,4 +1,4 @@
-import GoToTopLink from '@common/components/GoToTopLink';
+import BackToTopLink from '@common/components/BackToTopLink';
 import SectionBreak from '@common/components/SectionBreak';
 import generateIdFromHeading from '@common/components/util/generateIdFromHeading';
 import React, { ReactNode } from 'react';
@@ -48,7 +48,7 @@ export default function ReleasePageContentSection({
           {children}
 
           {includeBackToTopLink && (
-            <GoToTopLink className="govuk-!-margin-top-8" />
+            <BackToTopLink className="govuk-!-margin-top-8" />
           )}
         </div>
       </section>

@@ -1,8 +1,8 @@
-import GoToTopLink from '@common/components/GoToTopLink';
-import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
+import BackToTopLink from '@common/components/BackToTopLink';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import NotificationBanner from '@common/components/NotificationBanner';
+import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import { useMobileMedia } from '@common/hooks/useMedia';
@@ -12,9 +12,9 @@ import FiltersMobile from '@frontend/components/FiltersMobile';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
-import FindStatisticsSearchForm from '@frontend/modules/find-statistics/components/FindStatisticsSearchForm';
 import { SortOption } from '@frontend/components/SortControls';
 import Filters from '@frontend/modules/find-statistics/components/Filters';
+import FindStatisticsSearchForm from '@frontend/modules/find-statistics/components/FindStatisticsSearchForm';
 import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
 import { getParamsFromQuery } from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
 import {
@@ -25,13 +25,13 @@ import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/p
 import azurePublicationQueries from '@frontend/queries/azurePublicationQueries';
 import themeQueries from '@frontend/queries/themeQueries';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import React, { useState } from 'react';
-import { GetServerSideProps, NextPage } from 'next';
-import { useRouter } from 'next/router';
 import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query';
 import compact from 'lodash/compact';
 import omit from 'lodash/omit';
+import { GetServerSideProps, NextPage } from 'next';
+import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
+import React, { useState } from 'react';
 
 const defaultPageTitle = 'Find statistics and data';
 
@@ -418,7 +418,7 @@ const FindStatisticsPage: NextPage = () => {
           </LoadingSpinner>
 
           {publications.length > 0 && (
-            <GoToTopLink className="govuk-!-margin-top-7" />
+            <BackToTopLink className="govuk-!-margin-top-7" />
           )}
         </div>
       </div>

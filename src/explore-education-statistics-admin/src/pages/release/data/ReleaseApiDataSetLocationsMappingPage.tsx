@@ -455,7 +455,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                   if (levelNewLocations?.length) {
                     return (
                       <AccordionSection
-                        goToTop={false}
+                        backToTop={false}
                         heading={`${groupLabel} (${levelNewLocations.length})`}
                         headingTag="h4"
                         id={sectionIds.newLocationsLevel(level)}
@@ -504,7 +504,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                   if (levelAutoMappedLocations?.length) {
                     return (
                       <AccordionSection
-                        goToTop={false}
+                        backToTop={false}
                         heading={`${groupLabel} (${levelAutoMappedLocations.length})`}
                         headingTag="h4"
                         id={sectionIds.autoMappedLocationsLevel(level)}
