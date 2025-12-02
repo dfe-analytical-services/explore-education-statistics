@@ -203,6 +203,12 @@ export default function MapBlock({
 
   const [legendItems, setLegendItems] = useState<MapLegendItem[]>([]);
 
+  const selectedDataSetCategories = useMemo(() => {
+    return dataSetCategories.filter(
+      category => category.dataSets[selectedDataSetKey],
+    );
+  }, [dataSetCategories, selectedDataSetKey]);
+
   const selectedDataSetConfig = dataSetCategoryConfigs[selectedDataSetKey];
 
   const selectedDataSet =
@@ -216,23 +222,23 @@ export default function MapBlock({
 
   // Rebuild the geometry if the selection has changed
   useEffect(() => {
-    if (dataSetCategories.length && selectedDataSetConfig) {
+    if (selectedDataSetCategories.length && selectedDataSetConfig) {
       const { features: newFeatures, legendItems: newLegendItems } =
         generateFeaturesAndDataGroups({
           deprecatedCategoricalDataConfig: map?.categoricalDataConfig,
-          selectedDataSetConfig,
-          dataSetCategories,
+          dataSetConfig: selectedDataSetConfig,
+          dataSetCategories: selectedDataSetCategories,
         });
 
       setFeatures(newFeatures);
       setLegendItems(newLegendItems);
     }
   }, [
-    dataSetCategories,
-    dataSetCategoryConfigs,
+    selectedDataSetCategories,
     map?.categoricalDataConfig,
     selectedDataSetConfig,
     selectedDataSetKey,
+    selectedDataSetCategories.length,
   ]);
 
   const handleLocationChange = useCallback(
@@ -277,7 +283,7 @@ export default function MapBlock({
   return (
     <>
       <MapControls
-        dataSetCategories={dataSetCategories}
+        dataSetCategories={selectedDataSetCategories}
         dataSetOptions={dataSetOptions}
         id={id}
         selectedDataSetKey={selectedDataSetKey}
