@@ -385,7 +385,6 @@ export function chartBuilderReducer(
             axisMajor: draft.axes.major,
             data,
             legend: draft.legend,
-            mapDataSetConfigs: draft.map.dataSetConfigs,
             meta,
             options: draft.options,
           });
