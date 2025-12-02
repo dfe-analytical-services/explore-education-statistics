@@ -18,11 +18,6 @@ describe('PreviewTokenDateHelper', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     helper = new PreviewTokenDateHelper();
-    jest.useFakeTimers();
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
   });
 
   describe('setDateRangeBasedOnCustomDates', () => {
@@ -125,7 +120,7 @@ describe('PreviewTokenDateHelper', () => {
       'fixed now = %s → end should be end-of-tomorrow (London)',
       (fixedDateIso, expectedEndIso) => {
         const fixedDate = new Date(fixedDateIso);
-        jest.setSystemTime(fixedDate);
+        mockDate.set(fixedDate);
 
         // Act
         const result = helper.setDateRangeBasedOnCustomDates();
@@ -136,8 +131,7 @@ describe('PreviewTokenDateHelper', () => {
         ).toBeLessThanOrEqual(2);
 
         // Assert: end equals the expected end-of-tomorrow instant (UTC)
-        const expectedEndUtc = new Date(expectedEndIso);
-        expect(result.endDate.toISOString()).toBe(expectedEndUtc.toISOString());
+        expect(result.endDate.toISOString()).toBe(expectedEndIso);
 
         // Assert: in London, the wall-clock time is 23:59:59
         const londonEndHms = formatInTimeZone(
