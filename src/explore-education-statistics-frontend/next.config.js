@@ -26,7 +26,8 @@ const generalHeaders = [
     value: 'nosniff',
   },
 ];
-if (process.env.NODE_ENV !== 'production') {
+
+if (process.env.NODE_ENV === 'development') {
   // For local development, so hotreload works correctly
   generalHeaders.push({
     key: 'Cache-Control',
@@ -66,7 +67,7 @@ const nextConfig = {
         source: '/:path*',
         headers: generalHeaders,
       },
-      // specific cases (that overwrite the general case headers)
+      // specific cases (that override the general case headers)
       {
         source: '/:file(favicon.svg|manifest.json)',
         headers: metaHeaders,
