@@ -4,6 +4,11 @@ import {
   testMapConfiguration,
   testMapTableData,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
+import {
+  testMixedMapConfiguration,
+  testMixedData,
+  testMixedMeta,
+} from '@common/modules/charts/components/__tests__/__data__/testMixedMapData';
 import MapBlock, {
   MapBlockProps,
 } from '@common/modules/charts/components/MapBlock';
@@ -11,7 +16,6 @@ import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { within } from '@testing-library/dom';
 import { screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { produce } from 'immer';
 
 describe('MapBlock', () => {
@@ -131,13 +135,13 @@ describe('MapBlock', () => {
   });
 
   test('changing selected data set changes legends', async () => {
-    render(<MapBlock {...testBlockProps} />);
+    const { user } = render(<MapBlock {...testBlockProps} />);
 
     const select = screen.getByLabelText('1. Select data to view');
     expect(select.children[1]).toHaveTextContent(
       'Overall absence rate (2016/17)',
     );
-    await userEvent.selectOptions(select, select.children[1] as HTMLElement);
+    await user.selectOptions(select, select.children[1] as HTMLElement);
 
     const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 
@@ -157,7 +161,7 @@ describe('MapBlock', () => {
   });
 
   test('selecting data set with different boundary level calls onBoundaryLevelChange', async () => {
-    render(<MapBlock {...testBlockProps} />);
+    const { user } = render(<MapBlock {...testBlockProps} />);
 
     expect(onBoundaryLevelChange).not.toHaveBeenCalled();
 
@@ -166,12 +170,12 @@ describe('MapBlock', () => {
     expect(options).toHaveLength(2);
 
     // Selecting another data set with different boundary level
-    await userEvent.selectOptions(select, options[1]);
+    await user.selectOptions(select, options[1]);
     expect(onBoundaryLevelChange).toHaveBeenCalledWith(2);
   });
 
   test('changing selected location focuses the correct polygon', async () => {
-    const { container } = render(<MapBlock {...testBlockProps} />);
+    const { container, user } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
       expect(
@@ -187,7 +191,7 @@ describe('MapBlock', () => {
     const group1Options = within(groups[0]).getAllByRole('option');
     expect(group1Options[0]).toHaveTextContent('Leeds');
 
-    await userEvent.selectOptions(select, group1Options[0]);
+    await user.selectOptions(select, group1Options[0]);
 
     const paths = container.querySelectorAll<HTMLElement>(
       '.leaflet-container svg:not(.leaflet-attribution-flag) path.leaflet-interactive',
@@ -203,7 +207,7 @@ describe('MapBlock', () => {
   });
 
   test('changing selected location renders its indicator tile', async () => {
-    render(<MapBlock {...testBlockProps} />);
+    const { user } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
       expect(
@@ -217,7 +221,7 @@ describe('MapBlock', () => {
     const groups = within(select).getAllByRole('group');
     const group1Options = within(groups[0]).getAllByRole('option');
 
-    await userEvent.selectOptions(select, group1Options[0]);
+    await user.selectOptions(select, group1Options[0]);
 
     const indicator = screen.getByTestId('mapBlock-indicator');
     const tile = within(indicator);
@@ -240,7 +244,7 @@ describe('MapBlock', () => {
       }),
     );
 
-    render(
+    const { user } = render(
       <MapBlock
         {...testBlockProps}
         meta={fullTable.subjectMeta}
@@ -260,7 +264,7 @@ describe('MapBlock', () => {
     const groups = within(select).getAllByRole('group');
     const group1Options = within(groups[0]).getAllByRole('option');
 
-    await userEvent.selectOptions(select, group1Options[0]);
+    await user.selectOptions(select, group1Options[0]);
 
     const tile1 = within(screen.getByTestId('mapBlock-indicator'));
     expect(tile1.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
@@ -270,7 +274,7 @@ describe('MapBlock', () => {
       tile1.getByTestId('mapBlock-indicatorTile-statistic'),
     ).toHaveTextContent('3.51%');
 
-    await userEvent.selectOptions(select, group1Options[1]);
+    await user.selectOptions(select, group1Options[1]);
 
     const tile2 = within(screen.getByTestId('mapBlock-indicator'));
     expect(tile2.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
@@ -280,7 +284,7 @@ describe('MapBlock', () => {
       tile2.getByTestId('mapBlock-indicatorTile-statistic'),
     ).toHaveTextContent('3.01%');
 
-    await userEvent.selectOptions(select, group1Options[2]);
+    await user.selectOptions(select, group1Options[2]);
 
     const tile3 = within(screen.getByTestId('mapBlock-indicator'));
     expect(tile3.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
@@ -292,7 +296,7 @@ describe('MapBlock', () => {
   });
 
   test('resetting the map when no location selected', async () => {
-    const { container } = render(<MapBlock {...testBlockProps} />);
+    const { container, user } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
       expect(
@@ -306,7 +310,7 @@ describe('MapBlock', () => {
     const groups = within(select).getAllByRole('group');
     const group1Options = within(groups[0]).getAllByRole('option');
 
-    await userEvent.selectOptions(select, group1Options[0]);
+    await user.selectOptions(select, group1Options[0]);
 
     const paths = container.querySelectorAll<HTMLElement>(
       '.leaflet-container svg:not(.leaflet-attribution-flag) path.leaflet-interactive',
@@ -317,10 +321,7 @@ describe('MapBlock', () => {
     expect(paths[1]).toHaveAttribute('stroke-width', '1');
     expect(paths[2]).toHaveAttribute('stroke-width', '3');
 
-    await userEvent.selectOptions(
-      select,
-      within(select).getAllByRole('option')[0],
-    );
+    await user.selectOptions(select, within(select).getAllByRole('option')[0]);
 
     expect(paths[0]).toHaveAttribute('stroke-width', '1');
     expect(paths[1]).toHaveAttribute('stroke-width', '1');
@@ -381,6 +382,101 @@ describe('MapBlock', () => {
     expect(legendColours[2].style.backgroundColor).toBe('rgb(145, 161, 201)');
     expect(legendColours[3].style.backgroundColor).toBe('rgb(108, 130, 183)');
     expect(legendColours[4].style.backgroundColor).toBe('rgb(71, 99, 165)');
+  });
+
+  test('renders correctly with mixed data sets', async () => {
+    const testProps: MapBlockProps = {
+      ...testMixedMapConfiguration,
+      boundaryLevel: 1,
+      id: 'testMap',
+      axes: testMixedMapConfiguration.axes as MapBlockProps['axes'],
+      legend: testMixedMapConfiguration.legend as LegendConfiguration,
+      meta: testMixedMeta,
+      data: testMixedData,
+      height: 600,
+      onBoundaryLevelChange,
+    };
+    const { container, user } = render(<MapBlock {...testProps} />);
+
+    await waitFor(() => {
+      const paths = container.querySelectorAll<HTMLElement>(
+        '.leaflet-container svg:not(.leaflet-attribution-flag) path',
+      );
+
+      expect(paths).toHaveLength(3);
+
+      // Location polygons
+      expect(paths[0]).toHaveAttribute('fill', 'rgba(208, 217, 226, 1)');
+      expect(paths[1]).toHaveAttribute('fill', 'rgba(18, 67, 109, 1)');
+      // UK polygon
+      expect(paths[2]).toHaveAttribute('fill', '#003078');
+    });
+
+    const legendItems = screen.getAllByTestId('mapBlock-legend-item');
+    expect(legendItems).toHaveLength(5);
+    expect(legendItems[0]).toHaveTextContent('400 to 419');
+    expect(legendItems[1]).toHaveTextContent('420 to 439');
+    expect(legendItems[2]).toHaveTextContent('440 to 459');
+    expect(legendItems[3]).toHaveTextContent('460 to 479');
+    expect(legendItems[4]).toHaveTextContent('480 to 500');
+
+    const legendColours = screen.getAllByTestId('mapBlock-legend-colour');
+    expect(legendColours).toHaveLength(5);
+    expect(legendColours[0].style.backgroundColor).toBe('rgb(208, 217, 226)');
+    expect(legendColours[1].style.backgroundColor).toBe('rgb(160, 180, 197)');
+    expect(legendColours[2].style.backgroundColor).toBe('rgb(113, 142, 167)');
+    expect(legendColours[3].style.backgroundColor).toBe('rgb(65, 105, 138)');
+    expect(legendColours[4].style.backgroundColor).toBe('rgb(18, 67, 109)');
+
+    const dataSetSelect = screen.getByLabelText('1. Select data to view');
+    expect(dataSetSelect.children).toHaveLength(2);
+    expect(dataSetSelect.children[0]).toHaveTextContent(
+      'Numerical indicator (2024)',
+    );
+    expect(dataSetSelect.children[1]).toHaveTextContent(
+      'Categorical indicator (2024)',
+    );
+
+    const locationSelect = screen.getByLabelText('2. Select a Region');
+    expect(locationSelect.children).toHaveLength(3);
+    expect(locationSelect.children[0]).toHaveTextContent('None selected');
+    expect(locationSelect.children[1]).toHaveTextContent('Location 1');
+    expect(locationSelect.children[2]).toHaveTextContent('Location 2');
+
+    // Change selected data set
+    await user.selectOptions(dataSetSelect, ['Categorical indicator (2024)']);
+
+    await waitFor(() => {
+      const updatedPaths = container.querySelectorAll<HTMLElement>(
+        '.leaflet-container svg:not(.leaflet-attribution-flag) path',
+      );
+
+      expect(updatedPaths).toHaveLength(2);
+
+      // Location polygons
+      expect(updatedPaths[0]).toHaveAttribute('fill', '#003078');
+      // UK polygon
+      expect(updatedPaths[1]).toHaveAttribute('fill', '#12436D');
+    });
+
+    const updatedLegendItems = screen.getAllByTestId('mapBlock-legend-item');
+    expect(updatedLegendItems).toHaveLength(1);
+    expect(updatedLegendItems[0]).toHaveTextContent('large');
+
+    const updatedLegendColours = screen.getAllByTestId(
+      'mapBlock-legend-colour',
+    );
+    expect(updatedLegendColours).toHaveLength(1);
+    expect(updatedLegendColours[0].style.backgroundColor).toBe(
+      'rgb(18, 67, 109)',
+    );
+
+    const updatedLocationSelect = screen.getByLabelText('2. Select a Region');
+    expect(updatedLocationSelect.children).toHaveLength(2);
+    expect(updatedLocationSelect.children[0]).toHaveTextContent(
+      'None selected',
+    );
+    expect(updatedLocationSelect.children[1]).toHaveTextContent('Location 3');
   });
 
   describe('MapBlock (aria-label)', () => {
