@@ -120,7 +120,7 @@ describe('PreviewTokenDateHelper', () => {
       'fixed now = %s → end should be end-of-tomorrow (London)',
       (fixedDateIso, expectedEndIso) => {
         const fixedDate = new Date(fixedDateIso);
-        mockDate.set(fixedDate);
+        mockDate.set(fixedDateIso);
 
         // Act
         const result = helper.setDateRangeBasedOnCustomDates();
