@@ -142,10 +142,8 @@ export default function DataFilesTableUploadRow({
             title="Data set details"
             open={openImportConfirm}
             hideConfirm={
-              !isBauUser &&
-              (!canUpdateRelease ||
-                hasFailures ||
-                !dataSetUpload.screenerResult)
+              (!isBauUser && (!canUpdateRelease || hasFailures)) ||
+              !dataSetUpload.screenerResult
             }
             disableConfirm={
               !Object.values(warningAcknowledgements).every(

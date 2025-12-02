@@ -28,6 +28,8 @@ export const getDataSetUploadStatusLabel = (
       return 'Pending import';
     case 'FAILED_SCREENING':
       return 'Failed screening';
+    case 'SCREENER_ERROR':
+      return 'Screener error';
     default:
       return undefined;
   }
@@ -46,6 +48,7 @@ export const getDataSetUploadStatusColour = (
     case 'PENDING_IMPORT':
       return 'light-blue';
     case 'FAILED_SCREENING':
+    case 'SCREENER_ERROR':
       return 'red';
     default:
       return undefined;

@@ -248,6 +248,11 @@ public class MappingProfiles : CommonMappingProfile
 
     private static string GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)
     {
+        if (screenerResult is null)
+        {
+            return DataSetUploadStatus.SCREENER_ERROR.ToString();
+        }
+
         if (screenerResult.Passed && screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING))
         {
             return DataSetUploadStatus.PENDING_REVIEW.ToString();
