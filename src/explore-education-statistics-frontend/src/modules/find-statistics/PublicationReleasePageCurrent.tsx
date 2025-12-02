@@ -78,6 +78,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
             lastUpdated={releaseUpdates[0]?.on}
             latestRelease={releaseVersion.latestRelease}
             nextReleaseDate={releaseVersion.nextReleaseDate}
+            publishingOrganisations={releaseVersion.publishingOrganisations}
             releaseDate={releaseVersion.published}
             releaseType={releaseVersion.type}
             renderReleaseNotes={
@@ -555,6 +556,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
 
       <ReleaseHelpAndSupportSection
         publication={releaseVersion.publication}
+        publishingOrganisations={releaseVersion.publishingOrganisations}
         releaseType={releaseVersion.type}
         renderExternalMethodologyLink={externalMethodology => {
           const externalMethodologyAttributes = getUrlAttributes(

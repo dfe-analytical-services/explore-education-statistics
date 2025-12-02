@@ -6,6 +6,7 @@ import OfficialStatisticsSection from '@common/modules/release/components/Offici
 import OfficialStatisticsInDevelopmentSection from '@common/modules/release/components/OfficialStatisticsInDevelopmentSection';
 import { ReleaseType } from '@common/services/types/releaseType';
 import React from 'react';
+import { Organisation } from '@common/services/types/organisation';
 
 const releaseTypeComponents = {
   AccreditedOfficialStatistics: AccreditedOfficialStatisticsSection,
@@ -16,17 +17,27 @@ const releaseTypeComponents = {
   OfficialStatisticsInDevelopment: OfficialStatisticsInDevelopmentSection,
 };
 
-interface Props {
+export interface ReleaseTypeSectionProps {
+  publishingOrganisations?: Organisation[];
   showHeading?: boolean;
+}
+
+interface Props extends ReleaseTypeSectionProps {
   type: ReleaseType;
 }
 
 export default function ReleaseTypeSection({
+  publishingOrganisations,
   showHeading = true,
   type,
 }: Props) {
   const ReleaseTypeComponent = releaseTypeComponents[type];
   if (ReleaseTypeComponent) {
-    return <ReleaseTypeComponent showHeading={showHeading} />;
+    return (
+      <ReleaseTypeComponent
+        publishingOrganisations={publishingOrganisations}
+        showHeading={showHeading}
+      />
+    );
   }
 }

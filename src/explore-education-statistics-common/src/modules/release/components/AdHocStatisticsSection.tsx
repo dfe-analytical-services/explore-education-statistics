@@ -1,10 +1,9 @@
+import { ReleaseTypeSectionProps } from '@common/modules/release/components/ReleaseTypeSection';
 import React from 'react';
 
 export default function AdHocStatisticsSection({
   showHeading = true,
-}: {
-  showHeading?: boolean;
-}) {
+}: ReleaseTypeSectionProps) {
   return (
     <>
       {showHeading && <h3>Ad hoc official statistics</h3>}

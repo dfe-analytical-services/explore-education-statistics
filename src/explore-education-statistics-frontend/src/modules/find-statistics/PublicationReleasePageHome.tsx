@@ -55,6 +55,9 @@ const PublicationReleasePage = ({
 
           <ReleaseSummaryBlockMobile
             lastUpdated={releaseVersionSummary.lastUpdated}
+            publishingOrganisations={
+              releaseVersionSummary.publishingOrganisations
+            }
             releaseType={releaseVersionSummary.type}
             renderProducerLink={
               releaseVersionSummary.publishingOrganisations?.length ? (
@@ -193,6 +196,7 @@ const PublicationReleasePage = ({
       <ContactUsSection
         publicationContact={publicationSummary.contact}
         publicationTitle={publicationSummary.title}
+        publishingOrganisations={releaseVersionSummary.publishingOrganisations}
       />
     </>
   );

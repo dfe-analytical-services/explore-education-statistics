@@ -4,6 +4,7 @@ import InfoIcon from '@common/components/InfoIcon';
 import Modal from '@common/components/Modal';
 import styles from '@common/modules/release/components/ReleaseSummaryBlock.module.scss';
 import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
+import { Organisation } from '@common/services/types/organisation';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import { parseISO } from 'date-fns';
 import React, { ReactNode } from 'react';
@@ -45,6 +46,7 @@ const ListItem = ({ children, term, testId = term }: ListItemProps) => {
 interface Props {
   isEditing?: boolean;
   lastUpdated?: string | Date;
+  publishingOrganisations?: Organisation[];
   releaseDate?: string;
   releaseType: ReleaseType;
   renderProducerLink: ReactNode;
@@ -56,6 +58,7 @@ interface Props {
 export default function ReleaseSummaryBlock({
   isEditing,
   lastUpdated,
+  publishingOrganisations,
   releaseDate,
   releaseType,
   renderProducerLink,
@@ -90,7 +93,11 @@ export default function ReleaseSummaryBlock({
                 </ButtonText>
               }
             >
-              <ReleaseTypeSection showHeading={false} type={releaseType} />
+              <ReleaseTypeSection
+                publishingOrganisations={publishingOrganisations}
+                showHeading={false}
+                type={releaseType}
+              />
             </Modal>
           </ListItem>
 

@@ -32,6 +32,7 @@ const ReleaseHelpPage = ({
       <ContactUsSection
         publicationContact={publicationSummary.contact}
         publicationTitle={publicationSummary.title}
+        publishingOrganisations={releaseVersionSummary.publishingOrganisations}
         sectionTitle="Get help by contacting us"
         includeSectionBreak
       />
@@ -42,6 +43,9 @@ const ReleaseHelpPage = ({
         includeSectionBreak={hasPraSummary || hasRelatedInformation}
       >
         <ReleaseTypeSection
+          publishingOrganisations={
+            releaseVersionSummary.publishingOrganisations
+          }
           type={releaseVersionSummary.type}
           showHeading={false}
         />
