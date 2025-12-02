@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "logicAppName": {
@@ -411,32 +411,29 @@
           },
           "outputs": {}
         }
-      }
-    },
-    {
-      "type": "Microsoft.Insights/diagnosticSettings",
-      "apiVersion": "2021-05-01-preview",
-      "name": "Send all logs and metrics to Log Analytics",
-      "scope": "[resourceId('Microsoft.Logic/workflows', parameters('logicAppName'))]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Logic/workflows', parameters('logicAppName'))]"
-      ],
-      "properties": {
-          "logs": [
+      },
+      "resources": [
+        {
+          "type": "Microsoft.Insights/diagnosticSettings",
+          "apiVersion": "2021-05-01-preview",
+          "name": "Slack webhook logic app diagnostic setting",
+          "properties": {
+            "logs": [
               {
                   "categoryGroup": "allLogs",
                   "enabled": true
               }
-          ],
-          "metrics": [
+            ],
+            "metrics": [
               {
                   "category": "AllMetrics",
                   "enabled": true
               }
-          ],
-          "workspaceId": "[parameters('workspaceResourceId')]",
-          "logAnalyticsDestinationType": null
-      }
+            ],
+            "workspaceId": "[parameters('workspaceResourceId')]"
+          }
+        }
+      ]
     }
   ]
 }
