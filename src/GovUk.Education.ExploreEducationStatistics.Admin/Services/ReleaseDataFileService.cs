@@ -1,5 +1,6 @@
 #nullable enable
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -385,7 +386,22 @@ public class ReleaseDataFileService(
             .SelectAwait(async dataSetUpload =>
             {
                 var request = mapper.Map<DataSetScreenerRequest>(dataSetUpload);
-                var result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
+                DataSetScreenerResponse result;
+
+                try
+                {
+                    result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
+                }
+                catch (DataScreenerException)
+                {
+                    await dataSetFileStorage.UpdateDataSetUpload(
+                        dataSetUpload.Id,
+                        screenerResult: null,
+                        cancellationToken
+                    );
+
+                    return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
+                }
 
                 // TODO (EES-6693): Remove this automatic warning once the external screener is no longer required.
                 result.TestResults.Add(
@@ -399,7 +415,7 @@ public class ReleaseDataFileService(
                     }
                 );
 
-                await dataSetFileStorage.AddScreenerResultToUpload(dataSetUpload.Id, result, cancellationToken);
+                await dataSetFileStorage.UpdateDataSetUpload(dataSetUpload.Id, result, cancellationToken);
 
                 var hasWarnings = result.TestResults.Any(test => test.Result == TestResult.WARNING);
                 var hasFailures = result.TestResults.Any(test => test.Result == TestResult.FAIL);

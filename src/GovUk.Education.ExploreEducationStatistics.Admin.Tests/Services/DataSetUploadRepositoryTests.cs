@@ -21,9 +21,9 @@ public class DataSetUploadRepositoryTests
         var releaseVersionId = Guid.NewGuid();
 
         var builder = new DataSetUploadMockBuilder();
-        var upload1 = builder.WithReleaseVersionId(releaseVersionId).BuildEntity();
-        var upload2 = builder.WithReleaseVersionId(releaseVersionId).BuildEntity();
-        var upload3 = builder.WithReleaseVersionId(releaseVersionId).BuildEntity();
+        var upload1 = builder.WithReleaseVersionId(releaseVersionId).BuildScreenedEntity();
+        var upload2 = builder.WithReleaseVersionId(releaseVersionId).BuildScreenedEntity();
+        var upload3 = builder.WithReleaseVersionId(releaseVersionId).BuildScreenedEntity();
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
@@ -53,9 +53,9 @@ public class DataSetUploadRepositoryTests
         var releaseVersionId = Guid.NewGuid();
 
         var builder = new DataSetUploadMockBuilder();
-        var upload1 = builder.WithReleaseVersionId(releaseVersionId).BuildEntity();
-        var upload2 = builder.WithReleaseVersionId(releaseVersionId).BuildEntity();
-        var upload3 = builder.WithReleaseVersionId(releaseVersionId).BuildEntity();
+        var upload1 = builder.WithReleaseVersionId(releaseVersionId).BuildScreenedEntity();
+        var upload2 = builder.WithReleaseVersionId(releaseVersionId).BuildScreenedEntity();
+        var upload3 = builder.WithReleaseVersionId(releaseVersionId).BuildScreenedEntity();
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
@@ -96,9 +96,9 @@ public class DataSetUploadRepositoryTests
         var releaseVersionId = Guid.NewGuid();
 
         var builder = new DataSetUploadMockBuilder();
-        var upload1 = builder.WithReleaseVersionId(releaseVersionId).BuildEntity();
-        var upload2 = builder.WithReleaseVersionId(releaseVersionId).BuildEntity();
-        var upload3 = builder.WithReleaseVersionId(releaseVersionId).BuildEntity();
+        var upload1 = builder.WithReleaseVersionId(releaseVersionId).BuildScreenedEntity();
+        var upload2 = builder.WithReleaseVersionId(releaseVersionId).BuildScreenedEntity();
+        var upload3 = builder.WithReleaseVersionId(releaseVersionId).BuildScreenedEntity();
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
