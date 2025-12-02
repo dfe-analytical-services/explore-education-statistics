@@ -1,12 +1,34 @@
 import render from '@common-test/render';
+import { DataSetItem } from '@common/services/publicationService';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
-import { testDataSetItems } from '../../__tests__/__data__/testReleaseData';
 import ReleaseDataSetFileSummary from '../ReleaseDataSetFileSummary';
+
+const testDataSetItem: DataSetItem = {
+  dataSetFileId: 'test-dataset-1-datasetfileid',
+  fileId: 'test-dataset-1-fileid',
+  subjectId: 'test-dataset-1-subjectid',
+  meta: {
+    filters: ['Characteristic', 'School type'],
+    geographicLevels: [
+      'Local authority',
+      'Local authority district',
+      'National',
+    ],
+    indicators: ['Authorised absence rate', 'Authorised absence rate exact'],
+    numDataFileRows: 1000,
+    timePeriodRange: {
+      start: '2012/13',
+      end: '2016/17',
+    },
+  },
+  title: 'Test dataset 1',
+  summary: '<p>Test dataset 1 summary</p>',
+};
 
 describe('ReleaseDataSetFileSummary', () => {
   test('renders the collapsed view correctly', () => {
-    render(<ReleaseDataSetFileSummary dataSetFile={testDataSetItems[0]} />);
+    render(<ReleaseDataSetFileSummary dataSetFile={testDataSetItem} />);
 
     expect(
       screen.getByRole('button', {
@@ -17,7 +39,7 @@ describe('ReleaseDataSetFileSummary', () => {
 
   test('renders the expanded view when show more details is clicked', async () => {
     const { user } = render(
-      <ReleaseDataSetFileSummary dataSetFile={testDataSetItems[0]} />,
+      <ReleaseDataSetFileSummary dataSetFile={testDataSetItem} />,
     );
 
     await user.click(
@@ -58,7 +80,7 @@ describe('ReleaseDataSetFileSummary', () => {
 
   test('renders the expanded view when `expanded` is true', () => {
     render(
-      <ReleaseDataSetFileSummary dataSetFile={testDataSetItems[0]} expanded />,
+      <ReleaseDataSetFileSummary dataSetFile={testDataSetItem} expanded />,
     );
 
     expect(

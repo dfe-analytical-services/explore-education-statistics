@@ -306,11 +306,12 @@ export interface DataSetItem {
     };
   };
   title: string;
-  summary: string;
+  summary?: string;
 }
 
 export interface FeaturedTableItem {
   featuredTableId: string;
+  dataBlockId: string;
   dataBlockParentId: string;
   title: string;
   summary: string;

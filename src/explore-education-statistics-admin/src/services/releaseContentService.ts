@@ -13,6 +13,7 @@ import {
   ContentSection,
   ReleaseVersion,
   ReleaseApprovalStatus,
+  ReleaseVersionDataContent,
 } from '@common/services/publicationService';
 import { DataBlock } from '@common/services/types/blocks';
 import { Dictionary } from '@common/types';
@@ -40,7 +41,17 @@ export interface ContentBlockAttachRequest {
   order: number;
 }
 
+export interface DataContent
+  extends Omit<ReleaseVersionDataContent, 'dataGuidance'> {
+  dataGuidance?: string;
+}
+
 const releaseContentService = {
+  getDataContent(releaseVersionId: string): Promise<DataContent> {
+    return client.get<DataContent>(
+      `/releaseVersions/${releaseVersionId}/data-content`,
+    );
+  },
   getContent(releaseId: string, isPrerelease = false): Promise<ReleaseContent> {
     return client.get<ReleaseContent>(`/release/${releaseId}/content`, {
       params: { isPrerelease },
