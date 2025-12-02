@@ -50,16 +50,10 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtil
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api;
 
 [ExcludeFromCodeCoverage]
-public class Startup
+public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
 {
-    private IConfiguration Configuration { get; }
-    private IHostEnvironment HostEnvironment { get; }
-
-    public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
-    {
-        Configuration = configuration;
-        HostEnvironment = hostEnvironment;
-    }
+    private IConfiguration Configuration { get; } = configuration;
+    private IHostEnvironment HostEnvironment { get; } = hostEnvironment;
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)

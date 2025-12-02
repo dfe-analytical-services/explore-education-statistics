@@ -91,7 +91,7 @@ public class ReleaseApprovalService(
                 releaseVersion.UpdatePublishedDate = request.UpdatePublishedDate ?? false;
                 releaseVersion.PublishScheduled =
                     request.PublishMethod == PublishMethod.Immediate
-                        ? timeProvider.GetUtcNow().DateTime
+                        ? timeProvider.GetUtcNow().UtcDateTime
                         : request.PublishScheduledDate;
 
                 var releaseStatus = new ReleaseStatus
@@ -300,7 +300,7 @@ public class ReleaseApprovalService(
         var toUtc = fromUtc.AddDays(1).AddTicks(-1);
 
         // The publish date cannot be scheduled if it's already passed
-        var nowUtc = timeProvider.GetUtcNow().DateTime;
+        var nowUtc = timeProvider.GetUtcNow().UtcDateTime;
 
         if (nowUtc > toUtc)
         {
