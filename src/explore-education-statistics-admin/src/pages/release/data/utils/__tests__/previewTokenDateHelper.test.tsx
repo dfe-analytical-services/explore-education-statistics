@@ -18,6 +18,11 @@ describe('PreviewTokenDateHelper', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     helper = new PreviewTokenDateHelper();
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('setDateRangeBasedOnCustomDates', () => {
@@ -120,7 +125,7 @@ describe('PreviewTokenDateHelper', () => {
       'fixed now = %s → end should be end-of-tomorrow (London)',
       (fixedDateIso, expectedEndIso) => {
         const fixedDate = new Date(fixedDateIso);
-        mockDate.set(fixedDate);
+        jest.setSystemTime(fixedDate);
 
         // Act
         const result = helper.setDateRangeBasedOnCustomDates();
