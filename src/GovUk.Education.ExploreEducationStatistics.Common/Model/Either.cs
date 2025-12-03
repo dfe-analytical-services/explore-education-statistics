@@ -495,7 +495,7 @@ public static class EitherTaskExtensions
         )!;
     }
 
-    public static async Task<Either<TFailure?, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
+    public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
         this Task<Either<TFailure, TSuccess1>> task,
         Func<TSuccess1?, Task<TSuccess2>> func
     )
