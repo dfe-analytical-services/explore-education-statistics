@@ -4,13 +4,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Pos
 
 public static class OptimisedPostgreSqlIntegrationTestFixtureBaseExtensions
 {
-    public static Func<string> RegisterPostgreSqlContainer<TStartup>(
-        this OptimisedIntegrationTestFixtureBase<TStartup> fixture
-    )
-        where TStartup : class
+    public static Func<string> RegisterPostgreSqlContainer(this TestContainerRegistrations registrations)
     {
         var container = new PostgreSqlBuilder().WithImage("postgres:16.1-alpine").Build();
-        fixture.AddContainer(container);
+        registrations.RegisterContainer(container);
         return () => container.GetConnectionString();
     }
 }

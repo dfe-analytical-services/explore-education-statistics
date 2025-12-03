@@ -62,16 +62,16 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     private Func<string> _psqlConnectionString = null!;
     private Func<string> _azuriteConnectionString = null!;
 
-    protected override void RegisterTestContainers()
+    protected override void RegisterTestContainers(TestContainerRegistrations registrations)
     {
         if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
         {
-            _psqlConnectionString = this.RegisterPostgreSqlContainer();
+            _psqlConnectionString = registrations.RegisterPostgreSqlContainer();
         }
 
         if (capabilities.Contains(AdminIntegrationTestCapability.Azurite))
         {
-            _azuriteConnectionString = this.RegisterAzuriteContainer();
+            _azuriteConnectionString = registrations.RegisterAzuriteContainer();
         }
     }
 

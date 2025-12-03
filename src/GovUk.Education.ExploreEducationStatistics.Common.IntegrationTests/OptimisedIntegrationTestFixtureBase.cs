@@ -12,15 +12,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 public abstract class OptimisedIntegrationTestFixtureBase<TStartup> : IAsyncLifetime
     where TStartup : class
 {
-    private readonly List<DockerContainer> _testContainers = new();
+    private TestContainerRegistrations _testContainers = null!;
     private WebApplicationFactory<TStartup> _factory = null!;
 
     public async Task InitializeAsync()
     {
-        RegisterTestContainers();
+        _testContainers = new TestContainerRegistrations();
+        RegisterTestContainers(_testContainers);
 
-        var startupTasks = _testContainers.Select(container => container.StartAsync());
-        await Task.WhenAll(startupTasks);
+        await _testContainers.StartAll();
 
         var factory = new WebApplicationFactory<TStartup>();
 
@@ -45,7 +45,7 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup> : IAsyncLife
         AfterFactoryConstructed(lookups);
     }
 
-    protected virtual void RegisterTestContainers() { }
+    protected virtual void RegisterTestContainers(TestContainerRegistrations registrations) { }
 
     protected virtual void ConfigureServicesAndConfiguration(
         OptimisedServiceAndConfigModifications serviceModifications
@@ -66,17 +66,32 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup> : IAsyncLife
         return Task.CompletedTask;
     }
 
-    public void AddContainer(DockerContainer container)
+    public async Task DisposeAsync()
+    {
+        await _testContainers.StopAll();
+        await DisposeResources();
+    }
+}
+
+public class TestContainerRegistrations
+{
+    private readonly List<DockerContainer> _testContainers = new();
+
+    public void RegisterContainer(DockerContainer container)
     {
         _testContainers.Add(container);
     }
 
-    public async Task DisposeAsync()
+    public async Task StartAll()
     {
-        var shutdownTasks = _testContainers.Select(container => container.StopAsync());
-        await Task.WhenAll(shutdownTasks);
+        var startTasks = _testContainers.Select(container => container.StartAsync());
+        await Task.WhenAll(startTasks);
+    }
 
-        await DisposeResources();
+    public async Task StopAll()
+    {
+        var stopTasks = _testContainers.Select(container => container.StopAsync());
+        await Task.WhenAll(stopTasks);
     }
 }
 
