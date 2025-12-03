@@ -107,6 +107,9 @@ const ReleaseDataReorderSection = ({
                                   onClick={() => setReorderingFilters(subject)}
                                 >
                                   Reorder filters
+                                  <VisuallyHidden>
+                                    {` for ${subject.name}`}
+                                  </VisuallyHidden>
                                 </Button>
                                 <Button
                                   onClick={() =>
@@ -114,6 +117,9 @@ const ReleaseDataReorderSection = ({
                                   }
                                 >
                                   Reorder indicators
+                                  <VisuallyHidden>
+                                    {` for ${subject.name}`}
+                                  </VisuallyHidden>
                                 </Button>
                               </ButtonGroup>
                             </td>
