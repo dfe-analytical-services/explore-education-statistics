@@ -288,13 +288,12 @@ public abstract class DataSetCandidatesControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var defaultUser = DataFixture
-                .AuthenticatedUser()
-                .WithClaim(SecurityClaimTypes.AccessAllReleases.ToString());
+            var actualUser =
+                user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.AccessAllReleases));
 
-            fixture.RegisterTestUser(user ?? defaultUser);
+            fixture.RegisterTestUser(actualUser);
 
-            var client = fixture.CreateClient().WithUser(user ?? defaultUser);
+            var client = fixture.CreateClient().WithUser(actualUser);
 
             var query = new Dictionary<string, string?> { { "releaseVersionId", releaseVersionId.ToString() } };
 

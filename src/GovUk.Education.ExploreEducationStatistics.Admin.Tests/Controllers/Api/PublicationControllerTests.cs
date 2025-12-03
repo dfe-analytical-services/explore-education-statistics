@@ -231,13 +231,12 @@ public class PublicationControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var defaultUser = DataFixture
-                .AuthenticatedUser()
-                .WithClaim(nameof(SecurityClaimTypes.CreateAnyPublication));
+            var actualUser =
+                user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.CreateAnyPublication));
 
-            fixture.RegisterTestUser(user ?? defaultUser);
+            fixture.RegisterTestUser(actualUser);
 
-            var client = fixture.CreateClient().WithUser(user ?? defaultUser);
+            var client = fixture.CreateClient().WithUser(actualUser);
 
             return await client.PostAsJsonAsync("api/publications", request);
         }
@@ -297,13 +296,12 @@ public class PublicationControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var defaultUser = DataFixture
-                .AuthenticatedUser()
-                .WithClaim(nameof(SecurityClaimTypes.UpdateAllPublications));
+            var actualUser =
+                user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.UpdateAllPublications));
 
-            fixture.RegisterTestUser(user ?? defaultUser);
+            fixture.RegisterTestUser(actualUser);
 
-            var client = fixture.CreateClient().WithUser(user ?? defaultUser);
+            var client = fixture.CreateClient().WithUser(actualUser);
 
             return await client.PutAsJsonAsync($"api/publications/{publicationId}", request);
         }

@@ -644,13 +644,12 @@ public abstract class DataSetsControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var defaultUser = DataFixture
-                .AuthenticatedUser()
-                .WithClaim(SecurityClaimTypes.AccessAllPublications.ToString());
+            var actualUser =
+                user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.AccessAllPublications));
 
-            fixture.RegisterTestUser(defaultUser);
+            fixture.RegisterTestUser(actualUser);
 
-            var client = fixture.CreateClient().WithUser(user ?? defaultUser);
+            var client = fixture.CreateClient().WithUser(actualUser);
 
             var queryParams = new Dictionary<string, string?>
             {
@@ -1094,13 +1093,12 @@ public abstract class DataSetsControllerTests
             // Are we OK always having to do an explicit "RegisterTestUser" or should we set a user on
             // Fixture and then CreateClient() always uses that user until changed?  Should be safe but
             // is more "magic".
-            var defaultUser = DataFixture
-                .AuthenticatedUser()
-                .WithClaim(SecurityClaimTypes.AccessAllPublications.ToString());
+            var actualUser =
+                user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.AccessAllPublications));
 
-            fixture.RegisterTestUser(user ?? defaultUser);
+            fixture.RegisterTestUser(actualUser);
 
-            var client = fixture.CreateClient().WithUser(user ?? defaultUser);
+            var client = fixture.CreateClient().WithUser(actualUser);
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}", UriKind.Relative);
 
