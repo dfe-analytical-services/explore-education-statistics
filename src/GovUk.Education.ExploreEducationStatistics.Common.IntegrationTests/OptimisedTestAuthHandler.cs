@@ -1,12 +1,11 @@
 using System.Text.Encodings.Web;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
+namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 
 /// <summary>
 ///
@@ -15,9 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimis
 ///
 /// In order to use this handler, the caller sets the HTTP header <see cref="TestUserId"/> to match the ID of a user
 /// that is registered in the <see cref="OptimisedTestUserPool"/> that operates for the lifetime of a test class.
-///
-/// For convenience, a number of commonly used user types are automatically added to the test pool. These are available
-/// in <see cref="OptimisedTestUsers"/> and can be used at any time without the need to register them first.
 ///
 /// </summary>
 public class OptimisedTestAuthHandler(
@@ -52,8 +48,31 @@ public class OptimisedTestAuthHandler(
             );
         }
 
-        var ticket = new AuthenticationTicket(user, JwtBearerDefaults.AuthenticationScheme);
+        var ticket = new AuthenticationTicket(user, "Bearer");
         var result = AuthenticateResult.Success(ticket);
         return Task.FromResult(result);
+    }
+}
+
+public static class HttpContextExtensions
+{
+    public static bool TryGetRequestHeader(
+        this HttpContext? httpContext,
+        string headerName,
+        out StringValues headerValues
+    )
+    {
+        if (httpContext == null)
+        {
+            headerValues = StringValues.Empty;
+            return false;
+        }
+
+        return httpContext.Request.TryGetHeader(headerName, out headerValues);
+    }
+
+    public static bool TryGetHeader(this HttpRequest httpRequest, string headerName, out StringValues headerValues)
+    {
+        return httpRequest.Headers.TryGetValue(headerName, out headerValues);
     }
 }

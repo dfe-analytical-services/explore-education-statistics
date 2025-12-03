@@ -1,9 +1,6 @@
-#nullable enable
 using System.Security.Claims;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
+namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 
 /// <summary>
 /// Some convenience methods for <see cref="HttpClient"/> to be used within the test classes.
@@ -40,7 +37,25 @@ public static class OptimisedHttpClientExtensions
         Dictionary<string, string>? additionalHeaders
     )
     {
-        additionalHeaders?.ForEach(header => client.DefaultRequestHeaders.Add(header.Key, header.Value));
+        if (additionalHeaders == null)
+        {
+            return client;
+        }
+
+        foreach (var header in additionalHeaders)
+        {
+            client.DefaultRequestHeaders.Add(header.Key, header.Value);
+        }
+
         return client;
+    }
+}
+
+public static class ClaimsPrincipalExtensions
+{
+    public static Guid GetUserId(this ClaimsPrincipal principal)
+    {
+        var userIdClaim = principal.FindFirstValue("LocalId")!;
+        return Guid.Parse(userIdClaim);
     }
 }

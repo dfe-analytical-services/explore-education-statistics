@@ -1,11 +1,16 @@
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised.TestContainerWrappers;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.TestContainerWrappers;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -149,7 +154,11 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
         // to make final adjustments to the factory.
         // 7. Finally, "Build()" generates the finalised WebApplicationFactory<Startup> instance. At this point, we
         // should not attempt to reconfigure the factory further.
-        var factoryBuilder = new WebApplicationFactory<Startup>().WithReconfiguredAdmin();
+        var factory = new WebApplicationFactory<Startup>();
+        var factoryBuilder = new OptimisedWebApplicationFactoryBuilder<Startup>(factory);
+
+        // Re
+        factoryBuilder.AddServiceRegistration(ReconfigureAdminServices);
 
         if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
         {
@@ -174,6 +183,26 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
 
         // Finally, build the final factory that will be used for all the test classes that use this fixture.
         return factoryBuilder.Build();
+    }
+
+    private void ReconfigureAdminServices(IServiceCollection services)
+    {
+        services
+            .UseInMemoryDbContext<ContentDbContext>(databaseName: $"{nameof(ContentDbContext)}_{Guid.NewGuid()}")
+            .UseInMemoryDbContext<StatisticsDbContext>(databaseName: $"{nameof(StatisticsDbContext)}_{Guid.NewGuid()}")
+            .UseInMemoryDbContext<UsersAndRolesDbContext>(
+                databaseName: $"{nameof(UsersAndRolesDbContext)}_{Guid.NewGuid()}"
+            )
+            .AddScoped(_ => Mock.Of<PublicDataDbContext>(MockBehavior.Loose))
+            .MockService<IProcessorClient>()
+            .MockService<IPublicDataApiClient>()
+            .MockService<IDataProcessorClient>()
+            .MockService<IPublisherClient>()
+            .MockService<IPublisherTableStorageService>()
+            .MockService<IPrivateBlobStorageService>()
+            .MockService<IPublicBlobStorageService>()
+            .MockService<IAdminEventRaiser>(MockBehavior.Loose) // Ignore calls to publish events
+            .RegisterControllers<Startup>();
     }
 
     protected virtual void ModifyServices(OptimisedServiceCollectionModifications serviceModifications) { }
@@ -288,74 +317,4 @@ public enum AdminIntegrationTestCapability
     Postgres,
     Azurite,
     UserAuth,
-}
-
-/// <summary>
-///
-/// A helper class to control access to WebApplicationFactory modifications for tests.
-///
-/// By exposing only safe methods of reconfiguring the factory, we can better control the types of changes that we
-/// are able to perform, and it also makes it more visible when classes need particular additional support through
-/// reconfiguration.
-///
-/// By using this helper class, we also prevent direct access to the factory from test classes.
-///
-/// </summary>
-public class OptimisedServiceCollectionModifications
-{
-    internal readonly List<Action<IServiceCollection>> Actions = new();
-
-    public OptimisedServiceCollectionModifications AddController(Type controllerType)
-    {
-        Actions.Add(services =>
-            services.AddControllers().AddApplicationPart(controllerType.Assembly).AddControllersAsServices()
-        );
-        return this;
-    }
-
-    public OptimisedServiceCollectionModifications ReplaceService<T>(T service)
-        where T : class
-    {
-        Actions.Add(services => services.ReplaceService(service));
-        return this;
-    }
-
-    public OptimisedServiceCollectionModifications ReplaceServiceWithMock<T>()
-        where T : class
-    {
-        Actions.Add(services => services.MockService<T>());
-        return this;
-    }
-}
-
-/// <summary>
-///
-/// A helper class to allow tests to look up services and mocks after the factory has been configured.
-/// Through using this helper class to perform service lookups, we prevent direct access to the factory from tests.
-///
-/// </summary>
-public class OptimisedServiceCollectionLookups(WebApplicationFactory<Startup> factory)
-{
-    /// <summary>
-    ///
-    /// Look up a service from the factory.  If it's required to look up a mocked service, use the
-    /// <see cref="GetMockService{TService}" /> method instead.
-    ///
-    /// </summary>
-    public TService GetService<TService>()
-        where TService : class
-    {
-        return factory.Services.GetRequiredService<TService>();
-    }
-
-    /// <summary>
-    ///
-    /// Look up a mocked service from the factory.
-    ///
-    /// </summary>
-    public Mock<TService> GetMockService<TService>()
-        where TService : class
-    {
-        return Mock.Get(factory.Services.GetRequiredService<TService>());
-    }
 }
