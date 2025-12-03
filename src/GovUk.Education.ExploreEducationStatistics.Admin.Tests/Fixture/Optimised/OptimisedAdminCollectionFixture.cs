@@ -122,7 +122,7 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
         }
     }
 
-    protected override void AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    protected override void LookupServicesAfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
     {
         if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
         {

@@ -9,6 +9,39 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 
+/// <summary>
+///
+/// This fixture base class supports and controls a high-level and quite generic lifecycle.
+///
+/// It abstracts the WebApplicationFactory away from fixtures that subclass this fixture and
+/// instead controls configuration and access through helper classes that are provided to the
+/// subclass via lifecycle methods.
+///
+/// Essentially this fixture does the following steps:
+///
+/// 1. A test collection executes.
+/// 2. XUnit creates a new instance of the subclass of this fixture.
+/// 3. XUnit calls <see cref="InitializeAsync"/> on this fixture.
+/// 4. <see cref="InitializeAsync"/> then:
+///   1. Allows the subclass to register any Test Containers that it needs, by the subclass overriding the
+///      <see cref="RegisterTestContainers"/> method.
+///   2. Starts any Test Containers that the subclass needs.
+///   3. Lets the subclass modify any registered services and configuration prior to the WebApplicationFactory being
+///      built, by the subclass overriding the <see cref="ConfigureServicesAndConfiguration" /> method.
+///   4. Builds a new WebApplicationFactoryBuilder that will allow us to  create a WebApplicationFactory that is based
+///      on <see cref="TStartup"/> but with amendments made to allow testing.
+///   5. Applies any ServiceCollection and IConfigurationBuilder modifications that the subclass asked for to the
+///      builder.
+///   6. Lets the subclass look up any services that it needs after the factory has been constructed, by overriding the
+///      <see cref="LookupServicesAfterFactoryConstructed"/> method.
+/// 5. The tests in the collection run in sequence, all using this single instance of the fixture subclass.
+/// 6. XUnit calls <see cref="DisposeAsync"/> on this fixture.
+/// 7. <see cref="DisposeAsync"/> then:
+///   1. Stops any Test Containers that the subclass registered.
+///   2. Allows the subclass to dispose of any other disposable resources that it's holding references to, by the
+///      subclass overriding the <see cref="DisposeResources"/> methods.
+///
+/// </summary>
 public abstract class OptimisedIntegrationTestFixtureBase<TStartup> : IAsyncLifetime
     where TStartup : class
 {
@@ -22,12 +55,10 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup> : IAsyncLife
 
         await _testContainers.StartAll();
 
-        var factory = new WebApplicationFactory<TStartup>();
-
         var modifications = new OptimisedServiceAndConfigModifications();
         ConfigureServicesAndConfiguration(modifications);
 
-        var factoryBuilder = new OptimisedWebApplicationFactoryBuilder<TStartup>(factory);
+        var factoryBuilder = new OptimisedWebApplicationFactoryBuilder<TStartup>();
 
         foreach (var modification in modifications.ServiceModifications)
         {
@@ -42,7 +73,7 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup> : IAsyncLife
         _factory = factoryBuilder.Build();
 
         var lookups = new OptimisedServiceCollectionLookups<TStartup>(_factory);
-        AfterFactoryConstructed(lookups);
+        LookupServicesAfterFactoryConstructed(lookups);
     }
 
     protected virtual void RegisterTestContainers(TestContainerRegistrations registrations) { }
@@ -51,7 +82,9 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup> : IAsyncLife
         OptimisedServiceAndConfigModifications serviceModifications
     ) { }
 
-    protected virtual void AfterFactoryConstructed(OptimisedServiceCollectionLookups<TStartup> lookups) { }
+    protected virtual void LookupServicesAfterFactoryConstructed(
+        OptimisedServiceCollectionLookups<TStartup> lookups
+    ) { }
 
     /// <summary>
     /// Creates an HttpClient that can be used to send HTTP requests to the WebApplicationFactory.

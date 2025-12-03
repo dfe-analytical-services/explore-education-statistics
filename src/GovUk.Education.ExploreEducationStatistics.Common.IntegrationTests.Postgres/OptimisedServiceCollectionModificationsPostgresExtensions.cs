@@ -10,20 +10,10 @@ public static class OptimisedServiceCollectionModificationsPostgresExtensions
     )
         where TDbContext : DbContext
     {
-        // var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(TDbContext));
-        //
-        // if (descriptor != null)
-        // {
-        //     services.Remove(descriptor);
-        // }
-
         serviceModifications.AddDbContext<TDbContext>(options =>
             options.UseNpgsql(connectionString).EnableSensitiveDataLogging().EnableDetailedErrors()
         );
 
-        // services.AddDbContext<TDbContext>(options =>
-        //     options.UseNpgsql(connectionString).EnableSensitiveDataLogging().EnableDetailedErrors()
-        // );
         return serviceModifications;
     }
 }

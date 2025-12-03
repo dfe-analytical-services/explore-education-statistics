@@ -14,6 +14,7 @@ public static class OptimisedServiceCollectionModificationsAzuriteExtensions
         ));
 
         serviceModifications.AddInMemoryCollection(connectionStringSettings);
+
         return serviceModifications;
     }
 }

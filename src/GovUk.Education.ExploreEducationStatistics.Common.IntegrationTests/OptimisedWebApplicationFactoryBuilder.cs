@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 
-public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFactory<TStartup> factory)
+public class OptimisedWebApplicationFactoryBuilder<TStartup>
     where TStartup : class
 {
     private readonly List<Action<IServiceCollection>> _serviceModifications = [];
@@ -14,7 +14,7 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
 
     public WebApplicationFactory<TStartup> Build()
     {
-        return factory.WithWebHostBuilder(builder =>
+        return new WebApplicationFactory<TStartup>().WithWebHostBuilder(builder =>
         {
             builder
                 .UseIntegrationTestEnvironment()

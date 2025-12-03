@@ -1,5 +1,3 @@
-using System.Security.Claims;
-
 namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 
 /// <summary>
@@ -17,7 +15,7 @@ public static class OptimisedHttpClientExtensions
         return client;
     }
 
-    public static HttpClient WithAdditionalHeaders(
+    private static HttpClient WithAdditionalHeaders(
         this HttpClient client,
         Dictionary<string, string>? additionalHeaders
     )
