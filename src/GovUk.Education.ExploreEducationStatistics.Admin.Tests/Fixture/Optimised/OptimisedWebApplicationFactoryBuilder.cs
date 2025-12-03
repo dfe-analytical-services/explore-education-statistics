@@ -37,8 +37,6 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
         return factory.WithWebHostBuilder(builder =>
         {
             builder
-                // TODO EES-6450 - why did I remove this?
-                // .UseStartup<TStartup>()
                 .UseIntegrationTestEnvironment()
                 .UseTestServer()
                 .ConfigureServices(services =>
@@ -86,6 +84,20 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
         return this;
     }
 
+    public OptimisedWebApplicationFactoryBuilder<TStartup> WithTestUserAuthentication()
+    {
+        _serviceRegistrations.Add(RegisterTestUserAuthentication);
+        return this;
+    }
+
+    public OptimisedWebApplicationFactoryBuilder<TStartup> WithServiceCollectionModification(
+        OptimisedServiceCollectionModifications modifications
+    )
+    {
+        _serviceRegistrations.AddRange(modifications.Actions);
+        return this;
+    }
+
     private void ReconfigureAdminServices(IServiceCollection services)
     {
         services
@@ -104,14 +116,6 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
             .MockService<IPublicBlobStorageService>()
             .MockService<IAdminEventRaiser>(MockBehavior.Loose) // Ignore calls to publish events
             .RegisterControllers<Startup>();
-
-        services
-            .AddSingleton<OptimisedTestUserPool>()
-            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddScheme<AuthenticationSchemeOptions, OptimisedTestAuthHandler>(
-                JwtBearerDefaults.AuthenticationScheme,
-                null
-            );
     }
 
     private void RegisterPostgres(IServiceCollection services, string connectionString)
@@ -173,6 +177,17 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
         services.ReplaceService<IDataProcessorClient>(_ => new DataProcessorClient(connectionString));
         services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
         services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
+    }
+
+    private static void RegisterTestUserAuthentication(IServiceCollection services)
+    {
+        services
+            .AddSingleton<OptimisedTestUserPool>()
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddScheme<AuthenticationSchemeOptions, OptimisedTestAuthHandler>(
+                JwtBearerDefaults.AuthenticationScheme,
+                null
+            );
     }
 }
 

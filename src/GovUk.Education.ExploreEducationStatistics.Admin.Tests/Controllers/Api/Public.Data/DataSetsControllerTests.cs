@@ -26,7 +26,10 @@ using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class DataSetsControllerTestsFixture : OptimisedHttpClientWithPsqlCollectionFixture;
+public class DataSetsControllerTestsFixture()
+    : OptimisedAdminCollectionFixture(
+        capabilities: [AdminIntegrationTestCapability.UserAuth, AdminIntegrationTestCapability.Postgres]
+    );
 
 [CollectionDefinition(nameof(DataSetsControllerTestsFixture))]
 public class DataSetsControllerTestsCollection : ICollectionFixture<DataSetsControllerTestsFixture>;
@@ -34,7 +37,7 @@ public class DataSetsControllerTestsCollection : ICollectionFixture<DataSetsCont
 [Collection(nameof(DataSetsControllerTestsFixture))]
 public abstract class DataSetsControllerTests
 {
-    private static readonly DataFixture DataFixture = new(new Random().Next());
+    private static readonly DataFixture DataFixture = new();
     private const string BaseUrl = "api/public-data/data-sets";
 
     public class ListDataSetsTests(DataSetsControllerTestsFixture fixture) : DataSetsControllerTests
