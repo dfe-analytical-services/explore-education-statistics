@@ -29,22 +29,18 @@ public static class OptimisedHttpClientExtensions
     {
         if (headerValue != null)
         {
-            client.WithAdditionalHeaders(new Dictionary<string, string> { { headerName, headerValue } });
+            return client.WithAdditionalHeaders(new Dictionary<string, string> { { headerName, headerValue } });
         }
 
         return client;
     }
 
-    // TODO EES-6450 - remove these disables once we're able to without warnings.
-    // ReSharper disable once MemberCanBePrivate.Global
-    // ReSharper disable once UnusedMethodReturnValue.Global
-    public static HttpClient WithAdditionalHeaders(
+    private static HttpClient WithAdditionalHeaders(
         this HttpClient client,
         Dictionary<string, string>? additionalHeaders
     )
     {
         additionalHeaders?.ForEach(header => client.DefaultRequestHeaders.Add(header.Key, header.Value));
-
         return client;
     }
 }
