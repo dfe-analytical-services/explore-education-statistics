@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -10,8 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFactory<TStartup> factory)
     where TStartup : class
 {
-    private readonly List<Action<IServiceCollection>> _serviceRegistrations = [];
-    private readonly List<Action<IConfigurationBuilder>> _configRegistrations = [];
+    private readonly List<Action<IServiceCollection>> _serviceModifications = [];
+    private readonly List<Action<IConfigurationBuilder>> _configModifications = [];
 
     public WebApplicationFactory<TStartup> Build()
     {
@@ -22,12 +21,12 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
                 .UseTestServer()
                 .ConfigureServices(services =>
                 {
-                    _serviceRegistrations.ForEach(registrations => registrations.Invoke(services));
+                    _serviceModifications.ForEach(registrations => registrations.Invoke(services));
                 })
                 .ConfigureAppConfiguration(
                     (_, config) =>
                     {
-                        _configRegistrations.ForEach(registrations => registrations.Invoke(config));
+                        _configModifications.ForEach(registrations => registrations.Invoke(config));
                     }
                 )
                 .ConfigureAppConfiguration(config =>
@@ -44,41 +43,27 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>(WebApplicationFacto
         });
     }
 
-    public OptimisedWebApplicationFactoryBuilder<TStartup> AddServiceRegistration(
+    public OptimisedWebApplicationFactoryBuilder<TStartup> AddServiceModifications(
         Action<IServiceCollection> serviceRegistration
     )
     {
-        _serviceRegistrations.Add(serviceRegistration);
+        _serviceModifications.Add(serviceRegistration);
         return this;
     }
 
-    public OptimisedWebApplicationFactoryBuilder<TStartup> AddConfigRegistration(
+    public OptimisedWebApplicationFactoryBuilder<TStartup> AddConfigModifications(
         Action<IConfigurationBuilder> configRegistration
     )
     {
-        _configRegistrations.Add(configRegistration);
-        return this;
-    }
-
-    public OptimisedWebApplicationFactoryBuilder<TStartup> WithTestUserAuthentication()
-    {
-        _serviceRegistrations.Add(RegisterTestUserAuthentication);
+        _configModifications.Add(configRegistration);
         return this;
     }
 
     public OptimisedWebApplicationFactoryBuilder<TStartup> WithServiceCollectionModification(
-        OptimisedServiceCollectionModifications modifications
+        OptimisedServiceAndConfigModifications modifications
     )
     {
-        _serviceRegistrations.AddRange(modifications.Actions);
+        _serviceModifications.AddRange(modifications.ServiceModifications);
         return this;
-    }
-
-    private static void RegisterTestUserAuthentication(IServiceCollection services)
-    {
-        services
-            .AddSingleton<OptimisedTestUserPool>()
-            .AddAuthentication("Bearer")
-            .AddScheme<AuthenticationSchemeOptions, OptimisedTestAuthHandler>("Bearer", null);
     }
 }

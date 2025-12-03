@@ -6,16 +6,15 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Testcontainers.PostgreSql;
 
@@ -76,100 +75,55 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
         }
     }
 
-    // Build the WebApplicationFactory from the various standard capabilities that have been chosen by the test
-    // class using this fixture, plus any additional test-specific configuration that a particular class may need to
-    // apply prior to building the factory.
-    protected override WebApplicationFactory<Startup> ConfigureWebApplicationFactory(
-        OptimisedWebApplicationFactoryBuilder<Startup> factoryBuilder
+    protected override void ConfigureServicesAndConfiguration(
+        OptimisedServiceAndConfigModifications serviceModifications
     )
     {
-        // Configure the factory that represents Admin (with some mocks swapped in where appropriate and commonly used).
-        //
-        // This factory will also be built with additional capabilities according to the needs of the individual fixture
-        // classes that extend this base class.
-        //
-        // The factory is configured thus:
-        //
-        // 1. The "new WebApplicationFactory<Startup>()" line registers the services as laid out in Admin's Startup
-        // class.
-        // 2. The "WithReconfiguredAdmin()" line swaps out some of the production services from Startup with
-        // test-appropriate ones e.g. swapping real DbContexts for test ones, and HttpClient-based clients that call
-        // external services with Mocks.
-        // 3. If the "Postgres" capability is required, the "WithPostgres(_psql.GetContainer())" line swaps the
-        // PublicDataDbContext (which had previously been swapped for a mocked version) with one that is connected to
-        // the PSQL TestContainer instance being user by this test class. A TestContainer will be started for this test
-        // or an existing one reused if one is already running.
-        // 4. If the "Azurite" capability is required, the "factoryBuilder.WithAzurite(_azurite.GetContainer())" line
-        // swaps the various Blob services (which had previously been swapped for a mocked version) with one that is
-        // connected to the Azurite TestContainer instance being user by this test class. A TestContainer will be
-        // started for this test or an existing one reused if one is already running.
-        // 5. If the "UserAuth" capability is required, the "factoryBuilder.WithTestUserAuthentication()" line registers
-        // a test AuthenticationHandler that can be used with an HttpClient to specify a particular user to be using
-        // during a test.
-        // 6. If necessary, particular fixtures that are subclassing this fixture class can then make any final
-        // adjustments to the factory before it is built, by implementing the ModifyServices() method. The line
-        // factoryBuilder.WithServiceCollectionModification(testSpecificServiceModifications) will use these amendments
-        // to make final adjustments to the factory.
-        // 7. Finally, "Build()" generates the finalised WebApplicationFactory<Startup> instance. At this point, we
-        // should not attempt to reconfigure the factory further.
-        factoryBuilder.AddServiceRegistration(ReconfigureAdminServices);
-
-        if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
-        {
-            factoryBuilder = factoryBuilder.WithPostgres<Startup, PublicDataDbContext>(_psqlConnectionString());
-        }
+        serviceModifications
+            .AddInMemoryDbContext<ContentDbContext>(databaseName: $"{nameof(ContentDbContext)}_{Guid.NewGuid()}")
+            .AddInMemoryDbContext<StatisticsDbContext>(databaseName: $"{nameof(StatisticsDbContext)}_{Guid.NewGuid()}")
+            .AddInMemoryDbContext<UsersAndRolesDbContext>(
+                databaseName: $"{nameof(UsersAndRolesDbContext)}_{Guid.NewGuid()}"
+            )
+            .ReplaceServiceWithMock<IProcessorClient>()
+            .ReplaceServiceWithMock<IPublicDataApiClient>()
+            .ReplaceServiceWithMock<IDataProcessorClient>()
+            .ReplaceServiceWithMock<IPublisherClient>()
+            .ReplaceServiceWithMock<IAdminEventRaiser>(MockBehavior.Loose) // Ignore calls to publish events
+            .AddControllers<Startup>();
 
         if (capabilities.Contains(AdminIntegrationTestCapability.Azurite))
         {
-            factoryBuilder = factoryBuilder.WithAzurite(
+            serviceModifications.AddAzurite(
                 connectionString: _azuriteConnectionString(),
                 connectionStringKeys: ["PublicStorage", "PublisherStorage", "CoreStorage"]
             );
         }
+        else
+        {
+            serviceModifications
+                .ReplaceServiceWithMock<IPublisherTableStorageService>()
+                .ReplaceServiceWithMock<IPrivateBlobStorageService>()
+                .ReplaceServiceWithMock<IPublicBlobStorageService>();
+        }
+
+        if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
+        {
+            serviceModifications.AddPostgres<PublicDataDbContext>(_psqlConnectionString());
+        }
+        else
+        {
+            serviceModifications.AddSingleton(Mock.Of<PublicDataDbContext>());
+        }
 
         if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
         {
-            factoryBuilder = factoryBuilder.WithTestUserAuthentication();
-        }
-
-        // Call a lifecycle method to allow any test classes that require fine-tuned modification of the
-        // WebApplicationFactory to apply their modifications at the end of the factory setup for their fixtures.
-        var serviceModifications = new OptimisedServiceCollectionModifications();
-        ConfigureCollectionSpecificServices(serviceModifications);
-        factoryBuilder = factoryBuilder.WithServiceCollectionModification(serviceModifications);
-
-        // Finally, build the final factory that will be used for all the test classes that use this fixture.
-        return factoryBuilder.Build();
-    }
-
-    private void ReconfigureAdminServices(IServiceCollection services)
-    {
-        services
-            .UseInMemoryDbContext<ContentDbContext>(databaseName: $"{nameof(ContentDbContext)}_{Guid.NewGuid()}")
-            .UseInMemoryDbContext<StatisticsDbContext>(databaseName: $"{nameof(StatisticsDbContext)}_{Guid.NewGuid()}")
-            .UseInMemoryDbContext<UsersAndRolesDbContext>(
-                databaseName: $"{nameof(UsersAndRolesDbContext)}_{Guid.NewGuid()}"
-            )
-            .AddScoped(_ => Mock.Of<PublicDataDbContext>(MockBehavior.Loose))
-            .MockService<IProcessorClient>()
-            .MockService<IPublicDataApiClient>()
-            .MockService<IDataProcessorClient>()
-            .MockService<IPublisherClient>()
-            .MockService<IAdminEventRaiser>(MockBehavior.Loose) // Ignore calls to publish events
-            .RegisterControllers<Startup>();
-
-        if (!capabilities.Contains(AdminIntegrationTestCapability.Azurite))
-        {
-            services
-                .MockService<IPublisherTableStorageService>()
-                .MockService<IPrivateBlobStorageService>()
-                .MockService<IPublicBlobStorageService>();
+            serviceModifications.AddUserAuth();
         }
     }
 
     protected override void AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
     {
-        // TODO EES-6450 - this shouldn't be automatically registered
         if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
         {
             // Get a reference to the shared user pool that will be used throughout the life of the test class using this
@@ -196,11 +150,12 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
         // as used in the tested code itself.
         _processorClientMock = Mock.Get(lookups.GetService<IProcessorClient>());
         _publicDataApiClientMock = Mock.Get(lookups.GetService<IPublicDataApiClient>());
-    }
 
-    protected virtual void ConfigureCollectionSpecificServices(
-        OptimisedServiceCollectionModifications serviceModifications
-    ) { }
+        if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
+        {
+            _publicDataDbContext.Database.Migrate();
+        }
+    }
 
     /// <summary>
     ///

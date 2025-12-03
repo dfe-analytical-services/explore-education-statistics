@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Admin\GovUk.Education.ExploreEducationStatistics.Admin.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres.csproj" />
