@@ -5,32 +5,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Pos
 
 public static class OptimisedWebApplicationFactoryBuilderPostgresExtensions
 {
-    public static OptimisedWebApplicationFactoryBuilder<TStartup> RegisterPostgres<TStartup, TDbContext>(
+    public static OptimisedWebApplicationFactoryBuilder<TStartup> WithPostgres<TStartup, TDbContext>(
         this OptimisedWebApplicationFactoryBuilder<TStartup> builder,
-        IServiceCollection services,
         string connectionString
     )
         where TStartup : class
         where TDbContext : DbContext
     {
-        var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(TDbContext));
-
-        if (descriptor != null)
+        builder.AddServiceRegistration(services =>
         {
-            services.Remove(descriptor);
-        }
+            var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(TDbContext));
 
-        services.AddDbContext<TDbContext>(options =>
-            options.UseNpgsql(connectionString).EnableSensitiveDataLogging().EnableDetailedErrors()
-        );
+            if (descriptor != null)
+            {
+                services.Remove(descriptor);
+            }
 
-        using var serviceScope = services
-            .BuildServiceProvider()
-            .GetRequiredService<IServiceScopeFactory>()
-            .CreateScope();
+            services.AddDbContext<TDbContext>(options =>
+                options.UseNpgsql(connectionString).EnableSensitiveDataLogging().EnableDetailedErrors()
+            );
 
-        using var context = serviceScope.ServiceProvider.GetRequiredService<TDbContext>();
-        context.Database.Migrate();
+            using var serviceScope = services
+                .BuildServiceProvider()
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope();
+
+            using var context = serviceScope.ServiceProvider.GetRequiredService<TDbContext>();
+            context.Database.Migrate();
+        });
 
         return builder;
     }

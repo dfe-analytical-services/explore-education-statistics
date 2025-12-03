@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -236,7 +237,7 @@ public class TestController(IUserService userService) : ControllerBase
 public class ClaimsPrincipalTransformationServiceTestsFixture()
     : OptimisedAdminCollectionFixture(capabilities: [AdminIntegrationTestCapability.UserAuth])
 {
-    protected override void ModifyServices(OptimisedServiceCollectionModifications modifications)
+    protected override void ConfigureCollectionSpecificServices(OptimisedServiceCollectionModifications modifications)
     {
         modifications.AddController(typeof(TestController));
     }

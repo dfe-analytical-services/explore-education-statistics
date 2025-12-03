@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -279,8 +280,9 @@ public class DataSetVersionServiceTestsFixture()
 {
     public IDataSetVersionService DataSetVersionService = null!;
 
-    protected override void AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
+    protected override void AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
     {
+        base.AfterFactoryConstructed(lookups);
         DataSetVersionService = lookups.GetService<IDataSetVersionService>();
     }
 }

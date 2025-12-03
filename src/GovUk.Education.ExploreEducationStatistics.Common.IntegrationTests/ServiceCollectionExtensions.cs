@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 /// This class contains a number of extension methods for IServiceCollection that are useful when setting up
 /// integration tests that require a customised Startup class.
 /// </summary>
-public static class ServiceCollectionExtensions
+internal static class ServiceCollectionExtensions
 {
     /// <summary>
     /// This method replaces a DcContext that has been registered in Startup with an in-memory equivalent.

@@ -4,7 +4,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azu
 
 public static class OptimisedAzuriteIntegrationTestFixtureBaseExtensions
 {
-    public static string CreateAzuriteContainer(this OptimisedIntegrationTestFixtureBase fixture)
+    public static Func<string> RegisterAzuriteContainer<TStartup>(
+        this OptimisedIntegrationTestFixtureBase<TStartup> fixture
+    )
+        where TStartup : class
     {
         var container = new AzuriteBuilder()
             .WithImage("mcr.microsoft.com/azure-storage/azurite:3.34.0")
@@ -12,6 +15,6 @@ public static class OptimisedAzuriteIntegrationTestFixtureBaseExtensions
             .Build();
 
         fixture.AddContainer(container);
-        return container.GetConnectionString();
+        return () => container.GetConnectionString();
     }
 }

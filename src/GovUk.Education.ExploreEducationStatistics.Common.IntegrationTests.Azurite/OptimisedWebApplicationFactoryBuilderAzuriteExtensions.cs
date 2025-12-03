@@ -2,7 +2,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite;
 
-public static class OptimisedWebApplicationFactoryBuilderPostgresExtensions
+public static class OptimisedWebApplicationFactoryBuilderAzuriteExtensions
 {
     public static OptimisedWebApplicationFactoryBuilder<TStartup> WithAzurite<TStartup>(
         this OptimisedWebApplicationFactoryBuilder<TStartup> builder,

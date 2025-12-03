@@ -51,7 +51,7 @@ public static class OptimisedHttpClientExtensions
     }
 }
 
-public static class ClaimsPrincipalExtensions
+internal static class ClaimsPrincipalExtensions
 {
     public static Guid GetUserId(this ClaimsPrincipal principal)
     {
