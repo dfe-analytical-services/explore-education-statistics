@@ -39,7 +39,7 @@ public class KeyStatisticsMigrationService(ContentDbContext contentDbContext, IU
                     .Where(rv => rv is { Version: > 0, Published: null })
                     .ToList();
 
-                // Identity all the releases with draft, non-first latest versions
+                // Identify all the releases with draft, non-first latest versions
                 var releasesWithNonFirstDraftLatestReleaseVersions = draftNonFirstLatestReleaseVersions
                     .Select(rv => rv.ReleaseId)
                     .ToList();
