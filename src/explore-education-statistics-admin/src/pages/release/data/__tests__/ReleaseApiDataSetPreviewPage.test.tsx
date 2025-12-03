@@ -18,7 +18,8 @@ import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, Route, Router } from 'react-router-dom';
 import { createMemoryHistory, MemoryHistory } from 'history';
-import addHours from 'date-fns/addHours';
+import { addHours } from 'date-fns';
+import mockDate from '@common-test/mockDate';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/previewTokenService');
@@ -77,6 +78,7 @@ describe('ReleaseApiDataSetPreviewPage', () => {
   });
 
   test('generating a preview token', async () => {
+    mockDate.set('2025-10-08T13:00:00.000Z');
     const history = createMemoryHistory();
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
     previewTokenService.createPreviewToken.mockResolvedValue(testToken);
@@ -105,19 +107,14 @@ describe('ReleaseApiDataSetPreviewPage', () => {
     await waitFor(() => {
       expect(previewTokenService.createPreviewToken).toHaveBeenCalledTimes(1);
     });
-
+    const expectedActivates = new Date('2025-10-08T13:00:00.000Z');
+    const expectedExpires = new Date('2025-10-09T22:59:59.000Z');
     expect(previewTokenService.createPreviewToken).toHaveBeenCalledWith({
       dataSetVersionId: 'draft-version-id',
-      activates: expect.any(Date),
-      expires: expect.any(Date),
+      activates: expectedActivates,
+      expires: expectedExpires,
       label: 'Test label',
     });
-
-    const [[args]] = (previewTokenService.createPreviewToken as jest.Mock).mock
-      .calls;
-    expect(args.expires.getTime() - args.activates.getTime()).toBe(
-      24 * 60 * 60 * 1000,
-    ); // Assert token activates and expires within 24 hours
 
     await waitFor(() => {
       expect(history.location.pathname).toBe(

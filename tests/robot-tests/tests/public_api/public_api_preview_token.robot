@@ -1,4 +1,5 @@
 *** Settings ***
+Library             DateTime
 Library             ../libs/admin_api.py
 Resource            ../libs/admin-common.robot
 Resource            ../libs/admin/manage-content-common.robot
@@ -155,6 +156,100 @@ User revokes preview token
     user waits until modal is not visible    Revoke preview token    %{WAIT_LONG}
     user waits until page contains    API data set preview token log
 
+User again clicks on 'Generate preview token' to pick pre set days as expiry
+    user clicks link    Generate preview token
+    user clicks button    Generate preview token
+
+User creates preview token through 'Generate preview token' modal window selecting the preview token to be active for 7 days
+    ${modal}=    user waits until modal is visible    Generate preview token
+    user enters text into element    name:label    ${PREVIEW_TOKEN_NAME}
+
+    user clicks element    id:apiDataSetTokenCreateForm-selectionMethod-presetDays
+    user clicks element    id:apiDataSetTokenCreateForm-datePresetSpan-7
+    user clicks element    name:agreeTerms
+    user clicks button    Continue
+
+    user waits until page finishes loading
+    user waits until modal is not visible    Generate preview token    %{WAIT_LONG}
+    user waits until page contains    API data set preview token
+    user waits until h2 is visible    ${SUBJECT_NAME_1}
+
+User verifies created preview token details expires in 7 days
+    user checks page contains    Reference: ${PREVIEW_TOKEN_NAME}
+
+    ${date_in_7_days}=    get local browser date and time    offset_days=7    format_string=%-d %B %Y
+    user checks page contains
+    ...    The token expires: ${date_in_7_days} (UK time)
+
+    user checks page contains button    Copy preview token
+    user checks page contains button    Revoke preview token
+    user checks page contains link    View preview token log
+    user checks page contains    API data set endpoints quick start
+
+User revokes preview token that expires in 7 days
+    user clicks button    Revoke preview token
+    ${modal}=    user waits until modal is visible    Revoke preview token
+    user clicks button    Confirm
+    user waits until page finishes loading
+    user waits until modal is not visible    Revoke preview token    %{WAIT_LONG}
+    user waits until page contains    API data set preview token log
+
+User again clicks on 'Generate preview token' to pick custom activation and expiration dates
+    user clicks link    Generate preview token
+    user clicks button    Generate preview token
+
+User creates another preview token through 'Generate preview token' modal window to set custom activation and expiration dates
+    ${modal}=    user waits until modal is visible    Generate preview token
+    user enters text into element    name:label    ${PREVIEW_TOKEN_NAME}
+    user clicks element    id:apiDataSetTokenCreateForm-selectionMethod-customDates
+    ${today}=    Get Current Date    result_format=%d
+    ${current_month}=    Get Current Date    result_format=%m
+    ${current_year}=    Get Current Date    result_format=%Y
+    ${tomorrow}=    Add Time To Date    ${current_year}-${current_month}-${today}    1 day    result_format=%d
+    ${tomorrow_month}=    Add Time To Date    ${current_year}-${current_month}-${today}    1 day    result_format=%m
+    ${tomorrow_year}=    Add Time To Date    ${current_year}-${current_month}-${today}    1 day    result_format=%Y
+    ${after_tomorrow}=    Add Time To Date    ${current_year}-${current_month}-${today}    2 day    result_format=%d
+    ${after_tomorrow_month}=    Add Time To Date    ${current_year}-${current_month}-${today}    2 day
+    ...    result_format=%m
+    ${after_tomorrow_year}=    Add Time To Date    ${current_year}-${current_month}-${today}    2 day
+    ...    result_format=%Y
+
+    user enters text into element    id:apiDataSetTokenCreateForm-activates-day    ${tomorrow}
+    user enters text into element    id:apiDataSetTokenCreateForm-activates-month    ${tomorrow_month}
+    user enters text into element    id:apiDataSetTokenCreateForm-activates-year    ${tomorrow_year}
+
+    user enters text into element    id:apiDataSetTokenCreateForm-expires-day    ${after_tomorrow}
+    user enters text into element    id:apiDataSetTokenCreateForm-expires-month    ${after_tomorrow_month}
+    user enters text into element    id:apiDataSetTokenCreateForm-expires-year    ${tomorrow_year}
+    user clicks element    name:agreeTerms
+    user clicks button    Continue
+
+    user waits until page finishes loading
+    user waits until modal is not visible    Generate preview token    %{WAIT_LONG}
+    user waits until page contains    API data set preview token
+    user waits until h2 is visible    ${SUBJECT_NAME_1}
+
+User verifies created preview token details for custom dates
+    user checks page contains    Reference: ${PREVIEW_TOKEN_NAME}
+
+    ${date_tomorrow}=    get local browser date and time    offset_days=1    format_string=%d %B %Y
+    ${date_after_tomorrow}=    get local browser date and time    offset_days=2    format_string=%d %B %Y
+    user checks page contains
+    ...    The token is active from: ${date_tomorrow} (UK time) and expires: ${date_after_tomorrow} (UK time)
+
+    user checks page contains button    Copy preview token
+    user checks page contains button    Revoke preview token
+    user checks page contains link    View preview token log
+    user checks page contains    API data set endpoints quick start
+
+User revokes custom expiry preview token
+    user clicks button    Revoke preview token
+    ${modal}=    user waits until modal is visible    Revoke preview token
+    user clicks button    Confirm
+    user waits until page finishes loading
+    user waits until modal is not visible    Revoke preview token    %{WAIT_LONG}
+    user waits until page contains    API data set preview token log
+
 User again clicks on 'Generate preview token'
     user clicks link    Generate preview token
     user clicks button    Generate preview token
@@ -232,9 +327,8 @@ User verifies the relevant fields on the active preview token page
     user waits until h2 is visible    ${SUBJECT_NAME_1}
     user checks page contains    Reference: ${PREVIEW_TOKEN_NAME}
 
-    ${current_time_tomorrow}=    get local browser date and time    offset_days=1    format_string=%-I:%M %p
     user checks page contains
-    ...    The token expires: tomorrow at ${current_time_tomorrow} (local time)
+    ...    The token expires: tomorrow at 11:59 PM (UK time)
 
     user checks page contains button    Copy preview token
     user checks page contains button    Revoke preview token

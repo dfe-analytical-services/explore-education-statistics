@@ -47,4 +47,9 @@ public static class DateTimeExtensions
     {
         return subject.CompareTo(target) >= 0;
     }
+
+    public static TimeSpan GetUkOffset(this DateTime dateTime)
+    {
+        return GetUkTimeZone().GetUtcOffset(dateTime);
+    }
 }
