@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.KeyStatisticsMigration.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
@@ -59,8 +60,9 @@ public class KeyStatisticsMigrationService(ContentDbContext contentDbContext, IU
 
                 // Group the release versions by release and then by publication to build a report structure.
                 // Release versions are included with their key statistics with both original and plain text guidance
+                var publicationIdComparer = ComparerUtils.CreateComparerByProperty<Publication>(p => p.Id);
                 var publications = releaseVersions
-                    .GroupBy(rv => rv.Release.Publication)
+                    .GroupBy(rv => rv.Release.Publication, rv => rv, publicationIdComparer)
                     .Select(PublicationSelector())
                     .Where(p => p.Releases.Count > 0)
                     .OrderBy(p => p.Title)
@@ -112,13 +114,14 @@ public class KeyStatisticsMigrationService(ContentDbContext contentDbContext, IU
         publicationGroup =>
         {
             var publication = publicationGroup.Key;
+            var releaseIdComparer = ComparerUtils.CreateComparerByProperty<Release>(r => r.Id);
             return new KeyStatisticsMigrationReportPublicationDto
             {
                 PublicationId = publication.Id,
                 Releases =
                 [
                     .. publicationGroup
-                        .GroupBy(rv => rv.Release)
+                        .GroupBy(rv => rv.Release, rv => rv, releaseIdComparer)
                         .Select(ReleaseSelector())
                         .Where(r => r.ReleaseVersions.Count > 0)
                         .OrderBy(r => r.Title),

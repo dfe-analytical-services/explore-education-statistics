@@ -387,7 +387,7 @@ public abstract class KeyStatisticsMigrationServiceTests
                 Assert.Equal(2, reportRelease.ReleaseVersions.Count);
 
                 Assert.Equal(latestPublishedVersion.Id, reportRelease.ReleaseVersions[0].ReleaseVersionId);
-                Assert.False(reportRelease.ReleaseVersions[1].IsDraft);
+                Assert.False(reportRelease.ReleaseVersions[0].IsDraft);
 
                 Assert.Equal(draftVersion.Id, reportRelease.ReleaseVersions[1].ReleaseVersionId);
                 Assert.True(reportRelease.ReleaseVersions[1].IsDraft);
