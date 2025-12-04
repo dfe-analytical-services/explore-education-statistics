@@ -431,7 +431,10 @@
               }
             ],
             "workspaceId": "[parameters('workspaceResourceId')]"
-          }
+          },
+          "dependsOn": [
+            "resourceId('Microsoft.Logic/workflows', parameters('logicAppName'))"
+          ]
         }
       ]
     }
