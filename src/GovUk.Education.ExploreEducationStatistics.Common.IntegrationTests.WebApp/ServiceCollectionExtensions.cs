@@ -20,7 +20,15 @@ internal static class ServiceCollectionExtensions
         where TDbContext : DbContext
     {
         // Remove the default DbContext descriptor that was provided by Startup.cs.
-        var descriptor = services.Single(d => d.ServiceType == typeof(DbContextOptions<TDbContext>));
+        var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<TDbContext>));
+
+        if (descriptor == null)
+        {
+            throw new ArgumentException(
+                $"No DbContext of type {typeof(TDbContext).Name} can be replaced by an "
+                    + $"in-memory version because no original has yet been registered."
+            );
+        }
 
         services.Remove(descriptor);
 
@@ -66,7 +74,7 @@ internal static class ServiceCollectionExtensions
                 return services;
             }
 
-            throw new ArgumentNullException($"{nameof(TService)} service was not found to replace.");
+            throw new ArgumentNullException($"No service of type {typeof(TService).Name} was found to replace.");
         }
 
         services.Remove(descriptor);

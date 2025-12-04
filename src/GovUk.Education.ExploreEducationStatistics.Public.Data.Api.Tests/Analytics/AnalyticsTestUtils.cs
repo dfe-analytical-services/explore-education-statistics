@@ -37,6 +37,7 @@ public static class AnalyticsTheoryData
     ];
 }
 
+// TODO EES-6450 - remove when all integration tests use a mock AnalyticsService.
 public static class AnalyticsTestAssertions
 {
     public static async Task AssertTopLevelAnalyticsCallCaptured(
