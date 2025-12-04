@@ -14,6 +14,22 @@ public static class OptimisedDbContextTestExtensions
     public static async Task AddTestData<TDbContext>(this TDbContext context, Action<TDbContext> supplier)
         where TDbContext : DbContext
     {
+        if ((TDbContext?)context == null)
+        {
+            throw new ArgumentNullException(
+                $"The '{nameof(context)}' argument of type {typeof(TDbContext)} cannot be null.  Has an "
+                    + $"implementation been registered with the WebApplicationFactory?"
+            );
+        }
+
+        if (context.Database == null)
+        {
+            throw new ArgumentNullException(
+                $"The {nameof(context)} argument of type {typeof(TDbContext)} has a null Database. "
+                    + "Is it a Mock? Mocks cannot be used to set up test data."
+            );
+        }
+
         try
         {
             supplier.Invoke(context);

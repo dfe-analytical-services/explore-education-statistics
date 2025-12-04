@@ -26,10 +26,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Web
 ///   1. Allows the subclass to register any Test Containers that it needs, by the subclass overriding the
 ///      <see cref="RegisterTestContainers"/> method.
 ///   2. Starts any Test Containers that the subclass needs.
-///   3. Lets the subclass modify any registered services and configuration prior to the WebApplicationFactory being
-///      built, by the subclass overriding the <see cref="ConfigureServicesAndConfiguration" /> method.
-///   4. Builds a new WebApplicationFactoryBuilder that will allow us to  create a WebApplicationFactory that is based
+///   3. Builds a new WebApplicationFactoryBuilder that will allow us to  create a WebApplicationFactory that is based
 ///      on <see cref="TStartup"/> but with amendments made to allow testing.
+///   4. Asks the subclass for any modifications it requires to registered services and configuration prior to the
+///      WebApplicationFactory being built, by the subclass overriding the
+///      <see cref="ConfigureServicesAndConfiguration" /> method.
 ///   5. Applies any ServiceCollection and IConfigurationBuilder modifications that the subclass asked for to the
 ///      builder.
 ///   6. Lets the subclass look up any services that it needs after the factory has been constructed, by overriding the
@@ -42,7 +43,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Web
 ///      subclass overriding the <see cref="DisposeResources"/> methods.
 ///
 /// </summary>
-public abstract class OptimisedIntegrationTestFixtureBase<TStartup> : IAsyncLifetime
+///
+/// <param name="minimalApi">
+///
+/// This parameter controls the mechanism involved when building the WebApplicationFactory, as classic MVC projects and
+/// minimal API projects require different approaches.
+///
+/// </param>
+public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimalApi = false) : IAsyncLifetime
     where TStartup : class
 {
     private TestContainerRegistrations _testContainers = null!;
@@ -50,28 +58,36 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup> : IAsyncLife
 
     public async Task InitializeAsync()
     {
+        // Allow the subclass of this fixture to register any Test Containers.
         _testContainers = new TestContainerRegistrations();
         RegisterTestContainers(_testContainers);
 
+        // Start any registered Test Containers.
         await _testContainers.StartAll();
 
+        // Build the standard WebApplicationFactory builder based on the configuration in TStartup, choosing the
+        // correct approach based on the type of project being tested.
+        OptimisedWebApplicationFactoryBuilderBase<TStartup> factoryBuilder = minimalApi
+            ? new OptimisedWebApplicationFactoryMinimalApiBuilder<TStartup>()
+            : new OptimisedWebApplicationFactoryMvcBuilder<TStartup>();
+
+        // Allow the subclass to register changes to any service or configuration setups that need to differ
+        // from those found in TStartup e.g. mocking out components that communicate with external services,
+        // registering in-memory DbContexts etc.
         var modifications = new OptimisedServiceAndConfigModifications();
         ConfigureServicesAndConfiguration(modifications);
 
-        var factoryBuilder = new OptimisedWebApplicationFactoryBuilder<TStartup>();
+        // Build the final WebApplicationFactory, originally based on TStartup but with standard integration
+        // testing support added by the WebApplicationFactory builder and then the fixture subclass' requested
+        // service and configuration changes applied over the top.
+        _factory = factoryBuilder.Build(
+            serviceModifications: modifications.ServiceModifications,
+            configModifications: modifications.ConfigModifications
+        );
 
-        foreach (var modification in modifications.ServiceModifications)
-        {
-            factoryBuilder.AddServiceModifications(modification);
-        }
-
-        foreach (var modification in modifications.ConfigModifications)
-        {
-            factoryBuilder.AddConfigModifications(modification);
-        }
-
-        _factory = factoryBuilder.Build();
-
+        // Finally, allow the fixture subclass to perform any actions post-factory creation and prior to any
+        // tests from its collection starting. This might include looking up any services that the tests in the
+        // collection might need, setting up some collection-level global test data etc.
         var lookups = new OptimisedServiceCollectionLookups<TStartup>(_factory);
         await AfterFactoryConstructed(lookups);
     }
