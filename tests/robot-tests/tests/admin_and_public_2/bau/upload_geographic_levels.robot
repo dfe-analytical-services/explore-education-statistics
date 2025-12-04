@@ -39,16 +39,69 @@ Start creating a data block
     user clicks link    Create data block
     user waits until table tool wizard step is available    1    Select a data set
 
-Select subject "UI test subject"
-    user waits until page contains    All geographies subject name    %{WAIT_SMALL}
-    user clicks radio    All geographies subject name
+Check if the geographic levels are all present
+    user waits until page contains    ${SUBJECT_1_NAME}    %{WAIT_SMALL}
+    user clicks radio    ${SUBJECT_1_NAME}
     user clicks element    id:publicationDataStepForm-submit
     user waits until table tool wizard step is available    2    Choose locations    %{WAIT_MEDIUM}
-    user checks previous table tool step contains    1    Data set    All geographies subject name
+    user checks previous table tool step contains    1    Data set    ${SUBJECT_1_NAME}
+
+Verify and check the expected locations and location options
     user counts accordion form item rows    15
+    user checks all locations are present
+    user checks all location options are present
 
 
 *** Keywords ***
 user counts accordion form item rows
     [Arguments]    ${number}
     user checks element count is x    testid:filter-accordion-button    ${number}
+
+user checks all locations are present
+    user checks page contains button    National
+    user checks page contains button    Regional
+    user checks page contains button    Opportunity area
+    user checks page contains button    Parliamentary constituency
+    user checks page contains button    Local authority district
+    user checks page contains button    Local authority
+    user checks page contains button    RSC region
+    user checks page contains button    Local enterprise partnership
+    user checks page contains button    Ward
+    user checks page contains button    Local skills improvement plan area
+    user checks page contains button    English devolved area
+    user checks page contains button    Sponsor
+    user checks page contains button    MAT
+    user checks page contains button    Mayoral combined authority
+    user checks page contains button    Police force area
+
+user checks all location options are present
+    user clicks button    National
+    user checks page contains    England (N)
+    user clicks button    Regional
+    user checks page contains    Yorkshire and the Humber (R)
+    user clicks button    Opportunity area
+    user checks page contains    Bolton 001 (O)
+    user clicks button    Parliamentary constituency
+    user checks page contains    East Yorkshire (PC)
+    user clicks button    Local authority district
+    user checks page contains    Hartlepool (LAD)
+    user clicks button    Local authority
+    user checks page contains    Birmingham (LA)
+    user clicks button    RSC region
+    user checks page contains    North of England (RSC)
+    user clicks button    Local enterprise partnership
+    user checks page contains    Black Country (LEP)
+    user clicks button    Ward
+    user checks page contains    Syon (W)
+    user clicks button    Local skills improvement plan area
+    user checks page contains    Greater Manchester (LSIP)
+    user clicks button    English devolved area
+    user checks page contains    two (E)
+    user clicks button    Sponsor
+    user checks page contains    one (S)
+    user clicks button    MAT
+    user checks page contains    one (MAT)
+    user clicks button    Mayoral combined authority
+    user checks page contains    one (MCA)
+    user clicks button    Police force area
+    user checks page contains    E23000001
