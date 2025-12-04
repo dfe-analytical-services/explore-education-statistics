@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 
-public static class OptimisedServiceCollectionModificationsPostgresExtensions
+public static class OptimisedServiceCollectionModificationsUserAuthExtensions
 {
     public static OptimisedServiceAndConfigModifications AddUserAuth(
         this OptimisedServiceAndConfigModifications serviceModifications
