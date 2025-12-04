@@ -163,9 +163,16 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     /// </summary>
     protected override async Task DisposeResources()
     {
-        await DisposeReusableDbContexts();
+        // Dispose of any DbContexts when the test class that was using this fixture has completed.
+        await _publicDataDbContext.DisposeAsync();
+        await _contentDbContext.DisposeAsync();
+        await _statisticsDbContext.DisposeAsync();
+        await _usersAndRolesDbContext.DisposeAsync();
     }
 
+    /// <summary>
+    /// Create an HttpClient and set a specific user to handle the request.
+    /// </summary>
     public HttpClient CreateClient(ClaimsPrincipal user)
     {
         SetUser(user);
@@ -175,63 +182,34 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public ContentDbContext GetContentDbContext()
-    {
-        return _contentDbContext;
-    }
+    public ContentDbContext GetContentDbContext() => _contentDbContext;
 
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public StatisticsDbContext GetStatisticsDbContext()
-    {
-        return _statisticsDbContext;
-    }
+    public StatisticsDbContext GetStatisticsDbContext() => _statisticsDbContext;
 
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public UsersAndRolesDbContext GetUsersAndRolesDbContext()
-    {
-        return _usersAndRolesDbContext;
-    }
+    public UsersAndRolesDbContext GetUsersAndRolesDbContext() => _usersAndRolesDbContext;
 
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public PublicDataDbContext GetPublicDataDbContext()
-    {
-        return _publicDataDbContext;
-    }
+    public PublicDataDbContext GetPublicDataDbContext() => _publicDataDbContext;
 
     /// <summary>
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
-    public Mock<IProcessorClient> GetProcessorClientMock()
-    {
-        return _processorClientMock;
-    }
+    public Mock<IProcessorClient> GetProcessorClientMock() => _processorClientMock;
 
     /// <summary>
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
-    public Mock<IPublicDataApiClient> GetPublicDataApiClientMock()
-    {
-        return _publicDataApiClientMock;
-    }
-
-    /// <summary>
-    /// Dispose of any DbContexts when the test class that was using this fixture has completed.
-    /// </summary>
-    private async Task DisposeReusableDbContexts()
-    {
-        await _publicDataDbContext.DisposeAsync();
-        await _contentDbContext.DisposeAsync();
-        await _statisticsDbContext.DisposeAsync();
-        await _usersAndRolesDbContext.DisposeAsync();
-    }
+    public Mock<IPublicDataApiClient> GetPublicDataApiClientMock() => _publicDataApiClientMock;
 
     /// <summary>
     /// Adds a user to the test user pool so that they can be used for HttpClient calls and looked up successfully.
