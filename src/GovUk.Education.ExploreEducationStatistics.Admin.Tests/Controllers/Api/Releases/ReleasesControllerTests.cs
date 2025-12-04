@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -311,7 +310,7 @@ public abstract class ReleasesControllerIntegrationTests
             ClaimsPrincipal? user = null
         )
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var request = new
             {
@@ -1187,7 +1186,7 @@ public abstract class ReleasesControllerIntegrationTests
             ClaimsPrincipal? user = null
         )
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var request = new ReleaseUpdateRequest { Label = label };
 

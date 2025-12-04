@@ -1,7 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Common;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -80,7 +79,7 @@ public class PageFeedbackControllerTests(PageFeedbackControllerTestsFixture fixt
     [Fact]
     public async Task ListFeedback_NoQueryParameters_ReturnsOnlyUnreadFeedback()
     {
-        var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Bau);
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Bau);
 
         // Act
         var response = await client.GetAsync(BaseUrl);
@@ -102,7 +101,7 @@ public class PageFeedbackControllerTests(PageFeedbackControllerTestsFixture fixt
     [Fact]
     public async Task ListFeedback_ShowRead_ReturnsAllFeedback()
     {
-        var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Bau);
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Bau);
 
         // Act
         var response = await client.GetAsync(BaseUrl + "?showRead=true");
@@ -130,7 +129,7 @@ public class PageFeedbackControllerTests(PageFeedbackControllerTestsFixture fixt
 
         await fixture.GetContentDbContext().AddTestData(context => context.PageFeedback.Add(feedback));
 
-        var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Bau);
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Bau);
 
         // Act
         await client.PatchAsync($"{BaseUrl}/{feedback.Id}", content: null);

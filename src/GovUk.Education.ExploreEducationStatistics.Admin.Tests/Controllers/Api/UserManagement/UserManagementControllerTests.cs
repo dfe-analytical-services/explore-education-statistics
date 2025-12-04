@@ -1,8 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
@@ -33,9 +31,7 @@ public class UserManagementControllerTests
                 .WithRole(globalRoleName)
                 .WithEmail("user@education.gov.uk");
 
-            fixture.RegisterTestUser(claimsPrincipal);
-
-            var client = fixture.CreateClient().WithUser(claimsPrincipal);
+            var client = fixture.CreateClient(user: claimsPrincipal);
 
             var response = await client.DeleteAsync("/api/user-management/user/ees-test.delete@education.gov.uk");
 

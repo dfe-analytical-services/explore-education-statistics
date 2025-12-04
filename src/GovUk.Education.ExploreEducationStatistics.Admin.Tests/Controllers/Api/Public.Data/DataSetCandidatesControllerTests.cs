@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -288,12 +287,9 @@ public abstract class DataSetCandidatesControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var actualUser =
-                user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.AccessAllReleases));
-
-            fixture.RegisterTestUser(actualUser);
-
-            var client = fixture.CreateClient().WithUser(actualUser);
+            var client = fixture.CreateClient(
+                user: user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.AccessAllReleases))
+            );
 
             var query = new Dictionary<string, string?> { { "releaseVersionId", releaseVersionId.ToString() } };
 

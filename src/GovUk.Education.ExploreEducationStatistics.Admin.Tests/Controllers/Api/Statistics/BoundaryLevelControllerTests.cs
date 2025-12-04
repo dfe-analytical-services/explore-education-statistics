@@ -4,7 +4,6 @@ using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -44,7 +43,7 @@ public class BoundaryLevelControllerTests(BoundaryLevelControllerTestsFixture fi
             .GetStatisticsDbContext()
             .AddTestData(context => context.BoundaryLevel.AddRange(boundaryLevel1, boundaryLevel2));
 
-        var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Bau);
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Bau);
 
         var response = await client.GetAsync("api/boundary-level");
 
@@ -83,7 +82,7 @@ public class BoundaryLevelControllerTests(BoundaryLevelControllerTestsFixture fi
                 );
             });
 
-        var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Bau);
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Bau);
 
         var response = await client.GetAsync("api/boundary-level/1");
 
@@ -110,7 +109,7 @@ public class BoundaryLevelControllerTests(BoundaryLevelControllerTestsFixture fi
                 context.BoundaryLevel.Add(boundaryLevel);
             });
 
-        var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Bau);
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Bau);
 
         var updatedLabel = $"Updated {boundaryLevel.Label}";
         var request = new BoundaryLevelUpdateRequest { Id = boundaryLevel.Id, Label = updatedLabel };
@@ -133,7 +132,7 @@ public class BoundaryLevelControllerTests(BoundaryLevelControllerTestsFixture fi
     [Fact]
     public async Task CreateBoundaryLevel_Success()
     {
-        var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Bau);
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Bau);
 
         var path = Path.Combine(
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,

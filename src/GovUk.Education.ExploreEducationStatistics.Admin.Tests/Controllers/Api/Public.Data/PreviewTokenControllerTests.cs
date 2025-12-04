@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -56,7 +55,6 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
     {
         if (!_commonDataInitialized)
         {
-            fixture.RegisterTestUser(BauUser);
             await fixture.GetContentDbContext().AddTestData(context => context.Users.Add(BauUserEntry));
             _commonDataInitialized = true;
         }
@@ -336,7 +334,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
             ClaimsPrincipal? user = null
         )
         {
-            var client = fixture.CreateClient().WithUser(user ?? BauUser);
+            var client = fixture.CreateClient(user: user ?? BauUser);
 
             var request = new PreviewTokenCreateRequest
             {
@@ -485,7 +483,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
 
         private async Task<HttpResponseMessage> GetPreviewToken(Guid previewTokenId, ClaimsPrincipal? user = null)
         {
-            var client = fixture.CreateClient().WithUser(user ?? BauUser);
+            var client = fixture.CreateClient(user: user ?? BauUser);
 
             var uri = new Uri($"{BaseUrl}/{previewTokenId}", UriKind.Relative);
 
@@ -677,7 +675,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
 
         private async Task<HttpResponseMessage> ListPreviewTokens(Guid dataSetVersionId, ClaimsPrincipal? user = null)
         {
-            var client = fixture.CreateClient().WithUser(user ?? BauUser);
+            var client = fixture.CreateClient(user: user ?? BauUser);
 
             var queryParams = new Dictionary<string, string?> { { "dataSetVersionId", dataSetVersionId.ToString() } };
 
@@ -817,7 +815,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
 
         private async Task<HttpResponseMessage> RevokePreviewToken(Guid previewTokenId, ClaimsPrincipal? user = null)
         {
-            var client = fixture.CreateClient().WithUser(user ?? BauUser);
+            var client = fixture.CreateClient(user: user ?? BauUser);
 
             var uri = new Uri($"{BaseUrl}/{previewTokenId}/revoke", UriKind.Relative);
 

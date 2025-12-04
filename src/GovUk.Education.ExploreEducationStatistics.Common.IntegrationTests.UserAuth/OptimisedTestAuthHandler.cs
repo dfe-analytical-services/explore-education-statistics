@@ -12,40 +12,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Use
 /// An AuthenticationHandler that allows the tests to make a ClaimsPrincipal available in the HttpContext
 /// for authentication and authorization mechanisms to use.
 ///
-/// In order to use this handler, the caller sets the HTTP header <see cref="TestUserId"/> to match the ID of a user
-/// that is registered in the <see cref="OptimisedTestUserPool"/> that operates for the lifetime of a test class.
+/// In order to use this handler, the caller sets the desired user to the <see cref="OptimisedTestUserHolder"/> using
+/// the <see cref="OptimisedTestUserHolder.SetUser"/> method.
 ///
 /// </summary>
+// ReSharper disable once ClassNeverInstantiated.Global
 public class OptimisedTestAuthHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,
     ILoggerFactory logger,
     UrlEncoder encoder,
-    IHttpContextAccessor httpContextAccessor,
-    OptimisedTestUserPool userPool
+    OptimisedTestUserHolder userHolder
 ) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
-    public const string TestUserId = "TestUserId";
-
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!httpContextAccessor.HttpContext.TryGetRequestHeader(TestUserId, out var testUserId))
-        {
-            return Task.FromResult(AuthenticateResult.NoResult());
-        }
-
-        if (!Guid.TryParse(testUserId, out var id))
-        {
-            throw new ArgumentException($"{testUserId} is not a Guid");
-        }
-
-        var user = userPool.GetUser(id);
+        var user = userHolder.GetUser();
 
         if (user == null)
         {
-            throw new ArgumentException(
-                $"{testUserId} is not a recognised user in the test user pool. "
-                    + $"Use fixture.RegisterTestUser() to add non-standard users to authentication."
-            );
+            logger.CreateLogger(GetType()).LogWarning("No test user has been set to handle this HTTP request.");
+            return Task.FromResult(AuthenticateResult.NoResult());
         }
 
         var ticket = new AuthenticationTicket(user, "Bearer");

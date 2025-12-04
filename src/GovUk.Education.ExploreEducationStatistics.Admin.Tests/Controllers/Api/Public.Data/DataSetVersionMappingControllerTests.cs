@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -135,11 +134,7 @@ public abstract class DataSetVersionMappingControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var actualUser = user ?? OptimisedTestUsers.Bau;
-
-            fixture.RegisterTestUser(actualUser);
-
-            var client = fixture.CreateClient().WithUser(actualUser);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = new Uri($"{BaseUrl}/{nextDataSetVersionId}/mapping/locations", UriKind.Relative);
 
@@ -1102,11 +1097,7 @@ public abstract class DataSetVersionMappingControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var actualUser = user ?? OptimisedTestUsers.Bau;
-
-            fixture.RegisterTestUser(actualUser);
-
-            var client = fixture.CreateClient().WithUser(actualUser);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = new Uri($"{BaseUrl}/{nextDataSetVersionId}/mapping/locations", UriKind.Relative);
 
@@ -1207,11 +1198,7 @@ public abstract class DataSetVersionMappingControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var actualUser = user ?? OptimisedTestUsers.Bau;
-
-            fixture.RegisterTestUser(actualUser);
-
-            var client = fixture.CreateClient().WithUser(actualUser);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = new Uri($"{BaseUrl}/{nextDataSetVersionId}/mapping/filters", UriKind.Relative);
 
@@ -2324,11 +2311,7 @@ public abstract class DataSetVersionMappingControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var actualUser = user ?? OptimisedTestUsers.Bau;
-
-            fixture.RegisterTestUser(actualUser);
-
-            var client = fixture.CreateClient().WithUser(actualUser);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = new Uri($"{BaseUrl}/{nextDataSetVersionId}/mapping/filters/options", UriKind.Relative);
 

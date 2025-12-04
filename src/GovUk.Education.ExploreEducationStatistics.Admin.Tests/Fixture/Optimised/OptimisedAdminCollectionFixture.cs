@@ -57,7 +57,7 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     private UsersAndRolesDbContext _usersAndRolesDbContext = null!;
     private Mock<IProcessorClient> _processorClientMock = null!;
     private Mock<IPublicDataApiClient> _publicDataApiClientMock = null!;
-    private OptimisedTestUserPool _userPool = null!;
+    private OptimisedTestUserHolder _userHolder = null!;
 
     private Func<string> _psqlConnectionString = null!;
     private Func<string> _azuriteConnectionString = null!;
@@ -126,15 +126,8 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     {
         if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
         {
-            // Get a reference to the shared user pool that will be used throughout the life of the test class using this
-            // fixture.
-            _userPool = lookups.GetService<OptimisedTestUserPool>();
-            _userPool.AddUserIfNotExists(OptimisedTestUsers.Authenticated);
-            _userPool.AddUserIfNotExists(OptimisedTestUsers.Bau);
-            _userPool.AddUserIfNotExists(OptimisedTestUsers.Analyst);
-            _userPool.AddUserIfNotExists(OptimisedTestUsers.PreReleaseUser);
-            _userPool.AddUserIfNotExists(OptimisedTestUsers.Verified);
-            _userPool.AddUserIfNotExists(OptimisedTestUsers.VerifiedButNotAuthorized);
+            // Get a reference to the component that allows us to set the user we wish to use for a particular call.
+            _userHolder = lookups.GetService<OptimisedTestUserHolder>();
         }
 
         // Grab reusable DbContexts that can be used for test data setup and test assertions. These are looked up once
@@ -173,16 +166,10 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
         await DisposeReusableDbContexts();
     }
 
-    /// <summary>
-    /// Adds a user to the test user pool so that they can be used for HttpClient calls and looked up successfully.
-    /// </summary>
-    public void RegisterTestUser(ClaimsPrincipal user)
+    public HttpClient CreateClient(ClaimsPrincipal user)
     {
-        if (!capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
-        {
-            throw new Exception("""Cannot register test users if "useTestUserAuthentication" is false.""");
-        }
-        _userPool.AddUserIfNotExists(user);
+        SetUser(user);
+        return CreateClient();
     }
 
     /// <summary>
@@ -244,6 +231,19 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
         await _contentDbContext.DisposeAsync();
         await _statisticsDbContext.DisposeAsync();
         await _usersAndRolesDbContext.DisposeAsync();
+    }
+
+    /// <summary>
+    /// Adds a user to the test user pool so that they can be used for HttpClient calls and looked up successfully.
+    /// </summary>
+    private void SetUser(ClaimsPrincipal user)
+    {
+        if (!capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
+        {
+            throw new Exception("""Cannot register test users if "useTestUserAuthentication" is false.""");
+        }
+
+        _userHolder.SetUser(user);
     }
 }
 

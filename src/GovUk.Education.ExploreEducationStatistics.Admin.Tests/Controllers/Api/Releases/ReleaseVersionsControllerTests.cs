@@ -15,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -1144,7 +1143,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests
             ClaimsPrincipal? user = null
         )
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var request = new
             {
@@ -1442,7 +1441,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests
             ClaimsPrincipal? user = null
         )
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var dataFilePath = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
@@ -1488,7 +1487,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests
             ClaimsPrincipal? user = null
         )
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var filePath = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
@@ -1522,7 +1521,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests
             ClaimsPrincipal? user = null
         )
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var filePath = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
@@ -1555,7 +1554,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests
             ClaimsPrincipal? user = null
         )
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
             return await client.PostAsJsonAsync($"api/release/{releaseVersionId}/import-bulk-zip-data", dataSetFiles);
         }
     }

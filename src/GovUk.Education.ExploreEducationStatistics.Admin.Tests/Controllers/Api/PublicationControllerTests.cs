@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -231,12 +230,9 @@ public class PublicationControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var actualUser =
-                user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.CreateAnyPublication));
-
-            fixture.RegisterTestUser(actualUser);
-
-            var client = fixture.CreateClient().WithUser(actualUser);
+            var client = fixture.CreateClient(
+                user: user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.CreateAnyPublication))
+            );
 
             return await client.PostAsJsonAsync("api/publications", request);
         }
@@ -296,12 +292,10 @@ public class PublicationControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var actualUser =
-                user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.UpdateAllPublications));
-
-            fixture.RegisterTestUser(actualUser);
-
-            var client = fixture.CreateClient().WithUser(actualUser);
+            var client = fixture.CreateClient(
+                user: user
+                    ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.UpdateAllPublications))
+            );
 
             return await client.PutAsJsonAsync($"api/publications/{publicationId}", request);
         }

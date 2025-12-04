@@ -10,7 +10,7 @@ public static class OptimisedServiceCollectionModificationsPostgresExtensions
     )
     {
         serviceModifications
-            .AddSingleton<OptimisedTestUserPool>()
+            .AddSingleton<OptimisedTestUserHolder>()
             .AddAuthentication<OptimisedTestAuthHandler, AuthenticationSchemeOptions>("Bearer");
 
         return serviceModifications;

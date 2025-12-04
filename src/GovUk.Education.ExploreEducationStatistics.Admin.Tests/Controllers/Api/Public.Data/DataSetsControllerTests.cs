@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -644,12 +643,10 @@ public abstract class DataSetsControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var actualUser =
-                user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.AccessAllPublications));
-
-            fixture.RegisterTestUser(actualUser);
-
-            var client = fixture.CreateClient().WithUser(actualUser);
+            var client = fixture.CreateClient(
+                user: user
+                    ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.AccessAllPublications))
+            );
 
             var queryParams = new Dictionary<string, string?>
             {
@@ -1089,16 +1086,10 @@ public abstract class DataSetsControllerTests
 
         private async Task<HttpResponseMessage> GetDataSet(Guid dataSetId, ClaimsPrincipal? user = null)
         {
-            // TODO EES-6450 - are we happy with this approach for handling default or specific users?
-            // Are we OK always having to do an explicit "RegisterTestUser" or should we set a user on
-            // Fixture and then CreateClient() always uses that user until changed?  Should be safe but
-            // is more "magic".
-            var actualUser =
-                user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.AccessAllPublications));
-
-            fixture.RegisterTestUser(actualUser);
-
-            var client = fixture.CreateClient().WithUser(actualUser);
+            var client = fixture.CreateClient(
+                user: user
+                    ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.AccessAllPublications))
+            );
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}", UriKind.Relative);
 
@@ -1235,7 +1226,7 @@ public abstract class DataSetsControllerTests
 
         private async Task<HttpResponseMessage> CreateDataSet(Guid releaseFileId, ClaimsPrincipal? user = null)
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var request = new DataSetCreateRequest { ReleaseFileId = releaseFileId };
 

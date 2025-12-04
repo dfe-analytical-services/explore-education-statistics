@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
@@ -45,8 +44,7 @@ public class ClaimsPrincipalTransformationServiceTests(ClaimsPrincipalTransforma
             .WithClaim(scopeClaimName, scopeClaimValue);
 
         // Set up scenario and test data.
-        fixture.RegisterTestUser(claimsPrincipal);
-        var client = fixture.CreateClient().WithUser(claimsPrincipal);
+        var client = fixture.CreateClient(user: claimsPrincipal);
 
         var response = await client.GetAsync("/test/scope-access");
 
@@ -121,8 +119,7 @@ public class ClaimsPrincipalTransformationServiceTests(ClaimsPrincipalTransforma
             });
 
         // Set up scenario and test data.
-        fixture.RegisterTestUser(claimsPrincipal);
-        var client = fixture.CreateClient().WithUser(claimsPrincipal);
+        var client = fixture.CreateClient(user: claimsPrincipal);
 
         var response = await client.GetAsync("/test/role-claims");
 

@@ -2,7 +2,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -26,7 +25,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     [Fact]
     public async Task GetGlobalPermissions_AuthenticatedUser()
     {
-        var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated);
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Authenticated);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -46,7 +45,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     [Fact]
     public async Task GetGlobalPermissions_BauUser()
     {
-        var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Bau);
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Bau);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -85,9 +84,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 );
             });
 
-        fixture.RegisterTestUser(user);
-
-        var client = fixture.CreateClient().WithUser(user);
+        var client = fixture.CreateClient(user: user);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -119,9 +116,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 );
             });
 
-        fixture.RegisterTestUser(user);
-
-        var client = fixture.CreateClient().WithUser(user);
+        var client = fixture.CreateClient(user: user);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -153,9 +148,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 );
             });
 
-        fixture.RegisterTestUser(user);
-
-        var client = fixture.CreateClient().WithUser(user);
+        var client = fixture.CreateClient(user: user);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -176,7 +169,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     [Fact]
     public async Task GetGlobalPermissions_PreReleaseUser()
     {
-        var client = fixture.CreateClient().WithUser(OptimisedTestUsers.PreReleaseUser);
+        var client = fixture.CreateClient(user: OptimisedTestUsers.PreReleaseUser);
 
         var response = await client.GetAsync("/api/permissions/access");
 

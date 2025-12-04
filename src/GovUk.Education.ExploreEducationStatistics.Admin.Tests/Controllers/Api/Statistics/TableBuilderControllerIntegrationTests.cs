@@ -1,7 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -72,7 +71,7 @@ public class TableBuilderControllerIntegrationTests(TableBuilderControllerIntegr
             )
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated);
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Authenticated);
 
         var response = await client.PostAsync(
             $"/api/data/tablebuilder/release/{ReleaseVersionId}",
@@ -104,7 +103,7 @@ public class TableBuilderControllerIntegrationTests(TableBuilderControllerIntegr
                 }
             );
 
-        var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Authenticated);
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Authenticated);
 
         var response = await client.PostAsync(
             $"/api/data/tablebuilder/release/{ReleaseVersionId}",

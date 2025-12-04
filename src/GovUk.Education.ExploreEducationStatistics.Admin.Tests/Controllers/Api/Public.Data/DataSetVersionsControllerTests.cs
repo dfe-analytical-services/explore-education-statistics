@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -340,7 +339,7 @@ public abstract class DataSetVersionsControllerTests
         [Fact]
         public async Task NoDataSetId_Returns400()
         {
-            var client = fixture.CreateClient().WithUser(OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: OptimisedTestUsers.Bau);
 
             var response = await client.GetAsync(BaseUrl);
 
@@ -364,7 +363,7 @@ public abstract class DataSetVersionsControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var queryParams = new Dictionary<string, string?>
             {
@@ -441,7 +440,7 @@ public abstract class DataSetVersionsControllerTests
 
         private async Task<HttpResponseMessage> GetDataSetVersion(Guid dataSetVersionId, ClaimsPrincipal? user = null)
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = $"{BaseUrl}/{dataSetVersionId}";
 
@@ -568,7 +567,7 @@ public abstract class DataSetVersionsControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = new Uri(BaseUrl, UriKind.Relative);
 
@@ -680,7 +679,7 @@ public abstract class DataSetVersionsControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = new Uri($"{BaseUrl}/complete", UriKind.Relative);
 
@@ -839,7 +838,7 @@ public abstract class DataSetVersionsControllerTests
 
         private async Task<HttpResponseMessage> DeleteVersion(Guid dataSetVersionId, ClaimsPrincipal? user = null)
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = new Uri($"{BaseUrl}/{dataSetVersionId}", UriKind.Relative);
 
@@ -993,7 +992,7 @@ public abstract class DataSetVersionsControllerTests
 
         private async Task<HttpResponseMessage> GetVersionChanges(Guid dataSetVersionId, ClaimsPrincipal? user = null)
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = new Uri($"{BaseUrl}/{dataSetVersionId}/changes", UriKind.Relative);
 
@@ -1194,7 +1193,7 @@ public abstract class DataSetVersionsControllerTests
             ClaimsPrincipal? user = null
         )
         {
-            var client = fixture.CreateClient().WithUser(user ?? OptimisedTestUsers.Bau);
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             return await client.PatchAsJsonAsync($"{BaseUrl}/{dataSetVersionId}", updateRequest);
         }
