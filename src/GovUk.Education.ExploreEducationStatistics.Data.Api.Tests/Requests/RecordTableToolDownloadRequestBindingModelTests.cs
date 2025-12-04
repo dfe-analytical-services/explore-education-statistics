@@ -50,7 +50,7 @@ public class RecordTableToolDownloadRequestBindingModelTests
             ReleasePeriodAndLabel = "release period label",
             ReleaseVersionId = Guid.Parse("5c015e8a-772f-4450-9fe0-8e83f73808ee"),
             SubjectId = Guid.Parse("cbdb1ea4-9ff1-4f45-86be-c5918b28735c"),
-            Query = new FullTableQueryRequestBuilder().Build(),
+            Query = new FullTableQueryBuilder().BuildRequest(),
         };
 
         // ACT

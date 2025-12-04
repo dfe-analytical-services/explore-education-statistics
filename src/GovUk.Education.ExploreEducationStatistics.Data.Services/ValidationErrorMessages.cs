@@ -2,9 +2,6 @@
 
 public enum ValidationErrorMessages
 {
-    // Table builder queries
-    QueryExceedsMaxAllowableTableSize,
-
     // Updating Filters
     FiltersDifferFromSubject,
     FilterGroupsDifferFromSubject,

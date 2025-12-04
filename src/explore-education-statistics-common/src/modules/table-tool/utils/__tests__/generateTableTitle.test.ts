@@ -10,6 +10,7 @@ import generateTableTitle from '@common/modules/table-tool/utils/generateTableTi
 describe('generateTableTitle', () => {
   const testMeta: FullTableMeta = {
     geoJsonAvailable: false,
+    isCroppedTable: false,
     publicationName: 'Pupil absence in schools in England',
     subjectName: 'Absence by characteristic',
     footnotes: [],

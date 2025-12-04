@@ -98,6 +98,7 @@ describe('TableToolPage', () => {
         subjectName: 'data 1',
         timePeriodRange: [{ code: 'TY', label: '2018-19', year: 2018 }],
         geoJsonAvailable: true,
+        isCroppedTable: false,
       },
       results: [
         {

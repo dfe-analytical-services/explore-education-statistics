@@ -66,6 +66,7 @@ export const testTableData: TableDataResponse = {
     footnotes: [],
     subjectName: 'Subject 1',
     geoJsonAvailable: false,
+    isCroppedTable: false,
     locations: {
       localAuthority: [
         {
