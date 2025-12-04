@@ -58,12 +58,14 @@ public class OptimisedWebApplicationFactoryBuilder<TStartup>
         _configModifications.Add(configRegistration);
         return this;
     }
+}
 
-    public OptimisedWebApplicationFactoryBuilder<TStartup> WithServiceCollectionModification(
-        OptimisedServiceAndConfigModifications modifications
-    )
+internal static class HostEnvironmentExtensions
+{
+    public const string IntegrationTestEnvironment = "IntegrationTest";
+
+    public static IWebHostBuilder UseIntegrationTestEnvironment(this IWebHostBuilder hostBuilder)
     {
-        _serviceModifications.AddRange(modifications.ServiceModifications);
-        return this;
+        return hostBuilder.UseEnvironment(IntegrationTestEnvironment);
     }
 }
