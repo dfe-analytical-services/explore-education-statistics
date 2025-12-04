@@ -424,7 +424,7 @@
       "properties": {
         "logs": [
           {
-              "categoryGroup": "allLogs",
+              "category": "WorkflowRuntime",
               "enabled": true
           }
         ],
