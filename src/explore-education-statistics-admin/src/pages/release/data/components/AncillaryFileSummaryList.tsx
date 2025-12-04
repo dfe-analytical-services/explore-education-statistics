@@ -9,6 +9,7 @@ import FormattedDate from '@common/components/FormattedDate';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import React from 'react';
 import { generatePath } from 'react-router-dom';
 import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
@@ -82,12 +83,14 @@ export default function AncillaryFileSummaryList({
                   },
                 )}
               >
-                Edit file
+                Edit file<VisuallyHidden> {file.title}</VisuallyHidden>
               </Link>
               <ModalConfirm
                 title="Confirm deletion of file"
                 triggerButton={
-                  <ButtonText onClick={onDelete}>Delete file</ButtonText>
+                  <ButtonText onClick={onDelete}>
+                    Delete file<VisuallyHidden> {file.title}</VisuallyHidden>
+                  </ButtonText>
                 }
                 onExit={onCancelDelete}
                 onCancel={onCancelDelete}
