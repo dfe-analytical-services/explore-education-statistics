@@ -22,10 +22,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimis
 
 /// <summary>
 ///
-/// A Collection-level test fixture to be used by integration tests that require both an <see cref="HttpClient"/> and
-/// access to a <see cref="PostgreSqlContainer"/> TestContainer instance. For best performance, each test suite class
-/// requiring this fixture should create its own subclass of it so that it can run in parallel with other test suites
-/// also requiring this fixture's features.
+/// A Collection-level test fixture to be used by Admin integration tests.
+///
+/// A number of capabilities are supported by this fixture, and each subclass can specify the capabilities that they
+/// need.  The relevant configuration changes and Test Containers will then be put in place to support this for the
+/// lifetime of this fixture.
 ///
 /// This fixture is intended to be used specifically as a Collection-level fixture, and thus is able to provide
 /// reusable components that might otherwise not be thread-safe e.g. DbContexts. The reason why this is possible
@@ -36,13 +37,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimis
 /// of this Collection fixture. Within the individual test classes themselves, their tests will run sequentially and
 /// therefore able to safely use the reusable components of this fixture. We therefore get the speed of running multiple
 /// test suites in parallel, along with the speed of reusing expensive-to-look-up components with only one lookup per
-/// test class.
+/// test collection.
 ///
 /// Each test suite using a subclass of this fixture will receive its own isolated version of it.
 ///
-/// Note that in order to allow multiple suites to run in parallel whilst using this fixture, we do not allow automatic
-/// test data teardowns of entire databases. Instead, each test using this fixture should be written in a fashion
-/// whereby it does not assume that the database is empty at the start of its run, or that it can check for the
+/// Note that while test data teardown after each test in a collection is supported, it's encouraged to write
+/// integration tests in a way that allows them to run without the need to have an empty database, as teardowns per
+/// test method adds up to significant extra time added.  Instead, each test using this fixture should be written in a
+/// fashion whereby it does not assume that the database is empty at the start of its run, or that it can check for the
 /// existence of data in the assertions phase without providing decent enough "WHERE" clauses to look for specific data
 /// that was created, deleted or updated by its own actions.
 ///
