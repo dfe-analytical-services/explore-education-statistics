@@ -313,8 +313,6 @@ module.exports = webpackEnv => {
       },
       fallback: {
         path: require.resolve('path-browserify'),
-        // EES - Add `process` polyfill for compat with react-markdown
-        process: require.resolve('process/browser'),
         // EES - node core modules are no longer polyfilled by default in webpack 5
         querystring: require.resolve('querystring'),
       },
@@ -770,10 +768,6 @@ module.exports = webpackEnv => {
         }),
       // EES - Add error overlay plugin that is Webpack 5 compatible
       new ErrorOverlayPlugin(),
-      // EES - Add `process` polyfill for compat with react-markdown
-      new webpack.ProvidePlugin({
-        process: require.resolve('process/browser'),
-      }),
     ].filter(Boolean),
     // Turn off performance processing because we utilize
     // our own hints via the FileSizeReporter

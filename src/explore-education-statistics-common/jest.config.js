@@ -26,8 +26,6 @@ const config = {
     '^@common/(.*)$': '<rootDir>/src/$1',
     '^@common-test/(.*)$': '<rootDir>/test/$1',
     '^axios$': '<rootDir>/node_modules/axios/dist/axios.js',
-    'react-markdown':
-      '<rootDir>/node_modules/react-markdown/react-markdown.min.js',
   },
   moduleFileExtensions: [
     'web.js',

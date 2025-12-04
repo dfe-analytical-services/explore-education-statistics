@@ -7,6 +7,10 @@
   margin: 0 -#{govuk-spacing(1)} govuk-spacing(2);
 }
 
+.guidanceText {
+  white-space: pre-wrap;
+}
+
 .guidanceTitle {
   background: govuk-colour('white');
   font-size: 16px !important;

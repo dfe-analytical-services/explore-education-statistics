@@ -38,7 +38,6 @@
     "react-hook-form": "7.43.9",
     "react-lazyload": "3.2.1",
     "react-leaflet": "^4.2.1",
-    "react-markdown": "^8.0.0",
     "react-syntax-highlighter": "^15.5.0",
     "recharts": "^2.15.4",
     "regenerator-runtime": "0.13.9",
