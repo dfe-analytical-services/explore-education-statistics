@@ -3,38 +3,47 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using LinqToDB;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Moq;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-public abstract class DataSetVersionsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class DataSetVersionsControllerTestsFixture()
+    : OptimisedAdminCollectionFixture(
+        capabilities: [AdminIntegrationTestCapability.UserAuth, AdminIntegrationTestCapability.Postgres]
+    );
+
+[CollectionDefinition(nameof(DataSetVersionsControllerTestsFixture))]
+public class DataSetVersionsControllerTestsCollection : ICollectionFixture<DataSetVersionsControllerTestsFixture>;
+
+[Collection(nameof(DataSetVersionsControllerTestsFixture))]
+public abstract class DataSetVersionsControllerTests
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
+    private static readonly DataFixture DataFixture = new();
 
-    public class ListVersionsTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    public class ListVersionsTests(DataSetVersionsControllerTestsFixture fixture) : DataSetVersionsControllerTests
     {
         [Theory]
         [MemberData(
@@ -52,14 +61,16 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 )
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion currentDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -77,11 +88,13 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
             var response = await ListLiveVersions(dataSetId: dataSet.Id, page: 1, pageSize: 10);
 
@@ -117,7 +130,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -126,11 +139,13 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
             var response = await ListLiveVersions(dataSetId: dataSet.Id, page: 1, pageSize: 10);
 
@@ -170,14 +185,16 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .ForInstance(s => s.Set(rf => rf.File, () => DataFixture.DefaultFile(FileType.Data)))
                 .GenerateList(numberOfPublishedDataSetVersions);
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.AddRange(releaseFiles);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.AddRange(releaseFiles);
+                });
 
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             var now = DateTimeOffset.UtcNow.AddDays(-numberOfPublishedDataSetVersions);
             var dataSetVersions = releaseFiles
@@ -194,11 +211,13 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 )
                 .ToList();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(dataSetVersions);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSetVersions);
+                    context.DataSets.Update(dataSet);
+                });
 
             var response = await ListLiveVersions(dataSetId: dataSet.Id, page: page, pageSize: pageSize);
 
@@ -240,18 +259,20 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 )
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.AddRange(targetReleaseFile, otherReleaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.AddRange(targetReleaseFile, otherReleaseFile);
+                });
 
             DataSet targetDataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
             DataSet otherDataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-                context.DataSets.AddRange(targetDataSet, otherDataSet)
-            );
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context => context.DataSets.AddRange(targetDataSet, otherDataSet));
 
             DataSetVersion targetDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -269,11 +290,13 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(otherReleaseFile.Id))
                 .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(targetDataSetVersion, otherDataSetVersion);
-                context.DataSets.UpdateRange(targetDataSet, otherDataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.AddRange(targetDataSetVersion, otherDataSetVersion);
+                    context.DataSets.UpdateRange(targetDataSet, otherDataSet);
+                });
 
             var response = await ListLiveVersions(dataSetId: targetDataSet.Id, page: 1, pageSize: 10);
 
@@ -303,9 +326,12 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
-
-            var response = await ListLiveVersions(dataSetId: Guid.NewGuid(), page: 1, pageSize: 1, client: client);
+            var response = await ListLiveVersions(
+                dataSetId: Guid.NewGuid(),
+                page: 1,
+                pageSize: 1,
+                user: OptimisedTestUsers.Authenticated
+            );
 
             response.AssertForbidden();
         }
@@ -313,7 +339,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         [Fact]
         public async Task NoDataSetId_Returns400()
         {
-            var client = BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: OptimisedTestUsers.Bau);
 
             var response = await client.GetAsync(BaseUrl);
 
@@ -334,10 +360,10 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             Guid dataSetId,
             int? page = null,
             int? pageSize = null,
-            HttpClient? client = null
+            ClaimsPrincipal? user = null
         )
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var queryParams = new Dictionary<string, string?>
             {
@@ -352,7 +378,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         }
     }
 
-    public class GetDataSetVersionTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    public class GetDataSetVersionTests(DataSetVersionsControllerTestsFixture fixture) : DataSetVersionsControllerTests
     {
         public static TheoryData<DataSetVersionStatus> AllDataSetVersionStatuses =>
             new(EnumUtil.GetEnums<DataSetVersionStatus>());
@@ -363,7 +389,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             var dataSetVersions = DataFixture
                 .DefaultDataSetVersion()
@@ -371,11 +397,13 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithDataSet(dataSet)
                 .GenerateList(3);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(dataSetVersions);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSetVersions);
+                    context.DataSets.Update(dataSet);
+                });
 
             var requestedDataSetVersion = dataSetVersions[1];
 
@@ -394,9 +422,10 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
-
-            var response = await GetDataSetVersion(dataSetVersionId: Guid.NewGuid(), client: client);
+            var response = await GetDataSetVersion(
+                dataSetVersionId: Guid.NewGuid(),
+                user: OptimisedTestUsers.Authenticated
+            );
 
             response.AssertForbidden();
         }
@@ -409,9 +438,9 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
             response.AssertNotFound();
         }
 
-        private async Task<HttpResponseMessage> GetDataSetVersion(Guid dataSetVersionId, HttpClient? client = null)
+        private async Task<HttpResponseMessage> GetDataSetVersion(Guid dataSetVersionId, ClaimsPrincipal? user = null)
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = $"{BaseUrl}/{dataSetVersionId}";
 
@@ -419,7 +448,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         }
     }
 
-    public class CreateNextVersionTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    public class CreateNextVersionTests(DataSetVersionsControllerTestsFixture fixture) : DataSetVersionsControllerTests
     {
         [Fact]
         public async Task Success()
@@ -433,14 +462,16 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 )
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion currentDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -449,24 +480,25 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(currentDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(currentDataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
             DataSetVersion? nextVersion = null;
 
-            var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
-
-            processorClient
+            fixture
+                .GetProcessorClientMock()
                 .Setup(c =>
                     c.CreateNextDataSetVersionMappings(dataSet.Id, releaseFile.Id, null, It.IsAny<CancellationToken>())
                 )
                 .Returns(async () =>
                 {
-                    var savedDataSet = await TestApp
-                        .GetDbContext<PublicDataDbContext>()
+                    var savedDataSet = await fixture
+                        .GetPublicDataDbContext()
                         .DataSets.SingleAsync(ds => ds.Id == dataSet.Id);
 
                     nextVersion = DataFixture
@@ -477,11 +509,13 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                         .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
                         .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-                    await TestApp.AddTestData<PublicDataDbContext>(context =>
-                    {
-                        context.DataSetVersions.Add(nextVersion);
-                        context.DataSets.Update(savedDataSet);
-                    });
+                    await fixture
+                        .GetPublicDataDbContext()
+                        .AddTestData(context =>
+                        {
+                            context.DataSetVersions.Add(nextVersion);
+                            context.DataSets.Update(savedDataSet);
+                        });
 
                     return new ProcessDataSetVersionResponseViewModel
                     {
@@ -491,9 +525,9 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                     };
                 });
 
-            var client = BuildApp(processorClient.Object).CreateClient();
+            var response = await CreateNextVersion(dataSetId: dataSet.Id, releaseFileId: releaseFile.Id);
 
-            var response = await CreateNextVersion(dataSetId: dataSet.Id, releaseFileId: releaseFile.Id, client);
+            MockUtils.VerifyAllMocks(fixture.GetProcessorClientMock());
 
             var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
 
@@ -507,12 +541,10 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
-
             var response = await CreateNextVersion(
                 dataSetId: Guid.NewGuid(),
                 releaseFileId: Guid.NewGuid(),
-                client: client
+                user: OptimisedTestUsers.Authenticated
             );
 
             response.AssertForbidden();
@@ -521,9 +553,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         [Fact]
         public async Task EmptyRequiredFields_Return400()
         {
-            var client = BuildApp().CreateClient();
-
-            var response = await CreateNextVersion(dataSetId: Guid.Empty, releaseFileId: Guid.Empty, client: client);
+            var response = await CreateNextVersion(dataSetId: Guid.Empty, releaseFileId: Guid.Empty);
 
             var validationProblem = response.AssertValidationProblem();
             Assert.Equal(2, validationProblem.Errors.Count);
@@ -534,10 +564,10 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         private async Task<HttpResponseMessage> CreateNextVersion(
             Guid dataSetId,
             Guid releaseFileId,
-            HttpClient? client = null
+            ClaimsPrincipal? user = null
         )
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = new Uri(BaseUrl, UriKind.Relative);
 
@@ -550,7 +580,8 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         }
     }
 
-    public class CompleteNextVersionTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    public class CompleteNextVersionTests(DataSetVersionsControllerTestsFixture fixture)
+        : DataSetVersionsControllerTests
     {
         [Fact]
         public async Task Success()
@@ -564,14 +595,16 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 )
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion currentDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -588,15 +621,16 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
-
-            processorClient
+            fixture
+                .GetProcessorClientMock()
                 .Setup(c => c.CompleteNextDataSetVersionImport(nextDataSetVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() =>
                     new ProcessDataSetVersionResponseViewModel
@@ -607,9 +641,9 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                     }
                 );
 
-            var client = BuildApp(processorClient.Object).CreateClient();
+            var response = await CompleteNextVersionImport(dataSetVersionId: nextDataSetVersion.Id);
 
-            var response = await CompleteNextVersionImport(dataSetVersionId: nextDataSetVersion.Id, client);
+            MockUtils.VerifyAllMocks(fixture.GetProcessorClientMock());
 
             var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
 
@@ -622,9 +656,10 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
-
-            var response = await CompleteNextVersionImport(dataSetVersionId: Guid.NewGuid(), client: client);
+            var response = await CompleteNextVersionImport(
+                dataSetVersionId: Guid.NewGuid(),
+                user: OptimisedTestUsers.Authenticated
+            );
 
             response.AssertForbidden();
         }
@@ -632,9 +667,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         [Fact]
         public async Task EmptyRequiredFields_Return400()
         {
-            var client = BuildApp().CreateClient();
-
-            var response = await CompleteNextVersionImport(dataSetVersionId: Guid.Empty, client: client);
+            var response = await CompleteNextVersionImport(dataSetVersionId: Guid.Empty);
 
             var validationProblem = response.AssertValidationProblem();
             Assert.Single(validationProblem.Errors);
@@ -643,10 +676,10 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
 
         private async Task<HttpResponseMessage> CompleteNextVersionImport(
             Guid dataSetVersionId,
-            HttpClient? client = null
+            ClaimsPrincipal? user = null
         )
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = new Uri($"{BaseUrl}/complete", UriKind.Relative);
 
@@ -657,22 +690,21 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         }
     }
 
-    public class DeleteVersionTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    public class DeleteVersionTests(DataSetVersionsControllerTestsFixture fixture) : DataSetVersionsControllerTests
     {
         [Fact]
         public async Task Success()
         {
             var dataSetVersionId = Guid.NewGuid();
 
-            var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
-
-            processorClient
+            fixture
+                .GetProcessorClientMock()
                 .Setup(c => c.DeleteDataSetVersion(dataSetVersionId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Either<ActionResult, Unit>(Unit.Instance));
 
-            var client = BuildApp(processorClient.Object).CreateClient();
+            var response = await DeleteVersion(dataSetVersionId);
 
-            var response = await DeleteVersion(dataSetVersionId, client);
+            MockUtils.VerifyAllMocks(fixture.GetProcessorClientMock());
 
             response.AssertNoContent();
         }
@@ -680,9 +712,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
-
-            var response = await DeleteVersion(Guid.NewGuid(), client);
+            var response = await DeleteVersion(Guid.NewGuid(), user: OptimisedTestUsers.Authenticated);
 
             response.AssertForbidden();
         }
@@ -692,7 +722,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -702,21 +732,22 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
-
-            processorClient
+            fixture
+                .GetProcessorClientMock()
                 .Setup(c => c.DeleteDataSetVersion(dataSetVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Either<ActionResult, Unit>(new NotFoundResult()));
 
-            var client = BuildApp(processorClient.Object).CreateClient();
+            var response = await DeleteVersion(dataSetVersion.Id);
 
-            var response = await DeleteVersion(dataSetVersion.Id, client);
+            MockUtils.VerifyAllMocks(fixture.GetProcessorClientMock());
 
             response.AssertNotFound();
         }
@@ -726,7 +757,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -736,15 +767,16 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
-
-            processorClient
+            fixture
+                .GetProcessorClientMock()
                 .Setup(c => c.DeleteDataSetVersion(dataSetVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(
                     new Either<ActionResult, Unit>(
@@ -760,9 +792,9 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                     )
                 );
 
-            var client = BuildApp(processorClient.Object).CreateClient();
+            var response = await DeleteVersion(dataSetVersion.Id);
 
-            var response = await DeleteVersion(dataSetVersion.Id, client);
+            MockUtils.VerifyAllMocks(fixture.GetProcessorClientMock());
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -774,7 +806,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -784,30 +816,29 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            var processorClient = new Mock<IProcessorClient>(MockBehavior.Strict);
-
-            processorClient
+            fixture
+                .GetProcessorClientMock()
                 .Setup(c => c.DeleteDataSetVersion(dataSetVersion.Id, It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new HttpRequestException());
 
-            var client = BuildApp(processorClient.Object).CreateClient();
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => DeleteVersion(dataSetVersion.Id));
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                DeleteVersion(dataSetVersion.Id, client)
-            );
+            MockUtils.VerifyAllMocks(fixture.GetProcessorClientMock());
 
             Assert.IsType<HttpRequestException>(exception.InnerException);
         }
 
-        private async Task<HttpResponseMessage> DeleteVersion(Guid dataSetVersionId, HttpClient? client = null)
+        private async Task<HttpResponseMessage> DeleteVersion(Guid dataSetVersionId, ClaimsPrincipal? user = null)
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = new Uri($"{BaseUrl}/{dataSetVersionId}", UriKind.Relative);
 
@@ -815,14 +846,14 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         }
     }
 
-    public class GetVersionChangesTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    public class GetVersionChangesTests(DataSetVersionsControllerTestsFixture fixture) : DataSetVersionsControllerTests
     {
         [Fact]
         public async Task Success_Returns200()
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
@@ -831,17 +862,18 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
             var mockedChanges = new MockedChanges { Changes = ["test"] };
 
-            var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
-
-            publicDataApiClient
+            fixture
+                .GetPublicDataApiClientMock()
                 .Setup(c =>
                     c.GetDataSetVersionChanges(
                         dataSetVersion.DataSetId,
@@ -853,9 +885,9 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                     new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(mockedChanges) }
                 );
 
-            var client = BuildApp(publicDataApiClient: publicDataApiClient.Object).CreateClient();
+            var response = await GetVersionChanges(dataSetVersion.Id);
 
-            var response = await GetVersionChanges(dataSetVersion.Id, client);
+            MockUtils.VerifyAllMocks(fixture.GetPublicDataApiClientMock());
 
             response.AssertOk(mockedChanges, useSystemJson: true);
         }
@@ -863,9 +895,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
-
-            var response = await GetVersionChanges(Guid.NewGuid(), client);
+            var response = await GetVersionChanges(Guid.NewGuid(), user: OptimisedTestUsers.Authenticated);
 
             response.AssertForbidden();
         }
@@ -883,7 +913,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
@@ -892,15 +922,16 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
-
-            publicDataApiClient
+            fixture
+                .GetPublicDataApiClientMock()
                 .Setup(c =>
                     c.GetDataSetVersionChanges(
                         dataSetVersion.DataSetId,
@@ -910,11 +941,9 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 )
                 .ReturnsAsync(ValidationUtils.ValidationResult());
 
-            var client = BuildApp(publicDataApiClient: publicDataApiClient.Object).CreateClient();
+            var response = await GetVersionChanges(dataSetVersion.Id);
 
-            var response = await GetVersionChanges(dataSetVersion.Id, client);
-
-            MockUtils.VerifyAllMocks(publicDataApiClient);
+            MockUtils.VerifyAllMocks(fixture.GetPublicDataApiClientMock());
 
             response.AssertValidationProblem();
         }
@@ -924,7 +953,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -933,15 +962,16 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
-
-            publicDataApiClient
+            fixture
+                .GetPublicDataApiClientMock()
                 .Setup(c =>
                     c.GetDataSetVersionChanges(
                         dataSetVersion.DataSetId,
@@ -951,20 +981,18 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 )
                 .ThrowsAsync(new HttpRequestException());
 
-            var client = BuildApp(publicDataApiClient: publicDataApiClient.Object).CreateClient();
-
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                GetVersionChanges(dataSetVersion.Id, client)
+                GetVersionChanges(dataSetVersion.Id)
             );
 
-            Assert.IsType<HttpRequestException>(exception.InnerException);
+            MockUtils.VerifyAllMocks(fixture.GetPublicDataApiClientMock());
 
-            MockUtils.VerifyAllMocks(publicDataApiClient);
+            Assert.IsType<HttpRequestException>(exception.InnerException);
         }
 
-        private async Task<HttpResponseMessage> GetVersionChanges(Guid dataSetVersionId, HttpClient? client = null)
+        private async Task<HttpResponseMessage> GetVersionChanges(Guid dataSetVersionId, ClaimsPrincipal? user = null)
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = new Uri($"{BaseUrl}/{dataSetVersionId}/changes", UriKind.Relative);
 
@@ -978,7 +1006,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         }
     }
 
-    public class UpdateVersionTests(TestApplicationFactory testApp) : DataSetVersionsControllerTests(testApp)
+    public class UpdateVersionTests(DataSetVersionsControllerTestsFixture fixture) : DataSetVersionsControllerTests
     {
         [Theory]
         [MemberData(
@@ -996,14 +1024,16 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 )
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion currentDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -1021,11 +1051,13 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithNotes("initial notes.")
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
             var updateRequest = new DataSetVersionUpdateRequest { Notes = "updated notes." };
 
@@ -1059,11 +1091,9 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var client = BuildApp(user: DataFixture.AuthenticatedUser()).CreateClient();
-
             var updateRequest = new DataSetVersionUpdateRequest();
 
-            var response = await UpdateVersion(Guid.NewGuid(), updateRequest, client);
+            var response = await UpdateVersion(Guid.NewGuid(), updateRequest, user: OptimisedTestUsers.Authenticated);
 
             response.AssertForbidden();
         }
@@ -1087,7 +1117,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion currentDataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -1103,11 +1133,13 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
             var updateRequest = new DataSetVersionUpdateRequest();
 
@@ -1126,7 +1158,7 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
@@ -1135,11 +1167,13 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
             var updateRequest = new DataSetVersionUpdateRequest { Notes = "updated notes." };
 
@@ -1156,27 +1190,12 @@ public abstract class DataSetVersionsControllerTests(TestApplicationFactory test
         private async Task<HttpResponseMessage> UpdateVersion(
             Guid dataSetVersionId,
             DataSetVersionUpdateRequest updateRequest,
-            HttpClient? client = null
+            ClaimsPrincipal? user = null
         )
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             return await client.PatchAsJsonAsync($"{BaseUrl}/{dataSetVersionId}", updateRequest);
         }
-    }
-
-    private WebApplicationFactory<TestStartup> BuildApp(
-        IProcessorClient? processorClient = null,
-        IPublicDataApiClient? publicDataApiClient = null,
-        ClaimsPrincipal? user = null
-    )
-    {
-        return TestApp
-            .ConfigureServices(services =>
-            {
-                services.ReplaceService(processorClient ?? Mock.Of<IProcessorClient>());
-                services.ReplaceService(publicDataApiClient ?? Mock.Of<IPublicDataApiClient>());
-            })
-            .SetUser(user ?? DataFixture.BauUser());
     }
 }

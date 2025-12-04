@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
+// TODO EES-6450 - remove when all integration tests are migrated to using the new optimised framework.
 public static class DbContextTestExtensions
 {
     public static async Task ClearTestData<TDbContext>(this TDbContext context)

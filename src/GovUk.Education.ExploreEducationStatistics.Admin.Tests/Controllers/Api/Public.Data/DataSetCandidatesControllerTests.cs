@@ -1,12 +1,14 @@
 #nullable enable
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.WebUtilities;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -14,11 +16,23 @@ using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-public abstract class DataSetCandidatesControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class DataSetCandidatesControllerTestsFixture()
+    : OptimisedAdminCollectionFixture(
+        capabilities: [AdminIntegrationTestCapability.UserAuth, AdminIntegrationTestCapability.Postgres]
+    );
+
+[CollectionDefinition(nameof(DataSetCandidatesControllerTestsFixture))]
+public class DataSetCandidatesControllerTestsCollection : ICollectionFixture<DataSetCandidatesControllerTestsFixture>;
+
+[Collection(nameof(DataSetCandidatesControllerTestsFixture))]
+public abstract class DataSetCandidatesControllerTests
 {
+    private static readonly DataFixture DataFixture = new();
     private const string BaseUrl = "api/public-data/data-set-candidates";
 
-    public class ListDataSetCandidatesTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class ListDataSetCandidatesTests(DataSetCandidatesControllerTestsFixture fixture)
+        : DataSetCandidatesControllerTests
     {
         [Fact]
         public async Task Success()
@@ -40,11 +54,13 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
                 )
                 .ToList();
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.DataImports.AddRange(dataImports);
-                context.ReleaseFiles.AddRange(releaseFiles);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataImports.AddRange(dataImports);
+                    context.ReleaseFiles.AddRange(releaseFiles);
+                });
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
@@ -69,15 +85,13 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
         {
             ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion();
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseVersions.Add(releaseVersion));
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseVersions.Add(releaseVersion));
 
             var authenticatedUser = claimType.HasValue
                 ? DataFixture.AuthenticatedUser().WithClaim(claimType.Value.ToString())
                 : DataFixture.AuthenticatedUser();
 
-            var client = TestApp.SetUser(authenticatedUser).CreateClient();
-
-            var response = await GetDataSetCandidates(releaseVersion.Id, client);
+            var response = await GetDataSetCandidates(releaseVersion.Id, user: authenticatedUser);
 
             response.AssertForbidden();
         }
@@ -87,7 +101,7 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
         {
             ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion();
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseVersions.Add(releaseVersion));
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseVersions.Add(releaseVersion));
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
@@ -112,11 +126,13 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
                 .WithFile(dataImport.File)
                 .WithReleaseVersion(releaseVersion);
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.DataImports.Add(dataImport);
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataImports.Add(dataImport);
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
@@ -141,11 +157,13 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
                 .WithFile(dataImport.File)
                 .WithReleaseVersion(releaseVersion);
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.DataImports.Add(dataImport);
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataImports.Add(dataImport);
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
@@ -169,11 +187,13 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
                 .WithReleaseVersion(releaseVersion)
                 .WithPublicApiDataSetId(Guid.NewGuid());
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.DataImports.Add(dataImport);
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataImports.Add(dataImport);
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
@@ -199,11 +219,13 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
                 .WithReleaseVersion(releaseVersion)
                 .WithApiCompatibility(false);
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.DataImports.Add(dataImport);
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataImports.Add(dataImport);
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
@@ -237,11 +259,13 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
                 .WithFile(dataImport.File)
                 .WithReleaseVersion(releaseVersion);
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.DataImports.Add(dataImport);
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataImports.Add(dataImport);
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             var response = await GetDataSetCandidates(releaseVersion.Id);
 
@@ -258,11 +282,14 @@ public abstract class DataSetCandidatesControllerTests(TestApplicationFactory te
             response.AssertNotFound();
         }
 
-        private async Task<HttpResponseMessage> GetDataSetCandidates(Guid releaseVersionId, HttpClient? client = null)
+        private async Task<HttpResponseMessage> GetDataSetCandidates(
+            Guid releaseVersionId,
+            ClaimsPrincipal? user = null
+        )
         {
-            var user = DataFixture.AuthenticatedUser().WithClaim(SecurityClaimTypes.AccessAllReleases.ToString());
-
-            client ??= TestApp.SetUser(user).CreateClient();
+            var client = fixture.CreateClient(
+                user: user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.AccessAllReleases))
+            );
 
             var query = new Dictionary<string, string?> { { "releaseVersionId", releaseVersionId.ToString() } };
 
