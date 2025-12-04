@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using Testcontainers.PostgreSql;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres;

@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 

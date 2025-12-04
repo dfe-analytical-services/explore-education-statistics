@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 
 public class OptimisedWebApplicationFactoryBuilder<TStartup>
     where TStartup : class

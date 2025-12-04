@@ -11,6 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp.csproj" />
   </ItemGroup>
 </Project>

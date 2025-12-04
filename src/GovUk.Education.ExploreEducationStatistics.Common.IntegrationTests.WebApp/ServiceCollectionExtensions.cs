@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 
 /// <summary>
 /// This class contains a number of extension methods for IServiceCollection that are useful when setting up

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
+using Microsoft.AspNetCore.Authentication;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 

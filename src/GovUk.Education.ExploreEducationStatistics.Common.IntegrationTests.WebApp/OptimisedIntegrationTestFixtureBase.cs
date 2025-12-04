@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 
 /// <summary>
 ///

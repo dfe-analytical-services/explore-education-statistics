@@ -1,4 +1,4 @@
-namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 
 /// <summary>
 /// Some convenience methods for <see cref="HttpClient"/> to be used within the test classes.
