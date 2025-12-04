@@ -415,7 +415,7 @@
     },
     {
       "type": "Microsoft.Logic/workflows/providers/diagnosticSettings",
-      "apiVersion": "2017-06-01-preview",
+      "apiVersion": "2017-05-01-preview",
       "name": "[concat(parameters('logicAppName'), '/Microsoft.Insights/Slack webhook logic app diagnostic setting')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
