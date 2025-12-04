@@ -129,9 +129,9 @@ public class TableBuilderControllerIntegrationTestsFixture()
         modifications.ReplaceServiceWithMock<ITableBuilderService>();
     }
 
-    protected override void LookupServicesAfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
     {
-        base.LookupServicesAfterFactoryConstructed(lookups);
+        await base.AfterFactoryConstructed(lookups);
         TableBuilderServiceMock = lookups.GetMockService<ITableBuilderService>();
     }
 }

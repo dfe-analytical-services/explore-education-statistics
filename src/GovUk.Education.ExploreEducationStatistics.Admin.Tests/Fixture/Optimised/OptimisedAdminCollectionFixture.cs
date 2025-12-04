@@ -122,7 +122,7 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
         }
     }
 
-    protected override void LookupServicesAfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    protected override Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
     {
         if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
         {
@@ -148,6 +148,8 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
         {
             _publicDataDbContext.Database.Migrate();
         }
+
+        return Task.CompletedTask;
     }
 
     /// <summary>

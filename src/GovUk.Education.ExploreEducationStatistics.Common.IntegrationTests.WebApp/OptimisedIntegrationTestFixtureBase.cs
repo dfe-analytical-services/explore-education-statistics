@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Web
 ///   5. Applies any ServiceCollection and IConfigurationBuilder modifications that the subclass asked for to the
 ///      builder.
 ///   6. Lets the subclass look up any services that it needs after the factory has been constructed, by overriding the
-///      <see cref="LookupServicesAfterFactoryConstructed"/> method.
+///      <see cref="AfterFactoryConstructed"/> method.
 /// 5. The tests in the collection run in sequence, all using this single instance of the fixture subclass.
 /// 6. XUnit calls <see cref="DisposeAsync"/> on this fixture.
 /// 7. <see cref="DisposeAsync"/> then:
@@ -73,7 +73,7 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup> : IAsyncLife
         _factory = factoryBuilder.Build();
 
         var lookups = new OptimisedServiceCollectionLookups<TStartup>(_factory);
-        LookupServicesAfterFactoryConstructed(lookups);
+        await AfterFactoryConstructed(lookups);
     }
 
     protected virtual void RegisterTestContainers(TestContainerRegistrations registrations) { }
@@ -82,9 +82,10 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup> : IAsyncLife
         OptimisedServiceAndConfigModifications serviceModifications
     ) { }
 
-    protected virtual void LookupServicesAfterFactoryConstructed(
-        OptimisedServiceCollectionLookups<TStartup> lookups
-    ) { }
+    protected virtual Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<TStartup> lookups)
+    {
+        return Task.CompletedTask;
+    }
 
     /// <summary>
     /// Creates an HttpClient that can be used to send HTTP requests to the WebApplicationFactory.

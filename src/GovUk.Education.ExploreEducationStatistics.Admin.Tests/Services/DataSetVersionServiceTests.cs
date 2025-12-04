@@ -280,9 +280,9 @@ public class DataSetVersionServiceTestsFixture()
 {
     public IDataSetVersionService DataSetVersionService = null!;
 
-    protected override void LookupServicesAfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
     {
-        base.LookupServicesAfterFactoryConstructed(lookups);
+        await base.AfterFactoryConstructed(lookups);
         DataSetVersionService = lookups.GetService<IDataSetVersionService>();
     }
 }

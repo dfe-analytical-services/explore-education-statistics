@@ -21,54 +21,72 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-// TODO EES-6450 - decide if we're happy with ignoring this #pragma in test projects.
 // ReSharper disable once ClassNeverInstantiated.Global
-#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
 public class PreviewTokenControllerTestsFixture()
     : OptimisedAdminCollectionFixture(
         capabilities: [AdminIntegrationTestCapability.UserAuth, AdminIntegrationTestCapability.Postgres]
-    );
+    )
+{
+    public ClaimsPrincipal BauPrincipal = null!;
+
+    public User BauUser = null!;
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+
+        var dataFixture = new DataFixture();
+
+        BauPrincipal = dataFixture.BauUser();
+
+        BauUser = dataFixture.DefaultUser().WithId(BauPrincipal.GetUserId()).WithEmail(BauPrincipal.GetEmail());
+
+        await GetContentDbContext().AddTestData(context => context.Users.Add(BauUser));
+    }
+}
 
 [CollectionDefinition(nameof(PreviewTokenControllerTestsFixture))]
 public class PreviewTokenControllerTestsCollection : ICollectionFixture<PreviewTokenControllerTestsFixture>;
 
 [Collection(nameof(PreviewTokenControllerTestsFixture))]
-public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFixture fixture) : IAsyncLifetime
+public abstract class PreviewTokenControllerTests
 {
     private const string BaseUrl = "api/public-data/preview-tokens";
     private static readonly DataFixture DataFixture = new();
 
-    private static bool _commonDataInitialized;
-
-    private static readonly ClaimsPrincipal BauUser = DataFixture.BauUser();
-
-    private static readonly User BauUserEntry = DataFixture
-        .DefaultUser()
-        .WithId(BauUser.GetUserId())
-        .WithEmail(BauUser.GetEmail());
-
-    /// <summary>
-    /// Set up common test data that is commonly used by all tests within this suite.
-    /// TODO EES-6450 - see if we're happy with this way of setting up global test suite test data.
-    /// </summary>
-    public async Task InitializeAsync()
+    public class CreatePreviewTokenTests(PreviewTokenControllerTestsFixture fixture) : PreviewTokenControllerTests
     {
-        if (!_commonDataInitialized)
-        {
-            await fixture.GetContentDbContext().AddTestData(context => context.Users.Add(BauUserEntry));
-            _commonDataInitialized = true;
-        }
-    }
+        public record CreatePreviewTokenValidationError(string Message, string Path);
 
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
+        private static readonly CreatePreviewTokenValidationError InvalidExpiryOutOfBound = new(
+            Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
+            Message: "Expires date must be no more than 7 days after the activates date."
+        );
 
-    public class CreatePreviewTokenTests(PreviewTokenControllerTestsFixture fixture)
-        : PreviewTokenControllerTests(fixture)
-    {
-        private record CreatePreviewTokenValidationError(string Message, string Path);
+        private static readonly CreatePreviewTokenValidationError InvalidExpiryBeforeActivates = new(
+            Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
+            Message: "Expires date must be after the activates date."
+        );
+
+        private static readonly CreatePreviewTokenValidationError InvalidExpiryInPast = new(
+            Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
+            Message: "Expires date must not be in the past."
+        );
+
+        private static readonly CreatePreviewTokenValidationError InvalidExpiryLessThan7DaysFromToday = new(
+            Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
+            Message: "Expires date must be no more than 7 days from today."
+        );
+
+        private static readonly CreatePreviewTokenValidationError InvalidActivatesOutOfBound = new(
+            Path: nameof(PreviewTokenCreateRequest.Activates).ToLowerFirst(),
+            Message: "Activates date must be within the next 7 days."
+        );
+
+        private static readonly CreatePreviewTokenValidationError InvalidActivatesInPast = new(
+            Path: nameof(PreviewTokenCreateRequest.Activates).ToLowerFirst(),
+            Message: "Activates date must not be in the past."
+        );
 
         [Fact]
         public async Task Success()
@@ -77,7 +95,11 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
             var dataSetVersion = await SetUpDataSetVersionTestData();
 
             var label = new string('A', count: 100);
-            var response = await CreatePreviewToken(dataSetVersionId: dataSetVersion.Id, label: label);
+            var response = await CreatePreviewToken(
+                dataSetVersionId: dataSetVersion.Id,
+                label: label,
+                user: fixture.BauPrincipal
+            );
 
             var (viewModel, createdEntityId) = response.AssertCreated<PreviewTokenViewModel>(
                 expectedLocationPrefix: "http://localhost/api/public-data/preview-tokens/"
@@ -88,7 +110,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                 () => Assert.Equal(previewTokenId, viewModel.Id),
                 () => Assert.Equal(label, viewModel.Label),
                 () => Assert.Equal(PreviewTokenStatus.Active, viewModel.Status),
-                () => Assert.Equal(BauUserEntry.Email, viewModel.CreatedByEmail),
+                () => Assert.Equal(fixture.BauUser.Email, viewModel.CreatedByEmail),
                 () => viewModel.Created.AssertUtcNow(),
                 () => viewModel.Activates.AssertUtcNow(),
                 () => viewModel.Expires.AssertEqual(sevenDaysFromNow),
@@ -106,7 +128,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                 () => Assert.Equal(previewTokenId, actualPreviewToken.Id),
                 () => Assert.Equal(label, actualPreviewToken.Label),
                 () => Assert.Equal(dataSetVersion.Id, actualPreviewToken.DataSetVersionId),
-                () => Assert.Equal(BauUserEntry.Id, actualPreviewToken.CreatedByUserId),
+                () => Assert.Equal(fixture.BauUser.Id, actualPreviewToken.CreatedByUserId),
                 () => actualPreviewToken.Created.AssertUtcNow(),
                 () => actualPreviewToken.Activates.AssertUtcNow(),
                 () => actualPreviewToken.Expires.AssertEqual(sevenDaysFromNow),
@@ -137,7 +159,8 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                 dataSetVersionId: dataSetVersion.Id,
                 label: label,
                 activates: suppliedActivates,
-                expires: suppliedExpires
+                expires: suppliedExpires,
+                user: fixture.BauPrincipal
             );
 
             var (viewModel, createdEntityId) = response.AssertCreated<PreviewTokenViewModel>(
@@ -159,7 +182,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                         activatesProvided ? PreviewTokenStatus.Pending : PreviewTokenStatus.Active,
                         viewModel.Status
                     ),
-                () => Assert.Equal(BauUserEntry.Email, viewModel.CreatedByEmail),
+                () => Assert.Equal(fixture.BauUser.Email, viewModel.CreatedByEmail),
                 () => viewModel.Created.AssertUtcNow(),
                 () => viewModel.Activates.AssertEqual(expectedActivates),
                 () => viewModel.Expires.AssertEqual(expectedExpiry),
@@ -177,7 +200,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                 () => Assert.Equal(previewTokenId, actualPreviewToken.Id),
                 () => Assert.Equal(label, actualPreviewToken.Label),
                 () => Assert.Equal(dataSetVersion.Id, actualPreviewToken.DataSetVersionId),
-                () => Assert.Equal(BauUserEntry.Id, actualPreviewToken.CreatedByUserId),
+                () => Assert.Equal(fixture.BauUser.Id, actualPreviewToken.CreatedByUserId),
                 () => actualPreviewToken.Created.AssertUtcNow(),
                 () => actualPreviewToken.Activates.AssertEqual(expectedActivates),
                 () => actualPreviewToken.Expires.AssertEqual(expectedExpiry),
@@ -214,7 +237,8 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                 dataSetVersion.Id,
                 new string('A', count: 100),
                 activates: null,
-                expires: expiresDate
+                expires: expiresDate,
+                user: fixture.BauPrincipal
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -247,7 +271,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                     context.DataSets.Update(dataSet);
                 });
 
-            var response = await CreatePreviewToken(dataSetVersion.Id, "Label");
+            var response = await CreatePreviewToken(dataSetVersion.Id, "Label", user: fixture.BauPrincipal);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -261,7 +285,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         [Fact]
         public async Task DataSetVersionIdIsEmpty_ReturnsValidationProblem()
         {
-            var response = await CreatePreviewToken(dataSetVersionId: Guid.Empty, "Label");
+            var response = await CreatePreviewToken(dataSetVersionId: Guid.Empty, "Label", user: fixture.BauPrincipal);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -272,7 +296,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         [Fact]
         public async Task LabelIsEmpty_ReturnsValidationProblem()
         {
-            var response = await CreatePreviewToken(Guid.NewGuid(), label: string.Empty);
+            var response = await CreatePreviewToken(Guid.NewGuid(), label: string.Empty, user: fixture.BauPrincipal);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -283,7 +307,11 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         [Fact]
         public async Task LabelAboveMaximumLength_ReturnsValidationProblem()
         {
-            var response = await CreatePreviewToken(Guid.NewGuid(), label: new string('A', count: 101));
+            var response = await CreatePreviewToken(
+                Guid.NewGuid(),
+                label: new string('A', count: 101),
+                user: fixture.BauPrincipal
+            );
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -297,7 +325,11 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         [Fact]
         public async Task NoDataSetVersion_ReturnsNotFound()
         {
-            var response = await CreatePreviewToken(dataSetVersionId: Guid.NewGuid(), "Label");
+            var response = await CreatePreviewToken(
+                dataSetVersionId: Guid.NewGuid(),
+                "Label",
+                user: fixture.BauPrincipal
+            );
             response.AssertNotFound();
         }
 
@@ -329,12 +361,12 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         private async Task<HttpResponseMessage> CreatePreviewToken(
             Guid dataSetVersionId,
             string label,
+            ClaimsPrincipal user,
             DateTimeOffset? activates = null,
-            DateTimeOffset? expires = null,
-            ClaimsPrincipal? user = null
+            DateTimeOffset? expires = null
         )
         {
-            var client = fixture.CreateClient(user: user ?? BauUser);
+            var client = fixture.CreateClient(user: user);
 
             var request = new PreviewTokenCreateRequest
             {
@@ -370,7 +402,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         }
     }
 
-    public class GetPreviewTokenTests(PreviewTokenControllerTestsFixture fixture) : PreviewTokenControllerTests(fixture)
+    public class GetPreviewTokenTests(PreviewTokenControllerTestsFixture fixture) : PreviewTokenControllerTests
     {
         [Fact]
         public async Task Success()
@@ -383,7 +415,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
                 .WithPreviewTokens(() =>
-                    DataFixture.DefaultPreviewToken().WithCreatedByUserId(BauUserEntry.Id).Generate(2)
+                    DataFixture.DefaultPreviewToken().WithCreatedByUserId(fixture.BauUser.Id).Generate(2)
                 )
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
@@ -397,7 +429,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
 
             var previewToken = dataSetVersion.PreviewTokens[0];
 
-            var response = await GetPreviewToken(previewToken.Id);
+            var response = await GetPreviewToken(previewToken.Id, user: fixture.BauPrincipal);
 
             var expectedResult = new PreviewTokenViewModel
             {
@@ -406,7 +438,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                 Status = PreviewTokenStatus.Active,
                 Activates = previewToken.Activates,
                 Created = previewToken.Created,
-                CreatedByEmail = BauUserEntry.Email,
+                CreatedByEmail = fixture.BauUser.Email,
                 Expires = previewToken.Expires,
                 Updated = previewToken.Updated,
             };
@@ -425,7 +457,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
                 .WithPreviewTokens(() =>
-                    [DataFixture.DefaultPreviewToken(expired: true).WithCreatedByUserId(BauUserEntry.Id)]
+                    [DataFixture.DefaultPreviewToken(expired: true).WithCreatedByUserId(fixture.BauUser.Id)]
                 )
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
@@ -439,7 +471,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
 
             var previewToken = dataSetVersion.PreviewTokens[0];
 
-            var response = await GetPreviewToken(previewToken.Id);
+            var response = await GetPreviewToken(previewToken.Id, user: fixture.BauPrincipal);
 
             var viewModel = response.AssertOk<PreviewTokenViewModel>();
             Assert.Equal(PreviewTokenStatus.Expired, viewModel.Status);
@@ -448,7 +480,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         [Fact]
         public async Task NoPreviewToken_ReturnsNotFound()
         {
-            var response = await GetPreviewToken(previewTokenId: Guid.NewGuid());
+            var response = await GetPreviewToken(previewTokenId: Guid.NewGuid(), user: fixture.BauPrincipal);
             response.AssertNotFound();
         }
 
@@ -481,9 +513,9 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
             response.AssertForbidden();
         }
 
-        private async Task<HttpResponseMessage> GetPreviewToken(Guid previewTokenId, ClaimsPrincipal? user = null)
+        private async Task<HttpResponseMessage> GetPreviewToken(Guid previewTokenId, ClaimsPrincipal user)
         {
-            var client = fixture.CreateClient(user: user ?? BauUser);
+            var client = fixture.CreateClient(user: user);
 
             var uri = new Uri($"{BaseUrl}/{previewTokenId}", UriKind.Relative);
 
@@ -491,8 +523,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         }
     }
 
-    public class ListPreviewTokensTests(PreviewTokenControllerTestsFixture fixture)
-        : PreviewTokenControllerTests(fixture)
+    public class ListPreviewTokensTests(PreviewTokenControllerTestsFixture fixture) : PreviewTokenControllerTests
     {
         [Fact]
         public async Task Success()
@@ -508,7 +539,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                     DataFixture
                         .DefaultPreviewToken()
                         .ForIndex(1, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddSeconds(-1)))
-                        .WithCreatedByUserId(BauUserEntry.Id)
+                        .WithCreatedByUserId(fixture.BauUser.Id)
                         .Generate(2)
                 )
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
@@ -521,7 +552,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                     context.DataSets.Update(dataSet);
                 });
 
-            var response = await ListPreviewTokens(dataSetVersion.Id);
+            var response = await ListPreviewTokens(dataSetVersion.Id, user: fixture.BauPrincipal);
 
             var expectedViewModels = dataSetVersion
                 .PreviewTokens.Select(pt => new PreviewTokenViewModel
@@ -531,7 +562,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                     Status = pt.Status,
                     Activates = pt.Activates,
                     Created = pt.Created,
-                    CreatedByEmail = BauUserEntry.Email,
+                    CreatedByEmail = fixture.BauUser.Email,
                     Expires = pt.Expires,
                     Updated = pt.Updated,
                 })
@@ -550,7 +581,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
             var (dataSetVersion1, dataSetVersion2) = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
-                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken().WithCreatedByUserId(BauUserEntry.Id)])
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken().WithCreatedByUserId(fixture.BauUser.Id)])
                 .GenerateTuple2();
 
             await fixture
@@ -561,7 +592,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                     context.DataSets.Update(dataSet);
                 });
 
-            var response = await ListPreviewTokens(dataSetVersion1.Id);
+            var response = await ListPreviewTokens(dataSetVersion1.Id, user: fixture.BauPrincipal);
 
             var viewModels = response.AssertOk<List<PreviewTokenViewModel>>();
 
@@ -586,7 +617,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                         .ForIndex(1, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddDays(-1)))
                         .ForIndex(2, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddSeconds(-1)))
                         .ForIndex(3, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddDays(1)))
-                        .WithCreatedByUserId(BauUserEntry.Id)
+                        .WithCreatedByUserId(fixture.BauUser.Id)
                         .Generate(4)
                 )
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
@@ -599,7 +630,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                     context.DataSets.Update(dataSet);
                 });
 
-            var response = await ListPreviewTokens(dataSetVersion.Id);
+            var response = await ListPreviewTokens(dataSetVersion.Id, user: fixture.BauPrincipal);
 
             var viewModels = response.AssertOk<List<PreviewTokenViewModel>>();
 
@@ -634,7 +665,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                     context.DataSets.Update(dataSet);
                 });
 
-            var response = await ListPreviewTokens(dataSetVersion.Id);
+            var response = await ListPreviewTokens(dataSetVersion.Id, user: fixture.BauPrincipal);
 
             var result = response.AssertOk<List<PreviewTokenViewModel>>();
 
@@ -644,7 +675,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         [Fact]
         public async Task NoDataSetVersion_ReturnsNotFound()
         {
-            var response = await ListPreviewTokens(dataSetVersionId: Guid.NewGuid());
+            var response = await ListPreviewTokens(dataSetVersionId: Guid.NewGuid(), user: fixture.BauPrincipal);
             response.AssertNotFound();
         }
 
@@ -673,9 +704,9 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
             response.AssertForbidden();
         }
 
-        private async Task<HttpResponseMessage> ListPreviewTokens(Guid dataSetVersionId, ClaimsPrincipal? user = null)
+        private async Task<HttpResponseMessage> ListPreviewTokens(Guid dataSetVersionId, ClaimsPrincipal user)
         {
-            var client = fixture.CreateClient(user: user ?? BauUser);
+            var client = fixture.CreateClient(user: user);
 
             var queryParams = new Dictionary<string, string?> { { "dataSetVersionId", dataSetVersionId.ToString() } };
 
@@ -685,8 +716,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         }
     }
 
-    public class RevokePreviewTokenTests(PreviewTokenControllerTestsFixture fixture)
-        : PreviewTokenControllerTests(fixture)
+    public class RevokePreviewTokenTests(PreviewTokenControllerTestsFixture fixture) : PreviewTokenControllerTests
     {
         [Fact]
         public async Task Success()
@@ -698,7 +728,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
-                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken().WithCreatedByUserId(BauUserEntry.Id)])
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken().WithCreatedByUserId(fixture.BauUser.Id)])
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
             await fixture
@@ -711,7 +741,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
 
             var previewToken = dataSetVersion.PreviewTokens[0];
 
-            var response = await RevokePreviewToken(previewToken.Id);
+            var response = await RevokePreviewToken(previewToken.Id, user: fixture.BauPrincipal);
 
             var viewModel = response.AssertOk<PreviewTokenViewModel>();
 
@@ -719,7 +749,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                 () => Assert.Equal(previewToken.Id, viewModel.Id),
                 () => Assert.Equal(previewToken.Label, viewModel.Label),
                 () => Assert.Equal(PreviewTokenStatus.Expired, viewModel.Status),
-                () => Assert.Equal(BauUserEntry.Email, viewModel.CreatedByEmail),
+                () => Assert.Equal(fixture.BauUser.Email, viewModel.CreatedByEmail),
                 () => Assert.Equal(previewToken.Created.TruncateNanoseconds(), viewModel.Created),
                 () => viewModel.Expires.AssertUtcNow(),
                 () => viewModel.Updated.AssertUtcNow()
@@ -757,7 +787,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
                     context.DataSets.Update(dataSet);
                 });
 
-            var response = await RevokePreviewToken(dataSetVersion.PreviewTokens[0].Id);
+            var response = await RevokePreviewToken(dataSetVersion.PreviewTokens[0].Id, user: fixture.BauPrincipal);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -780,7 +810,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         [Fact]
         public async Task NoPreviewToken_ReturnsNotFound()
         {
-            var response = await RevokePreviewToken(previewTokenId: Guid.NewGuid());
+            var response = await RevokePreviewToken(previewTokenId: Guid.NewGuid(), user: fixture.BauPrincipal);
             response.AssertNotFound();
         }
 
@@ -813,9 +843,9 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
             response.AssertForbidden();
         }
 
-        private async Task<HttpResponseMessage> RevokePreviewToken(Guid previewTokenId, ClaimsPrincipal? user = null)
+        private async Task<HttpResponseMessage> RevokePreviewToken(Guid previewTokenId, ClaimsPrincipal user)
         {
-            var client = fixture.CreateClient(user: user ?? BauUser);
+            var client = fixture.CreateClient(user: user);
 
             var uri = new Uri($"{BaseUrl}/{previewTokenId}/revoke", UriKind.Relative);
 

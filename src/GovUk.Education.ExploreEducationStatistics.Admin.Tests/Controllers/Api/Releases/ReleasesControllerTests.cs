@@ -1220,9 +1220,9 @@ public class ReleasesControllerIntegrationTestsFixture()
     public IPublicBlobCacheService PublicBlobCacheService = null!;
     public IPublisherTableStorageService PublisherTableStorageService = null!;
 
-    protected override void LookupServicesAfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
     {
-        base.LookupServicesAfterFactoryConstructed(lookups);
+        await base.AfterFactoryConstructed(lookups);
         PublicBlobCacheService = lookups.GetService<IPublicBlobCacheService>();
         PublisherTableStorageService = lookups.GetService<IPublisherTableStorageService>();
     }
