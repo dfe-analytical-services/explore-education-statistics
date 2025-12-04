@@ -86,7 +86,7 @@ public class MemoryCacheService(
             }
             else
             {
-                var nextExpiryTime = configuration.ExpirySchedule.GetNextOccurrence(nowUtc.DateTime);
+                var nextExpiryTime = configuration.ExpirySchedule.GetNextOccurrence(nowUtc.UtcDateTime);
 
                 absoluteExpiryTime =
                     targetAbsoluteExpiryDateTime < nextExpiryTime ? targetAbsoluteExpiryDateTime : nextExpiryTime;
