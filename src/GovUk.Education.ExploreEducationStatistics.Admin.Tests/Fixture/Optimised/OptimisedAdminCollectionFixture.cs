@@ -256,17 +256,9 @@ public enum AdminIntegrationTestCapability
 
 public static class OptimisedTestUsers
 {
-    public static ClaimsPrincipal Bau = new DataFixture().BauUser().Generate();
+    public static readonly ClaimsPrincipal Bau = new DataFixture().BauUser();
 
-    public static ClaimsPrincipal Analyst = new DataFixture().AnalystUser().Generate();
+    public static readonly ClaimsPrincipal Authenticated = new DataFixture().AuthenticatedUser();
 
-    public static ClaimsPrincipal Authenticated = new DataFixture().AuthenticatedUser().Generate();
-
-    public static ClaimsPrincipal Verified = new DataFixture().VerifiedByIdentityProviderUser().Generate();
-
-    public static ClaimsPrincipal VerifiedButNotAuthorized = new DataFixture()
-        .VerifiedButNotAuthorizedByIdentityProviderUser()
-        .Generate();
-
-    public static ClaimsPrincipal PreReleaseUser = new DataFixture().PreReleaseUser().Generate();
+    public static readonly ClaimsPrincipal PreReleaseUser = new DataFixture().PreReleaseUser();
 }
