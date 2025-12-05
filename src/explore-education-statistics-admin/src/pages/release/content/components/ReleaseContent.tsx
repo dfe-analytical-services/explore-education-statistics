@@ -41,6 +41,7 @@ import React, {
 import { generatePath, useLocation } from 'react-router';
 import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 import { useConfig } from '@admin/contexts/ConfigContext';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 
 interface MethodologyLink {
   key: string;
@@ -368,7 +369,9 @@ const ReleaseContent = ({
                 </li>
               )}
               <li>
-                <a href="#contact-us">Contact us</a>
+                <a href="#contact-us">
+                  Contact us<VisuallyHidden> about this release</VisuallyHidden>
+                </a>
               </li>
             </ul>
 

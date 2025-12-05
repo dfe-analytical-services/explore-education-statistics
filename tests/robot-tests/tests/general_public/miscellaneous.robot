@@ -96,7 +96,7 @@ Validate Cookies Details page
     cookie names should be on page
 
 Validate Contact page
-    user clicks link    Contact us
+    user clicks link containing text    Contact us
     user waits until page contains    Contact Explore education statistics
     user waits until page contains    Need help using this service or have a question about the data?
     user waits until page contains    explore.statistics@education.gov.uk

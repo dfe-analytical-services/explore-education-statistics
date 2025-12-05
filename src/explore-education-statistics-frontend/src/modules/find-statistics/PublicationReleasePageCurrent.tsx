@@ -316,7 +316,9 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
                 </li>
               )}
               <li>
-                <a href="#contact-us">Contact us</a>
+                <a href="#contact-us">
+                  Contact us<VisuallyHidden> about this release</VisuallyHidden>
+                </a>
               </li>
             </ul>
             {!!releaseSeries.length && (

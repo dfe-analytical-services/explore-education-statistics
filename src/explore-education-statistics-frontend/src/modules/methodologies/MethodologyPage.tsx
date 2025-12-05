@@ -5,6 +5,7 @@ import FormattedDate from '@common/components/FormattedDate';
 import RelatedInformation from '@common/components/RelatedInformation';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import methodologyService, {
   Methodology,
 } from '@common/services/methodologyService';
@@ -143,7 +144,10 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
             </h3>
             <ul className="govuk-list">
               <li>
-                <a href="#contact-us">Contact us</a>
+                <a href="#contact-us">
+                  Contact us
+                  <VisuallyHidden> about this methodology</VisuallyHidden>
+                </a>
               </li>
             </ul>
           </RelatedInformation>
