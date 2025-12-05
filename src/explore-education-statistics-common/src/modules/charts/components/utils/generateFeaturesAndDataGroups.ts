@@ -15,7 +15,7 @@ import { getScale } from 'color2k';
 export default function generateFeaturesAndDataGroups({
   deprecatedCategoricalDataConfig,
   dataSetCategories,
-  selectedDataSetConfig,
+  dataSetConfig,
 }: {
   /**
    * Deprecated as this information is now on the data set config.
@@ -24,29 +24,28 @@ export default function generateFeaturesAndDataGroups({
    */
   deprecatedCategoricalDataConfig?: MapCategoricalData[];
   dataSetCategories: MapDataSetCategory[];
-  selectedDataSetConfig: MapDataSetCategoryConfig;
+  dataSetConfig: MapDataSetCategoryConfig;
 }): {
   features: MapFeatureCollection;
   legendItems: MapLegendItem[];
   categoricalDataConfig?: MapCategoricalData[];
 } {
-  const selectedDataSetKey = selectedDataSetConfig.dataKey;
+  const selectedDataSetKey = dataSetConfig.dataKey;
 
-  const categoricalDataConfig = selectedDataSetConfig.categoricalDataConfig
-    ?.length
-    ? selectedDataSetConfig.categoricalDataConfig
+  const categoricalDataConfig = dataSetConfig.categoricalDataConfig?.length
+    ? dataSetConfig.categoricalDataConfig
     : deprecatedCategoricalDataConfig;
 
   const { features, legendItems } = categoricalDataConfig?.length
     ? getCategoricalDataFeatures({
         categoricalDataConfig,
         dataSetCategories,
-        selectedDataSetConfig,
+        dataSetConfig,
         selectedDataSetKey,
       })
     : getNumericDataFeatures({
         dataSetCategories,
-        selectedDataSetConfig,
+        dataSetConfig,
         selectedDataSetKey,
       });
 
@@ -56,22 +55,19 @@ export default function generateFeaturesAndDataGroups({
 function getCategoricalDataFeatures({
   categoricalDataConfig,
   dataSetCategories,
-  selectedDataSetConfig,
+  dataSetConfig,
   selectedDataSetKey,
 }: {
   categoricalDataConfig: MapCategoricalData[];
   dataSetCategories: MapDataSetCategory[];
-  selectedDataSetConfig: MapDataSetCategoryConfig;
+  dataSetConfig: MapDataSetCategoryConfig;
   selectedDataSetKey: string;
 }) {
   const defaultColour = 'rgba(0,0,0,0)';
 
-  const dataGroups = selectedDataSetConfig.config.sequentialCategoryColours
+  const dataGroups = dataSetConfig.config.sequentialCategoryColours
     ? categoricalDataConfig?.map((config, index) => {
-        const colourScale = getScale(
-          '#fff',
-          selectedDataSetConfig.config.colour,
-        );
+        const colourScale = getScale('#fff', dataSetConfig.config.colour);
         const groupProportion = 1 / categoricalDataConfig.length;
 
         return {
@@ -119,23 +115,22 @@ function getCategoricalDataFeatures({
 
 function getNumericDataFeatures({
   dataSetCategories,
-  selectedDataSetConfig,
+  dataSetConfig,
   selectedDataSetKey,
 }: {
   dataSetCategories: MapDataSetCategory[];
-  selectedDataSetConfig: MapDataSetCategoryConfig;
+  dataSetConfig: MapDataSetCategoryConfig;
   selectedDataSetKey: string;
 }) {
-  const { unit, decimalPlaces } = selectedDataSetConfig.dataSet.indicator;
+  const { unit, decimalPlaces } = dataSetConfig.dataSet.indicator;
 
   const colour =
-    selectedDataSetConfig.config.colour ??
-    generateHslColour(selectedDataSetConfig.dataKey);
+    dataSetConfig.config.colour ?? generateHslColour(dataSetConfig.dataKey);
 
   // Default to white for areas not covered by custom data sets
   // to make it clearer which aren't covered by the groups.
   const defaultColour =
-    selectedDataSetConfig.dataGrouping?.type === 'Custom'
+    dataSetConfig.dataGrouping?.type === 'Custom'
       ? 'rgba(255, 255, 255, 1)'
       : 'rgba(0,0,0,0)';
 
@@ -154,7 +149,7 @@ function getNumericDataFeatures({
 
   const dataGroups = generateLegendDataGroups({
     colour,
-    dataGrouping: selectedDataSetConfig.dataGrouping,
+    dataGrouping: dataSetConfig.dataGrouping,
     decimalPlaces,
     values,
     unit,

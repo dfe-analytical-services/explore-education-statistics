@@ -4,6 +4,11 @@ import {
   MapDataSetConfig,
 } from '@common/modules/charts/types/chart';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import {
+  testMixedData,
+  testMixedDataAxisDataSets,
+  testMixedMeta,
+} from '@common/modules/charts/components/__tests__/__data__/testMixedMapData';
 import { testTableData } from '../../__tests__/__data__/testTableData';
 import {
   testCategoricalData,
@@ -103,6 +108,60 @@ describe('getMapDataSetConfigs', () => {
           '{"filters":[],"indicator":"indicator-1","timePeriod":"2024_CY"}',
       },
     ];
+
+    expect(result).toEqual(expected);
+  });
+
+  test('returns the correct config for mixed categorical and numerical data sets', () => {
+    const result = getMapDataSetConfigs({
+      axisMajor: {
+        ...testAxisConfiguration,
+        dataSets: testMixedDataAxisDataSets,
+      },
+      data: testMixedData,
+      meta: testMixedMeta,
+    });
+
+    const expected: MapDataSetConfig[] = [
+      {
+        boundaryLevel: undefined,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 5,
+          type: 'EqualIntervals',
+        },
+        dataSet: {
+          filters: [],
+          indicator: 'numerical-indicator',
+          timePeriod: '2024_CY',
+        },
+        dataSetKey:
+          '{"filters":[],"indicator":"numerical-indicator","timePeriod":"2024_CY"}',
+      },
+      {
+        boundaryLevel: undefined,
+        categoricalDataConfig: [
+          {
+            colour: '#12436D',
+            value: 'large',
+          },
+        ],
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 5,
+          type: 'EqualIntervals',
+        },
+        dataSet: {
+          filters: [],
+          indicator: 'categorical-indicator',
+          timePeriod: '2024_CY',
+        },
+        dataSetKey:
+          '{"filters":[],"indicator":"categorical-indicator","timePeriod":"2024_CY"}',
+      },
+    ];
+
+    expect(result).toHaveLength(2);
 
     expect(result).toEqual(expected);
   });

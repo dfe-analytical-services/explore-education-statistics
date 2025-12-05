@@ -136,7 +136,7 @@ describe('ReleaseDataGuidancePageContent', () => {
     ).toBeInTheDocument();
 
     await userEvent.click(
-      dataSet1.getByRole('button', { name: 'Variable names and descriptions' }),
+      dataSet1.getByRole('button', { name: /Variable names and descriptions/ }),
     );
 
     const section1VariableRows = within(
@@ -157,7 +157,7 @@ describe('ReleaseDataGuidancePageContent', () => {
     expect(dataSet1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
     expect(dataSet1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
 
-    await userEvent.click(dataSet1.getByRole('button', { name: 'Footnotes' }));
+    await userEvent.click(dataSet1.getByRole('button', { name: /Footnotes/ }));
 
     const dataSet1Footnotes = within(
       dataSet1.getByTestId('Footnotes'),
@@ -186,7 +186,7 @@ describe('ReleaseDataGuidancePageContent', () => {
     ).toBeInTheDocument();
 
     await userEvent.click(
-      dataSet2.getByRole('button', { name: 'Variable names and descriptions' }),
+      dataSet2.getByRole('button', { name: /Variable names and descriptions/ }),
     );
 
     const dataSet2VariableRows = within(
@@ -207,7 +207,7 @@ describe('ReleaseDataGuidancePageContent', () => {
     expect(dataSet2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
     expect(dataSet2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
 
-    await userEvent.click(dataSet2.getByRole('button', { name: 'Footnotes' }));
+    await userEvent.click(dataSet2.getByRole('button', { name: /Footnotes/ }));
 
     const dataSet2Footnotes = within(
       dataSet2.getByTestId('Footnotes'),
@@ -327,7 +327,7 @@ describe('ReleaseDataGuidancePageContent', () => {
     const dataSets = screen.getAllByTestId('accordionSection');
 
     expect(
-      within(dataSets[0]).queryByRole('button', { name: 'Footnotes' }),
+      within(dataSets[0]).queryByRole('button', { name: /Footnotes/ }),
     ).not.toBeInTheDocument();
     expect(
       within(dataSets[0]).queryByTestId('Footnotes'),

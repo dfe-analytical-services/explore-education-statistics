@@ -17,7 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { generatePath, useHistory, useParams } from 'react-router-dom';
 import React from 'react';
 import { PreviewTokenCreateValues } from '@admin/pages/release/data/types/PreviewTokenCreateValues';
-import { isToday } from 'date-fns';
+import PreviewTokenDateHelper from '@admin/pages/release/data/utils/previewTokenDateHelper';
 
 export default function ReleaseApiDataSetPreviewPage() {
   const history = useHistory();
@@ -32,47 +32,21 @@ export default function ReleaseApiDataSetPreviewPage() {
     apiDataSetQueries.get(dataSetId),
   );
 
-  function getPresetSpanEndDate(days: number) {
-    const fromDate = new Date();
-
-    if (!(Number.isInteger(days) && days > 0 && days < 8)) {
-      throw new Error(
-        `The number of days (${days}) selected is not allowed, please select between 1 to 7 days.`,
-      );
-    }
-
-    fromDate.setDate(fromDate.getDate() + days);
-    fromDate.setHours(23, 59, 59);
-    return fromDate;
-  }
-
   const handleCreate = async ({
     label,
     datePresetSpan,
     activates,
     expires,
   }: PreviewTokenCreateValues) => {
-    let startDate: Date | null = null;
-    let endDate: Date | null = null;
-
     if (!dataSet?.draftVersion) {
       return;
     }
-    if (datePresetSpan && datePresetSpan > 0) {
-      startDate = new Date();
-      endDate = getPresetSpanEndDate(datePresetSpan);
-    } else if (activates && expires) {
-      if (isToday(activates)) {
-        startDate = new Date(); // set activates to the current time
-      } else {
-        startDate = activates;
-      }
-      endDate = expires;
-    } else {
-      startDate = new Date();
-      endDate = new Date();
-      endDate.setDate(endDate.getDate() + 1);
-    }
+
+    const tokenDatesHelper = new PreviewTokenDateHelper();
+    const { startDate, endDate } =
+      datePresetSpan && datePresetSpan > 0
+        ? tokenDatesHelper.setDateRangeBasedOnPresets(datePresetSpan)
+        : tokenDatesHelper.setDateRangeBasedOnCustomDates(activates, expires);
 
     const token = await previewTokenService.createPreviewToken({
       label,
@@ -148,19 +122,6 @@ export default function ReleaseApiDataSetPreviewPage() {
                 </Button>
               }
             >
-              <p>
-                Preview tokens are valid for <strong>24 hours</strong> by
-                default to meet pre-release access needs.
-              </p>
-              <p>
-                If you require a longer duration preview token for testing of
-                secondary products such as data dashboards, contact{' '}
-                <a href="mailto:explore.statistics@education.gov.uk">
-                  {' '}
-                  explore.statistics@education.gov.uk
-                </a>
-                .
-              </p>
               <ApiDataSetPreviewTokenCreateForm
                 onCancel={toggleModalOpen.off}
                 onSubmit={handleCreate}

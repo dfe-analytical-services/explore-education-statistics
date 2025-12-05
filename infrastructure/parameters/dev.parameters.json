@@ -132,6 +132,9 @@
       "value": [
         "http://localhost:3000"
       ]
+    },
+    "publicAppCompressionDisable": {
+      "value": true
     }
   }
 }

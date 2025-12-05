@@ -3,6 +3,7 @@ import ContentHtml from '@common/components/ContentHtml';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { DataSetDataGuidance } from '@common/services/releaseDataGuidanceService';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import React, { ReactNode, useMemo } from 'react';
 import styles from './ReleaseDataGuidanceDataFile.module.scss';
 
@@ -12,7 +13,7 @@ interface Props {
 }
 
 const ReleaseDataGuidanceDataFile = ({ dataSet, renderContent }: Props) => {
-  const { filename, variables, footnotes } = dataSet;
+  const { filename, variables, footnotes, name } = dataSet;
 
   const geographicLevels = useMemo(
     () => dataSet.geographicLevels.sort().join('; '),
@@ -67,6 +68,7 @@ const ReleaseDataGuidanceDataFile = ({ dataSet, renderContent }: Props) => {
       {variables.length > 0 && (
         <Details
           summary="Variable names and descriptions"
+          summaryAfter={<VisuallyHidden>{` for ${name}`}</VisuallyHidden>}
           className="govuk-!-margin-bottom-4"
         >
           <p>
@@ -94,7 +96,10 @@ const ReleaseDataGuidanceDataFile = ({ dataSet, renderContent }: Props) => {
       )}
 
       {footnotes.length > 0 && (
-        <Details summary="Footnotes">
+        <Details
+          summary="Footnotes"
+          summaryAfter={<VisuallyHidden>{` for ${name}`}</VisuallyHidden>}
+        >
           <ol data-testid="Footnotes">
             {footnotes.map(footnote => (
               <li key={footnote.id}>

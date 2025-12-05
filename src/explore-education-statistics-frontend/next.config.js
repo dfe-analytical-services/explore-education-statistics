@@ -5,7 +5,38 @@ const path = require('path');
 /**
  * @type {import('next').NextConfig}
  */
+
+const assetHeaders = [
+  {
+    key: 'Cache-Control',
+    value: 'public, max-age=31536000, immutable',
+  },
+];
+
+const metaHeaders = [
+  {
+    key: 'Cache-Control',
+    value: 'public, max-age=3600',
+  },
+];
+
+const generalHeaders = [
+  {
+    key: 'X-Content-Type-Options',
+    value: 'nosniff',
+  },
+];
+
+if (process.env.NODE_ENV === 'development') {
+  // For local development, so hotreload works correctly
+  generalHeaders.push({
+    key: 'Cache-Control',
+    value: 'no-store, no-cache, must-revalidate, proxy-revalidate, private',
+  });
+}
+
 const nextConfig = {
+  compress: !process.env.WEBSITES_DISABLE_CONTENT_COMPRESSION,
   reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,
@@ -31,14 +62,23 @@ const nextConfig = {
   },
   async headers() {
     return [
+      // general case
       {
-        source: '/fonts/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
+        source: '/:path*',
+        headers: generalHeaders,
+      },
+      // specific cases (that override the general case headers)
+      {
+        source: '/:file(favicon.svg|manifest.json)',
+        headers: metaHeaders,
+      },
+      {
+        source: '/assets/:path*',
+        headers: assetHeaders,
+      },
+      {
+        source: '/_next/static/:path*',
+        headers: assetHeaders,
       },
     ];
   },

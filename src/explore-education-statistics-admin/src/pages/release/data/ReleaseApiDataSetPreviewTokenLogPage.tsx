@@ -107,9 +107,10 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                     <td>{token.label}</td>
                     <td>{token.createdByEmail}</td>
                     <td>
-                      <FormattedDate format="d MMMM yyyy, HH:mm">
+                      <FormattedDate usingUkTime format="d MMMM yyyy, HH:mm">
                         {token.activates}
-                      </FormattedDate>
+                      </FormattedDate>{' '}
+                      (UK time)
                     </td>
                     <td>
                       <Tag colour={getPreviewTokenTagColour(token.status)}>
@@ -117,9 +118,10 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                       </Tag>
                     </td>
                     <td>
-                      <FormattedDate format="d MMMM yyyy, HH:mm">
+                      <FormattedDate usingUkTime format="d MMMM yyyy, HH:mm">
                         {token.expires}
-                      </FormattedDate>
+                      </FormattedDate>{' '}
+                      (UK time)
                     </td>
                     <td className="govuk-!-text-align-right">
                       {(token.status === 'Active' ||
