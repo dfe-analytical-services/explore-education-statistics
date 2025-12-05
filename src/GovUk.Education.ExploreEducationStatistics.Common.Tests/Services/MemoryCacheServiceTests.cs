@@ -170,7 +170,7 @@ public class MemoryCacheServiceTests
             .Throws(new Exception("Exception during \"SetItem\" call should have been handled gracefully"));
 
         var service = SetupService(memoryCache.Object);
-        service.SetItem(_cacheKey, "test item", cacheConfiguration, DateTime.UtcNow);
+        service.SetItem(_cacheKey, "test item", cacheConfiguration, DateTimeOffset.UtcNow);
         VerifyAllMocks(memoryCache);
     }
 
@@ -270,7 +270,7 @@ public class MemoryCacheServiceTests
     }
 
     private void SetItemAndAssertExpiryTime(
-        DateTime now,
+        DateTimeOffset now,
         MemoryCacheConfiguration cacheConfiguration,
         DateTime expectedCacheExpiry
     )
