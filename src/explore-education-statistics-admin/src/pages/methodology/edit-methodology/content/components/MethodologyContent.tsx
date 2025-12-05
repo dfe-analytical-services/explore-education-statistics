@@ -18,6 +18,7 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import { MethodologyContent as MethodologyContentData } from '@admin/services/methodologyContentService';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 
 interface Props {
   methodology: MethodologyContentData;
@@ -91,7 +92,10 @@ export default function MethodologyContent({
             </h3>
             <ul className="govuk-list">
               <li>
-                <a href="#contact-us">Contact us</a>
+                <a href="#contact-us">
+                  Contact us
+                  <VisuallyHidden> about this methodology</VisuallyHidden>
+                </a>
               </li>
             </ul>
           </RelatedInformation>

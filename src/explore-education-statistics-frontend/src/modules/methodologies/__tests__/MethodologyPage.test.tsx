@@ -203,7 +203,7 @@ describe('MethodologyPage', () => {
         within(
           screen.getByRole('navigation', { name: 'Related information' }),
         ).getByRole('link', {
-          name: 'Contact us',
+          name: /Contact us/,
         }),
       ).toBeInTheDocument();
     });
@@ -215,13 +215,13 @@ describe('MethodologyPage', () => {
         within(
           screen.getByRole('navigation', { name: 'Related information' }),
         ).getByRole('link', {
-          name: 'Contact us',
+          name: /Contact us/,
         }),
       ).toHaveAttribute('href', '#contact-us');
 
       expect(
         screen
-          .queryAllByRole('heading', { name: 'Contact us' })
+          .queryAllByRole('heading', { name: /Contact us/ })
           .find(e => e.id === 'contact-us'),
       ).not.toBeUndefined();
     });
