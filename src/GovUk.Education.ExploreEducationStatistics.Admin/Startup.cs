@@ -21,12 +21,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.KeyStatisticsMigration;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
@@ -81,13 +81,13 @@ using Notify.Interfaces;
 using Semver;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.ObservationService;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
 using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using DataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.DataSetService;
+using EducationInNumbersService = GovUk.Education.ExploreEducationStatistics.Admin.Services.EducationInNumbersService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
 using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
 using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
@@ -95,11 +95,13 @@ using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Co
 using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
 using IDataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data.IDataSetService;
+using IEducationInNumbersService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IEducationInNumbersService;
 using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
 using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
+using IReleaseDataContentService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Releases.IReleaseDataContentService;
 using IReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseFileService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
@@ -109,6 +111,7 @@ using MethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyService;
 using PublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationRepository;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
+using ReleaseDataContentService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Releases.ReleaseDataContentService;
 using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseFileService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
@@ -160,12 +163,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.AddFluentValidation();
 
-        services.AddValidatorsFromAssemblies(
-            [
-                typeof(UploadDataSetRequest.Validator).Assembly, // Adds *all* validators from Admin
-                typeof(FullTableQueryRequest.Validator).Assembly, // Adds *all* validators from Common
-            ]
-        );
+        services.AddValidatorsFromAssemblies([
+            typeof(UploadDataSetRequest.Validator).Assembly, // Adds *all* validators from Admin
+            typeof(FullTableQueryRequest.Validator).Assembly, // Adds *all* validators from Common
+        ]);
 
         services
             .AddMvc(options =>
@@ -407,11 +408,17 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IPublicationCacheService, PublicationCacheService>();
         services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
 
+        // Content.Model repositories
         services.AddTransient<IFileRepository, FileRepository>();
         services.AddTransient<IDataImportRepository, DataImportRepository>();
         services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
         services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
+        services.AddTransient<IMethodologyNoteRepository, MethodologyNoteRepository>();
+        services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
+        services.AddTransient<IMethodologyRepository, MethodologyRepository>();
 
+        services.AddTransient<IKeyStatisticsMigrationService, KeyStatisticsMigrationService>();
+        services.AddTransient<IReleaseDataContentService, ReleaseDataContentService>();
         services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
         services.AddTransient<IDataSetFileStorage, DataSetFileStorage>();
         services.AddScoped<IDataSetUploadRepository, DataSetUploadRepository>();
@@ -434,6 +441,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReleaseVersionService, ReleaseVersionService>();
         services.AddTransient<IReleaseService, ReleaseService>();
         services.AddTransient<IReleaseAmendmentService, ReleaseAmendmentService>();
+        services.AddTransient<IUserResourceRoleNotificationService, UserResourceRoleNotificationService>();
         services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
         services.AddTransient<ReleaseSubjectRepository.SubjectDeleter, ReleaseSubjectRepository.SubjectDeleter>();
         services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();
@@ -441,9 +449,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
         services.AddTransient<IMethodologyService, MethodologyService>();
         services.AddTransient<IMethodologyNoteService, MethodologyNoteService>();
-        services.AddTransient<IMethodologyNoteRepository, MethodologyNoteRepository>();
-        services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
-        services.AddTransient<IMethodologyRepository, MethodologyRepository>();
         services.AddTransient<IMethodologyContentService, MethodologyContentService>();
         services.AddTransient<IMethodologyFileRepository, MethodologyFileRepository>();
         services.AddTransient<IMethodologyImageService, MethodologyImageService>();
@@ -453,10 +458,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
         services.AddTransient<IPreReleaseService, PreReleaseService>();
         services.AddTransient<IPreReleaseSummaryService, PreReleaseSummaryService>();
-        services.AddTransient<
-            Admin.Services.Interfaces.IEducationInNumbersService,
-            Admin.Services.EducationInNumbersService
-        >();
+        services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
         services.AddTransient<IEducationInNumbersContentService, EducationInNumbersContentService>();
 
         services.AddTransient<IManageContentPageService, ManageContentPageService>();
@@ -667,6 +669,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 sasService: provider.GetRequiredService<IBlobSasService>()
             )
         );
+
         services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(
             _ => new PublisherTableStorageService(configuration.GetRequiredValue("PublisherStorage"))
         );
@@ -676,6 +679,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         AddPersistenceHelper<UsersAndRolesDbContext>(services);
         services.AddTransient<AuthorizationHandlerService>();
         services.AddSingleton<DateTimeProvider>();
+        services.AddSingleton(TimeProvider.System);
 
         // This service allows a set of users to be pre-invited to the service on startup.
         if (hostEnvironment.IsDevelopment())
@@ -687,6 +691,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
 
         services.AddSingleton<IFileTypeService, FileTypeService>();
+        services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
         services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
         services.AddTransient<ICacheKeyService, CacheKeyService>();
         services.AddSingleton<IDataProcessorClient, DataProcessorClient>(_ => new DataProcessorClient(
@@ -738,21 +743,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        var provider = app.ApplicationServices;
-
-        // Enable caching and register any caching services.
-        CacheAspect.Enabled = true;
-        var privateCacheService = new BlobCacheService(
-            app.ApplicationServices.GetRequiredService<IPrivateBlobStorageService>(),
-            provider.GetRequiredService<ILogger<BlobCacheService>>()
-        );
-        var publicCacheService = new BlobCacheService(
-            app.ApplicationServices.GetRequiredService<IPublicBlobStorageService>(),
-            provider.GetRequiredService<ILogger<BlobCacheService>>()
-        );
-        BlobCacheAttribute.AddService("default", privateCacheService);
-        BlobCacheAttribute.AddService("public", publicCacheService);
-
         if (!env.IsIntegrationTest())
         {
             UpdateDatabase(app, env);

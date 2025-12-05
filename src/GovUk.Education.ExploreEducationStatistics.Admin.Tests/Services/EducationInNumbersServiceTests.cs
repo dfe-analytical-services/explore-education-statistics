@@ -512,7 +512,7 @@ public class EducationInNumbersServiceTests
         {
             var amendment = await contentDbContext
                 .EducationInNumbersPages.Include(p => p.Content)
-                .ThenInclude(s => s.Content)
+                    .ThenInclude(s => s.Content)
                 .SingleAsync(p => p.Id == amendmentId);
 
             Assert.NotEqual(originalPage.Id, amendment.Id);

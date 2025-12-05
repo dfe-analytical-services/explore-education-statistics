@@ -22,7 +22,7 @@ var rolesToRoleIds = {
   'Search Service Contributor': builtInRoleDefinitionIds.SearchServiceContributor
 }
 
-resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' existing = {
+resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
   name: searchServiceName
 }
 

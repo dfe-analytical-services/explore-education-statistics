@@ -121,6 +121,7 @@ const PublicationReleasePage: NextPage<Props> = props => {
         <ReleaseMethodologyPage
           publicationSummary={props.publicationSummary}
           methodologiesSummary={props.methodologiesSummary}
+          releaseVersionSummary={props.releaseVersionSummary}
         />
       )}
       {page === 'help' && (

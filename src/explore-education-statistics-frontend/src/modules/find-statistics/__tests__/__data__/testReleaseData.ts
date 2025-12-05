@@ -1,5 +1,4 @@
 import {
-  DataSetItem,
   Publication,
   PublicationSummaryRedesign,
   ReleaseVersion,
@@ -491,66 +490,69 @@ export const testReleaseHomeContent: ReleaseVersionHomeContent = {
   },
 };
 
-export const testDataSetItems: DataSetItem[] = [
-  {
-    dataSetFileId: 'test-dataset-1-datasetfileid',
-    fileId: 'test-dataset-1-fileid',
-    subjectId: 'test-dataset-1-subjectid',
-    meta: {
-      filters: ['Characteristic', 'School type'],
-      geographicLevels: [
-        'Local authority',
-        'Local authority district',
-        'National',
-      ],
-      indicators: ['Authorised absence rate', 'Authorised absence rate exact'],
-      numDataFileRows: 1000,
-      timePeriodRange: {
-        start: '2012/13',
-        end: '2016/17',
-      },
-    },
-    title: 'Test dataset 1',
-    summary: '<p>Test dataset 1 summary</p>',
-  },
-  {
-    dataSetFileId: 'test-dataset-2-datasetfileid',
-    fileId: 'test-dataset-2-fileid',
-    subjectId: 'test-dataset-2-subjectid',
-    meta: {
-      filters: ['Characteristic', 'School type'],
-      geographicLevels: ['Local authority', 'National', 'Regional'],
-      indicators: [
-        'Authorised absence rate',
-        'Number of authorised absence sessions',
-      ],
-      numDataFileRows: 2000,
-      timePeriodRange: {
-        start: '2013/14',
-        end: '2016/17',
-      },
-    },
-    title: 'Test dataset 2',
-    summary: '<p>Test dataset 2 summary</p>',
-  },
-];
-
 export const testReleaseDataContent: ReleaseVersionDataContent = {
   releaseId: 'test-release-id',
   releaseVersionId: 'test-release-version-id',
   dataDashboards: '<h3>Data dashboard text</h3>',
   dataGuidance:
     '<h3>Description</h3><p>---</p><h3>Coverage</h3><p>---</p><h3>File formats and conventions</h3><p>---</p>',
-  dataSets: testDataSetItems,
+  dataSets: [
+    {
+      dataSetFileId: 'test-dataset-1-datasetfileid',
+      fileId: 'test-dataset-1-fileid',
+      subjectId: 'test-dataset-1-subjectid',
+      meta: {
+        filters: ['Characteristic', 'School type'],
+        geographicLevels: [
+          'Local authority',
+          'Local authority district',
+          'National',
+        ],
+        indicators: [
+          'Authorised absence rate',
+          'Authorised absence rate exact',
+        ],
+        numDataFileRows: 1000,
+        timePeriodRange: {
+          start: '2012/13',
+          end: '2016/17',
+        },
+      },
+      title: 'Test dataset 1',
+      summary: '<p>Test dataset 1 summary</p>',
+    },
+    {
+      dataSetFileId: 'test-dataset-2-datasetfileid',
+      fileId: 'test-dataset-2-fileid',
+      subjectId: 'test-dataset-2-subjectid',
+      meta: {
+        filters: ['Characteristic', 'School type'],
+        geographicLevels: ['Local authority', 'National', 'Regional'],
+        indicators: [
+          'Authorised absence rate',
+          'Number of authorised absence sessions',
+        ],
+        numDataFileRows: 2000,
+        timePeriodRange: {
+          start: '2013/14',
+          end: '2016/17',
+        },
+      },
+      title: 'Test dataset 2',
+      summary: '<p>Test dataset 2 summary</p>',
+    },
+  ],
   featuredTables: [
     {
       featuredTableId: 'featured-table-1-id',
+      dataBlockId: 'featured-table-1-data-block-id',
       dataBlockParentId: 'featured-table-1-data-block-parent-id',
       title: 'Featured table 1',
       summary: 'Featured table 1 description',
     },
     {
       featuredTableId: 'featured-table-2-id',
+      dataBlockId: 'featured-table-2-data-block-id',
       dataBlockParentId: 'featured-table-2-data-block-parent-id',
       title: 'Featured table 2',
       summary: 'Featured table 2 description',

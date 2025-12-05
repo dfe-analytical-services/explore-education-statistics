@@ -2651,13 +2651,11 @@ public class PublicationServiceTests
 
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
-                    _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                ]
-            )
+            .WithReleases([
+                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+            ])
             .WithLegacyLinks([legacyLink])
             .WithTheme(_dataFixture.DefaultTheme());
 
@@ -2925,13 +2923,11 @@ public class PublicationServiceTests
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                    _dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2021),
-                    _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                ]
-            )
+            .WithReleases([
+                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                _dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2021),
+                _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+            ])
             .WithLegacyLinks([_dataFixture.DefaultLegacyReleaseSeriesItem()])
             .WithTheme(_dataFixture.DefaultTheme());
 
@@ -3052,13 +3048,11 @@ public class PublicationServiceTests
     {
         var publicationBuilder = _dataFixture
             .DefaultPublication()
-            .WithReleases(
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                    _dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2021),
-                    _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                ]
-            )
+            .WithReleases([
+                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                _dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2021),
+                _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+            ])
             .WithTheme(_dataFixture.DefaultTheme());
 
         if (isPublicationArchived)
@@ -3177,13 +3171,11 @@ public class PublicationServiceTests
     {
         var publicationBuilder = _dataFixture
             .DefaultPublication()
-            .WithReleases(
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
-                    _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                ]
-            )
+            .WithReleases([
+                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+            ])
             .WithTheme(_dataFixture.DefaultTheme());
 
         if (isPublicationArchived)

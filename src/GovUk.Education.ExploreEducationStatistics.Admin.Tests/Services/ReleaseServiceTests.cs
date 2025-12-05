@@ -215,7 +215,7 @@ public abstract class ReleaseServiceTests
                 // Do an in depth check of the saved release version
                 var newReleaseVersion = await context
                     .ReleaseVersions.Include(releaseVersion => releaseVersion.Content)
-                    .ThenInclude(section => section.Content)
+                        .ThenInclude(section => section.Content)
                     .SingleAsync(rv => rv.Id == newReleaseVersionId);
 
                 var contentSections = newReleaseVersion.GenericContent.ToList();

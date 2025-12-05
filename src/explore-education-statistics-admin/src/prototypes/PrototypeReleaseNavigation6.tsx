@@ -391,42 +391,42 @@ const PrototypeReleaseData = () => {
               </section>{' '}
               {isMobileMedia ? (
                 <Accordion id="releaseContents">
-                  <AccordionSection heading="Release details" goToTop>
+                  <AccordionSection heading="Release details" backToTop>
                     <PrototypeSectionExamples sectionExample="summaryFull" />
                   </AccordionSection>
                   <AccordionSection
                     heading="How to find data and supplementary tables in this release"
-                    goToTop
+                    backToTop
                   >
                     <PrototypeSectionExamples sectionExample="supplement" />
                   </AccordionSection>
-                  <AccordionSection heading="Release details" goToTop>
+                  <AccordionSection heading="Release details" backToTop>
                     <PrototypeSectionExamples sectionExample="summaryFull" />
                   </AccordionSection>
                   <AccordionSection
                     heading="Full year apprenticeship landscape"
-                    goToTop
+                    backToTop
                   >
                     <PrototypeSectionExamples sectionExample="fullYearApprenticeship" />
                   </AccordionSection>
-                  <AccordionSection heading="Full year traineeships" goToTop>
+                  <AccordionSection heading="Full year traineeships" backToTop>
                     <PrototypeSectionExamples sectionExample="fullYearTraineeship" />
                   </AccordionSection>
                   <AccordionSection
                     heading="Latest apprenticeships in year data"
-                    goToTop
+                    backToTop
                   >
                     <PrototypeSectionExamples sectionExample="latestApprenticeship" />
                   </AccordionSection>
                   <AccordionSection
                     heading="Latest traineeships in year data"
-                    goToTop
+                    backToTop
                   >
                     <PrototypeSectionExamples sectionExample="latestTraineeship" />
                   </AccordionSection>
                   <AccordionSection
                     heading="Interactive data visualisation tool"
-                    goToTop
+                    backToTop
                   >
                     <PrototypeSectionExamples sectionExample="interactiveTool" />
                   </AccordionSection>

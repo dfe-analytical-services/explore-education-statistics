@@ -343,7 +343,7 @@ internal class DataSetService(
                 .FilterMetas.AsNoTracking()
                 .Where(fm => fm.DataSetVersionId == dataSetVersion.Id)
                 .Include(fm => fm.OptionLinks)
-                .ThenInclude(fom => fom.Option)
+                    .ThenInclude(fom => fom.Option)
                 .ToListAsync(cancellationToken: cancellationToken);
         }
 
@@ -358,7 +358,7 @@ internal class DataSetService(
                 .LocationMetas.AsNoTracking()
                 .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
                 .Include(lm => lm.OptionLinks)
-                .ThenInclude(l => l.Option)
+                    .ThenInclude(l => l.Option)
                 .ToListAsync(cancellationToken: cancellationToken);
         }
 

@@ -78,8 +78,8 @@ public class ReleaseService : IReleaseService
             .ReleaseVersions.Include(rv => rv.Release)
             .Include(rv => rv.PublishingOrganisations)
             .Include(rv => rv.Content)
-            .ThenInclude(cs => cs.Content)
-            .ThenInclude(cb => (cb as EmbedBlockLink)!.EmbedBlock)
+                .ThenInclude(cs => cs.Content)
+                    .ThenInclude(cb => (cb as EmbedBlockLink)!.EmbedBlock)
             .Include(rv => rv.Updates)
             .Include(rv => rv.KeyStatistics)
             .SingleAsync(rv => rv.Id == releaseVersionId);

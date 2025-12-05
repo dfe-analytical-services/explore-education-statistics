@@ -1,17 +1,17 @@
-import generateReleaseContent, {
-  generateEditableRelease,
-} from '@admin-test/generators/releaseContentGenerators';
+import generateReleaseContent from '@admin-test/generators/releaseContentGenerators';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import ReleasePageTabExploreData from '@admin/pages/release/content/components/ReleasePageTabExploreData';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
-import { ReleaseContent as ReleaseContentType } from '@admin/services/releaseContentService';
+import _releaseContentService, {
+  DataContent,
+  ReleaseContent as ReleaseContentType,
+} from '@admin/services/releaseContentService';
 import render from '@common-test/render';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import { FeaturedTable } from '@admin/services/featuredTableService';
-import { FileInfo } from '@common/services/types/file';
+import { noop } from 'lodash';
 
 let mockIsMedia = false;
 jest.mock('@common/hooks/useMedia', () => ({
@@ -27,66 +27,21 @@ jest.mock('@common/hooks/useMedia', () => ({
   },
 }));
 
-const testFeaturedTables: FeaturedTable[] = [
-  {
-    id: 'featured-table-1',
-    dataBlockId: 'data-block-1',
-    dataBlockParentId: 'data-block-parent-1',
-    description: '',
-    name: 'Featured table 1',
-    order: 0,
-  },
-  {
-    id: 'featured-table-2',
-    dataBlockId: 'data-block-2',
-    dataBlockParentId: 'data-block-parent-2',
-    description: '',
-    name: 'Featured table 2',
-    order: 0,
-  },
-];
+jest.mock('@admin/services/releaseContentService');
 
-const testDownloadFiles: FileInfo[] = [
-  {
-    id: 'download-file-id-1',
-    extension: 'csv',
-    fileName: 'File name 1',
-    name: 'Download file name 1',
-    size: '100kb',
-    summary: 'Download file summary 1',
-    type: 'Data',
-  },
-  {
-    id: 'download-file-id-2',
-    extension: 'csv',
-    fileName: 'File name 2',
-    name: 'Download file name 2',
-    size: '80kb',
-    summary: 'Download file summary 2',
-    type: 'Data',
-  },
-  {
-    id: 'download-file-id-3',
-    extension: 'pdf',
-    fileName: 'File name 3',
-    name: 'Download file name 3',
-    size: '200kb',
-    summary: 'Download file summary 3',
-    type: 'Ancillary',
-  },
-];
+const releaseContentService = _releaseContentService as jest.Mocked<
+  typeof _releaseContentService
+>;
 
 const testReleaseContent = generateReleaseContent({});
 const renderWithContext = (
   component: React.ReactNode,
   releaseContent: ReleaseContentType = testReleaseContent,
-  featuredTables: FeaturedTable[] = testFeaturedTables,
 ) =>
   render(
     <TestConfigContextProvider>
       <ReleaseContentProvider
         value={{
-          featuredTables,
           ...releaseContent,
           canUpdateRelease: true,
         }}
@@ -101,37 +56,103 @@ const renderWithContext = (
   );
 
 describe('ReleasePageTabExploreData', () => {
-  test('renders correctly with all content sections', () => {
-    renderWithContext(
-      <ReleasePageTabExploreData hidden={false} />,
-      generateReleaseContent({
-        release: generateEditableRelease({
-          downloadFiles: testDownloadFiles,
-          published: '2025-10-13T00:00:00.0000000Z',
-          relatedDashboardsSection: {
-            id: 'test-dashboards-section-id',
-            heading: 'Data dashboards',
-            order: 0,
-            content: [
-              {
-                type: 'HtmlBlock',
-                id: 'related-dashboard-block-1',
-                comments: [],
-                order: 0,
-                body: '<p>Related dashboard content</p>',
-              },
-            ],
+  const testReleaseDataContent: DataContent = {
+    releaseId: 'test-release-id',
+    releaseVersionId: 'test-release-version-id',
+    dataDashboards: '<h3>Data dashboard text</h3>',
+    dataGuidance:
+      '<h3>Description</h3><p>---</p><h3>Coverage</h3><p>---</p><h3>File formats and conventions</h3><p>---</p>',
+    dataSets: [
+      {
+        dataSetFileId: 'test-dataset-1-datasetfileid',
+        fileId: 'test-dataset-1-fileid',
+        subjectId: 'test-dataset-1-subjectid',
+        meta: {
+          filters: ['Characteristic', 'School type'],
+          geographicLevels: [
+            'Local authority',
+            'Local authority district',
+            'National',
+          ],
+          indicators: [
+            'Authorised absence rate',
+            'Authorised absence rate exact',
+          ],
+          numDataFileRows: 1000,
+          timePeriodRange: {
+            start: '2012/13',
+            end: '2016/17',
           },
-        }),
-      }),
+        },
+        title: 'Test dataset 1',
+        summary: 'Test dataset 1 summary',
+      },
+      {
+        dataSetFileId: 'test-dataset-2-datasetfileid',
+        fileId: 'test-dataset-2-fileid',
+        subjectId: 'test-dataset-2-subjectid',
+        meta: {
+          filters: ['Characteristic', 'School type'],
+          geographicLevels: ['Local authority', 'National', 'Regional'],
+          indicators: [
+            'Authorised absence rate',
+            'Number of authorised absence sessions',
+          ],
+          numDataFileRows: 2000,
+          timePeriodRange: {
+            start: '2013/14',
+            end: '2016/17',
+          },
+        },
+        title: 'Test dataset 2',
+        summary: 'Test dataset 2 summary',
+      },
+    ],
+    featuredTables: [
+      {
+        featuredTableId: 'featured-table-1-id',
+        dataBlockId: 'featured-table-1-data-block-id',
+        dataBlockParentId: 'featured-table-1-data-block-parent-id',
+        title: 'Featured table 1',
+        summary: 'Featured table 1 description',
+      },
+      {
+        featuredTableId: 'featured-table-2-id',
+        dataBlockId: 'featured-table-2-data-block-id',
+        dataBlockParentId: 'featured-table-2-data-block-parent-id',
+        title: 'Featured table 2',
+        summary: 'Featured table 2 description',
+      },
+    ],
+    supportingFiles: [
+      {
+        fileId: 'supporting-file-1-file-id',
+        extension: 'pdf',
+        filename: 'file1.pdf',
+        title: 'Supporting file 1',
+        summary: 'Supporting file 1 description',
+        size: '10 Mb',
+      },
+    ],
+  };
+
+  beforeEach(() => {});
+
+  test('renders correctly with all content sections', async () => {
+    releaseContentService.getDataContent.mockResolvedValue(
+      testReleaseDataContent,
     );
 
-    expect(
-      screen.getByRole('heading', {
-        name: 'Explore data used in this release',
-        level: 2,
-      }),
-    ).toBeInTheDocument();
+    renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', {
+          name: 'Explore data used in this release',
+          level: 2,
+        }),
+      ).toBeInTheDocument();
+    });
 
     const linksList = screen.getByTestId('links-grid');
     const listItems = within(linksList).getAllByRole('listitem');
@@ -172,9 +193,9 @@ describe('ReleasePageTabExploreData', () => {
       }),
     ).toHaveAttribute('href', '#data-guidance-section');
     expect(
-      within(listItems[6]).getByRole('link', {
-        name: 'Data catalogue',
-      }),
+      within(listItems[6]).getByText(
+        'Data catalogue (available when release is published)',
+      ),
     ).toBeInTheDocument();
 
     const featuredTablesSection = screen.getByTestId('featured-tables-section');
@@ -195,9 +216,11 @@ describe('ReleasePageTabExploreData', () => {
         "Featured tables are pre-prepared tables created from a statistical release's data sets. They provide statistics that are regularly requested by some users (such as local councils, regional government or government policy teams) and can be adapted to switch between different categories (such as different geographies, time periods or characteristics where available).",
       ),
     ).toBeInTheDocument();
-    expect(within(featuredTablesSection).getAllByRole('listitem')).toHaveLength(
-      2,
+    const featuredTableItems = within(featuredTablesSection).getAllByRole(
+      'listitem',
     );
+    expect(featuredTableItems).toHaveLength(2);
+    expect(within(featuredTableItems[0]).getByRole('link')).toBeInTheDocument();
 
     const datasetsSection = screen.getByTestId('datasets-section');
     expect(
@@ -228,15 +251,13 @@ describe('ReleasePageTabExploreData', () => {
     expect(dataSetItems).toHaveLength(2);
     expect(
       within(dataSetItems[0]).getByRole('heading', {
-        name: 'Download file name 1',
+        name: 'Test dataset 1',
       }),
     ).toBeInTheDocument();
     expect(
-      within(dataSetItems[0]).getByText(/Download file summary 1/),
-    ).toBeInTheDocument();
-
-    expect(
-      within(dataSetItems[1]).getByRole('button', { name: /Download/ }),
+      within(dataSetItems[0]).getByRole('button', {
+        name: /Download Test dataset 1/,
+      }),
     ).toBeInTheDocument();
 
     const supportingFilesSection = screen.getByTestId(
@@ -290,24 +311,84 @@ describe('ReleasePageTabExploreData', () => {
     ).toBeInTheDocument();
   });
 
-  test('does not render optional content sections or links when not present', () => {
-    renderWithContext(
-      <ReleasePageTabExploreData hidden={false} />,
-      generateReleaseContent({
-        release: generateEditableRelease({
-          downloadFiles: [testDownloadFiles[0]],
-          published: '2025-10-13T00:00:00.0000000Z',
+  test('featured table links go to pre-release table tool if isPra', async () => {
+    releaseContentService.getDataContent.mockResolvedValue(
+      testReleaseDataContent,
+    );
+    renderWithContext(<ReleasePageTabExploreData hidden={false} isPra />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', {
+          name: 'Explore data used in this release',
+          level: 2,
         }),
-      }),
-      [],
+      ).toBeInTheDocument();
+    });
+
+    const featuredTablesSection = screen.getByTestId('featured-tables-section');
+    const featuredTableItems = within(featuredTablesSection).getAllByRole(
+      'listitem',
+    );
+    expect(featuredTableItems).toHaveLength(2);
+    expect(within(featuredTableItems[0]).getByRole('link')).toHaveAttribute(
+      'href',
+      '/publication/publication-id/release/Release-title-id/prerelease/table-tool/featured-table-1-data-block-id',
+    );
+  });
+
+  test('featured table items have buttons instead of links in preview mode (unpublished)', async () => {
+    releaseContentService.getDataContent.mockResolvedValue(
+      testReleaseDataContent,
+    );
+    renderWithContext(
+      <ReleasePageTabExploreData
+        hidden={false}
+        isPra
+        handleFeaturedTableItemClick={noop}
+      />,
     );
 
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', {
+          name: 'Explore data used in this release',
+          level: 2,
+        }),
+      ).toBeInTheDocument();
+    });
+
+    const featuredTablesSection = screen.getByTestId('featured-tables-section');
+    const featuredTableItems = within(featuredTablesSection).getAllByRole(
+      'listitem',
+    );
+    expect(featuredTableItems).toHaveLength(2);
     expect(
-      screen.getByRole('heading', {
-        name: 'Explore data used in this release',
-        level: 2,
-      }),
+      within(featuredTableItems[0]).queryByRole('link'),
+    ).not.toBeInTheDocument();
+    expect(
+      within(featuredTableItems[0]).getByRole('button'),
     ).toBeInTheDocument();
+  });
+
+  test('does not render optional content sections or links when some data not present', async () => {
+    releaseContentService.getDataContent.mockResolvedValue({
+      ...testReleaseDataContent,
+      featuredTables: [],
+      supportingFiles: [],
+      dataDashboards: undefined,
+    });
+
+    renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', {
+          name: 'Explore data used in this release',
+          level: 2,
+        }),
+      ).toBeInTheDocument();
+    });
 
     const linksList = screen.getByTestId('links-grid');
     const listItems = within(linksList).getAllByRole('listitem');
@@ -328,9 +409,9 @@ describe('ReleasePageTabExploreData', () => {
       }),
     ).toHaveAttribute('href', '#data-guidance-section');
     expect(
-      within(listItems[3]).getByRole('link', {
-        name: 'Data catalogue',
-      }),
+      within(listItems[3]).getByText(
+        'Data catalogue (available when release is published)',
+      ),
     ).toBeInTheDocument();
 
     expect(
@@ -344,24 +425,59 @@ describe('ReleasePageTabExploreData', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('does not render links grid on mobile', () => {
+  test('does not render links grid on mobile', async () => {
+    releaseContentService.getDataContent.mockResolvedValue(
+      testReleaseDataContent,
+    );
     mockIsMedia = true;
     renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', {
+          name: 'Explore data used in this release',
+          level: 2,
+        }),
+      ).toBeInTheDocument();
+    });
 
     expect(screen.queryByTestId('links-grid')).not.toBeInTheDocument();
     mockIsMedia = false;
   });
 
-  test('does not render accordion sections on desktop', () => {
+  test('does not render accordion sections on desktop', async () => {
+    releaseContentService.getDataContent.mockResolvedValue(
+      testReleaseDataContent,
+    );
     renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', {
+          name: 'Explore data used in this release',
+          level: 2,
+        }),
+      ).toBeInTheDocument();
+    });
+
     expect(screen.queryByTestId('accordion')).not.toBeInTheDocument();
   });
 
-  test('renders some content sections as accordions on mobile', () => {
+  test('renders some content sections as accordions on mobile', async () => {
+    releaseContentService.getDataContent.mockResolvedValue(
+      testReleaseDataContent,
+    );
     mockIsMedia = true;
     renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', {
+          name: 'Explore data used in this release',
+          level: 2,
+        }),
+      ).toBeInTheDocument();
+    });
+
     expect(screen.getByTestId('accordion')).toBeInTheDocument();
-    expect(screen.getAllByTestId('accordionSection')).toHaveLength(3);
+    expect(screen.getAllByTestId('accordionSection')).toHaveLength(5);
     mockIsMedia = false;
   });
 });

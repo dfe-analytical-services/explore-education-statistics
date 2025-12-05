@@ -2,8 +2,9 @@ import DraftReleasesTable from '@admin/pages/admin-dashboard/components/DraftRel
 import _releaseVersionService, {
   DashboardReleaseVersionSummary,
 } from '@admin/services/releaseVersionService';
+import render from '@common-test/render';
 import { waitFor, within } from '@testing-library/dom';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
@@ -233,7 +234,7 @@ describe('DraftReleasesTable', () => {
       '/publication/publication-1/release/release-1-version-1/summary',
     );
     expect(
-      within(row3cells[2]).queryByRole('button', { name: /View issues/ }),
+      within(row3cells[2]).queryByRole('link', { name: /View issues/ }),
     ).not.toBeInTheDocument();
     expect(
       within(row3cells[2]).queryByRole('button', {
@@ -257,7 +258,7 @@ describe('DraftReleasesTable', () => {
       '/publication/publication-1/release/release-3-version-1/summary',
     );
     expect(
-      within(row4cells[2]).queryByRole('button', { name: /View issues/ }),
+      within(row4cells[2]).queryByRole('link', { name: /View issues/ }),
     ).not.toBeInTheDocument();
     expect(
       within(row4cells[2]).queryByRole('button', {
@@ -298,7 +299,7 @@ describe('DraftReleasesTable', () => {
       }),
     ).toBeInTheDocument();
     expect(
-      within(row6cells[2]).queryByRole('button', { name: /View issues/ }),
+      within(row6cells[2]).queryByRole('link', { name: /View issues/ }),
     ).not.toBeInTheDocument();
 
     expect(within(rows[6]).getByRole('columnheader')).toHaveTextContent(
@@ -318,7 +319,7 @@ describe('DraftReleasesTable', () => {
       '/publication/publication-3/release/release-4-version-1/summary',
     );
     expect(
-      within(row8cells[2]).queryByRole('button', { name: /View issues/ }),
+      within(row8cells[2]).queryByRole('link', { name: /View issues/ }),
     ).not.toBeInTheDocument();
     expect(
       within(row8cells[2]).queryByRole('button', {
@@ -361,8 +362,8 @@ describe('DraftReleasesTable', () => {
     expect(within(row3cells[0]).getByText('Release 1')).toBeInTheDocument();
     expect(within(row3cells[1]).getByText('Draft')).toBeInTheDocument();
     expect(
-      await within(row3cells[2]).findByRole('button', {
-        name: 'View issues (3)',
+      await within(row3cells[2]).findByRole('link', {
+        name: 'View issues (3) for Release 1',
       }),
     ).toBeInTheDocument();
     expect(
@@ -387,7 +388,9 @@ describe('DraftReleasesTable', () => {
     expect(within(row4cells[0]).getByText('Release 3')).toBeInTheDocument();
     expect(within(row4cells[1]).getByText('In Review')).toBeInTheDocument();
     expect(
-      within(row4cells[2]).getByRole('button', { name: 'View issues (3)' }),
+      within(row4cells[2]).getByRole('link', {
+        name: 'View issues (3) for Release 3',
+      }),
     ).toBeInTheDocument();
     expect(
       within(row4cells[3]).getByRole('link', { name: 'Edit Release 3' }),
@@ -418,7 +421,9 @@ describe('DraftReleasesTable', () => {
       within(row6cells[1]).getByText('Draft Amendment'),
     ).toBeInTheDocument();
     expect(
-      within(row6cells[2]).getByRole('button', { name: 'View issues (3)' }),
+      within(row6cells[2]).getByRole('link', {
+        name: 'View issues (3) for Release 2',
+      }),
     ).toBeInTheDocument();
     expect(
       within(row6cells[3]).getByRole('link', { name: 'Edit Release 2' }),
@@ -448,7 +453,9 @@ describe('DraftReleasesTable', () => {
       within(row8cells[1]).getByText('In Review Amendment'),
     ).toBeInTheDocument();
     expect(
-      within(row8cells[2]).getByRole('button', { name: 'View issues (3)' }),
+      within(row8cells[2]).getByRole('link', {
+        name: 'View issues (3) for Release 4',
+      }),
     ).toBeInTheDocument();
     expect(
       within(row8cells[3]).getByRole('link', { name: 'Edit Release 4' }),

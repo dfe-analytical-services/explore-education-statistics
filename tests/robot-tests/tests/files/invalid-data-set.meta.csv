@@ -1,7 +1,7 @@
-col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
-Phase-type_grouping,Filter,School type,,,,Filter by school type,
-ethnicity,Filter,Ethnicity,,,,Filter by pupil ethnicity,
-FSM,Filter,Free School Meals,,,,Filter by free school meal status,
-Language,Filter,First language,,,,Filter by first language,
-headcount,Indicator,Headcount,Pupil counts,,0,,
-percent_of_pupils,Indicator,Percent,Pupil counts,,1,,
+"col_name","col_type","label","indicator_grouping","indicator_unit","indicator_dp","filter_hint","filter_grouping_column"
+"pupil_gender_girls_percent","Indicator","Girls (%)","Gender",NA,1,"",NA
+NA,NA,NA,NA,NA,NA,NA,NA
+NA,NA,NA,NA,NA,NA,NA,NA
+NA,NA,NA,NA,NA,NA,NA,NA
+NA,NA,NA,NA,NA,NA,NA,NA
+NA,NA,NA,NA,NA,NA,NA,NA

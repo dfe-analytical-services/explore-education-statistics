@@ -74,7 +74,7 @@ public class ReleaseVersionService(
     {
         return await context
             .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .Include(rv => rv.PublishingOrganisations)
             .Include(rv => rv.ReleaseStatuses)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
@@ -412,7 +412,7 @@ public class ReleaseVersionService(
     {
         return await context
             .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccessDo(userService.CheckIsBauUser)
             .OnSuccess<ActionResult, ReleaseVersion, Unit>(async releaseVersion =>
@@ -459,7 +459,7 @@ public class ReleaseVersionService(
     {
         return await context
             .Publications.Include(p => p.LatestPublishedReleaseVersion)
-            .ThenInclude(rv => rv.Release)
+                .ThenInclude(rv => rv.Release)
             .SingleOrNotFoundAsync(p => p.Id == publicationId)
             .OnSuccess(userService.CheckCanViewPublication)
             .OnSuccess(p =>
@@ -522,7 +522,7 @@ public class ReleaseVersionService(
 
         var releaseVersionsForApproval = await context
             .ReleaseVersions.Include(releaseVersion => releaseVersion.Release)
-            .ThenInclude(release => release.Publication)
+                .ThenInclude(release => release.Publication)
             .Where(releaseVersion =>
                 releaseVersion.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview
                 && releaseVersionIdsForApproval.Contains(releaseVersion.Id)

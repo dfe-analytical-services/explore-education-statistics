@@ -70,14 +70,9 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
                 .ConfigureAppConfiguration(
                     (_, config) =>
                     {
-                        config.AddInMemoryCollection(
-                            [
-                                new KeyValuePair<string, string?>(
-                                    "PublicStorage",
-                                    _azuriteContainer.GetConnectionString()
-                                ),
-                            ]
-                        );
+                        config.AddInMemoryCollection([
+                            new KeyValuePair<string, string?>("PublicStorage", _azuriteContainer.GetConnectionString()),
+                        ]);
                     }
                 )
                 .ConfigureServices(services =>
@@ -96,6 +91,8 @@ public sealed class TestApplicationFactory : TestApplicationFactory<Startup>
         return base.CreateHostBuilder()
             .ConfigureServices(services =>
             {
+                services.MockService<IPublicBlobCacheService>(MockBehavior.Loose);
+
                 services
                     .UseInMemoryDbContext<ContentDbContext>()
                     .UseInMemoryDbContext<StatisticsDbContext>()

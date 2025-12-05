@@ -1,12 +1,10 @@
 import PageMetaTitle from '@admin/components/PageMetaTitle';
-import ReleaseStatusChecklist from '@admin/pages/release/components/ReleaseStatusChecklist';
 import ReleaseStatusForm from '@admin/pages/release/components/ReleaseStatusForm';
+import ReleaseStatusChecklistSummary from '@admin/pages/release/components/ReleaseStatusChecklistSummary';
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
 import releaseVersionService, {
   ReleaseVersion,
 } from '@admin/services/releaseVersionService';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import { formatISO } from 'date-fns';
 import React from 'react';
 
@@ -23,46 +21,36 @@ const ReleaseStatusEditPage = ({
   onCancel,
   onUpdate,
 }: Props) => {
-  const { value: checklist, isLoading } = useAsyncHandledRetry(
-    async () =>
-      releaseVersionService.getReleaseVersionChecklist(releaseVersion.id),
-    [releaseVersion.id],
-  );
-
   return (
     <>
       <PageMetaTitle title="Edit release status" />
-      <LoadingSpinner loading={isLoading}>
-        <h2>Edit release status</h2>
+      <h2>Edit release status</h2>
 
-        {checklist && (
-          <ReleaseStatusChecklist
-            checklist={checklist}
-            releaseVersion={releaseVersion}
-          />
-        )}
+      <ReleaseStatusChecklistSummary
+        publicationId={releaseVersion.publicationId}
+        releaseVersionId={releaseVersion.id}
+      />
 
-        <ReleaseStatusForm
-          releaseVersion={releaseVersion}
-          statusPermissions={statusPermissions}
-          onCancel={onCancel}
-          onSubmit={async values => {
-            const nextRelease =
-              await releaseVersionService.createReleaseVersionStatus(
-                releaseVersion.id,
-                {
-                  ...values,
-                  publishScheduled: values.publishScheduled
-                    ? formatISO(values.publishScheduled, {
-                        representation: 'date',
-                      })
-                    : undefined,
-                },
-              );
-            onUpdate(nextRelease);
-          }}
-        />
-      </LoadingSpinner>
+      <ReleaseStatusForm
+        releaseVersion={releaseVersion}
+        statusPermissions={statusPermissions}
+        onCancel={onCancel}
+        onSubmit={async values => {
+          const nextRelease =
+            await releaseVersionService.createReleaseVersionStatus(
+              releaseVersion.id,
+              {
+                ...values,
+                publishScheduled: values.publishScheduled
+                  ? formatISO(values.publishScheduled, {
+                      representation: 'date',
+                    })
+                  : undefined,
+              },
+            );
+          onUpdate(nextRelease);
+        }}
+      />
     </>
   );
 };

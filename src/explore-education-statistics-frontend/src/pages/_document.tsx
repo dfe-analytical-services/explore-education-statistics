@@ -9,14 +9,6 @@ class Document extends BaseDocument {
         className="govuk-template govuk-template--rebranded app-html-class"
       >
         <Head>
-          {process.env.NODE_ENV === 'development' && (
-            <>
-              {/* Force browser to not cache any assets */}
-              <meta httpEquiv="pragma" content="no-cache" />
-              <meta httpEquiv="cache-control" content="no-cache" />
-            </>
-          )}
-
           <link
             rel="icon"
             sizes="48x48"

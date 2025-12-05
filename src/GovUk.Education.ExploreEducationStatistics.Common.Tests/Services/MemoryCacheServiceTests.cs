@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -169,7 +170,7 @@ public class MemoryCacheServiceTests
             .Throws(new Exception("Exception during \"SetItem\" call should have been handled gracefully"));
 
         var service = SetupService(memoryCache.Object);
-        service.SetItem(_cacheKey, "test item", cacheConfiguration, DateTime.UtcNow);
+        service.SetItem(_cacheKey, "test item", cacheConfiguration, DateTimeOffset.UtcNow);
         VerifyAllMocks(memoryCache);
     }
 
@@ -269,7 +270,7 @@ public class MemoryCacheServiceTests
     }
 
     private void SetItemAndAssertExpiryTime(
-        DateTime now,
+        DateTimeOffset now,
         MemoryCacheConfiguration cacheConfiguration,
         DateTime expectedCacheExpiry
     )
@@ -295,8 +296,9 @@ public class MemoryCacheServiceTests
     )
     {
         return new MemoryCacheService(
-            memoryCache ?? new MemoryCache(new MemoryCacheOptions()),
-            logger ?? Mock.Of<ILogger<MemoryCacheService>>()
+            cache: memoryCache ?? new MemoryCache(new MemoryCacheOptions()),
+            logger: logger ?? Mock.Of<ILogger<MemoryCacheService>>(),
+            options: new MemoryCacheServiceOptions()
         );
     }
 

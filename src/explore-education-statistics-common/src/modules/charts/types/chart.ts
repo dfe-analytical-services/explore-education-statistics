@@ -112,6 +112,7 @@ export interface MapCategoricalData {
 export interface MapDataSetConfig {
   boundaryLevel?: number;
   categoricalDataConfig?: MapCategoricalData[];
+  sequentialCategoryColours?: boolean;
   dataSet: DataSet;
   dataSetKey: string;
   dataGrouping: DataGroupingConfig;
@@ -156,6 +157,7 @@ export interface StackedBarProps extends ChartProps {
 export interface ChartCapabilities {
   canIncludeNonNumericData: boolean;
   canPositionLegendInline: boolean;
+  canReorderDataCategories: boolean;
   canSetBarThickness: boolean;
   canSetDataLabelColour: boolean;
   canSetDataLabelPosition: boolean;

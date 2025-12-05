@@ -6,6 +6,7 @@ import {
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import render from '@common-test/render';
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
+import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
 import {
   DataSet,
   DataSetConfiguration,
@@ -14,6 +15,11 @@ import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
+import {
+  testCategoricalMeta,
+  testCategoricalData,
+  testMapDataSetConfigs,
+} from './__data__/testCategoricalData';
 
 describe('ChartLegendConfiguration', () => {
   const testTable = testFullTable;
@@ -53,6 +59,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={noop}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -91,6 +98,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={noop}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -135,6 +143,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={noop}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -198,6 +207,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={noop}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -264,6 +274,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={noop}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -332,6 +343,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={noop}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -403,6 +415,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={noop}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -475,6 +488,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={noop}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -534,6 +548,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={noop}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -587,6 +602,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={noop}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -638,6 +654,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={noop}
           onChange={handleChange}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -705,6 +722,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={noop}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -762,6 +780,7 @@ describe('ChartLegendConfiguration', () => {
           showDataLabels
           onSubmit={noop}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -812,6 +831,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={handleSubmit}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -873,6 +893,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={handleSubmit}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -916,6 +937,7 @@ describe('ChartLegendConfiguration', () => {
           }}
           onSubmit={handleSubmit}
           onChange={noop}
+          onReorderCategories={noop}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -977,6 +999,398 @@ describe('ChartLegendConfiguration', () => {
       };
 
       expect(handleSubmit).toHaveBeenCalledWith(values);
+    });
+  });
+
+  test('shows the sequential colours checkbox for data sets with categorical data in maps', () => {
+    render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={mapBlockDefinition}
+          meta={testCategoricalMeta}
+          data={testCategoricalData}
+          axisMajor={{
+            dataSets: [
+              {
+                order: 0,
+                indicator: 'indicator-1',
+                filters: [],
+                timePeriod: '2024_CY',
+              },
+              {
+                order: 1,
+                indicator: 'indicator-2',
+                filters: [],
+                timePeriod: '2024_CY',
+              },
+            ],
+            groupBy: 'locations',
+            referenceLines: [],
+            type: 'major',
+          }}
+          legend={{
+            position: 'bottom',
+            items: [],
+          }}
+          mapDataSetConfigs={testMapDataSetConfigs}
+          onSubmit={noop}
+          onChange={noop}
+          onReorderCategories={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    const legendItems = screen.getAllByRole('group');
+    expect(legendItems).toHaveLength(2);
+    expect(
+      within(legendItems[0]).getByRole('checkbox', {
+        name: 'Sequential colours',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(legendItems[1]).getByRole('checkbox', {
+        name: 'Sequential colours',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  test('clicking the sequential colours checkbox shows the colour field', async () => {
+    const { user } = render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={mapBlockDefinition}
+          meta={testCategoricalMeta}
+          data={testCategoricalData}
+          axisMajor={{
+            dataSets: [
+              {
+                order: 0,
+                indicator: 'indicator-1',
+                filters: [],
+                timePeriod: '2024_CY',
+              },
+              {
+                order: 1,
+                indicator: 'indicator-2',
+                filters: [],
+                timePeriod: '2024_CY',
+              },
+            ],
+            groupBy: 'locations',
+            referenceLines: [],
+            type: 'major',
+          }}
+          legend={{
+            position: 'bottom',
+            items: [],
+          }}
+          mapDataSetConfigs={testMapDataSetConfigs}
+          onSubmit={noop}
+          onChange={noop}
+          onReorderCategories={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    const legendItems = screen.getAllByRole('group');
+    expect(legendItems).toHaveLength(2);
+    expect(
+      within(legendItems[0]).queryByLabelText('Colour'),
+    ).not.toBeInTheDocument();
+
+    await user.click(
+      within(legendItems[0]).getByRole('checkbox', {
+        name: 'Sequential colours',
+      }),
+    );
+
+    expect(within(legendItems[0]).getByLabelText('Colour')).toBeInTheDocument();
+  });
+
+  describe('reorder categories in map key', () => {
+    test('shows the reorder button for data sets with categorical data in maps', () => {
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartLegendConfiguration
+            definition={mapBlockDefinition}
+            meta={testCategoricalMeta}
+            data={testCategoricalData}
+            axisMajor={{
+              dataSets: [
+                {
+                  order: 0,
+                  indicator: 'indicator-1',
+                  filters: [],
+                  timePeriod: '2024_CY',
+                },
+                {
+                  order: 1,
+                  indicator: 'indicator-2',
+                  filters: [],
+                  timePeriod: '2024_CY',
+                },
+              ],
+              groupBy: 'locations',
+              referenceLines: [],
+              type: 'major',
+            }}
+            legend={{
+              position: 'bottom',
+              items: [],
+            }}
+            mapDataSetConfigs={testMapDataSetConfigs}
+            onSubmit={noop}
+            onChange={noop}
+            onReorderCategories={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      const legendItems = screen.getAllByRole('group');
+      expect(legendItems).toHaveLength(2);
+      expect(
+        within(legendItems[0]).getByRole('button', {
+          name: /Reorder categories/,
+        }),
+      ).toBeInTheDocument();
+      expect(
+        within(legendItems[1]).getByRole('button', {
+          name: /Reorder categories/,
+        }),
+      ).toBeInTheDocument();
+    });
+
+    test('does not show the reorder button for data sets with numerical data in maps', () => {
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartLegendConfiguration
+            definition={mapBlockDefinition}
+            meta={testTable.subjectMeta}
+            data={testTable.results}
+            axisMajor={{
+              dataSets: [
+                {
+                  location: {
+                    level: 'localAuthority',
+                    value: 'barnet',
+                  },
+                  filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                  indicator: 'authorised-absence-sessions',
+                },
+              ],
+              groupBy: 'locations',
+              referenceLines: [],
+              type: 'major',
+              visible: true,
+            }}
+            legend={{
+              position: 'bottom',
+              items: [],
+            }}
+            mapDataSetConfigs={testMapDataSetConfigs}
+            onSubmit={noop}
+            onChange={noop}
+            onReorderCategories={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      const legendItems = screen.getAllByRole('group');
+      expect(legendItems).toHaveLength(2);
+      expect(
+        within(legendItems[0]).queryByRole('button', {
+          name: /Reorder categories/,
+        }),
+      ).not.toBeInTheDocument();
+      expect(
+        within(legendItems[1]).queryByRole('button', {
+          name: /Reorder categories/,
+        }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('does not show the reorder button for charts', () => {
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartLegendConfiguration
+            definition={lineChartBlockDefinition}
+            meta={testTable.subjectMeta}
+            data={testTable.results}
+            axisMajor={{
+              dataSets: [
+                {
+                  location: {
+                    level: 'localAuthority',
+                    value: 'barnet',
+                  },
+                  filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                  indicator: 'authorised-absence-sessions',
+                },
+              ],
+              groupBy: 'timePeriod',
+              referenceLines: [],
+              type: 'major',
+              visible: true,
+            }}
+            legend={{
+              position: 'bottom',
+              items: [],
+            }}
+            onSubmit={noop}
+            onChange={noop}
+            onReorderCategories={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      const legendItems = screen.getAllByRole('group');
+      expect(legendItems).toHaveLength(1);
+      expect(
+        within(legendItems[0]).queryByRole('button', {
+          name: /Reorder categories/,
+        }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('shows the categories for the data set when the modal is opened', async () => {
+      const { user } = render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartLegendConfiguration
+            definition={mapBlockDefinition}
+            meta={testCategoricalMeta}
+            data={testCategoricalData}
+            axisMajor={{
+              dataSets: [
+                {
+                  order: 0,
+                  indicator: 'indicator-1',
+                  filters: [],
+                  timePeriod: '2024_CY',
+                },
+                {
+                  order: 1,
+                  indicator: 'indicator-2',
+                  filters: [],
+                  timePeriod: '2024_CY',
+                },
+              ],
+              groupBy: 'locations',
+              referenceLines: [],
+              type: 'major',
+            }}
+            legend={{
+              position: 'bottom',
+              items: [],
+            }}
+            mapDataSetConfigs={testMapDataSetConfigs}
+            onSubmit={noop}
+            onChange={noop}
+            onReorderCategories={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      const legendItems = screen.getAllByRole('group');
+
+      await user.click(
+        within(legendItems[0]).getByRole('button', {
+          name: /Reorder categories/,
+        }),
+      );
+
+      const modal = within(screen.getByRole('dialog'));
+      const listItems = modal.getAllByRole('listitem');
+      expect(listItems).toHaveLength(2);
+      expect(listItems[0]).toHaveTextContent('high');
+      expect(listItems[1]).toHaveTextContent('low');
+
+      await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+      await user.click(
+        within(legendItems[1]).getByRole('button', {
+          name: /Reorder categories/,
+        }),
+      );
+
+      const modal2 = within(screen.getByRole('dialog'));
+      const listItems2 = modal2.getAllByRole('listitem');
+      expect(listItems2).toHaveLength(3);
+      expect(listItems2[0]).toHaveTextContent('large');
+      expect(listItems2[1]).toHaveTextContent('medium');
+      expect(listItems2[2]).toHaveTextContent('small');
+    });
+
+    test('calls onReorderCategories with the correct order when confirm', async () => {
+      const handleReorder = jest.fn();
+      const { user } = render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartLegendConfiguration
+            definition={mapBlockDefinition}
+            meta={testCategoricalMeta}
+            data={testCategoricalData}
+            axisMajor={{
+              dataSets: [
+                {
+                  order: 0,
+                  indicator: 'indicator-1',
+                  filters: [],
+                  timePeriod: '2024_CY',
+                },
+                {
+                  order: 1,
+                  indicator: 'indicator-2',
+                  filters: [],
+                  timePeriod: '2024_CY',
+                },
+              ],
+              groupBy: 'locations',
+              referenceLines: [],
+              type: 'major',
+            }}
+            legend={{
+              position: 'bottom',
+              items: [],
+            }}
+            mapDataSetConfigs={testMapDataSetConfigs}
+            onSubmit={noop}
+            onChange={noop}
+            onReorderCategories={handleReorder}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      const legendItems = screen.getAllByRole('group');
+
+      await user.click(
+        within(legendItems[0]).getByRole('button', {
+          name: /Reorder categories/,
+        }),
+      );
+
+      const modal = within(screen.getByRole('dialog'));
+      const listItems = modal.getAllByRole('listitem');
+      expect(listItems).toHaveLength(2);
+
+      await user.click(modal.getByRole('button', { name: 'Move low up' }));
+
+      expect(handleReorder).not.toHaveBeenCalled();
+
+      await user.click(screen.getByRole('button', { name: 'Confirm' }));
+
+      expect(handleReorder).toHaveBeenCalledTimes(1);
+      expect(handleReorder).toHaveBeenCalledWith({
+        ...testMapDataSetConfigs[0],
+        categoricalDataConfig: [
+          {
+            value: 'low',
+            colour: '#12436D',
+          },
+          {
+            value: 'high',
+            colour: '#28A197',
+          },
+        ],
+      });
     });
   });
 });

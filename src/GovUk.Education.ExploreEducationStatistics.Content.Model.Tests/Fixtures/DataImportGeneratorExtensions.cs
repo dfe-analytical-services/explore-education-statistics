@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
@@ -29,6 +30,12 @@ public static class DataImportGeneratorExtensions
 
     public static Generator<DataImport> WithFile(this Generator<DataImport> generator, File file) =>
         generator.ForInstance(s => s.SetFile(file));
+
+    public static Generator<DataImport> WithFiles(this Generator<DataImport> generator, IEnumerable<File> files)
+    {
+        files.ForEach((file, index) => generator.ForIndex(index, s => s.SetFile(file)));
+        return generator;
+    }
 
     public static Generator<DataImport> WithMetaFile(this Generator<DataImport> generator, File metaFile) =>
         generator.ForInstance(s => s.SetMetaFile(metaFile));

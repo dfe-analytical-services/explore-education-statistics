@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import DraftReleaseRowIssues from '@admin/pages/admin-dashboard/components/DraftReleaseRowIssues';
+import ReleaseStatusChecklistSummary from '@admin/pages/release/components/ReleaseStatusChecklistSummary';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import releaseVersionService, {
   ReleaseVersionSummaryWithPermissions,
@@ -40,7 +40,16 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
           }`}
         </Tag>
       </td>
-      {!isBauUser && <DraftReleaseRowIssues releaseVersionId={release.id} />}
+      {!isBauUser && (
+        <td>
+          <ReleaseStatusChecklistSummary
+            publicationId={release.publication.id}
+            releaseTitle={release.title}
+            releaseVersionId={release.id}
+            simple
+          />
+        </td>
+      )}
       <td>
         <Link
           className="govuk-!-margin-right-4 govuk-!-display-inline-block"

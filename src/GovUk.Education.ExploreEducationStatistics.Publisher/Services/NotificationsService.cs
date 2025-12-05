@@ -12,7 +12,7 @@ public class NotificationsService(ContentDbContext context, INotifierClient noti
     {
         var releasesVersions = await context
             .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .Where(rv => releaseVersionIds.Contains(rv.Id) && rv.NotifySubscribers)
             .ToListAsync();
 
@@ -33,7 +33,7 @@ public class NotificationsService(ContentDbContext context, INotifierClient noti
     {
         var releasesVersions = await context
             .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .Where(rv => releaseVersionIds.Contains(rv.Id))
             .ToListAsync();
 

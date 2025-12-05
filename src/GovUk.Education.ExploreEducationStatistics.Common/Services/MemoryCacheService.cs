@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -9,7 +10,11 @@ using Newtonsoft.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 
-public class MemoryCacheService : IMemoryCacheService
+public class MemoryCacheService(
+    IMemoryCache cache,
+    MemoryCacheServiceOptions options,
+    ILogger<MemoryCacheService> logger
+) : IMemoryCacheService
 {
     private readonly JsonSerializerSettings _jsonSerializerSettings = new()
     {
@@ -18,26 +23,17 @@ public class MemoryCacheService : IMemoryCacheService
         TypeNameHandling = TypeNameHandling.Auto,
     };
 
-    private readonly IMemoryCache _cache;
-    private readonly ILogger<MemoryCacheService> _logger;
-
-    public MemoryCacheService(IMemoryCache cache, ILogger<MemoryCacheService> logger)
-    {
-        _cache = cache;
-        _logger = logger;
-    }
-
     public object? GetItem(IMemoryCacheKey cacheKey, Type targetType)
     {
         object? cachedItem;
 
         try
         {
-            cachedItem = _cache.Get<object?>(cacheKey);
+            cachedItem = cache.Get<object?>(cacheKey);
         }
         catch (Exception e)
         {
-            _logger.LogError(
+            logger.LogError(
                 e,
                 "Error whilst retrieving cached item for key {CacheKey} - returning null",
                 GetCacheKeyDescription(cacheKey)
@@ -47,13 +43,13 @@ public class MemoryCacheService : IMemoryCacheService
 
         if (cachedItem == null)
         {
-            _logger.LogInformation("Cache miss for cache key {CacheKeyDescription}", GetCacheKeyDescription(cacheKey));
+            logger.LogInformation("Cache miss for cache key {CacheKeyDescription}", GetCacheKeyDescription(cacheKey));
             return null;
         }
 
         if (!targetType.IsInstanceOfType(cachedItem))
         {
-            _logger.LogError(
+            logger.LogError(
                 "Cached type {CachedItemType} is not an instance of "
                     + "{TargetType} for cache key {CacheKey} - returning null",
                 cachedItem.GetType(),
@@ -64,7 +60,7 @@ public class MemoryCacheService : IMemoryCacheService
             return null;
         }
 
-        _logger.LogInformation(
+        logger.LogInformation(
             "Returning cached result for cache key {CacheKeyDescription}",
             GetCacheKeyDescription(cacheKey)
         );
@@ -76,15 +72,13 @@ public class MemoryCacheService : IMemoryCacheService
         IMemoryCacheKey cacheKey,
         TItem item,
         MemoryCacheConfiguration configuration,
-        DateTime? nowUtc = null
+        DateTimeOffset nowUtc
     )
     {
         try
         {
-            var now = nowUtc ?? DateTime.UtcNow;
-
-            DateTime absoluteExpiryTime;
-            var targetAbsoluteExpiryDateTime = now.AddSeconds(configuration.DurationInSeconds);
+            DateTimeOffset absoluteExpiryTime;
+            var targetAbsoluteExpiryDateTime = nowUtc.AddSeconds(configuration.DurationInSeconds);
 
             if (configuration.ExpirySchedule == null)
             {
@@ -92,7 +86,7 @@ public class MemoryCacheService : IMemoryCacheService
             }
             else
             {
-                var nextExpiryTime = configuration.ExpirySchedule.GetNextOccurrence(now);
+                var nextExpiryTime = configuration.ExpirySchedule.GetNextOccurrence(nowUtc.UtcDateTime);
 
                 absoluteExpiryTime =
                     targetAbsoluteExpiryDateTime < nextExpiryTime ? targetAbsoluteExpiryDateTime : nextExpiryTime;
@@ -103,30 +97,34 @@ public class MemoryCacheService : IMemoryCacheService
             var json = JsonConvert.SerializeObject(item, null, _jsonSerializerSettings);
             var approximateSizeInBytes = Encoding.GetEncoding("utf-8").GetByteCount(json);
 
-            var expiryTime = new DateTimeOffset(absoluteExpiryTime);
-
-            _cache.Set(
+            cache.Set(
                 cacheKey,
                 item,
-                new MemoryCacheEntryOptions { Size = approximateSizeInBytes, AbsoluteExpiration = expiryTime }
+                new MemoryCacheEntryOptions { Size = approximateSizeInBytes, AbsoluteExpiration = absoluteExpiryTime }
             );
 
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Setting cached item with cache key {CacheKeyDescription}, "
-                    + "approx size {Size} bytes, expiry time {ExpiryTime}",
+                    + "approx size {Size} bytes, expiry time {AbsoluteExpiryTime}",
                 GetCacheKeyDescription(cacheKey),
                 approximateSizeInBytes,
-                expiryTime
+                absoluteExpiryTime
             );
         }
         catch (Exception e)
         {
-            _logger.LogError(
+            logger.LogError(
                 e,
                 "Exception thrown when caching item with cache key {CacheKeyDescription}.  " + "Returning gracefully.",
                 GetCacheKeyDescription(cacheKey)
             );
         }
+    }
+
+    // TODO EES-6450 - stop exposing this publicly when "GetOrCreate" method is absorbed into this service.
+    public MemoryCacheServiceOptions? GetMemoryCacheOptions()
+    {
+        return options;
     }
 
     private static string GetCacheKeyDescription(IMemoryCacheKey cacheKey)

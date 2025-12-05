@@ -13,9 +13,10 @@ public static class DataSetVersionStatusQueryTheoryData
 
     public static readonly TheoryData<DataSetVersionStatus> AvailableStatuses = new(AvailableStatusesList);
 
-    public static readonly TheoryData<DataSetVersionStatus> AvailableStatusesIncludingDraft = new(
-        [.. AvailableStatusesList, DataSetVersionStatus.Draft]
-    );
+    public static readonly TheoryData<DataSetVersionStatus> AvailableStatusesIncludingDraft = new([
+        .. AvailableStatusesList,
+        DataSetVersionStatus.Draft,
+    ]);
 
     public static readonly TheoryData<DataSetVersionStatus> UnavailableStatuses = new(
         EnumUtil.GetEnums<DataSetVersionStatus>().Except(AvailableStatusesList)
@@ -45,9 +46,10 @@ public static class DataSetVersionStatusViewTheoryData
 
     public static readonly TheoryData<DataSetVersionStatus> AvailableStatuses = new(AvailableStatusesList);
 
-    public static readonly TheoryData<DataSetVersionStatus> AvailableStatusesIncludingDraft = new(
-        [.. AvailableStatusesList, DataSetVersionStatus.Draft]
-    );
+    public static readonly TheoryData<DataSetVersionStatus> AvailableStatusesIncludingDraft = new([
+        .. AvailableStatusesList,
+        DataSetVersionStatus.Draft,
+    ]);
 
     public static readonly TheoryData<DataSetVersionStatus> UnavailableStatuses = new(
         EnumUtil.GetEnums<DataSetVersionStatus>().Except(AvailableStatusesList)

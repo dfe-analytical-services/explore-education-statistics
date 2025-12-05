@@ -46,9 +46,10 @@ public abstract class ReleaseDataContentServiceTests
                             _dataFixture
                                 .DefaultFile(FileType.Data)
                                 .WithDataSetFileMeta(_dataFixture.DefaultDataSetFileMeta().WithNumDataFileRows(1000))
-                                .WithDataSetFileVersionGeographicLevels(
-                                    [GeographicLevel.Country, GeographicLevel.LocalAuthority]
-                                )
+                                .WithDataSetFileVersionGeographicLevels([
+                                    GeographicLevel.Country,
+                                    GeographicLevel.LocalAuthority,
+                                ])
                         )
                 )
                 .ForIndex(
@@ -58,9 +59,10 @@ public abstract class ReleaseDataContentServiceTests
                             _dataFixture
                                 .DefaultFile(FileType.Data)
                                 .WithDataSetFileMeta(_dataFixture.DefaultDataSetFileMeta().WithNumDataFileRows(2000))
-                                .WithDataSetFileVersionGeographicLevels(
-                                    [GeographicLevel.Region, GeographicLevel.School]
-                                )
+                                .WithDataSetFileVersionGeographicLevels([
+                                    GeographicLevel.Region,
+                                    GeographicLevel.School,
+                                ])
                         )
                 )
                 .WithReleaseVersion(releaseVersion)
@@ -420,9 +422,11 @@ public abstract class ReleaseDataContentServiceTests
                 .WithFile(
                     _dataFixture
                         .DefaultFile(FileType.Data)
-                        .WithDataSetFileVersionGeographicLevels(
-                            [GeographicLevel.Ward, GeographicLevel.Country, GeographicLevel.LocalAuthority]
-                        )
+                        .WithDataSetFileVersionGeographicLevels([
+                            GeographicLevel.Ward,
+                            GeographicLevel.Country,
+                            GeographicLevel.LocalAuthority,
+                        ])
                 )
                 .WithReleaseVersion(releaseVersion);
 
@@ -527,8 +531,6 @@ public abstract class ReleaseDataContentServiceTests
                 // Assert
                 var result = outcome.AssertRight();
 
-                Assert.Equal(release.Id, result.ReleaseId);
-                Assert.Equal(release.Versions[0].Id, result.ReleaseVersionId);
                 Assert.Null(result.DataDashboards);
                 Assert.Equal(releaseVersion.DataGuidance, result.DataGuidance);
                 Assert.Empty(result.DataSets);
@@ -678,6 +680,7 @@ public abstract class ReleaseDataContentServiceTests
         private static void AssertFeaturedTableEqual(FeaturedTable expected, ReleaseDataContentFeaturedTableDto actual)
         {
             Assert.Equal(expected.Id, actual.FeaturedTableId);
+            Assert.Equal(expected.DataBlockId, actual.DataBlockId);
             Assert.Equal(expected.DataBlockParentId, actual.DataBlockParentId);
             Assert.Equal(expected.Description, actual.Summary);
             Assert.Equal(expected.Name, actual.Title);

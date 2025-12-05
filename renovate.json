@@ -121,12 +121,6 @@
       "groupName": "Azure Bicep resources",
       "description": "Prevent unofficial resource versions being suggested",
       "enabled": false
-    },
-    {
-    "description": "Disable AspectInjector and Aspects.Universal due to an issue with AspectInjector 2.9.0. See https://github.com/pamidur/aspect-injector/issues/244",
-    "matchDatasources": ["nuget"],
-    "matchPackageNames": ["AspectInjector", "Aspects.Universal"],
-    "enabled": false
     }
   ]
 }

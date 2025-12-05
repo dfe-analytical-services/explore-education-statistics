@@ -356,7 +356,7 @@ public partial class ReleaseService(
     {
         return await context
             .Releases.Include(r => r.Publication)
-            .ThenInclude(p => p.SupersededBy)
+                .ThenInclude(p => p.SupersededBy)
             .SingleOrNotFoundAsync(p => p.Id == releaseId);
     }
 

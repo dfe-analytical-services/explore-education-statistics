@@ -14,6 +14,7 @@ import Modal from '@common/components/Modal';
 import { parseISO } from 'date-fns';
 import React, { ReactNode } from 'react';
 import classNames from 'classnames';
+import { Organisation } from '@common/services/types/organisation';
 
 interface ReleaseTypeIcon {
   url: string;
@@ -32,6 +33,7 @@ interface Props {
   lastUpdated?: Date;
   latestRelease: boolean;
   nextReleaseDate?: PartialDate;
+  publishingOrganisations?: Organisation[];
   releaseDate?: string;
   releaseType: ReleaseType;
   renderReleaseNotes: ReactNode;
@@ -47,6 +49,7 @@ export default function ReleaseSummarySection({
   lastUpdated,
   latestRelease,
   nextReleaseDate,
+  publishingOrganisations,
   releaseDate,
   releaseType,
   renderReleaseNotes,
@@ -113,7 +116,11 @@ export default function ReleaseSummarySection({
               </ButtonText>
             }
           >
-            <ReleaseTypeSection showHeading={false} type={releaseType} />
+            <ReleaseTypeSection
+              publishingOrganisations={publishingOrganisations}
+              showHeading={false}
+              type={releaseType}
+            />
           </Modal>
         </SummaryListItem>
 

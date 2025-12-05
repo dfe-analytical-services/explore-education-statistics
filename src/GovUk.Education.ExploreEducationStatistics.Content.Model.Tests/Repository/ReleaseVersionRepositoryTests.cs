@@ -19,12 +19,10 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    [
-                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2022),
-                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021),
-                    ]
-                );
+                .WithReleases([
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2022),
+                    _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021),
+                ]);
 
             var contextId = await AddTestData(publication);
             await using var contentDbContext = InMemoryContentDbContext(contextId);
@@ -133,13 +131,11 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    [
-                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
-                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
-                    ]
-                )
+                .WithReleases([
+                    _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                    _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
+                ])
                 .FinishWith(p => p.ReleaseSeries = GenerateReleaseSeries(p.Releases, 2021, 2020, 2022));
 
             var contextId = await AddTestData(publication);
@@ -282,13 +278,11 @@ public class ReleaseVersionRepositoryTests
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleases(
-                        [
-                            _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                            _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
-                            _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
-                        ]
-                    )
+                    .WithReleases([
+                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
+                    ])
                     .FinishWith(p => p.ReleaseSeries = GenerateReleaseSeries(p.Releases, 2021, 2020, 2022));
 
                 var contextId = await AddTestData(publication);
@@ -373,13 +367,11 @@ public class ReleaseVersionRepositoryTests
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleases(
-                        [
-                            _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                            _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
-                            _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
-                        ]
-                    )
+                    .WithReleases([
+                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
+                    ])
                     .FinishWith(p => p.ReleaseSeries = GenerateReleaseSeries(p.Releases, 2021, 2020, 2022));
 
                 var contextId = await AddTestData(publication);
@@ -480,13 +472,11 @@ public class ReleaseVersionRepositoryTests
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleases(
-                        [
-                            _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                            _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
-                            _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
-                        ]
-                    );
+                    .WithReleases([
+                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
+                    ]);
 
                 var contextId = await AddTestData(publication);
                 await using var contentDbContext = InMemoryContentDbContext(contextId);
@@ -570,13 +560,11 @@ public class ReleaseVersionRepositoryTests
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleases(
-                        [
-                            _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
-                            _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
-                            _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
-                        ]
-                    );
+                    .WithReleases([
+                        _dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022),
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
+                    ]);
 
                 var contextId = await AddTestData(publication);
                 await using var contentDbContext = InMemoryContentDbContext(contextId);

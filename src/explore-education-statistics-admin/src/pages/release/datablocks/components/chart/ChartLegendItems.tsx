@@ -1,5 +1,6 @@
 import styles from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration.module.scss';
 import { ChartLegendFormValues } from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration';
+import ChartReorderCategories from '@admin/pages/release/datablocks/components/chart/ChartReorderCategories';
 import {
   legendInlinePositions,
   colours,
@@ -19,6 +20,9 @@ import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
+import { FormFieldCheckbox } from '@common/components/form';
+import { DataSet } from '@common/modules/charts/types/dataSet';
+import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import {
   ChartCapabilities,
   MapDataSetConfig,
@@ -27,8 +31,6 @@ import { Dictionary } from '@common/types';
 import upperFirst from 'lodash/upperFirst';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import React from 'react';
-import { DataSet } from '@common/modules/charts/types/dataSet';
-import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 
 const symbolOptions: SelectOption[] = symbols.map(symbol => ({
   label: upperFirst(symbol),
@@ -59,6 +61,7 @@ interface Props {
   mapDataSetConfigs?: MapDataSetConfig[];
   position?: LegendPosition;
   onChange: (legend: LegendConfiguration) => void;
+  onReorderCategories: (mapDataSetConfig: MapDataSetConfig) => void;
 }
 
 export default function ChartLegendItems({
@@ -66,12 +69,13 @@ export default function ChartLegendItems({
   mapDataSetConfigs,
   position,
   onChange,
+  onReorderCategories,
 }: Props) {
   const { fields } = useFieldArray({
     name: 'items',
   });
 
-  const { formState, getValues } = useFormContext<ChartLegendFormValues>();
+  const { formState } = useFormContext<ChartLegendFormValues>();
 
   const currentItems = useWatch({ name: 'items' });
 
@@ -81,7 +85,10 @@ export default function ChartLegendItems({
     }
   }, 200);
 
-  const getMapDataSetConfig = (dataSet: DataSet) => {
+  const getMapDataSetConfig = (dataSet?: DataSet) => {
+    if (!dataSet) {
+      return undefined;
+    }
     const key = generateDataSetKey(dataSet);
     return mapDataSetConfigs?.find(config => config.dataSetKey === key);
   };
@@ -104,13 +111,19 @@ export default function ChartLegendItems({
             const fieldErrorDetails = fieldErrors
               ? Object.values(fieldErrors as Dictionary<{ message: string }>)
               : [];
-            const currentItem = getValues().items[index];
-            const mapDataSetConfig = getMapDataSetConfig(currentItem.dataSet);
+            const mapDataSetConfig = getMapDataSetConfig(
+              currentItems[index]?.dataSet,
+            );
             const allowColourSelection =
-              !mapDataSetConfig?.categoricalDataConfig?.length;
+              !mapDataSetConfig?.categoricalDataConfig?.length ||
+              currentItems[index].sequentialCategoryColours;
 
             return (
-              <div key={item.id} className={styles.item}>
+              <div
+                key={item.id}
+                className={styles.item}
+                data-testid={`legend-item-${index}`}
+              >
                 <FormFieldset
                   id={`items-${item.id}`}
                   legend={`Legend item ${index + 1}`}
@@ -128,6 +141,15 @@ export default function ChartLegendItems({
                         showError={false}
                       />
                     </div>
+                    {mapDataSetConfig?.categoricalDataConfig && (
+                      <div className={styles.labelInput}>
+                        <FormFieldCheckbox
+                          label="Sequential colours"
+                          name={`items.${index}.sequentialCategoryColours`}
+                          formGroup={false}
+                        />
+                      </div>
+                    )}
                     {allowColourSelection && (
                       <div className={styles.colourInput}>
                         <FormFieldColourInput
@@ -201,6 +223,17 @@ export default function ChartLegendItems({
                         </div>
                       </>
                     )}
+                    {capabilities.canReorderDataCategories &&
+                      mapDataSetConfig &&
+                      mapDataSetConfig.categoricalDataConfig && (
+                        <ChartReorderCategories
+                          label={currentItems[index].label}
+                          mapDataSetConfig={mapDataSetConfig}
+                          onReorder={updatedConfig =>
+                            onReorderCategories(updatedConfig)
+                          }
+                        />
+                      )}
                   </div>
                 </FormFieldset>
               </div>

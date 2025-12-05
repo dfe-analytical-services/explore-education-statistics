@@ -39,8 +39,8 @@ public class EducationInNumbersService(ContentDbContext contentDbContext) : IEdu
     {
         return await contentDbContext
             .EducationInNumbersPages.Include(page => page.Content)
-            .ThenInclude(section => section.Content)
-            .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
+                .ThenInclude(section => section.Content)
+                    .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
             .Where(page => page.Slug == slug && page.Published != null)
             .OrderByDescending(page => page.Version)
             .Select(page => EinPageViewModel.FromModel(page))

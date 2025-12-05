@@ -67,7 +67,7 @@ public static class ReleaseFileGeneratorExtensions
         Guid releaseVersionId
     ) => generator.ForInstance(s => s.SetReleaseVersionId(releaseVersionId));
 
-    public static Generator<ReleaseFile> WithSummary(this Generator<ReleaseFile> generator, string summary) =>
+    public static Generator<ReleaseFile> WithSummary(this Generator<ReleaseFile> generator, string? summary) =>
         generator.ForInstance(s => s.SetSummary(summary));
 
     public static Generator<ReleaseFile> WithFilterSequence(
@@ -130,7 +130,7 @@ public static class ReleaseFileGeneratorExtensions
         Guid releaseVersionId
     ) => setters.Set(rf => rf.ReleaseVersionId, releaseVersionId);
 
-    public static InstanceSetters<ReleaseFile> SetSummary(this InstanceSetters<ReleaseFile> setters, string summary) =>
+    public static InstanceSetters<ReleaseFile> SetSummary(this InstanceSetters<ReleaseFile> setters, string? summary) =>
         setters.Set(rf => rf.Summary, summary);
 
     public static InstanceSetters<ReleaseFile> SetFilterSequence(

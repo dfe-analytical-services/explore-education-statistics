@@ -5,6 +5,10 @@ import {
   ChartOptions,
   useChartBuilderReducer,
 } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
+import {
+  testCategoricalData,
+  testCategoricalMeta,
+} from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testCategoricalData';
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
 import { mapBlockDefinition } from '@common/modules/charts/components/MapBlock';
 import {
@@ -14,6 +18,7 @@ import {
   ChartDefinition,
   DataGroupingConfig,
   LineChart,
+  MapDataSetConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
@@ -28,6 +33,7 @@ describe('chartBuilderReducer', () => {
     capabilities: {
       canPositionLegendInline: true,
       canIncludeNonNumericData: true,
+      canReorderDataCategories: false,
       canSetBarThickness: true,
       canSetDataLabelColour: true,
       canSetDataLabelPosition: true,
@@ -550,6 +556,206 @@ describe('chartBuilderReducer', () => {
         {
           indicator: 'indicator-1',
           filters: ['filter-1'],
+        },
+      ]);
+    });
+
+    test('sets map dataSetConfigs when data sets are added', () => {
+      const mapInitialState: ChartBuilderState = {
+        axes: {
+          major: {
+            type: 'major',
+            visible: true,
+            referenceLines: [],
+            dataSets: [],
+          },
+        },
+        options: {
+          height: 300,
+          subtitle: '',
+          title: '',
+          titleType: 'default',
+          alt: '',
+        },
+        map: {
+          dataSetConfigs: [],
+        },
+      };
+      const action: ChartBuilderActions = {
+        type: 'UPDATE_DATA_SETS',
+        payload: [
+          {
+            indicator: 'indicator-1',
+            filters: [],
+            timePeriod: '2024_CY',
+          },
+        ],
+      };
+
+      const nextState = produce(
+        chartBuilderReducer({
+          data: testCategoricalData,
+          meta: testCategoricalMeta,
+        }),
+      )(mapInitialState, action);
+
+      expect(nextState.axes.major?.dataSets).toEqual<DataSet[]>([
+        {
+          filters: [],
+          indicator: 'indicator-1',
+          timePeriod: '2024_CY',
+        },
+      ]);
+
+      expect(nextState.map?.dataSetConfigs).toEqual<MapDataSetConfig[]>([
+        {
+          boundaryLevel: undefined,
+          categoricalDataConfig: [
+            {
+              colour: '#12436D',
+              value: 'low',
+            },
+            {
+              colour: '#28A197',
+              value: 'high',
+            },
+          ],
+          dataGrouping: {
+            customGroups: [],
+            numberOfGroups: 5,
+            type: 'EqualIntervals',
+          },
+          dataSet: {
+            filters: [],
+            indicator: 'indicator-1',
+            timePeriod: '2024_CY',
+          },
+          dataSetKey:
+            '{"filters":[],"indicator":"indicator-1","timePeriod":"2024_CY"}',
+        },
+      ]);
+    });
+
+    test('updates map dataSetConfigs when more data sets are added', () => {
+      const mapInitialState: ChartBuilderState = {
+        axes: {
+          major: {
+            type: 'major',
+            visible: true,
+            referenceLines: [],
+            dataSets: [
+              {
+                filters: [],
+                indicator: 'indicator-1',
+                location: { level: 'region', value: 'location-1-value' },
+                timePeriod: '2024_CY',
+              },
+            ],
+            groupBy: 'locations',
+          },
+        },
+        options: {
+          height: 300,
+          subtitle: '',
+          title: '',
+          titleType: 'default',
+          alt: '',
+        },
+        map: {
+          dataSetConfigs: [
+            {
+              boundaryLevel: undefined,
+              categoricalDataConfig: [
+                {
+                  colour: '#12436D',
+                  value: 'low',
+                },
+              ],
+              dataGrouping: {
+                customGroups: [],
+                numberOfGroups: 5,
+                type: 'EqualIntervals',
+              },
+              dataSet: {
+                filters: [],
+                indicator: 'indicator-1',
+                timePeriod: '2024_CY',
+              },
+              dataSetKey:
+                '{"filters":[],"indicator":"indicator-1","timePeriod":"2024_CY"}',
+            },
+          ],
+        },
+      };
+      const action: ChartBuilderActions = {
+        type: 'UPDATE_DATA_SETS',
+        payload: [
+          {
+            indicator: 'indicator-1',
+            filters: [],
+            location: { level: 'region', value: 'location-1-value' },
+            timePeriod: '2024_CY',
+          },
+          {
+            indicator: 'indicator-1',
+            filters: [],
+            location: { level: 'region', value: 'location-2-value' },
+            timePeriod: '2024_CY',
+          },
+        ],
+      };
+
+      const nextState = produce(
+        chartBuilderReducer({
+          data: testCategoricalData,
+          meta: testCategoricalMeta,
+        }),
+      )(mapInitialState, action);
+
+      expect(nextState.axes.major?.dataSets).toEqual<DataSet[]>([
+        {
+          indicator: 'indicator-1',
+          filters: [],
+          location: { level: 'region', value: 'location-1-value' },
+          timePeriod: '2024_CY',
+        },
+        {
+          filters: [],
+          indicator: 'indicator-1',
+          location: { level: 'region', value: 'location-2-value' },
+          timePeriod: '2024_CY',
+        },
+      ]);
+
+      expect(
+        nextState.map?.dataSetConfigs[0].categoricalDataConfig,
+      ).toHaveLength(2);
+
+      expect(nextState.map?.dataSetConfigs).toEqual<MapDataSetConfig[]>([
+        {
+          boundaryLevel: undefined,
+          categoricalDataConfig: [
+            {
+              colour: '#12436D',
+              value: 'low',
+            },
+            {
+              colour: '#28A197',
+              value: 'high',
+            },
+          ],
+          dataGrouping: {
+            customGroups: [],
+            numberOfGroups: 5,
+            type: 'EqualIntervals',
+          },
+          dataSet: {
+            filters: [],
+            indicator: 'indicator-1',
+            timePeriod: '2024_CY',
+          },
+          dataSetKey:
+            '{"filters":[],"indicator":"indicator-1","timePeriod":"2024_CY"}',
         },
       ]);
     });

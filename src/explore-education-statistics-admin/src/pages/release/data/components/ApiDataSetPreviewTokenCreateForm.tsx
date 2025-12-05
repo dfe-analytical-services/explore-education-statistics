@@ -1,4 +1,4 @@
-import { isSameDay, isBefore, isPast, isToday } from 'date-fns';
+import { isSameDay, isBefore } from 'date-fns';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -12,20 +12,18 @@ import FormProvider from '@common/components/form/FormProvider';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
-import { ObjectSchema } from 'yup';
+import { ObjectSchema, Schema } from 'yup';
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import { PreviewTokenCreateValues } from '@admin/pages/release/data/types/PreviewTokenCreateValues';
+import InsetText from '@common/components/InsetText';
+import UkTimeHelper from '@common/utils/date/ukTimeHelper';
 
-interface FormValues {
+interface FormValues extends PreviewTokenCreateValues {
   agreeTerms: boolean;
-  label: string;
-  datePresetSpan?: number | null;
-  activates?: Date | string | null;
-  expires?: Date | string | null;
-  selectionMethod?: 'presetDays' | 'customDates' | null;
+  selectionMethod?: 'presetDays' | 'customDates' | 'oneDay';
 }
 
 interface Props {
@@ -63,7 +61,6 @@ export default function ApiDataSetPreviewTokenCreateForm({
         .required('The terms of usage must be agreed')
         .oneOf([true], 'The terms of usage must be agreed'),
       datePresetSpan: Yup.number()
-        .nullable()
         .when('selectionMethod', {
           is: 'presetDays',
           then: s =>
@@ -76,7 +73,8 @@ export default function ApiDataSetPreviewTokenCreateForm({
                   return value >= 1 && value <= 7;
                 },
               }),
-        }),
+        })
+        .notRequired() as Schema<number | undefined>,
       activates: Yup.date().when('selectionMethod', {
         is: 'customDates',
         then: s =>
@@ -84,21 +82,29 @@ export default function ApiDataSetPreviewTokenCreateForm({
             .required('Activates date must be a valid date')
             .test({
               name: 'not-in-past',
-              message: 'Activates date must not be in the past',
+              message: 'Activates date must not be in the past.',
               test(value) {
                 if (value == null) return false;
-                return isToday(value) || !isPast(value);
+                const activatesMidnightUk = UkTimeHelper.toUkStartOfDay(value);
+                const todayMidnightUk = UkTimeHelper.toUkStartOfDay(new Date());
+                return !isBefore(activatesMidnightUk, todayMidnightUk);
               },
             })
             .test({
               name: 'within-7-days',
-              message: 'Activates date must be within 7 days from today',
+              message: 'Activates date must be within 7 days from today.',
               test(value) {
                 if (value == null) return false;
-                const now = new Date();
-                const maxDate = new Date();
-                maxDate.setDate(now.getDate() + 7);
-                return endDateIsLaterThanOrEqualToStartDate(value, maxDate);
+                // Start of activates day in UK (UTC instant)
+                const todayMidnightUk = new Date(
+                  UkTimeHelper.toUkStartOfDay(new Date()),
+                );
+                const activatesMidnightUk = UkTimeHelper.toUkStartOfDay(value);
+
+                return endDateIsLaterThanOrEqualToStartDate(
+                  activatesMidnightUk,
+                  UkTimeHelper.getDateRangeFromDate(7, todayMidnightUk).endDate,
+                );
               },
             }),
       }),
@@ -108,34 +114,35 @@ export default function ApiDataSetPreviewTokenCreateForm({
           s.required('Expires date must be a valid date').test({
             name: 'after-activates',
             message:
-              'Expires date must be later than Activates date by at most 7 days',
+              'Expires date must be later than Activates date by at most 7 days.',
             test(value, context) {
               const activates = context.parent.activates as Date | null;
-              if (activates == null || value == null) return false;
-              value.setHours(23, 59, 59, 999); // Set 'Expires' to the end of the day as FE doesn't allow Time input
+              if (!activates || !value) return false;
 
-              const activatesMaxDate = new Date(activates);
-              activatesMaxDate.setDate(activates.getDate() + 7);
+              const activatesMidnightUk =
+                UkTimeHelper.toUkStartOfDay(activates);
 
-              const laterThanActivates = endDateIsLaterThanOrEqualToStartDate(
-                activates,
-                value,
+              return (
+                value >= activates &&
+                value <=
+                  UkTimeHelper.getDateRangeFromDate(7, activatesMidnightUk)
+                    .endDate
               );
-              const notLaterThanMaxTime = endDateIsLaterThanOrEqualToStartDate(
-                value,
-                activatesMaxDate,
-              );
-              return laterThanActivates && notLaterThanMaxTime;
             },
           }),
       }),
-      selectionMethod: Yup.mixed<'presetDays' | 'customDates'>()
-        .oneOf(['presetDays', 'customDates'])
-        .notRequired(),
+      selectionMethod: Yup.string()
+        .oneOf(['presetDays', 'customDates', 'oneDay'] as const)
+        .notRequired() as Schema<
+        'presetDays' | 'customDates' | 'oneDay' | undefined
+      >,
     });
   }, []);
   return (
-    <FormProvider validationSchema={validationSchema}>
+    <FormProvider
+      initialValues={{ selectionMethod: 'oneDay' }}
+      validationSchema={validationSchema}
+    >
       {({ formState }) => {
         return (
           <Form
@@ -146,22 +153,22 @@ export default function ApiDataSetPreviewTokenCreateForm({
                 datePresetSpan:
                   values.selectionMethod === 'presetDays'
                     ? values.datePresetSpan
-                    : null,
+                    : undefined,
                 activates:
                   values.selectionMethod === 'customDates'
                     ? values.activates
-                    : null,
+                    : undefined,
                 expires:
                   values.selectionMethod === 'customDates'
                     ? values.expires
-                    : null,
+                    : undefined,
               })
             }
           >
             <FormFieldTextInput<FormValues>
               name="label"
               label="Token name"
-              hint="Add a name so you can easily reference this token"
+              hint="Add a name so you can easily reference this token."
             />
             {isBau && (
               <>
@@ -170,10 +177,17 @@ export default function ApiDataSetPreviewTokenCreateForm({
                   legend="Select a custom duration"
                   legendSize="s"
                   hint="Select a number of days"
+                  order={[]}
                   options={[
+                    {
+                      label: 'Set the duration to 1 day',
+                      value: 'oneDay',
+                      hint: 'This sets the preview token to expire tomorrow at 23:59:59 UK time.',
+                    },
                     {
                       label: 'Choose number of days',
                       value: 'presetDays',
+                      hint: 'Pick a preset number of days.',
                       conditional: (
                         <FormFieldRadioGroup<FormValues>
                           legend="Select a duration"
@@ -186,11 +200,12 @@ export default function ApiDataSetPreviewTokenCreateForm({
                     },
                     {
                       label: 'Enter specific start and end dates',
+                      hint: 'Select a duration of at most 7 days.',
                       value: 'customDates',
                       conditional: (
                         <>
                           <FormFieldDateInput<FormValues>
-                            hint="The date the preview token activates for use"
+                            hint="The date the preview token activates for use. This can not be more than 7 days from today."
                             legend="Activates on"
                             legendSize="s"
                             name="activates"
@@ -198,7 +213,7 @@ export default function ApiDataSetPreviewTokenCreateForm({
                           />
                           <br />
                           <FormFieldDateInput<FormValues>
-                            hint="The date the preview token expires"
+                            hint="The date the preview token expires. This can not be more than 7 days from activates on date."
                             legend="Expires on"
                             legendSize="s"
                             name="expires"
@@ -212,6 +227,19 @@ export default function ApiDataSetPreviewTokenCreateForm({
                 <br />
               </>
             )}
+            {!isBau && (
+              <InsetText>
+                <p>
+                  If you would like to extend the period that this new token is
+                  valid for, please contact{' '}
+                  <a href="mailto:explore.statistics@education.gov.uk">
+                    explore.statistics@education.gov.uk
+                  </a>{' '}
+                  for support.
+                </p>
+              </InsetText>
+            )}
+
             <FormFieldset
               error={formState.errors?.agreeTerms?.message}
               id="terms"

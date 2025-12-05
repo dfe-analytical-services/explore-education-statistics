@@ -242,6 +242,11 @@ export default function ReleaseDataUploadsSection({
           replacement instead of importing as a separate file.
         </p>
       </InsetText>
+      <WarningMessage>
+        The system runs some basic screening checks during data import. Analysts
+        should still ensure that all data files undergo the full screening check
+        suite prior to being uploaded, as provided by the external screener app.
+      </WarningMessage>
       {canUpdateRelease ? (
         <DataFileUploadForm
           dataSetFileTitles={dataFilesExcludingReplacements.map(

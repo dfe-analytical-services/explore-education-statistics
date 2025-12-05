@@ -554,6 +554,10 @@ user clicks element
     ${element}=    lookup or return webelement    ${selector}    ${parent}
     user scrolls to element    ${element}
     wait until element is enabled    ${element}
+
+    # Look up the element again prior to clicking, as scrolling can often lead to DOM elements being refreshed.
+    # This lets us reduce the number of StaleElementReferenceExceptions.
+    ${element}=    lookup or return webelement    ${selector}    ${parent}
     click element    ${element}
 
 user clicks link
@@ -945,6 +949,14 @@ user clicks checkbox
     ${text_matcher}=    get xpath text matcher    ${label}    ${exact_match}
     user scrolls to element    xpath://label[${text_matcher} or strong[${text_matcher}]]/../input[@type="checkbox"]
     user clicks element    xpath://label[${text_matcher} or strong[${text_matcher}]]/../input[@type="checkbox"]
+
+user clicks all checkboxes in parent
+    [Arguments]    ${testid}
+    @{checkboxes}=    Get WebElements    css:[data-testid="${testid}"] input[type=checkbox]
+    FOR    ${checkbox}    IN    @{checkboxes}
+        user scrolls to element    ${checkbox}
+        user clicks element    ${checkbox}
+    END
 
 user checks checkbox is checked
     [Arguments]    ${label}    ${exact_match}=${True}

@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -13,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -155,18 +155,18 @@ public class ReleaseApprovalServicePermissionTests
     {
         return new ReleaseApprovalService(
             contentDbContext,
-            new DateTimeProvider(),
+            new FakeTimeProvider(),
             userService,
             Mock.Of<IPublishingService>(),
             Mock.Of<IReleaseChecklistService>(),
             Mock.Of<IContentService>(),
             Mock.Of<IPreReleaseUserService>(),
+            Mock.Of<IUserResourceRoleNotificationService>(),
             Mock.Of<IReleaseFileRepository>(),
             Mock.Of<IReleaseFileService>(),
             new ReleaseApprovalOptions().ToOptionsWrapper(),
             Mock.Of<IUserReleaseRoleService>(),
-            Mock.Of<IEmailTemplateService>(),
-            Mock.Of<IUserRepository>()
+            Mock.Of<IEmailTemplateService>()
         );
     }
 }

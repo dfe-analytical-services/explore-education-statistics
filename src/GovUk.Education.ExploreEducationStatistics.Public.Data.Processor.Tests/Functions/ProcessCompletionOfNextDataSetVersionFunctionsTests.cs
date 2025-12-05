@@ -3174,13 +3174,11 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
                 {
                     GeographicLevelMeta = DataFixture
                         .DefaultGeographicLevelMeta()
-                        .WithLevels(
-                            [
-                                GeographicLevel.LocalAuthority,
-                                GeographicLevel.LocalAuthorityDistrict,
-                                GeographicLevel.School,
-                            ]
-                        ),
+                        .WithLevels([
+                            GeographicLevel.LocalAuthority,
+                            GeographicLevel.LocalAuthorityDistrict,
+                            GeographicLevel.School,
+                        ]),
                 }
             );
 

@@ -26,7 +26,7 @@ public class UserRoleService(
     ContentDbContext contentDbContext,
     IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
     IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
-    IEmailTemplateService emailTemplateService,
+    IUserResourceRoleNotificationService userResourceRoleNotificationService,
     IUserService userService,
     IReleaseVersionRepository releaseVersionRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
@@ -71,16 +71,26 @@ public class UserRoleService(
                     {
                         var (user, publication) = tuple;
 
-                        await userPublicationRoleRepository.Create(
-                            userId: userId,
-                            publicationId: publication.Id,
-                            role: role,
-                            createdById: userService.GetUserId()
-                        );
+                        await contentDbContext.RequireTransaction(async () =>
+                        {
+                            await userPublicationRoleRepository.Create(
+                                userId: userId,
+                                publicationId: publication.Id,
+                                role: role,
+                                createdById: userService.GetUserId()
+                            );
 
-                        await UpgradeToGlobalRoleIfRequired(GetAssociatedGlobalRoleNameForPublicationRole(role), user);
+                            await UpgradeToGlobalRoleIfRequired(
+                                GetAssociatedGlobalRoleNameForPublicationRole(role),
+                                user
+                            );
 
-                        return emailTemplateService.SendPublicationRoleEmail(user.Email, publication, role);
+                            await userResourceRoleNotificationService.NotifyUserOfNewPublicationRole(
+                                userId: userId,
+                                publication: publication,
+                                role: role
+                            );
+                        });
                     });
             });
     }
@@ -89,7 +99,7 @@ public class UserRoleService(
     {
         return await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .LatestReleaseVersion(releaseId: releaseId)
             .SingleOrNotFoundAsync()
             .OnSuccessDo(rv => userService.CheckCanUpdateReleaseRole(rv!.Release.Publication, role))
@@ -100,17 +110,25 @@ public class UserRoleService(
             .OnSuccess(async tuple =>
             {
                 var (releaseVersion, user) = tuple;
-                await userReleaseRoleRepository.Create(
-                    userId: userId,
-                    releaseVersionId: releaseVersion!.Id,
-                    role,
-                    createdById: userService.GetUserId()
-                );
 
-                var globalRole = GetAssociatedGlobalRoleNameForReleaseRole(role);
-                await UpgradeToGlobalRoleIfRequired(globalRole, user);
+                await contentDbContext.RequireTransaction(async () =>
+                {
+                    await userReleaseRoleRepository.Create(
+                        userId: userId,
+                        releaseVersionId: releaseVersion!.Id,
+                        role,
+                        createdById: userService.GetUserId()
+                    );
 
-                return emailTemplateService.SendReleaseRoleEmail(user.Email!, releaseVersion, role);
+                    var globalRole = GetAssociatedGlobalRoleNameForReleaseRole(role);
+                    await UpgradeToGlobalRoleIfRequired(globalRole, user);
+
+                    await userResourceRoleNotificationService.NotifyUserOfNewReleaseRole(
+                        userId: userId,
+                        releaseVersion: releaseVersion,
+                        role: role
+                    );
+                });
             });
     }
 
@@ -368,8 +386,8 @@ public class UserRoleService(
             {
                 var allReleaseRoles = await contentDbContext
                     .UserReleaseRoles.Include(userReleaseRole => userReleaseRole.ReleaseVersion)
-                    .ThenInclude(releaseVersion => releaseVersion.Release)
-                    .ThenInclude(release => release.Publication)
+                        .ThenInclude(releaseVersion => releaseVersion.Release)
+                            .ThenInclude(release => release.Publication)
                     .Where(userReleaseRole => userReleaseRole.UserId == userId)
                     .ToListAsync();
 
@@ -421,8 +439,8 @@ public class UserRoleService(
                     query
                         .Include(userReleaseRole => userReleaseRole.User)
                         .Include(userReleaseRole => userReleaseRole.ReleaseVersion)
-                        .ThenInclude(releaseVersion => releaseVersion.Release)
-                        .ThenInclude(release => release.Publication)
+                            .ThenInclude(releaseVersion => releaseVersion.Release)
+                                .ThenInclude(release => release.Publication)
             )
             .OnSuccess(async userReleaseRole =>
             {

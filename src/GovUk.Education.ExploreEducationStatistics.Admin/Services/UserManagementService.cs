@@ -194,8 +194,8 @@ public class UserManagementService(
                     {
                         var userReleaseInvites = await contentDbContext
                             .UserReleaseInvites.Include(uri => uri.ReleaseVersion)
-                            .ThenInclude(rv => rv.Release)
-                            .ThenInclude(r => r.Publication)
+                                .ThenInclude(rv => rv.Release)
+                                    .ThenInclude(r => r.Publication)
                             .Where(uri => uri.Email.ToLower().Equals(pendingUserInvite.Email.ToLower()))
                             .ToListAsync();
 
@@ -294,8 +294,8 @@ public class UserManagementService(
             {
                 var userReleaseInvites = await contentDbContext
                     .UserReleaseInvites.Include(uri => uri.ReleaseVersion)
-                    .ThenInclude(rv => rv.Release)
-                    .ThenInclude(r => r.Publication)
+                        .ThenInclude(rv => rv.Release)
+                            .ThenInclude(r => r.Publication)
                     .Where(uri => uri.Email.ToLower() == sanitisedEmail)
                     .ToListAsync();
 

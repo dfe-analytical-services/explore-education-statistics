@@ -167,9 +167,9 @@ public class MethodologyService : IMethodologyService
                 publicationId,
                 q =>
                     q.Include(publication => publication.Methodologies)
-                        .ThenInclude(publicationMethodology => publicationMethodology.Methodology)
-                        .ThenInclude(methodology => methodology.Versions)
-                        .ThenInclude(versions => versions.PreviousVersion)
+                            .ThenInclude(publicationMethodology => publicationMethodology.Methodology)
+                                .ThenInclude(methodology => methodology.Versions)
+                                    .ThenInclude(versions => versions.PreviousVersion)
             )
             .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
             .OnSuccess(async publication =>
@@ -240,7 +240,7 @@ public class MethodologyService : IMethodologyService
                 // Get the Releases of those publications
                 var releaseVersions = await _context
                     .ReleaseVersions.Include(rv => rv.Release)
-                    .ThenInclude(r => r.Publication)
+                        .ThenInclude(r => r.Publication)
                     .Where(rv => publicationIds.Contains(rv.PublicationId))
                     .ToListAsync();
 
@@ -312,12 +312,12 @@ public class MethodologyService : IMethodologyService
             .Reference(m => m.Methodology)
             .Query()
             .Include(m => m.Publications)
-            .ThenInclude(p => p.Publication)
-            .ThenInclude(p => p.Contact)
+                .ThenInclude(p => p.Publication)
+                    .ThenInclude(p => p.Contact)
             .Include(m => m.Publications)
-            .ThenInclude(p => p.Publication)
-            .ThenInclude(p => p.LatestPublishedReleaseVersion)
-            .ThenInclude(p => p!.Release)
+                .ThenInclude(p => p.Publication)
+                    .ThenInclude(p => p.LatestPublishedReleaseVersion)
+                        .ThenInclude(p => p!.Release)
             .LoadAsync();
 
         var publicationLinks = loadedMethodologyVersion.Methodology.Publications;
@@ -342,7 +342,7 @@ public class MethodologyService : IMethodologyService
                 .Reference(m => m.ScheduledWithReleaseVersion)
                 .Query()
                 .Include(rv => rv.Release)
-                .ThenInclude(r => r.Publication)
+                    .ThenInclude(r => r.Publication)
                 .LoadAsync();
 
             if (loadedMethodologyVersion.ScheduledWithReleaseVersion != null)

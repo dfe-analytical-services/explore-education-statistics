@@ -3883,14 +3883,12 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             .WithMetaSummary(
                 DataFixture
                     .DefaultDataSetVersionMetaSummary()
-                    .WithGeographicLevels(
-                        [
-                            GeographicLevel.Country,
-                            GeographicLevel.LocalAuthority,
-                            GeographicLevel.Region,
-                            GeographicLevel.School,
-                        ]
-                    )
+                    .WithGeographicLevels([
+                        GeographicLevel.Country,
+                        GeographicLevel.LocalAuthority,
+                        GeographicLevel.Region,
+                        GeographicLevel.School,
+                    ])
             )
             .WithStatus(versionStatus);
 

@@ -253,6 +253,7 @@ Create release amendment
 Replace subject data
     user uploads subject replacement    ${SUBJECT_NAME}    dates.csv    dates.meta.csv
     user waits until page contains element    testid:Data file replacements table
+    user confirms replacement upload    ${SUBJECT_NAME}
     user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains    Footnotes: ERROR    %{WAIT_MEDIUM}

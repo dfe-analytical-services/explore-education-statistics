@@ -110,7 +110,7 @@ public class ImporterMetaService : IImporterMetaService
         var filters = await context
             .Filter.AsNoTracking()
             .Include(filter => filter.FilterGroups)
-            .ThenInclude(group => group.FilterItems)
+                .ThenInclude(group => group.FilterItems)
             .Where(filter => filter.SubjectId == subject.Id)
             .ToListAsync();
 

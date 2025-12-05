@@ -1,19 +1,21 @@
-import PageTitle from '@admin/components/PageTitle';
 import Link from '@admin/components/Link';
+import PageTitle from '@admin/components/PageTitle';
 import ReleaseContent from '@admin/pages/release/content/components/ReleaseContent';
+import ReleaseContentRedesign from '@admin/pages/release/content/components/ReleaseContentRedesign';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
-import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
+import featuredTableQueries from '@admin/queries/featuredTableQueries';
+import releaseContentQueries from '@admin/queries/releaseContentQueries';
 import {
   preReleaseTableToolRoute,
   PreReleaseTableToolRouteParams,
 } from '@admin/routes/preReleaseRoutes';
-import featuredTableQueries from '@admin/queries/featuredTableQueries';
-import releaseContentQueries from '@admin/queries/releaseContentQueries';
+import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import { useQuery } from '@tanstack/react-query';
+import classNames from 'classnames';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { generatePath } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 
 const PreReleaseContentPage = ({
   match,
@@ -23,6 +25,10 @@ const PreReleaseContentPage = ({
   const { data: content, isLoading: isLoadingContent } = useQuery(
     releaseContentQueries.get(releaseVersionId),
   );
+
+  const previewRedesign =
+    new URLSearchParams(window.location.search).get('redesign') === 'true' &&
+    !window.location.href.includes('admin.explore');
 
   const { data: featuredTables = [], isLoading: isLoadingFeaturedTables } =
     useQuery(featuredTableQueries.list(releaseVersionId));
@@ -52,23 +58,37 @@ const PreReleaseContentPage = ({
   };
 
   return (
-    <div className="govuk-width-container">
+    <div
+      className={classNames('govuk-width-container', {
+        'dfe-width-container--wide': previewRedesign,
+      })}
+    >
       <LoadingSpinner loading={isLoadingContent || isLoadingFeaturedTables}>
         {content && (
           <ReleaseContentProvider
             value={{
               ...content,
               canUpdateRelease: false,
+              featuredTables,
             }}
           >
-            <PageTitle
-              caption={content.release.title}
-              title={content.release.publication.title}
-            />
+            {previewRedesign ? (
+              <ReleaseContentRedesign
+                isPra
+                transformFeaturedTableLinks={handleFeaturedTableLinks}
+              />
+            ) : (
+              <>
+                <PageTitle
+                  caption={content.release.title}
+                  title={content.release.publication.title}
+                />
 
-            <ReleaseContent
-              transformFeaturedTableLinks={handleFeaturedTableLinks}
-            />
+                <ReleaseContent
+                  transformFeaturedTableLinks={handleFeaturedTableLinks}
+                />
+              </>
+            )}
           </ReleaseContentProvider>
         )}
       </LoadingSpinner>

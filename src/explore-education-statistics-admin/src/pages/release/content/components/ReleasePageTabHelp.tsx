@@ -21,8 +21,13 @@ interface Props {
 const ReleasePageTabHelp = ({ hidden }: Props) => {
   const { release } = useReleaseContentState();
 
-  const { publication, relatedInformation, hasPreReleaseAccessList, type } =
-    release;
+  const {
+    publication,
+    publishingOrganisations,
+    relatedInformation,
+    hasPreReleaseAccessList,
+    type,
+  } = release;
 
   const {
     data: releaseVersion,
@@ -53,11 +58,12 @@ const ReleasePageTabHelp = ({ hidden }: Props) => {
   );
 
   return (
-    <ReleasePageTabPanel tabKey="explore" hidden={hidden}>
+    <ReleasePageTabPanel tabKey="help" hidden={hidden}>
       <ReleasePageLayout navItems={navItems}>
         <ContactUsSection
           publicationContact={publication.contact}
           publicationTitle={publication.title}
+          publishingOrganisations={publishingOrganisations}
           sectionTitle="Get help by contacting us"
           includeSectionBreak
         />
@@ -67,7 +73,11 @@ const ReleasePageTabHelp = ({ hidden }: Props) => {
           id="release-type-section"
           includeSectionBreak={hasPreReleaseAccessList || hasRelatedInformation}
         >
-          <ReleaseTypeSection type={type} showHeading={false} />
+          <ReleaseTypeSection
+            publishingOrganisations={publishingOrganisations}
+            type={type}
+            showHeading={false}
+          />
         </ReleasePageContentSection>
 
         {hasRelatedInformation && (

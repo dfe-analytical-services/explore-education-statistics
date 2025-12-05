@@ -27,7 +27,13 @@ export type BaseFormRadioGroupProps<Value extends string = string> = {
   inline?: boolean;
   inputRef?: Ref<HTMLInputElement>;
   name: string;
+  /* Array of radio options.
+   * Each option should have a unique value. Use the 'order' attribute to specify the order of the options.
+   * */
   options: RadioOption<Value>[];
+  /* Order of the radio options.
+   * If set to an empty array, the order of the options will be the same as the order of the array.
+   * */
   order?: OrderKeys<RadioOption<Value>>;
   orderDirection?: OrderDirection | OrderDirection[];
   small?: boolean;

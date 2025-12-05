@@ -1,11 +1,14 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Options;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using NCrontab;
 using Xunit;
@@ -16,7 +19,7 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public class ThemeControllerCachingTests : CacheServiceTestFixture
+public class ThemeControllerCachingTests
 {
     private readonly IList<ThemeViewModel> _themes =
     [
@@ -41,7 +44,13 @@ public class ThemeControllerCachingTests : CacheServiceTestFixture
     {
         var themeService = new Mock<IThemeService>(Strict);
 
-        MemoryCacheService
+        var memoryCacheService = new Mock<IMemoryCacheService>(Strict);
+
+        memoryCacheService
+            .Setup(s => s.GetMemoryCacheOptions())
+            .Returns(new MemoryCacheServiceOptions { Enabled = true });
+
+        memoryCacheService
             .Setup(s => s.GetItem(new ListThemesCacheKey(), typeof(IList<ThemeViewModel>)))
             .Returns((object?)null);
 
@@ -50,17 +59,28 @@ public class ThemeControllerCachingTests : CacheServiceTestFixture
             CrontabSchedule.Parse(HalfHourlyExpirySchedule)
         );
 
-        MemoryCacheService.Setup(s =>
-            s.SetItem<object>(new ListThemesCacheKey(), _themes, ItIs.DeepEqualTo(expectedCacheConfiguration), null)
+        var cachingTime = DateTime.UtcNow;
+
+        memoryCacheService.Setup(s =>
+            s.SetItem<object>(
+                new ListThemesCacheKey(),
+                _themes,
+                ItIs.DeepEqualTo(expectedCacheConfiguration),
+                cachingTime
+            )
         );
 
         themeService.Setup(s => s.ListThemes()).ReturnsAsync(_themes);
 
-        var controller = BuildController(themeService.Object);
+        var controller = BuildController(
+            themeService.Object,
+            memoryCacheService: memoryCacheService.Object,
+            timeProvider: new FakeTimeProvider(cachingTime)
+        );
 
         var result = await controller.ListThemes();
 
-        VerifyAllMocks(MemoryCacheService, themeService);
+        VerifyAllMocks(memoryCacheService, themeService);
 
         Assert.Equal(_themes, result);
     }
@@ -68,15 +88,21 @@ public class ThemeControllerCachingTests : CacheServiceTestFixture
     [Fact]
     public async Task ListThemes_CachedEntryExists()
     {
-        MemoryCacheService
+        var memoryCacheService = new Mock<IMemoryCacheService>(Strict);
+
+        memoryCacheService
+            .Setup(s => s.GetMemoryCacheOptions())
+            .Returns(new MemoryCacheServiceOptions { Enabled = true });
+
+        memoryCacheService
             .Setup(s => s.GetItem(new ListThemesCacheKey(), typeof(IList<ThemeViewModel>)))
             .Returns(_themes);
 
-        var controller = BuildController();
+        var controller = BuildController(memoryCacheService: memoryCacheService.Object);
 
         var result = await controller.ListThemes();
 
-        VerifyAllMocks(MemoryCacheService);
+        VerifyAllMocks(memoryCacheService);
 
         Assert.Equal(_themes, result);
     }
@@ -88,8 +114,18 @@ public class ThemeControllerCachingTests : CacheServiceTestFixture
         converted.AssertDeepEqualTo(_themes);
     }
 
-    private static ThemeController BuildController(IThemeService? themeService = null)
+    private static ThemeController BuildController(
+        IThemeService? themeService = null,
+        IMemoryCacheService? memoryCacheService = null,
+        TimeProvider? timeProvider = null
+    )
     {
-        return new(Mock.Of<IMethodologyCacheService>(), themeService ?? Mock.Of<IThemeService>(Strict));
+        return new(
+            Mock.Of<IMethodologyCacheService>(),
+            themeService ?? Mock.Of<IThemeService>(Strict),
+            memoryCacheService ?? Mock.Of<IMemoryCacheService>(Strict),
+            logger: Mock.Of<ILogger<ThemeController>>(),
+            timeProvider: timeProvider ?? new FakeTimeProvider(DateTime.UtcNow)
+        );
     }
 }

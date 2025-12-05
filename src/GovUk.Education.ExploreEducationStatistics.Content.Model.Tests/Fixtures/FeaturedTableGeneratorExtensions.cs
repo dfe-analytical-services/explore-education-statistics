@@ -45,6 +45,8 @@ public static class FeaturedTableGeneratorExtensions
             .SetDefault(featuredTable => featuredTable.Id)
             .SetDefault(featuredTable => featuredTable.Name)
             .SetDefault(featuredTable => featuredTable.Description)
+            .SetDefault(featuredTable => featuredTable.DataBlockId)
+            .SetDefault(featuredTable => featuredTable.DataBlockParentId)
             .SetDefault(featuredTable => featuredTable.Order, offset: 1)
             .Set(featuredTable => featuredTable.Created, DateTime.UtcNow.AddDays(-1))
             .SetDefault(featuredTable => featuredTable.CreatedById);

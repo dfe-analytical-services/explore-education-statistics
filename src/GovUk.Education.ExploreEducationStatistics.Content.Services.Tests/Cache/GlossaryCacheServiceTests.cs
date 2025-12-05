@@ -1,8 +1,9 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -11,36 +12,38 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cache;
 
-public class GlossaryCacheServiceTests : CacheServiceTestFixture
+public class GlossaryCacheServiceTests
 {
-    private readonly List<GlossaryCategoryViewModel> _glossary = new()
-    {
-        new GlossaryCategoryViewModel(
-            Heading: 'A',
-            Entries: new List<GlossaryEntryViewModel> { new(Title: "A title", Slug: "A slug", Body: "A body") }
-        ),
-    };
+    private readonly List<GlossaryCategoryViewModel> _glossary =
+    [
+        new(Heading: 'A', Entries: [new GlossaryEntryViewModel(Title: "A title", Slug: "A slug", Body: "A body")]),
+    ];
 
     [Fact]
     public async Task GetGlossary_NoCachedGlossary()
     {
         var cacheKey = new GlossaryCacheKey();
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.GetItemAsync(cacheKey, typeof(List<GlossaryCategoryViewModel>)))
             .ReturnsAsync((object?)null);
 
-        PublicBlobCacheService.Setup(s => s.SetItemAsync<object>(cacheKey, _glossary)).Returns(Task.CompletedTask);
+        publicBlobCacheService.Setup(s => s.SetItemAsync<object>(cacheKey, _glossary)).Returns(Task.CompletedTask);
 
         var glossaryService = new Mock<IGlossaryService>(Strict);
 
         glossaryService.Setup(s => s.GetGlossary()).ReturnsAsync(_glossary);
 
-        var service = BuildService(glossaryService: glossaryService.Object);
+        var service = BuildService(
+            glossaryService: glossaryService.Object,
+            publicBlobCacheService: publicBlobCacheService.Object
+        );
 
         var result = await service.GetGlossary();
 
-        VerifyAllMocks(glossaryService, PublicBlobCacheService);
+        VerifyAllMocks(glossaryService, publicBlobCacheService);
 
         Assert.Equal(_glossary, result);
     }
@@ -48,15 +51,17 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetGlossary_CachedGlossary()
     {
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.GetItemAsync(new GlossaryCacheKey(), typeof(List<GlossaryCategoryViewModel>)))
             .ReturnsAsync(_glossary);
 
-        var service = BuildService();
+        var service = BuildService(publicBlobCacheService: publicBlobCacheService.Object);
 
         var result = await service.GetGlossary();
 
-        VerifyAllMocks(PublicBlobCacheService);
+        VerifyAllMocks(publicBlobCacheService);
 
         Assert.Equal(_glossary, result);
     }
@@ -68,17 +73,22 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
 
         glossaryService.Setup(s => s.GetGlossary()).ReturnsAsync(_glossary);
 
-        PublicBlobCacheService
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
+
+        publicBlobCacheService
             .Setup(s => s.SetItemAsync<object>(new GlossaryCacheKey(), _glossary))
             .Returns(Task.CompletedTask);
 
-        var service = BuildService(glossaryService: glossaryService.Object);
+        var service = BuildService(
+            glossaryService: glossaryService.Object,
+            publicBlobCacheService: publicBlobCacheService.Object
+        );
 
         var result = await service.UpdateGlossary();
 
         // There should be no attempt on the cache service to get the cached resource
 
-        VerifyAllMocks(glossaryService, PublicBlobCacheService);
+        VerifyAllMocks(glossaryService, publicBlobCacheService);
 
         Assert.Equal(_glossary, result);
     }
@@ -95,8 +105,15 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
         converted.AssertDeepEqualTo(original);
     }
 
-    private static GlossaryCacheService BuildService(IGlossaryService? glossaryService = null)
+    private static GlossaryCacheService BuildService(
+        IGlossaryService? glossaryService = null,
+        IPublicBlobCacheService? publicBlobCacheService = null
+    )
     {
-        return new GlossaryCacheService(glossaryService: glossaryService ?? Mock.Of<IGlossaryService>(Strict));
+        return new GlossaryCacheService(
+            glossaryService: glossaryService ?? Mock.Of<IGlossaryService>(Strict),
+            publicBlobCacheService: publicBlobCacheService ?? Mock.Of<IPublicBlobCacheService>(Strict),
+            logger: Mock.Of<ILogger<GlossaryCacheService>>()
+        );
     }
 }

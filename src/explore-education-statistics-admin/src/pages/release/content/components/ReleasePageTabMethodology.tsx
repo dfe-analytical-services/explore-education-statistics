@@ -21,7 +21,7 @@ interface Props {
 
 const ReleasePageTabMethodology = ({ hidden }: Props) => {
   const {
-    release: { publication },
+    release: { publication, publishingOrganisations },
   } = useReleaseContentState();
 
   const { methodologies, externalMethodology } = publication;
@@ -59,7 +59,7 @@ const ReleasePageTabMethodology = ({ hidden }: Props) => {
   );
 
   return (
-    <ReleasePageTabPanel tabKey="explore" hidden={hidden}>
+    <ReleasePageTabPanel tabKey="methodology" hidden={hidden}>
       <ReleasePageLayout navItems={navItems}>
         {allMethodologies.length > 0 && (
           <ReleasePageContentSection
@@ -88,6 +88,7 @@ const ReleasePageTabMethodology = ({ hidden }: Props) => {
         <ContactUsSection
           publicationContact={publication.contact}
           publicationTitle={publication.title}
+          publishingOrganisations={publishingOrganisations}
         />
       </ReleasePageLayout>
     </ReleasePageTabPanel>

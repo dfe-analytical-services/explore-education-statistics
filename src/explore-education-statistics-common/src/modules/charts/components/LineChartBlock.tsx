@@ -270,6 +270,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
   capabilities: {
     canIncludeNonNumericData: true,
     canPositionLegendInline: true,
+    canReorderDataCategories: false,
     canSetBarThickness: false,
     canSetDataLabelColour: true,
     canSetDataLabelPosition: true,

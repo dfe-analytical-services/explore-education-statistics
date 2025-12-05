@@ -49,8 +49,7 @@ const ReleasePageTabBar = ({ activeTab, onChangeTab }: Props) => {
                 href={`#${sectionId}`}
                 id={`${sectionId}-tab`}
                 tabIndex={!isActive ? -1 : undefined}
-                onClick={event => {
-                  event.preventDefault();
+                onClick={() => {
                   onChangeTab(key as ReleasePageTabSectionKey);
                 }}
                 onKeyDown={event => {

@@ -1,11 +1,8 @@
 #nullable enable
-using System.Globalization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -13,10 +10,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -30,8 +25,6 @@ public abstract class PreReleaseUserServiceTests
     private readonly DataFixture _dataFixture = new();
 
     private static readonly Guid _userId = Guid.NewGuid();
-
-    private const string PreReleaseTemplateId = "prerelease-template-id";
 
     private static readonly DateTime PublishedScheduledStartOfDay = new DateTime(
         2020,
@@ -566,159 +559,6 @@ public abstract class PreReleaseUserServiceTests
         }
 
         [Fact]
-        public async Task ActiveUserForApprovedReleaseFailsSendingEmail_Fails()
-        {
-            ReleaseVersion releaseVersion = _dataFixture
-                .DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
-                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-                .WithPublishScheduled(PublishedScheduledStartOfDay);
-
-            User user = _dataFixture.DefaultUser();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var emailService = new Mock<IEmailService>(MockBehavior.Strict);
-
-            var expectedTemplateValues = GetExpectedPreReleaseTemplateValues(releaseVersion, newUser: false);
-
-            emailService
-                .Setup(mock => mock.SendEmail(user.Email, PreReleaseTemplateId, expectedTemplateValues))
-                .Returns(new BadRequestResult());
-
-            var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
-            SetupGetPrereleaseWindow(preReleaseService, releaseVersion);
-
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
-            userReleaseRoleRepository
-                .Setup(mock => mock.HasUserReleaseRole(user.Email, releaseVersion.Id, ReleaseRole.PrereleaseViewer))
-                .ReturnsAsync(false);
-
-            var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
-            userReleaseInviteRepository
-                .Setup(mock => mock.UserHasInvite(releaseVersion.Id, user.Email, ReleaseRole.PrereleaseViewer))
-                .ReturnsAsync(false);
-
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
-            userRepository
-                .Setup(mock => mock.FindActiveUserByEmail(user.Email, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(user);
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupPreReleaseUserService(
-                    contentDbContext,
-                    preReleaseService: preReleaseService.Object,
-                    emailService: emailService.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
-                    userReleaseInviteRepository: userReleaseInviteRepository.Object,
-                    userRepository: userRepository.Object
-                );
-
-                var result = await service.InvitePreReleaseUsers(releaseVersion.Id, ListOf(user.Email));
-
-                result.AssertLeft();
-            }
-
-            VerifyAllMocks(
-                emailService,
-                preReleaseService,
-                userReleaseRoleRepository,
-                userReleaseInviteRepository,
-                userRepository
-            );
-        }
-
-        [Fact]
-        public async Task NewUserForApprovedReleaseFailsSendingEmail_Fails()
-        {
-            ReleaseVersion releaseVersion = _dataFixture
-                .DefaultReleaseVersion()
-                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
-                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-                .WithPublishScheduled(PublishedScheduledStartOfDay);
-
-            User userToCreate = _dataFixture.DefaultUser();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var emailService = new Mock<IEmailService>();
-
-            var expectedTemplateValues = GetExpectedPreReleaseTemplateValues(releaseVersion, newUser: true);
-
-            emailService
-                .Setup(mock => mock.SendEmail(userToCreate.Email, PreReleaseTemplateId, expectedTemplateValues))
-                .Returns(new BadRequestResult());
-
-            var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
-            SetupGetPrereleaseWindow(preReleaseService, releaseVersion);
-
-            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
-            userReleaseRoleRepository
-                .Setup(mock =>
-                    mock.HasUserReleaseRole(userToCreate.Email, releaseVersion.Id, ReleaseRole.PrereleaseViewer)
-                )
-                .ReturnsAsync(false);
-
-            var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(MockBehavior.Strict);
-            userReleaseInviteRepository
-                .Setup(mock => mock.UserHasInvite(releaseVersion.Id, userToCreate.Email, ReleaseRole.PrereleaseViewer))
-                .ReturnsAsync(false);
-
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
-            userRepository
-                .Setup(mock => mock.FindActiveUserByEmail(userToCreate.Email, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((User?)null);
-            userRepository
-                .Setup(mock =>
-                    mock.CreateOrUpdate(
-                        userToCreate.Email,
-                        GlobalRoles.Role.PrereleaseUser,
-                        _userId,
-                        null,
-                        It.IsAny<CancellationToken>()
-                    )
-                )
-                .ReturnsAsync(userToCreate);
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupPreReleaseUserService(
-                    contentDbContext,
-                    preReleaseService: preReleaseService.Object,
-                    emailService: emailService.Object,
-                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
-                    userReleaseInviteRepository: userReleaseInviteRepository.Object,
-                    userRepository: userRepository.Object
-                );
-
-                var result = await service.InvitePreReleaseUsers(releaseVersion.Id, ListOf(userToCreate.Email));
-
-                result.AssertLeft();
-            }
-
-            VerifyAllMocks(
-                emailService,
-                preReleaseService,
-                userReleaseRoleRepository,
-                userReleaseInviteRepository,
-                userRepository
-            );
-        }
-
-        [Fact]
         public async Task InvitesMultipleUsersForApprovedRelease()
         {
             ReleaseVersion releaseVersion = _dataFixture
@@ -774,11 +614,9 @@ public abstract class PreReleaseUserServiceTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
-            SetupGetPrereleaseWindow(preReleaseService, releaseVersion);
-
-            var emailService = new Mock<IEmailService>(MockBehavior.Strict);
-
+            var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(
+                MockBehavior.Strict
+            );
             foreach (var email in allEmails)
             {
                 if (
@@ -789,15 +627,11 @@ public abstract class PreReleaseUserServiceTests
                     continue;
                 }
 
-                var classedAsNewUserForEmail = !activeUsersWithNoRolesOrInvitesByEmail.ContainsKey(email);
-                var expectedTemplateValues = GetExpectedPreReleaseTemplateValues(
-                    releaseVersion,
-                    classedAsNewUserForEmail
-                );
-
-                emailService
-                    .Setup(mock => mock.SendEmail(email, PreReleaseTemplateId, expectedTemplateValues))
-                    .Returns(Unit.Instance);
+                userResourceRoleNotificationService
+                    .Setup(mock =>
+                        mock.NotifyUserOfNewPreReleaseRole(email, releaseVersion.Id, It.IsAny<CancellationToken>())
+                    )
+                    .Returns(Task.CompletedTask);
             }
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
@@ -910,8 +744,7 @@ public abstract class PreReleaseUserServiceTests
             {
                 var service = SetupPreReleaseUserService(
                     contentDbContext,
-                    emailService: emailService.Object,
-                    preReleaseService: preReleaseService.Object,
+                    userResourceRoleNotificationService: userResourceRoleNotificationService.Object,
                     userReleaseRoleRepository: userReleaseRoleRepository.Object,
                     userReleaseInviteRepository: userReleaseInviteRepository.Object,
                     userRepository: userRepository.Object
@@ -944,8 +777,7 @@ public abstract class PreReleaseUserServiceTests
             }
 
             VerifyAllMocks(
-                emailService,
-                preReleaseService,
+                userResourceRoleNotificationService,
                 userReleaseRoleRepository,
                 userReleaseInviteRepository,
                 userRepository
@@ -1148,46 +980,6 @@ public abstract class PreReleaseUserServiceTests
 
             VerifyAllMocks(userReleaseRoleRepository, userReleaseInviteRepository, userRepository);
         }
-
-        private static Dictionary<string, dynamic> GetExpectedPreReleaseTemplateValues(
-            ReleaseVersion releaseVersion,
-            bool newUser
-        )
-        {
-            return new()
-            {
-                { "newUser", newUser ? "yes" : "no" },
-                { "release name", releaseVersion.Release.Title },
-                { "publication name", releaseVersion.Release.Publication.Title },
-                {
-                    "prerelease link",
-                    $"http://localhost/publication/{releaseVersion.Release.PublicationId}/release/{releaseVersion.Id}/prerelease/content"
-                },
-                { "prerelease day", "Tuesday 08 September 2020" },
-                { "prerelease time", "09:30" },
-                { "publish day", "Wednesday 09 September 2020" },
-                { "publish time", "09:30" },
-            };
-        }
-
-        private static void SetupGetPrereleaseWindow(
-            Mock<IPreReleaseService> preReleaseService,
-            ReleaseVersion releaseVersion
-        )
-        {
-            preReleaseService
-                .Setup(s => s.GetPreReleaseWindow(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
-                .Returns(
-                    new PreReleaseWindow
-                    {
-                        Start = DateTime.Parse("2020-09-08T08:30:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
-                        ScheduledPublishDate = DateTime.Parse(
-                            "2020-09-09T00:00:00.00Z",
-                            styles: DateTimeStyles.AdjustToUniversal
-                        ),
-                    }
-                );
-        }
     }
 
     public class RemovePreReleaseUserTests : PreReleaseUserServiceTests
@@ -1329,22 +1121,9 @@ public abstract class PreReleaseUserServiceTests
         }
     }
 
-    private static IOptions<AppOptions> DefaultAppOptions()
-    {
-        return new AppOptions { Url = "http://localhost" }.ToOptionsWrapper();
-    }
-
-    private static IOptions<NotifyOptions> DefaultNotifyOptions()
-    {
-        return new NotifyOptions { PreReleaseTemplateId = PreReleaseTemplateId }.ToOptionsWrapper();
-    }
-
     private static PreReleaseUserService SetupPreReleaseUserService(
         ContentDbContext contentDbContext,
-        IEmailService? emailService = null,
-        IOptions<AppOptions>? appOptions = null,
-        IOptions<NotifyOptions>? notifyOptions = null,
-        IPreReleaseService? preReleaseService = null,
+        IUserResourceRoleNotificationService? userResourceRoleNotificationService = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IUserService? userService = null,
         IUserRepository? userRepository = null,
@@ -1359,10 +1138,7 @@ public abstract class PreReleaseUserServiceTests
 
         return new(
             contentDbContext,
-            emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
-            appOptions ?? DefaultAppOptions(),
-            notifyOptions ?? DefaultNotifyOptions(),
-            preReleaseService ?? Mock.Of<IPreReleaseService>(MockBehavior.Strict),
+            userResourceRoleNotificationService ?? Mock.Of<IUserResourceRoleNotificationService>(MockBehavior.Strict),
             persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
             userService ?? AlwaysTrueUserService(_userId).Object,
             userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict),

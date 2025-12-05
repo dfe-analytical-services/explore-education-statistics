@@ -332,13 +332,11 @@ public abstract class PublicationReleaseServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(
-                    [
-                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2025),
-                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2024),
-                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2023),
-                    ]
-                );
+                .WithReleases([
+                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2025),
+                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2024),
+                    _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2023),
+                ]);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))

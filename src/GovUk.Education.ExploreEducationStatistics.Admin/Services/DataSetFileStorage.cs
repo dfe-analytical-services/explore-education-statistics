@@ -80,7 +80,7 @@ public class DataSetFileStorage(
 
         var dataReleaseFile = await contentDbContext
             .ReleaseFiles.Include(rf => rf.File)
-            .ThenInclude(f => f.CreatedBy)
+                .ThenInclude(f => f.CreatedBy)
             .SingleAsync(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == dataFile.Id, cancellationToken);
 
         var metaFile = await releaseDataFileRepository.Create(

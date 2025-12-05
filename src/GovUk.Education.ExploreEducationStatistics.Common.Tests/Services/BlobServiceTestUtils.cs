@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using Azure;
 using Azure.Storage.Blobs;
 using Moq;
@@ -43,7 +41,7 @@ public static class BlobServiceTestUtils
     {
         var blobServiceClient = new Mock<BlobServiceClient>(MockBehavior.Strict);
 
-        blobServiceClient.Setup(s => s.Uri).Returns(new Uri("https://data-storage:10001/devstoreaccount1;"));
+        blobServiceClient.Setup(s => s.AccountName).Returns("testaccount");
 
         foreach (var blobContainerClient in blobContainerClients)
         {

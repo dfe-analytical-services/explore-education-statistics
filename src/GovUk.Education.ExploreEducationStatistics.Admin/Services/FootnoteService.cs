@@ -364,12 +364,12 @@ public class FootnoteService : IFootnoteService
     {
         return queryable
             .Include(rs => rs.Subject)
-            .ThenInclude(s => s.IndicatorGroups)
-            .ThenInclude(ig => ig.Indicators)
+                .ThenInclude(s => s.IndicatorGroups)
+                    .ThenInclude(ig => ig.Indicators)
             .Include(rs => rs.Subject)
-            .ThenInclude(s => s.Filters)
-            .ThenInclude(f => f.FilterGroups)
-            .ThenInclude(fg => fg.FilterItems);
+                .ThenInclude(s => s.Filters)
+                    .ThenInclude(f => f.FilterGroups)
+                        .ThenInclude(fg => fg.FilterItems);
     }
 
     private static bool AllSpecifiedSubjectsAreLinkedToRelease(

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "logicAppName": {
@@ -16,12 +16,15 @@
     },
     "resourceGroup": {
       "type": "string"
+    },
+    "workspaceResourceId": {
+      "type": "string"
     }
   },
   "resources": [
     {
       "type": "Microsoft.Logic/workflows",
-      "apiVersion": "2017-07-01",
+      "apiVersion": "2019-05-01",
       "name": "[parameters('logicAppName')]",
       "location": "[resourceGroup().location]",
       "properties": {
@@ -408,6 +411,31 @@
           },
           "outputs": {}
         }
+      }
+    },
+    {
+      "type": "Microsoft.Logic/workflows/providers/diagnosticSettings",
+      "apiVersion": "2017-05-01-preview",
+      "name": "[concat(parameters('logicAppName'), '/Microsoft.Insights/Slack webhook logic app diagnostic setting')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Logic/workflows', parameters('logicAppName'))]"
+      ],
+      "properties": {
+        "logs": [
+          {
+              "category": "WorkflowRuntime",
+              "enabled": true
+          }
+        ],
+        "metrics": [
+          {
+              "category": "AllMetrics",
+              "enabled": true
+          }
+        ],
+        "workspaceId": "[parameters('workspaceResourceId')]",
+        "logAnalyticsDestinationType": null
       }
     }
   ]

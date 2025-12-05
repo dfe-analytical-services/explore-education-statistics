@@ -1,30 +1,35 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 
-public class RedirectsCacheService : IRedirectsCacheService
+public class RedirectsCacheService(
+    IRedirectsService redirectsService,
+    IPublicBlobCacheService publicBlobCacheService,
+    ILogger<RedirectsCacheService> logger
+) : IRedirectsCacheService
 {
-    private readonly IRedirectsService _redirectsService;
-
-    public RedirectsCacheService(IRedirectsService redirectsService)
+    public Task<Either<ActionResult, RedirectsViewModel>> List()
     {
-        _redirectsService = redirectsService;
+        return publicBlobCacheService.GetOrCreateAsync(
+            cacheKey: new RedirectsCacheKey(),
+            createIfNotExistsFn: redirectsService.List,
+            logger: logger
+        );
     }
 
-    [BlobCache(typeof(RedirectsCacheKey), ServiceName = "public")]
-    public async Task<Either<ActionResult, RedirectsViewModel>> List()
+    public Task<Either<ActionResult, RedirectsViewModel>> UpdateRedirects()
     {
-        return await _redirectsService.List();
-    }
-
-    [BlobCache(typeof(RedirectsCacheKey), forceUpdate: true, ServiceName = "public")]
-    public async Task<Either<ActionResult, RedirectsViewModel>> UpdateRedirects()
-    {
-        return await _redirectsService.List();
+        return publicBlobCacheService.Update(
+            cacheKey: new RedirectsCacheKey(),
+            createFn: redirectsService.List,
+            logger: logger
+        );
     }
 }

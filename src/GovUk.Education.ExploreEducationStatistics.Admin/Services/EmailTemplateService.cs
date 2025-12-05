@@ -4,12 +4,16 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class EmailTemplateService(
+    ContentDbContext contentDbContext,
+    IPreReleaseService preReleaseService,
     IEmailService emailService,
     IOptions<AppOptions> appOptions,
     IOptions<NotifyOptions> notifyOptions
@@ -107,6 +111,52 @@ public class EmailTemplateService(
         return emailService.SendEmail(email, template, emailValues);
     }
 
+    public async Task<Either<ActionResult, Unit>> SendPreReleaseInviteEmail(
+        string email,
+        Guid releaseVersionId,
+        bool isNewUser
+    )
+    {
+        return await contentDbContext
+            .ReleaseVersions.Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+            .OnSuccess(releaseVersion =>
+            {
+                var url = appOptions.Value.Url;
+                var template = notifyOptions.Value.PreReleaseTemplateId;
+
+                var prereleaseUrl =
+                    $"{url}/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/prerelease/content";
+
+                var preReleaseWindow = preReleaseService.GetPreReleaseWindow(releaseVersion);
+                var preReleaseWindowStart = preReleaseWindow.Start.ConvertUtcToUkTimeZone();
+                var publishScheduled = releaseVersion.PublishScheduled!.Value.ConvertUtcToUkTimeZone();
+
+                // TODO EES-828 This time should depend on the Publisher schedule
+                var publishScheduledTime = new TimeSpan(9, 30, 0);
+
+                var preReleaseDay = FormatDayForEmail(preReleaseWindowStart);
+                var preReleaseTime = FormatTimeForEmail(preReleaseWindowStart);
+                var publishDay = FormatDayForEmail(publishScheduled);
+                var publishTime = FormatTimeForEmail(publishScheduledTime);
+
+                var emailValues = new Dictionary<string, dynamic>
+                {
+                    { "newUser", isNewUser ? "yes" : "no" },
+                    { "release name", releaseVersion.Release.Title },
+                    { "publication name", releaseVersion.Release.Publication.Title },
+                    { "prerelease link", prereleaseUrl },
+                    { "prerelease day", preReleaseDay },
+                    { "prerelease time", preReleaseTime },
+                    { "publish day", publishDay },
+                    { "publish time", publishTime },
+                };
+
+                return emailService.SendEmail(email, template, emailValues);
+            });
+    }
+
     public Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email, ReleaseVersion releaseVersion)
     {
         var url = appOptions.Value.Url;
@@ -151,5 +201,20 @@ public class EmailTemplateService(
             PublicationRole.Allower => "Approver",
             _ => throw new ArgumentOutOfRangeException(nameof(role), role, null),
         };
+    }
+
+    private static string FormatTimeForEmail(DateTime dateTime)
+    {
+        return dateTime.ToString("HH:mm");
+    }
+
+    private static string FormatTimeForEmail(TimeSpan timeSpan)
+    {
+        return timeSpan.ToString(@"hh\:mm");
+    }
+
+    private static string FormatDayForEmail(DateTime dateTime)
+    {
+        return dateTime.ToString("dddd dd MMMM yyyy");
     }
 }

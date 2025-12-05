@@ -231,7 +231,7 @@ public class UserRoleServicePermissionTests
         UsersAndRolesDbContext? usersAndRolesDbContext = null,
         IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
         IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
-        IEmailTemplateService? emailTemplateService = null,
+        IUserResourceRoleNotificationService? userResourceRoleNotificationService = null,
         IReleaseVersionRepository? releaseVersionRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
@@ -247,11 +247,11 @@ public class UserRoleServicePermissionTests
             contentDbContext,
             contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
             usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
-            emailTemplateService ?? Mock.Of<IEmailTemplateService>(),
-            userService ?? Mock.Of<IUserService>(),
-            releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(),
-            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(),
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(),
+            userResourceRoleNotificationService ?? Mock.Of<IUserResourceRoleNotificationService>(MockBehavior.Strict),
+            userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
+            releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict),
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict),
+            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict),
             userManager ?? MockUserManager().Object
         );
     }

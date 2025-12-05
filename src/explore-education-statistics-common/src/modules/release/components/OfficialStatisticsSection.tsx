@@ -1,10 +1,9 @@
+import { ReleaseTypeSectionProps } from '@common/modules/release/components/ReleaseTypeSection';
 import React from 'react';
 
 export default function OfficialStatisticsSection({
   showHeading = true,
-}: {
-  showHeading?: boolean;
-}) {
+}: ReleaseTypeSectionProps) {
   return (
     <>
       {showHeading && <h3>Official statistics</h3>}

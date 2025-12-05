@@ -41,10 +41,10 @@ param partitionCount int = 1
 
 @description('Applicable only for SKUs set to standard3. You can set this property to enable a single, high density partition that allows up to 1000 indexes, which is much higher than the maximum indexes allowed for any other SKU.')
 @allowed([
-  'default'
-  'highDensity'
+  'Default'
+  'HighDensity'
 ])
-param hostingMode string = 'default'
+param hostingMode string = 'Default'
 
 @description('Specifies whether traffic is allowed over the public interface.')
 @allowed([
@@ -78,6 +78,9 @@ param alerts {
   alertsGroupName: string
 }?
 
+@description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
+param logAnalyticsWorkspaceId string
+
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
@@ -89,7 +92,7 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   name: userAssignedIdentityName
 }
 
-resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' = {
+resource searchService 'Microsoft.Search/searchServices@2025-05-01' = {
   name: name
   location: location
   sku: {
@@ -100,11 +103,7 @@ resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' = {
     userAssignedIdentities: !empty(userAssignedIdentityName) ? { '${userAssignedIdentity.id}': {} } : null
   }
   properties: {
-    authOptions: {
-      aadOrApiKey: {
-        aadAuthFailureMode: 'http403'
-      }
-    }
+    disableLocalAuth: true
     replicaCount: replicaCount
     networkRuleSet: {
       bypass: length(ipRules) > 0 ? 'AzureServices' : 'None'
@@ -120,6 +119,27 @@ resource searchService 'Microsoft.Search/searchServices@2025-02-01-preview' = {
     hostingMode: hostingMode
   }
   tags: tagValues
+}
+
+resource searchDiagnosticSetting 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: 'Send all logs and metrics to Log Analytics'
+  scope: searchService
+  properties: {
+    logAnalyticsDestinationType: null
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+    workspaceId: logAnalyticsWorkspaceId
+  }
 }
 
 module searchLatencyAlert '../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null) {

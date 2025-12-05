@@ -195,7 +195,7 @@ public class ReleaseFileService : IReleaseFileService
     {
         return await _contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccessVoid(async releaseVersion =>
@@ -490,7 +490,7 @@ public class ReleaseFileService : IReleaseFileService
     {
         return _contentDbContext
             .ReleaseFiles.Include(f => f.ReleaseVersion)
-            .ThenInclude(rv => rv.Publication)
+                .ThenInclude(rv => rv.Publication)
             .Include(f => f.File)
             .Where(releaseFile =>
                 releaseFile.ReleaseVersionId == releaseVersionId && AllowedZipFileTypes.Contains(releaseFile.File.Type)
