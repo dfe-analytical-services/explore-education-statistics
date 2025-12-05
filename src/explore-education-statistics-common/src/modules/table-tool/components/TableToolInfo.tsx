@@ -5,10 +5,12 @@ import ButtonText from '@common/components/ButtonText';
 import InfoIcon from '@common/components/InfoIcon';
 import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
 import Modal from '@common/components/Modal';
+import { Organisation } from '@common/services/types/organisation';
 
 interface Props {
   contactDetails?: Contact;
   methodologyLinks?: ReactNode[];
+  publishingOrganisations?: Organisation[];
   releaseLink?: ReactNode;
   releaseType?: ReleaseType;
 }
@@ -16,6 +18,7 @@ interface Props {
 const TableToolInfo = ({
   contactDetails,
   methodologyLinks,
+  publishingOrganisations,
   releaseLink,
   releaseType,
 }: Props) => {
@@ -36,7 +39,11 @@ const TableToolInfo = ({
                 </ButtonText>
               }
             >
-              <ReleaseTypeSection showHeading={false} type={releaseType} />
+              <ReleaseTypeSection
+                publishingOrganisations={publishingOrganisations}
+                showHeading={false}
+                type={releaseType}
+              />
             </Modal>
           </li>
         )}

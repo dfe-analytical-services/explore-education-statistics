@@ -47,7 +47,7 @@ const ReleasePageTabExploreData = ({
   handleFeaturedTableItemClick,
 }: Props) => {
   const { release } = useReleaseContentState();
-  const { publication } = release;
+  const { publication, publishingOrganisations } = release;
 
   const { isMedia: isMobileMedia } = useMobileMedia();
   const [showAllDataSetDetails, toggleAllDataSetDetails] = useToggle(false);
@@ -465,6 +465,7 @@ const ReleasePageTabExploreData = ({
               <ContactUsSection
                 publicationContact={publication.contact}
                 publicationTitle={publication.title}
+                publishingOrganisations={publishingOrganisations}
               />
             </>
           )}

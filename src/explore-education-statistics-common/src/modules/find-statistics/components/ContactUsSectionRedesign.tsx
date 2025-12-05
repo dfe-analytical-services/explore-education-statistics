@@ -1,5 +1,6 @@
 import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
 import { Contact } from '@common/services/publicationService';
+import { Organisation } from '@common/services/types/organisation';
 import React from 'react';
 
 export const contactUsNavItem = {
@@ -11,13 +12,18 @@ const ContactUsSection = ({
   includeSectionBreak = false,
   publicationContact,
   publicationTitle,
+  publishingOrganisations,
   sectionTitle = 'Contact us',
 }: {
   includeSectionBreak?: boolean;
   publicationContact: Contact;
   publicationTitle: string;
+  publishingOrganisations?: Organisation[];
   sectionTitle?: string;
 }) => {
+  const isSkillsEngland = !!publishingOrganisations?.find(
+    org => org.title === 'Skills England',
+  );
   return (
     <ReleasePageContentSection
       heading={sectionTitle}
@@ -48,27 +54,60 @@ const ContactUsSection = ({
         )}
       </address>
 
-      <h3 className="govuk-heading-s govuk-!-margin-bottom-0">Press office</h3>
+      {isSkillsEngland ? (
+        <>
+          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+            Press office
+          </h3>
 
-      <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
-        If you have a media enquiry:
-      </p>
-      <p>Telephone: 020 7783 8300</p>
+          <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+            If you have a media enquiry:
+          </p>
+          <p>
+            Email:{' '}
+            <a href="mailto:skills.england@education.gov.uk">
+              skills.england@education.gov.uk
+            </a>
+          </p>
 
-      <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-        Public enquiries
-      </h3>
-
-      <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
-        If you have a general enquiry about the Department for Education (DfE)
-        or education:
-      </p>
-      <p>Telephone: 037 0000 2288</p>
-
-      <h3 className="govuk-heading-s govuk-!-margin-bottom-0">Opening times</h3>
-      <p className="govuk-!-margin-top-0">
-        Monday to Friday from 9.30am to 5pm (excluding bank holidays)
-      </p>
+          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+            Public enquiries
+          </h3>
+          <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+            If you have a general enquiry about Skills England:
+          </p>
+          <p>
+            Email:{' '}
+            <a href="mailto:skills.england@education.gov.uk">
+              skills.england@education.gov.uk
+            </a>
+          </p>
+        </>
+      ) : (
+        <>
+          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+            Press office
+          </h3>
+          <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+            If you have a media enquiry:
+          </p>
+          <p>Telephone: 020 7783 8300</p>
+          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+            Public enquiries
+          </h3>
+          <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+            If you have a general enquiry about the Department for Education
+            (DfE) or education:
+          </p>
+          <p>Telephone: 037 0000 2288</p>
+          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+            Opening times
+          </h3>
+          <p className="govuk-!-margin-top-0">
+            Monday to Friday from 9.30am to 5pm (excluding bank holidays)
+          </p>
+        </>
+      )}
     </ReleasePageContentSection>
   );
 };

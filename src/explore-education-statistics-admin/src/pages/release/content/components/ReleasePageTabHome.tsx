@@ -104,6 +104,7 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
 
             <ReleaseSummaryBlockMobile
               lastUpdated={updates[0]?.on}
+              publishingOrganisations={publishingOrganisations}
               releaseType={type}
               renderProducerLink={
                 publishingOrganisations?.length ? (
@@ -219,6 +220,7 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
         <ContactUsSection
           publicationContact={publication.contact}
           publicationTitle={publication.title}
+          publishingOrganisations={publishingOrganisations}
         />
       </ReleasePageLayout>
     </ReleasePageTabPanel>

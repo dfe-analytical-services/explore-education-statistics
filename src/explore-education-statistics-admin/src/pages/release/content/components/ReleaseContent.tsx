@@ -192,6 +192,7 @@ const ReleaseContent = ({
             isEditing={editingMode === 'edit'}
             lastUpdated={release.updates[0]?.on}
             latestRelease={release.latestRelease}
+            publishingOrganisations={release.publishingOrganisations}
             nextReleaseDate={release.nextReleaseDate}
             releaseDate={release.published ?? release.publishScheduled}
             releaseType={release.type}
@@ -548,6 +549,7 @@ const ReleaseContent = ({
 
       <ReleaseHelpAndSupportSection
         publication={release.publication}
+        publishingOrganisations={release.publishingOrganisations}
         releaseType={release.type}
         renderExternalMethodologyLink={externalMethodology => {
           const externalMethodologyAttributes = getUrlAttributes(

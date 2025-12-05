@@ -86,4 +86,20 @@ describe('ContactUsSectionRedesign', () => {
       screen.queryByRole('link', { name: 'Mock Contact Tel No' }),
     ).not.toBeInTheDocument();
   });
+
+  test('renders correctly when the publishing organisation is Skills England', () => {
+    render(
+      <ContactUsSection
+        publicationContact={testContact}
+        publicationTitle="Mock Publication Title"
+        publishingOrganisations={[
+          { id: 'test-id', title: 'Skills England', url: 'test-url' },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getAllByRole('link', { name: 'skills.england@education.gov.uk' }),
+    ).toHaveLength(2);
+  });
 });

@@ -100,6 +100,7 @@ const ReleasePageIntro = ({
       {!isMobileMedia && (
         <ReleaseSummaryBlock
           lastUpdated={lastUpdated}
+          publishingOrganisations={publishingOrganisations}
           releaseDate={published}
           releaseType={type}
           renderProducerLink={

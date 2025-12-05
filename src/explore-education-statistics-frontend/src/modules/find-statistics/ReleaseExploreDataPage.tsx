@@ -414,6 +414,7 @@ const ReleaseExploreDataPage = ({
       <ContactUsSection
         publicationContact={publicationSummary.contact}
         publicationTitle={publicationSummary.title}
+        publishingOrganisations={releaseVersionSummary.publishingOrganisations}
       />
     </>
   );

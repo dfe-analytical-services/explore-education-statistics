@@ -104,6 +104,7 @@ const ReleaseContent = ({
       {!isMobileMedia && (
         <ReleaseSummaryBlock
           lastUpdated={updates[0]?.on}
+          publishingOrganisations={release.publishingOrganisations}
           releaseDate={release.published}
           releaseType={release.type}
           renderProducerLink={
