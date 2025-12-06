@@ -24,7 +24,7 @@
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
     <PackageReference Include="Generator.Equals" Version="3.2.1" />
     <PackageReference Include="InterpolatedSql" Version="2.5.0" />
-    <PackageReference Include="Medo.Uuid7" Version="3.1.0" />
+    <PackageReference Include="Medo.Uuid7" Version="3.2.0" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.23.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.22" />
     <!-- TODO EES-4202 DataMovement depends on deprecated Microsoft.Azure.Storage.Blob SDK v11 -->
