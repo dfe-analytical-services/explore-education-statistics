@@ -11,14 +11,14 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
 {
     public Guid Id { get; set; }
 
-    /**
-     * The last date the release was published - this should be set when the PublishScheduled date is reached and
-     * the release is published.
-     */
+    /// <summary>
+    /// The last date the release version was published - this should be set when the PublishScheduled date is reached and the release is published.
+    /// </summary>
     public DateTime? Published { get; set; }
 
-    // The date that the release is scheduled to be published - when this time is reached then the release should
-    // be published and the Published date set.
+    /// <summary>
+    /// The date that the release version is scheduled to be published - when this time is reached then the release should be published and the Published date set.
+    /// </summary>
     public DateTime? PublishScheduled { get; set; }
 
     [NotMapped]
