@@ -236,8 +236,8 @@ public class EmailTemplateService(
             .Query(ResourceRoleFilter.PendingOnly)
             .Where(urr => userReleaseRoleIds.Contains(urr.Id))
             .Include(urr => urr.ReleaseVersion)
-            .ThenInclude(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(rv => rv.Release)
+                    .ThenInclude(r => r.Publication)
             .ToListAsync();
     }
 

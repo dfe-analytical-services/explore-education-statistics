@@ -45,8 +45,8 @@ public class PublicationRepository(
         var releasesGrantedByReleaseRolesQueryable = userReleaseRoleRepository
             .Query()
             .Include(urr => urr.ReleaseVersion)
-            .ThenInclude(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(rv => rv.Release)
+                    .ThenInclude(r => r.Publication)
             .WhereForUser(userId)
             .WhereRolesNotIn(ReleaseRole.PrereleaseViewer);
 
