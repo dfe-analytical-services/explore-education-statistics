@@ -60,7 +60,6 @@ public interface IUserPublicationRoleRepository
         Guid userId,
         Guid publicationId,
         PublicationRole role,
-        DateTimeOffset? emailSent = null,
         CancellationToken cancellationToken = default
     );
 }
