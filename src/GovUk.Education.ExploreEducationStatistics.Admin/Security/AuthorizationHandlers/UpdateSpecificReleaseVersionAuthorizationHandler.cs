@@ -40,7 +40,7 @@ public class UpdateSpecificReleaseVersionAuthorizationHandler
         var allowedReleaseRoles = ReleaseEditorAndApproverRoles;
 
         if (
-            await _authorizationHandlerService.HasRolesOnPublicationOrReleaseVersion(
+            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrReleaseVersion(
                 context.User.GetUserId(),
                 releaseVersion.PublicationId,
                 releaseVersion.Id,

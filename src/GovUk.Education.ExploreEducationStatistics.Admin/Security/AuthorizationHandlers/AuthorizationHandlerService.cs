@@ -31,27 +31,10 @@ public class AuthorizationHandlerService(
         ReleaseRole.Approver,
     ];
 
-    public Task<bool> HasRolesOnPublicationOrReleaseVersion(
+    public async Task<bool> UserHasAnyRoleOnPublicationOrReleaseVersion(
         Guid userId,
         Guid publicationId,
         Guid releaseVersionId,
-        HashSet<PublicationRole> publicationRoles,
-        HashSet<ReleaseRole> releaseRoles
-    )
-    {
-        return HasRolesOnPublicationOrReleaseVersion(
-            userId,
-            publicationId,
-            () => Task.FromResult((Guid?)releaseVersionId),
-            publicationRoles,
-            releaseRoles
-        );
-    }
-
-    public async Task<bool> HasRolesOnPublicationOrReleaseVersion(
-        Guid userId,
-        Guid publicationId,
-        Func<Task<Guid?>> releaseVersionIdSupplier,
         HashSet<PublicationRole> publicationRoles,
         HashSet<ReleaseRole> releaseRoles
     )
@@ -67,16 +50,9 @@ public class AuthorizationHandlerService(
             return true;
         }
 
-        var releaseVersionId = await releaseVersionIdSupplier.Invoke();
-
-        if (releaseVersionId == null)
-        {
-            return false;
-        }
-
         return await UserHasAnyReleaseRoleOnReleaseVersion(
             userId: userId,
-            releaseVersionId: releaseVersionId.Value,
+            releaseVersionId: releaseVersionId,
             rolesToInclude: [.. releaseRoles]
         );
     }
