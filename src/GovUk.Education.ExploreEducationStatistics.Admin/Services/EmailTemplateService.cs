@@ -233,7 +233,7 @@ public class EmailTemplateService(
     private async Task<List<UserReleaseRole>> GetUserReleaseRoles(HashSet<Guid> userReleaseRoleIds)
     {
         return await userReleaseRoleRepository
-            .Query(ResourceRoleStatusFilter.PendingOnly)
+            .Query(ResourceRoleFilter.PendingOnly)
             .Where(urr => userReleaseRoleIds.Contains(urr.Id))
             .Include(urr => urr.ReleaseVersion)
             .ThenInclude(rv => rv.Release)
@@ -244,7 +244,7 @@ public class EmailTemplateService(
     private async Task<List<UserPublicationRole>> GetUserPublicationRoles(HashSet<Guid> userPublicationRoleIds)
     {
         return await userPublicationRoleRepository
-            .Query(ResourceRoleStatusFilter.PendingOnly)
+            .Query(ResourceRoleFilter.PendingOnly)
             .Where(upr => userPublicationRoleIds.Contains(upr.Id))
             .Include(upr => upr.Publication)
             .ToListAsync();
