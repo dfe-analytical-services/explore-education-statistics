@@ -1,4 +1,5 @@
 import { useAuthContext } from '@admin/contexts/AuthContext';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import classNames from 'classnames';
 import React from 'react';
 import Link from './Link';
@@ -62,6 +63,7 @@ const PageFooter = ({ wide }: Props) => {
                   <li className="govuk-footer__inline-list-item">
                     <Link className="govuk-footer__link" to="/contact-us">
                       Contact us
+                      <VisuallyHidden> about general enquiries</VisuallyHidden>
                     </Link>
                   </li>
                 </ul>

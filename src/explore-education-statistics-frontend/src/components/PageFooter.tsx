@@ -70,6 +70,7 @@ const PageFooter = ({ width }: Props) => (
                 data-testid="footer--contact-link"
               >
                 Contact us
+                <VisuallyHidden> about general enquiries</VisuallyHidden>
               </Link>
             </li>
             <li className="govuk-footer__inline-list-item">

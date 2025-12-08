@@ -100,6 +100,15 @@ export default function PageNavExpandable({
       <h2 className="govuk-body-m" id="nav-label">
         {heading}
       </h2>
+
+      <a
+        href={`#${items[0].id}`}
+        className="govuk-skip-link govuk-!-margin-bottom-4"
+        onClick={() => handleNavItemClick(items[0].id)}
+      >
+        Skip in page navigation
+      </a>
+
       <nav aria-labelledby="nav-label" role="navigation">
         <ul className={styles.navSection}>
           {items.map(item => (

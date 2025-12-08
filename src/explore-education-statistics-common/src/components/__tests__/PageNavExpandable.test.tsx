@@ -26,6 +26,10 @@ describe('PageNavExpandable', () => {
 
     expect(screen.getByRole('heading', { name: 'On this page' }));
 
+    expect(
+      screen.getByRole('link', { name: 'Skip in page navigation' }),
+    ).toBeInTheDocument();
+
     const items = screen.getAllByRole('listitem');
     expect(items).toHaveLength(4);
 
