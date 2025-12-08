@@ -74,7 +74,7 @@ public abstract class ReleaseStatusAuthorizationHandler<TRequirement>
         }
 
         if (
-            await _authorizationHandlerService.HasRolesOnPublicationOrReleaseVersion(
+            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrReleaseVersion(
                 userId: context.User.GetUserId(),
                 publicationId: releaseVersion.PublicationId,
                 releaseVersionId: releaseVersion.Id,
@@ -108,7 +108,7 @@ public abstract class ReleaseStatusAuthorizationHandler<TRequirement>
             releaseVersion.ApprovalStatus == Approved ? SetOf(ReleaseRole.Approver) : ReleaseEditorAndApproverRoles;
 
         if (
-            await _authorizationHandlerService.HasRolesOnPublicationOrReleaseVersion(
+            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrReleaseVersion(
                 userId: context.User.GetUserId(),
                 publicationId: releaseVersion.PublicationId,
                 releaseVersionId: releaseVersion.Id,
@@ -142,7 +142,7 @@ public abstract class ReleaseStatusAuthorizationHandler<TRequirement>
             releaseVersion.ApprovalStatus == Approved ? SetOf(ReleaseRole.Approver) : ReleaseEditorAndApproverRoles;
 
         if (
-            await _authorizationHandlerService.HasRolesOnPublicationOrReleaseVersion(
+            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrReleaseVersion(
                 userId: context.User.GetUserId(),
                 publicationId: releaseVersion.PublicationId,
                 releaseVersionId: releaseVersion.Id,
