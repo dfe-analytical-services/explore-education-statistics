@@ -401,8 +401,8 @@ public class UserRoleService(
                     .Query()
                     .WhereForUser(userId)
                     .Include(urr => urr.ReleaseVersion)
-                    .ThenInclude(rv => rv.Release)
-                    .ThenInclude(r => r.Publication)
+                        .ThenInclude(rv => rv.Release)
+                            .ThenInclude(r => r.Publication)
                     .ToListAsync();
 
                 var latestReleaseRoles = await allReleaseRoles
@@ -530,7 +530,7 @@ public class UserRoleService(
             .Query(ResourceRoleFilter.All)
             .Where(urr => urr.Id == userReleaseRoleId)
             .Include(userReleaseRole => userReleaseRole.ReleaseVersion)
-            .ThenInclude(releaseVersion => releaseVersion.Release)
-            .ThenInclude(release => release.Publication)
+                .ThenInclude(releaseVersion => releaseVersion.Release)
+                    .ThenInclude(release => release.Publication)
             .SingleOrNotFoundAsync();
 }
