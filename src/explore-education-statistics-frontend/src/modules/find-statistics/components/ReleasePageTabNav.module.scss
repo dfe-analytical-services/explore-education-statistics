@@ -12,7 +12,7 @@
 .navList {
   list-style: none;
   border-bottom: 1px solid $govuk-border-colour;
-  padding: 0 0 govuk-spacing(2);
+  padding: govuk-spacing(2) 0;
   margin: 0 0 govuk-spacing(2);
 
   ::-webkit-scrollbar {
@@ -30,35 +30,24 @@
     scrollbar-width: none;
     gap: govuk-spacing(4);
   }
-
-  > li {
-    margin: 0;
-    flex-shrink: 0;
-  }
 }
 
 .navItem {
-  display: inline-flex;
-  color: $govuk-link-colour;
+  flex-shrink: 0;
+  display: flex;
   border-left: 5px solid transparent;
-  margin: govuk-spacing(2) 0;
+  margin: 0 0 govuk-spacing(3);
   border-left-width: 5px;
   text-decoration: none;
+  color: $govuk-link-colour;
 
   @include govuk-media-query($from: tablet) {
     margin: 0;
-    padding: govuk-spacing(3) govuk-spacing(1) govuk-spacing(2);
     border-left: unset;
     border-bottom: 5px solid transparent;
   }
 
-  &:hover {
-    text-decoration: underline;
-    color: $govuk-link-hover-colour;
-  }
-
-  &:focus,
-  &[aria-current='page'] {
+  &:has([aria-current='page']) {
     border-color: currentColor;
 
     @include govuk-media-query($until: tablet) {
@@ -66,5 +55,27 @@
       margin-left: -15px;
       padding-left: 10px;
     }
+  }
+}
+
+.navItemLink {
+  display: inline-flex;
+  text-decoration: none;
+
+  @include govuk-media-query($from: tablet) {
+    padding: govuk-spacing(3) govuk-spacing(1) govuk-spacing(2);
+  }
+
+  &:hover:not(:focus) {
+    text-decoration: underline;
+    color: $govuk-link-hover-colour;
+  }
+
+  &:visited:not(:focus) {
+    color: $govuk-link-colour;
+  }
+
+  &:focus {
+    color: $govuk-focus-text-colour;
   }
 }

@@ -63,9 +63,9 @@ const ReleasePageTabNavLink = ({
   }, [activePage, pageKey]);
 
   return (
-    <li ref={itemRef}>
+    <li ref={itemRef} className={styles.navItem}>
       <Link
-        className={styles.navItem}
+        className={styles.navItemLink}
         // TODO EES-6449 - remove redesign query param
         to={`${ensureTrailingSlash(releaseUrlBase)}${
           slug || '?redesign=true'
