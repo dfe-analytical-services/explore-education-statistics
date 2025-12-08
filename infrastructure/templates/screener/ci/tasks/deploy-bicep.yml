@@ -25,14 +25,7 @@ steps:
 
         # Workaround for AZ CLI 2.71.x breaks bicep deployments when using Azure Devops Agent
         # See https://github.com/Azure/azure-cli/issues/31189
-        # az config set bicep.use_binary_from_path=true
-        
-        # Another workaround for Azure CLI and its bundled version of Bicep, which introduces
-        # a bug. See https://github.com/Azure/bicep/pull/18167.
-        # Once this one is sorted, we can look to see if the workaround mentioned above this
-        # one can be removed too.
-        az bicep install --version v0.38.2
-        az config set bicep.use_binary_from_path=true
+        az config set bicep.use_binary_from_path=false
 
         az deployment group ${{ parameters.action }} \
           --name $(infraDeployName) \
