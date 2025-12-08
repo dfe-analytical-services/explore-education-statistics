@@ -109,7 +109,7 @@ const DataBlockDetailsForm = ({
       {({ formState, getValues }) => {
         return (
           <Form id={formId} submitId={formId} onSubmit={handleSubmit}>
-            <h2>Data block details</h2>
+            <h3>Data block details</h3>
 
             <FormGroup>
               <FormFieldTextInput<FormValues>
