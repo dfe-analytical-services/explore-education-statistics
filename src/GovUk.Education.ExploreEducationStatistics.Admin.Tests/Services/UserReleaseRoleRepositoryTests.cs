@@ -618,7 +618,7 @@ public abstract class UserReleaseRoleRepositoryTests
             {
                 var service = CreateRepository(contentDbContext);
 
-                var result = await service.GetUserReleaseRole(
+                var result = await service.GetByCompositeKey(
                     userId: userReleaseRole.UserId,
                     releaseVersionId: userReleaseRole.ReleaseVersionId,
                     ReleaseRole.Contributor
@@ -667,7 +667,7 @@ public abstract class UserReleaseRoleRepositoryTests
             {
                 var service = CreateRepository(contentDbContext);
 
-                var result = await service.GetUserReleaseRole(
+                var result = await service.GetByCompositeKey(
                     userId: user.Id,
                     releaseVersionId: releaseVersion.Id,
                     ReleaseRole.Contributor

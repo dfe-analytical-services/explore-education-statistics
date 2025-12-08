@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -430,7 +431,7 @@ public class UserRoleService(
     {
         return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(() => contentPersistenceHelper.CheckEntityExists<UserPublicationRole>(userPublicationRoleId))
+            .OnSuccess(() => FindUserPublicationRole(userPublicationRoleId))
             .OnSuccessVoid(async role =>
             {
                 await userPublicationRoleRepository.Remove(role);
@@ -445,30 +446,22 @@ public class UserRoleService(
 
     public async Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid userReleaseRoleId)
     {
-        return await contentPersistenceHelper
-            .CheckEntityExists<UserReleaseRole>(
-                userReleaseRoleId,
-                query =>
-                    query
-                        .Include(userReleaseRole => userReleaseRole.User)
-                        .Include(userReleaseRole => userReleaseRole.ReleaseVersion)
-                            .ThenInclude(releaseVersion => releaseVersion.Release)
-                                .ThenInclude(release => release.Publication)
+        return await FindUserReleaseRole(userReleaseRoleId)
+            .OnSuccessDo(async userReleaseRole =>
+                userService.CheckCanUpdateReleaseRole(
+                    userReleaseRole.ReleaseVersion.Release.Publication,
+                    userReleaseRole.Role
+                )
             )
-            .OnSuccess(async userReleaseRole =>
+            .OnSuccessVoid(async userReleaseRole =>
             {
-                return await userService
-                    .CheckCanUpdateReleaseRole(userReleaseRole.ReleaseVersion.Release.Publication, userReleaseRole.Role)
-                    .OnSuccessVoid(async () =>
-                    {
-                        await userReleaseRoleRepository.Remove(userReleaseRole);
+                await userReleaseRoleRepository.Remove(userReleaseRole);
 
-                        var associatedGlobalRoleName = GetAssociatedGlobalRoleNameForReleaseRole(userReleaseRole.Role);
+                var associatedGlobalRoleName = GetAssociatedGlobalRoleNameForReleaseRole(userReleaseRole.Role);
 
-                        await usersAndRolesPersistenceHelper
-                            .CheckEntityExists<ApplicationUser, string>(userReleaseRole.UserId.ToString())
-                            .OnSuccessDo(user => DowngradeFromGlobalRoleIfRequired(user, associatedGlobalRoleName));
-                    });
+                await usersAndRolesPersistenceHelper
+                    .CheckEntityExists<ApplicationUser, string>(userReleaseRole.UserId.ToString())
+                    .OnSuccessDo(user => DowngradeFromGlobalRoleIfRequired(user, associatedGlobalRoleName));
             });
     }
 
@@ -527,4 +520,17 @@ public class UserRoleService(
 
         return Unit.Instance;
     }
+
+    private async Task<Either<ActionResult, UserPublicationRole>> FindUserPublicationRole(Guid userPublicationRoleId) =>
+        await userPublicationRoleRepository.GetById(userPublicationRoleId)
+        ?? new Either<ActionResult, UserPublicationRole>(new NotFoundResult());
+
+    private async Task<Either<ActionResult, UserReleaseRole>> FindUserReleaseRole(Guid userReleaseRoleId) =>
+        await userReleaseRoleRepository
+            .Query(ResourceRoleFilter.All)
+            .Where(urr => urr.Id == userReleaseRoleId)
+            .Include(userReleaseRole => userReleaseRole.ReleaseVersion)
+            .ThenInclude(releaseVersion => releaseVersion.Release)
+            .ThenInclude(release => release.Publication)
+            .SingleOrNotFoundAsync();
 }

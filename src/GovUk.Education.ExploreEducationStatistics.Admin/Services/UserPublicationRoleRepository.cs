@@ -55,6 +55,30 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task<UserPublicationRole?> GetById(
+        Guid userPublicationRoleId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await Query(ResourceRoleFilter.All)
+            .Where(upr => upr.Id == userPublicationRoleId)
+            .SingleOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<UserPublicationRole?> GetByCompositeKey(
+        Guid userId,
+        Guid publicationId,
+        PublicationRole role,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await Query(ResourceRoleFilter.All)
+            .WhereForUser(userId)
+            .WhereForPublication(publicationId)
+            .WhereRolesIn(role)
+            .SingleOrDefaultAsync(cancellationToken);
+    }
+
     public IQueryable<UserPublicationRole> Query(
         ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly
     ) =>
@@ -66,20 +90,6 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
             ResourceRoleFilter.All => contentDbContext.UserPublicationRoles,
             _ => throw new ArgumentOutOfRangeException(nameof(resourceRoleFilter), resourceRoleFilter, null),
         };
-
-    public async Task<UserPublicationRole?> GetUserPublicationRole(
-        Guid userId,
-        Guid publicationId,
-        PublicationRole role,
-        CancellationToken cancellationToken = default
-    )
-    {
-        return await Query()
-            .WhereForUser(userId)
-            .WhereForPublication(publicationId)
-            .WhereRolesIn(role)
-            .SingleOrDefaultAsync(cancellationToken);
-    }
 
     public async Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default)
     {
@@ -104,8 +114,8 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
 
     public async Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default)
     {
-        var userPublicationRoles = await contentDbContext
-            .UserPublicationRoles.Where(urr => urr.UserId == userId)
+        var userPublicationRoles = await Query(ResourceRoleFilter.All)
+            .Where(urr => urr.UserId == userId)
             .ToListAsync(cancellationToken);
 
         await RemoveMany(userPublicationRoles, cancellationToken);
@@ -150,7 +160,7 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
         CancellationToken cancellationToken = default
     )
     {
-        var userPublicationRole = await GetUserPublicationRole(
+        var userPublicationRole = await GetByCompositeKey(
             userId: userId,
             publicationId: publicationId,
             role: role,
