@@ -1,6 +1,6 @@
 ﻿namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 
-public enum ResourceRoleStatusFilter
+public enum ResourceRoleFilter
 {
     ActiveOnly,
     PendingOnly,
