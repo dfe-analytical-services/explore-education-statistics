@@ -2,7 +2,8 @@
 
 public enum ResourceRoleStatusFilter
 {
-    Active,
-    Pending,
+    ActiveOnly,
+    PendingOnly,
+    AllButExpired,
     All,
 }
