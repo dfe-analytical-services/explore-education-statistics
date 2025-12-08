@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -197,7 +198,7 @@ public class UserManagementService(
                     .SelectAwait(async pendingUserInvite =>
                     {
                         var userReleaseRoles = await userReleaseRoleRepository
-                            .Query(includeInactiveUsers: true)
+                            .Query(ResourceRoleStatusFilter.PendingOnly)
                             .AsNoTracking()
                             .WhereForUser(pendingUserInvite.Id)
                             .Select(urr => new UserReleaseRoleViewModel
@@ -210,7 +211,7 @@ public class UserManagementService(
                             .ToListAsync();
 
                         var userPublicationRoles = await userPublicationRoleRepository
-                            .Query(includeInactiveUsers: true)
+                            .Query(ResourceRoleStatusFilter.PendingOnly)
                             .AsNoTracking()
                             .WhereForUser(pendingUserInvite.Id)
                             .Select(upr => new UserPublicationRoleViewModel

@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -28,12 +29,12 @@ public class UserResourceRoleNotificationService(
         }
 
         var userReleaseRoles = await userReleaseRoleRepository
-            .Query(includeInactiveUsers: true)
+            .Query(ResourceRoleStatusFilter.PendingOnly)
             .WhereForUser(user.Id)
             .ToListAsync(cancellationToken);
 
         var userPublicationRoles = await userPublicationRoleRepository
-            .Query(includeInactiveUsers: true)
+            .Query(ResourceRoleStatusFilter.PendingOnly)
             .WhereForUser(user.Id)
             .ToListAsync(cancellationToken);
 
