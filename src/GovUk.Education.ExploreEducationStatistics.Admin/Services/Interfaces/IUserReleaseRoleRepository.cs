@@ -20,7 +20,9 @@ public interface IUserReleaseRoleRepository
         CancellationToken cancellationToken = default
     );
 
-    Task<UserReleaseRole?> GetUserReleaseRole(
+    Task<UserReleaseRole?> GetById(Guid userReleaseRoleId, CancellationToken cancellationToken = default);
+
+    Task<UserReleaseRole?> GetByCompositeKey(
         Guid userId,
         Guid releaseVersionId,
         ReleaseRole role,

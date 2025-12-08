@@ -9,8 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogger<UserReleaseRoleRepository> logger)
-    : IUserReleaseRoleRepository
+public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUserReleaseRoleRepository
 {
     public async Task<UserReleaseRole> Create(
         Guid userId,
@@ -56,7 +55,14 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<UserReleaseRole?> GetUserReleaseRole(
+    public async Task<UserReleaseRole?> GetById(Guid userReleaseRoleId, CancellationToken cancellationToken = default)
+    {
+        return await Query(ResourceRoleFilter.All)
+            .Where(urr => urr.Id == userReleaseRoleId)
+            .SingleOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<UserReleaseRole?> GetByCompositeKey(
         Guid userId,
         Guid releaseVersionId,
         ReleaseRole role,
@@ -103,8 +109,8 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
 
     public async Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default)
     {
-        var userReleaseRoles = await contentDbContext
-            .UserReleaseRoles.Where(urr => urr.UserId == userId)
+        var userReleaseRoles = await Query(ResourceRoleFilter.All)
+            .Where(urr => urr.UserId == userId)
             .ToListAsync(cancellationToken);
 
         await RemoveMany(userReleaseRoles, cancellationToken);
@@ -166,7 +172,7 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext, ILogge
         CancellationToken cancellationToken = default
     )
     {
-        var userReleaseRole = await GetUserReleaseRole(
+        var userReleaseRole = await GetByCompositeKey(
             userId: userId,
             releaseVersionId: releaseVersionId,
             role: role,
