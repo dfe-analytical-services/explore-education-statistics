@@ -65,7 +65,6 @@ public interface IUserReleaseRoleRepository
         Guid userId,
         Guid releaseVersionId,
         ReleaseRole role,
-        DateTimeOffset? emailSent = null,
         CancellationToken cancellationToken = default
     );
 }
