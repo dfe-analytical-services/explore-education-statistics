@@ -65,7 +65,7 @@ public class ReleaseInviteService(
             .OnSuccess(async tuple =>
             {
                 var releaseRolesToRemove = await userReleaseRoleRepository
-                    .Query(ResourceRoleStatusFilter.PendingOnly)
+                    .Query(ResourceRoleFilter.PendingOnly)
                     .WhereForUser(tuple.user.Id)
                     .WhereForPublication(publicationId)
                     .WhereRolesIn(releaseRole)

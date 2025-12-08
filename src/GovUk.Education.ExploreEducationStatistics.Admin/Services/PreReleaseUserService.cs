@@ -36,7 +36,7 @@ public class PreReleaseUserService(
             .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
             .OnSuccess(async _ =>
                 await userReleaseRoleRepository
-                    .Query(ResourceRoleStatusFilter.All)
+                    .Query(ResourceRoleFilter.All)
                     .WhereForReleaseVersion(releaseVersionId)
                     .WhereRolesIn(ReleaseRole.PrereleaseViewer)
                     .Select(r => new PreReleaseUserViewModel(r.User.Email.ToLower()))
@@ -134,7 +134,7 @@ public class PreReleaseUserService(
             .OnSuccessVoid(async user =>
             {
                 var releaseRolesToRemove = await userReleaseRoleRepository
-                    .Query(ResourceRoleStatusFilter.All)
+                    .Query(ResourceRoleFilter.All)
                     .WhereForUser(user!.Id)
                     .WhereForReleaseVersion(releaseVersionId)
                     .WhereRolesIn(ReleaseRole.PrereleaseViewer)

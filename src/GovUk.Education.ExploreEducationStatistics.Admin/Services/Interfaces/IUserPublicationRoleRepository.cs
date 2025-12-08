@@ -27,9 +27,7 @@ public interface IUserPublicationRoleRepository
         CancellationToken cancellationToken = default
     );
 
-    IQueryable<UserPublicationRole> Query(
-        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.ActiveOnly
-    );
+    IQueryable<UserPublicationRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly);
 
     Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default);
 
@@ -44,14 +42,14 @@ public interface IUserPublicationRoleRepository
         Guid userId,
         Guid publicationId,
         PublicationRole role,
-        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.ActiveOnly,
+        ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly,
         CancellationToken cancellationToken = default
     );
 
     Task<bool> UserHasAnyRoleOnPublication(
         Guid userId,
         Guid publicationId,
-        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.ActiveOnly,
+        ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly,
         CancellationToken cancellationToken = default,
         params PublicationRole[] rolesToInclude
     );

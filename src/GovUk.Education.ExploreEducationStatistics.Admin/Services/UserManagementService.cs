@@ -198,7 +198,7 @@ public class UserManagementService(
                     .SelectAwait(async pendingUserInvite =>
                     {
                         var userReleaseRoles = await userReleaseRoleRepository
-                            .Query(ResourceRoleStatusFilter.PendingOnly)
+                            .Query(ResourceRoleFilter.PendingOnly)
                             .AsNoTracking()
                             .WhereForUser(pendingUserInvite.Id)
                             .Select(urr => new UserReleaseRoleViewModel
@@ -211,7 +211,7 @@ public class UserManagementService(
                             .ToListAsync();
 
                         var userPublicationRoles = await userPublicationRoleRepository
-                            .Query(ResourceRoleStatusFilter.PendingOnly)
+                            .Query(ResourceRoleFilter.PendingOnly)
                             .AsNoTracking()
                             .WhereForUser(pendingUserInvite.Id)
                             .Select(upr => new UserPublicationRoleViewModel

@@ -74,7 +74,7 @@ public class ReleaseVersionService(
             .OnSuccess(async releaseVersion =>
             {
                 var prereleaseRolesAdded = await userReleaseRoleRepository
-                    .Query(ResourceRoleStatusFilter.AllButExpired)
+                    .Query(ResourceRoleFilter.AllButExpired)
                     .WhereForReleaseVersion(releaseVersionId)
                     .WhereRolesIn(ReleaseRole.PrereleaseViewer)
                     .AnyAsync();
@@ -273,7 +273,7 @@ public class ReleaseVersionService(
         // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
 
         var releaseRolesToRemove = await userReleaseRoleRepository
-            .Query(ResourceRoleStatusFilter.All)
+            .Query(ResourceRoleFilter.All)
             .WhereForReleaseVersion(releaseVersion.Id)
             .ToListAsync(cancellationToken);
 

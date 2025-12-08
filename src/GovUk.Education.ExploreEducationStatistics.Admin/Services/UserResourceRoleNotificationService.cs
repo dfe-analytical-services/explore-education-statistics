@@ -29,12 +29,12 @@ public class UserResourceRoleNotificationService(
         }
 
         var userReleaseRoles = await userReleaseRoleRepository
-            .Query(ResourceRoleStatusFilter.PendingOnly)
+            .Query(ResourceRoleFilter.PendingOnly)
             .WhereForUser(user.Id)
             .ToListAsync(cancellationToken);
 
         var userPublicationRoles = await userPublicationRoleRepository
-            .Query(ResourceRoleStatusFilter.PendingOnly)
+            .Query(ResourceRoleFilter.PendingOnly)
             .WhereForUser(user.Id)
             .ToListAsync(cancellationToken);
 
