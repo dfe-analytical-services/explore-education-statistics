@@ -232,8 +232,8 @@ User creates another preview token through 'Generate preview token' modal window
 User verifies created preview token details for custom dates
     user checks page contains    Reference: ${PREVIEW_TOKEN_NAME}
 
-    ${date_tomorrow}=    get local browser date and time    offset_days=1    format_string=%d %B %Y
-    ${date_after_tomorrow}=    get local browser date and time    offset_days=2    format_string=%d %B %Y
+    ${date_tomorrow}=    get local browser date and time    offset_days=1    format_string=%-d %B %Y
+    ${date_after_tomorrow}=    get local browser date and time    offset_days=2    format_string=%-d %B %Y
     user checks page contains
     ...    The token is active from: ${date_tomorrow} (UK time) and expires: ${date_after_tomorrow} (UK time)
 
