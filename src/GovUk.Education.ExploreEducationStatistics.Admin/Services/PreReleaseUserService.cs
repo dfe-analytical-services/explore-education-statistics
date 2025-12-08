@@ -1,5 +1,6 @@
 #nullable enable
 using System.ComponentModel.DataAnnotations;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -34,8 +35,9 @@ public class PreReleaseUserService(
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
             .OnSuccess(async _ =>
-                await context
-                    .UserReleaseRolesForActiveOrPending.WhereForReleaseVersion(releaseVersionId)
+                await userReleaseRoleRepository
+                    .Query(ResourceRoleStatusFilter.All)
+                    .WhereForReleaseVersion(releaseVersionId)
                     .WhereRolesIn(ReleaseRole.PrereleaseViewer)
                     .Select(r => new PreReleaseUserViewModel(r.User.Email.ToLower()))
                     .Distinct()
@@ -132,7 +134,7 @@ public class PreReleaseUserService(
             .OnSuccessVoid(async user =>
             {
                 var releaseRolesToRemove = await userReleaseRoleRepository
-                    .Query(includeInactiveUsers: true)
+                    .Query(ResourceRoleStatusFilter.All)
                     .WhereForUser(user!.Id)
                     .WhereForReleaseVersion(releaseVersionId)
                     .WhereRolesIn(ReleaseRole.PrereleaseViewer)

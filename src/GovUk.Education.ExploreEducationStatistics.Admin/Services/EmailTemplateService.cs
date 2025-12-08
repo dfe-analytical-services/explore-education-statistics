@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -232,7 +233,7 @@ public class EmailTemplateService(
     private async Task<List<UserReleaseRole>> GetUserReleaseRoles(HashSet<Guid> userReleaseRoleIds)
     {
         return await userReleaseRoleRepository
-            .Query(includeInactiveUsers: true)
+            .Query(ResourceRoleStatusFilter.PendingOnly)
             .Where(urr => userReleaseRoleIds.Contains(urr.Id))
             .Include(urr => urr.ReleaseVersion)
             .ThenInclude(rv => rv.Release)
@@ -243,7 +244,7 @@ public class EmailTemplateService(
     private async Task<List<UserPublicationRole>> GetUserPublicationRoles(HashSet<Guid> userPublicationRoleIds)
     {
         return await userPublicationRoleRepository
-            .Query(includeInactiveUsers: true)
+            .Query(ResourceRoleStatusFilter.PendingOnly)
             .Where(upr => userPublicationRoleIds.Contains(upr.Id))
             .Include(upr => upr.Publication)
             .ToListAsync();

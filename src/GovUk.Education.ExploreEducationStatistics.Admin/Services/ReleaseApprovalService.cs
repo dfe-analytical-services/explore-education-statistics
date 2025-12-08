@@ -2,6 +2,7 @@
 using Cronos;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -36,6 +37,7 @@ public class ReleaseApprovalService(
     IReleaseFileService releaseFileService,
     IOptions<ReleaseApprovalOptions> options,
     IUserReleaseRoleService userReleaseRoleService,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IEmailTemplateService emailTemplateService
 ) : IReleaseApprovalService
@@ -193,8 +195,9 @@ public class ReleaseApprovalService(
 
     private async Task SendPreReleaseUserInviteEmails(ReleaseVersion releaseVersion)
     {
-        var unsentUserReleaseRoleInvites = await context
-            .UserReleaseRolesForPendingInvites.WhereForReleaseVersion(releaseVersion.Id)
+        var unsentUserReleaseRoleInvites = await userReleaseRoleRepository
+            .Query(ResourceRoleStatusFilter.PendingOnly)
+            .WhereForReleaseVersion(releaseVersion.Id)
             .WhereRolesIn(ReleaseRole.PrereleaseViewer)
             .WhereEmailNotSent()
             .ToListAsync();

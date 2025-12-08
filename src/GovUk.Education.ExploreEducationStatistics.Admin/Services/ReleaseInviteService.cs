@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -64,7 +65,7 @@ public class ReleaseInviteService(
             .OnSuccess(async tuple =>
             {
                 var releaseRolesToRemove = await userReleaseRoleRepository
-                    .Query(includeInactiveUsers: true)
+                    .Query(ResourceRoleStatusFilter.PendingOnly)
                     .WhereForUser(tuple.user.Id)
                     .WhereForPublication(publicationId)
                     .WhereRolesIn(releaseRole)

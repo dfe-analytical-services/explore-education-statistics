@@ -56,13 +56,14 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
     }
 
     public IQueryable<UserPublicationRole> Query(
-        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.Active
+        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.ActiveOnly
     ) =>
         resourceRoleStatusFilter switch
         {
-            ResourceRoleStatusFilter.Active => contentDbContext.UserPublicationRolesForActiveUsers,
-            ResourceRoleStatusFilter.Pending => contentDbContext.UserPublicationRolesForPendingInvites,
-            ResourceRoleStatusFilter.All => contentDbContext.UserPublicationRolesForActiveOrPending,
+            ResourceRoleStatusFilter.ActiveOnly => contentDbContext.UserPublicationRolesForActiveUsers,
+            ResourceRoleStatusFilter.PendingOnly => contentDbContext.UserPublicationRolesForPendingInvites,
+            ResourceRoleStatusFilter.AllButExpired => contentDbContext.UserPublicationRolesForActiveOrPending,
+            ResourceRoleStatusFilter.All => contentDbContext.UserPublicationRoles,
             _ => throw new ArgumentOutOfRangeException(
                 nameof(resourceRoleStatusFilter),
                 resourceRoleStatusFilter,
@@ -118,7 +119,7 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
         Guid userId,
         Guid publicationId,
         PublicationRole role,
-        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.Active,
+        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.ActiveOnly,
         CancellationToken cancellationToken = default
     )
     {
@@ -132,7 +133,7 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
     public async Task<bool> UserHasAnyRoleOnPublication(
         Guid userId,
         Guid publicationId,
-        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.Active,
+        ResourceRoleStatusFilter resourceRoleStatusFilter = ResourceRoleStatusFilter.ActiveOnly,
         CancellationToken cancellationToken = default,
         params PublicationRole[] rolesToInclude
     )

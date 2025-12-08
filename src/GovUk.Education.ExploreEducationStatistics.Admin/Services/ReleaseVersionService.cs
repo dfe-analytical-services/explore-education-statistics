@@ -1,6 +1,7 @@
 #nullable enable
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -56,6 +57,7 @@ public class ReleaseVersionService(
     IPrivateBlobCacheService privateCacheService,
     IOrganisationsValidator organisationsValidator,
     IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
     IReleaseSlugValidator releaseSlugValidator,
     ILogger<ReleaseVersionService> logger
 ) : IReleaseVersionService
@@ -72,7 +74,7 @@ public class ReleaseVersionService(
             .OnSuccess(async releaseVersion =>
             {
                 var prereleaseRolesAdded = await userReleaseRoleRepository
-                    .Query(includeInactiveUsers: true)
+                    .Query(ResourceRoleStatusFilter.AllButExpired)
                     .WhereForReleaseVersion(releaseVersionId)
                     .WhereRolesIn(ReleaseRole.PrereleaseViewer)
                     .AnyAsync();
@@ -271,7 +273,7 @@ public class ReleaseVersionService(
         // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
 
         var releaseRolesToRemove = await userReleaseRoleRepository
-            .Query(includeInactiveUsers: true)
+            .Query(ResourceRoleStatusFilter.All)
             .WhereForReleaseVersion(releaseVersion.Id)
             .ToListAsync(cancellationToken);
 
@@ -492,9 +494,10 @@ public class ReleaseVersionService(
             .Select(urr => urr.ReleaseVersionId)
             .ToListAsync();
 
-        var indirectReleaseVersionsWithApprovalRole = await context
-            .UserPublicationRolesForActiveUsers.Where(upr => upr.UserId == userId)
-            .Where(upr => upr.Role == PublicationRole.Allower)
+        var indirectReleaseVersionsWithApprovalRole = await userPublicationRoleRepository
+            .Query()
+            .WhereForUser(userId)
+            .WhereRolesIn(PublicationRole.Allower)
             .SelectMany(upr => upr.Publication.Releases.SelectMany(r => r.Versions.Select(rv => rv.Id)))
             .ToListAsync();
 

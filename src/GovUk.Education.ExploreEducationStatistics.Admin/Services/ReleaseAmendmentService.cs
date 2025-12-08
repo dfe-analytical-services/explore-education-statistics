@@ -19,35 +19,23 @@ using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class ReleaseAmendmentService : IReleaseAmendmentService
+public class ReleaseAmendmentService(
+    ContentDbContext context,
+    IUserService userService,
+    IFootnoteRepository footnoteRepository,
+    StatisticsDbContext statisticsDbContext,
+    IUserReleaseRoleRepository userReleaseRoleRepository
+) : IReleaseAmendmentService
 {
-    private readonly ContentDbContext _context;
-    private readonly IFootnoteRepository _footnoteRepository;
-    private readonly StatisticsDbContext _statisticsDbContext;
-    private readonly IUserService _userService;
-
-    public ReleaseAmendmentService(
-        ContentDbContext context,
-        IUserService userService,
-        IFootnoteRepository footnoteRepository,
-        StatisticsDbContext statisticsDbContext
-    )
-    {
-        _context = context;
-        _userService = userService;
-        _footnoteRepository = footnoteRepository;
-        _statisticsDbContext = statisticsDbContext;
-    }
-
     public async Task<Either<ActionResult, IdViewModel>> CreateReleaseAmendment(Guid releaseVersionId)
     {
         var createdDate = DateTime.UtcNow;
 
-        return await _context
+        return await context
             .ReleaseVersions.HydrateReleaseVersionForAmendment()
             .SingleOrDefault(releaseVersion => releaseVersion.Id == releaseVersionId)
             .OrNotFound()
-            .OnSuccess(_userService.CheckCanMakeAmendmentOfReleaseVersion)
+            .OnSuccess(userService.CheckCanMakeAmendmentOfReleaseVersion)
             .OnSuccess(originalReleaseVersion =>
                 CreateBasicReleaseAmendment(originalReleaseVersion, createdDate)
                     .OnSuccessDo(CreateStatisticsReleaseAmendment)
@@ -63,7 +51,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         DateTime createdDate
     )
     {
-        var createdByUserId = _userService.GetUserId();
+        var createdByUserId = userService.GetUserId();
 
         var amendmentReleaseVersionId = Guid.NewGuid();
 
@@ -127,8 +115,8 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             Updates = CopyUpdates(originalReleaseVersion, amendmentReleaseVersionId, createdDate, createdByUserId),
         };
 
-        _context.ReleaseVersions.Add(amendmentReleaseVersion);
-        await _context.SaveChangesAsync();
+        context.ReleaseVersions.Add(amendmentReleaseVersion);
+        await context.SaveChangesAsync();
         return amendmentReleaseVersion;
     }
 
@@ -500,7 +488,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         ReleaseVersion amendmentReleaseVersion
     )
     {
-        var statsReleaseVersion = await _statisticsDbContext.ReleaseVersion.FirstOrDefaultAsync(rv =>
+        var statsReleaseVersion = await statisticsDbContext.ReleaseVersion.FirstOrDefaultAsync(rv =>
             rv.Id == amendmentReleaseVersion.PreviousVersionId
         );
 
@@ -514,7 +502,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                 PublicationId = amendmentReleaseVersion.PublicationId,
             };
 
-            var statsAmendmentSubjectLinks = _statisticsDbContext
+            var statsAmendmentSubjectLinks = statisticsDbContext
                 .ReleaseSubject.Where(rs => rs.ReleaseVersionId == amendmentReleaseVersion.PreviousVersionId)
                 .Select(originalReleaseSubject => new ReleaseSubject
                 {
@@ -524,10 +512,10 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                     // Copy certain fields from the original.
                     SubjectId = originalReleaseSubject.SubjectId,
                 });
-            _statisticsDbContext.ReleaseVersion.Add(statsAmendmentVersion);
-            _statisticsDbContext.ReleaseSubject.AddRange(statsAmendmentSubjectLinks);
+            statisticsDbContext.ReleaseVersion.Add(statsAmendmentVersion);
+            statisticsDbContext.ReleaseSubject.AddRange(statsAmendmentSubjectLinks);
 
-            await _statisticsDbContext.SaveChangesAsync();
+            await statisticsDbContext.SaveChangesAsync();
         }
 
         return Unit.Instance;
@@ -540,8 +528,9 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
     )
     {
         // Copy all current roles apart from Prerelease Users to the Release amendment.
-        var newRoles = await _context
-            .UserReleaseRolesForActiveUsers.WhereForReleaseVersion(originalReleaseId)
+        var newRoles = await userReleaseRoleRepository
+            .Query()
+            .WhereForReleaseVersion(originalReleaseId)
             .WhereRolesNotIn(ReleaseRole.PrereleaseViewer)
             .Select(urr => new UserReleaseRole
             {
@@ -557,8 +546,8 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             })
             .ToListAsync();
 
-        _context.AddRange(newRoles);
-        await _context.SaveChangesAsync();
+        context.AddRange(newRoles);
+        await context.SaveChangesAsync();
 
         return Unit.Instance;
     }
@@ -568,7 +557,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         Guid amendmentReleaseVersionId
     )
     {
-        var originalFootnotes = await _footnoteRepository.GetFootnotes(originalReleaseVersionId);
+        var originalFootnotes = await footnoteRepository.GetFootnotes(originalReleaseVersionId);
 
         return await originalFootnotes
             .ToAsyncEnumerable()
@@ -588,7 +577,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                     .Subjects.Select(subjectFootnote => subjectFootnote.SubjectId)
                     .ToHashSet();
 
-                return await _footnoteRepository.CreateFootnote(
+                return await footnoteRepository.CreateFootnote(
                     amendmentReleaseVersionId,
                     originalFootnote.Content,
                     filterIds: filterIds,
@@ -607,7 +596,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         ReleaseVersion amendmentReleaseVersion
     )
     {
-        var releaseFileCopies = _context
+        var releaseFileCopies = context
             .ReleaseFiles.Include(f => f.File)
             .Where(f => f.ReleaseVersionId == originalReleaseVersion.Id)
             .Select(originalFile => new ReleaseFile
@@ -631,8 +620,8 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             })
             .ToList();
 
-        await _context.ReleaseFiles.AddRangeAsync(releaseFileCopies);
-        await _context.SaveChangesAsync();
+        await context.ReleaseFiles.AddRangeAsync(releaseFileCopies);
+        await context.SaveChangesAsync();
         return amendmentReleaseVersion;
     }
 

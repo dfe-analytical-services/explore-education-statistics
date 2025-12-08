@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -14,7 +15,6 @@ using Microsoft.EntityFrameworkCore;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class ReleasePermissionService(
-    ContentDbContext contentDbContext,
     IPersistenceHelper<ContentDbContext> persistenceHelper,
     IUserReleaseRoleRepository userReleaseRoleRepository,
     IUserReleaseRoleService userReleaseRoleService,
@@ -60,8 +60,9 @@ public class ReleasePermissionService(
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Publication))
             .OnSuccessDo(releaseVersion => userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
             .OnSuccess(async _ =>
-                await contentDbContext
-                    .UserReleaseRolesForPendingInvites.WhereForReleaseVersion(releaseVersionId)
+                await userReleaseRoleRepository
+                    .Query(ResourceRoleStatusFilter.PendingOnly)
+                    .WhereForReleaseVersion(releaseVersionId)
                     .WhereRolesIn(rolesToCheck)
                     .Where(urr => rolesToCheck.Contains(urr.Role))
                     .Select(urr => new UserReleaseInviteViewModel(urr.User.Email, urr.Role))
@@ -113,8 +114,9 @@ public class ReleasePermissionService(
             )
             .OnSuccessVoid(async releaseVersion =>
             {
-                var releaseContributorReleaseRolesByUserId = await contentDbContext
-                    .UserReleaseRolesForActiveUsers.WhereForReleaseVersion(releaseVersion.Id)
+                var releaseContributorReleaseRolesByUserId = await userReleaseRoleRepository
+                    .Query()
+                    .WhereForReleaseVersion(releaseVersion.Id)
                     .WhereRolesIn(ReleaseRole.Contributor)
                     .ToDictionaryAsync(urr => urr.UserId);
 

@@ -2,7 +2,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.EntityFrameworkCore;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
@@ -10,8 +9,8 @@ using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Con
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class UserReleaseRoleService(
-    ContentDbContext contentDbContext,
-    IReleaseVersionRepository releaseVersionRepository
+    IReleaseVersionRepository releaseVersionRepository,
+    IUserReleaseRoleRepository userReleaseRoleRepository
 ) : IUserReleaseRoleService
 {
     public async Task<List<UserReleaseRole>> ListLatestActiveUserReleaseRolesByPublication(
@@ -23,8 +22,9 @@ public class UserReleaseRoleService(
 
         var releaseVersionIds = await releaseVersionRepository.ListLatestReleaseVersionIds(publicationId);
 
-        return await contentDbContext
-            .UserReleaseRolesForActiveUsers.Where(urr => releaseVersionIds.Contains(urr.ReleaseVersionId))
+        return await userReleaseRoleRepository
+            .Query()
+            .Where(urr => releaseVersionIds.Contains(urr.ReleaseVersionId))
             .WhereRolesIn(rolesToCheck)
             .Include(urr => urr.User)
             .ToListAsync();
