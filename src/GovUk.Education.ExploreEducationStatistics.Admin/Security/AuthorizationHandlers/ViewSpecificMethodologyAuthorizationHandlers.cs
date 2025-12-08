@@ -40,10 +40,10 @@ public class ViewSpecificMethodologyAuthorizationHandler(
         // view it.  Additionally, if the user is a Contributor or an Approver of any
         // (Live or non-Live) release version of the owning publication of this methodology, they can view it.
         if (
-            await authorizationHandlerService.HasRolesOnPublicationOrAnyReleaseVersion(
+            await authorizationHandlerService.UserHasAnyRoleOnPublicationOrAnyReleaseVersion(
                 context.User.GetUserId(),
                 owningPublication.Id,
-                ListOf(PublicationRole.Owner, PublicationRole.Allower),
+                SetOf(PublicationRole.Owner, PublicationRole.Allower),
                 ReleaseEditorAndApproverRoles
             )
         )

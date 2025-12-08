@@ -51,16 +51,16 @@ public class MarkMethodologyAsDraftAuthorizationHandler
 
         var allowedPublicationRoles =
             methodologyVersion.Status == Approved
-                ? ListOf(PublicationRole.Allower)
-                : ListOf(PublicationRole.Owner, PublicationRole.Allower);
+                ? SetOf(PublicationRole.Allower)
+                : SetOf(PublicationRole.Owner, PublicationRole.Allower);
 
         var allowedReleaseRoles =
-            methodologyVersion.Status == Approved ? ListOf(ReleaseRole.Approver) : ReleaseEditorAndApproverRoles;
+            methodologyVersion.Status == Approved ? SetOf(ReleaseRole.Approver) : ReleaseEditorAndApproverRoles;
 
         var owningPublication = await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
         if (
-            await _authorizationHandlerService.HasRolesOnPublicationOrAnyReleaseVersion(
+            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrAnyReleaseVersion(
                 context.User.GetUserId(),
                 owningPublication.Id,
                 allowedPublicationRoles,
