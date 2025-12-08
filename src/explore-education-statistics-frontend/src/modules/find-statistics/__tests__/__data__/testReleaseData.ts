@@ -494,8 +494,7 @@ export const testReleaseDataContent: ReleaseVersionDataContent = {
   releaseId: 'test-release-id',
   releaseVersionId: 'test-release-version-id',
   dataDashboards: '<h3>Data dashboard text</h3>',
-  dataGuidance:
-    '<h3>Description</h3><p>---</p><h3>Coverage</h3><p>---</p><h3>File formats and conventions</h3><p>---</p>',
+  dataGuidance: 'Test data guidance',
   dataSets: [
     {
       dataSetFileId: 'test-dataset-1-datasetfileid',

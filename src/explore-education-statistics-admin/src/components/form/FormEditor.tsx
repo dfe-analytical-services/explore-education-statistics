@@ -31,6 +31,7 @@ import classNames from 'classnames';
 import Editor from 'explore-education-statistics-ckeditor';
 import React, {
   MutableRefObject,
+  ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -46,7 +47,7 @@ export interface FormEditorProps {
   error?: string;
   focusOnInit?: boolean;
   hideLabel?: boolean;
-  hint?: string;
+  hint?: ReactNode | string;
   id: string;
   includePlugins?: ReadonlySet<PluginName> | Set<PluginName>;
   label: string;

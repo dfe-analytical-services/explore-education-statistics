@@ -89,38 +89,6 @@ describe('ReleaseDataGuidanceSection', () => {
       });
     });
 
-    test('renders empty guidance correctly', async () => {
-      releaseDataGuidanceService.getDataGuidance.mockResolvedValue({
-        ...testDataGuidance,
-        content: '',
-      });
-
-      render(
-        <ReleaseDataGuidanceSection
-          releaseVersionId="release-1"
-          canUpdateRelease
-        />,
-      );
-
-      await waitFor(() => {
-        expect(
-          screen.getByLabelText('Main guidance content'),
-        ).toBeInTheDocument();
-      });
-
-      const mainGuidanceContent = screen.getByLabelText(
-        'Main guidance content',
-      ) as HTMLTextAreaElement;
-
-      const mainGuidanceContentValue = mainGuidanceContent.value;
-
-      expect(mainGuidanceContentValue).toContain('<h3>Description</h3>');
-      expect(mainGuidanceContentValue).toContain('<h3>Coverage</h3>');
-      expect(mainGuidanceContentValue).toContain(
-        '<h3>File formats and conventions</h3>',
-      );
-    });
-
     test('renders correct message when there are no data sets', async () => {
       releaseDataGuidanceService.getDataGuidance.mockResolvedValue({
         ...testDataGuidance,
