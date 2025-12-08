@@ -224,7 +224,9 @@ export default function PreReleaseUserAccessForm({
             <thead>
               <tr>
                 <th>User email</th>
-                {!isReleaseLive && <th />}
+                {!isReleaseLive && (
+                  <th className="govuk-!-text-align-right">Actions</th>
+                )}
               </tr>
             </thead>
             <tbody>
