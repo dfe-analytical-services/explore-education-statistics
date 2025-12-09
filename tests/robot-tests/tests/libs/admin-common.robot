@@ -454,6 +454,11 @@ user clicks footnote subject checkbox
     user clicks element    ${checkbox}
     checkbox should be selected    ${checkbox}
 
+user adds main data guidance content
+    [Arguments]    ${text}=Test data guidance content
+    user waits until page contains element    id:dataGuidanceForm-content
+    user enters text into element    id:dataGuidanceForm-content    ${text}
+
 user gets data guidance data file content editor
     [Arguments]    ${accordion_heading}
     user waits until page contains element    id:dataGuidance-dataFiles

@@ -50,7 +50,7 @@ Add metadata guidance
     user checks table cell contains    1    1    admission_numbers    id:dataGuidance-dataFiles
     user checks table cell contains    1    2    Admission Numbers    id:dataGuidance-dataFiles
 
-    user enters text into element    id:dataGuidanceForm-content    Test metadata guidance content
+    user adds main data guidance content    Test metadata guidance content
     user enters text into element    id:dataGuidanceForm-dataSets-0-content    Test file guidance content
 
     user clicks button    Save guidance

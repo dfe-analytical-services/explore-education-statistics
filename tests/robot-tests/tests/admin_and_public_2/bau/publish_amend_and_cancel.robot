@@ -33,10 +33,9 @@ Upload subject
 Add data guidance
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
 
-    user waits until page contains element    id:dataGuidanceForm-content
     user waits until page contains element    id:dataGuidance-dataFiles
-    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    Dates test subject
 
     user enters text into data guidance data file content editor    Dates test subject
@@ -259,7 +258,7 @@ Edit ancillary file and replace data
     user opens accordion section    Test ancillary file 1    id:file-uploads
 
     ${section_1}=    user gets accordion section content element    Test ancillary file 1    id:file-uploads
-    user clicks link    Edit file    ${section_1}
+    user clicks link containing text    Edit file    ${section_1}
     user waits until h2 is visible    Edit ancillary file
     user enters text into element    id:ancillaryFileForm-title    Replacement ancillary file
     user enters text into element    id:ancillaryFileForm-summary    Replacement ancillary file summary updated

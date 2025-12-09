@@ -44,6 +44,7 @@ Add data guidance to subjects
 
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME_1}
@@ -180,6 +181,7 @@ Add data guidance to second release
 
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME_4}
@@ -238,6 +240,7 @@ Add data guidance to the third release
 
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME_5}

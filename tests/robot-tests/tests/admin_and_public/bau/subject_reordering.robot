@@ -159,6 +159,7 @@ Validate subject order is correct after replacement
 Add data guidance for all subjects
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    One

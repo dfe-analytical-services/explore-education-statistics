@@ -86,9 +86,8 @@ Add data guidance to subject
     user clicks link    Data and files
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
-    user waits until page contains element    id:dataGuidanceForm-content
+    user adds main data guidance content
     user waits until page contains element    id:dataGuidance-dataFiles
-    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    UI test subject
     user enters text into data guidance data file content editor    UI test subject    dataguidance content
     user clicks button    Save guidance
