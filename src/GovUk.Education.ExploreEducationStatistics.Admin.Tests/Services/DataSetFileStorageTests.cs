@@ -265,7 +265,7 @@ public class DataSetFileStorageTests
     public async Task CreateOrReplaceExistingDataSetUpload_CreateNew_ReturnsUploadDetails()
     {
         // Arrange
-        var dataSetUpload = new DataSetUploadMockBuilder().BuildEntity();
+        var dataSetUpload = new DataSetUploadMockBuilder().BuildScreenedEntity();
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
         var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
@@ -316,9 +316,11 @@ public class DataSetFileStorageTests
         var existingDataSetUpload = new DataSetUploadMockBuilder()
             .WithReleaseVersionId(releaseVersionId)
             .WithFailingTests()
-            .BuildEntity();
+            .BuildScreenedEntity();
 
-        var newDataSetUpload = new DataSetUploadMockBuilder().WithReleaseVersionId(releaseVersionId).BuildEntity();
+        var newDataSetUpload = new DataSetUploadMockBuilder()
+            .WithReleaseVersionId(releaseVersionId)
+            .BuildScreenedEntity();
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
         var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
@@ -363,7 +365,7 @@ public class DataSetFileStorageTests
     }
 
     [Fact]
-    public async Task AddScreenerResultToUpload_UploadNotFound_ThrowsInvalidOperationException()
+    public async Task UpdateDataSetUpload_UploadNotFound_ThrowsInvalidOperationException()
     {
         // Arrange
         await using var contentDbContext = InMemoryApplicationDbContext();
@@ -371,26 +373,64 @@ public class DataSetFileStorageTests
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await service.AddScreenerResultToUpload(Guid.NewGuid(), screenerResult: null!, cancellationToken: default)
+            await service.UpdateDataSetUpload(Guid.NewGuid(), screenerResult: null!, cancellationToken: default)
         );
 
         Assert.Equal("Sequence contains no elements", exception.Message);
+    }
+
+    [Fact]
+    public async Task UpdateDataSetUpload_ResultIsNull_UpdatesUploadState()
+    {
+        // Arrange
+        var builder = new DataSetUploadMockBuilder();
+        var dataSetUpload = builder.BuildInitialEntity();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.DataSetUploads.Add(dataSetUpload);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleaseDataFileService(contentDbContext);
+
+            // Act
+            await service.UpdateDataSetUpload(
+                dataSetUpload.Id,
+                dataSetUpload.ScreenerResult!,
+                cancellationToken: default
+            );
+
+            // Act
+            await service.UpdateDataSetUpload(dataSetUpload.Id, screenerResult: null!, cancellationToken: default);
+
+            // Assert
+            var result = await contentDbContext.DataSetUploads.FindAsync(dataSetUpload.Id);
+
+            Assert.NotNull(result);
+            Assert.Equal(DataSetUploadStatus.SCREENER_ERROR, result.Status);
+            Assert.Null(result.ScreenerResult);
+        }
     }
 
     [Theory]
     [InlineData(TestResult.PASS)]
     [InlineData(TestResult.WARNING)]
     [InlineData(TestResult.FAIL)]
-    public async Task AddScreenerResultToUpload_WithTestResult_UpdatesStatusCorrectly(TestResult testResult)
+    public async Task UpdateDataSetUpload_WithTestResult_UpdatesStatusCorrectly(TestResult testResult)
     {
         // Arrange
         var builder = new DataSetUploadMockBuilder();
 
         var dataSetUpload = testResult switch
         {
-            TestResult.PASS => builder.BuildEntity(),
-            TestResult.WARNING => builder.WithWarningTests().BuildEntity(),
-            TestResult.FAIL => builder.WithFailingTests().BuildEntity(),
+            TestResult.PASS => builder.BuildScreenedEntity(),
+            TestResult.WARNING => builder.WithWarningTests().BuildScreenedEntity(),
+            TestResult.FAIL => builder.WithFailingTests().BuildScreenedEntity(),
             _ => throw new ArgumentOutOfRangeException(nameof(testResult)),
         };
 
@@ -404,7 +444,7 @@ public class DataSetFileStorageTests
             var service = SetupReleaseDataFileService(contentDbContext);
 
             // Act
-            await service.AddScreenerResultToUpload(
+            await service.UpdateDataSetUpload(
                 dataSetUpload.Id,
                 dataSetUpload.ScreenerResult!,
                 cancellationToken: default

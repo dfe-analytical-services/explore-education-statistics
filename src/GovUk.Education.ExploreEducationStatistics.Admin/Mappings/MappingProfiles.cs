@@ -248,14 +248,19 @@ public class MappingProfiles : CommonMappingProfile
 
     private static string GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)
     {
+        if (screenerResult is null)
+        {
+            return nameof(DataSetUploadStatus.SCREENER_ERROR);
+        }
+
         if (screenerResult.Passed && screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING))
         {
-            return DataSetUploadStatus.PENDING_REVIEW.ToString();
+            return nameof(DataSetUploadStatus.PENDING_REVIEW);
         }
 
         return !screenerResult.Passed
-            ? DataSetUploadStatus.FAILED_SCREENING.ToString()
-            : DataSetUploadStatus.PENDING_IMPORT.ToString();
+            ? nameof(DataSetUploadStatus.FAILED_SCREENING)
+            : nameof(DataSetUploadStatus.PENDING_IMPORT);
     }
 
     private void CreateContentBlockMap()
