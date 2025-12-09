@@ -25,7 +25,12 @@ public static class LocationOptionMetaGeneratorExtensions
         where TOptionMeta : LocationOptionMeta => generator.ForInstance(s => s.SetMetaLinks(links));
 
     public static InstanceSetters<TOptionMeta> SetBaseDefaults<TOptionMeta>(this InstanceSetters<TOptionMeta> setters)
-        where TOptionMeta : LocationOptionMeta => setters.SetDefault(m => m.Label);
+        where TOptionMeta : LocationOptionMeta
+    {
+        // This property must be unique in order to avoid unique database index violations (that don't include the
+        // unique ID as part of the index). This ensures that these index entries are unique.
+        return setters.SetDefaultUnique(m => m.Label);
+    }
 
     public static InstanceSetters<TOptionMeta> SetDefaultCode<TOptionMeta>(
         this InstanceSetters<TOptionMeta> setters,
@@ -41,16 +46,16 @@ public static class LocationOptionMetaGeneratorExtensions
             }
         );
 
-    public static InstanceSetters<TOptionMeta> SetId<TOptionMeta>(this InstanceSetters<TOptionMeta> setters, int id)
+    private static InstanceSetters<TOptionMeta> SetId<TOptionMeta>(this InstanceSetters<TOptionMeta> setters, int id)
         where TOptionMeta : LocationOptionMeta => setters.Set(m => m.Id, id);
 
-    public static InstanceSetters<TOptionMeta> SetLabel<TOptionMeta>(
+    private static InstanceSetters<TOptionMeta> SetLabel<TOptionMeta>(
         this InstanceSetters<TOptionMeta> setters,
         string label
     )
         where TOptionMeta : LocationOptionMeta => setters.Set(m => m.Label, label);
 
-    public static InstanceSetters<TOptionMeta> SetMetas<TOptionMeta>(
+    private static InstanceSetters<TOptionMeta> SetMetas<TOptionMeta>(
         this InstanceSetters<TOptionMeta> setters,
         Func<IEnumerable<LocationMeta>> metas
     )

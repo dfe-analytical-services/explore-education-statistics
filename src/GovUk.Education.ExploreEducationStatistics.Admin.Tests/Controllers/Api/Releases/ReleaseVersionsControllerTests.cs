@@ -10,20 +10,20 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -674,17 +674,23 @@ public class ReleaseVersionsControllerUnitTests
     }
 }
 
-public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationFactory testApp)
-    : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class ReleaseVersionsControllerIntegrationTestsFixture()
+    : OptimisedAdminCollectionFixture(
+        capabilities: [AdminIntegrationTestCapability.UserAuth, AdminIntegrationTestCapability.Postgres]
+    );
+
+[CollectionDefinition(nameof(ReleaseVersionsControllerIntegrationTestsFixture))]
+public class ReleaseVersionsControllerIntegrationTestsCollection
+    : ICollectionFixture<ReleaseVersionsControllerIntegrationTestsFixture>;
+
+[Collection(nameof(ReleaseVersionsControllerIntegrationTestsFixture))]
+public abstract class ReleaseVersionsControllerIntegrationTests
 {
-    public override async Task InitializeAsync() => await InitializeWithAzurite();
+    private static readonly DataFixture DataFixture = new();
 
-    private WebApplicationFactory<TestStartup> BuildApp(ClaimsPrincipal? user = null)
-    {
-        return WithAzurite(testApp: TestApp.SetUser(user ?? DataFixture.BauUser()), enabled: true);
-    }
-
-    public class UpdateReleaseTests(TestApplicationFactory testApp) : ReleaseVersionsControllerIntegrationTests(testApp)
+    public class UpdateReleaseTests(ReleaseVersionsControllerIntegrationTestsFixture fixture)
+        : ReleaseVersionsControllerIntegrationTests
     {
         [Fact]
         public async Task Success()
@@ -699,7 +705,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                         .WithLabel(null),
                 ]);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
             var newYear = 2021;
             var newTimePeriodCoverage = TimeIdentifier.AcademicYearQ1;
@@ -719,9 +725,8 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             // Assert
             var viewModel = response.AssertOk<ReleaseVersionViewModel>();
 
-            var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
-
-            var updatedPublication = await contentDbContext
+            var updatedPublication = await fixture
+                .GetContentDbContext()
                 .Publications.Include(p => p.Releases)
                     .ThenInclude(r => r.Versions)
                 .SingleAsync(p => p.Id == publication.Id);
@@ -769,7 +774,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                         .WithLabel(null),
                 ]);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
@@ -782,9 +787,8 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             // Assert
             var viewModel = response.AssertOk<ReleaseVersionViewModel>();
 
-            var contentDbContext = TestApp.GetDbContext<ContentDbContext>();
-
-            var updatedPublication = await contentDbContext
+            var updatedPublication = await fixture
+                .GetContentDbContext()
                 .Publications.Include(p => p.Releases)
                     .ThenInclude(r => r.Versions)
                 .SingleAsync(p => p.Id == publication.Id);
@@ -810,7 +814,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                         .GenerateList(2)
                 );
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
@@ -842,7 +846,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                         .GenerateList(2)
                 );
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
@@ -874,7 +878,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                         .GenerateList(2)
                 );
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
@@ -900,7 +904,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 .DefaultPublication()
                 .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)]);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
@@ -937,9 +941,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 .DefaultPublication()
                 .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
-
-            var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
@@ -947,7 +949,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 year: 2020,
                 timePeriodCoverage: TimeIdentifier.AcademicYear,
                 label: null,
-                client: client
+                user: OptimisedTestUsers.Authenticated
             );
 
             // Assert
@@ -962,7 +964,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 .DefaultPublication()
                 .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
@@ -1007,7 +1009,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                         .GenerateList(2)
                 );
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
@@ -1047,9 +1049,9 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 .WithRedirects([DataFixture.DefaultReleaseRedirect().WithSlug("2020-21-final")])
                 .WithPublication(publication);
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-                context.Releases.AddRange(targetRelease, otherRelease)
-            );
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context => context.Releases.AddRange(targetRelease, otherRelease));
 
             var response = await UpdateRelease(
                 releaseVersionId: targetRelease.Versions[0].Id,
@@ -1087,9 +1089,9 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 .WithRedirects([DataFixture.DefaultReleaseRedirect().WithSlug("2020-21-final")])
                 .WithPublication(otherPublication);
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-                context.Releases.AddRange(targetRelease, otherRelease)
-            );
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context => context.Releases.AddRange(targetRelease, otherRelease));
 
             var response = await UpdateRelease(
                 releaseVersionId: targetRelease.Versions[0].Id,
@@ -1109,7 +1111,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 .DefaultPublication()
                 .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
             // Act
             var response = await UpdateRelease(
@@ -1138,10 +1140,10 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             string? label = null,
             ReleaseType? type = ReleaseType.OfficialStatistics,
             string? preReleaseAccessList = "",
-            HttpClient? client = null
+            ClaimsPrincipal? user = null
         )
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var request = new
             {
@@ -1156,7 +1158,8 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         }
     }
 
-    public class UploadDataSetTests(TestApplicationFactory testApp) : ReleaseVersionsControllerIntegrationTests(testApp)
+    public class UploadDataSetTests(ReleaseVersionsControllerIntegrationTestsFixture fixture)
+        : ReleaseVersionsControllerIntegrationTests
     {
         [Fact]
         public async Task UploadDataSet_InvalidRequest_ReturnsValidationProblems()
@@ -1191,7 +1194,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                         .WithLabel(null),
                 ]);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
             // Act
             var response = await UploadDataSet(
@@ -1231,7 +1234,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                         .WithLabel(null),
                 ]);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
             // Act
             var response = await UploadDataSetAsZip(
@@ -1284,7 +1287,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                         .WithLabel(null),
                 ]);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
             // Act
             var response = await UploadDataSetAsBulkZip(
@@ -1337,7 +1340,9 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
                 .Generate();
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFileToBeReplaced));
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context => context.ReleaseFiles.Add(releaseFileToBeReplaced));
 
             // Act
             var response = await UploadDataSetAsBulkZip(
@@ -1401,7 +1406,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
                         .WithLabel(null),
                 ]);
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
             // Act
             var response = await UploadDataSetAsBulkZip(
@@ -1433,10 +1438,10 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             string dataSetTitle,
             string dataFileName,
             string metaFileName,
-            HttpClient? client = null
+            ClaimsPrincipal? user = null
         )
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var dataFilePath = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
@@ -1479,10 +1484,10 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
             Guid releaseVersionId,
             string dataSetTitle,
             string fileName,
-            HttpClient? client = null
+            ClaimsPrincipal? user = null
         )
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var filePath = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
@@ -1513,10 +1518,10 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         private async Task<HttpResponseMessage> UploadDataSetAsBulkZip(
             Guid releaseVersionId,
             string fileName,
-            HttpClient? client = null
+            ClaimsPrincipal? user = null
         )
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var filePath = Path.Combine(
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
@@ -1546,11 +1551,10 @@ public abstract class ReleaseVersionsControllerIntegrationTests(TestApplicationF
         private async Task<HttpResponseMessage> ImportBulkZipDataSetsFromTempStorage(
             Guid releaseVersionId,
             List<DataSetUploadViewModel> dataSetFiles,
-            HttpClient? client = null
+            ClaimsPrincipal? user = null
         )
         {
-            client ??= BuildApp().CreateClient();
-
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
             return await client.PostAsJsonAsync($"api/release/{releaseVersionId}/import-bulk-zip-data", dataSetFiles);
         }
     }

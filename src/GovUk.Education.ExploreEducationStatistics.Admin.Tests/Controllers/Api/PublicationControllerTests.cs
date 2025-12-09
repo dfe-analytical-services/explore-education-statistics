@@ -1,32 +1,46 @@
 #nullable enable
 using System.Net.Http.Json;
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
 
-public class PublicationControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class PublicationControllerTestsFixture()
+    : OptimisedAdminCollectionFixture(capabilities: [AdminIntegrationTestCapability.UserAuth]);
+
+[CollectionDefinition(nameof(PublicationControllerTestsFixture))]
+public class PublicationControllerTestsCollection : ICollectionFixture<PublicationControllerTestsFixture>;
+
+[Collection(nameof(PublicationControllerTestsFixture))]
+public class PublicationControllerTests
 {
-    public class CreatePublicationTests(TestApplicationFactory testApp) : PublicationControllerTests(testApp)
+    private static readonly DataFixture DataFixture = new();
+
+    public class CreatePublicationTests(PublicationControllerTestsFixture fixture) : PublicationControllerTests
     {
         [Fact]
         public async Task Success()
         {
             var theme = DataFixture.DefaultTheme().Generate();
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.Themes.Add(theme);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Themes.Add(theme);
+                });
 
             var request = new PublicationCreateRequest
             {
@@ -60,9 +74,8 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
                 () => Assert.False(result.IsSuperseded)
             );
 
-            await using var context = TestApp.GetDbContext<ContentDbContext>();
-
-            var saved = await context
+            var saved = await fixture
+                .GetContentDbContext()
                 .Publications.Include(p => p.Contact)
                 .Include(p => p.Theme)
                 .SingleAsync(p => p.Id == result.Id);
@@ -83,20 +96,22 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
         [Fact]
         public async Task PublicationSlugNotUnique_ReturnsValidationError()
         {
-            var publication = DataFixture.DefaultPublication().WithTheme(DataFixture.DefaultTheme()).Generate();
+            var existingPublication = DataFixture.DefaultPublication().WithTheme(DataFixture.DefaultTheme()).Generate();
 
             var theme = DataFixture.DefaultTheme().Generate();
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.Publications.Add(publication);
-                context.Themes.Add(theme);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(existingPublication);
+                    context.Themes.Add(theme);
+                });
 
             var request = new PublicationCreateRequest
             {
                 Title = "Publication",
-                Slug = publication.Slug, // Same slug as an existing saved publication
+                Slug = existingPublication.Slug, // Same slug as an existing saved publication
                 Summary = "Publication summary",
                 Contact = new ContactSaveRequest
                 {
@@ -114,11 +129,11 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
 
             validationProblem.AssertHasGlobalError(ValidationErrorMessages.PublicationSlugNotUnique);
 
-            await using var context = TestApp.GetDbContext<ContentDbContext>();
+            // Assert the existing publication is still available.
+            Assert.Single(fixture.GetContentDbContext().Publications.Where(p => p.Id == existingPublication.Id));
 
-            // Assert a new publication was not created
-            var saved = Assert.Single(await context.Publications.ToListAsync());
-            Assert.Equal(publication.Id, saved.Id);
+            // Assert the new publication was not created under the other theme.
+            Assert.Null(fixture.GetContentDbContext().Publications.SingleOrDefault(p => p.ThemeId == theme.Id));
         }
 
         [Fact]
@@ -184,10 +199,12 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
         {
             var theme = DataFixture.DefaultTheme().Generate();
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.Themes.Add(theme);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Themes.Add(theme);
+                });
 
             var request = new PublicationCreateRequest
             {
@@ -203,27 +220,25 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
                 ThemeId = theme.Id,
             };
 
-            var client = TestApp.SetUser(DataFixture.AuthenticatedUser()).CreateClient();
-
-            var response = await CreatePublication(request, client);
+            var response = await CreatePublication(request, user: OptimisedTestUsers.Authenticated);
 
             response.AssertForbidden();
         }
 
         private async Task<HttpResponseMessage> CreatePublication(
             PublicationCreateRequest request,
-            HttpClient? client = null
+            ClaimsPrincipal? user = null
         )
         {
-            client ??= TestApp
-                .SetUser(DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.CreateAnyPublication)))
-                .CreateClient();
+            var client = fixture.CreateClient(
+                user: user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.CreateAnyPublication))
+            );
 
             return await client.PostAsJsonAsync("api/publications", request);
         }
     }
 
-    public class UpdatePublicationTests(TestApplicationFactory testApp) : PublicationControllerTests(testApp)
+    public class UpdatePublicationTests(PublicationControllerTestsFixture fixture) : PublicationControllerTests
     {
         [Fact]
         public async Task RequiredFieldsAreEmpty_ReturnsValidationError()
@@ -274,12 +289,13 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
         private async Task<HttpResponseMessage> UpdatePublication(
             Guid publicationId,
             PublicationSaveRequest request,
-            HttpClient? client = null
+            ClaimsPrincipal? user = null
         )
         {
-            client ??= TestApp
-                .SetUser(DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.UpdateAllPublications)))
-                .CreateClient();
+            var client = fixture.CreateClient(
+                user: user
+                    ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.UpdateAllPublications))
+            );
 
             return await client.PutAsJsonAsync($"api/publications/{publicationId}", request);
         }
