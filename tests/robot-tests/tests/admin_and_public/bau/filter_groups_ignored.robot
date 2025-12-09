@@ -33,6 +33,7 @@ Add data guidance to subjects and verify the expected variables are there
 
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
 
     user waits until page contains element    id:dataGuidance-dataFiles
 
@@ -47,7 +48,7 @@ Add data guidance to subjects and verify the expected variables are there
     user checks table cell contains    2    1    enrollment_count    id:dataGuidance-dataFiles
     user checks table cell contains    2    2    Number of students enrolled    id:dataGuidance-dataFiles
 
-    user enters text into element    id:dataGuidanceForm-content    Test metadata guidance content
+    user adds main data guidance content    Test metadata guidance content
     user enters text into element    id:dataGuidanceForm-dataSets-0-content    Test file guidance content
 
     user waits until page contains accordion section    ${SUBJECT_1_NAME}

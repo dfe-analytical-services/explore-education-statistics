@@ -39,14 +39,14 @@ Upload another subject (for deletion later)
 Add data guidance to subject
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance    %{WAIT_MEDIUM}
-    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
+    user adds main data guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}
     ...    data guidance content
 
 Add data guidance to second Subject
     user waits until h2 is visible    Public data guidance
-    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
+    user adds main data guidance content
     user waits until page contains accordion section    ${SECOND_SUBJECT}    15
     user enters text into data guidance data file content editor    ${SECOND_SUBJECT}
     ...    data guidance content
