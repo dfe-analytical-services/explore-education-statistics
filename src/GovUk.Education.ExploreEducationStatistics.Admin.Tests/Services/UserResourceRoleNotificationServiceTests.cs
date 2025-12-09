@@ -55,7 +55,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         }
 
         [Fact]
-        public async Task ActiveUserDoesNotExist_ThrowsArgumentException()
+        public async Task ActiveUserDoesNotExist_ThrowsKeyNotFoundException()
         {
             var userId = Guid.NewGuid();
 
@@ -67,7 +67,7 @@ public abstract class UserResourceRoleNotificationServiceTests
 
             var service = BuildService(userRepository: userRepository.Object);
 
-            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
                 await service.NotifyUserOfNewPublicationRole(
                     userId: userId,
                     publication: _dataFixture.DefaultPublication(),
@@ -158,7 +158,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         }
 
         [Fact]
-        public async Task ActiveUserDoesNotExist_ThrowsArgumentException()
+        public async Task ActiveUserDoesNotExist_ThrowsKeyNotFoundException()
         {
             var userId = Guid.NewGuid();
 
@@ -170,7 +170,7 @@ public abstract class UserResourceRoleNotificationServiceTests
 
             var service = BuildService(userRepository: userRepository.Object);
 
-            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
                 await service.NotifyUserOfNewReleaseRole(
                     userId: userId,
                     releaseVersion: _dataFixture.DefaultReleaseVersion(),
@@ -267,7 +267,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         }
 
         [Fact]
-        public async Task UserDoesNotExist_ThrowsArgumentException()
+        public async Task UserDoesNotExist_ThrowsKeyNotFoundException()
         {
             var userId = Guid.NewGuid();
 
@@ -277,7 +277,7 @@ public abstract class UserResourceRoleNotificationServiceTests
 
             var service = BuildService(userRepository: userRepository.Object);
 
-            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
                 await service.NotifyUserOfNewContributorRoles(
                     userId: userId,
                     publicationTitle: "publication-title",
