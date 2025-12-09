@@ -100,9 +100,6 @@
     },
     "maxStatsDbSizeBytes": {
       "value": 2748779069440
-    },
-    "enableReplacementOfPublicApiDataSets": {
-      "value": true
     }
   }
 }

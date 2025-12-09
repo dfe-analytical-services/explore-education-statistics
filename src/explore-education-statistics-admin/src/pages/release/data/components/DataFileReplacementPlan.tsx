@@ -31,7 +31,6 @@ import { generatePath } from 'react-router';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import Link from '@admin/components/Link';
-import { useConfig } from '@admin/contexts/ConfigContext';
 import isPatchVersion from '@common/utils/isPatchVersion';
 
 interface Props {
@@ -74,9 +73,6 @@ const DataFileReplacementPlan = ({
     () => plan?.footnotes.some(footnote => !footnote.valid) ?? false,
     [plan],
   );
-  const {
-    enableReplacementOfPublicApiDataSets: isNewReplaceDsvFeatureEnabled,
-  } = useConfig();
 
   const {
     hasDataSetVersionPlan,
@@ -86,17 +82,6 @@ const DataFileReplacementPlan = ({
     hasMajorLocationMapping,
     hasMajorFilterMapping,
   } = useMemo(() => {
-    if (!isNewReplaceDsvFeatureEnabled) {
-      return {
-        hasDataSetVersionPlan: false,
-        hasIncompleteLocationMapping: false,
-        hasIncompleteFilterMapping: false,
-        isNotReadyToPublish: false,
-        hasMajorLocationMapping: false,
-        hasMajorFilterMapping: false,
-      };
-    }
-
     return {
       hasDataSetVersionPlan: !!plan?.apiDataSetVersionPlan,
       hasIncompleteLocationMapping:
@@ -109,7 +94,7 @@ const DataFileReplacementPlan = ({
         plan?.apiDataSetVersionPlan?.mappingStatus?.filtersHaveMajorChange,
       isNotReadyToPublish: !plan?.apiDataSetVersionPlan?.readyToPublish,
     };
-  }, [plan, isNewReplaceDsvFeatureEnabled]);
+  }, [plan]);
 
   const { user } = useAuthContext();
   const dataSetId = plan?.apiDataSetVersionPlan?.dataSetId;
@@ -152,9 +137,7 @@ const DataFileReplacementPlan = ({
     </Tag>
   );
 
-  const isPatch = isNewReplaceDsvFeatureEnabled
-    ? isPatchVersion(plan?.apiDataSetVersionPlan?.version)
-    : false;
+  const isPatch = isPatchVersion(plan?.apiDataSetVersionPlan?.version);
 
   const linkToApiDetailsTab = apiDataSetsTabRoute && (
     <Link to={apiDataSetsTabRoute} unvisited>

@@ -16,6 +16,7 @@ import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthContext } from '@admin/contexts/AuthContext';
 
 jest.mock('@admin/services/dataReplacementService');
 jest.mock('@admin/services/releaseDataFileService');
@@ -37,6 +38,21 @@ describe('ReleaseDataFileReplacePage', () => {
       canCancelImport: false,
     });
   });
+  const defaultPermissions = {
+    isBauUser: true,
+    canAccessSystem: true,
+    canAccessPrereleasePages: true,
+    canAccessAnalystPages: true,
+    canAccessAllImports: true,
+    canManageAllTaxonomy: true,
+    isApprover: true,
+  };
+
+  const user = {
+    id: 'user-1',
+    name: 'Test User',
+    permissions: defaultPermissions,
+  };
 
   const testOriginalFile: DataFile = {
     id: 'data-1',
@@ -327,10 +343,19 @@ describe('ReleaseDataFileReplacePage', () => {
           ),
         ]}
       >
-        <Route
-          path={releaseDataFileReplaceRoute.path}
-          component={ReleaseDataFileReplacePage}
-        />
+        <AuthContext.Provider
+          value={{
+            user: {
+              ...user,
+              permissions: { ...defaultPermissions, isBauUser: true },
+            },
+          }}
+        >
+          <Route
+            path={releaseDataFileReplaceRoute.path}
+            component={ReleaseDataFileReplacePage}
+          />
+        </AuthContext.Provider>
       </MemoryRouter>,
     );
 
@@ -656,10 +681,7 @@ describe('ReleaseDataFileReplacePage', () => {
     });
   };
 
-  const renderWithTestConfig = (
-    ui: React.ReactElement,
-    enableReplaceApiFeatureFlag: boolean = false,
-  ) => {
+  const renderWithTestConfig = (ui: React.ReactElement) => {
     const defaultTestConfig = {
       appInsightsKey: '',
       publicAppUrl: 'http://localhost',
@@ -687,7 +709,6 @@ describe('ReleaseDataFileReplacePage', () => {
       <TestConfigContextProvider
         config={{
           ...defaultTestConfig,
-          enableReplacementOfPublicApiDataSets: enableReplaceApiFeatureFlag,
         }}
       >
         <QueryClientProvider client={testQueryClient}>{ui}</QueryClientProvider>

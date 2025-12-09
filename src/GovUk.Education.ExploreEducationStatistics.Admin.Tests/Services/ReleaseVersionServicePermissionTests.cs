@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -324,8 +323,7 @@ public class ReleaseVersionServicePermissionTests
         IUserService userService,
         ContentDbContext? contentDbContext = null,
         StatisticsDbContext? statisticsDbContext = null,
-        IReleaseVersionRepository? releaseVersionRepository = null,
-        bool enableReplacementOfPublicApiDataSets = false
+        IReleaseVersionRepository? releaseVersionRepository = null
     )
     {
         contentDbContext ??= Mock.Of<ContentDbContext>();
@@ -355,12 +353,6 @@ public class ReleaseVersionServicePermissionTests
             Mock.Of<IUserReleaseInviteRepository>(),
             Mock.Of<IUserReleaseRoleRepository>(),
             Mock.Of<IReleaseSlugValidator>(),
-            featureFlags: Microsoft.Extensions.Options.Options.Create(
-                new FeatureFlagsOptions()
-                {
-                    EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets,
-                }
-            ),
             Mock.Of<ILogger<ReleaseVersionService>>()
         );
     }

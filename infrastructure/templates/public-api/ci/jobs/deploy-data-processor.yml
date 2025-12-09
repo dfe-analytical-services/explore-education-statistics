@@ -48,8 +48,7 @@ jobs:
                       "App__PrivateStorageConnectionString=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
                       "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
                       "AzureWebJobs.TriggerLongRunningOrchestration.Disabled=true" \
-                      "DataFiles__BasePath=$(dataProcessorPublicApiDataFileShareMountPath)" \
-                      "FeatureFlags__EnableReplacementOfPublicApiDataSets=$(enableReplacementOfPublicApiDataSets)"
+                      "DataFiles__BasePath=$(dataProcessorPublicApiDataFileShareMountPath)"
                   
                   az webapp config connection-string set \
                     --name $(dataProcessorFunctionAppName) \

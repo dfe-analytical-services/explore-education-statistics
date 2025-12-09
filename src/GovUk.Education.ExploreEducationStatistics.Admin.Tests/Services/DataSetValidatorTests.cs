@@ -6,14 +6,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
@@ -423,12 +421,8 @@ public class DataSetValidatorTests
         Assert.Equal(ValidationMessages.DataSetFileNamesShouldMatchConvention.Code, errors[0].Code);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task ValidateDataSet_ReplacementHasApiDataSet_ReturnsErrorDetails(
-        bool enableFeatureFlagPatchReplacements
-    )
+    [Fact]
+    public async Task ValidateDataSet_ReplacementHasApiDataSet_ReturnsErrorDetails()
     {
         // Arrange
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Version = 2 };
@@ -469,26 +463,13 @@ public class DataSetValidatorTests
         context.ReleaseFiles.AddRange(existingDataReleaseFile, existingMetaReleaseFile);
         await context.SaveChangesAsync();
 
-        var featureFlagOptions = Microsoft.Extensions.Options.Options.Create(
-            new FeatureFlagsOptions() { EnableReplacementOfPublicApiDataSets = enableFeatureFlagPatchReplacements }
-        );
-
-        var sut = BuildService(context, featureFlagOptions, userService.Object);
+        var sut = BuildService(context, userService.Object);
 
         // Act
         var result = await sut.ValidateDataSet(dataSetDto);
 
         // Assert
-        if (enableFeatureFlagPatchReplacements)
-        {
-            result.AssertRight();
-        }
-        else
-        {
-            var errors = result.AssertLeft();
-            Assert.Single(errors);
-            Assert.Equal(ValidationMessages.CannotReplaceDataSetWithApiDataSet.Code, errors[0].Code);
-        }
+        result.AssertRight();
     }
 
     [Fact]
@@ -553,11 +534,7 @@ public class DataSetValidatorTests
         var userService = new Mock<IUserService>(MockBehavior.Strict);
         userService.Setup(s => s.MatchesPolicy(SecurityPolicies.IsBauUser)).ReturnsAsync(false);
 
-        var featureFlagOptions = Microsoft.Extensions.Options.Options.Create(
-            new FeatureFlagsOptions() { EnableReplacementOfPublicApiDataSets = true }
-        );
-
-        var sut = BuildService(context, featureFlagOptions, userService.Object);
+        var sut = BuildService(context, userService.Object);
 
         // Act
         var result = await sut.ValidateDataSet(dataSetDto);
@@ -907,7 +884,6 @@ public class DataSetValidatorTests
 
     private static DataSetValidator BuildService(
         ContentDbContext? contentDbContext = null,
-        IOptions<FeatureFlagsOptions>? featureFlags = null,
         IUserService? userService = null,
         IDataSetService? dataSetService = null
     )
@@ -928,13 +904,6 @@ public class DataSetValidatorTests
             dataSetService = dataSetServiceMock.Object;
         }
 
-        if (featureFlags is null)
-        {
-            featureFlags = Microsoft.Extensions.Options.Options.Create(
-                new FeatureFlagsOptions() { EnableReplacementOfPublicApiDataSets = true }
-            );
-        }
-
-        return new DataSetValidator(contentDbContext!, userService!, dataSetService!, featureFlags!);
+        return new DataSetValidator(contentDbContext!, userService!, dataSetService!);
     }
 }

@@ -404,136 +404,93 @@ describe('DataReplacementPlan', () => {
     valid: true,
   };
 
-  describe('feature flagged enableReplacementOfPublicApiDataSets section renders as expected ', () => {
-    const noAccessApiDetailsMessage =
-      /Please contact the EES team for support at explore.statistics@education.gov.uk. Your user account does not have the role required access to the API details page which can help resolve this issue./;
-    test('renders the API errors section when the feature flag enableReplacementOfPublicApiDataSets is turned on', async () => {
-      dataReplacementService.getReplacementPlan.mockResolvedValue(
-        testReplacementPlan,
+  const locationsBauInstruction =
+    /Please go to the API data sets tab and complete manual mapping process for locations\./;
+  const filtersBauInstruction =
+    /Please go to the API data sets tab and complete manual mapping process for filters\./;
+  const bauFinalisationMessage =
+    /Please go to the API data sets tab and finalize the data set version mapping process\./;
+  const noAccessApiDetailsMessage =
+    /Please contact the EES team for support at explore.statistics@education.gov.uk. Your user account does not have the role required access to the API details page which can help resolve this issue./;
+
+  test('renders the API errors section with links to API details page when a BAU user is viewing the page', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testReplacementPlan,
+    );
+    renderWithTestConfig(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+      true,
+    );
+    await waitFor(() => {
+      const filtersHeading = screen.getByText('API data set Filters: ERROR');
+      const filtersParagraph = filtersHeading.closest('h3')?.nextElementSibling;
+      const locationsHeading = screen.getByText(
+        'API data set Locations: ERROR',
       );
-      renderWithTestConfig(
-        <MemoryRouter>
-          <DataFileReplacementPlan
-            cancelButton={<button type="button">Cancel</button>}
-            publicationId="publication-1"
-            releaseVersionId="release-1"
-            fileId="file-1"
-            replacementFileId="file-2"
-          />
-        </MemoryRouter>,
-        true,
+      const locationsParagraph =
+        locationsHeading.closest('h3')?.nextElementSibling;
+      const finalizationHeading = screen.getByText(
+        'API data set has to be finalized: ERROR',
       );
-      await waitFor(() => {
-        const filtersHeading = screen.getByText('API data set Filters: ERROR');
-        const filtersParagraph =
-          filtersHeading.closest('h3')?.nextElementSibling;
-        const locationsHeading = screen.getByText(
-          'API data set Locations: ERROR',
-        );
-        const locationsParagraph =
-          locationsHeading.closest('h3')?.nextElementSibling;
-        const finalizationHeading = screen.getByText(
-          'API data set has to be finalized: ERROR',
-        );
-        const finalizationParagraph =
-          finalizationHeading.closest('h3')?.nextElementSibling;
+      const finalizationParagraph =
+        finalizationHeading.closest('h3')?.nextElementSibling;
 
-        expect(locationsHeading).toBeInTheDocument();
-        expect(locationsParagraph).toBeInTheDocument();
+      expect(locationsHeading).toBeInTheDocument();
+      expect(locationsParagraph).toBeInTheDocument();
+      expect(locationsParagraph).toHaveTextContent(
+        /Please go to the API data sets tab and complete manual mapping process for locations\./,
+      );
+      expect(
+        within(locationsParagraph as HTMLElement).getByRole('link', {
+          name: 'go to the API data sets tab',
+          hidden: false,
+        }),
+      ).toHaveAttribute(
+        'href',
+        '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
+      );
 
-        expect(locationsParagraph).toHaveTextContent(noAccessApiDetailsMessage);
+      expect(filtersHeading).toBeInTheDocument();
+      expect(filtersParagraph).toBeInTheDocument();
+      expect(filtersParagraph).toHaveTextContent(
+        /Please go to the API data sets tab and complete manual mapping process for filters\./,
+      );
+      expect(
+        within(filtersParagraph as HTMLElement).getByRole('link', {
+          name: 'go to the API data sets tab',
+          hidden: false,
+        }),
+      ).toHaveAttribute(
+        'href',
+        '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
+      );
 
-        expect(filtersHeading).toBeInTheDocument();
-        expect(filtersParagraph).toBeInTheDocument();
-        expect(filtersParagraph).toHaveTextContent(noAccessApiDetailsMessage);
-        expect(finalizationHeading).toBeInTheDocument();
-        expect(finalizationParagraph).toBeInTheDocument();
-        expect(finalizationParagraph).toHaveTextContent(
-          noAccessApiDetailsMessage,
-        );
-      });
+      expect(finalizationHeading).toBeInTheDocument();
+      expect(finalizationParagraph).toBeInTheDocument();
+      expect(finalizationParagraph).toHaveTextContent(bauFinalisationMessage);
+      expect(
+        within(finalizationParagraph as HTMLElement).getByRole('link', {
+          name: 'go to the API data sets tab',
+          hidden: false,
+        }),
+      ).toHaveAttribute(
+        'href',
+        '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
+      );
     });
+  });
 
-    test('renders the API errors section with links to API details page when a BAU user is viewing the page', async () => {
-      dataReplacementService.getReplacementPlan.mockResolvedValue(
-        testReplacementPlan,
-      );
-      renderWithTestConfig(
-        <MemoryRouter>
-          <DataFileReplacementPlan
-            cancelButton={<button type="button">Cancel</button>}
-            publicationId="publication-1"
-            releaseVersionId="release-1"
-            fileId="file-1"
-            replacementFileId="file-2"
-          />
-        </MemoryRouter>,
-        true,
-        true,
-      );
-      await waitFor(() => {
-        const filtersHeading = screen.getByText('API data set Filters: ERROR');
-        const filtersParagraph =
-          filtersHeading.closest('h3')?.nextElementSibling;
-        const locationsHeading = screen.getByText(
-          'API data set Locations: ERROR',
-        );
-        const locationsParagraph =
-          locationsHeading.closest('h3')?.nextElementSibling;
-        const finalizationHeading = screen.getByText(
-          'API data set has to be finalized: ERROR',
-        );
-        const finalizationParagraph =
-          finalizationHeading.closest('h3')?.nextElementSibling;
-
-        expect(locationsHeading).toBeInTheDocument();
-        expect(locationsParagraph).toBeInTheDocument();
-        expect(locationsParagraph).toHaveTextContent(
-          /Please go to the API data sets tab and complete manual mapping process for locations\./,
-        );
-        expect(
-          within(locationsParagraph as HTMLElement).getByRole('link', {
-            name: 'go to the API data sets tab',
-            hidden: false,
-          }),
-        ).toHaveAttribute(
-          'href',
-          '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
-        );
-
-        expect(filtersHeading).toBeInTheDocument();
-        expect(filtersParagraph).toBeInTheDocument();
-        expect(filtersParagraph).toHaveTextContent(
-          /Please go to the API data sets tab and complete manual mapping process for filters\./,
-        );
-        expect(
-          within(filtersParagraph as HTMLElement).getByRole('link', {
-            name: 'go to the API data sets tab',
-            hidden: false,
-          }),
-        ).toHaveAttribute(
-          'href',
-          '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
-        );
-
-        expect(finalizationHeading).toBeInTheDocument();
-        expect(finalizationParagraph).toBeInTheDocument();
-        expect(finalizationParagraph).toHaveTextContent(
-          /Please go to the API data sets tab and finalize the data set version mapping process\./,
-        );
-        expect(
-          within(finalizationParagraph as HTMLElement).getByRole('link', {
-            name: 'go to the API data sets tab',
-            hidden: false,
-          }),
-        ).toHaveAttribute(
-          'href',
-          '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
-        );
-      });
-    });
-
-    test('renders the API errors section correctly when the locations is valid and the filters is not', async () => {
+  it.each([true, false])(
+    'renders the API errors section correctly when the locations is valid and the filters is not and bau user is %s',
+    async bauUser => {
       dataReplacementService.getReplacementPlan.mockResolvedValue({
         ...testReplacementPlan,
         apiDataSetVersionPlan: {
@@ -563,7 +520,7 @@ describe('DataReplacementPlan', () => {
             replacementFileId="file-2"
           />
         </MemoryRouter>,
-        true,
+        bauUser,
       );
       await waitFor(() => {
         const filtersHeading = screen.getByText('API data set Filters: ERROR');
@@ -585,17 +542,26 @@ describe('DataReplacementPlan', () => {
         );
 
         expect(filtersHeading).toBeInTheDocument();
-        expect(filtersParagraph).toBeInTheDocument();
-        expect(filtersParagraph).toHaveTextContent(noAccessApiDetailsMessage);
         expect(finalizationHeading).toBeInTheDocument();
-        expect(finalizationParagraph).toBeInTheDocument();
-        expect(finalizationParagraph).toHaveTextContent(
-          noAccessApiDetailsMessage,
-        );
+        if (bauUser) {
+          expect(filtersParagraph).toHaveTextContent(filtersBauInstruction);
+          expect(finalizationParagraph).toHaveTextContent(
+            bauFinalisationMessage,
+          );
+        } else {
+          expect(filtersParagraph).toHaveTextContent(noAccessApiDetailsMessage);
+          expect(finalizationParagraph).toHaveTextContent(
+            noAccessApiDetailsMessage,
+          );
+        }
       });
-    });
+    },
+  );
 
-    test('renders the API errors section correctly when the filters is valid and the locations is not', async () => {
+  it.each([true, false])(
+    'renders the API errors section correctly when the filters is valid and the locations is not and bau user is %s',
+    async () => {
+      const bauUser = false;
       dataReplacementService.getReplacementPlan.mockResolvedValue({
         ...testReplacementPlan,
         apiDataSetVersionPlan: {
@@ -625,7 +591,7 @@ describe('DataReplacementPlan', () => {
             replacementFileId="file-2"
           />
         </MemoryRouter>,
-        true,
+        bauUser,
       );
       await waitFor(() => {
         const filtersHeading = screen.getByText('API data set Filters: OK');
@@ -644,7 +610,6 @@ describe('DataReplacementPlan', () => {
 
         expect(locationsHeading).toBeInTheDocument();
         expect(locationsParagraph).toBeInTheDocument();
-        expect(locationsParagraph).toHaveTextContent(noAccessApiDetailsMessage);
 
         expect(filtersHeading).toBeInTheDocument();
         expect(filtersParagraph).toBeInTheDocument();
@@ -653,72 +618,22 @@ describe('DataReplacementPlan', () => {
         );
         expect(finalizationHeading).toBeInTheDocument();
         expect(finalizationParagraph).toBeInTheDocument();
-        expect(finalizationParagraph).toHaveTextContent(
-          noAccessApiDetailsMessage,
-        );
+        if (bauUser) {
+          expect(locationsParagraph).toHaveTextContent(locationsBauInstruction);
+          expect(finalizationParagraph).toHaveTextContent(
+            bauFinalisationMessage,
+          );
+        } else {
+          expect(locationsParagraph).toHaveTextContent(
+            noAccessApiDetailsMessage,
+          );
+          expect(finalizationParagraph).toHaveTextContent(
+            noAccessApiDetailsMessage,
+          );
+        }
       });
-    });
-
-    test('doesnt render the section when the feature flag enableReplacementOfPublicApiDataSets is turned off', async () => {
-      dataReplacementService.getReplacementPlan.mockResolvedValue(
-        testReplacementPlan,
-      );
-      renderWithTestConfig(
-        <MemoryRouter>
-          <DataFileReplacementPlan
-            cancelButton={<button type="button">Cancel</button>}
-            publicationId="publication-1"
-            releaseVersionId="release-1"
-            fileId="file-1"
-            replacementFileId="file-2"
-          />
-        </MemoryRouter>,
-      );
-      await waitFor(() => {
-        expect(() => screen.getByText('API data set Filters: ERROR')).toThrow(
-          'Unable to find an element',
-        );
-        expect(() => screen.getByText('API data set Locations: ERROR')).toThrow(
-          'Unable to find an element',
-        );
-      });
-    });
-
-    test('doesnt render the section when the feature flag enableReplacementOfPublicApiDataSets is turned on and no mapping status is defined', async () => {
-      dataReplacementService.getReplacementPlan.mockResolvedValue({
-        ...testReplacementPlan,
-        apiDataSetVersionPlan: {
-          id: 'version-1',
-          dataSetId: 'data-set-1',
-          name: 'Version 1',
-          version: '1.0',
-          readyToPublish: false,
-          status: 'Draft',
-          valid: false,
-        },
-      });
-      renderWithTestConfig(
-        <MemoryRouter>
-          <DataFileReplacementPlan
-            cancelButton={<button type="button">Cancel</button>}
-            publicationId="publication-1"
-            releaseVersionId="release-1"
-            fileId="file-1"
-            replacementFileId="file-2"
-          />
-        </MemoryRouter>,
-        true,
-      );
-      await waitFor(() => {
-        expect(() => screen.getByText('API data set Filters: ERROR')).toThrow(
-          'Unable to find an element',
-        );
-        expect(() => screen.getByText('API data set Locations: ERROR')).toThrow(
-          'Unable to find an element',
-        );
-      });
-    });
-  });
+    },
+  );
 
   test('renders correctly with invalid plan', async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue(
@@ -950,7 +865,6 @@ describe('DataReplacementPlan', () => {
         />
       </MemoryRouter>,
       true,
-      true,
     );
 
     await waitFor(() => {
@@ -1037,7 +951,6 @@ describe('DataReplacementPlan', () => {
           replacementFileId="file-2"
         />
       </MemoryRouter>,
-      true,
       false,
     );
 
@@ -1067,7 +980,6 @@ describe('DataReplacementPlan', () => {
         />
       </MemoryRouter>,
       true,
-      true,
     );
 
     await waitFor(() => {
@@ -1095,7 +1007,6 @@ describe('DataReplacementPlan', () => {
           replacementFileId="file-2"
         />
       </MemoryRouter>,
-      true,
       true,
     );
 
@@ -1516,6 +1427,7 @@ describe('DataReplacementPlan', () => {
           replacementFileId="replacement-file-id"
         />
       </MemoryRouter>,
+      true,
     );
 
     await waitFor(() => {
@@ -1540,7 +1452,6 @@ describe('DataReplacementPlan', () => {
 
   function renderWithTestConfig(
     children: React.ReactNode,
-    enableReplacementFeatureFlag: boolean = false,
     bauUser: boolean = false,
   ) {
     const defaultTestConfig = {
@@ -1585,7 +1496,6 @@ describe('DataReplacementPlan', () => {
       <TestConfigContextProvider
         config={{
           ...defaultTestConfig,
-          enableReplacementOfPublicApiDataSets: enableReplacementFeatureFlag,
         }}
       >
         <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
