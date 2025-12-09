@@ -44,4 +44,10 @@ public class PublicationsController(
                 cancellationToken
             )
             .HandleFailuresOrOk();
+
+    [HttpGet("publications/{publicationSlug}/title")]
+    public async Task<ActionResult<PublicationTitleDto>> GetPublicationTitle(
+        string publicationSlug,
+        CancellationToken cancellationToken = default
+    ) => await publicationsService.GetPublicationTitle(publicationSlug, cancellationToken).HandleFailuresOrOk();
 }
