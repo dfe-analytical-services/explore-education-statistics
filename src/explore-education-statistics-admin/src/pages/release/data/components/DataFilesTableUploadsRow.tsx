@@ -40,7 +40,6 @@ export default function DataFilesTableUploadRow({
   const [openImportConfirm, toggleOpenImportConfirm] = useToggle(false);
   const [openDeleteConfirm, toggleOpenDeleteConfirm] = useToggle(false);
   const { user } = useAuthContext();
-  const isBauUser = user?.permissions.isBauUser ?? false;
 
   const hasFailures = dataSetUpload.screenerResult?.testResults.some(
     testResult => testResult.result === 'FAIL',
@@ -52,6 +51,19 @@ export default function DataFilesTableUploadRow({
   const [warningAcknowledgements, setWarningAcknowledgements] = useState<
     Dictionary<boolean>
   >({});
+
+  const canOverride = user?.permissions.isBauUser ?? false;
+
+  const importBlocked =
+    !canUpdateRelease ||
+    !dataSetUpload.screenerResult ||
+    dataSetUpload.status === 'SCREENER_ERROR' ||
+    dataSetUpload.status === 'FAILED_SCREENING' ||
+    hasFailures;
+
+  const importUnavailable = !Object.values(warningAcknowledgements).every(
+    acknowledgement => acknowledgement === true,
+  );
 
   useEffect(() => {
     const warnings = dataSetUpload.screenerResult?.testResults.filter(
@@ -145,16 +157,9 @@ export default function DataFilesTableUploadRow({
           <ModalConfirm
             title="Data set details"
             open={openImportConfirm}
-            hideConfirm={
-              (!isBauUser && (!canUpdateRelease || hasFailures)) ||
-              (!dataSetUpload.screenerResult &&
-                !isBauUser &&
-                dataSetUpload.status === 'SCREENER_ERROR')
-            }
+            hideConfirm={importBlocked && !canOverride}
             disableConfirm={
-              !Object.values(warningAcknowledgements).every(
-                acknowledgement => acknowledgement === true,
-              ) && !(isBauUser && hasFailures)
+              importUnavailable && !(importBlocked && canOverride)
             }
             onConfirm={() => onConfirmImport([dataSetUpload.id])}
             confirmText={confirmText}
