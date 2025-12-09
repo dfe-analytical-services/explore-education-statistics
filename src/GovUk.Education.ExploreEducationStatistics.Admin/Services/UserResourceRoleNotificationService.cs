@@ -170,7 +170,7 @@ public class UserResourceRoleNotificationService(
                     )
                 );
 
-            emailTemplateService
+            await emailTemplateService
                 .SendContributorInviteEmail(
                     email: user.Email,
                     publicationTitle: publicationTitle,
