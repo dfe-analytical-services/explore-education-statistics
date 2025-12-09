@@ -58,7 +58,7 @@ const MethodologyEditableBlock = ({
           isEditing={isEditing}
           label="Content block"
           hideLabel
-          value={block.body}
+          value={block.body || ''}
           toolbarConfig={methodologyToolbarConfigFull}
           transformImageAttributes={transformImageAttributes}
           onCancel={toggleEditing.off}
