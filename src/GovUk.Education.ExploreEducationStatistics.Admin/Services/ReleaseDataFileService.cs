@@ -385,7 +385,28 @@ public class ReleaseDataFileService(
             .ToAsyncEnumerable()
             .SelectAwait(async dataSetUpload =>
             {
+                var dataFileToken = await privateBlobStorageService.GetBlobDownloadToken(
+                    PrivateReleaseTempFiles,
+                    dataSetUpload.DataFileName,
+                    dataSetUpload.DataFilePath,
+                    cancellationToken
+                );
+                var metaFileToken = await privateBlobStorageService.GetBlobDownloadToken(
+                    PrivateReleaseTempFiles,
+                    dataSetUpload.MetaFileName,
+                    dataSetUpload.MetaFilePath,
+                    cancellationToken
+                );
+
+                if (dataFileToken.IsLeft || metaFileToken.IsLeft)
+                {
+                    throw new DataScreenerException("Failed to get SAS tokens for data set screener request");
+                }
+
                 var request = mapper.Map<DataSetScreenerRequest>(dataSetUpload);
+                request.DataFileSasToken = dataFileToken.Right!.Token;
+                request.MetaFileSasToken = metaFileToken.Right!.Token;
+
                 DataSetScreenerResponse result;
 
                 try
