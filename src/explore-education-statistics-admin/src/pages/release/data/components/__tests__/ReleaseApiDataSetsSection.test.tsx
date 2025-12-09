@@ -356,7 +356,6 @@ describe('ReleaseApiDataSetsSection', () => {
       <TestConfigContextProvider
         config={{
           ...defaultTestConfig,
-          enableReplacementOfPublicApiDataSets: false,
         }}
       >
         <AuthContextTestProvider user={user}>

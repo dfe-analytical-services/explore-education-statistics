@@ -1,5 +1,4 @@
 import isPatchVersion from '@common/utils/isPatchVersion';
-import { useConfig } from '@admin/contexts/ConfigContext';
 import Link from '@admin/components/Link';
 import DeleteDraftVersionButton from '@admin/pages/release/data/components/DeleteDraftVersionButton';
 import getDataSetVersionStatusTagColour from '@admin/pages/release/data/components/utils/getDataSetVersionStatusColour';
@@ -41,10 +40,6 @@ export default function DraftApiDataSetsTable({
   publicationId,
   releaseVersionId,
 }: Props) {
-  const {
-    enableReplacementOfPublicApiDataSets: isNewReplaceDsvFeatureEnabled,
-  } = useConfig();
-
   if (!dataSets.length) {
     return <InsetText>No draft API data sets for this publication.</InsetText>;
   }
@@ -87,9 +82,7 @@ export default function DraftApiDataSetsTable({
               draftVersion.status === 'Cancelled' ||
               draftVersion.status === 'Mapping';
 
-            const isPatch = isNewReplaceDsvFeatureEnabled
-              ? isPatchVersion(draftVersion?.version)
-              : false;
+            const isPatch = isPatchVersion(draftVersion?.version);
 
             return (
               <tr

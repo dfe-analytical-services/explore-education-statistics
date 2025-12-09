@@ -395,15 +395,6 @@ public static class ValidationMessages
         Message: "Data set with title '{0}' cannot be replaced as it has an API data set linked to it. Please remove the API data set before replacing the data."
     );
 
-    public static ErrorViewModel GenerateErrorCannotReplaceDataSetWithApiDataSet(string title)
-    {
-        return new ErrorViewModel
-        {
-            Code = CannotReplaceDataSetWithApiDataSet.Code,
-            Message = string.Format(CannotReplaceDataSetWithApiDataSet.Message, title),
-        };
-    }
-
     public static readonly LocalizableMessage CannotReplaceDraftApiDataSet = new(
         Code: nameof(CannotReplaceDraftApiDataSet),
         Message: "Data set with title '{0}' cannot be replaced as it is targeting an existing draft API data set. Please contact the explore statistics team at explore.statistics@education.gov.uk for support on completing this replacement."
