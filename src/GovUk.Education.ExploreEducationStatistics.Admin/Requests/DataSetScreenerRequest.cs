@@ -13,4 +13,8 @@ public record DataSetScreenerRequest
     public required string DataFilePath { get; set; }
 
     public required string MetaFilePath { get; set; }
+
+    public string DataFileSasToken { get; set; } = string.Empty;
+
+    public string MetaFileSasToken { get; set; } = string.Empty;
 }

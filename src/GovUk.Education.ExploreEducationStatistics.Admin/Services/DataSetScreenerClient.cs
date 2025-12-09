@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
@@ -33,6 +34,8 @@ public class DataSetScreenerClient(
 
         return response.IsSuccessStatusCode
             ? await response.Content.ReadFromJsonAsync<DataSetScreenerResponse>(cancellationToken)
-            : throw new Exception($"Screening process failed with status {response.StatusCode}");
+            : throw new DataScreenerException(
+                $"External data screening process failed with status code {response.StatusCode}."
+            );
     }
 }

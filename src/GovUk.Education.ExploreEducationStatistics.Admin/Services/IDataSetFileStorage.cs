@@ -61,9 +61,9 @@ public interface IDataSetFileStorage
         CancellationToken cancellationToken
     );
 
-    Task AddScreenerResultToUpload(
+    Task UpdateDataSetUpload(
         Guid dataSetUploadId,
-        DataSetScreenerResponse screenerResult,
+        DataSetScreenerResponse? screenerResult,
         CancellationToken cancellationToken
     );
 

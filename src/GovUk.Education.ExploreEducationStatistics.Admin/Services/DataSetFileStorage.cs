@@ -415,9 +415,9 @@ public class DataSetFileStorage(
         return dataSetUpload;
     }
 
-    public async Task AddScreenerResultToUpload(
+    public async Task UpdateDataSetUpload(
         Guid dataSetUploadId,
-        DataSetScreenerResponse screenerResult,
+        DataSetScreenerResponse? screenerResult,
         CancellationToken cancellationToken
     )
     {
@@ -425,22 +425,30 @@ public class DataSetFileStorage(
             upload => upload.Id == dataSetUploadId,
             cancellationToken
         );
-        upload.ScreenerResult = screenerResult;
 
-        var hasWarnings = screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING);
-        var hasFailures = screenerResult.TestResults.Any(test => test.Result == TestResult.FAIL);
-
-        if (hasWarnings)
+        if (screenerResult is null)
         {
-            upload.Status = DataSetUploadStatus.PENDING_REVIEW;
-        }
-        else if (hasFailures)
-        {
-            upload.Status = DataSetUploadStatus.FAILED_SCREENING;
+            upload.Status = DataSetUploadStatus.SCREENER_ERROR;
         }
         else
         {
-            upload.Status = DataSetUploadStatus.PENDING_IMPORT;
+            upload.ScreenerResult = screenerResult;
+
+            var hasWarnings = screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING);
+            var hasFailures = screenerResult.TestResults.Any(test => test.Result == TestResult.FAIL);
+
+            if (hasWarnings)
+            {
+                upload.Status = DataSetUploadStatus.PENDING_REVIEW;
+            }
+            else if (hasFailures)
+            {
+                upload.Status = DataSetUploadStatus.FAILED_SCREENING;
+            }
+            else
+            {
+                upload.Status = DataSetUploadStatus.PENDING_IMPORT;
+            }
         }
 
         await contentDbContext.SaveChangesAsync(cancellationToken);

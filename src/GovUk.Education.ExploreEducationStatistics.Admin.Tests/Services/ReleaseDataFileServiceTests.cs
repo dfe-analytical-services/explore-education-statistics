@@ -1736,7 +1736,9 @@ public class ReleaseDataFileServiceTests
 
         var metaFile = _fixture.DefaultFile().WithType(FileType.Metadata).Generate();
 
-        var dataSetUpload = new DataSetUploadMockBuilder().WithReleaseVersionId(releaseVersion.Id).BuildEntity();
+        var dataSetUpload = new DataSetUploadMockBuilder()
+            .WithReleaseVersionId(releaseVersion.Id)
+            .BuildScreenedEntity();
 
         var import = new DataImport
         {
@@ -1809,7 +1811,7 @@ public class ReleaseDataFileServiceTests
         var dataSetUpload = new DataSetUploadMockBuilder()
             .WithReleaseVersionId(releaseVersion.Id)
             .WithFailingTests()
-            .BuildEntity();
+            .BuildScreenedEntity();
 
         var import = new DataImport
         {
@@ -1878,7 +1880,7 @@ public class ReleaseDataFileServiceTests
         var dataSetUpload = new DataSetUploadMockBuilder()
             .WithReleaseVersionId(releaseVersion.Id)
             .WithFailingTests()
-            .BuildEntity();
+            .BuildScreenedEntity();
 
         var import = new DataImport
         {
