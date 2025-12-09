@@ -409,7 +409,7 @@
       "type": "string",
       "defaultValue": "Unknown",
       "metadata": {
-        "description": "Tag Value - The name of the phase of the development lifecycle environment that the component will be used in e.g. Development / Test / Integration / Production"
+        "description": "Tag Value - The name of the phase of the development lifecycle environment that the component will be used in e.g. Development / Test / Pre-Production / Production"
       }
     },
     "subscriptionName": {

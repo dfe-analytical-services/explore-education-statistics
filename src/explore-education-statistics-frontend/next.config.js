@@ -27,32 +27,23 @@ const generalHeaders = [
   },
 ];
 
-if (process.env.NODE_ENV !== 'production') {
-  // For local development, so hotreload works correctly
-  generalHeaders.push({
-    key: 'Cache-Control',
-    value: 'no-store, no-cache, must-revalidate',
-  });
-} else {
-  generalHeaders.push({
-    key: 'Cache-Control',
-    value: 'public, max-age=0',
-  });
+let generalCacheControlValue;
+switch (process.env.NODE_ENV) {
+  case 'production':
+    // for all environments, not just production! - see where NODE_ENV is set in ARM template
+    generalCacheControlValue =
+      'public, max-age=0, s-maxage=30, stale-while-revalidate=30';
+    break;
+  default:
+    // for hotreload when running locally
+    generalCacheControlValue = 'no-store, no-cache, must-revalidate';
+    break;
 }
 
-const releasePageAndSubPageHeaders = [];
-if (process.env.NODE_ENV !== 'production') {
-  releasePageAndSubPageHeaders.push({
-    key: 'Cache-Control',
-    value: 'no-store, no-cache, must-revalidate',
-  });
-} else {
-  releasePageAndSubPageHeaders.push({
-    key: 'Cache-Control',
-    // value: 'public, max-age=30, s-maxage=604800', // TODO enable once we purge the release page CDN cache on a release page change
-    value: 'public, max-age=0',
-  });
-}
+generalHeaders.push({
+  key: 'Cache-Control',
+  value: generalCacheControlValue,
+});
 
 const nextConfig = {
   compress: !process.env.WEBSITES_DISABLE_CONTENT_COMPRESSION,
@@ -83,10 +74,20 @@ const nextConfig = {
     return [
       // general case
       {
-        source: '/:path*',
+        // use next.js defaults for /_next/*
+        source: '/((?!_next/).*)',
         headers: generalHeaders,
       },
       // specific cases (that override the general case headers)
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, no-cache, must-revalidate',
+          },
+        ],
+      },
       {
         source: '/:file(favicon.svg|manifest.json)',
         headers: metaHeaders,
@@ -94,25 +95,6 @@ const nextConfig = {
       {
         source: '/assets/:path*',
         headers: assetHeaders,
-      },
-      {
-        source: '/_next/static/:path*',
-        headers: assetHeaders,
-      },
-      // for release pages and subpages
-      {
-        source: '/find-statistics/:publicationSlug/:releaseSlug/:path*',
-        headers: releasePageAndSubPageHeaders,
-      },
-      {
-        source:
-          '/_next/data/:buildId/find-statistics/:publicationSlug/:releaseSlug.json', // SPA load
-        headers: releasePageAndSubPageHeaders,
-      },
-      {
-        source:
-          '/_next/data/:buildId/find-statistics/:publicationSlug/:releaseSlug/:path*',
-        headers: releasePageAndSubPageHeaders,
       },
     ];
   },
