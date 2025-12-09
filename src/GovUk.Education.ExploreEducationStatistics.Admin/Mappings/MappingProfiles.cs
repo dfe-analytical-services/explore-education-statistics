@@ -250,17 +250,17 @@ public class MappingProfiles : CommonMappingProfile
     {
         if (screenerResult is null)
         {
-            return DataSetUploadStatus.SCREENER_ERROR.ToString();
+            return nameof(DataSetUploadStatus.SCREENER_ERROR);
         }
 
         if (screenerResult.Passed && screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING))
         {
-            return DataSetUploadStatus.PENDING_REVIEW.ToString();
+            return nameof(DataSetUploadStatus.PENDING_REVIEW);
         }
 
         return !screenerResult.Passed
-            ? DataSetUploadStatus.FAILED_SCREENING.ToString()
-            : DataSetUploadStatus.PENDING_IMPORT.ToString();
+            ? nameof(DataSetUploadStatus.FAILED_SCREENING)
+            : nameof(DataSetUploadStatus.PENDING_IMPORT);
     }
 
     private void CreateContentBlockMap()
