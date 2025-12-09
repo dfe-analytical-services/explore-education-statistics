@@ -26,8 +26,9 @@ export default function FormFieldTextInput<TFormValues extends FieldValues>({
         <FormGroup>
           <FormField {...props} maxLength={maxLength} as={FormTextInput} />
           <FormCharacterCount
-            id={props.id ?? ''}
+            id={props.id}
             maxLength={maxLength}
+            name={props.name}
             value={watchedValue}
           />
         </FormGroup>

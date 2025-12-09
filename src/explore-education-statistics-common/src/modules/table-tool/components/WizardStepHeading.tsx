@@ -13,12 +13,13 @@ const WizardStepHeading = ({
   fieldsetHeading = false,
   isActive,
   isEnabled,
+  stepHeadingTag: Heading = 'h2',
   stepNumber,
 }: Props) => {
   return (
-    <h2
+    <Heading
       aria-current={isActive ? 'step' : undefined}
-      className={classNames({
+      className={classNames('govuk-heading-l', {
         'govuk-heading-l dfe-flex dfe-align-items--center': isActive,
         'govuk-fieldset__heading': fieldsetHeading && isActive,
         [styles.stepEnabled]: isEnabled && !isActive,
@@ -35,7 +36,7 @@ const WizardStepHeading = ({
       <span className={classNames({ 'govuk-visually-hidden': !isActive })}>
         {children}
       </span>
-    </h2>
+    </Heading>
   );
 };
 

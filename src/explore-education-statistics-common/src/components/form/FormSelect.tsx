@@ -40,6 +40,7 @@ export interface FormSelectProps
   inlineHint?: boolean;
   inputRef?: Ref<HTMLSelectElement>;
   hint?: string | ReactNode;
+  labelClassName?: string;
   name: string;
   onBlur?: FocusEventHandler;
   onChange?: SelectChangeEventHandler;
@@ -65,6 +66,7 @@ const FormSelect = ({
   hint,
   hideLabel,
   label,
+  labelClassName,
   name,
   onBlur,
   onChange,
@@ -91,7 +93,9 @@ const FormSelect = ({
       <FormSelectWrapper inline={inline}>
         <FormSelectLabelWrapper inlineHint={inlineHint && !inline}>
           <FormLabel
-            className={classNames({ 'govuk-!-margin-right-2': inline })}
+            className={classNames(labelClassName, {
+              'govuk-!-margin-right-2': inline,
+            })}
             id={id}
             label={label}
             hideLabel={hideLabel}
