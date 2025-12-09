@@ -296,7 +296,7 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
               </ul>
             </nav>
 
-            <h2 className="govuk-heading-s">Related information</h2>
+            <h3 className="govuk-heading-s">Related information</h3>
             <ul className="govuk-list">
               <li>
                 <Link
@@ -323,9 +323,9 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
             </ul>
             {!!releaseSeries.length && (
               <>
-                <h2 className="govuk-heading-s" id="past-releases">
+                <h3 className="govuk-heading-s" id="past-releases">
                   Releases in this series
-                </h2>
+                </h3>
 
                 <Details
                   className="govuk-!-margin-bottom-4"
@@ -382,12 +382,12 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
             {(releaseVersion.publication.methodologies.length > 0 ||
               releaseVersion.publication.externalMethodology) && (
               <>
-                <h2
+                <h3
                   className="govuk-heading-s govuk-!-padding-top-0"
                   id="methodologies"
                 >
                   Methodologies
-                </h2>
+                </h3>
                 <ul className="govuk-list">
                   {releaseVersion.publication.methodologies.map(methodology => (
                     <li key={methodology.id}>
@@ -413,9 +413,9 @@ const PublicationReleasePage: NextPage<Props> = ({ releaseVersion }) => {
             )}
             {releaseVersion.relatedInformation.length > 0 && (
               <>
-                <h2 className="govuk-heading-s" id="related-pages">
+                <h3 className="govuk-heading-s" id="related-pages">
                   Related pages
-                </h2>
+                </h3>
                 <ul className="govuk-list">
                   {releaseVersion.relatedInformation &&
                     releaseVersion.relatedInformation.map(link => (

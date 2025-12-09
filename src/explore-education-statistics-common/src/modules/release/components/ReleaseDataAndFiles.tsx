@@ -11,6 +11,7 @@ import React, { ReactNode } from 'react';
 interface Props {
   downloadFiles: FileInfo[];
   hasDataGuidance: boolean;
+  headingClassName?: string;
   renderCreateTablesLink?: ReactNode;
   renderDataCatalogueLink?: ReactNode;
   renderAllFilesLink?: ReactNode;
@@ -25,6 +26,7 @@ interface Props {
 const ReleaseDataAndFiles = ({
   downloadFiles,
   hasDataGuidance,
+  headingClassName = 'govuk-heading-m',
   renderCreateTablesLink,
   renderDataCatalogueLink,
   renderAllFilesLink,
@@ -56,7 +58,7 @@ const ReleaseDataAndFiles = ({
         id="data-and-files-section"
         data-scroll={trackScroll ? true : undefined}
       >
-        <h2 className="govuk-heading-m" id="explore-data-and-files">
+        <h2 className={headingClassName} id="explore-data-and-files">
           Explore data and files used in this release
         </h2>
 
@@ -129,12 +131,11 @@ const ReleaseDataAndFiles = ({
                   {ancillaryFiles.map(file => (
                     <li
                       key={file.id}
-                      className={`${styles.listItem} govuk-!-margin-bottom-4`}
+                      className={`${styles.listItem} govuk-!-margin-bottom-4 govuk-!-padding-bottom-4`}
                     >
-                      <h3 className="govuk-heading-s govuk-!-margin-bottom-2">
-                        {renderDownloadLink(file)}
-                      </h3>
-                      {file.summary && <p>{file.summary}</p>}
+                      {renderDownloadLink(file)}
+                      <br />
+                      {file.summary}
                     </li>
                   ))}
                 </ul>
