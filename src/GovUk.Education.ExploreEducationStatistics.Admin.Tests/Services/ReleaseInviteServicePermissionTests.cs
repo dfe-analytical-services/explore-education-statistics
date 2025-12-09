@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -10,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -53,7 +51,7 @@ public class ReleaseInviteServicePermissionTest
                         contentDbContext: contentDbContext,
                         userService: userService.Object
                     );
-                    return await service.InviteContributor("test@test.com", publication.Id, ListOf(releaseVersion.Id));
+                    return await service.InviteContributor("test@test.com", publication.Id, SetOf(releaseVersion.Id));
                 }
             });
     }
@@ -148,9 +146,8 @@ public class ReleaseInviteServicePermissionTest
         IUserRoleService? userRoleService = null,
         IUserReleaseInviteRepository? userReleaseInviteRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
-        IEmailService? emailService = null,
-        IOptions<AppOptions>? appOptions = null,
-        IOptions<NotifyOptions>? notifyOptions = null
+        IEmailTemplateService? emailTemplateService = null,
+        IUserResourceRoleNotificationService? userResourceRoleNotificationService = null
     )
     {
         contentDbContext ??= InMemoryApplicationDbContext();
@@ -165,9 +162,9 @@ public class ReleaseInviteServicePermissionTest
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
             userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict),
             userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
-            emailService ?? Mock.Of<IEmailService>(Strict),
-            appOptions ?? Mock.Of<IOptions<AppOptions>>(),
-            notifyOptions ?? Mock.Of<IOptions<NotifyOptions>>()
+            emailTemplateService: emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
+            userResourceRoleNotificationService: userResourceRoleNotificationService
+                ?? Mock.Of<IUserResourceRoleNotificationService>(Strict)
         );
     }
 }

@@ -78,6 +78,45 @@ public class UserResourceRoleNotificationService(
         });
     }
 
+    public async Task NotifyUserOfNewContributorRoles(
+        Guid userId,
+        string publicationTitle,
+        HashSet<Guid> releaseVersionIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var user = await FindUser(userId, cancellationToken);
+
+        await contentDbContext.RequireTransaction(async () =>
+        {
+            // Doing it in this order will technically set a `SentDate` slightly before the email is actually sent.
+            // But if we did it the other way, and the database transaction failed after sending the email, then we
+            // would have sent an email for a role which has an unmarked `SentDate`.
+            // At least this way, if the email fails to send, the database transaction will be rolled back.
+            // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
+            await releaseVersionIds
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async releaseVersionId =>
+                    await userReleaseRoleRepository.MarkEmailAsSent(
+                        userId: userId,
+                        releaseVersionId: releaseVersionId,
+                        role: ReleaseRole.Contributor,
+                        cancellationToken: cancellationToken
+                    )
+                );
+
+            await emailTemplateService
+                .SendContributorInviteEmail(
+                    email: user.Email,
+                    publicationTitle: publicationTitle,
+                    releaseVersionIds: releaseVersionIds
+                )
+                .OrThrow(_ =>
+                    throw new EmailSendFailedException($"Failed to send contributor invite email to {user.Email}.")
+                );
+        });
+    }
+
     public async Task NotifyUserOfNewPreReleaseRole(
         string userEmail,
         Guid releaseVersionId,
@@ -117,5 +156,11 @@ public class UserResourceRoleNotificationService(
     {
         return await userRepository.FindActiveUserById(userId, cancellationToken)
             ?? throw new ArgumentException($"Active user with ID {userId} does not exist.");
+    }
+
+    private async Task<User> FindUser(Guid userId, CancellationToken cancellationToken)
+    {
+        return await userRepository.FindUserById(userId, cancellationToken)
+            ?? throw new ArgumentException($"User with ID {userId} does not exist.");
     }
 }
