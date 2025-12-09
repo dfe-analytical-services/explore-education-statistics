@@ -497,6 +497,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 typeof(IHttpClientAzureAuthenticationManager<>),
                 typeof(DefaultAzureCredentialHttpClientAuthenticationManager<>)
             );
+
+            services.AddSingleton<ICdnService, CdnService>();
         }
         else
         {
@@ -504,6 +506,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 typeof(IHttpClientAzureAuthenticationManager<>),
                 typeof(HttpHeaderHttpClientAuthenticationManager<>)
             );
+
+            services.AddSingleton<ICdnService, NoOpCdnService>();
         }
 
         services.AddEventGridClient(configuration);

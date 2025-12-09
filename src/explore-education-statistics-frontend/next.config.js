@@ -60,6 +60,13 @@ const nextConfig = {
     AZURE_SEARCH_ENDPOINT: process.env.AZURE_SEARCH_ENDPOINT,
     AZURE_SEARCH_INDEX: process.env.AZURE_SEARCH_INDEX,
   },
+  generateBuildId: async () => {
+    if (process.env.NEXT_BUILD_ID) {
+      return process.env.NEXT_BUILD_ID;
+    }
+
+    return crypto.randomUUID();
+  },
   async headers() {
     return [
       // general case

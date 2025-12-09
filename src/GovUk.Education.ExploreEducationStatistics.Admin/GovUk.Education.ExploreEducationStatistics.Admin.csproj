@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
+    <PackageReference Include="Azure.ResourceManager.Cdn" Version="1.5.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.22" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.22" PrivateAssets="all" />
     <PackageReference Include="GovukNotify" Version="7.2.0" />
