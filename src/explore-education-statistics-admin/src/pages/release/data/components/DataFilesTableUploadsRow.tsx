@@ -123,6 +123,10 @@ export default function DataFilesTableUploadRow({
     confirmText = 'Continue import (override failures)';
   }
 
+  if (dataSetUpload.status === 'SCREENER_ERROR') {
+    confirmText = 'Continue import (bypass screening)';
+  }
+
   return (
     <tr key={dataSetUpload.dataSetTitle}>
       <td data-testid="Title" className={styles.title}>
@@ -143,7 +147,9 @@ export default function DataFilesTableUploadRow({
             open={openImportConfirm}
             hideConfirm={
               (!isBauUser && (!canUpdateRelease || hasFailures)) ||
-              !dataSetUpload.screenerResult
+              (!dataSetUpload.screenerResult &&
+                !isBauUser &&
+                dataSetUpload.status === 'SCREENER_ERROR')
             }
             disableConfirm={
               !Object.values(warningAcknowledgements).every(
