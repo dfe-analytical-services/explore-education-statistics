@@ -1,8 +1,6 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -10,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -28,15 +25,14 @@ public class ReleaseInviteService(
     IUserRoleService userRoleService,
     IUserReleaseInviteRepository userReleaseInviteRepository,
     IUserReleaseRoleRepository userReleaseRoleRepository,
-    IEmailService emailService,
-    IOptions<AppOptions> appOptions,
-    IOptions<NotifyOptions> notifyOptions
+    IEmailTemplateService emailTemplateService,
+    IUserResourceRoleNotificationService userResourceRoleNotificationService
 ) : IReleaseInviteService
 {
     public async Task<Either<ActionResult, Unit>> InviteContributor(
         string email,
         Guid publicationId,
-        List<Guid> releaseVersionIds
+        HashSet<Guid> releaseVersionIds
     )
     {
         return await contentPersistenceHelper
@@ -74,14 +70,14 @@ public class ReleaseInviteService(
     }
 
     private async Task<Either<ActionResult, Unit>> CreateInactiveUserContributorInvite(
-        List<Guid> releaseVersionIds,
+        HashSet<Guid> releaseVersionIds,
         string email,
         string publicationTitle
     )
     {
         var normalizedEmail = email.Trim().ToLower();
 
-        var emailResult = await SendContributorInviteEmail(
+        var emailResult = await emailTemplateService.SendContributorInviteEmail(
             publicationTitle: publicationTitle,
             releaseVersionIds: releaseVersionIds,
             email: normalizedEmail
@@ -99,7 +95,7 @@ public class ReleaseInviteService(
         );
 
         await userReleaseInviteRepository.CreateManyIfNotExists(
-            releaseVersionIds: releaseVersionIds,
+            releaseVersionIds: [.. releaseVersionIds],
             email: normalizedEmail,
             releaseRole: Contributor,
             emailSent: true,
@@ -110,7 +106,7 @@ public class ReleaseInviteService(
     }
 
     private async Task<Either<ActionResult, Unit>> CreateActiveUserContributorInvite(
-        List<Guid> releaseVersionIds,
+        HashSet<Guid> releaseVersionIds,
         User user,
         string publicationTitle
     )
@@ -122,32 +118,28 @@ public class ReleaseInviteService(
                 releaseVersionIds.Contains(urr.ReleaseVersionId) && urr.Role == Contributor && urr.UserId == user.Id
             )
             .Select(urr => urr.ReleaseVersionId)
-            .ToList();
+            .ToHashSet();
 
         var missingReleaseRoleReleaseVersionIds = releaseVersionIds
             .Except(existingReleaseRoleReleaseVersionIds)
-            .ToList();
+            .ToHashSet();
 
         if (!missingReleaseRoleReleaseVersionIds.Any())
         {
             return ValidationActionResult(UserAlreadyHasReleaseRoles);
         }
 
-        var emailResult = await SendContributorInviteEmail(
-            publicationTitle: publicationTitle,
-            releaseVersionIds: missingReleaseRoleReleaseVersionIds,
-            email: user.Email
-        );
-        if (emailResult.IsLeft)
-        {
-            return emailResult;
-        }
-
         await userReleaseRoleRepository.CreateManyIfNotExists(
             userId: user.Id,
-            releaseVersionIds: missingReleaseRoleReleaseVersionIds,
+            releaseVersionIds: [.. missingReleaseRoleReleaseVersionIds],
             role: Contributor,
             createdById: userService.GetUserId()
+        );
+
+        await userResourceRoleNotificationService.NotifyUserOfNewContributorRoles(
+            userId: user.Id,
+            publicationTitle: publicationTitle,
+            releaseVersionIds: missingReleaseRoleReleaseVersionIds
         );
 
         var globalRoleNameToSet = userRoleService.GetAssociatedGlobalRoleNameForReleaseRole(Contributor);
@@ -156,7 +148,7 @@ public class ReleaseInviteService(
 
     private async Task<Either<ActionResult, Unit>> ValidateReleaseVersionIds(
         Guid publicationId,
-        List<Guid> releaseVersionIds
+        HashSet<Guid> releaseVersionIds
     )
     {
         var distinctReleaseVersionIds = releaseVersionIds.Distinct().ToList();
@@ -175,39 +167,5 @@ public class ReleaseInviteService(
         }
 
         return Unit.Instance;
-    }
-
-    private async Task<Either<ActionResult, Unit>> SendContributorInviteEmail(
-        string publicationTitle,
-        List<Guid> releaseVersionIds,
-        string email
-    )
-    {
-        if (releaseVersionIds.IsNullOrEmpty())
-        {
-            throw new ArgumentException("List of release versions cannot be empty");
-        }
-
-        var url = appOptions.Value.Url;
-        var template = notifyOptions.Value.ContributorTemplateId;
-
-        var releases = await contentDbContext
-            .Releases.Where(r => r.Versions.Any(rv => releaseVersionIds.Contains(rv.Id)))
-            .ToListAsync();
-
-        var releaseTitles = releases
-            .OrderBy(r => r.Year)
-            .ThenBy(r => r.TimePeriodCoverage)
-            .Select(r => $"* {r.Title}")
-            .JoinToString('\n');
-
-        var emailValues = new Dictionary<string, dynamic>
-        {
-            { "url", url },
-            { "publication name", publicationTitle },
-            { "release list", releaseTitles },
-        };
-
-        return emailService.SendEmail(email, template, emailValues);
     }
 }

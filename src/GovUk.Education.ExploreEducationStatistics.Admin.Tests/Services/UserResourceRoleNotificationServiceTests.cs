@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -54,7 +55,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         }
 
         [Fact]
-        public async Task ActiveUserDoesNotExist_ThrowsArgumentException()
+        public async Task ActiveUserDoesNotExist_ThrowsKeyNotFoundException()
         {
             var userId = Guid.NewGuid();
 
@@ -66,7 +67,7 @@ public abstract class UserResourceRoleNotificationServiceTests
 
             var service = BuildService(userRepository: userRepository.Object);
 
-            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
                 await service.NotifyUserOfNewPublicationRole(
                     userId: userId,
                     publication: _dataFixture.DefaultPublication(),
@@ -157,7 +158,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         }
 
         [Fact]
-        public async Task ActiveUserDoesNotExist_ThrowsArgumentException()
+        public async Task ActiveUserDoesNotExist_ThrowsKeyNotFoundException()
         {
             var userId = Guid.NewGuid();
 
@@ -169,7 +170,7 @@ public abstract class UserResourceRoleNotificationServiceTests
 
             var service = BuildService(userRepository: userRepository.Object);
 
-            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
                 await service.NotifyUserOfNewReleaseRole(
                     userId: userId,
                     releaseVersion: _dataFixture.DefaultReleaseVersion(),
@@ -216,6 +217,113 @@ public abstract class UserResourceRoleNotificationServiceTests
                     userId: activeUser.Id,
                     releaseVersion: releaseVersion,
                     role: role
+                )
+            );
+
+            MockUtils.VerifyAllMocks(userRepository, userReleaseRoleRepository, emailTemplateService);
+        }
+    }
+
+    public class NotifyUserOfNewContributorRolesTests : UserResourceRoleNotificationServiceTests
+    {
+        [Fact]
+        public async Task Success()
+        {
+            User user = _dataFixture.DefaultUser();
+            var publicationTitle = "publication-title";
+            var releaseVersionIds = CollectionUtils.SetOf(Guid.NewGuid(), Guid.NewGuid());
+            const ReleaseRole role = ReleaseRole.Contributor;
+
+            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+            var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
+
+            userRepository.Setup(r => r.FindUserById(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+
+            foreach (var releaseVersionId in releaseVersionIds)
+            {
+                userReleaseRoleRepository
+                    .Setup(r => r.MarkEmailAsSent(user.Id, releaseVersionId, role, null, It.IsAny<CancellationToken>()))
+                    .Returns(Task.CompletedTask);
+            }
+
+            emailTemplateService
+                .Setup(s => s.SendContributorInviteEmail(user.Email, publicationTitle, releaseVersionIds))
+                .ReturnsAsync(Unit.Instance);
+
+            var service = BuildService(
+                userRepository: userRepository.Object,
+                emailTemplateService: emailTemplateService.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
+            );
+
+            await service.NotifyUserOfNewContributorRoles(
+                userId: user.Id,
+                publicationTitle: publicationTitle,
+                releaseVersionIds: releaseVersionIds
+            );
+
+            MockUtils.VerifyAllMocks(userRepository, userReleaseRoleRepository, emailTemplateService);
+        }
+
+        [Fact]
+        public async Task UserDoesNotExist_ThrowsKeyNotFoundException()
+        {
+            var userId = Guid.NewGuid();
+
+            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
+
+            userRepository.Setup(r => r.FindUserById(userId, It.IsAny<CancellationToken>())).ReturnsAsync((User?)null);
+
+            var service = BuildService(userRepository: userRepository.Object);
+
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+                await service.NotifyUserOfNewContributorRoles(
+                    userId: userId,
+                    publicationTitle: "publication-title",
+                    releaseVersionIds: []
+                )
+            );
+
+            MockUtils.VerifyAllMocks(userRepository);
+        }
+
+        [Fact]
+        public async Task SendingEmailFails_ThrowsEmailSendFailedException()
+        {
+            User user = _dataFixture.DefaultUser();
+            var publicationTitle = "publication-title";
+            var releaseVersionIds = CollectionUtils.SetOf(Guid.NewGuid(), Guid.NewGuid());
+            const ReleaseRole role = ReleaseRole.Contributor;
+
+            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+            var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
+
+            userRepository.Setup(r => r.FindUserById(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+
+            foreach (var releaseVersionId in releaseVersionIds)
+            {
+                userReleaseRoleRepository
+                    .Setup(r => r.MarkEmailAsSent(user.Id, releaseVersionId, role, null, It.IsAny<CancellationToken>()))
+                    .Returns(Task.CompletedTask);
+            }
+
+            emailTemplateService
+                .Setup(s => s.SendContributorInviteEmail(user.Email, publicationTitle, releaseVersionIds))
+                .ReturnsAsync(new BadRequestResult());
+
+            var service = BuildService(
+                userRepository: userRepository.Object,
+                emailTemplateService: emailTemplateService.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
+            );
+
+            await Assert.ThrowsAsync<EmailSendFailedException>(async () =>
+                await service.NotifyUserOfNewContributorRoles(
+                    userId: user.Id,
+                    publicationTitle: publicationTitle,
+                    releaseVersionIds: releaseVersionIds
                 )
             );
 
