@@ -1,7 +1,4 @@
-import {
-  PreReleaseAccessListSummary,
-  RelatedInformationItem,
-} from '@common/services/publicationService';
+import { RelatedInformationItem } from '@common/services/publicationService';
 import { render, screen, within } from '@testing-library/react';
 import React from 'react';
 import ReleaseHelpPage from '../ReleaseHelpPage';
@@ -24,36 +21,9 @@ describe('ReleaseHelpPage', () => {
     },
   ];
 
-  const testPraSummary: PreReleaseAccessListSummary = {
-    id: 'test-pra-summary',
-    title: 'test-release-title',
-    yearTitle: '2024',
-    coverageTitle: 'National',
-    slug: 'test-release-slug',
-    nextReleaseDate: {
-      year: '2025',
-    },
-    type: 'OfficialStatistics',
-    latestRelease: true,
-    preReleaseAccessList: '<p>Pre-release access list content</p>',
-    publication: {
-      id: 'publication-1',
-      slug: 'publication-1-slug',
-      latestReleaseSlug: 'latest-release-slug-1',
-      title: 'Publication 1',
-      owner: false,
-      contact: {
-        teamName: 'Mock Contact Team Name',
-        teamEmail: 'Mock Contact Team Email',
-        contactName: 'Mock Contact Name',
-      },
-    },
-  };
-
   test('renders correctly with all content sections', () => {
     render(
       <ReleaseHelpPage
-        praSummary={testPraSummary}
         publicationSummary={testPublicationSummary}
         relatedInformationItems={testRelatedLinks}
         releaseVersionSummary={testReleaseVersionSummary}
@@ -96,7 +66,6 @@ describe('ReleaseHelpPage', () => {
   test('does not render related info section if no links', () => {
     render(
       <ReleaseHelpPage
-        praSummary={testPraSummary}
         publicationSummary={testPublicationSummary}
         relatedInformationItems={[]}
         releaseVersionSummary={testReleaseVersionSummary}
@@ -113,10 +82,12 @@ describe('ReleaseHelpPage', () => {
   test('does not render pra section if no data', () => {
     render(
       <ReleaseHelpPage
-        praSummary={{ ...testPraSummary, preReleaseAccessList: '' }}
         publicationSummary={testPublicationSummary}
         relatedInformationItems={testRelatedLinks}
-        releaseVersionSummary={testReleaseVersionSummary}
+        releaseVersionSummary={{
+          ...testReleaseVersionSummary,
+          preReleaseAccessList: '',
+        }}
       />,
     );
 

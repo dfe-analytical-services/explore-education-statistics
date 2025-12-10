@@ -4,7 +4,6 @@ import getNavItemsFromContentSections from '@common/components/util/getNavItemsF
 import { contactUsNavItem } from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import exploreDataPageSections from '@common/modules/release/data/releaseExploreDataPageSections';
 import publicationService, {
-  PreReleaseAccessListSummary,
   PublicationMethodologiesList,
   PublicationSummaryRedesign,
   RelatedInformationItem,
@@ -74,7 +73,6 @@ interface MethodologyProps extends BaseReleaseProps {
 
 interface HelpProps extends BaseReleaseProps {
   page: 'help';
-  praSummary: PreReleaseAccessListSummary;
   relatedInformationItems: RelatedInformationItem[];
 }
 
@@ -126,7 +124,6 @@ const PublicationReleasePage: NextPage<Props> = props => {
       )}
       {page === 'help' && (
         <ReleaseHelpPage
-          praSummary={props.praSummary}
           publicationSummary={props.publicationSummary}
           relatedInformationItems={props.relatedInformationItems}
           releaseVersionSummary={props.releaseVersionSummary}
@@ -265,12 +262,6 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
           }
 
           case 'help': {
-            const praSummary = await queryClient.fetchQuery(
-              publicationQueries.getPreReleaseAccessList(
-                publicationSlug,
-                releaseSlug,
-              ),
-            );
             const relatedInformationItems = await queryClient.fetchQuery(
               publicationQueries.getReleaseVersionRelatedInformation(
                 publicationSlug,
@@ -278,7 +269,7 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
               ),
             );
             const hasRelatedInformation = !!relatedInformationItems.length;
-            const hasPraSummary = !!praSummary.preReleaseAccessList;
+            const hasPraSummary = !!releaseVersionSummary.preReleaseAccessList;
             return {
               props: {
                 ...baseProps,
@@ -298,7 +289,6 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
                     text: 'Pre-release access list',
                   },
                 ].filter(item => !!item),
-                praSummary,
                 relatedInformationItems,
               },
             };

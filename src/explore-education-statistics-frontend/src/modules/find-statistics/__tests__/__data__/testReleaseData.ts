@@ -248,6 +248,7 @@ export const testReleaseVersionSummary: ReleaseVersionSummary = {
   published: '2025-08-10T09:30:00+01:00',
   lastUpdated: '2025-08-11T14:30:00+01:00',
   isLatestRelease: true,
+  preReleaseAccessList: '<p>Pre-release access list content</p>',
   updateCount: 5,
 };
 
