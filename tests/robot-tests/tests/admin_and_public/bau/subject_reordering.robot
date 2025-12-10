@@ -104,8 +104,9 @@ Validate new order is preserved after refresh
 Start replacing last subject in order
     user uploads subject replacement    Three    ordering-test-3-replacement.csv
     ...    ordering-test-3-replacement.meta.csv
-
     user waits until page contains element    testid:Data file replacements table
+    user confirms replacement upload    Three
+
     user checks table cell contains    1    1    Three    testid:Data file replacements table
     user checks table cell contains    1    3    Ready    testid:Data file replacements table
     user clicks link in table cell    1    4    View details    testid:Data file replacements table

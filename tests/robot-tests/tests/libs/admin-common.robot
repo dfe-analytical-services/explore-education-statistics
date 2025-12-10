@@ -1116,8 +1116,8 @@ user clicks edit data block link
     ...    ${data_block_name}
     user clicks element    testid:Edit data block ${data_block_name}
     user waits until page finishes loading
-    user waits until h2 is visible    ${data_block_name}
-    user waits until h2 is visible    Data block details
+    user waits until h3 is visible    ${data_block_name}
+    user waits until h3 is visible    Data block details
 
 user creates legacy release
     [Arguments]

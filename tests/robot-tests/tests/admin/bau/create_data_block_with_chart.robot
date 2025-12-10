@@ -602,7 +602,7 @@ Validate line chart embeds correctly
 Configure basic vertical bar chart
     user navigates to    ${DATABLOCK_URL}
 
-    user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_MEDIUM}
+    user waits until h3 is visible    ${DATABLOCK_NAME}    %{WAIT_MEDIUM}
     user waits until page finishes loading
 
     user configures basic chart    Vertical bar    500
@@ -694,7 +694,7 @@ Save and validate vertical bar chart embeds correctly
 
 Configure basic horizontal bar chart
     user navigates to    ${DATABLOCK_URL}
-    user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
+    user waits until h3 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
     user waits until page finishes loading
 
     user configures basic chart    Horizontal bar    600
@@ -774,7 +774,7 @@ Save and validate horizontal bar chart embeds correctly
 
 Configure basic geographic chart
     user navigates to    ${DATABLOCK_URL}
-    user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
+    user waits until h3 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
     user waits until page finishes loading
 
     user configures basic chart    Geographic    700
@@ -1032,7 +1032,7 @@ Reorder categorical data
 Configure basic infographic chart
     user navigates to    ${DATABLOCK_URL}
 
-    user waits until h2 is visible    ${DATABLOCK_NAME}
+    user waits until h3 is visible    ${DATABLOCK_NAME}
     user waits until page finishes loading
 
     user clicks link    Chart
@@ -1071,7 +1071,7 @@ Delete embedded data block
 
 Delete chart from data block
     user navigates to    ${DATABLOCK_URL}
-    user waits until h2 is visible    ${DATABLOCK_NAME}
+    user waits until h3 is visible    ${DATABLOCK_NAME}
     user waits until page finishes loading
     user clicks link    Chart
     user clicks button    Delete chart
