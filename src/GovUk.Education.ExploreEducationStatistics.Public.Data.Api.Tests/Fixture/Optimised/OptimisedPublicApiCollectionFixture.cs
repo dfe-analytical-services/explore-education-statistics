@@ -1,27 +1,20 @@
-#nullable enable
 using System.Security.Claims;
-using GovUk.Education.ExploreEducationStatistics.Admin.Database;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Search;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.Optimised;
 
 /// <summary>
 ///
-/// A Collection-level test fixture to be used by Admin integration tests.
+/// A Collection-level test fixture to be used by Public API integration tests.
 ///
 /// A number of capabilities are supported by this fixture, and each subclass can specify the capabilities that they
 /// need.  The relevant configuration changes and Test Containers will then be put in place to support this for the
@@ -49,30 +42,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimis
 ///
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapability[] capabilities)
-    : OptimisedIntegrationTestFixtureBase<Startup>
+public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTestCapability[] capabilities)
+    : OptimisedIntegrationTestFixtureBase<Startup>(minimalApi: true)
 {
-    private PublicDataDbContext _publicDataDbContext = null!;
-    private ContentDbContext _contentDbContext = null!;
-    private StatisticsDbContext _statisticsDbContext = null!;
-    private UsersAndRolesDbContext _usersAndRolesDbContext = null!;
-    private Mock<IProcessorClient> _processorClientMock = null!;
-    private Mock<IPublicDataApiClient> _publicDataApiClientMock = null!;
     private OptimisedTestUserHolder _userHolder = null!;
 
     private Func<string> _psqlConnectionString = null!;
-    private Func<string> _azuriteConnectionString = null!;
+
+    private PublicDataDbContext _publicDataDbContext = null!;
+    private Mock<IContentApiClient> _contentApiClientMock = null!;
+    private Mock<ISearchService> _searchServiceMock = null!;
+    private Mock<IAnalyticsService> _analyticsServiceMock = null!;
 
     protected override void RegisterTestContainers(TestContainerRegistrations registrations)
     {
-        if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
+        if (capabilities.Contains(PublicApiIntegrationTestCapability.Postgres))
         {
             _psqlConnectionString = registrations.RegisterPostgreSqlContainer();
-        }
-
-        if (capabilities.Contains(AdminIntegrationTestCapability.Azurite))
-        {
-            _azuriteConnectionString = registrations.RegisterAzuriteContainer();
         }
     }
 
@@ -80,35 +66,14 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
         OptimisedServiceAndConfigModifications serviceModifications
     )
     {
+        serviceModifications.AddControllers<Startup>();
+
         serviceModifications
-            .AddInMemoryDbContext<ContentDbContext>(databaseName: $"{nameof(ContentDbContext)}_{Guid.NewGuid()}")
-            .AddInMemoryDbContext<StatisticsDbContext>(databaseName: $"{nameof(StatisticsDbContext)}_{Guid.NewGuid()}")
-            .AddInMemoryDbContext<UsersAndRolesDbContext>(
-                databaseName: $"{nameof(UsersAndRolesDbContext)}_{Guid.NewGuid()}"
-            )
-            .ReplaceServiceWithMock<IProcessorClient>()
-            .ReplaceServiceWithMock<IPublicDataApiClient>()
-            .ReplaceServiceWithMock<IDataProcessorClient>()
-            .ReplaceServiceWithMock<IPublisherClient>()
-            .ReplaceServiceWithMock<IAdminEventRaiser>(MockBehavior.Loose) // Ignore calls to publish events
-            .AddControllers<Startup>();
+            .ReplaceServiceWithMock<IContentApiClient>()
+            .ReplaceServiceWithMock<ISearchService>()
+            .ReplaceServiceWithMock<IAnalyticsService>(mockBehavior: MockBehavior.Loose);
 
-        if (capabilities.Contains(AdminIntegrationTestCapability.Azurite))
-        {
-            serviceModifications.AddAzurite(
-                connectionString: _azuriteConnectionString(),
-                connectionStringKeys: ["PublicStorage", "PublisherStorage", "CoreStorage"]
-            );
-        }
-        else
-        {
-            serviceModifications
-                .ReplaceServiceWithMock<IPublisherTableStorageService>()
-                .ReplaceServiceWithMock<IPrivateBlobStorageService>()
-                .ReplaceServiceWithMock<IPublicBlobStorageService>();
-        }
-
-        if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
+        if (capabilities.Contains(PublicApiIntegrationTestCapability.Postgres))
         {
             serviceModifications.AddPostgres<PublicDataDbContext>(_psqlConnectionString());
         }
@@ -117,7 +82,7 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
             serviceModifications.AddSingleton(Mock.Of<PublicDataDbContext>());
         }
 
-        if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
+        if (capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
         {
             serviceModifications.AddUserAuth();
         }
@@ -125,7 +90,7 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
 
     protected override Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
     {
-        if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
+        if (capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
         {
             // Get a reference to the component that allows us to set the user we wish to use for a particular call.
             _userHolder = lookups.GetService<OptimisedTestUserHolder>();
@@ -135,17 +100,15 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
         // per startup of a test class that uses this fixture and are disposed of at the end of its lifetime, via XUnit
         // calling "DisposeAsync" on this fixture.
         _publicDataDbContext = lookups.GetService<PublicDataDbContext>();
-        _contentDbContext = lookups.GetService<ContentDbContext>();
-        _statisticsDbContext = lookups.GetService<StatisticsDbContext>();
-        _usersAndRolesDbContext = lookups.GetService<UsersAndRolesDbContext>();
 
         // Look up the Mocks surrounding mocked-out dependencies once per test class using this fixture.
         // Test classes can then use the Mocks for setups and verifications, as the Mocks will be the same ones
         // as used in the tested code itself.
-        _processorClientMock = lookups.GetMockService<IProcessorClient>();
-        _publicDataApiClientMock = lookups.GetMockService<IPublicDataApiClient>();
+        _contentApiClientMock = lookups.GetMockService<IContentApiClient>();
+        _searchServiceMock = lookups.GetMockService<ISearchService>();
+        _analyticsServiceMock = lookups.GetMockService<IAnalyticsService>();
 
-        if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
+        if (capabilities.Contains(PublicApiIntegrationTestCapability.Postgres))
         {
             _publicDataDbContext.Database.Migrate();
         }
@@ -168,9 +131,6 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     {
         // Dispose of any DbContexts when the test class that was using this fixture has completed.
         await _publicDataDbContext.DisposeAsync();
-        await _contentDbContext.DisposeAsync();
-        await _statisticsDbContext.DisposeAsync();
-        await _usersAndRolesDbContext.DisposeAsync();
     }
 
     /// <summary>
@@ -185,24 +145,10 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public ContentDbContext GetContentDbContext() => _contentDbContext;
-
-    /// <summary>
-    /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
-    /// </summary>
-    public StatisticsDbContext GetStatisticsDbContext() => _statisticsDbContext;
-
-    /// <summary>
-    /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
-    /// </summary>
-    public UsersAndRolesDbContext GetUsersAndRolesDbContext() => _usersAndRolesDbContext;
-
-    /// <summary>
-    /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
-    /// </summary>
     public PublicDataDbContext GetPublicDataDbContext() => _publicDataDbContext;
 
     /// <summary>
+    ///
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
@@ -210,9 +156,10 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     /// <param name="resetMock">
     /// Controls whether this mock is firstly reset upon being requested via this method.
     /// See <see cref="MockExtensions.WithOptionalReset" /> for more details.
+    ///
     /// </param>
-    public Mock<IProcessorClient> GetProcessorClientMock(bool resetMock = true) =>
-        _processorClientMock.WithOptionalReset(resetMock);
+    public Mock<IContentApiClient> GetContentApiClientMock(bool resetMock = true) =>
+        _contentApiClientMock.WithOptionalReset(resetMock);
 
     /// <summary>
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
@@ -223,15 +170,29 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     /// Controls whether this mock is firstly reset upon being requested via this method.
     /// See <see cref="MockExtensions.WithOptionalReset" /> for more details.
     /// </param>
-    public Mock<IPublicDataApiClient> GetPublicDataApiClientMock(bool resetMock = true) =>
-        _publicDataApiClientMock.WithOptionalReset(resetMock);
+    public Mock<ISearchService> GetSearchServiceMock(bool resetMock = true) =>
+        _searchServiceMock.WithOptionalReset(resetMock);
+
+    /// <summary>
+    ///
+    /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
+    /// within the tested code itself.
+    /// </summary>
+    ///
+    /// <param name="resetMock">
+    /// Controls whether this mock is firstly reset upon being requested via this method.
+    /// See <see cref="MockExtensions.WithOptionalReset" /> for more details.
+    ///
+    /// </param>
+    public Mock<IAnalyticsService> GetAnalyticsServiceMock(bool resetMock = true) =>
+        _analyticsServiceMock.WithOptionalReset(resetMock);
 
     /// <summary>
     /// Adds a user to the test user pool so that they can be used for HttpClient calls and looked up successfully.
     /// </summary>
     private void SetUser(ClaimsPrincipal user)
     {
-        if (!capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
+        if (!capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
         {
             throw new Exception("""Cannot register test users if "useTestUserAuthentication" is false.""");
         }
@@ -240,20 +201,21 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     }
 }
 
-public enum AdminIntegrationTestCapability
+public enum PublicApiIntegrationTestCapability
 {
     Postgres,
-    Azurite,
     UserAuth,
 }
 
 public static class OptimisedTestUsers
 {
-    public static readonly ClaimsPrincipal Bau = new DataFixture().BauUser();
+    public static readonly ClaimsPrincipal AdminAppUser = new DataFixture()
+        .Generator<ClaimsPrincipal>()
+        .WithRole(SecurityConstants.AdminAccessAppRole);
 
-    public static readonly ClaimsPrincipal Authenticated = new DataFixture().AuthenticatedUser();
-
-    public static readonly ClaimsPrincipal PreReleaseUser = new DataFixture().PreReleaseUser();
+    public static readonly ClaimsPrincipal UnsupportedRoleUser = new DataFixture()
+        .Generator<ClaimsPrincipal>()
+        .WithRole("Unsupported Role");
 }
 
 public static class MockExtensions

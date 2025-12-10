@@ -1124,8 +1124,9 @@ public abstract class DataSetsControllerTests
             DataSet? dataSet = null;
             DataSetVersion? dataSetVersion = null;
 
-            fixture
-                .GetProcessorClientMock()
+            var processorClientMock = fixture.GetProcessorClientMock();
+
+            processorClientMock
                 .Setup(c => c.CreateDataSet(releaseFile.Id, It.IsAny<CancellationToken>()))
                 .Returns(async () =>
                 {
@@ -1158,7 +1159,7 @@ public abstract class DataSetsControllerTests
 
             var response = await CreateDataSet(releaseFile.Id);
 
-            MockUtils.VerifyAllMocks(fixture.GetProcessorClientMock());
+            MockUtils.VerifyAllMocks(processorClientMock);
 
             var content = response.AssertOk<DataSetViewModel>();
 
@@ -1210,14 +1211,15 @@ public abstract class DataSetsControllerTests
                 },
             ];
 
-            fixture
-                .GetProcessorClientMock()
+            var processorClientMock = fixture.GetProcessorClientMock();
+
+            processorClientMock
                 .Setup(c => c.CreateDataSet(releaseFileId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(ValidationUtils.ValidationResult(processorErrors));
 
             var response = await CreateDataSet(releaseFileId);
 
-            MockUtils.VerifyAllMocks(fixture.GetProcessorClientMock());
+            MockUtils.VerifyAllMocks(processorClientMock);
 
             var validationProblem = response.AssertValidationProblem();
 

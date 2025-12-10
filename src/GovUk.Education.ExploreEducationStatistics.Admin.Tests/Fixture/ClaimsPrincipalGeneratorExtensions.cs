@@ -9,11 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 
 public static class ClaimsPrincipalGeneratorExtensions
 {
-    public static Generator<ClaimsPrincipal> VerifiedButNotAuthorizedByIdentityProviderUser(this DataFixture fixture)
-    {
-        return fixture.Generator<ClaimsPrincipal>().WithId(Guid.NewGuid()).WithScope("some-other-scope");
-    }
-
     public static Generator<ClaimsPrincipal> VerifiedByIdentityProviderUser(this DataFixture fixture)
     {
         return fixture

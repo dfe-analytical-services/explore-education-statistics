@@ -490,8 +490,9 @@ public abstract class DataSetVersionsControllerTests
 
             DataSetVersion? nextVersion = null;
 
-            fixture
-                .GetProcessorClientMock()
+            var processorClientMock = fixture.GetProcessorClientMock();
+
+            processorClientMock
                 .Setup(c =>
                     c.CreateNextDataSetVersionMappings(dataSet.Id, releaseFile.Id, null, It.IsAny<CancellationToken>())
                 )
@@ -527,7 +528,7 @@ public abstract class DataSetVersionsControllerTests
 
             var response = await CreateNextVersion(dataSetId: dataSet.Id, releaseFileId: releaseFile.Id);
 
-            MockUtils.VerifyAllMocks(fixture.GetProcessorClientMock());
+            MockUtils.VerifyAllMocks(processorClientMock);
 
             var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
 
@@ -629,8 +630,9 @@ public abstract class DataSetVersionsControllerTests
                     context.DataSets.Update(dataSet);
                 });
 
-            fixture
-                .GetProcessorClientMock()
+            var processorClientMock = fixture.GetProcessorClientMock();
+
+            processorClientMock
                 .Setup(c => c.CompleteNextDataSetVersionImport(nextDataSetVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() =>
                     new ProcessDataSetVersionResponseViewModel
@@ -643,7 +645,7 @@ public abstract class DataSetVersionsControllerTests
 
             var response = await CompleteNextVersionImport(dataSetVersionId: nextDataSetVersion.Id);
 
-            MockUtils.VerifyAllMocks(fixture.GetProcessorClientMock());
+            MockUtils.VerifyAllMocks(processorClientMock);
 
             var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
 
@@ -697,14 +699,15 @@ public abstract class DataSetVersionsControllerTests
         {
             var dataSetVersionId = Guid.NewGuid();
 
-            fixture
-                .GetProcessorClientMock()
+            var processorClientMock = fixture.GetProcessorClientMock();
+
+            processorClientMock
                 .Setup(c => c.DeleteDataSetVersion(dataSetVersionId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Either<ActionResult, Unit>(Unit.Instance));
 
             var response = await DeleteVersion(dataSetVersionId);
 
-            MockUtils.VerifyAllMocks(fixture.GetProcessorClientMock());
+            MockUtils.VerifyAllMocks(processorClientMock);
 
             response.AssertNoContent();
         }
@@ -740,14 +743,15 @@ public abstract class DataSetVersionsControllerTests
                     context.DataSets.Update(dataSet);
                 });
 
-            fixture
-                .GetProcessorClientMock()
+            var processorClientMock = fixture.GetProcessorClientMock();
+
+            processorClientMock
                 .Setup(c => c.DeleteDataSetVersion(dataSetVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Either<ActionResult, Unit>(new NotFoundResult()));
 
             var response = await DeleteVersion(dataSetVersion.Id);
 
-            MockUtils.VerifyAllMocks(fixture.GetProcessorClientMock());
+            MockUtils.VerifyAllMocks(processorClientMock);
 
             response.AssertNotFound();
         }
@@ -775,8 +779,9 @@ public abstract class DataSetVersionsControllerTests
                     context.DataSets.Update(dataSet);
                 });
 
-            fixture
-                .GetProcessorClientMock()
+            var processorClientMock = fixture.GetProcessorClientMock();
+
+            processorClientMock
                 .Setup(c => c.DeleteDataSetVersion(dataSetVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(
                     new Either<ActionResult, Unit>(
@@ -794,7 +799,7 @@ public abstract class DataSetVersionsControllerTests
 
             var response = await DeleteVersion(dataSetVersion.Id);
 
-            MockUtils.VerifyAllMocks(fixture.GetProcessorClientMock());
+            MockUtils.VerifyAllMocks(processorClientMock);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -824,14 +829,15 @@ public abstract class DataSetVersionsControllerTests
                     context.DataSets.Update(dataSet);
                 });
 
-            fixture
-                .GetProcessorClientMock()
+            var processorClientMock = fixture.GetProcessorClientMock();
+
+            processorClientMock
                 .Setup(c => c.DeleteDataSetVersion(dataSetVersion.Id, It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new HttpRequestException());
 
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => DeleteVersion(dataSetVersion.Id));
 
-            MockUtils.VerifyAllMocks(fixture.GetProcessorClientMock());
+            MockUtils.VerifyAllMocks(processorClientMock);
 
             Assert.IsType<HttpRequestException>(exception.InnerException);
         }
@@ -872,8 +878,9 @@ public abstract class DataSetVersionsControllerTests
 
             var mockedChanges = new MockedChanges { Changes = ["test"] };
 
-            fixture
-                .GetPublicDataApiClientMock()
+            var publicDataApiClientMock = fixture.GetPublicDataApiClientMock();
+
+            publicDataApiClientMock
                 .Setup(c =>
                     c.GetDataSetVersionChanges(
                         dataSetVersion.DataSetId,
@@ -887,7 +894,7 @@ public abstract class DataSetVersionsControllerTests
 
             var response = await GetVersionChanges(dataSetVersion.Id);
 
-            MockUtils.VerifyAllMocks(fixture.GetPublicDataApiClientMock());
+            MockUtils.VerifyAllMocks(publicDataApiClientMock);
 
             response.AssertOk(mockedChanges, useSystemJson: true);
         }
@@ -930,8 +937,9 @@ public abstract class DataSetVersionsControllerTests
                     context.DataSets.Update(dataSet);
                 });
 
-            fixture
-                .GetPublicDataApiClientMock()
+            var publicDataApiClientMock = fixture.GetPublicDataApiClientMock();
+
+            publicDataApiClientMock
                 .Setup(c =>
                     c.GetDataSetVersionChanges(
                         dataSetVersion.DataSetId,
@@ -943,7 +951,7 @@ public abstract class DataSetVersionsControllerTests
 
             var response = await GetVersionChanges(dataSetVersion.Id);
 
-            MockUtils.VerifyAllMocks(fixture.GetPublicDataApiClientMock());
+            MockUtils.VerifyAllMocks(publicDataApiClientMock);
 
             response.AssertValidationProblem();
         }
@@ -970,8 +978,9 @@ public abstract class DataSetVersionsControllerTests
                     context.DataSets.Update(dataSet);
                 });
 
-            fixture
-                .GetPublicDataApiClientMock()
+            var publicDataApiClientMock = fixture.GetPublicDataApiClientMock();
+
+            publicDataApiClientMock
                 .Setup(c =>
                     c.GetDataSetVersionChanges(
                         dataSetVersion.DataSetId,
@@ -985,7 +994,7 @@ public abstract class DataSetVersionsControllerTests
                 GetVersionChanges(dataSetVersion.Id)
             );
 
-            MockUtils.VerifyAllMocks(fixture.GetPublicDataApiClientMock());
+            MockUtils.VerifyAllMocks(publicDataApiClientMock);
 
             Assert.IsType<HttpRequestException>(exception.InnerException);
         }

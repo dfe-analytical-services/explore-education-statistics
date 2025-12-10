@@ -31,6 +31,14 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
     public async Task Initialize()
     {
         await _postgreSqlContainer.StartAsync();
+
+        var options = new DbContextOptionsBuilder<PublicDataDbContext>()
+            .UseNpgsql(_postgreSqlContainer.GetConnectionString())
+            .Options;
+
+        await using var context = new PublicDataDbContext(options);
+        context.Database.SetConnectionString(_postgreSqlContainer.GetConnectionString());
+        await context.Database.MigrateAsync();
     }
 
     public override async ValueTask DisposeAsync()
