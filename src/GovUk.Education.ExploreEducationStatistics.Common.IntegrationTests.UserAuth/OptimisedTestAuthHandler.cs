@@ -1,9 +1,7 @@
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 
@@ -24,41 +22,20 @@ public class OptimisedTestAuthHandler(
     OptimisedTestUserHolder userHolder
 ) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
+    private readonly ILoggerFactory _logger = logger;
+
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var user = userHolder.GetUser();
 
         if (user == null)
         {
-            logger.CreateLogger(GetType()).LogWarning("No test user has been set to handle this HTTP request.");
+            _logger.CreateLogger(GetType()).LogWarning("No test user has been set to handle this HTTP request.");
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
         var ticket = new AuthenticationTicket(user, "Bearer");
         var result = AuthenticateResult.Success(ticket);
         return Task.FromResult(result);
-    }
-}
-
-public static class HttpContextExtensions
-{
-    public static bool TryGetRequestHeader(
-        this HttpContext? httpContext,
-        string headerName,
-        out StringValues headerValues
-    )
-    {
-        if (httpContext == null)
-        {
-            headerValues = StringValues.Empty;
-            return false;
-        }
-
-        return httpContext.Request.TryGetHeader(headerName, out headerValues);
-    }
-
-    public static bool TryGetHeader(this HttpRequest httpRequest, string headerName, out StringValues headerValues)
-    {
-        return httpRequest.Headers.TryGetValue(headerName, out headerValues);
     }
 }

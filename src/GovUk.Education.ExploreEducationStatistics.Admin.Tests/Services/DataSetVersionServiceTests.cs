@@ -14,6 +14,21 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
+// ReSharper disable once ClassNeverInstantiated.Global
+public class DataSetVersionServiceTestsFixture()
+    : OptimisedAdminCollectionFixture(
+        capabilities: [AdminIntegrationTestCapability.UserAuth, AdminIntegrationTestCapability.Postgres]
+    )
+{
+    public IDataSetVersionService DataSetVersionService = null!;
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+        DataSetVersionService = lookups.GetService<IDataSetVersionService>();
+    }
+}
+
 [CollectionDefinition(nameof(DataSetVersionServiceTestsFixture))]
 public class DataSetVersionServiceTestsCollection : ICollectionFixture<DataSetVersionServiceTestsFixture>;
 
@@ -269,20 +284,5 @@ public abstract class DataSetVersionServiceTests
             Assert.Equal(releaseVersion2.Release.Slug, actualDataSetVersion2.Release.Slug);
             Assert.Equal(releaseVersion2.Release.Title, actualDataSetVersion2.Release.Title);
         }
-    }
-}
-
-// ReSharper disable once ClassNeverInstantiated.Global
-public class DataSetVersionServiceTestsFixture()
-    : OptimisedAdminCollectionFixture(
-        capabilities: [AdminIntegrationTestCapability.UserAuth, AdminIntegrationTestCapability.Postgres]
-    )
-{
-    public IDataSetVersionService DataSetVersionService = null!;
-
-    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
-    {
-        await base.AfterFactoryConstructed(lookups);
-        DataSetVersionService = lookups.GetService<IDataSetVersionService>();
     }
 }

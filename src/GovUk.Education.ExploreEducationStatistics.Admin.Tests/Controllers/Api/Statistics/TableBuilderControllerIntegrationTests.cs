@@ -17,6 +17,25 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics;
 
+// ReSharper disable once ClassNeverInstantiated.Global
+public class TableBuilderControllerIntegrationTestsFixture()
+    : OptimisedAdminCollectionFixture(capabilities: [AdminIntegrationTestCapability.UserAuth])
+{
+    public Mock<ITableBuilderService> TableBuilderServiceMock = null!;
+
+    protected override void ConfigureServicesAndConfiguration(OptimisedServiceAndConfigModifications modifications)
+    {
+        base.ConfigureServicesAndConfiguration(modifications);
+        modifications.ReplaceServiceWithMock<ITableBuilderService>();
+    }
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+        TableBuilderServiceMock = lookups.GetMockService<ITableBuilderService>();
+    }
+}
+
 [CollectionDefinition(nameof(TableBuilderControllerIntegrationTestsFixture))]
 public class TableBuilderControllerIntegrationTestsCollection
     : ICollectionFixture<TableBuilderControllerIntegrationTestsFixture>;
@@ -114,24 +133,5 @@ public class TableBuilderControllerIntegrationTests(TableBuilderControllerIntegr
         VerifyAllMocks(fixture.TableBuilderServiceMock);
 
         response.AssertOk("Test csv");
-    }
-}
-
-// ReSharper disable once ClassNeverInstantiated.Global
-public class TableBuilderControllerIntegrationTestsFixture()
-    : OptimisedAdminCollectionFixture(capabilities: [AdminIntegrationTestCapability.UserAuth])
-{
-    public Mock<ITableBuilderService> TableBuilderServiceMock = null!;
-
-    protected override void ConfigureServicesAndConfiguration(OptimisedServiceAndConfigModifications modifications)
-    {
-        base.ConfigureServicesAndConfiguration(modifications);
-        modifications.ReplaceServiceWithMock<ITableBuilderService>();
-    }
-
-    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
-    {
-        await base.AfterFactoryConstructed(lookups);
-        TableBuilderServiceMock = lookups.GetMockService<ITableBuilderService>();
     }
 }

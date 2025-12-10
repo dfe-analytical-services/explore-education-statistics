@@ -56,37 +56,7 @@ public abstract class PreviewTokenControllerTests
 
     public class CreatePreviewTokenTests(PreviewTokenControllerTestsFixture fixture) : PreviewTokenControllerTests
     {
-        public record CreatePreviewTokenValidationError(string Message, string Path);
-
-        private static readonly CreatePreviewTokenValidationError InvalidExpiryOutOfBound = new(
-            Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
-            Message: "Expires date must be no more than 7 days after the activates date."
-        );
-
-        private static readonly CreatePreviewTokenValidationError InvalidExpiryBeforeActivates = new(
-            Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
-            Message: "Expires date must be after the activates date."
-        );
-
-        private static readonly CreatePreviewTokenValidationError InvalidExpiryInPast = new(
-            Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
-            Message: "Expires date must not be in the past."
-        );
-
-        private static readonly CreatePreviewTokenValidationError InvalidExpiryLessThan7DaysFromToday = new(
-            Path: nameof(PreviewTokenCreateRequest.Expires).ToLowerFirst(),
-            Message: "Expires date must be no more than 7 days from today."
-        );
-
-        private static readonly CreatePreviewTokenValidationError InvalidActivatesOutOfBound = new(
-            Path: nameof(PreviewTokenCreateRequest.Activates).ToLowerFirst(),
-            Message: "Activates date must be within the next 7 days."
-        );
-
-        private static readonly CreatePreviewTokenValidationError InvalidActivatesInPast = new(
-            Path: nameof(PreviewTokenCreateRequest.Activates).ToLowerFirst(),
-            Message: "Activates date must not be in the past."
-        );
+        private record CreatePreviewTokenValidationError(string Message, string Path);
 
         [Fact]
         public async Task Success()
