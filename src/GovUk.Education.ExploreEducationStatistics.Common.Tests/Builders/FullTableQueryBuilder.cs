@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Builders;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Builders;
 
 public class FullTableQueryBuilder
 {
@@ -26,6 +26,19 @@ public class FullTableQueryBuilder
             Indicators = MockUtils.GenerateGuids(2),
             Filters = MockUtils.GenerateGuids(2),
             SubjectId = Guid.NewGuid(),
+            FilterHierarchiesOptions =
+            [
+                new()
+                {
+                    LeafFilterId = Guid.NewGuid(),
+                    Options = [MockUtils.GenerateGuids(2), MockUtils.GenerateGuids(2)],
+                },
+                new()
+                {
+                    LeafFilterId = Guid.NewGuid(),
+                    Options = [MockUtils.GenerateGuids(2), MockUtils.GenerateGuids(2)],
+                },
+            ],
         };
     }
 
