@@ -14,3 +14,18 @@
 .divider {
   margin: govuk-spacing(4) 0;
 }
+
+.hasSwatch {
+  label {
+    align-items: center;
+    display: flex;
+    padding-left: govuk-spacing(2);
+    max-width: none;
+  }
+}
+
+.swatch {
+  margin-right: govuk-spacing(2);
+  height: 30px;
+  width: 30px;
+}

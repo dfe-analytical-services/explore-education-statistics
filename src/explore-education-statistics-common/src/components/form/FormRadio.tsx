@@ -32,6 +32,7 @@ export interface FormRadioProps {
   label: string;
   labelClassName?: string;
   name: string;
+  swatch?: string;
   value: string;
   onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: RadioChangeEventHandler;
@@ -53,6 +54,7 @@ const FormRadio = ({
   label,
   labelClassName,
   name,
+  swatch,
   value,
   onBlur,
   onChange,
@@ -65,6 +67,7 @@ const FormRadio = ({
       <div
         className={classNames('govuk-radios__item', className, {
           [styles.inlineHint]: inlineHint,
+          [styles.hasSwatch]: swatch,
         })}
         data-testid={`Radio item for ${label}`}
       >
@@ -95,6 +98,12 @@ const FormRadio = ({
           )}
           htmlFor={id}
         >
+          {swatch && (
+            <span
+              className={styles.swatch}
+              style={{ backgroundColor: swatch }}
+            />
+          )}
           {label}
         </label>
         {hint && (
