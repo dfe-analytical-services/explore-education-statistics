@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251208181950_Ees6511AddingUniqueIndexToUserResourceRoles")]
+    partial class Ees6511AddingUniqueIndexToUserResourceRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1371,14 +1374,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("PublishScheduled")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateTime?>("PublishScheduled")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTimeOffset?>("Published")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("PublishedDisplayDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateTime?>("Published")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("RelatedInformation")
                         .IsRequired()
