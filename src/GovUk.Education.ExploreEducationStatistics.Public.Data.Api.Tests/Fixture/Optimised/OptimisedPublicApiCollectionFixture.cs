@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixtu
 
 /// <summary>
 ///
-/// A Collection-level test fixture to be used by Admin integration tests.
+/// A Collection-level test fixture to be used by Public API integration tests.
 ///
 /// A number of capabilities are supported by this fixture, and each subclass can specify the capabilities that they
 /// need.  The relevant configuration changes and Test Containers will then be put in place to support this for the

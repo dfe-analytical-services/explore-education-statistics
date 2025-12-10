@@ -24,7 +24,7 @@ internal static class ServiceCollectionExtensions
 
         if (descriptor == null)
         {
-            throw new ArgumentException(
+            throw new InvalidOperationException(
                 $"No DbContext of type {typeof(TDbContext).Name} can be replaced by an "
                     + $"in-memory version because no original has yet been registered."
             );
