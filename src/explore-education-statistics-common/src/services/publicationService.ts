@@ -101,7 +101,7 @@ export interface Contact {
 }
 
 export interface PublicationTitle {
-  id: string;
+  publicationId: string;
   title: string;
 }
 

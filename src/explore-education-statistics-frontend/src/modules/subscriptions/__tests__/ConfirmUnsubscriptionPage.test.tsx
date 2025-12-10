@@ -29,7 +29,7 @@ describe('ConfirmUnsubscriptionPage', () => {
       <ConfirmUnsubscriptionPage
         publicationSlug="test-publication-slug"
         publicationTitle={testPublicationTitle.title}
-        publicationId={testPublicationTitle.id}
+        publicationId={testPublicationTitle.publicationId}
         token="test-token"
       />,
     );
@@ -48,7 +48,7 @@ describe('ConfirmUnsubscriptionPage', () => {
       <ConfirmUnsubscriptionPage
         publicationSlug="test-publication-slug"
         publicationTitle={testPublicationTitle.title}
-        publicationId={testPublicationTitle.id}
+        publicationId={testPublicationTitle.publicationId}
         token="test-token"
       />,
     );
@@ -57,7 +57,7 @@ describe('ConfirmUnsubscriptionPage', () => {
 
     await waitFor(() => {
       expect(notificationService.confirmUnsubscription).toHaveBeenCalledWith(
-        testPublicationTitle.id,
+        testPublicationTitle.publicationId,
         'test-token',
       );
     });
@@ -72,7 +72,7 @@ describe('ConfirmUnsubscriptionPage', () => {
       <ConfirmUnsubscriptionPage
         publicationSlug="test-publication-slug"
         publicationTitle={testPublicationTitle.title}
-        publicationId={testPublicationTitle.id}
+        publicationId={testPublicationTitle.publicationId}
         token="test-token"
       />,
     );
@@ -81,7 +81,7 @@ describe('ConfirmUnsubscriptionPage', () => {
 
     await waitFor(() => {
       expect(notificationService.confirmUnsubscription).toHaveBeenCalledWith(
-        testPublicationTitle.id,
+        testPublicationTitle.publicationId,
         'test-token',
       );
     });

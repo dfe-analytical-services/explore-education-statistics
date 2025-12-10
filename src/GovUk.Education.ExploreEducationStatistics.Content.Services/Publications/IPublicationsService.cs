@@ -10,4 +10,9 @@ public interface IPublicationsService
         string publicationSlug,
         CancellationToken cancellationToken = default
     );
+
+    Task<Either<ActionResult, PublicationTitleDto>> GetPublicationTitle(
+        string publicationSlug,
+        CancellationToken cancellationToken = default
+    );
 }

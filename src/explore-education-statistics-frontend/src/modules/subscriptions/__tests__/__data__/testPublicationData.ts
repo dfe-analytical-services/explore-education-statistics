@@ -1,7 +1,7 @@
 import { PublicationTitle } from '@common/services/publicationService';
 
 const testPublicationTitle: PublicationTitle = {
-  id: '123abc',
+  publicationId: 'publication-1',
   title: 'Test Publication Title',
 };
 

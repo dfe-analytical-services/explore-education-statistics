@@ -29,7 +29,7 @@ describe('ConfirmSubscriptionPage', () => {
       <ConfirmSubscriptionPage
         publicationSlug="test-publication-slug"
         publicationTitle={testPublicationTitle.title}
-        publicationId={testPublicationTitle.id}
+        publicationId={testPublicationTitle.publicationId}
         token="test-token"
       />,
     );
@@ -48,7 +48,7 @@ describe('ConfirmSubscriptionPage', () => {
       <ConfirmSubscriptionPage
         publicationSlug="test-publication-slug"
         publicationTitle={testPublicationTitle.title}
-        publicationId={testPublicationTitle.id}
+        publicationId={testPublicationTitle.publicationId}
         token="test-token"
       />,
     );
@@ -58,7 +58,7 @@ describe('ConfirmSubscriptionPage', () => {
     await waitFor(() => {
       expect(
         notificationService.confirmPendingSubscription,
-      ).toHaveBeenCalledWith(testPublicationTitle.id, 'test-token');
+      ).toHaveBeenCalledWith(testPublicationTitle.publicationId, 'test-token');
     });
   });
 
@@ -71,7 +71,7 @@ describe('ConfirmSubscriptionPage', () => {
       <ConfirmSubscriptionPage
         publicationSlug="test-publication-slug"
         publicationTitle={testPublicationTitle.title}
-        publicationId={testPublicationTitle.id}
+        publicationId={testPublicationTitle.publicationId}
         token="test-token"
       />,
     );
@@ -81,7 +81,7 @@ describe('ConfirmSubscriptionPage', () => {
     await waitFor(() => {
       expect(
         notificationService.confirmPendingSubscription,
-      ).toHaveBeenCalledWith(testPublicationTitle.id, 'test-token');
+      ).toHaveBeenCalledWith(testPublicationTitle.publicationId, 'test-token');
     });
 
     expect(
@@ -99,7 +99,7 @@ describe('ConfirmSubscriptionPage', () => {
       <ConfirmSubscriptionPage
         publicationSlug="test-publication-slug"
         publicationTitle={testPublicationTitle.title}
-        publicationId={testPublicationTitle.id}
+        publicationId={testPublicationTitle.publicationId}
         token="test-token"
       />,
     );
@@ -109,7 +109,7 @@ describe('ConfirmSubscriptionPage', () => {
     await waitFor(() => {
       expect(
         notificationService.confirmPendingSubscription,
-      ).toHaveBeenCalledWith(testPublicationTitle.id, 'test-token');
+      ).toHaveBeenCalledWith(testPublicationTitle.publicationId, 'test-token');
     });
 
     expect(

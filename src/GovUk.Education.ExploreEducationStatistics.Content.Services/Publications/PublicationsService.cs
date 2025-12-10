@@ -31,6 +31,13 @@ public class PublicationsService(ContentDbContext contentDbContext) : IPublicati
                 );
             });
 
+    public async Task<Either<ActionResult, PublicationTitleDto>> GetPublicationTitle(
+        string publicationSlug,
+        CancellationToken cancellationToken = default
+    ) =>
+        await GetPublicationBySlug(publicationSlug, cancellationToken: cancellationToken)
+            .OnSuccess(PublicationTitleDto.FromPublication);
+
     private async Task<Either<ActionResult, Publication>> GetPublicationBySlug(
         string publicationSlug,
         bool includeContact = false,
