@@ -20,7 +20,13 @@ public record TimePeriodQuery
 
     public TimePeriodQuery() { }
 
-    public TimePeriodQuery(int startYear, TimeIdentifier startCode, int endYear, TimeIdentifier endCode, int? limit)
+    public TimePeriodQuery(
+        int startYear,
+        TimeIdentifier startCode,
+        int endYear,
+        TimeIdentifier endCode,
+        int? limit = null
+    )
     {
         StartYear = startYear;
         StartCode = startCode;
