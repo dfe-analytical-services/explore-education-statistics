@@ -37,10 +37,6 @@ param screenerAppRegistrationClientId string
 @secure()
 param devopsServicePrincipalId string
 
-@description('The access key name for the Core storage account.')
-@secure()
-param coreStorageAccessKeyName string
-
 @description('The endpoint URL for the core storage blob service.')
 param coreStorageBlobEndpoint string
 
@@ -88,6 +84,9 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
 }
 
 var adminAppClientId = adminAppServiceIdentity.properties.clientId
+var coreStorageBlobEndpointWithoutTrailingSlash = endsWith(coreStorageBlobEndpoint, '/')
+  ? substring(coreStorageBlobEndpoint, 0, length(coreStorageBlobEndpoint) - 1)
+  : coreStorageBlobEndpoint
 
 module containerisedFunctionAppModule '../../common/components/containerisedFunctionApp.bicep' = {
   name: 'screenerContainerisedFunctionAppModuleDeploy'
@@ -109,11 +108,7 @@ module containerisedFunctionAppModule '../../common/components/containerisedFunc
     appSettings: [
       {
         name: 'STORAGE_URL'
-        value: coreStorageBlobEndpoint
-      }
-      {
-        name: 'STORAGE_KEY'
-        value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${coreStorageAccessKeyName})'
+        value: coreStorageBlobEndpointWithoutTrailingSlash
       }
       {
         name: 'STORAGE_CONTAINER_NAME'
