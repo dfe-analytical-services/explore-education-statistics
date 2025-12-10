@@ -17,6 +17,7 @@ public class ReleaseVersionSummaryDtoBuilder
     private string _coverageTitle = "Calendar year";
     private string _yearTitle = "2024";
     private ReleaseType _type = ReleaseType.OfficialStatistics;
+    private string? _preReleaseAccessList = "Pre-release access list";
     private int _updateCount = 1;
 
     public ReleaseVersionSummaryDto Build() =>
@@ -34,6 +35,7 @@ public class ReleaseVersionSummaryDtoBuilder
             CoverageTitle = _coverageTitle,
             YearTitle = _yearTitle,
             Type = _type,
+            PreReleaseAccessList = _preReleaseAccessList,
             UpdateCount = _updateCount,
         };
 
@@ -108,6 +110,12 @@ public class ReleaseVersionSummaryDtoBuilder
     public ReleaseVersionSummaryDtoBuilder WithType(ReleaseType type)
     {
         _type = type;
+        return this;
+    }
+
+    public ReleaseVersionSummaryDtoBuilder WithPreReleaseAccessList(string? preReleaseAccessList)
+    {
+        _preReleaseAccessList = preReleaseAccessList;
         return this;
     }
 
