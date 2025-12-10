@@ -78,7 +78,6 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
   params: {
     location: location
     functionAppImageName: 'ees-screener-api'
-    coreStorageAccessKeyName: coreStorage.outputs.coreStorageAccessKey
     coreStorageBlobEndpoint: coreStorage.outputs.coreStorageBlobEndpoint
     acrLoginServer: keyVault.getSecret('DOCKER-REGISTRY-SERVER-DOMAIN')
     screenerAppRegistrationClientId: screenerAppRegistrationClientId
