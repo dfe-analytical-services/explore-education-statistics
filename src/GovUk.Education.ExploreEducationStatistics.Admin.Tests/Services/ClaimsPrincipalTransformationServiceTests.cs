@@ -15,6 +15,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
+// ReSharper disable once ClassNeverInstantiated.Global
+public class ClaimsPrincipalTransformationServiceTestsFixture()
+    : OptimisedAdminCollectionFixture(capabilities: [AdminIntegrationTestCapability.UserAuth])
+{
+    protected override void ConfigureServicesAndConfiguration(OptimisedServiceAndConfigModifications modifications)
+    {
+        base.ConfigureServicesAndConfiguration(modifications);
+        modifications.AddController(typeof(TestController));
+    }
+}
+
 [CollectionDefinition(nameof(ClaimsPrincipalTransformationServiceTestsFixture))]
 public class ClaimsPrincipalTransformationServiceTestsCollection
     : ICollectionFixture<ClaimsPrincipalTransformationServiceTestsFixture>;
@@ -228,16 +239,5 @@ public class TestController(IUserService userService) : ControllerBase
                     .ToList()
             )
         );
-    }
-}
-
-// ReSharper disable once ClassNeverInstantiated.Global
-public class ClaimsPrincipalTransformationServiceTestsFixture()
-    : OptimisedAdminCollectionFixture(capabilities: [AdminIntegrationTestCapability.UserAuth])
-{
-    protected override void ConfigureServicesAndConfiguration(OptimisedServiceAndConfigModifications modifications)
-    {
-        base.ConfigureServicesAndConfiguration(modifications);
-        modifications.AddController(typeof(TestController));
     }
 }

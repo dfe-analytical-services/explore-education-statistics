@@ -55,6 +55,23 @@ public class ReleasesControllerUnitTests
     }
 }
 
+// ReSharper disable once ClassNeverInstantiated.Global
+public class ReleasesControllerIntegrationTestsFixture()
+    : OptimisedAdminCollectionFixture(
+        capabilities: [AdminIntegrationTestCapability.UserAuth, AdminIntegrationTestCapability.Azurite]
+    )
+{
+    public IPublicBlobCacheService PublicBlobCacheService = null!;
+    public IPublisherTableStorageService PublisherTableStorageService = null!;
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+        PublicBlobCacheService = lookups.GetService<IPublicBlobCacheService>();
+        PublisherTableStorageService = lookups.GetService<IPublisherTableStorageService>();
+    }
+}
+
 [CollectionDefinition(nameof(ReleasesControllerIntegrationTestsFixture))]
 public class ReleasesControllerIntegrationTestsCollection
     : ICollectionFixture<ReleasesControllerIntegrationTestsFixture>;
@@ -1208,22 +1225,5 @@ public abstract class ReleasesControllerIntegrationTests
         }
 
         private record TestReleaseParentPathDataViewModel;
-    }
-}
-
-// ReSharper disable once ClassNeverInstantiated.Global
-public class ReleasesControllerIntegrationTestsFixture()
-    : OptimisedAdminCollectionFixture(
-        capabilities: [AdminIntegrationTestCapability.UserAuth, AdminIntegrationTestCapability.Azurite]
-    )
-{
-    public IPublicBlobCacheService PublicBlobCacheService = null!;
-    public IPublisherTableStorageService PublisherTableStorageService = null!;
-
-    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
-    {
-        await base.AfterFactoryConstructed(lookups);
-        PublicBlobCacheService = lookups.GetService<IPublicBlobCacheService>();
-        PublisherTableStorageService = lookups.GetService<IPublisherTableStorageService>();
     }
 }
