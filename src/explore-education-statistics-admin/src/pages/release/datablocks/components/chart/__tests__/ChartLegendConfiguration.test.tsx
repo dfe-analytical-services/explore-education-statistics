@@ -113,7 +113,12 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem1.getByLabelText('Label')).toHaveValue(
       'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, Barnet)',
     );
-    expect(legendItem1.getByLabelText('Colour')).toHaveValue('#12436D');
+    expect(
+      legendItem1.getByRole('button', {
+        name: 'Colour Dark blue, click to change colour for Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, Barnet)',
+      }),
+    ).toBeInTheDocument();
+
     expect(legendItem1.getByLabelText('Symbol')).toHaveValue('none');
     expect(legendItem1.getByLabelText('Style')).toHaveValue('solid');
   });
@@ -158,7 +163,11 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem1.getByLabelText('Label')).toHaveValue(
       'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, Barnet)',
     );
-    expect(legendItem1.getByLabelText('Colour')).toHaveValue('#12436D');
+    expect(
+      legendItem1.getByRole('button', {
+        name: 'Colour Dark blue, click to change colour for Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, Barnet)',
+      }),
+    ).toBeInTheDocument();
     expect(legendItem1.getByLabelText('Symbol')).toHaveValue('none');
     expect(legendItem1.getByLabelText('Style')).toHaveValue('solid');
 
@@ -167,7 +176,11 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem2.getByLabelText('Label')).toHaveValue(
       'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, Barnsley)',
     );
-    expect(legendItem2.getByLabelText('Colour')).toHaveValue('#F46A25');
+    expect(
+      legendItem2.getByRole('button', {
+        name: 'Colour Orange, click to change colour for Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, Barnsley)',
+      }),
+    ).toBeInTheDocument();
     expect(legendItem2.getByLabelText('Symbol')).toHaveValue('none');
     expect(legendItem2.getByLabelText('Style')).toHaveValue('solid');
   });
@@ -190,7 +203,7 @@ describe('ChartLegendConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 config: {
                   label: 'Legend item 1',
-                  colour: '#ff0000',
+                  colour: '#28A197',
                   lineStyle: 'dashed',
                   symbol: 'diamond',
                 },
@@ -220,7 +233,11 @@ describe('ChartLegendConfiguration', () => {
     const legendItem1 = within(legendItems[0]);
 
     expect(legendItem1.getByLabelText('Label')).toHaveValue('Legend item 1');
-    expect(legendItem1.getByLabelText('Colour')).toHaveValue('#ff0000');
+    expect(
+      legendItem1.getByRole('button', {
+        name: 'Colour Turquoise, click to change colour for Legend item 1',
+      }),
+    ).toBeInTheDocument();
     expect(legendItem1.getByLabelText('Symbol')).toHaveValue('diamond');
     expect(legendItem1.getByLabelText('Style')).toHaveValue('dashed');
   });
@@ -243,7 +260,7 @@ describe('ChartLegendConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 config: {
                   label: 'Legend item 1',
-                  colour: '#00ff00',
+                  colour: '#F46A25',
                   lineStyle: 'dotted',
                   symbol: 'square',
                 },
@@ -257,7 +274,7 @@ describe('ChartLegendConfiguration', () => {
                 indicator: 'authorised-absence-sessions',
                 config: {
                   label: 'Legend item 2',
-                  colour: '#ff0000',
+                  colour: '#28A197',
                   lineStyle: 'dashed',
                   symbol: 'diamond',
                 },
@@ -287,14 +304,22 @@ describe('ChartLegendConfiguration', () => {
     const legendItem1 = within(legendItems[0]);
 
     expect(legendItem1.getByLabelText('Label')).toHaveValue('Legend item 1');
-    expect(legendItem1.getByLabelText('Colour')).toHaveValue('#00ff00');
+    expect(
+      legendItem1.getByRole('button', {
+        name: 'Colour Orange, click to change colour for Legend item 1',
+      }),
+    ).toBeInTheDocument();
     expect(legendItem1.getByLabelText('Symbol')).toHaveValue('square');
     expect(legendItem1.getByLabelText('Style')).toHaveValue('dotted');
 
     const legendItem2 = within(legendItems[1]);
 
     expect(legendItem2.getByLabelText('Label')).toHaveValue('Legend item 2');
-    expect(legendItem2.getByLabelText('Colour')).toHaveValue('#ff0000');
+    expect(
+      legendItem2.getByRole('button', {
+        name: 'Colour Turquoise, click to change colour for Legend item 2',
+      }),
+    ).toBeInTheDocument();
     expect(legendItem2.getByLabelText('Symbol')).toHaveValue('diamond');
     expect(legendItem2.getByLabelText('Style')).toHaveValue('dashed');
   });
@@ -335,7 +360,7 @@ describe('ChartLegendConfiguration', () => {
                   indicator: 'authorised-absence-sessions',
                 },
                 label: 'Legend item 1',
-                colour: '#00ff00',
+                colour: '#F46A25',
                 lineStyle: 'dashed',
                 symbol: 'star',
               },
@@ -356,7 +381,11 @@ describe('ChartLegendConfiguration', () => {
     const legendItem1 = within(legendItems[0]);
 
     expect(legendItem1.getByLabelText('Label')).toHaveValue('Legend item 1');
-    expect(legendItem1.getByLabelText('Colour')).toHaveValue('#00ff00');
+    expect(
+      legendItem1.getByRole('button', {
+        name: 'Colour Orange, click to change colour for Legend item 1',
+      }),
+    ).toBeInTheDocument();
     expect(legendItem1.getByLabelText('Symbol')).toHaveValue('star');
     expect(legendItem1.getByLabelText('Style')).toHaveValue('dashed');
   });
@@ -393,7 +422,7 @@ describe('ChartLegendConfiguration', () => {
                   indicator: 'authorised-absence-sessions',
                 },
                 label: 'Legend item 1',
-                colour: '#ff0000',
+                colour: '#28A197',
                 lineStyle: 'dotted',
                 symbol: 'square',
               },
@@ -407,7 +436,7 @@ describe('ChartLegendConfiguration', () => {
                   indicator: 'authorised-absence-sessions',
                 },
                 label: 'Legend item 2',
-                colour: '#00ff00',
+                colour: '#F46A25',
                 lineStyle: 'dashed',
                 symbol: 'star',
               },
@@ -428,14 +457,22 @@ describe('ChartLegendConfiguration', () => {
     const legendItem1 = within(legendItems[0]);
 
     expect(legendItem1.getByLabelText('Label')).toHaveValue('Legend item 2');
-    expect(legendItem1.getByLabelText('Colour')).toHaveValue('#00ff00');
+    expect(
+      legendItem1.getByRole('button', {
+        name: 'Colour Orange, click to change colour for Legend item 2',
+      }),
+    ).toBeInTheDocument();
     expect(legendItem1.getByLabelText('Symbol')).toHaveValue('star');
     expect(legendItem1.getByLabelText('Style')).toHaveValue('dashed');
 
     const legendItem2 = within(legendItems[1]);
 
     expect(legendItem2.getByLabelText('Label')).toHaveValue('Legend item 1');
-    expect(legendItem2.getByLabelText('Colour')).toHaveValue('#ff0000');
+    expect(
+      legendItem2.getByRole('button', {
+        name: 'Colour Turquoise, click to change colour for Legend item 1',
+      }),
+    ).toBeInTheDocument();
     expect(legendItem2.getByLabelText('Symbol')).toHaveValue('square');
     expect(legendItem2.getByLabelText('Style')).toHaveValue('dotted');
   });
@@ -482,7 +519,7 @@ describe('ChartLegendConfiguration', () => {
                   indicator: 'authorised-absence-sessions',
                 },
                 label: 'Legend item 1',
-                colour: '#ff0000',
+                colour: '#28A197',
               },
             ],
           }}
@@ -542,7 +579,7 @@ describe('ChartLegendConfiguration', () => {
                   indicator: 'authorised-absence-sessions',
                 },
                 label: 'Legend item 1',
-                colour: '#ff0000',
+                colour: '#28A197',
               },
             ],
           }}
@@ -596,7 +633,7 @@ describe('ChartLegendConfiguration', () => {
                   indicator: 'authorised-absence-sessions',
                 },
                 label: 'Legend item 1',
-                colour: '#ff0000',
+                colour: '#28A197',
               },
             ],
           }}
@@ -615,7 +652,11 @@ describe('ChartLegendConfiguration', () => {
     const legendItem1 = within(legendItems[0]);
 
     expect(legendItem1.getByLabelText('Label')).toHaveValue('Legend item 1');
-    expect(legendItem1.getByLabelText('Colour')).toHaveValue('#ff0000');
+    expect(
+      legendItem1.getByRole('button', {
+        name: 'Colour Turquoise, click to change colour for Legend item 1',
+      }),
+    ).toBeInTheDocument();
     expect(legendItem1.getByLabelText('Label Colour')).toHaveValue('black');
     expect(legendItem1.getByLabelText('Symbol')).toHaveValue('none');
     expect(legendItem1.getByLabelText('Style')).toHaveValue('solid');
@@ -958,11 +999,14 @@ describe('ChartLegendConfiguration', () => {
       'Updated legend item 1',
     );
 
-    fireEvent.change(legendItem1.getByLabelText('Colour'), {
-      target: {
-        value: '#d53880',
-      },
-    });
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Colour Dark blue, click to change colour for Updated legend item 1',
+      }),
+    );
+
+    await user.click(screen.getByLabelText('Dark pink'));
+    await user.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await user.selectOptions(legendItem1.getByLabelText('Symbol'), 'diamond');
     await user.selectOptions(legendItem1.getByLabelText('Style'), 'dotted');
@@ -988,7 +1032,7 @@ describe('ChartLegendConfiguration', () => {
               indicator: 'authorised-absence-sessions',
             },
             label: 'Updated legend item 1',
-            colour: '#d53880',
+            colour: '#801650',
             labelColour: 'black',
             lineStyle: 'dotted',
             symbol: 'diamond',
@@ -1104,7 +1148,11 @@ describe('ChartLegendConfiguration', () => {
       }),
     );
 
-    expect(within(legendItems[0]).getByLabelText('Colour')).toBeInTheDocument();
+    expect(
+      within(legendItems[0]).getByRole('button', {
+        name: 'Colour Dark blue, click to change colour for Indicator 1 (2024)',
+      }),
+    ).toBeInTheDocument();
   });
 
   describe('reorder categories in map key', () => {
