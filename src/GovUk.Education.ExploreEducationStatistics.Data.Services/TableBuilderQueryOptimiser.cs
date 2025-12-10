@@ -32,9 +32,6 @@ public class TableBuilderQueryOptimiser(
                     })
                     .ToList();
 
-        // TODO Accessing time periods for the Subject by altering the Importer to store them would improve accuracy
-        // here rather than assuming the Subject has all time periods between the start and end range.
-
         return TableBuilderUtils.MaximumTableCellCount(
             countOfIndicators: query.Indicators.Count(),
             countOfLocations: query.LocationIds.Count,

@@ -40,7 +40,7 @@ public class TimePeriodUtilTests
     public void RangeFailsIfStartYearIsAfterEndYear()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, CalendarYear, 2018, CalendarYear, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, CalendarYear, 2018, CalendarYear))
         );
     }
 
@@ -48,11 +48,11 @@ public class TimePeriodUtilTests
     public void RangeFailsIfYearsAreInvalid()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            TimePeriodUtil.Range(new TimePeriodQuery(12345, CalendarYear, 2019, CalendarYear, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(12345, CalendarYear, 2019, CalendarYear))
         );
 
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, CalendarYear, 12345, CalendarYear, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, CalendarYear, 12345, CalendarYear))
         );
     }
 
@@ -140,52 +140,52 @@ public class TimePeriodUtilTests
         foreach (var identifier in _allTimeIdentifiers.Except(calendarQuarterIdentifiers))
         {
             Assert.Throws<ArgumentException>(() =>
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYearQ1, 2019, identifier, null))
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYearQ1, 2019, identifier))
             );
         }
 
         foreach (var identifier in _allTimeIdentifiers.Except(monthIdentifiers))
         {
             Assert.Throws<ArgumentException>(() =>
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, January, 2019, identifier, null))
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, January, 2019, identifier))
             );
         }
 
         foreach (var identifier in _allTimeIdentifiers.Except(weekIdentifiers))
         {
             Assert.Throws<ArgumentException>(() =>
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, Week1, 2019, identifier, null))
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, Week1, 2019, identifier))
             );
         }
 
         foreach (var identifier in _allTimeIdentifiers.Except(termIdentifiers))
         {
             Assert.Throws<ArgumentException>(() =>
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, AutumnTerm, 2019, identifier, null))
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, AutumnTerm, 2019, identifier))
             );
         }
 
         foreach (var identifier in _allTimeIdentifiers.Except(financialYearPartIdentifiers))
         {
             Assert.Throws<ArgumentException>(() =>
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, FinancialYearPart1, 2019, identifier, null))
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, FinancialYearPart1, 2019, identifier))
             );
         }
 
         Assert.Throws<ArgumentException>(() =>
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, AcademicYear, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, AcademicYear))
         );
 
         Assert.Throws<ArgumentException>(() =>
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, TaxYear, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, TaxYear))
         );
 
         Assert.Throws<ArgumentException>(() =>
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, FinancialYear, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, FinancialYear))
         );
 
         Assert.Throws<ArgumentException>(() =>
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, ReportingYear, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, ReportingYear))
         );
     }
 
@@ -194,7 +194,7 @@ public class TimePeriodUtilTests
     {
         Assert.Equal(
             [(2018, AcademicYear), (2019, AcademicYear)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, AcademicYear, 2019, AcademicYear, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, AcademicYear, 2019, AcademicYear))
         );
     }
 
@@ -203,7 +203,7 @@ public class TimePeriodUtilTests
     {
         Assert.Equal(
             [(2018, CalendarYear), (2019, CalendarYear)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, CalendarYear, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYear, 2019, CalendarYear))
         );
     }
 
@@ -212,7 +212,7 @@ public class TimePeriodUtilTests
     {
         Assert.Equal(
             [(2018, FinancialYear), (2019, FinancialYear)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, FinancialYear, 2019, FinancialYear, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, FinancialYear, 2019, FinancialYear))
         );
     }
 
@@ -221,7 +221,7 @@ public class TimePeriodUtilTests
     {
         Assert.Equal(
             [(2018, TaxYear), (2019, TaxYear)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYear, 2019, TaxYear, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYear, 2019, TaxYear))
         );
     }
 
@@ -230,17 +230,14 @@ public class TimePeriodUtilTests
     {
         Assert.Equal(
             [(2018, TaxYear), (2019, TaxYear)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYear, 2019, TaxYear, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYear, 2019, TaxYear))
         );
     }
 
     [Fact]
     public void RangeIsGeneratedForMonthQuery()
     {
-        Assert.Equal(
-            [(2019, February)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, February, 2019, February, null))
-        );
+        Assert.Equal([(2019, February)], TimePeriodUtil.Range(new TimePeriodQuery(2019, February, 2019, February)));
 
         Assert.Equal(
             [
@@ -257,7 +254,7 @@ public class TimePeriodUtilTests
                 (2019, November),
                 (2019, December),
             ],
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, January, 2019, December, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, January, 2019, December))
         );
 
         Assert.Equal(
@@ -271,7 +268,7 @@ public class TimePeriodUtilTests
                 (2019, September),
                 (2019, October),
             ],
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, March, 2019, October, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, March, 2019, October))
         );
 
         Assert.Equal(
@@ -301,14 +298,14 @@ public class TimePeriodUtilTests
                 (2020, February),
                 (2020, March),
             ],
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, April, 2020, March, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, April, 2020, March))
         );
     }
 
     [Fact]
     public void RangeIsGeneratedForWeekQuery()
     {
-        Assert.Equal([(2020, Week17)], TimePeriodUtil.Range(new TimePeriodQuery(2020, Week17, 2020, Week17, null)));
+        Assert.Equal([(2020, Week17)], TimePeriodUtil.Range(new TimePeriodQuery(2020, Week17, 2020, Week17)));
 
         Assert.Equal(
             [
@@ -365,17 +362,17 @@ public class TimePeriodUtilTests
                 (2020, Week51),
                 (2020, Week52),
             ],
-            TimePeriodUtil.Range(new TimePeriodQuery(2020, Week1, 2020, Week52, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2020, Week1, 2020, Week52))
         );
 
         Assert.Equal(
             [(2020, Week17), (2020, Week18), (2020, Week19), (2020, Week20)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2020, Week17, 2020, Week20, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2020, Week17, 2020, Week20))
         );
 
         Assert.Equal(
             [(2019, Week51), (2019, Week52), (2020, Week1), (2020, Week2)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, Week51, 2020, Week2, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, Week51, 2020, Week2))
         );
     }
 
@@ -384,12 +381,12 @@ public class TimePeriodUtilTests
     {
         Assert.Equal(
             [(2019, AcademicYearQ3)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, AcademicYearQ3, 2019, AcademicYearQ3, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, AcademicYearQ3, 2019, AcademicYearQ3))
         );
 
         Assert.Equal(
             [(2019, AcademicYearQ3), (2019, AcademicYearQ4)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, AcademicYearQ3, 2019, AcademicYearQ4, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, AcademicYearQ3, 2019, AcademicYearQ4))
         );
 
         Assert.Equal(
@@ -402,7 +399,7 @@ public class TimePeriodUtilTests
                 (2020, AcademicYearQ1),
                 (2020, AcademicYearQ2),
             ],
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, AcademicYearQ4, 2020, AcademicYearQ2, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, AcademicYearQ4, 2020, AcademicYearQ2))
         );
     }
 
@@ -411,12 +408,12 @@ public class TimePeriodUtilTests
     {
         Assert.Equal(
             [(2019, CalendarYearQ3)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, CalendarYearQ3, 2019, CalendarYearQ3, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, CalendarYearQ3, 2019, CalendarYearQ3))
         );
 
         Assert.Equal(
             [(2019, CalendarYearQ3), (2019, CalendarYearQ4)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, CalendarYearQ3, 2019, CalendarYearQ4, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, CalendarYearQ3, 2019, CalendarYearQ4))
         );
 
         Assert.Equal(
@@ -429,7 +426,7 @@ public class TimePeriodUtilTests
                 (2020, CalendarYearQ1),
                 (2020, CalendarYearQ2),
             ],
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYearQ4, 2020, CalendarYearQ2, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, CalendarYearQ4, 2020, CalendarYearQ2))
         );
     }
 
@@ -438,12 +435,12 @@ public class TimePeriodUtilTests
     {
         Assert.Equal(
             [(2019, FinancialYearQ3)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, FinancialYearQ3, 2019, FinancialYearQ3, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, FinancialYearQ3, 2019, FinancialYearQ3))
         );
 
         Assert.Equal(
             [(2019, FinancialYearQ3), (2019, FinancialYearQ4)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, FinancialYearQ3, 2019, FinancialYearQ4, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, FinancialYearQ3, 2019, FinancialYearQ4))
         );
 
         Assert.Equal(
@@ -456,21 +453,18 @@ public class TimePeriodUtilTests
                 (2020, FinancialYearQ1),
                 (2020, FinancialYearQ2),
             ],
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, FinancialYearQ4, 2020, FinancialYearQ2, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, FinancialYearQ4, 2020, FinancialYearQ2))
         );
     }
 
     [Fact]
     public void RangeIsGeneratedForTaxQuarterQuery()
     {
-        Assert.Equal(
-            [(2019, TaxYearQ3)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, TaxYearQ3, 2019, TaxYearQ3, null))
-        );
+        Assert.Equal([(2019, TaxYearQ3)], TimePeriodUtil.Range(new TimePeriodQuery(2019, TaxYearQ3, 2019, TaxYearQ3)));
 
         Assert.Equal(
             [(2019, TaxYearQ3), (2019, TaxYearQ4)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, TaxYearQ3, 2019, TaxYearQ4, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, TaxYearQ3, 2019, TaxYearQ4))
         );
 
         Assert.Equal(
@@ -483,7 +477,7 @@ public class TimePeriodUtilTests
                 (2020, TaxYearQ1),
                 (2020, TaxYearQ2),
             ],
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYearQ4, 2020, TaxYearQ2, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, TaxYearQ4, 2020, TaxYearQ2))
         );
     }
 
@@ -492,12 +486,12 @@ public class TimePeriodUtilTests
     {
         Assert.Equal(
             [(2019, AutumnTerm)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, AutumnTerm, 2019, AutumnTerm, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, AutumnTerm, 2019, AutumnTerm))
         );
 
         Assert.Equal(
             [(2019, AutumnTerm), (2019, SpringTerm), (2019, AutumnSpringTerm), (2019, SummerTerm)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2019, AutumnTerm, 2019, SummerTerm, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2019, AutumnTerm, 2019, SummerTerm))
         );
 
         Assert.Equal(
@@ -510,7 +504,7 @@ public class TimePeriodUtilTests
                 (2019, SummerTerm),
                 (2020, AutumnTerm),
             ],
-            TimePeriodUtil.Range(new TimePeriodQuery(2018, AutumnSpringTerm, 2020, AutumnTerm, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2018, AutumnSpringTerm, 2020, AutumnTerm))
         );
     }
 
@@ -519,17 +513,17 @@ public class TimePeriodUtilTests
     {
         Assert.Equal(
             [(2021, FinancialYearPart1)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2021, FinancialYearPart1, 2021, FinancialYearPart1, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2021, FinancialYearPart1, 2021, FinancialYearPart1))
         );
 
         Assert.Equal(
             [(2021, FinancialYearPart1), (2021, FinancialYearPart2)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2021, FinancialYearPart1, 2021, FinancialYearPart2, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2021, FinancialYearPart1, 2021, FinancialYearPart2))
         );
 
         Assert.Equal(
             [(2020, FinancialYearPart1), (2020, FinancialYearPart2), (2021, FinancialYearPart1)],
-            TimePeriodUtil.Range(new TimePeriodQuery(2020, FinancialYearPart1, 2021, FinancialYearPart1, null))
+            TimePeriodUtil.Range(new TimePeriodQuery(2020, FinancialYearPart1, 2021, FinancialYearPart1))
         );
     }
 }
