@@ -5,6 +5,7 @@ import {
 } from '@admin/pages/publication/components/PublicationGuidance';
 import { DashboardReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import { Dictionary } from '@common/types';
+import ButtonGroup from '@common/components/ButtonGroup';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo } from 'react';
 
@@ -60,30 +61,34 @@ const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
         <>
           {releasesByPublication &&
             Object.keys(releasesByPublication).length > 0 && (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Publication / Release period</th>
-                    <th className="dfe-white-space--nowrap">
-                      Status <ScheduledStatusGuidanceModal />
-                    </th>
-                    <th className="govuk-!-width-one-quarter dfe-white-space--nowrap">
-                      Stages checklist <ScheduledStagesGuidanceModal />
-                    </th>
-                    <th>Scheduled publish date</th>
-                    <th>Actions</th>
-                  </tr>
-                  {orderBy(Object.keys(releasesByPublication)).map(
-                    publication => (
-                      <PublicationRow
-                        key={publication}
-                        publication={publication}
-                        releases={releasesByPublication[publication]}
-                      />
-                    ),
-                  )}
-                </thead>
-              </table>
+              <>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Publication / Release period</th>
+                      <th className="dfe-white-space--nowrap">Status</th>
+                      <th className="govuk-!-width-one-quarter dfe-white-space--nowrap">
+                        Stages checklist
+                      </th>
+                      <th>Scheduled publish date</th>
+                      <th>Actions</th>
+                    </tr>
+                    {orderBy(Object.keys(releasesByPublication)).map(
+                      publication => (
+                        <PublicationRow
+                          key={publication}
+                          publication={publication}
+                          releases={releasesByPublication[publication]}
+                        />
+                      ),
+                    )}
+                  </thead>
+                </table>
+                <ButtonGroup>
+                  <ScheduledStatusGuidanceModal />
+                  <ScheduledStagesGuidanceModal />
+                </ButtonGroup>
+              </>
             )}
         </>
       )}
