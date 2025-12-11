@@ -63,6 +63,12 @@ public interface IEducationInNumbersContentService
         EinFreeTextStatTileUpdateRequest request
     );
 
+    Task<Either<ActionResult?, EinTileViewModel>> UpdateApiQueryStatTile(
+        Guid pageId,
+        Guid tileId,
+        EinApiQueryStatTileUpdateRequest request
+    );
+
     Task<Either<ActionResult, List<EinTileViewModel>>> ReorderTiles(
         Guid pageId,
         Guid parentBlockId,

@@ -1,11 +1,16 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using Moq;
+using Moq.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -85,7 +90,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var result = await service.GetPageContent(_pageId);
 
             var viewModel = result.AssertRight();
@@ -129,7 +134,7 @@ public class EducationInNumbersContentServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
         await using var context = InMemoryApplicationDbContext(contextId);
-        var service = new EducationInNumbersContentService(context);
+        var service = BuildService(context);
 
         var result = await service.GetPageContent(Guid.NewGuid());
         result.AssertNotFound();
@@ -147,7 +152,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var result = await service.AddSection(_pageId, 0);
 
             var viewModel = result.AssertRight();
@@ -189,7 +194,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var result = await service.AddSection(_pageId, 0);
 
             var viewModel = result.AssertRight();
@@ -240,7 +245,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var result = await service.UpdateSectionHeading(_pageId, _sectionAId, "New Heading");
 
             var viewModel = result.AssertRight();
@@ -262,7 +267,7 @@ public class EducationInNumbersContentServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
         await using var context = InMemoryApplicationDbContext(contextId);
-        var service = new EducationInNumbersContentService(context);
+        var service = BuildService(context);
 
         var result = await service.UpdateSectionHeading(_pageId, Guid.NewGuid(), "New Heading");
         result.AssertNotFound();
@@ -292,7 +297,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var newOrder = new List<Guid> { _sectionBId, sectionCId, _sectionAId };
             var result = await service.ReorderSections(_pageId, newOrder);
 
@@ -317,7 +322,7 @@ public class EducationInNumbersContentServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
         await using var context = InMemoryApplicationDbContext(contextId);
-        var service = new EducationInNumbersContentService(context);
+        var service = BuildService(context);
 
         var result = await service.ReorderSections(Guid.NewGuid(), new List<Guid>());
         result.AssertNotFound();
@@ -341,7 +346,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             // Providing a different set of IDs
             var newOrder = new List<Guid> { _sectionAId, _sectionBId };
             var result = await service.ReorderSections(_pageId, newOrder);
@@ -377,7 +382,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var result = await service.DeleteSection(_pageId, _sectionBId);
 
             var viewModels = result.AssertRight();
@@ -411,7 +416,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var result = await service.DeleteSection(_pageId, Guid.NewGuid());
             result.AssertNotFound();
         }
@@ -431,7 +436,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var result = await service.AddBlock(_pageId, _sectionAId, EinBlockType.HtmlBlock, 2);
 
             var viewModel = result.AssertRight();
@@ -464,7 +469,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             // order is null, so should be added to the end
             var result = await service.AddBlock(_pageId, _sectionAId, EinBlockType.HtmlBlock, null);
 
@@ -499,7 +504,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             // order is null, so should be added to the end
             var result = await service.AddBlock(_pageId, _sectionAId, EinBlockType.TileGroupBlock, null);
 
@@ -543,7 +548,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var result = await service.AddBlock(_pageId, _sectionAId, EinBlockType.HtmlBlock, 0);
 
             var viewModel = result.AssertRight();
@@ -584,7 +589,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var request = new EinHtmlBlockUpdateRequest { Body = "New body" };
             var result = await service.UpdateHtmlBlock(_pageId, _sectionAId, _blockAId, request);
 
@@ -604,7 +609,7 @@ public class EducationInNumbersContentServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
         await using var context = InMemoryApplicationDbContext(contextId);
-        var service = new EducationInNumbersContentService(context);
+        var service = BuildService(context);
         var request = new EinHtmlBlockUpdateRequest { Body = "New body" };
 
         var result = await service.UpdateHtmlBlock(_pageId, _sectionAId, Guid.NewGuid(), request);
@@ -631,7 +636,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var request = new EinTileGroupBlockUpdateRequest { Title = "New title" };
             var result = await service.UpdateTileGroupBlock(_pageId, _sectionAId, _blockAId, request);
 
@@ -658,7 +663,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var request = new EinTileGroupBlockUpdateRequest { Title = "New title" };
 
             var result = await service.UpdateTileGroupBlock(_pageId, _sectionAId, Guid.NewGuid(), request);
@@ -691,7 +696,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var newOrder = new List<Guid> { _blockBId, blockCId, _blockAId };
             var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder);
 
@@ -725,7 +730,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
 
             var newOrder = new List<Guid> { _blockAId, _blockBId }; // _blockBId does not exist in the section
             var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder);
@@ -760,7 +765,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var result = await service.DeleteBlock(_pageId, _sectionAId, _blockBId);
 
             result.AssertRight();
@@ -781,7 +786,7 @@ public class EducationInNumbersContentServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
         await using var context = InMemoryApplicationDbContext(contextId);
-        var service = new EducationInNumbersContentService(context);
+        var service = BuildService(context);
 
         var result = await service.DeleteBlock(_pageId, Guid.NewGuid(), _blockAId);
         result.AssertNotFound();
@@ -801,7 +806,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var result = await service.DeleteBlock(_pageId, _sectionAId, Guid.NewGuid());
             result.AssertNotFound();
         }
@@ -825,7 +830,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var result = await service.AddTile(_pageId, _blockAId, EinTileType.FreeTextStatTile, 1);
 
             var viewModel = result.AssertRight();
@@ -860,7 +865,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             // order is null, so should be added to the end of the list
             var result = await service.AddTile(_pageId, _blockAId, EinTileType.FreeTextStatTile, null);
 
@@ -903,7 +908,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var request = new EinFreeTextStatTileUpdateRequest
             {
                 Title = "New title",
@@ -935,7 +940,7 @@ public class EducationInNumbersContentServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
         await using var context = InMemoryApplicationDbContext(contextId);
-        var service = new EducationInNumbersContentService(context);
+        var service = BuildService(context);
         var request = new EinFreeTextStatTileUpdateRequest();
 
         var result = await service.UpdateFreeTextStatTile(_pageId, Guid.NewGuid(), request);
@@ -967,7 +972,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var newOrder = new List<Guid> { _tileBId, tileCId, _tileAId };
             var result = await service.ReorderTiles(_pageId, _blockAId, newOrder);
 
@@ -1006,7 +1011,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
 
             var newOrder = new List<Guid> { _tileAId, _tileBId }; // _tileBId does not exist
             var result = await service.ReorderTiles(_pageId, _blockAId, newOrder);
@@ -1041,7 +1046,7 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var result = await service.DeleteTile(_pageId, _blockAId, _tileBId);
 
             result.AssertRight();
@@ -1062,7 +1067,7 @@ public class EducationInNumbersContentServiceTests
     {
         var contextId = Guid.NewGuid().ToString();
         await using var context = InMemoryApplicationDbContext(contextId);
-        var service = new EducationInNumbersContentService(context);
+        var service = BuildService(context);
 
         var result = await service.DeleteTile(_pageId, Guid.NewGuid(), _tileAId);
         result.AssertNotFound();
@@ -1086,9 +1091,22 @@ public class EducationInNumbersContentServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var service = new EducationInNumbersContentService(context);
+            var service = BuildService(context);
             var result = await service.DeleteTile(_pageId, _blockAId, Guid.NewGuid());
             result.AssertNotFound();
         }
+    }
+
+    private EducationInNumbersContentService BuildService(
+        ContentDbContext contentDbContext,
+        PublicDataDbContext? publicDataDbContext = null,
+        IPublicDataApiClient? publicDataApiClient = null
+    )
+    {
+        return new EducationInNumbersContentService(
+            contentDbContext,
+            publicDataDbContext ?? new Mock<PublicDataDbContext>().Object, // @MarkFix not strict?
+            publicDataApiClient ?? new Mock<IPublicDataApiClient>(MockBehavior.Strict).Object
+        );
     }
 }

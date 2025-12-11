@@ -45,3 +45,11 @@ public record EinFreeTextStatTileUpdateRequest
     public string? LinkUrl { get; set; }
     public string? LinkText { get; set; }
 }
+
+public record EinApiQueryStatTileUpdateRequest
+{
+    public string Title { get; set; } = string.Empty;
+    public Guid DataSetId { get; set; }
+    public string Version { get; set; }
+    public string Query { get; set; }
+}

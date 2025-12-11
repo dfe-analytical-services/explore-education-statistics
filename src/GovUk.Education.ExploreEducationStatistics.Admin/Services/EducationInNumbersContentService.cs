@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -8,12 +9,18 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Profiling.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class EducationInNumbersContentService(ContentDbContext contentDbContext) : IEducationInNumbersContentService
+public class EducationInNumbersContentService(
+    ContentDbContext contentDbContext,
+    PublicDataDbContext publicDataDbContext,
+    IPublicDataApiClient publicDataApiClient
+) : IEducationInNumbersContentService
 {
     public async Task<Either<ActionResult, EinContentViewModel>> GetPageContent(Guid pageId)
     {
@@ -338,6 +345,20 @@ public class EducationInNumbersContentService(ContentDbContext contentDbContext)
                 LinkUrl = null,
                 LinkText = null,
             },
+            EinTileType.ApiQueryStatTile => new EinApiQueryStatTile
+            {
+                Id = Guid.NewGuid(),
+                EinParentBlockId = parentBlockId,
+                Order = order ?? tileList.Count,
+                Title = "",
+                DataSetId = null,
+                Query = "",
+                DecimalPlaces = null,
+                IndicatorUnit = null,
+                IsLatestVersion = false,
+                QueryResult = "",
+                Version = "",
+            },
             _ => throw new Exception($"{nameof(EinTile)} type {type} not found"),
         };
 
@@ -379,6 +400,89 @@ public class EducationInNumbersContentService(ContentDbContext contentDbContext)
         await contentDbContext.SaveChangesAsync();
 
         return EinTileViewModel.FromModel(tileToUpdate);
+    }
+
+    public async Task<Either<ActionResult?, EinTileViewModel>> UpdateApiQueryStatTile(
+        Guid pageId,
+        Guid tileId,
+        EinApiQueryStatTileUpdateRequest request
+    )
+    {
+        var tileToUpdate = contentDbContext
+            .EinTiles.OfType<EinApiQueryStatTile>()
+            .SingleOrDefault(tile =>
+                tile.Id == tileId && tile.EinParentBlock.EinContentSection.EducationInNumbersPageId == pageId
+            );
+
+        if (tileToUpdate == null)
+        {
+            return new NotFoundResult();
+        }
+
+        // @MarkFix fetch api query results, validate it's correct, then update tile
+        return await publicDataApiClient
+            .RunQuery(request.DataSetId, request.Version, request.Query)
+            .OnSuccess(async queryResults =>
+            {
+                int majorVersion;
+                int minorVersion;
+                int patchVersion;
+                if (Version.TryParse(request.Version, out Version? version))
+                {
+                    majorVersion = version.Major;
+                    minorVersion = version.Minor;
+                    patchVersion = version.Build;
+                }
+                else
+                {
+                    // @MarkFix Could return a validation error?
+                    return new Either<ActionResult?, EinTileViewModel>(
+                        new BadRequestObjectResult("Unable to parse version")
+                    );
+                }
+
+                var latestLiveDataSetVersion = publicDataDbContext
+                    .DataSets.Where(ds => ds.Id == request.DataSetId)
+                    .Select(ds => ds.LatestLiveVersion)
+                    .Single();
+                if (latestLiveDataSetVersion == null)
+                {
+                    return new BadRequestObjectResult("Data set has no latest live version");
+                }
+                var isLatestVersion =
+                    latestLiveDataSetVersion.VersionMajor == majorVersion
+                    && latestLiveDataSetVersion.VersionMinor == minorVersion
+                    && latestLiveDataSetVersion.VersionPatch == patchVersion;
+
+                if (queryResults == null || queryResults.Warnings.Count > 0)
+                {
+                    return new BadRequestObjectResult("Warnings returned, {queryResults.Warnings}");
+                }
+
+                if (queryResults.Paging.TotalResults > queryResults.Paging.PageSize)
+                {
+                    // @MarkFix could collate results from multiple pages into a single array
+                    return new BadRequestObjectResult("Results need to all fit on the first page");
+                }
+
+                // @MarkFix check one result for NAT and latest year
+                // @MarkFix fetch meta data
+
+                tileToUpdate.Title = request.Title;
+                tileToUpdate.DataSetId = request.DataSetId;
+                tileToUpdate.Version = request.Version;
+                tileToUpdate.Query = request.Query;
+                tileToUpdate.QueryResult = queryResults.Results.ToJson();
+                tileToUpdate.IsLatestVersion = isLatestVersion;
+                //tileToUpdate.MetaResult = ; // @MarkFix from /meta endpoint
+                //tileToUpdate.DecimalPlaces = ;
+                //tileToUpdate.IndicatorUnit = ;
+
+                contentDbContext.EinTiles.Update(tileToUpdate);
+                await contentDbContext.SaveChangesAsync();
+
+                return EinTileViewModel.FromModel(tileToUpdate);
+            });
     }
 
     public async Task<Either<ActionResult, List<EinTileViewModel>>> ReorderTiles(

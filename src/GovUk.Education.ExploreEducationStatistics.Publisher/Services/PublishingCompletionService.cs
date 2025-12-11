@@ -96,6 +96,9 @@ public class PublishingCompletionService(
 
         await publisherEventRaiser.OnReleaseVersionsPublished(publishedPublicationInfos);
 
+        // @MarkFix at what point to check for updated api data sets and check if they're used in EiN pages? here?
+        // If it's being used by EiN page - then set EinApiQueryStatTile.IsLatestVersion = false and send a BAU email
+
         await prePublishingStagesComplete
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async status =>

@@ -129,6 +129,16 @@ public class EducationInNumbersContentController(IEducationInNumbersContentServi
         return await einContentService.UpdateFreeTextStatTile(pageId, tileId, request).HandleFailuresOrOk();
     }
 
+    [HttpPut("education-in-numbers/{pageId:guid}/content/tile/{tileId:guid}/api-stat")]
+    public async Task<ActionResult<EinTileViewModel>> UpdateApiQueryStatTile(
+        [FromRoute] Guid pageId,
+        [FromRoute] Guid tileId,
+        [FromBody] EinApiQueryStatTileUpdateRequest request
+    )
+    {
+        return await einContentService.UpdateApiQueryStatTile(pageId, tileId, request).HandleFailuresOrOk();
+    }
+
     [HttpPut("education-in-numbers/{pageId:guid}/content/block/{blockId:guid}/tiles/order")]
     public async Task<ActionResult<List<EinTileViewModel>>> ReorderTiles(
         [FromRoute] Guid pageId,
