@@ -76,7 +76,7 @@ const FormEditor = ({
   hint,
   id,
   includePlugins,
-  label,
+  label = 'my custom label', // TODO: WIP
   testId,
   toolbarConfig,
   value,
@@ -112,6 +112,7 @@ const FormEditor = ({
     onClickAddGlossaryItem: toggleGlossaryModal.on,
     onImageUpload,
     onImageUploadCancel,
+    label,
   });
 
   const [isFocused, toggleFocused] = useToggle(false);

@@ -64,6 +64,7 @@ export interface AlignmentConfig {
 export interface EditorConfig {
   toolbar: (ToolbarOption | ToolbarGroup)[];
   extraPlugins?: Plugin[];
+  label?: string;
   image?: {
     toolbar: string[];
     resizeOptions?: ResizeOption[];

@@ -26,6 +26,7 @@ import { MutableRefObject, useMemo } from 'react';
 const useCKEditorConfig = ({
   allowComments,
   allowedHeadings,
+  label,
   editorInstance,
   includePlugins,
   toolbarConfig = toolbarConfigFull,
@@ -39,6 +40,7 @@ const useCKEditorConfig = ({
 }: {
   allowComments?: boolean;
   allowedHeadings?: string[];
+  label?: string;
   editorInstance?: MutableRefObject<EditorType | undefined>;
   glossaryItems?: {
     title: string;
@@ -99,6 +101,7 @@ const useCKEditorConfig = ({
             ],
           }
         : undefined,
+      label,
       image: hasImageUpload
         ? {
             toolbar: imageToolbar,
@@ -229,6 +232,7 @@ const useCKEditorConfig = ({
     onClickAddGlossaryItem,
     onImageUpload,
     onImageUploadCancel,
+    label,
     reAddComment,
     removeComment,
     resolveComment,
