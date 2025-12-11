@@ -214,6 +214,7 @@ export interface ReleaseVersionSummary {
   title: string;
   type: ReleaseType;
   updateCount: number;
+  preReleaseAccessList: string;
   yearTitle: string;
 }
 

@@ -32,6 +32,8 @@ public record ReleaseVersionSummaryDto
     [JsonConverter(typeof(StringEnumConverter))]
     public required ReleaseType Type { get; init; }
 
+    public required string? PreReleaseAccessList { get; init; }
+
     public required int UpdateCount { get; init; }
 
     public static ReleaseVersionSummaryDto FromReleaseVersion(
@@ -55,6 +57,7 @@ public record ReleaseVersionSummaryDto
             CoverageTitle = releaseVersion.Release.TimePeriodCoverage.GetEnumLabel(),
             YearTitle = releaseVersion.Release.YearTitle,
             Type = releaseVersion.Type,
+            PreReleaseAccessList = releaseVersion.PreReleaseAccessList,
             UpdateCount = updateCount,
         };
 }
