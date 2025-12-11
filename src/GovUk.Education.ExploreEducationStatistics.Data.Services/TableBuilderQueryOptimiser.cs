@@ -63,49 +63,49 @@ public class TableBuilderQueryOptimiser(
                 query.TimePeriod.EndYear = croppedTimePeriods.Last().Year;
                 query.TimePeriod.EndCode = croppedTimePeriods.Last().TimeIdentifier;
 
-                requiresCropping = await IsCroppingRequired(query);
+                if (!await IsCroppingRequired(query))
+                {
+                    return query;
+                }
             }
         }
 
-        if (requiresCropping)
+        var maxLocationsPerGeographicLevel = new Dictionary<GeographicLevel, int>
         {
-            var maxLocationsPerGeographicLevel = new Dictionary<GeographicLevel, int>
-            {
-                { GeographicLevel.Country, 1 },
-                { GeographicLevel.Region, 2 },
-                { GeographicLevel.LocalAuthority, 2 },
-                { GeographicLevel.EnglishDevolvedArea, 2 },
-                { GeographicLevel.Institution, 2 },
-                { GeographicLevel.MayoralCombinedAuthority, 2 },
-                { GeographicLevel.LocalEnterprisePartnership, 2 },
-                { GeographicLevel.LocalSkillsImprovementPlanArea, 2 },
-                { GeographicLevel.LocalAuthorityDistrict, 2 },
-                { GeographicLevel.MultiAcademyTrust, 2 },
-                { GeographicLevel.OpportunityArea, 2 },
-                { GeographicLevel.ParliamentaryConstituency, 2 },
-                { GeographicLevel.PlanningArea, 2 },
-                { GeographicLevel.PoliceForceArea, 2 },
-                { GeographicLevel.Provider, 2 },
-                { GeographicLevel.RscRegion, 2 },
-                { GeographicLevel.School, 2 },
-                { GeographicLevel.Sponsor, 2 },
-                { GeographicLevel.Ward, 2 },
-            };
+            { GeographicLevel.Country, 1 },
+            { GeographicLevel.Region, 2 },
+            { GeographicLevel.LocalAuthority, 2 },
+            { GeographicLevel.EnglishDevolvedArea, 2 },
+            { GeographicLevel.Institution, 2 },
+            { GeographicLevel.MayoralCombinedAuthority, 2 },
+            { GeographicLevel.LocalEnterprisePartnership, 2 },
+            { GeographicLevel.LocalSkillsImprovementPlanArea, 2 },
+            { GeographicLevel.LocalAuthorityDistrict, 2 },
+            { GeographicLevel.MultiAcademyTrust, 2 },
+            { GeographicLevel.OpportunityArea, 2 },
+            { GeographicLevel.ParliamentaryConstituency, 2 },
+            { GeographicLevel.PlanningArea, 2 },
+            { GeographicLevel.PoliceForceArea, 2 },
+            { GeographicLevel.Provider, 2 },
+            { GeographicLevel.RscRegion, 2 },
+            { GeographicLevel.School, 2 },
+            { GeographicLevel.Sponsor, 2 },
+            { GeographicLevel.Ward, 2 },
+        };
 
-            var limitedLevels = maxLocationsPerGeographicLevel.Keys.ToList();
+        var limitedLevels = maxLocationsPerGeographicLevel.Keys.ToList();
 
-            var locations = await statisticsDbContext
-                .Location.Where(l => query.LocationIds.Contains(l.Id) && limitedLevels.Contains(l.GeographicLevel))
-                .ToListAsync(cancellationToken);
+        var locations = await statisticsDbContext
+            .Location.Where(l => query.LocationIds.Contains(l.Id) && limitedLevels.Contains(l.GeographicLevel))
+            .ToListAsync(cancellationToken);
 
-            var croppedLocationIds = locations
-                .GroupBy(l => l.GeographicLevel)
-                .SelectMany(g => g.OrderBy(l => l.Id).Take(maxLocationsPerGeographicLevel[g.Key]).Select(l => l.Id))
-                .Take(maxSelections)
-                .ToList();
+        var croppedLocationIds = locations
+            .GroupBy(l => l.GeographicLevel)
+            .SelectMany(g => g.OrderBy(l => l.Id).Take(maxLocationsPerGeographicLevel[g.Key]).Select(l => l.Id))
+            .Take(maxSelections)
+            .ToList();
 
-            query.LocationIds = croppedLocationIds;
-        }
+        query.LocationIds = croppedLocationIds;
 
         return query;
     }
