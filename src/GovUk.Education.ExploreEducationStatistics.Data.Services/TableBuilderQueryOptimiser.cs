@@ -53,8 +53,18 @@ public class TableBuilderQueryOptimiser(
 
         if (query.TimePeriod is not null)
         {
-            query.TimePeriod.Limit = maxSelections;
-            requiresCropping = await IsCroppingRequired(query);
+            var timePeriods = TimePeriodUtil.Range(query.TimePeriod);
+
+            if (timePeriods.Count > maxSelections)
+            {
+                var croppedTimePeriods = timePeriods.Take(maxSelections);
+                query.TimePeriod.StartYear = croppedTimePeriods.First().Year;
+                query.TimePeriod.StartCode = croppedTimePeriods.First().TimeIdentifier;
+                query.TimePeriod.EndYear = croppedTimePeriods.Last().Year;
+                query.TimePeriod.EndCode = croppedTimePeriods.Last().TimeIdentifier;
+
+                requiresCropping = await IsCroppingRequired(query);
+            }
         }
 
         if (requiresCropping)
