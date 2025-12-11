@@ -35,6 +35,7 @@ const ScheduledReleaseRow = ({ publicationId, release }: Props) => {
         <ReleasePublishingStages
           checklistStyle
           currentStatus={currentStatus}
+          hiddenLabel={`for ${release.title}`}
           includeScheduled
         />
       </td>

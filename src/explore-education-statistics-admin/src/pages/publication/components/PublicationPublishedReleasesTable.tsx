@@ -108,7 +108,15 @@ export default function PublicationPublishedReleasesTable({
                         currentReleaseSlug={release.slug}
                         publicationSlug={publication.slug}
                         initialValues={{ label: release.label }}
-                        triggerButton={<ButtonText>Edit details</ButtonText>}
+                        triggerButton={
+                          <ButtonText>
+                            Edit release label
+                            <VisuallyHidden>
+                              {' '}
+                              for {release.title}
+                            </VisuallyHidden>
+                          </ButtonText>
+                        }
                         onSubmit={formValues =>
                           onEdit(release.releaseId, formValues)
                         }

@@ -11,6 +11,7 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
 import Tag from '@common/components/Tag';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import { Dictionary } from '@common/types';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import DataSetUploadSummaryList from './DataSetUploadSummaryList';
@@ -166,6 +167,7 @@ export default function DataFilesTableUploadRow({
             triggerButton={
               <ButtonText onClick={toggleOpenImportConfirm.on}>
                 View details
+                <VisuallyHidden>{` for ${dataSetUpload.dataSetTitle}`}</VisuallyHidden>
               </ButtonText>
             }
           >
@@ -233,6 +235,7 @@ export default function DataFilesTableUploadRow({
                   variant="warning"
                 >
                   Delete files
+                  <VisuallyHidden>{` for ${dataSetUpload.dataSetTitle}`}</VisuallyHidden>
                 </ButtonText>
               }
               onConfirm={handleDeleteConfirm}

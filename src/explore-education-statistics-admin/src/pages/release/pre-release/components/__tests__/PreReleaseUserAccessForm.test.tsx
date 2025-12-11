@@ -89,7 +89,7 @@ describe('PreReleaseUserAccessForm', () => {
       expect(rows).toHaveLength(3);
 
       expect(
-        screen.queryByRole('button', { name: 'Remove' }),
+        screen.queryByRole('button', { name: /Remove/ }),
       ).not.toBeInTheDocument();
     });
   });
@@ -703,7 +703,9 @@ describe('PreReleaseUserAccessForm', () => {
       let rows = screen.getAllByRole('row');
       expect(rows).toHaveLength(3);
 
-      await user.click(within(rows[2]).getByRole('button', { name: 'Remove' }));
+      await user.click(
+        within(rows[2]).getByRole('button', { name: 'Remove test2@test.com' }),
+      );
 
       await waitFor(() => {
         expect(preReleaseUserService.removeUser).toHaveBeenCalledWith(
