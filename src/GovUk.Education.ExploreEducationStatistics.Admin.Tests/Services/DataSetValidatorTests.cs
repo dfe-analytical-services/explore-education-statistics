@@ -904,6 +904,6 @@ public class DataSetValidatorTests
             dataSetService = dataSetServiceMock.Object;
         }
 
-        return new DataSetValidator(contentDbContext!, userService!, dataSetService!);
+        return new DataSetValidator(contentDbContext!, userService, dataSetService);
     }
 }

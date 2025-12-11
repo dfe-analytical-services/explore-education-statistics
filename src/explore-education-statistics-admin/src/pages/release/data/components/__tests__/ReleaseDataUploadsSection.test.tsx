@@ -1422,11 +1422,7 @@ describe('ReleaseDataUploadsSection', () => {
     };
     return render(
       <ReleaseVersionContextProvider releaseVersion={testRelease}>
-        <TestConfigContextProvider
-          config={{
-            ...defaultTestConfig,
-          }}
-        >
+        <TestConfigContextProvider config={defaultTestConfig}>
           {children}
         </TestConfigContextProvider>
       </ReleaseVersionContextProvider>,

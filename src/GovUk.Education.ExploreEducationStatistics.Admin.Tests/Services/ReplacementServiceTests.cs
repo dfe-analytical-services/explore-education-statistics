@@ -692,6 +692,7 @@ public class ReplacementServiceTests
         releaseVersionService
             .Setup(service => service.RemoveDataFiles(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync(Unit.Instance);
+
         var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
         releaseFileRepository
             .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))

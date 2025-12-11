@@ -780,7 +780,7 @@ public abstract class ReleaseVersionServiceTests
                 testFixture.DataBlockService
             );
 
-            var viewModel = result.AssertRight();
+            result.AssertRight();
         }
     }
 
