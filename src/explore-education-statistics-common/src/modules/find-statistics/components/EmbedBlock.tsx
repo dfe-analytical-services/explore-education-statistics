@@ -1,6 +1,6 @@
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useToggle from '@common/hooks/useToggle';
-import { IframeResizer } from '@open-iframe-resizer/react';
+import IframeResizer from 'iframe-resizer-react';
 import React from 'react';
 
 interface Props {
