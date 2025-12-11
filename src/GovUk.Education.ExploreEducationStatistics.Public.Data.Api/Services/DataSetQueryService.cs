@@ -39,7 +39,9 @@ internal class DataSetQueryService(
     IParquetIndicatorRepository indicatorRepository,
     IParquetLocationRepository locationRepository,
     IParquetTimePeriodRepository timePeriodRepository,
-    IAnalyticsService analyticsService
+    IAnalyticsService analyticsService,
+    TimeProvider timeProvider,
+    ILogger<DataSetQueryService> logger
 ) : IDataSetQueryService
 {
     private static readonly Dictionary<string, string> ReservedSorts = new()
@@ -145,7 +147,7 @@ internal class DataSetQueryService(
         string baseCriteriaPath = ""
     )
     {
-        var startTime = DateTime.UtcNow;
+        var startTime = timeProvider.GetUtcNow().UtcDateTime;
 
         return await RunQuery(
                 dataSetVersion: dataSetVersion,
@@ -153,16 +155,24 @@ internal class DataSetQueryService(
                 cancellationToken: cancellationToken,
                 baseCriteriaPath: baseCriteriaPath
             )
-            .OnSuccessDo(results =>
-                analyticsService.CaptureDataSetVersionQuery(
-                    dataSetVersion: dataSetVersion,
-                    requestedDataSetVersion: requestedDataSetVersion,
-                    query: query,
-                    results: results,
-                    startTime: startTime,
-                    cancellationToken: cancellationToken
-                )
-            );
+            .OnSuccessDo(async results =>
+            {
+                try
+                {
+                    await analyticsService.CaptureDataSetVersionQuery(
+                        dataSetVersion: dataSetVersion,
+                        requestedDataSetVersion: requestedDataSetVersion,
+                        query: query,
+                        results: results,
+                        startTime: startTime,
+                        cancellationToken: cancellationToken
+                    );
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "Error capturing query in analytics");
+                }
+            });
     }
 
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(

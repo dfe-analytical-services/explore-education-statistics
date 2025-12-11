@@ -65,7 +65,16 @@ internal static class ServiceCollectionExtensions
         where TService : class
     {
         // Remove the default service descriptor that was provided by Startup.cs.
-        var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(TService));
+        var descriptors = services.Where(d => d.ServiceType == typeof(TService)).ToList();
+
+        if (descriptors.Count > 1)
+        {
+            throw new InvalidOperationException(
+                $"More than one service of type {typeof(TService).Name} was found to replace."
+            );
+        }
+
+        var descriptor = descriptors.SingleOrDefault();
 
         if (descriptor == null)
         {

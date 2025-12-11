@@ -2,12 +2,16 @@ using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Search;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.Optimised;
@@ -54,6 +58,10 @@ public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTe
     private Mock<ISearchService> _searchServiceMock = null!;
     private Mock<IAnalyticsService> _analyticsServiceMock = null!;
 
+    private TestDataSetVersionPathResolver _testDataSetVersionPathResolver = new() { Directory = "AbsenceSchool" };
+    private FakeTimeProvider _timeProvider = new(DateTimeOffset.UtcNow);
+    private DateTimeProvider _dateTimeProvider = new(DateTime.UtcNow);
+
     protected override void RegisterTestContainers(TestContainerRegistrations registrations)
     {
         if (capabilities.Contains(PublicApiIntegrationTestCapability.Postgres))
@@ -72,6 +80,11 @@ public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTe
             .ReplaceServiceWithMock<IContentApiClient>()
             .ReplaceServiceWithMock<ISearchService>()
             .ReplaceServiceWithMock<IAnalyticsService>(mockBehavior: MockBehavior.Loose);
+
+        serviceModifications.ReplaceService<IDataSetVersionPathResolver>(_testDataSetVersionPathResolver);
+
+        serviceModifications.ReplaceService<TimeProvider>(_timeProvider);
+        serviceModifications.ReplaceService(_dateTimeProvider);
 
         if (capabilities.Contains(PublicApiIntegrationTestCapability.Postgres))
         {
@@ -140,6 +153,22 @@ public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTe
     {
         SetUser(user);
         return CreateClient();
+    }
+
+    public void SetDataSetVersionDataDirectory(string directory)
+    {
+        _testDataSetVersionPathResolver.Directory = directory;
+    }
+
+    public DateTimeOffset GetUtcNow()
+    {
+        return _timeProvider.GetUtcNow();
+    }
+
+    public void SetUtcNow(DateTimeOffset utcNow)
+    {
+        _timeProvider.SetUtcNow(utcNow);
+        _dateTimeProvider.SetFixedDateTimeUtc(utcNow.UtcDateTime);
     }
 
     /// <summary>
