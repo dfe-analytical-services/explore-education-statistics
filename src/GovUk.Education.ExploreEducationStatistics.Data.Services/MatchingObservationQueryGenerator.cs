@@ -255,9 +255,7 @@ public class MatchingObservationsQueryGenerator(ITemporaryTableCreator tempTable
             $"(o.TimeIdentifier = '{timePeriod.TimeIdentifier.GetEnumValue()}' AND o.Year = {timePeriod.Year})"
         );
 
-        return timePeriodQuery.Limit is not null
-            ? timePeriodClauses.Take(timePeriodQuery.Limit.Value).JoinToString(" OR ")
-            : timePeriodClauses.JoinToString(" OR ");
+        return timePeriodClauses.JoinToString(" OR ");
     }
 
     // ReSharper disable TypeWithSuspiciousEqualityIsUsedInRecord.Local

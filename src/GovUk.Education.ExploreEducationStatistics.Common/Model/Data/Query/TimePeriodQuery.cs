@@ -15,23 +15,13 @@ public record TimePeriodQuery
     [JsonConverter(typeof(EnumToEnumValueJsonConverter<TimeIdentifier>))]
     public TimeIdentifier EndCode { get; set; }
 
-    [JsonIgnore]
-    public int? Limit { get; set; }
-
     public TimePeriodQuery() { }
 
-    public TimePeriodQuery(
-        int startYear,
-        TimeIdentifier startCode,
-        int endYear,
-        TimeIdentifier endCode,
-        int? limit = null
-    )
+    public TimePeriodQuery(int startYear, TimeIdentifier startCode, int endYear, TimeIdentifier endCode)
     {
         StartYear = startYear;
         StartCode = startCode;
         EndYear = endYear;
         EndCode = endCode;
-        Limit = limit;
     }
 }
