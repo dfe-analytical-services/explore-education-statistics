@@ -28,21 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Contr
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class DataSetsControllerGetQueryTestsFixture()
-    : OptimisedPublicApiCollectionFixture(
-        capabilities: [PublicApiIntegrationTestCapability.UserAuth, PublicApiIntegrationTestCapability.Postgres]
-    )
-{
-    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
-    {
-        await base.AfterFactoryConstructed(lookups);
-    }
-}
+    : OptimisedPublicApiCollectionFixture(capabilities: [PublicApiIntegrationTestCapability.Postgres]);
 
 [CollectionDefinition(nameof(DataSetsControllerGetQueryTestsFixture))]
 public class DataSetsControllerGetQueryTestsCollection : ICollectionFixture<DataSetsControllerGetQueryTestsFixture>;
 
 [Collection(nameof(DataSetsControllerGetQueryTestsFixture))]
-[SuppressMessage("Usage", "xUnit1041:Fixture arguments to test classes must have fixture sources")]
 public abstract class DataSetsControllerGetQueryTests(DataSetsControllerGetQueryTestsFixture fixture)
 {
     private const string BaseUrl = "v1/data-sets";
