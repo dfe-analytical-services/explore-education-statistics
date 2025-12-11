@@ -16,7 +16,7 @@ describe('ReleaseMethodologyPage', () => {
         title: 'Publication 1',
       },
       {
-        methodologyId: 'test-methodology-id-1',
+        methodologyId: 'test-methodology-id-2',
         slug: 'publication-2',
         title: 'Publication 2',
       },
