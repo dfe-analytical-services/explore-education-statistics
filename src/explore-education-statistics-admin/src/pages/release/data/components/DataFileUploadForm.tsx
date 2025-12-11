@@ -62,7 +62,6 @@ const fileErrorMappings = {
   FileNameNotUnique: 'FileNameNotUnique',
   FileSizeMustNotBeZero: 'FileSizeMustNotBeZero',
   MustBeCsvFile: 'MustBeCsvFile',
-  CannotReplaceDataSetWithApiDataSet: 'CannotReplaceDataSetWithApiDataSet',
   CannotReplaceDraftApiDataSet: 'CannotReplaceDraftApiDataSet',
   InvalidFileTypeForReplacement: 'InvalidFileTypeForReplacement',
   DataSetIsNotInAnImportableState: 'DataSetIsNotInAnImportableState',
