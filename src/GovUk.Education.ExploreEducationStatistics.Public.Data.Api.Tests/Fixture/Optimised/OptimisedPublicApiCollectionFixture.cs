@@ -58,9 +58,13 @@ public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTe
     private Mock<ISearchService> _searchServiceMock = null!;
     private Mock<IAnalyticsService> _analyticsServiceMock = null!;
 
-    private TestDataSetVersionPathResolver _testDataSetVersionPathResolver = new() { Directory = "AbsenceSchool" };
-    private FakeTimeProvider _timeProvider = new(DateTimeOffset.UtcNow);
-    private DateTimeProvider _dateTimeProvider = new(DateTime.UtcNow);
+    private readonly TestDataSetVersionPathResolver _testDataSetVersionPathResolver = new()
+    {
+        Directory = "AbsenceSchool",
+    };
+
+    private readonly FakeTimeProvider _timeProvider = new(DateTimeOffset.UtcNow);
+    private readonly DateTimeProvider _dateTimeProvider = new(DateTime.UtcNow);
 
     protected override void RegisterTestContainers(TestContainerRegistrations registrations)
     {
@@ -149,9 +153,13 @@ public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTe
     /// <summary>
     /// Create an HttpClient and set a specific user to handle the request.
     /// </summary>
-    public HttpClient CreateClient(ClaimsPrincipal user)
+    public HttpClient CreateClient(ClaimsPrincipal? user)
     {
-        SetUser(user);
+        if (user != null)
+        {
+            SetUser(user);
+        }
+
         return CreateClient();
     }
 
@@ -215,6 +223,8 @@ public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTe
     /// </param>
     public Mock<IAnalyticsService> GetAnalyticsServiceMock(bool resetMock = true) =>
         _analyticsServiceMock.WithOptionalReset(resetMock);
+
+    public TestDataSetVersionPathResolver GetTestDataSetVersionPathResolver() => _testDataSetVersionPathResolver;
 
     /// <summary>
     /// Adds a user to the test user pool so that they can be used for HttpClient calls and looked up successfully.

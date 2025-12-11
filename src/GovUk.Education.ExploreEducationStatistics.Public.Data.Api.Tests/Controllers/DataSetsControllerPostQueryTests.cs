@@ -3647,7 +3647,7 @@ public abstract class DataSetsControllerPostQueryTests(DataSetsControllerPostQue
                     s.CaptureDataSetVersionQuery(
                         It.Is<DataSetVersion>(dsv => dsv.Id == dataSetVersion.Id),
                         null,
-                        It.Is<DataSetQueryRequest>(r => r.IsDeepEqualTo(request, null)),
+                        ItIs.DeepEqualTo(request),
                         It.Is<DataSetQueryPaginatedResultsViewModel>(model => model.Results.Count == 1),
                         fixture.GetUtcNow().UtcDateTime,
                         It.IsAny<CancellationToken>()

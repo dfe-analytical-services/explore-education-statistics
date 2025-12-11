@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -2748,7 +2747,7 @@ public abstract class DataSetsControllerGetQueryTests(DataSetsControllerGetQuery
                     s.CaptureDataSetVersionQuery(
                         It.Is<DataSetVersion>(dsv => dsv.Id == dataSetVersion.Id),
                         null,
-                        It.Is<DataSetQueryRequest>(r => r.IsDeepEqualTo(expectedRequest, null)),
+                        ItIs.DeepEqualTo(expectedRequest),
                         It.Is<DataSetQueryPaginatedResultsViewModel>(model => model.Results.Count == 1),
                         fixture.GetUtcNow().UtcDateTime,
                         It.IsAny<CancellationToken>()
