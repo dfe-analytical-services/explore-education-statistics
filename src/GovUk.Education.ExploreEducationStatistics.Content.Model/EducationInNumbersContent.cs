@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.ComponentModel.DataAnnotations;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -45,7 +46,12 @@ public class EinTileGroupBlock : EinContentBlock
 public class EinTile
 {
     public Guid Id { get; set; }
+
+    [MaxLength(2048)]
+    public string Title { get; set; } = string.Empty;
+
     public int Order { get; set; }
+
     public Guid EinParentBlockId { get; set; }
     public EinTileGroupBlock EinParentBlock { get; set; } = null!;
 }
@@ -54,13 +60,41 @@ public enum EinTileType
 {
     // NOTE: Update ContentDbContext.ConfigureEinTile if you add a new type!
     FreeTextStatTile,
+    ApiQueryStatTile,
 }
 
 public class EinFreeTextStatTile : EinTile
 {
-    public string Title { get; set; } = string.Empty;
     public string Statistic { get; set; } = string.Empty;
     public string Trend { get; set; } = string.Empty;
     public string? LinkUrl { get; set; }
     public string? LinkText { get; set; }
+}
+
+public class EinApiQueryStatTile : EinTile
+{
+    public Guid? DataSetId { get; set; }
+
+    [MaxLength(32)]
+    public string Version { get; set; } = string.Empty;
+
+    [MaxLength(32)]
+    public string LatestPublishedVersion { get; set; } = string.Empty;
+
+    public string Query { get; set; } = string.Empty;
+
+    [MaxLength(64)]
+    public string Statistic { get; set; } = string.Empty;
+
+    public IndicatorUnit IndicatorUnit { get; set; } = IndicatorUnit.None;
+
+    public int? DecimalPlaces { get; set; }
+
+    public string QueryResult { get; set; } = string.Empty;
+
+    [MaxLength(512)]
+    public string PublicationSlug { get; set; } = string.Empty;
+
+    [MaxLength(512)]
+    public string ReleaseSlug { get; set; } = string.Empty;
 }

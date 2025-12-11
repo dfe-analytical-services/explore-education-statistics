@@ -1,19 +1,29 @@
 #nullable enable
+using System.Text.Json;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Profiling.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class EducationInNumbersContentService(ContentDbContext contentDbContext) : IEducationInNumbersContentService
+public class EducationInNumbersContentService(
+    ContentDbContext contentDbContext,
+    IPublicDataSetRepository publicDataSetRepository,
+    IPublicDataApiClient publicDataApiClient
+) : IEducationInNumbersContentService
 {
     public async Task<Either<ActionResult, EinContentViewModel>> GetPageContent(Guid pageId)
     {
@@ -338,6 +348,22 @@ public class EducationInNumbersContentService(ContentDbContext contentDbContext)
                 LinkUrl = null,
                 LinkText = null,
             },
+            EinTileType.ApiQueryStatTile => new EinApiQueryStatTile
+            {
+                Id = Guid.NewGuid(),
+                EinParentBlockId = parentBlockId,
+                Order = order ?? tileList.Count,
+                Title = "",
+                DataSetId = null,
+                Query = "",
+                DecimalPlaces = null,
+                IndicatorUnit = IndicatorUnit.None,
+                LatestPublishedVersion = "",
+                QueryResult = "",
+                Version = "",
+                PublicationSlug = "",
+                ReleaseSlug = "",
+            },
             _ => throw new Exception($"{nameof(EinTile)} type {type} not found"),
         };
 
@@ -379,6 +405,120 @@ public class EducationInNumbersContentService(ContentDbContext contentDbContext)
         await contentDbContext.SaveChangesAsync();
 
         return EinTileViewModel.FromModel(tileToUpdate);
+    }
+
+    public async Task<Either<ActionResult, EinTileViewModel>> UpdateApiQueryStatTile(
+        Guid pageId,
+        Guid tileId,
+        EinApiQueryStatTileUpdateRequest request
+    )
+    {
+        // Get tile to update
+        var tileToUpdate = contentDbContext
+            .EinTiles.OfType<EinApiQueryStatTile>()
+            .SingleOrDefault(tile =>
+                tile.Id == tileId && tile.EinParentBlock.EinContentSection.EducationInNumbersPageId == pageId
+            );
+        if (tileToUpdate == null)
+        {
+            return new NotFoundResult();
+        }
+
+        // Get indicator PublicId
+        var indicatorPublicId = FetchSingleIndicator(request.Query);
+        if (indicatorPublicId == null)
+        {
+            return new Either<ActionResult, EinTileViewModel>(
+                new BadRequestObjectResult("Request query must contain exactly one indicator")
+            );
+        }
+
+        // Get data from publicDataDbContext where possible
+        var apiDataSet = await publicDataSetRepository.GetDataSet(request.DataSetId);
+        if (apiDataSet.LatestLiveVersion == null)
+        {
+            return new BadRequestObjectResult("API data set has no live version");
+        }
+        var apiDataSetLatest = apiDataSet.LatestLiveVersion;
+
+        var latestVersion =
+            $"{apiDataSetLatest.VersionMajor}.{apiDataSetLatest.VersionMinor}.{apiDataSetLatest.VersionPatch}";
+        if (latestVersion != request.Version) // we always expect the full api data set version to be provided in the request
+        {
+            return new BadRequestObjectResult(
+                $"Version provided isn't the latest version. Latest: {latestVersion} Provided: {request.Version}"
+            );
+        }
+
+        var releaseSlug = apiDataSetLatest.Release.Slug;
+
+        var publicationSlug = contentDbContext
+            .ReleaseFiles.Where(rf => rf.Id == apiDataSetLatest.Release.ReleaseFileId)
+            .Select(rf => rf.ReleaseVersion.Release.Publication.Slug)
+            .Single();
+
+        var indicatorMeta = await publicDataSetRepository.GetIndicatorMeta(apiDataSetLatest.Id, indicatorPublicId);
+        if (indicatorMeta == null)
+        {
+            return new BadRequestObjectResult(
+                $"Could not find indicator meta for {indicatorPublicId} for API data set {apiDataSetLatest.Id}"
+            );
+        }
+        var indicatorUnit = indicatorMeta.Unit ?? IndicatorUnit.None;
+        var indicatorDecimalPlaces = indicatorMeta.DecimalPlaces;
+
+        // Make the actual PAPI query
+        return await publicDataApiClient
+            .RunQuery(request.DataSetId, request.Version, request.Query)
+            .OnSuccess(async queryResults =>
+            {
+                if (queryResults.Warnings.Count > 0)
+                {
+                    return new Either<ActionResult, EinTileViewModel>(
+                        new BadRequestObjectResult(
+                            $"PAPI query returned warnings: {queryResults.Warnings.Select(w => w.Message).JoinToString(',')}"
+                        )
+                    );
+                }
+
+                if (queryResults.Paging.TotalPages > 1)
+                {
+                    return new BadRequestObjectResult("Results need to all fit on the first page");
+                }
+
+                if (queryResults.Results.Count == 0)
+                {
+                    return new BadRequestObjectResult("PAPI query returned no results");
+                }
+
+                var latestResults = FetchLatestYearNationalResults(queryResults);
+
+                if (latestResults.Count != 1)
+                {
+                    return new BadRequestObjectResult(
+                        $"Should only be one result with NAT and latest year. Found {latestResults.Count} results"
+                    );
+                }
+
+                var theStat = latestResults[0].Values[indicatorPublicId];
+
+                tileToUpdate.Title = request.Title;
+                tileToUpdate.DataSetId = request.DataSetId;
+                tileToUpdate.Version = request.Version;
+                tileToUpdate.LatestPublishedVersion = latestVersion;
+                tileToUpdate.Query = request.Query;
+                tileToUpdate.Statistic = theStat;
+                tileToUpdate.IndicatorUnit = indicatorUnit;
+                tileToUpdate.DecimalPlaces = indicatorDecimalPlaces;
+                tileToUpdate.QueryResult = queryResults.Results.ToJson();
+                tileToUpdate.PublicationSlug = publicationSlug;
+                tileToUpdate.ReleaseSlug = releaseSlug;
+
+                contentDbContext.EinTiles.Update(tileToUpdate);
+                await contentDbContext.SaveChangesAsync();
+
+                return EinTileViewModel.FromModel(tileToUpdate);
+            });
     }
 
     public async Task<Either<ActionResult, List<EinTileViewModel>>> ReorderTiles(
@@ -454,5 +594,41 @@ public class EducationInNumbersContentService(ContentDbContext contentDbContext)
         await contentDbContext.SaveChangesAsync();
 
         return Unit.Instance;
+    }
+
+    private static string? FetchSingleIndicator(string queryString)
+    {
+        using JsonDocument doc = JsonDocument.Parse(queryString);
+
+        if (
+            !doc.RootElement.TryGetProperty("indicators", out var indicators)
+            || indicators.ValueKind != JsonValueKind.Array
+            || indicators.GetArrayLength() != 1
+            || indicators[0].ValueKind != JsonValueKind.String
+        )
+        {
+            return null;
+        }
+        return indicators[0].ToString();
+    }
+
+    private static List<DataSetQueryResultViewModel> FetchLatestYearNationalResults(
+        DataSetQueryPaginatedResultsViewModel queryResults
+    )
+    {
+        var natResults = queryResults.Results.Where(result => result.GeographicLevel == GeographicLevel.Country);
+
+        var latestTimePeriod2 = queryResults
+            .Results.OrderBy(result => result.TimePeriod.Period[..4])
+            .ThenBy(result => result.TimePeriod.Code)
+            .ToList();
+
+        var latestTimePeriod = latestTimePeriod2.Select(result => result.TimePeriod).Last();
+
+        return natResults
+            .Where(result =>
+                result.TimePeriod.Period == latestTimePeriod.Period && result.TimePeriod.Code == latestTimePeriod.Code
+            )
+            .ToList();
     }
 }

@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -89,6 +90,8 @@ public class EducationInNumbersContentViewModels
     {
         public Guid Id { get; set; }
 
+        public string Title { get; init; } = string.Empty;
+
         public int Order { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -99,6 +102,7 @@ public class EducationInNumbersContentViewModels
             return tile switch
             {
                 EinFreeTextStatTile statTile => EinFreeTextStatTileViewModel.FromModel(statTile),
+                EinApiQueryStatTile statTile => EinApiQueryStatTileViewModel.FromModel(statTile),
                 _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found"),
             };
         }
@@ -106,7 +110,6 @@ public class EducationInNumbersContentViewModels
 
     public class EinFreeTextStatTileViewModel : EinTileViewModel
     {
-        public string Title { get; set; } = string.Empty;
         public string Statistic { get; set; } = string.Empty;
         public string Trend { get; set; } = string.Empty;
         public string? LinkUrl { get; set; }
@@ -124,6 +127,35 @@ public class EducationInNumbersContentViewModels
                 Trend = statTile.Trend,
                 LinkUrl = statTile.LinkUrl,
                 LinkText = statTile.LinkText,
+            };
+        }
+    }
+
+    public class EinApiQueryStatTileViewModel : EinTileViewModel
+    {
+        public Guid? DataSetId { get; init; }
+        public string Statistic { get; init; } = string.Empty;
+        public IndicatorUnit? IndicatorUnit { get; init; }
+        public int? DecimalPlaces { get; set; }
+        public string Version { get; init; } = string.Empty;
+        public string LatestPublishedVersion { get; init; } = string.Empty;
+        public string Query { get; init; } = string.Empty;
+
+        public static EinApiQueryStatTileViewModel FromModel(EinApiQueryStatTile statTile)
+        {
+            return new EinApiQueryStatTileViewModel
+            {
+                Id = statTile.Id,
+                Order = statTile.Order,
+                Type = EinTileType.ApiQueryStatTile,
+                Title = statTile.Title,
+                DataSetId = statTile.DataSetId,
+                Statistic = statTile.Statistic,
+                IndicatorUnit = statTile.IndicatorUnit,
+                DecimalPlaces = statTile.DecimalPlaces,
+                Version = statTile.Version,
+                LatestPublishedVersion = statTile.LatestPublishedVersion,
+                Query = statTile.Query,
             };
         }
     }

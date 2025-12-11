@@ -1,12 +1,16 @@
 #nullable enable
 using System.Net;
+using System.Text;
+using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
@@ -26,6 +30,32 @@ public class PublicDataApiClient(
             () => httpClient.GetAsync($"v1/data-sets/{dataSetId}/versions/{dataSetVersion}/changes", cancellationToken),
             cancellationToken
         );
+    }
+
+    public async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(
+        Guid dataSetId,
+        string dataSetVersion,
+        string queryBody,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var requestUri = $"v1/data-sets/{dataSetId}/query";
+        requestUri = QueryHelpers.AddQueryString(requestUri, "dataSetVersion", dataSetVersion);
+
+        var httpContent = new StringContent(queryBody, Encoding.UTF8, "application/json");
+
+        var result = await SendRequest(
+            () => httpClient.PostAsync(requestUri, httpContent, cancellationToken),
+            cancellationToken
+        );
+        return result.OnSuccess(responseMsg =>
+        {
+            using var stream = responseMsg.Content.ReadAsStream();
+            return JsonSerializer.Deserialize<DataSetQueryPaginatedResultsViewModel>(
+                stream,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            )!;
+        });
     }
 
     private async Task<Either<ActionResult, HttpResponseMessage>> SendRequest(

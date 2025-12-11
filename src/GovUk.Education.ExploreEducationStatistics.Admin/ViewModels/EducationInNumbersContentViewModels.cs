@@ -1,4 +1,7 @@
 #nullable enable
+using System.ComponentModel.DataAnnotations;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -123,6 +126,7 @@ public record EinTileViewModel
         return tile switch
         {
             EinFreeTextStatTile statTile => EinFreeTextStatTileViewModel.FromModel(statTile),
+            EinApiQueryStatTile statTile => EinApiQueryStatTileViewModel.FromModel(statTile),
             _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found"),
         };
     }
@@ -148,6 +152,43 @@ public record EinFreeTextStatTileViewModel : EinTileViewModel
             Trend = statTile.Trend,
             LinkUrl = statTile.LinkUrl,
             LinkText = statTile.LinkText,
+        };
+    }
+}
+
+public record EinApiQueryStatTileViewModel : EinTileViewModel
+{
+    public string Title { get; init; } = string.Empty;
+    public Guid? DataSetId { get; init; }
+    public string Version { get; init; } = string.Empty;
+    public string LatestPublishedVersion { get; init; } = string.Empty;
+    public string Query { get; init; } = string.Empty;
+    public string Statistic { get; init; } = string.Empty;
+
+    [JsonConverter(typeof(EnumToEnumValueJsonConverter<IndicatorUnit>))]
+    public IndicatorUnit IndicatorUnit { get; init; }
+
+    public int? DecimalPlaces { get; set; }
+    public string PublicationSlug { get; set; } = string.Empty;
+    public string ReleaseSlug { get; set; } = string.Empty;
+
+    public static EinApiQueryStatTileViewModel FromModel(EinApiQueryStatTile statTile)
+    {
+        return new EinApiQueryStatTileViewModel
+        {
+            Id = statTile.Id,
+            Order = statTile.Order,
+            Type = EinTileType.ApiQueryStatTile,
+            Title = statTile.Title,
+            DataSetId = statTile.DataSetId,
+            Version = statTile.Version,
+            LatestPublishedVersion = statTile.LatestPublishedVersion,
+            Query = statTile.Query,
+            Statistic = statTile.Statistic,
+            IndicatorUnit = statTile.IndicatorUnit,
+            DecimalPlaces = statTile.DecimalPlaces,
+            PublicationSlug = statTile.PublicationSlug,
+            ReleaseSlug = statTile.ReleaseSlug,
         };
     }
 }

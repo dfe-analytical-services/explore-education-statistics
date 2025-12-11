@@ -111,6 +111,7 @@
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels\GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Publisher.Model\GovUk.Education.ExploreEducationStatistics.Publisher.Model.csproj" />
   </ItemGroup>
   <ItemGroup>
