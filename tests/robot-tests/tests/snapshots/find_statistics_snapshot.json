@@ -79,7 +79,7 @@
   {
     "publication_summary": "Statistics on the characteristics of early years providers in England.",
     "publication_title": "Childcare and early years provider survey",
-    "published": "12 Dec 2024",
+    "published": "11 Dec 2025",
     "release_type": "Official statistics",
     "theme": "Early years"
   },
@@ -102,6 +102,13 @@
     "publication_title": "Children in need",
     "published": "30 Oct 2025",
     "release_type": "Accredited official statistics",
+    "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "Analysis of children in need assessments data with a focus on children who have been assessed with child sexual abuse or child sexual exploitation.",
+    "publication_title": "Children in need: A focus on sexual abuse and exploitation",
+    "published": "11 Dec 2025",
+    "release_type": "Ad hoc statistics",
     "theme": "Children's social care"
   },
   {
@@ -331,7 +338,7 @@
   {
     "publication_summary": "Key stage 2 attainment statistics by pupil characteristics, school characteristics, region and local authority.",
     "publication_title": "Key stage 2 attainment",
-    "published": "11 Sep 2025",
+    "published": "11 Dec 2025",
     "release_type": "Accredited official statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -359,7 +366,7 @@
   {
     "publication_summary": "Local authority and school spending on education, children's services and social care across financial years. Also includes income of LA maintained schools.",
     "publication_title": "LA and school expenditure",
-    "published": "12 Dec 2024",
+    "published": "11 Dec 2025",
     "release_type": "Official statistics",
     "theme": "Finance and funding"
   },
@@ -457,7 +464,7 @@
   {
     "publication_summary": "Data and commentary on demand for occupations, using 4-digit SOC20 definitions, and industries, using grouped SIC, across the UK labour market.",
     "publication_title": "Occupations in demand",
-    "published": "19 Sep 2024",
+    "published": "11 Dec 2025",
     "release_type": "Official statistics in development",
     "theme": "Labour market and skills"
   },
