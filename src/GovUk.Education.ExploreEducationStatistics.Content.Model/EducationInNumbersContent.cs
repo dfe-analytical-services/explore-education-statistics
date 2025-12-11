@@ -1,5 +1,9 @@
 ﻿#nullable enable
 using System.ComponentModel.DataAnnotations;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Newtonsoft.Json;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -54,6 +58,7 @@ public enum EinTileType
 {
     // NOTE: Update ContentDbContext.ConfigureEinTile if you add a new type!
     FreeTextStatTile,
+    ApiQueryTile,
 }
 
 public class EinFreeTextStatTile : EinTile
@@ -64,3 +69,29 @@ public class EinFreeTextStatTile : EinTile
     public string? LinkUrl { get; set; }
     public string? LinkText { get; set; }
 }
+
+public class EinApiQueryStatTile : EinTile
+{
+    public string Title { get; set; } = string.Empty;
+
+    public Guid DataSetId { get; set; }
+
+    public string Version { get; set; } = string.Empty;
+
+    public bool IsLatestVersion { get; set; }
+
+    public string Query { get; set; } = string.Empty;
+
+    [JsonConverter(typeof(EnumToEnumValueJsonConverter<IndicatorUnit>))]
+    public IndicatorUnit IndicatorUnit { get; set; } = IndicatorUnit.None;
+
+    public int? DecimalPlaces { get; set; }
+
+    public string QueryResult { get; set; } = string.Empty;
+}
+
+// @MarkFix Public API papiStatTile for MVP - i.e. one stat drawn from a papi query
+// MVP
+// - filters results by NAT and latest TimeIdentifier/TimePeriod and then should have one result
+// -- BAU must manually update the papi stat tile for the tile and then publish it - no auto update
+// - link to release that the api data set is from (like free stat text tile)

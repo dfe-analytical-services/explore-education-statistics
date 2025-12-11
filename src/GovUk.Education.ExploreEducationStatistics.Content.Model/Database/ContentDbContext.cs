@@ -890,7 +890,8 @@ public class ContentDbContext : DbContext
         modelBuilder
             .Entity<EinTile>()
             .HasDiscriminator<string>("Type")
-            .HasValue<EinFreeTextStatTile>("FreeTextStatTile");
+            .HasValue<EinFreeTextStatTile>("FreeTextStatTile")
+            .HasValue<EinApiQueryStatTile>("ApiQueryStatTile");
     }
 }
 

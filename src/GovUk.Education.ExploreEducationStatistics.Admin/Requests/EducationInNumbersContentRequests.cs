@@ -1,5 +1,7 @@
 #nullable enable
+using System.Numerics;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
@@ -44,4 +46,12 @@ public record EinFreeTextStatTileUpdateRequest
     public string Trend { get; set; } = string.Empty;
     public string? LinkUrl { get; set; }
     public string? LinkText { get; set; }
+}
+
+public record EinApiQueryStatTileUpdateRequest
+{
+    public string Title { get; set; } = string.Empty;
+    public Guid DataSetId { get; set; }
+    public string Version { get; set; }
+    public string Query { get; set; }
 }

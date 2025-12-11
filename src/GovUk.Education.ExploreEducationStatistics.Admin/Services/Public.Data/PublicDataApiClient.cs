@@ -1,10 +1,12 @@
 #nullable enable
 using System.Net;
+using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Requests;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,6 +28,28 @@ public class PublicDataApiClient(
             () => httpClient.GetAsync($"v1/data-sets/{dataSetId}/versions/{dataSetVersion}/changes", cancellationToken),
             cancellationToken
         );
+    }
+
+    public async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(
+        Guid dataSetId,
+        string dataSetVersion,
+        string queryBody,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var httpContent = new StringContent(queryBody, Encoding.UTF8, "application/json");
+        return await SendRequest(
+                () =>
+                    httpClient.PostAsJsonAsync(
+                        $"v1/data-sets/{dataSetId}/query?dataSetVersion={dataSetVersion}",
+                        httpContent,
+                        cancellationToken
+                    ),
+                cancellationToken
+            )
+            .OnSuccess(httpResp =>
+                httpResp.Content.ReadFromJsonAsync<DataSetQueryPaginatedResultsViewModel>(cancellationToken)
+            );
     }
 
     private async Task<Either<ActionResult, HttpResponseMessage>> SendRequest(
