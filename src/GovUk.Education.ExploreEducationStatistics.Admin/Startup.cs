@@ -752,7 +752,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         {
             app.UseDeveloperExceptionPage();
         }
-        else
+
+        if (env.IsProduction())
         {
             app.UseExceptionHandler("/Error");
             app.UseHsts(opts =>

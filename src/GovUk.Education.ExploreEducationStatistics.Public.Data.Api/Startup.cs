@@ -277,7 +277,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             app.UseMiniProfiler();
         }
 
-        if (env.IsDevelopment() || env.IsIntegrationTest())
+        if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
 

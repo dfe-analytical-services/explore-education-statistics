@@ -48,7 +48,10 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         )]
         public async Task VersionNotAvailable_Returns403(DataSetVersionStatus versionStatus)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion(versionStatus);
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>(),
+                versionStatus
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -65,7 +68,10 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         )]
         public async Task VersionAvailable_Returns200(DataSetVersionStatus versionStatus)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion(versionStatus);
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>(),
+                versionStatus
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -97,7 +103,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task VersionDoesNotExist_Returns404()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -275,7 +283,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task Blank_Returns400()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -294,7 +304,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task TooLong_Returns400()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -312,7 +324,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task NotFound_Returns400()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             string[] notFoundIndicators = ["invalid1", "invalid2", "invalid3"];
 
@@ -336,7 +350,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn")]
         public async Task Empty_Returns400(string comparator)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -362,7 +378,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn")]
         public async Task InvalidMix_Returns400(string comparator)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             string[] invalidFilters = ["", " ", "  ", new('a', 11), new('a', 12)];
 
@@ -394,7 +412,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task AllComparatorsInvalid_Returns400()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             string[] invalidFilters = [new('a', 11), ""];
 
@@ -430,7 +450,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task NotFound_Returns200_HasWarning()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             string[] notFoundFilters = ["invalid", "9999999"];
 
@@ -469,7 +491,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task Empty_Returns400()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -496,7 +520,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn")]
         public async Task InvalidMix_Returns400(string comparator)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             string[] invalidLevels = ["", " ", "LADD", "NATT", "National", "Local authority", "LocalAuthority"];
 
@@ -534,7 +560,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn")]
         public async Task NotFound_Returns200_HasWarning(string comparator)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             GeographicLevel[] notFoundGeographicLevels =
             [
@@ -571,7 +599,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task AllComparatorsInvalid_Returns400()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             string[] invalidLevels = ["  ", "National"];
 
@@ -630,7 +660,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn")]
         public async Task Empty_Returns400(string comparator)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -656,7 +688,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn")]
         public async Task InvalidMix_Returns400(string comparator)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -719,7 +753,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task AllComparatorsInvalid_Returns400()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             IDataSetQueryLocation[] invalidLocations =
             [
@@ -772,7 +808,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn")]
         public async Task NotFound_Returns200_HasWarning(string comparator)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             IDataSetQueryLocation[] notFoundLocations =
             [
@@ -819,7 +857,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn")]
         public async Task Empty_Returns400(string comparator)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -845,7 +885,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn")]
         public async Task InvalidMix_Returns400(string comparator)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             DataSetQueryTimePeriod[] invalidTimePeriods =
             [
@@ -894,7 +936,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task AllComparatorsInvalid_Returns400()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             DataSetQueryTimePeriod[] invalidTimePeriods =
             [
@@ -953,7 +997,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn")]
         public async Task NotFound_Returns200_HasWarning(string comparator)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             DataSetQueryTimePeriod[] notFoundTimePeriods =
             [
@@ -995,7 +1041,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task Empty_Returns400()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -1016,7 +1064,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task InvalidMix_Returns400()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -1055,7 +1105,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task FieldsNotFound_Returns400()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             DataSetQuerySort[] notFoundSorts =
             [
@@ -1093,7 +1145,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData(0)]
         public async Task PageTooSmall_Returns400(int page)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -1117,7 +1171,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData(10001)]
         public async Task PageSizeOutOfBounds_Returns400(int pageSize)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -1149,7 +1205,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
             int pageResults
         )
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -1180,7 +1238,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn", 162)]
         public async Task SingleOption_Returns200(string comparator, int expectedResults)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             const string filterOptionId = AbsenceSchoolData.FilterNcYear4;
 
@@ -1222,7 +1282,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn", 108)]
         public async Task MultipleOptionsInSameFilter_Returns200(string comparator, int expectedResults)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             string[] filterOptionIds = [AbsenceSchoolData.FilterNcYear4, AbsenceSchoolData.FilterNcYear8];
 
@@ -1268,7 +1330,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn", 66)]
         public async Task MultipleOptionsInDifferentFilters_Returns200(string comparator, int expectedResults)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             string[] filterOptionIds =
             [
@@ -1329,7 +1393,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn", 84)]
         public async Task SingleOption_Returns200(string comparator, int expectedResults)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             const GeographicLevel geographicLevel = GeographicLevel.LocalAuthority;
 
@@ -1371,7 +1437,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn", 36)]
         public async Task MultipleOptions_Returns200(string comparator, int expectedResults)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             GeographicLevel[] geographicLevels = [GeographicLevel.Region, GeographicLevel.LocalAuthority];
 
@@ -1418,7 +1486,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn", 180)]
         public async Task SingleOption_Returns200(string comparator, int expectedResults)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             // Sheffield
             var location = new DataSetQueryLocationLocalAuthorityCode { Code = "E08000019" };
@@ -1461,7 +1531,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn", 144)]
         public async Task MultipleOptionsInSameLevel_Returns200(string comparator, int expectedResults)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             IDataSetQueryLocation[] locations =
             [
@@ -1508,7 +1580,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn", 132)]
         public async Task MultipleOptionsInDifferentLevels_Returns200(string comparator, int expectedResults)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             IDataSetQueryLocation[] locations =
             [
@@ -1576,7 +1650,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("Lte", 144)]
         public async Task SingleOption_Returns200(string comparator, int expectedResults)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var queryTimePeriod = new DataSetQueryTimePeriod { Code = "AY", Period = "2021/2022" };
 
@@ -1630,7 +1706,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData("NotIn", 72)]
         public async Task MultipleOptions_Returns200(string comparator, int expectedResults)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             DataSetQueryTimePeriod[] queryTimePeriods =
             [
@@ -1683,7 +1761,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task NoResults_Returns200_HasWarning()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -1721,7 +1801,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task DebugEnabled_Returns200_HasWarning()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -1743,7 +1825,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task SingleIndicator_Returns200_CorrectViewModel()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -1783,7 +1867,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task AllIndicators_Returns200_ResultValuesInAllowedRanges()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -1847,7 +1933,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData(true)]
         public async Task AllIndicators_Returns200_CorrectResultIds(bool includeIndicatorsQueryParam)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -1964,7 +2052,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [InlineData(true)]
         public async Task AllIndicators_Returns200_CorrectDebuggedResultLabels(bool includeIndicatorsQueryParam)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -2127,7 +2217,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task AllFacetsMixture_Returns200()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -2204,7 +2296,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task NoFacets_Returns200AndAllResults()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(dataSetId: dataSetVersion.DataSetId, request: null);
 
@@ -2251,7 +2345,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task Empty_Returns400()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -2405,7 +2501,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [MemberData(nameof(EquivalentCriteria))]
         public async Task EquivalentCriteria_Returns200(IDataSetQueryCriteria criteria)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -2453,7 +2551,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task Empty_Returns400()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -2663,7 +2763,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [MemberData(nameof(EquivalentCriteria))]
         public async Task EquivalentCriteria_Returns200(IDataSetQueryCriteria criteria)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -2871,7 +2973,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [MemberData(nameof(EquivalentCriteria))]
         public async Task EquivalentCriteria_Returns200(IDataSetQueryCriteria criteria)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -2919,7 +3023,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task NoFields_SingleTimePeriod_Returns200()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -2974,7 +3080,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task NoFields_MultipleTimePeriods_Returns200()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -3033,7 +3141,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task SingleField_TimePeriodAsc_Returns200()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -3093,7 +3203,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task SingleField_TimePeriodDesc_Returns200()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -3153,7 +3265,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task SingleField_GeographicLevelAsc_Returns200_CorrectSequence()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -3198,7 +3312,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task SingleField_GeographicLevelDesc_Returns200_CorrectSequence()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -3243,7 +3359,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task SingleField_LocationAsc_Returns200_CorrectSequence()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -3281,7 +3399,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task SingleField_LocationDesc_Returns200_CorrectSequence()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -3319,7 +3439,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task SingleField_FilterAsc_Returns200_CorrectSequence()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -3362,7 +3484,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task SingleField_FilterDesc_Returns200_CorrectSequence()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -3405,7 +3529,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task SingleField_IndicatorAsc_Returns200_CorrectSequence()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -3447,7 +3573,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task SingleField_IndicatorDesc_Returns200_CorrectSequence()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -3489,7 +3617,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task MultipleFields_Returns200_CorrectSequence()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var response = await QueryDataSet(
                 dataSetId: dataSetVersion.DataSetId,
@@ -3589,7 +3719,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task SuccessfulQuery_CapturedByAnalytics()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                TestApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var request = new DataSetQueryRequest
             {
@@ -3676,7 +3808,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task UnsuccessfulQuery_NotCapturedByAnalytics()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                TestApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var request = new DataSetQueryRequest
             {
@@ -3701,7 +3835,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task RequestFromEes_NotCapturedByAnalytics()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                TestApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var request = new DataSetQueryRequest
             {
@@ -3764,7 +3900,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
                     .ReplaceService(analyticsManagerMock)
             );
 
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                TestApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var request = new DataSetQueryRequest
             {
@@ -3803,7 +3941,9 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         [Fact]
         public async Task SuccessfulQuery_AnalyticsDisabled_NotCapturedByAnalytics()
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+            var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(
+                testApp.GetDbContext<PublicDataDbContext>()
+            );
 
             var request = new DataSetQueryRequest
             {
@@ -3867,40 +4007,6 @@ public abstract class DataSetsControllerPostQueryTests(TestApplicationFactory te
         var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/query", query);
 
         return await client.PostAsJsonAsync(uri, request);
-    }
-
-    private async Task<DataSetVersion> SetupDefaultDataSetVersion(
-        DataSetVersionStatus versionStatus = DataSetVersionStatus.Published
-    )
-    {
-        DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
-
-        await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
-
-        DataSetVersion dataSetVersion = DataFixture
-            .DefaultDataSetVersion()
-            .WithDataSet(dataSet)
-            .WithMetaSummary(
-                DataFixture
-                    .DefaultDataSetVersionMetaSummary()
-                    .WithGeographicLevels([
-                        GeographicLevel.Country,
-                        GeographicLevel.LocalAuthority,
-                        GeographicLevel.Region,
-                        GeographicLevel.School,
-                    ])
-            )
-            .WithStatus(versionStatus);
-
-        dataSet.LatestLiveVersion = dataSetVersion;
-
-        await TestApp.AddTestData<PublicDataDbContext>(context =>
-        {
-            context.DataSetVersions.Add(dataSetVersion);
-            context.DataSets.Update(dataSet);
-        });
-
-        return dataSetVersion;
     }
 
     private WebApplicationFactory<Startup> BuildApp()
