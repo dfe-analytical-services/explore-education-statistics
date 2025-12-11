@@ -1,6 +1,6 @@
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useToggle from '@common/hooks/useToggle';
-import IframeResizer from '@iframe-resizer/react';
+import { IframeResizer } from '@open-iframe-resizer/react';
 import React from 'react';
 
 interface Props {
@@ -16,7 +16,6 @@ const EmbedBlock = ({ title, url }: Props) => {
       {isLoading && <LoadingSpinner hideText text={`Loading ${title}`} />}
 
       <IframeResizer
-        license="GPLv3"
         src={url}
         style={{ border: 0, minWidth: '100%', width: '1px' }}
         title={title}
