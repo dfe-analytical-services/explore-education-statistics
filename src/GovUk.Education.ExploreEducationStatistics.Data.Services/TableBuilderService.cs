@@ -74,6 +74,8 @@ public class TableBuilderService : ITableBuilderService
         CancellationToken cancellationToken = default
     )
     {
+        query.EnableCropping = true;
+
         return await FindLatestPublishedReleaseVersionId(query.SubjectId)
             .OnSuccess(releaseVersionId => Query(releaseVersionId, query, cancellationToken));
     }
@@ -181,7 +183,7 @@ public class TableBuilderService : ITableBuilderService
         CancellationToken cancellationToken
     )
     {
-        var requiresCropping = await _tableBuilderQueryOptimiser.IsCroppingRequired(query);
+        var requiresCropping = query.EnableCropping && await _tableBuilderQueryOptimiser.IsCroppingRequired(query);
 
         if (requiresCropping)
         {
@@ -192,20 +194,26 @@ public class TableBuilderService : ITableBuilderService
 
         var matchedObservationIds = _statisticsDbContext.MatchedObservations.Select(o => o.Id);
 
-        if (await matchedObservationIds.CountAsync(cancellationToken) > _options.CroppedTableMaxRows)
+        if (
+            query.EnableCropping
+            && await matchedObservationIds.CountAsync(cancellationToken) > _options.CroppedTableMaxRows
+        )
         {
             requiresCropping = true;
         }
 
-        var results = await _statisticsDbContext
+        var results = _statisticsDbContext
             .Observation.AsNoTracking()
             .Include(o => o.Location)
             .Include(o => o.FilterItems)
-            .Where(o => matchedObservationIds.Contains(o.Id))
-            .Take(_options.CroppedTableMaxRows)
-            .ToListAsync(cancellationToken);
+            .Where(o => matchedObservationIds.Contains(o.Id));
 
-        return (results, requiresCropping);
+        if (requiresCropping)
+        {
+            results = results.Take(_options.CroppedTableMaxRows);
+        }
+
+        return (await results.ToListAsync(cancellationToken), requiresCropping);
     }
 
     private async Task<Either<ActionResult, Guid>> FindLatestPublishedReleaseVersionId(Guid subjectId)
