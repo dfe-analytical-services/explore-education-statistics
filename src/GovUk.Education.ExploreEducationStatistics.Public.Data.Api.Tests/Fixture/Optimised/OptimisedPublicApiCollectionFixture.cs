@@ -151,16 +151,12 @@ public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTe
     }
 
     /// <summary>
-    /// Create an HttpClient and set a specific user to handle the request.
+    /// Create an HttpClient and optionally set a specific user to handle the request.
     /// </summary>
-    public HttpClient CreateClient(ClaimsPrincipal? user)
+    public HttpClient CreateClient(ClaimsPrincipal? user = null)
     {
-        if (user != null)
-        {
-            SetUser(user);
-        }
-
-        return CreateClient();
+        SetUser(user);
+        return base.CreateClient();
     }
 
     public void SetDataSetVersionDataDirectory(string directory)
@@ -229,7 +225,7 @@ public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTe
     /// <summary>
     /// Adds a user to the test user pool so that they can be used for HttpClient calls and looked up successfully.
     /// </summary>
-    private void SetUser(ClaimsPrincipal user)
+    private void SetUser(ClaimsPrincipal? user)
     {
         if (!capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
         {
