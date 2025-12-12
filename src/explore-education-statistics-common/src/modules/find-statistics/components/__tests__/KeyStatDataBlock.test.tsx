@@ -18,6 +18,7 @@ describe('KeyStatDataBlock', () => {
       publicationName: 'Test publication',
       subjectName: 'Test subject',
       geoJsonAvailable: false,
+      isCroppedTable: false,
       filters: {
         Filter1: {
           legend: 'Filter 1',

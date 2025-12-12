@@ -115,6 +115,7 @@ export const testTable: FullTable = {
       }),
     ],
     geoJsonAvailable: true,
+    isCroppedTable: false,
   },
   results: [
     {

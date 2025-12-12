@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using Newtonsoft.Json;
 
@@ -29,6 +30,10 @@ public record FullTableQuery
         return Filters;
 #pragma warning restore CS0618 // Type or member is obsolete
     }
+
+    [NotMapped]
+    [JsonIgnore]
+    public bool EnableCropping { get; set; }
 
     public List<Guid> GetFilterItemIds()
     {

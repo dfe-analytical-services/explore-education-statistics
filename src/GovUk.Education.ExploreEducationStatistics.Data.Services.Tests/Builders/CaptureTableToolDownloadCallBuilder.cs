@@ -1,4 +1,5 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Dtos;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Builders;
