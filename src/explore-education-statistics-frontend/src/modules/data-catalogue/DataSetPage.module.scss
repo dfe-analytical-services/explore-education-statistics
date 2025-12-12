@@ -30,7 +30,7 @@
 
 .subscribeContainer {
   @include govuk-media-query($from: tablet) {
-    align-items: start;
+    align-items: flex-start;
     display: flex;
   }
 }
