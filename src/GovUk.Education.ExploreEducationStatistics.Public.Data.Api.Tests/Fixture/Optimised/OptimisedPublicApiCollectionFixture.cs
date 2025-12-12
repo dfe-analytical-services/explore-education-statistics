@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixtu
 ///
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTestCapability[] capabilities)
+public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegrationTestCapability[] capabilities)
     : OptimisedIntegrationTestFixtureBase<Startup>(minimalApi: true)
 {
     private OptimisedTestUserHolder _userHolder = null!;
@@ -227,12 +227,15 @@ public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTe
     /// </summary>
     private void SetUser(ClaimsPrincipal? user)
     {
-        if (!capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
+        if (user != null && !capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
         {
             throw new Exception("""Cannot register test users if "useTestUserAuthentication" is false.""");
         }
 
-        _userHolder.SetUser(user);
+        if (capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
+        {
+            _userHolder.SetUser(user);
+        }
     }
 }
 

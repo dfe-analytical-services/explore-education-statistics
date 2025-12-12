@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimis
 ///
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapability[] capabilities)
+public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTestCapability[] capabilities)
     : OptimisedIntegrationTestFixtureBase<Startup>
 {
     private PublicDataDbContext _publicDataDbContext = null!;
@@ -231,12 +231,15 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     /// </summary>
     private void SetUser(ClaimsPrincipal? user)
     {
-        if (!capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
+        if (user != null && !capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
         {
             throw new Exception("""Cannot register test users if "useTestUserAuthentication" is false.""");
         }
 
-        _userHolder.SetUser(user);
+        if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
+        {
+            _userHolder.SetUser(user);
+        }
     }
 }
 

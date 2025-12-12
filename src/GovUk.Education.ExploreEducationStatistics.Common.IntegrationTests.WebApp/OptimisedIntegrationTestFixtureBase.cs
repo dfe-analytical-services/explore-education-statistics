@@ -249,6 +249,13 @@ public class OptimisedServiceAndConfigModifications
         ConfigModifications.Add(config => config.AddInMemoryCollection(appsettings));
         return this;
     }
+
+    public OptimisedServiceAndConfigModifications ConfigureService<TService>(Action<TService> configurFn)
+        where TService : class
+    {
+        ServiceModifications.Add(services => services.Configure(configurFn));
+        return this;
+    }
 }
 
 /// <summary>
