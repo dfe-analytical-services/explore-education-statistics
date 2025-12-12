@@ -92,17 +92,38 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimal
         await AfterFactoryConstructed(lookups);
     }
 
+    /// <summary>
+    /// A method that can be overridden by subclasses of this fixture to register any test containers that they require.
+    ///
+    /// Containers registered here will be started prior to any tests in a collection running and stopped after all
+    /// tests in the collection have finished.
+    /// </summary>
     protected virtual void RegisterTestContainers(TestContainerRegistrations registrations) { }
 
+    /// <summary>
+    /// A method that can be overridden by subclasses of this fixture to provide any specific alteration of services
+    /// and configuration prior to building the WebApplicationFactory e.g. replacing services with mocks, adding
+    /// in-memory DbContexts etc.
+    /// </summary>
     protected virtual void ConfigureServicesAndConfiguration(
         OptimisedServiceAndConfigModifications serviceModifications
     ) { }
 
+    /// <summary>
+    /// A method that can be overridden by subclasses of this fixture to perform any actions after the
+    /// WebApplicationFactory has been constructed e.g. looking up any special services that the fixture may have
+    /// registered via the <see cref="ConfigureServicesAndConfiguration"/> method.
+    /// </summary>
     protected virtual Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<TStartup> lookups)
     {
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// A method that can be overridden by subclasses of this fixture to perform actions before each test
+    /// in a collection runs e.g. resetting any shared Mocks that were dirtied in previous tests in the
+    /// collection, unsettings users from handling requests etc.
+    /// </summary>
     public virtual Task BeforeEachTest()
     {
         return Task.CompletedTask;
