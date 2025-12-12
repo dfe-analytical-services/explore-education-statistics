@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Search;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
@@ -243,17 +244,6 @@ public enum PublicApiIntegrationTestCapability
 {
     Postgres,
     UserAuth,
-}
-
-public static class OptimisedTestUsers
-{
-    public static readonly ClaimsPrincipal AdminAppUser = new DataFixture()
-        .Generator<ClaimsPrincipal>()
-        .WithRole(SecurityConstants.AdminAccessAppRole);
-
-    public static readonly ClaimsPrincipal UnsupportedRoleUser = new DataFixture()
-        .Generator<ClaimsPrincipal>()
-        .WithRole("Unsupported Role");
 }
 
 public static class MockExtensions
