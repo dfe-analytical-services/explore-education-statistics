@@ -70,7 +70,7 @@
     "test:coverage": "pnpm -r --no-bail test:coverage",
     "tsc": "pnpm -r --aggregate-output --reporter=append-only --no-bail tsc",
     "api-docs:build": "docker rm -f ees-api-docs-builder-container && cd src/explore-education-statistics-api-docs && docker build -f docker/Dockerfile -t ees-api-docs-builder . && docker run --rm -v .:/home/ubuntu/docs --name ees-api-docs-builder-container ees-api-docs-builder ./docker/build-docs.sh",
-    "api-docs:run": "docker rm -f ees-api-docs-builder-container && cd src/explore-education-statistics-api-docs && docker build -f docker/Dockerfile -t ees-api-docs-builder . && docker run --rm -v .:/home/ubuntu/docs -p4567:4567 -p35729:35729 --name ees-api-docs-builder-container ees-api-docs-builder ./docker/run-docs.sh" 
+    "api-docs:run": "docker rm -f ees-api-docs-builder-container && cd src/explore-education-statistics-api-docs && docker build -f docker/Dockerfile -t ees-api-docs-builder . && docker run --rm -v .:/home/ubuntu/docs -p4567:4567 -p35729:35729 --name ees-api-docs-builder-container ees-api-docs-builder ./docker/run-docs.sh"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
