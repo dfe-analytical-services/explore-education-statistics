@@ -16,7 +16,7 @@
     "@microsoft/signalr": "^7.0.7",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
     "@svgr/webpack": "^6.5.1",
-    "@tanstack/react-query": "4.32.0",
+    "@tanstack/react-query": "4.36.1",
     "axios": "^1.4.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "^8.3.0",
