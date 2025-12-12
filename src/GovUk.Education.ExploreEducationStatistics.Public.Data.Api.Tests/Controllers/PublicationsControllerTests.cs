@@ -1,4 +1,3 @@
-using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -420,12 +419,14 @@ public abstract class PublicationsControllerTests
                     .Setup(c => c.GetPublication(publicationId, It.IsAny<CancellationToken>()))
                     .ThrowsAsync(new HttpRequestException("something went wrong"));
 
-                var response = await GetPublication(publicationId);
+                var response = await Assert.ThrowsAsync<HttpRequestException>(() => GetPublication(publicationId));
 
                 MockUtils.VerifyAllMocks(contentApiClientMock);
 
-                Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
-                Assert.Contains("something went wrong", await response.Content.ReadAsStringAsync());
+                // TODO EES-6762 - this suggests that we are at risk of exposing raw exception details on uncaught
+                // exceptions, and we should have some global way to handle exceptions. Previously this test was
+                // passing because we were using app.UseDeveloperExceptionPage() during integration tests.
+                Assert.Equal("something went wrong", response.Message);
             }
 
             [Fact]
