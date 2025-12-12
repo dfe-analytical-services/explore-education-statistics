@@ -1,7 +1,6 @@
 import Details from '@common/components/Details';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import React, { ReactNode } from 'react';
-import ReactMarkdown from 'react-markdown';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import classNames from 'classnames';
 
@@ -81,7 +80,7 @@ const KeyStat = ({
           hiddenText={guidanceTitle === 'Help' ? `for ${title}` : undefined}
         >
           <div data-testid={`${testId}-guidanceText`}>
-            <ReactMarkdown key={guidanceText}>{guidanceText}</ReactMarkdown>
+            <p className={styles.guidanceText}>{guidanceText}</p>
           </div>
         </Details>
       )}
