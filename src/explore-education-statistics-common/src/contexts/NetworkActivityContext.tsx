@@ -80,7 +80,7 @@ export function NetworkActivityContextProvider({
   useEffect(() => {
     if (document.body.hasAttribute(dataAttribute)) {
       throw new Error(
-        `Cannot have more than once instance of ${NetworkActivityContextProvider.name}`,
+        `Cannot have more than once instance of NetworkActivityContextProvider`,
       );
     }
 
@@ -141,9 +141,7 @@ export function useNetworkActivityContext(): NetworkActivityState {
   const context = useContext(NetworkActivityContext);
 
   if (!context) {
-    throw new Error(
-      `Must be used within a ${NetworkActivityContextProvider.name}`,
-    );
+    throw new Error(`Must be used within a NetworkActivityContextProvider`);
   }
 
   return context;
