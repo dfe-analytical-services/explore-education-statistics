@@ -162,9 +162,6 @@ param searchServiceIndexName string = ''
 @description('Enable the Swagger UI for public API.')
 param enableSwagger bool = false
 
-@description('Enable replacement of public API data sets.')
-param enableReplacementOfPublicApiDataSets bool = false
-
 @description('Whether to assign roles that enable us to register PostgreSQL Flexible Server with Backup Vault')
 param deployPsqlBackupVaultRoleAssignment bool = false
 
@@ -592,5 +589,3 @@ output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreSto
 output keyVaultName string = resourceNames.existingResources.keyVault
 
 output enableThemeDeletion bool = enableThemeDeletion
-
-output enableReplacementOfPublicApiDataSets bool = enableReplacementOfPublicApiDataSets

@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -20,7 +19,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using DataSet = GovUk.Education.ExploreEducationStatistics.Admin.Models.DataSet;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
@@ -38,7 +36,6 @@ public class DataSetFileStorage(
     IUserService userService,
     IDataSetVersionService dataSetVersionService,
     IDataSetService dataSetService,
-    IOptions<FeatureFlagsOptions> featureFlags,
     ILogger<DataSetFileStorage> logger
 ) : IDataSetFileStorage
 {
@@ -94,11 +91,7 @@ public class DataSetFileStorage(
 
         await UploadDataSetToReleaseStorage(releaseVersionId, dataFile.Id, metaFile.Id, dataSet, cancellationToken);
 
-        if (
-            featureFlags.Value.EnableReplacementOfPublicApiDataSets
-            && dataSet.ReplacingFile is not null
-            && replacedReleaseDataFile!.PublicApiDataSetId != null
-        )
+        if (dataSet.ReplacingFile is not null && replacedReleaseDataFile!.PublicApiDataSetId != null)
         {
             await CreateDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
         }
@@ -535,11 +528,7 @@ public class DataSetFileStorage(
                 PrivateReleaseFiles
             );
 
-            if (
-                featureFlags.Value.EnableReplacementOfPublicApiDataSets
-                && replacingFile is not null
-                && replacedReleaseDataFile!.PublicApiDataSetId != null
-            )
+            if (replacingFile is not null && replacedReleaseDataFile!.PublicApiDataSetId != null)
             {
                 await CreateDraftDataSetVersion(dataReleaseFile.Id, replacedReleaseDataFile, cancellationToken);
             }

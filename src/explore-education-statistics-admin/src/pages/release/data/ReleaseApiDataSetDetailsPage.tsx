@@ -42,10 +42,7 @@ export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 export default function ReleaseApiDataSetDetailsPage() {
   const { dataSetId } = useParams<ReleaseDataSetRouteParams>();
   const history = useHistory();
-  const {
-    enableReplacementOfPublicApiDataSets: isNewReplaceDsvFeatureEnabled,
-    publicAppUrl,
-  } = useConfig();
+  const { publicAppUrl } = useConfig();
   const { releaseVersion } = useReleaseVersionContext();
 
   const [finalisingStatus, setFinalisingStatus] =
@@ -75,9 +72,7 @@ export default function ReleaseApiDataSetDetailsPage() {
     }
   }, [finalisingStatus, dataSet?.draftVersion?.status, setFinalisingStatus]);
 
-  const isPatch = isNewReplaceDsvFeatureEnabled
-    ? isPatchVersion(dataSet?.draftVersion?.version)
-    : false;
+  const isPatch = isPatchVersion(dataSet?.draftVersion?.version);
 
   const shouldShowRejectedError = (
     apiDataSet: ApiDataSet | undefined,
@@ -527,7 +522,7 @@ export default function ReleaseApiDataSetDetailsPage() {
                       dataSetId: dataSet.id,
                       releaseFileId,
                     });
-                    refetch();
+                    await refetch();
                   }}
                 />
               )}

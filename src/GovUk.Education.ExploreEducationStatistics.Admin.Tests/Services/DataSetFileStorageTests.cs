@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -22,7 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -142,10 +140,6 @@ public class DataSetFileStorageTests
                 );
         }
 
-        var featureFlagOptions = Microsoft.Extensions.Options.Options.Create(
-            new FeatureFlagsOptions() { EnableReplacementOfPublicApiDataSets = false }
-        );
-
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             var service = SetupReleaseDataFileService(
@@ -154,7 +148,6 @@ public class DataSetFileStorageTests
                 dataImportService: dataImportService.Object,
                 releaseVersionRepository: releaseVersionRepository.Object,
                 releaseDataFileRepository: releaseDataFileRepository.Object,
-                featureFlags: featureFlagOptions,
                 addDefaultUser: false
             );
 
@@ -597,10 +590,7 @@ public class DataSetFileStorageTests
                 privateBlobStorageService: privateBlobStorageService.Object,
                 dataImportService: dataImportService.Object,
                 releaseVersionRepository: releaseVersionRepository.Object,
-                releaseDataFileRepository: releaseDataFileRepository.Object,
-                featureFlags: Microsoft.Extensions.Options.Options.Create(
-                    new FeatureFlagsOptions() { EnableReplacementOfPublicApiDataSets = false }
-                )
+                releaseDataFileRepository: releaseDataFileRepository.Object
             );
 
             // Act
@@ -770,7 +760,6 @@ public class DataSetFileStorageTests
         IUserService? userService = null,
         IDataSetVersionService? dataSetVersionService = null,
         IDataSetService? dataSetService = null,
-        IOptions<FeatureFlagsOptions>? featureFlags = null,
         bool addDefaultUser = true
     )
     {
@@ -790,7 +779,6 @@ public class DataSetFileStorageTests
             userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             dataSetService ?? Mock.Of<IDataSetService>(Strict),
-            featureFlags ?? Mock.Of<IOptions<FeatureFlagsOptions>>(Strict),
             Mock.Of<ILogger<DataSetFileStorage>>(Strict)
         );
     }
@@ -1122,17 +1110,12 @@ public class DataSetFileStorageTests
         ContentDbContext contentDbContext
     )
     {
-        var featureFlagOptions = Microsoft.Extensions.Options.Options.Create(
-            new FeatureFlagsOptions { EnableReplacementOfPublicApiDataSets = true }
-        );
-
         return SetupReleaseDataFileService(
             contentDbContext: contentDbContext,
             privateBlobStorageService: fileStorageTestFixture.PrivateBlobStorageService.Object,
             dataImportService: fileStorageTestFixture.DataImportService.Object,
             releaseVersionRepository: fileStorageTestFixture.ReleaseVersionRepository.Object,
             releaseDataFileRepository: fileStorageTestFixture.ReleaseDataFileRepository.Object,
-            featureFlags: featureFlagOptions,
             dataSetVersionService: fileStorageTestFixture.DataSetVersionService.Object,
             dataSetService: fileStorageTestFixture.DataSetService.Object,
             addDefaultUser: false

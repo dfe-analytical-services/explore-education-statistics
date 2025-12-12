@@ -56,8 +56,6 @@ param searchServiceIndexName = 'index-1'
 
 param enableThemeDeletion = false
 
-param enableReplacementOfPublicApiDataSets = true
-
 param deployPsqlBackupVaultRoleAssignment = true
 
 param deployPsqlBackupVaultRegistration = true

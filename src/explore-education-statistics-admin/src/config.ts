@@ -19,7 +19,6 @@ export interface Config {
   readonly publicAppUrl: string;
   readonly publicApiUrl: string;
   readonly publicApiDocsUrl: string;
-  readonly enableReplacementOfPublicApiDataSets?: boolean;
 }
 
 let config: Config;
