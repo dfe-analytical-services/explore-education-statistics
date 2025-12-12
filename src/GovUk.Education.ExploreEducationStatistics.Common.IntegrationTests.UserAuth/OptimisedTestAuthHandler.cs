@@ -22,15 +22,12 @@ public class OptimisedTestAuthHandler(
     OptimisedTestUserHolder userHolder
 ) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
-    private readonly ILoggerFactory _logger = logger;
-
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var user = userHolder.GetUser();
 
         if (user == null)
         {
-            _logger.CreateLogger(GetType()).LogWarning("No test user has been set to handle this HTTP request.");
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 

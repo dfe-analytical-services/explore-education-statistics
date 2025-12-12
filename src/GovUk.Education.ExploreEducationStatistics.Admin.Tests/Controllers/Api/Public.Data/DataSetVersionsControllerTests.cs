@@ -26,6 +26,8 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -38,12 +40,14 @@ public class DataSetVersionsControllerTestsFixture()
 public class DataSetVersionsControllerTestsCollection : ICollectionFixture<DataSetVersionsControllerTestsFixture>;
 
 [Collection(nameof(DataSetVersionsControllerTestsFixture))]
-public abstract class DataSetVersionsControllerTests
+public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
     private static readonly DataFixture DataFixture = new();
 
-    public class ListVersionsTests(DataSetVersionsControllerTestsFixture fixture) : DataSetVersionsControllerTests
+    public class ListVersionsTests(DataSetVersionsControllerTestsFixture fixture)
+        : DataSetVersionsControllerTests(fixture)
     {
         [Theory]
         [MemberData(
@@ -378,7 +382,8 @@ public abstract class DataSetVersionsControllerTests
         }
     }
 
-    public class GetDataSetVersionTests(DataSetVersionsControllerTestsFixture fixture) : DataSetVersionsControllerTests
+    public class GetDataSetVersionTests(DataSetVersionsControllerTestsFixture fixture)
+        : DataSetVersionsControllerTests(fixture)
     {
         public static TheoryData<DataSetVersionStatus> AllDataSetVersionStatuses =>
             new(EnumUtil.GetEnums<DataSetVersionStatus>());
@@ -448,7 +453,8 @@ public abstract class DataSetVersionsControllerTests
         }
     }
 
-    public class CreateNextVersionTests(DataSetVersionsControllerTestsFixture fixture) : DataSetVersionsControllerTests
+    public class CreateNextVersionTests(DataSetVersionsControllerTestsFixture fixture)
+        : DataSetVersionsControllerTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -582,7 +588,7 @@ public abstract class DataSetVersionsControllerTests
     }
 
     public class CompleteNextVersionTests(DataSetVersionsControllerTestsFixture fixture)
-        : DataSetVersionsControllerTests
+        : DataSetVersionsControllerTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -692,7 +698,8 @@ public abstract class DataSetVersionsControllerTests
         }
     }
 
-    public class DeleteVersionTests(DataSetVersionsControllerTestsFixture fixture) : DataSetVersionsControllerTests
+    public class DeleteVersionTests(DataSetVersionsControllerTestsFixture fixture)
+        : DataSetVersionsControllerTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -835,11 +842,9 @@ public abstract class DataSetVersionsControllerTests
                 .Setup(c => c.DeleteDataSetVersion(dataSetVersion.Id, It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new HttpRequestException());
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => DeleteVersion(dataSetVersion.Id));
+            await Assert.ThrowsAsync<HttpRequestException>(() => DeleteVersion(dataSetVersion.Id));
 
             MockUtils.VerifyAllMocks(processorClientMock);
-
-            Assert.IsType<HttpRequestException>(exception.InnerException);
         }
 
         private async Task<HttpResponseMessage> DeleteVersion(Guid dataSetVersionId, ClaimsPrincipal? user = null)
@@ -852,7 +857,8 @@ public abstract class DataSetVersionsControllerTests
         }
     }
 
-    public class GetVersionChangesTests(DataSetVersionsControllerTestsFixture fixture) : DataSetVersionsControllerTests
+    public class GetVersionChangesTests(DataSetVersionsControllerTestsFixture fixture)
+        : DataSetVersionsControllerTests(fixture)
     {
         [Fact]
         public async Task Success_Returns200()
@@ -990,13 +996,9 @@ public abstract class DataSetVersionsControllerTests
                 )
                 .ThrowsAsync(new HttpRequestException());
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                GetVersionChanges(dataSetVersion.Id)
-            );
+            await Assert.ThrowsAsync<HttpRequestException>(() => GetVersionChanges(dataSetVersion.Id));
 
             MockUtils.VerifyAllMocks(publicDataApiClientMock);
-
-            Assert.IsType<HttpRequestException>(exception.InnerException);
         }
 
         private async Task<HttpResponseMessage> GetVersionChanges(Guid dataSetVersionId, ClaimsPrincipal? user = null)
@@ -1015,7 +1017,8 @@ public abstract class DataSetVersionsControllerTests
         }
     }
 
-    public class UpdateVersionTests(DataSetVersionsControllerTestsFixture fixture) : DataSetVersionsControllerTests
+    public class UpdateVersionTests(DataSetVersionsControllerTestsFixture fixture)
+        : DataSetVersionsControllerTests(fixture)
     {
         [Theory]
         [MemberData(

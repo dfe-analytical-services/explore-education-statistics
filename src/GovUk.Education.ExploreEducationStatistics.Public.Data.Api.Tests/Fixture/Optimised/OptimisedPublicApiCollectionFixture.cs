@@ -3,11 +3,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgre
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Search;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
@@ -152,28 +149,17 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
     }
 
     /// <summary>
-    /// Create an HttpClient and optionally set a specific user to handle the request.
+    /// Create an HttpClient and set a specific user to handle the request.
     /// </summary>
-    public HttpClient CreateClient(ClaimsPrincipal? user = null)
+    public HttpClient CreateClient(ClaimsPrincipal user)
     {
         SetUser(user);
         return base.CreateClient();
     }
 
-    public void SetDataSetVersionDataDirectory(string directory)
-    {
-        _testDataSetVersionPathResolver.Directory = directory;
-    }
-
     public DateTimeOffset GetUtcNow()
     {
         return _timeProvider.GetUtcNow();
-    }
-
-    public void SetUtcNow(DateTimeOffset utcNow)
-    {
-        _timeProvider.SetUtcNow(utcNow);
-        _dateTimeProvider.SetFixedDateTimeUtc(utcNow.UtcDateTime);
     }
 
     /// <summary>
@@ -182,61 +168,50 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
     public PublicDataDbContext GetPublicDataDbContext() => _publicDataDbContext;
 
     /// <summary>
-    ///
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
-    ///
-    /// <param name="resetMock">
-    /// Controls whether this mock is firstly reset upon being requested via this method.
-    /// See <see cref="MockExtensions.WithOptionalReset" /> for more details.
-    ///
-    /// </param>
-    public Mock<IContentApiClient> GetContentApiClientMock(bool resetMock = true) =>
-        _contentApiClientMock.WithOptionalReset(resetMock);
+    public Mock<IContentApiClient> GetContentApiClientMock() => _contentApiClientMock;
 
     /// <summary>
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
-    ///
-    /// <param name="resetMock">
-    /// Controls whether this mock is firstly reset upon being requested via this method.
-    /// See <see cref="MockExtensions.WithOptionalReset" /> for more details.
-    /// </param>
-    public Mock<ISearchService> GetSearchServiceMock(bool resetMock = true) =>
-        _searchServiceMock.WithOptionalReset(resetMock);
+    public Mock<ISearchService> GetSearchServiceMock() => _searchServiceMock;
 
     /// <summary>
-    ///
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
-    ///
-    /// <param name="resetMock">
-    /// Controls whether this mock is firstly reset upon being requested via this method.
-    /// See <see cref="MockExtensions.WithOptionalReset" /> for more details.
-    ///
-    /// </param>
-    public Mock<IAnalyticsService> GetAnalyticsServiceMock(bool resetMock = true) =>
-        _analyticsServiceMock.WithOptionalReset(resetMock);
+    public Mock<IAnalyticsService> GetAnalyticsServiceMock() => _analyticsServiceMock;
 
     public TestDataSetVersionPathResolver GetTestDataSetVersionPathResolver() => _testDataSetVersionPathResolver;
+
+    public override Task BeforeEachTest()
+    {
+        _contentApiClientMock.Reset();
+        _searchServiceMock.Reset();
+        _analyticsServiceMock.Reset();
+
+        if (capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
+        {
+            _userHolder.SetUser(null);
+        }
+
+        return Task.CompletedTask;
+    }
 
     /// <summary>
     /// Adds a user to the test user pool so that they can be used for HttpClient calls and looked up successfully.
     /// </summary>
-    private void SetUser(ClaimsPrincipal? user)
+    private void SetUser(ClaimsPrincipal user)
     {
-        if (user != null && !capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
+        if (!capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
         {
             throw new Exception("""Cannot register test users if "useTestUserAuthentication" is false.""");
         }
 
-        if (capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
-        {
-            _userHolder.SetUser(user);
-        }
+        _userHolder.SetUser(user);
     }
 }
 
@@ -244,31 +219,4 @@ public enum PublicApiIntegrationTestCapability
 {
     Postgres,
     UserAuth,
-}
-
-public static class MockExtensions
-{
-    /// <summary>
-    /// Allows mocks to be reset if requested.
-    ///
-    /// The reason that we support this and enable it by default when using a "GetXMock()" method is because this
-    /// fixture is reused by all tests within a collection, and therefore each new test using a Mock will ideally
-    /// want to use a Mock that has no pre-existing unverified setups on it. It is possible that prior tests might
-    /// have left the Mock in an unclean state.
-    ///
-    /// A test class should therefore use Mocks from this fixture firstly by calling "GetXMock()" and assigning the
-    /// Mock to a variable, then adding its setups to that variable. After the method under test has been performed,
-    /// that same variable should be used for verifications.
-    ///
-    /// </summary>
-    public static Mock<TMockType> WithOptionalReset<TMockType>(this Mock<TMockType> mock, bool resetMock)
-        where TMockType : class
-    {
-        if (resetMock)
-        {
-            mock.Reset();
-        }
-
-        return mock;
-    }
 }

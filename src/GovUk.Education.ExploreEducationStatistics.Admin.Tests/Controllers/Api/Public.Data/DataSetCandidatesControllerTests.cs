@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.WebUtilities;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -26,13 +28,14 @@ public class DataSetCandidatesControllerTestsFixture()
 public class DataSetCandidatesControllerTestsCollection : ICollectionFixture<DataSetCandidatesControllerTestsFixture>;
 
 [Collection(nameof(DataSetCandidatesControllerTestsFixture))]
-public abstract class DataSetCandidatesControllerTests
+public abstract class DataSetCandidatesControllerTests(DataSetCandidatesControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private static readonly DataFixture DataFixture = new();
     private const string BaseUrl = "api/public-data/data-set-candidates";
 
     public class ListDataSetCandidatesTests(DataSetCandidatesControllerTestsFixture fixture)
-        : DataSetCandidatesControllerTests
+        : DataSetCandidatesControllerTests(fixture)
     {
         [Fact]
         public async Task Success()

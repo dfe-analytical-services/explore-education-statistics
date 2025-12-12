@@ -28,6 +28,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static Moq.MockBehavior;
 using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Releases;
 
 public class ReleasesControllerUnitTests
@@ -77,12 +79,13 @@ public class ReleasesControllerIntegrationTestsCollection
     : ICollectionFixture<ReleasesControllerIntegrationTestsFixture>;
 
 [Collection(nameof(ReleasesControllerIntegrationTestsFixture))]
-public abstract class ReleasesControllerIntegrationTests
+public abstract class ReleasesControllerIntegrationTests(ReleasesControllerIntegrationTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private static readonly DataFixture DataFixture = new();
 
     public class CreateReleaseTests(ReleasesControllerIntegrationTestsFixture fixture)
-        : ReleasesControllerIntegrationTests
+        : ReleasesControllerIntegrationTests(fixture)
     {
         [Theory]
         [InlineData(2020, TimeIdentifier.AcademicYear, "initial", "initial", "2020-21-initial")]
@@ -343,7 +346,7 @@ public abstract class ReleasesControllerIntegrationTests
     }
 
     public class UpdateReleaseTests(ReleasesControllerIntegrationTestsFixture fixture)
-        : ReleasesControllerIntegrationTests
+        : ReleasesControllerIntegrationTests(fixture)
     {
         [Theory]
         [InlineData(

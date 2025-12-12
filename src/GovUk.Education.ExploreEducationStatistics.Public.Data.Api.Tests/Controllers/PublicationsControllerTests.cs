@@ -31,27 +31,25 @@ public class PublicationsControllerTestsFixture()
 public class PublicationControllerTestsCollection : ICollectionFixture<PublicationsControllerTestsFixture>;
 
 [Collection(nameof(PublicationsControllerTestsFixture))]
-public abstract class PublicationsControllerTests
+public abstract class PublicationsControllerTests(PublicationsControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private const string BaseUrl = "v1/publications";
 
     private static readonly DataFixture DataFixture = new();
 
     public abstract class ListPublicationsTests(PublicationsControllerTestsFixture fixture)
-        : PublicationsControllerTests,
+        : PublicationsControllerTests(fixture),
             IAsyncLifetime
     {
-        public async Task InitializeAsync()
+        public new async Task InitializeAsync()
         {
+            await base.InitializeAsync();
+
             // As the "ListPublications" method does not allow us to call it with parameters that let us control
             // what data it acts upon, we have to clear down any published data sets so we're acting on a clean
             // slate between test methods.
             await fixture.GetPublicDataDbContext().ClearTestData();
-        }
-
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
         }
 
         [Fact]
@@ -315,7 +313,8 @@ public abstract class PublicationsControllerTests
         }
     }
 
-    public abstract class GetPublicationTests(PublicationsControllerTestsFixture fixture) : PublicationsControllerTests
+    public abstract class GetPublicationTests(PublicationsControllerTestsFixture fixture)
+        : PublicationsControllerTests(fixture)
     {
         public class PublishedPublicationsTests(PublicationsControllerTestsFixture fixture)
             : GetPublicationTests(fixture)
@@ -482,7 +481,7 @@ public abstract class PublicationsControllerTests
     }
 
     public abstract class ListPublicationDataSetsTests(PublicationsControllerTestsFixture fixture)
-        : PublicationsControllerTests
+        : PublicationsControllerTests(fixture)
     {
         public class ControllerTests(PublicationsControllerTestsFixture fixture) : ListPublicationDataSetsTests(fixture)
         {

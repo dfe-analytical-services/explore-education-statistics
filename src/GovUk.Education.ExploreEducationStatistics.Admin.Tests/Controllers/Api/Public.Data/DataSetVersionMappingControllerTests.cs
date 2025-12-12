@@ -19,6 +19,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data.DataSetVersionMappingControllerTestsHelpers;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -32,13 +34,14 @@ public class DataSetVersionMappingControllerTestsCollection
     : ICollectionFixture<DataSetVersionMappingControllerTestsFixture>;
 
 [Collection(nameof(DataSetVersionMappingControllerTestsFixture))]
-public abstract class DataSetVersionMappingControllerTests
+public abstract class DataSetVersionMappingControllerTests(DataSetVersionMappingControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private const string BaseUrl = "api/public-data/data-set-versions";
     private static readonly DataFixture DataFixture = new();
 
     public class OptimisedGetLocationMappingsTests(DataSetVersionMappingControllerTestsFixture fixture)
-        : DataSetVersionMappingControllerTests
+        : DataSetVersionMappingControllerTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -143,7 +146,7 @@ public abstract class DataSetVersionMappingControllerTests
     }
 
     public class OptimisedApplyBatchLocationMappingUpdatesTests(DataSetVersionMappingControllerTestsFixture fixture)
-        : DataSetVersionMappingControllerTests
+        : DataSetVersionMappingControllerTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -1109,7 +1112,7 @@ public abstract class DataSetVersionMappingControllerTests
     }
 
     public class OptimisedGetFilterMappingsTests(DataSetVersionMappingControllerTestsFixture fixture)
-        : DataSetVersionMappingControllerTests
+        : DataSetVersionMappingControllerTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -1207,7 +1210,7 @@ public abstract class DataSetVersionMappingControllerTests
     }
 
     public class OptimisedApplyBatchFilterOptionMappingUpdatesTests(DataSetVersionMappingControllerTestsFixture fixture)
-        : DataSetVersionMappingControllerTests
+        : DataSetVersionMappingControllerTests(fixture)
     {
         [Fact]
         public async Task Success()

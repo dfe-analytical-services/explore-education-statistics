@@ -174,9 +174,9 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
     }
 
     /// <summary>
-    /// Create an HttpClient and optionally set a specific user to handle the request.
+    /// Create an HttpClient and set a specific user to handle the request.
     /// </summary>
-    public HttpClient CreateClient(ClaimsPrincipal? user = null)
+    public HttpClient CreateClient(ClaimsPrincipal user)
     {
         SetUser(user);
         return base.CreateClient();
@@ -206,40 +206,38 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
-    ///
-    /// <param name="resetMock">
-    /// Controls whether this mock is firstly reset upon being requested via this method.
-    /// See <see cref="MockExtensions.WithOptionalReset" /> for more details.
-    /// </param>
-    public Mock<IProcessorClient> GetProcessorClientMock(bool resetMock = true) =>
-        _processorClientMock.WithOptionalReset(resetMock);
+    public Mock<IProcessorClient> GetProcessorClientMock() => _processorClientMock;
 
     /// <summary>
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
-    ///
-    /// <param name="resetMock">
-    /// Controls whether this mock is firstly reset upon being requested via this method.
-    /// See <see cref="MockExtensions.WithOptionalReset" /> for more details.
-    /// </param>
-    public Mock<IPublicDataApiClient> GetPublicDataApiClientMock(bool resetMock = true) =>
-        _publicDataApiClientMock.WithOptionalReset(resetMock);
+    public Mock<IPublicDataApiClient> GetPublicDataApiClientMock() => _publicDataApiClientMock;
+
+    public override Task BeforeEachTest()
+    {
+        _processorClientMock.Reset();
+        _publicDataApiClientMock.Reset();
+
+        if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
+        {
+            _userHolder.SetUser(null);
+        }
+
+        return Task.CompletedTask;
+    }
 
     /// <summary>
     /// Adds a user to the test user pool so that they can be used for HttpClient calls and looked up successfully.
     /// </summary>
     private void SetUser(ClaimsPrincipal? user)
     {
-        if (user != null && !capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
+        if (!capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
         {
             throw new Exception("""Cannot register test users if "useTestUserAuthentication" is false.""");
         }
 
-        if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
-        {
-            _userHolder.SetUser(user);
-        }
+        _userHolder.SetUser(user);
     }
 }
 
@@ -257,31 +255,4 @@ public static class OptimisedTestUsers
     public static readonly ClaimsPrincipal Authenticated = new DataFixture().AuthenticatedUser();
 
     public static readonly ClaimsPrincipal PreReleaseUser = new DataFixture().PreReleaseUser();
-}
-
-public static class MockExtensions
-{
-    /// <summary>
-    /// Allows mocks to be reset if requested.
-    ///
-    /// The reason that we support this and enable it by default when using a "GetXMock()" method is because this
-    /// fixture is reused by all tests within a collection, and therefore each new test using a Mock will ideally
-    /// want to use a Mock that has no pre-existing unverified setups on it. It is possible that prior tests might
-    /// have left the Mock in an unclean state.
-    ///
-    /// A test class should therefore use Mocks from this fixture firstly by calling "GetXMock()" and assigning the
-    /// Mock to a variable, then adding its setups to that variable. After the method under test has been performed,
-    /// that same variable should be used for verifications.
-    ///
-    /// </summary>
-    public static Mock<TMockType> WithOptionalReset<TMockType>(this Mock<TMockType> mock, bool resetMock)
-        where TMockType : class
-    {
-        if (resetMock)
-        {
-            mock.Reset();
-        }
-
-        return mock;
-    }
 }

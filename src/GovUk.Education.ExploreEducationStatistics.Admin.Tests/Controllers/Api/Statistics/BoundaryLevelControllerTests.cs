@@ -19,6 +19,7 @@ public class BoundaryLevelControllerTestsCollection : ICollectionFixture<Boundar
 
 [Collection(nameof(BoundaryLevelControllerTestsFixture))]
 public class BoundaryLevelControllerTests(BoundaryLevelControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     [Fact]
     public async Task ListBoundaryLevels_Success()

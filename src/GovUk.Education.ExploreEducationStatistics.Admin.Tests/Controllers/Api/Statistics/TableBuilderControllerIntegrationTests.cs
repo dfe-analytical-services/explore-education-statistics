@@ -42,6 +42,7 @@ public class TableBuilderControllerIntegrationTestsCollection
 
 [Collection(nameof(TableBuilderControllerIntegrationTestsFixture))]
 public class TableBuilderControllerIntegrationTests(TableBuilderControllerIntegrationTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private static readonly Guid ReleaseVersionId = Guid.NewGuid();
     private static readonly Guid SubjectId = Guid.NewGuid();

@@ -37,13 +37,14 @@ public class DataSetsControllerTestsFixture()
 public class DataSetsControllerTestsCollection : ICollectionFixture<DataSetsControllerTestsFixture>;
 
 [Collection(nameof(DataSetsControllerTestsFixture))]
-public abstract class DataSetsControllerTests
+public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private const string BaseUrl = "v1/data-sets";
 
     private static readonly DataFixture DataFixture = new();
 
-    public abstract class GetDataSetTests(DataSetsControllerTestsFixture fixture) : DataSetsControllerTests
+    public abstract class GetDataSetTests(DataSetsControllerTestsFixture fixture) : DataSetsControllerTests(fixture)
     {
         public class PublishedDataSetTests(DataSetsControllerTestsFixture fixture) : GetDataSetTests(fixture)
         {
@@ -403,7 +404,7 @@ public abstract class DataSetsControllerTests
         }
     }
 
-    public class GetDataSetMetaTests(DataSetsControllerTestsFixture fixture) : DataSetsControllerTests
+    public class GetDataSetMetaTests(DataSetsControllerTestsFixture fixture) : DataSetsControllerTests(fixture)
     {
         public class NoQueryParametersTests(DataSetsControllerTestsFixture fixture) : GetDataSetMetaTests(fixture)
         {
@@ -1531,7 +1532,8 @@ public abstract class DataSetsControllerTests
         }
     }
 
-    public abstract class DownloadDataSetCsvTests(DataSetsControllerTestsFixture fixture) : DataSetsControllerTests
+    public abstract class DownloadDataSetCsvTests(DataSetsControllerTestsFixture fixture)
+        : DataSetsControllerTests(fixture)
     {
         private static readonly List<TestClass> CsvData =
         [

@@ -216,7 +216,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             // CORS config for dev/test/etc. environments set in IaC config
             app.UseCors(options => options.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
         }
-        else
+
+        if (env.IsProduction())
         {
             app.UseHttpsRedirection();
             app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());

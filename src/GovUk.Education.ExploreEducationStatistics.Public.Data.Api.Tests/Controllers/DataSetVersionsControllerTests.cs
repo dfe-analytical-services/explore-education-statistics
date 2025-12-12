@@ -31,14 +31,15 @@ public class DataSetVersionsControllerTestsFixture()
 public class DataSetVersionsControllerTestsCollection : ICollectionFixture<DataSetVersionsControllerTestsFixture>;
 
 [Collection(nameof(DataSetVersionsControllerTestsFixture))]
-public abstract class DataSetVersionsControllerTests
+public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private const string BaseUrl = "v1/data-sets";
 
     private static readonly DataFixture DataFixture = new();
 
     public abstract class ListDataSetVersionsTests(DataSetVersionsControllerTestsFixture fixture)
-        : DataSetVersionsControllerTests
+        : DataSetVersionsControllerTests(fixture)
     {
         public class PublicDataSetVersionsTests(DataSetVersionsControllerTestsFixture fixture)
             : ListDataSetVersionsTests(fixture)
@@ -540,7 +541,7 @@ public abstract class DataSetVersionsControllerTests
     }
 
     public abstract class GetDataSetVersionTests(DataSetVersionsControllerTestsFixture fixture)
-        : DataSetVersionsControllerTests
+        : DataSetVersionsControllerTests(fixture)
     {
         public class ControllerTests(DataSetVersionsControllerTestsFixture fixture) : GetDataSetVersionTests(fixture)
         {
@@ -955,7 +956,7 @@ public abstract class DataSetVersionsControllerTests
     }
 
     public class GetDataSetVersionChangesTests(DataSetVersionsControllerTestsFixture fixture)
-        : DataSetVersionsControllerTests
+        : DataSetVersionsControllerTests(fixture)
     {
         [Fact]
         public async Task VersionAvailable_Returns200_AllChanges()

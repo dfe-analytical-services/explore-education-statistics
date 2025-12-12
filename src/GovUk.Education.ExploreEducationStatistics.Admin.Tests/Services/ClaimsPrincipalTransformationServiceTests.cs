@@ -32,6 +32,7 @@ public class ClaimsPrincipalTransformationServiceTestsCollection
 
 [Collection(nameof(ClaimsPrincipalTransformationServiceTestsFixture))]
 public class ClaimsPrincipalTransformationServiceTests(ClaimsPrincipalTransformationServiceTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private static readonly DataFixture DataFixture = new();
 
