@@ -48,7 +48,6 @@ public class TableBuilderQueryOptimiser(
 
     public async Task<FullTableQuery> CropQuery(FullTableQuery query, CancellationToken cancellationToken)
     {
-        var requiresCropping = true;
         var maxSelections = 5;
 
         if (query.TimePeriod is not null)
