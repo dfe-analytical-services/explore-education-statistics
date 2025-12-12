@@ -1,22 +1,42 @@
 using System.Net.Http.Json;
 using System.Text;
 using Asp.Versioning;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.Optimised;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
+
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Filters;
 
-public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class InvalidRequestInputFilterTestsFixture : OptimisedPublicApiCollectionFixture
+{
+    protected override void ConfigureServicesAndConfiguration(
+        OptimisedServiceAndConfigModifications serviceModifications
+    )
+    {
+        base.ConfigureServicesAndConfiguration(serviceModifications);
+
+        serviceModifications
+            .AddController(typeof(TestController))
+            .ConfigureService<ApiVersioningOptions>(options => options.AssumeDefaultVersionWhenUnspecified = true);
+    }
+}
+
+[CollectionDefinition(nameof(InvalidRequestInputFilterTestsFixture))]
+public class InvalidRequestInputFilterTestsCollection : ICollectionFixture<InvalidRequestInputFilterTestsFixture>;
+
+[Collection(nameof(InvalidRequestInputFilterTestsFixture))]
+public class InvalidRequestInputFilterTests(InvalidRequestInputFilterTestsFixture fixture)
 {
     [Fact]
     public async Task TestPersonBody_ValidBody_Returns200()
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.PostAsJsonAsync(
             requestUri: nameof(TestController.TestPersonBody),
@@ -34,7 +54,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [InlineData("{ \"name\": true }", "name")]
     public async Task TestPersonBody_InvalidInput_Returns400(string body, string path)
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestPersonBody),
@@ -56,7 +76,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [InlineData("{ \"name\": \"Test\", \"lastName\": \"Last\"  }", "lastName")]
     public async Task TestPersonBody_UnknownFields_Returns400(string body, string path)
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestPersonBody),
@@ -75,7 +95,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [Fact]
     public async Task TestPersonBody_EmptyBody_Returns400()
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestPersonBody),
@@ -94,7 +114,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [Fact]
     public async Task TestPersonBody_RequiredValue_Returns400()
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestPersonBody),
@@ -113,7 +133,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [Fact]
     public async Task TestGroupBody_ValidBody_Returns200()
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.PostAsJsonAsync(
             requestUri: nameof(TestController.TestGroupBody),
@@ -133,7 +153,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [InlineData("{ \"owner\": { \"name\": true } }", "owner.name")]
     public async Task TestGroupBody_InvalidInput_Returns400(string body, string path)
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestGroupBody),
@@ -155,7 +175,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [InlineData("{ \"owner\": { \"name\": \"Test\", \"lastName\": \"Last\" } }", "owner.lastName")]
     public async Task TestGroupBody_UnknownFields_Returns400(string body, string path)
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestGroupBody),
@@ -174,7 +194,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [Fact]
     public async Task TestGroupBody_EmptyBody_Returns400()
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestGroupBody),
@@ -193,7 +213,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [Fact]
     public async Task TestGroupBody_RequiredValue_Returns400()
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.PostAsync(
             requestUri: nameof(TestController.TestGroupBody),
@@ -228,7 +248,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
         params string[] expectedAliases
     )
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestPersonQuery)}{query}");
 
@@ -242,7 +262,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [Fact]
     public async Task TestPersonQuery_RequiredValue_Returns400()
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.GetAsync(requestUri: nameof(TestController.TestPersonQuery));
 
@@ -260,7 +280,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [InlineData("?name=Test&firstName=First&lastName=Last", "firstName", "lastName")]
     public async Task TestPersonQuery_UnknownFields_Returns400(string query, params string[] unknownFields)
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestPersonQuery)}{query}");
 
@@ -283,7 +303,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [InlineData("?name=Test&age=ten")]
     public async Task TestPersonQuery_InvalidValue_Returns400(string query)
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestPersonQuery)}{query}");
 
@@ -311,7 +331,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
         params string[] expectedAliases
     )
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestGroupQuery)}{query}");
 
@@ -325,7 +345,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [Fact]
     public async Task TestGroupQuery_RequiredValue_Returns400()
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.GetAsync(requestUri: nameof(TestController.TestGroupQuery));
 
@@ -345,7 +365,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [InlineData("?owner.name=Test&name=Test", "name")]
     public async Task TestGroupQuery_UnknownFields_Returns400(string query, params string[] unknownFields)
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestGroupQuery)}{query}");
 
@@ -368,7 +388,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
     [InlineData("?owner.name=Test&owner.age=ten")]
     public async Task TestGroupQuery_InvalidValue_Returns400(string query)
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestGroupQuery)}{query}");
 
@@ -392,7 +412,7 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
         params string[] expectedAliases
     )
     {
-        var client = BuildApp().CreateClient();
+        var client = fixture.CreateClient();
 
         var response = await client.GetAsync(requestUri: $"{nameof(TestController.TestQueryArgs)}{query}");
 
@@ -402,76 +422,66 @@ public class InvalidRequestInputFilterTests(TestApplicationFactory testApp) : In
         Assert.Equal(expectedAge, group.Age);
         Assert.Equal(expectedAliases, group.Aliases);
     }
+}
 
-    [ApiController]
-    private class TestController : ControllerBase
+[ApiController]
+public class TestController : ControllerBase
+{
+    [HttpPost(nameof(TestPersonBody))]
+    public ActionResult TestPersonBody([FromBody] TestPerson testPerson, CancellationToken _)
     {
-        [HttpPost(nameof(TestPersonBody))]
-        public ActionResult TestPersonBody([FromBody] TestPerson testPerson, CancellationToken _)
-        {
-            return Ok(testPerson);
-        }
-
-        [HttpPost(nameof(TestGroupBody))]
-        public ActionResult TestGroupBody([FromBody] TestGroup testGroup, CancellationToken _)
-        {
-            return Ok(testGroup);
-        }
-
-        [HttpGet(nameof(TestPersonQuery))]
-        public ActionResult TestPersonQuery([FromQuery] TestPerson testPerson, CancellationToken _)
-        {
-            return Ok(testPerson);
-        }
-
-        [HttpGet(nameof(TestGroupQuery))]
-        public ActionResult TestGroupQuery([FromQuery] TestGroup testGroup, CancellationToken _)
-        {
-            return Ok(testGroup);
-        }
-
-        [HttpGet(nameof(TestQueryArgs))]
-        public ActionResult TestQueryArgs(
-            string name,
-            [FromQuery(Name = "age")] int? ageNumber,
-            [FromQuery] List<string>? aliases,
-            CancellationToken _
-        )
-        {
-            return Ok(
-                new TestPerson
-                {
-                    Name = name,
-                    Age = ageNumber,
-                    Aliases = aliases ?? [],
-                }
-            );
-        }
+        return Ok(testPerson);
     }
 
-    private class TestPerson
+    [HttpPost(nameof(TestGroupBody))]
+    public ActionResult TestGroupBody([FromBody] TestGroup testGroup, CancellationToken _)
     {
-        public required string Name { get; init; }
-
-        public int? Age { get; init; }
-
-        [FromQuery]
-        [QuerySeparator]
-        public List<string> Aliases { get; init; } = [];
+        return Ok(testGroup);
     }
 
-    private class TestGroup
+    [HttpGet(nameof(TestPersonQuery))]
+    public ActionResult TestPersonQuery([FromQuery] TestPerson testPerson, CancellationToken _)
     {
-        public required TestPerson Owner { get; init; }
+        return Ok(testPerson);
     }
 
-    private WebApplicationFactory<Startup> BuildApp()
+    [HttpGet(nameof(TestGroupQuery))]
+    public ActionResult TestGroupQuery([FromQuery] TestGroup testGroup, CancellationToken _)
     {
-        return TestApp
-            .WithWebHostBuilder(builder => builder.WithAdditionalControllers(typeof(TestController)))
-            .ConfigureServices(s =>
+        return Ok(testGroup);
+    }
+
+    [HttpGet(nameof(TestQueryArgs))]
+    public ActionResult TestQueryArgs(
+        string name,
+        [FromQuery(Name = "age")] int? ageNumber,
+        [FromQuery] List<string>? aliases,
+        CancellationToken _
+    )
+    {
+        return Ok(
+            new TestPerson
             {
-                s.Configure<ApiVersioningOptions>(options => options.AssumeDefaultVersionWhenUnspecified = true);
-            });
+                Name = name,
+                Age = ageNumber,
+                Aliases = aliases ?? [],
+            }
+        );
     }
+}
+
+public class TestPerson
+{
+    public required string Name { get; init; }
+
+    public int? Age { get; init; }
+
+    [FromQuery]
+    [QuerySeparator]
+    public List<string> Aliases { get; init; } = [];
+}
+
+public class TestGroup
+{
+    public required TestPerson Owner { get; init; }
 }
