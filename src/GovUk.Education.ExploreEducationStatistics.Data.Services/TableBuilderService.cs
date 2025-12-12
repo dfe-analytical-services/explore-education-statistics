@@ -118,12 +118,12 @@ public class TableBuilderService : ITableBuilderService
         CancellationToken cancellationToken = default
     )
     {
-        return await CheckReleaseSubjectExists(subjectId: query.SubjectId, releaseVersionId: releaseVersionId)
+        return await CheckReleaseSubjectExists(query.SubjectId, releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
             .OnSuccess(() => ListQueryObservations(query, cancellationToken))
             .OnSuccess(async queryObservations =>
             {
-                var (observations, isCroppedTable) = queryObservations;
+                var (observations, _) = queryObservations;
 
                 if (observations.Count == 0)
                 {
@@ -191,6 +191,11 @@ public class TableBuilderService : ITableBuilderService
         await _observationService.GetMatchedObservations(query, cancellationToken);
 
         var matchedObservationIds = _statisticsDbContext.MatchedObservations.Select(o => o.Id);
+
+        if (await matchedObservationIds.CountAsync(cancellationToken) > _options.CroppedTableMaxRows)
+        {
+            requiresCropping = true;
+        }
 
         var results = await _statisticsDbContext
             .Observation.AsNoTracking()
