@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Analytics;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.TheoryData;
@@ -343,9 +342,8 @@ public abstract class DataSetsControllerTests
 
         public class AnalyticsTests(DataSetsControllerTestsFixture fixture) : GetDataSetTests(fixture)
         {
-            [Theory]
-            [MemberData(nameof(AnalyticsTheoryData.PreviewTokens), MemberType = typeof(AnalyticsTheoryData))]
-            public async Task AnalyticsRequestCaptured(AnalyticsTheoryData.PreviewTokenSummary? expectedPreviewToken)
+            [Fact]
+            public async Task AnalyticsRequestCaptured()
             {
                 DataSet dataSet = DataFixture.DefaultDataSet().WithStatus(DataSetStatus.Published);
 
@@ -355,16 +353,6 @@ public abstract class DataSetsControllerTests
                     .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
                     .WithStatusPublished()
                     .WithDataSet(dataSet)
-                    .WithPreviewTokens(
-                        expectedPreviewToken != null
-                            ? DataFixture
-                                .DefaultPreviewToken()
-                                .WithLabel(expectedPreviewToken.Label)
-                                .WithCreated(expectedPreviewToken.Created)
-                                .WithExpiry(expectedPreviewToken.Expiry)
-                                .Generate(1)
-                            : []
-                    )
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
                 await fixture
@@ -1450,36 +1438,19 @@ public abstract class DataSetsControllerTests
 
         public class AnalyticsTests(DataSetsControllerTestsFixture fixture) : GetDataSetMetaTests(fixture)
         {
-            public static readonly TheoryData<(
-                AnalyticsTheoryData.PreviewTokenSummary?,
-                string?,
-                DataSetMetaType[]?
-            )> PreviewTokensRequestedDataSetVersionsAndTypes =
+            public static readonly TheoryData<(string?, DataSetMetaType[]?)> RequestedDataSetVersionsAndTypes =
             [
-                (null, null, null),
-                (
-                    new AnalyticsTheoryData.PreviewTokenSummary(
-                        Label: "Preview token",
-                        Created: DateTimeOffset.UtcNow.AddDays(-1),
-                        Expiry: DateTimeOffset.UtcNow.AddDays(1)
-                    ),
-                    "1.0.*",
-                    [DataSetMetaType.Filters, DataSetMetaType.Locations]
-                ),
+                (null, null),
+                ("1.0.*", [DataSetMetaType.Filters, DataSetMetaType.Locations]),
             ];
 
             [Theory]
-            [MemberData(nameof(PreviewTokensRequestedDataSetVersionsAndTypes))]
+            [MemberData(nameof(RequestedDataSetVersionsAndTypes))]
             public async Task AnalyticsRequestCaptured(
-                (
-                    AnalyticsTheoryData.PreviewTokenSummary?,
-                    string?,
-                    DataSetMetaType[]? types
-                ) previewTokenRequestedDataSetVersionAndParameters
+                (string?, DataSetMetaType[]? types) previewTokenRequestedDataSetVersionAndParameters
             )
             {
-                var (expectedPreviewToken, requestedDataSetVersion, types) =
-                    previewTokenRequestedDataSetVersionAndParameters;
+                var (requestedDataSetVersion, types) = previewTokenRequestedDataSetVersionAndParameters;
 
                 DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
@@ -1489,16 +1460,6 @@ public abstract class DataSetsControllerTests
                     .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 3)
                     .WithStatusPublished()
                     .WithDataSetId(dataSet.Id)
-                    .WithPreviewTokens(
-                        expectedPreviewToken != null
-                            ? DataFixture
-                                .DefaultPreviewToken()
-                                .WithLabel(expectedPreviewToken.Label)
-                                .WithCreated(expectedPreviewToken.Created)
-                                .WithExpiry(expectedPreviewToken.Expiry)
-                                .Generate(1)
-                            : []
-                    )
                     .WithFilterMetas(() => [DataFixture.DefaultFilterMeta().WithLabel("filter 1")])
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
@@ -2097,16 +2058,10 @@ public abstract class DataSetsControllerTests
         public class AnalyticsTests(DataSetsControllerTestsFixture fixture) : DownloadDataSetCsvTests(fixture)
         {
             [Theory]
-            [MemberData(
-                nameof(AnalyticsTheoryData.PreviewTokensAndRequestedDataSetVersions),
-                MemberType = typeof(AnalyticsTheoryData)
-            )]
-            public async Task AnalyticsRequestCaptured(
-                (AnalyticsTheoryData.PreviewTokenSummary?, string?) previewTokenAndRequestedDataSetVersion
-            )
+            [InlineData(null)]
+            [InlineData("1.0.*")]
+            public async Task AnalyticsRequestCaptured(string? requestedDataSetVersion)
             {
-                var (expectedPreviewToken, requestedDataSetVersion) = previewTokenAndRequestedDataSetVersion;
-
                 DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
                 await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
@@ -2115,16 +2070,6 @@ public abstract class DataSetsControllerTests
                     .DefaultDataSetVersion()
                     .WithStatus(DataSetVersionStatus.Published)
                     .WithDataSet(dataSet)
-                    .WithPreviewTokens(
-                        expectedPreviewToken != null
-                            ? DataFixture
-                                .DefaultPreviewToken()
-                                .WithLabel(expectedPreviewToken.Label)
-                                .WithCreated(expectedPreviewToken.Created)
-                                .WithExpiry(expectedPreviewToken.Expiry)
-                                .Generate(1)
-                            : []
-                    )
                     .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
                 await fixture

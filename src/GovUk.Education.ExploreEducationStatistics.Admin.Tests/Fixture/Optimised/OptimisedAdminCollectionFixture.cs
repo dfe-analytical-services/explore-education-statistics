@@ -174,12 +174,12 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     }
 
     /// <summary>
-    /// Create an HttpClient and set a specific user to handle the request.
+    /// Create an HttpClient and optionally set a specific user to handle the request.
     /// </summary>
-    public HttpClient CreateClient(ClaimsPrincipal user)
+    public HttpClient CreateClient(ClaimsPrincipal? user = null)
     {
         SetUser(user);
-        return CreateClient();
+        return base.CreateClient();
     }
 
     /// <summary>
@@ -229,7 +229,7 @@ public abstract class OptimisedAdminCollectionFixture(AdminIntegrationTestCapabi
     /// <summary>
     /// Adds a user to the test user pool so that they can be used for HttpClient calls and looked up successfully.
     /// </summary>
-    private void SetUser(ClaimsPrincipal user)
+    private void SetUser(ClaimsPrincipal? user)
     {
         if (!capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
         {

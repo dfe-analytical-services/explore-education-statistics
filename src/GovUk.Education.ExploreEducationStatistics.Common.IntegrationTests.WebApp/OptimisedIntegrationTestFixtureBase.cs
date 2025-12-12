@@ -106,7 +106,7 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimal
     /// <summary>
     /// Creates an HttpClient that can be used to send HTTP requests to the WebApplicationFactory.
     /// </summary>
-    public HttpClient CreateClient()
+    protected HttpClient CreateClient()
     {
         return _factory.CreateClient();
     }
