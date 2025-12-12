@@ -92,10 +92,8 @@ public class TableBuilderQueryOptimiser(
             { GeographicLevel.Ward, 2 },
         };
 
-        var limitedLevels = maxLocationsPerGeographicLevel.Keys.ToList();
-
         var locations = await statisticsDbContext
-            .Location.Where(l => query.LocationIds.Contains(l.Id) && limitedLevels.Contains(l.GeographicLevel))
+            .Location.Where(l => query.LocationIds.Contains(l.Id))
             .ToListAsync(cancellationToken);
 
         var croppedLocationIds = locations
