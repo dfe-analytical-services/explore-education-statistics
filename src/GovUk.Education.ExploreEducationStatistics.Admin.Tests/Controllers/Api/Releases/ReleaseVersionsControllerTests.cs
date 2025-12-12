@@ -35,6 +35,8 @@ using ErrorViewModel = GovUk.Education.ExploreEducationStatistics.Common.ViewMod
 using File = System.IO.File;
 using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Releases;
 
 public class ReleaseVersionsControllerUnitTests
@@ -685,12 +687,14 @@ public class ReleaseVersionsControllerIntegrationTestsCollection
     : ICollectionFixture<ReleaseVersionsControllerIntegrationTestsFixture>;
 
 [Collection(nameof(ReleaseVersionsControllerIntegrationTestsFixture))]
-public abstract class ReleaseVersionsControllerIntegrationTests
+public abstract class ReleaseVersionsControllerIntegrationTests(
+    ReleaseVersionsControllerIntegrationTestsFixture fixture
+) : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private static readonly DataFixture DataFixture = new();
 
     public class UpdateReleaseTests(ReleaseVersionsControllerIntegrationTestsFixture fixture)
-        : ReleaseVersionsControllerIntegrationTests
+        : ReleaseVersionsControllerIntegrationTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -1159,7 +1163,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests
     }
 
     public class UploadDataSetTests(ReleaseVersionsControllerIntegrationTestsFixture fixture)
-        : ReleaseVersionsControllerIntegrationTests
+        : ReleaseVersionsControllerIntegrationTests(fixture)
     {
         [Fact]
         public async Task UploadDataSet_InvalidRequest_ReturnsValidationProblems()

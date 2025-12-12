@@ -799,7 +799,11 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 .ScriptSources(s => s.UnsafeInline())
         );
 
-        app.UseHttpsRedirection();
+        if (env.IsProduction())
+        {
+            app.UseHttpsRedirection();
+        }
+
         app.UseStaticFiles();
         app.UseSpaStaticFiles();
         app.UseCookiePolicy();

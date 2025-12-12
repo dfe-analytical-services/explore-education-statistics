@@ -34,6 +34,7 @@ public class DataSetsControllerGetQueryTestsCollection : ICollectionFixture<Data
 
 [Collection(nameof(DataSetsControllerGetQueryTestsFixture))]
 public abstract class DataSetsControllerGetQueryTests(DataSetsControllerGetQueryTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private const string BaseUrl = "v1/data-sets";
 

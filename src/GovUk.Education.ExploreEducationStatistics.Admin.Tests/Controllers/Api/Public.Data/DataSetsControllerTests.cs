@@ -24,6 +24,8 @@ using Microsoft.AspNetCore.WebUtilities;
 using Moq;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -36,12 +38,13 @@ public class DataSetsControllerTestsFixture()
 public class DataSetsControllerTestsCollection : ICollectionFixture<DataSetsControllerTestsFixture>;
 
 [Collection(nameof(DataSetsControllerTestsFixture))]
-public abstract class DataSetsControllerTests
+public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private static readonly DataFixture DataFixture = new();
     private const string BaseUrl = "api/public-data/data-sets";
 
-    public class ListDataSetsTests(DataSetsControllerTestsFixture fixture) : DataSetsControllerTests
+    public class ListDataSetsTests(DataSetsControllerTestsFixture fixture) : DataSetsControllerTests(fixture)
     {
         [Fact]
         public async Task PublicationHasSingleDataSet_Success_CorrectViewModel()
@@ -661,7 +664,7 @@ public abstract class DataSetsControllerTests
         }
     }
 
-    public class GetDataSetTests(DataSetsControllerTestsFixture fixture) : DataSetsControllerTests
+    public class GetDataSetTests(DataSetsControllerTestsFixture fixture) : DataSetsControllerTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -1097,7 +1100,7 @@ public abstract class DataSetsControllerTests
         }
     }
 
-    public class CreateDataSetTests(DataSetsControllerTestsFixture fixture) : DataSetsControllerTests
+    public class CreateDataSetTests(DataSetsControllerTestsFixture fixture) : DataSetsControllerTests(fixture)
     {
         [Fact]
         public async Task Success()
