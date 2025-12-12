@@ -412,10 +412,6 @@ public class TableBuilderServiceTests
             var matchedObservationsTable = Mock.Of<ITempTableReference>(Strict);
             var subjectResultMetaService = new Mock<ISubjectResultMetaService>(Strict);
 
-            tableBuilderQueryOptimiser
-                .Setup(mock => mock.IsCroppingRequired(It.IsAny<FullTableQuery>()))
-                .ReturnsAsync(false);
-
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
                 .ReturnsAsync(matchedObservationsTable);
@@ -440,7 +436,8 @@ public class TableBuilderServiceTests
 
             var result = await service.Query(releaseSubject.ReleaseVersionId, query);
 
-            VerifyAllMocks(observationService, subjectResultMetaService, tableBuilderQueryOptimiser);
+            VerifyAllMocks(observationService, subjectResultMetaService);
+            tableBuilderQueryOptimiser.Verify(mock => mock.IsCroppingRequired(It.IsAny<FullTableQuery>()), Times.Never);
 
             var observationResults = result.AssertRight().Results.ToList();
 
@@ -701,10 +698,6 @@ public class TableBuilderServiceTests
             var matchedObservationsTable = Mock.Of<ITempTableReference>(Strict);
             var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
 
-            tableBuilderQueryOptimiser
-                .Setup(mock => mock.IsCroppingRequired(It.IsAny<FullTableQuery>()))
-                .ReturnsAsync(false);
-
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
                 .ReturnsAsync(matchedObservationsTable);
@@ -766,11 +759,11 @@ public class TableBuilderServiceTests
             var result = await service.QueryToCsvStream(query, stream);
 
             VerifyAllMocks(observationService, subjectCsvMetaService, tableBuilderQueryOptimiser);
+            tableBuilderQueryOptimiser.Verify(mock => mock.IsCroppingRequired(It.IsAny<FullTableQuery>()), Times.Never);
 
             result.AssertRight();
 
             stream.SeekToBeginning();
-
             Snapshot.Match(stream.ReadToEnd());
         }
     }
@@ -986,10 +979,6 @@ public class TableBuilderServiceTests
             var matchedObservationsTable = Mock.Of<ITempTableReference>(Strict);
             var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
 
-            tableBuilderQueryOptimiser
-                .Setup(mock => mock.IsCroppingRequired(It.IsAny<FullTableQuery>()))
-                .ReturnsAsync(false);
-
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
                 .ReturnsAsync(matchedObservationsTable);
@@ -1048,6 +1037,7 @@ public class TableBuilderServiceTests
             var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
 
             VerifyAllMocks(observationService, subjectCsvMetaService, tableBuilderQueryOptimiser);
+            tableBuilderQueryOptimiser.Verify(mock => mock.IsCroppingRequired(It.IsAny<FullTableQuery>()), Times.Never);
 
             result.AssertRight();
 
@@ -1129,10 +1119,6 @@ public class TableBuilderServiceTests
             var matchedObservationsTable = Mock.Of<ITempTableReference>(Strict);
             var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
 
-            tableBuilderQueryOptimiser
-                .Setup(mock => mock.IsCroppingRequired(It.IsAny<FullTableQuery>()))
-                .ReturnsAsync(false);
-
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
                 .ReturnsAsync(matchedObservationsTable);
@@ -1182,6 +1168,7 @@ public class TableBuilderServiceTests
             var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
 
             VerifyAllMocks(observationService, subjectCsvMetaService, tableBuilderQueryOptimiser);
+            tableBuilderQueryOptimiser.Verify(mock => mock.IsCroppingRequired(It.IsAny<FullTableQuery>()), Times.Never);
 
             result.AssertRight();
 
