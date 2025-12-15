@@ -80,6 +80,7 @@ public class MethodologyApprovalServicePermissionTests
         IPublishingService? publishingService = null,
         IUserService? userService = null,
         IUserReleaseRoleService? userReleaseRoleService = null,
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IMethodologyCacheService? methodologyCacheService = null,
         IEmailTemplateService? emailTemplateService = null,
         IRedirectsCacheService? redirectsCacheService = null
@@ -95,6 +96,7 @@ public class MethodologyApprovalServicePermissionTests
             publishingService ?? Mock.Of<IPublishingService>(Strict),
             userService ?? Mock.Of<IUserService>(),
             userReleaseRoleService ?? Mock.Of<IUserReleaseRoleService>(Strict),
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict)

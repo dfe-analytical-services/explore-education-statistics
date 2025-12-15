@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
@@ -254,7 +255,9 @@ public class MethodologyServicePermissionTests
         IMethodologyApprovalService? methodologyApprovalService = null,
         IMethodologyCacheService? methodologyCacheService = null,
         IRedirectsCacheService? redirectsCacheService = null,
-        IUserService? userService = null
+        IUserService? userService = null,
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null
     )
     {
         return new(
@@ -267,7 +270,9 @@ public class MethodologyServicePermissionTests
             methodologyApprovalService ?? Mock.Of<IMethodologyApprovalService>(Strict),
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
-            userService ?? Mock.Of<IUserService>()
+            userService ?? Mock.Of<IUserService>(),
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict)
         );
     }
 
