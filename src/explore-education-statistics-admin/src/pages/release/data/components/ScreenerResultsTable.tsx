@@ -1,3 +1,4 @@
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import { ScreenerResult } from '@admin/services/releaseDataFileService';
 import React from 'react';
 import Tag from '@common/components/Tag';
@@ -21,6 +22,8 @@ export default function ScreenerResultsTable({
   onAcknowledgeWarning,
   warningAcknowledgements,
 }: Props) {
+  const { user } = useAuthContext();
+  const isBauUser = user?.permissions.isBauUser;
   const testResults = showAll
     ? screenerResult?.testResults
     : screenerResult?.testResults.filter(
@@ -37,10 +40,14 @@ export default function ScreenerResultsTable({
       className="dfe-table--vertical-align-middle"
       data-testid="screener-result-table"
     >
+      <thead>
+        <th>Test</th>
+        <th>Status</th>
+      </thead>
       <tbody>
         {testResults.map(testResult => (
           <tr data-testid="screener-result-table-row" key={testResult.id}>
-            <td className="govuk-!-padding-right-0">
+            <td className="dfe-word-break--break-word">
               <div>
                 {!hasFailures &&
                 onAcknowledgeWarning &&
@@ -77,6 +84,26 @@ export default function ScreenerResultsTable({
       </tbody>
     </table>
   ) : (
-    <p>No test results to display, please delete the file and try again.</p>
+    <>
+      {isBauUser ? (
+        <p>
+          The data file failed to transfer to the automatic screener service and
+          screening has not been run. Make sure to validate the files using the
+          external screener and, once checked, bypass this automated screening
+          step to continue to import this data set.
+        </p>
+      ) : (
+        <p>
+          We've hit an issue with running the automatic screening on this file.
+          Please make sure you have fully validated the file in the external
+          screener and then e-mail{' '}
+          <a href="mailto:explore.statistics@education.gov.uk">
+            explore.statistics@education.gov.uk
+          </a>{' '}
+          with the publication and data set names for help in bypassing this
+          issue.
+        </p>
+      )}
+    </>
   );
 }

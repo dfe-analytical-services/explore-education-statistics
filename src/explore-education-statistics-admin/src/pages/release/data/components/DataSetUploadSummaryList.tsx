@@ -30,6 +30,7 @@ export default function DataSetUploadSummaryList({
       </SummaryListItem>
       <SummaryListItem term="Data file">
         <ButtonText
+          className="dfe-word-break--break-word"
           onClick={() =>
             downloadTemporaryReleaseFileSecurely({
               releaseVersionId,
@@ -44,6 +45,7 @@ export default function DataSetUploadSummaryList({
       </SummaryListItem>
       <SummaryListItem term="Meta file">
         <ButtonText
+          className="dfe-word-break--break-word"
           onClick={() =>
             downloadTemporaryReleaseFileSecurely({
               releaseVersionId,
