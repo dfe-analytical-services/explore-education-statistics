@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+﻿using static GovUk.Education.ExploreEducationStatistics.Common.Utils.TimeZoneUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
@@ -29,13 +29,6 @@ public static class DateTimeExtensions
     public static DateTime ConvertUtcToUkTimeZone(this DateTime dateTime)
     {
         return TimeZoneInfo.ConvertTimeFromUtc(dateTime, GetUkTimeZone());
-    }
-
-    public static TimeZoneInfo GetUkTimeZone()
-    {
-        return TimeZoneInfo.FindSystemTimeZoneById(
-            RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "GMT Standard Time" : "Europe/London"
-        );
     }
 
     public static bool IsBefore(this DateTime subject, DateTime target)
