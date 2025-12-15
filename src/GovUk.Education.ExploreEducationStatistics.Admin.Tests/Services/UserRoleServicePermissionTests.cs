@@ -3,14 +3,17 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Identity;
+using MockQueryable;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -189,6 +192,11 @@ public class UserRoleServicePermissionTests
             .WithUser(_dataFixture.DefaultUser())
             .WithRole(Contributor);
 
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+        userReleaseRoleRepository
+            .Setup(m => m.Query(ResourceRoleFilter.All))
+            .Returns(new[] { userReleaseRole }.BuildMock());
+
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
                 tuple => tuple.Item1.Id == releaseVersion.Release.PublicationId && tuple.Item2 == Contributor,
@@ -196,21 +204,16 @@ public class UserRoleServicePermissionTests
             )
             .AssertForbidden(async userService =>
             {
-                var contentDbContextId = Guid.NewGuid().ToString();
-                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    contentDbContext.Add(userReleaseRole);
-                    await contentDbContext.SaveChangesAsync();
-                }
+                var service = SetupUserRoleService(
+                    userService: userService.Object,
+                    userReleaseRoleRepository: userReleaseRoleRepository.Object
+                );
 
-                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var service = SetupUserRoleService(
-                        contentDbContext: contentDbContext,
-                        userService: userService.Object
-                    );
-                    return await service.RemoveUserReleaseRole(userReleaseRole.Id);
-                }
+                var result = await service.RemoveUserReleaseRole(userReleaseRole.Id);
+
+                MockUtils.VerifyAllMocks(userService, userReleaseRoleRepository);
+
+                return result;
             });
     }
 

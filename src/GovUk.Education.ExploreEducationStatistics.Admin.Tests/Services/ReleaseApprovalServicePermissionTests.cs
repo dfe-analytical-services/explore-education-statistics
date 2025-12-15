@@ -151,7 +151,7 @@ public class ReleaseApprovalServicePermissionTests
             });
     }
 
-    private ReleaseApprovalService BuildService(ContentDbContext contentDbContext, IUserService userService)
+    private static ReleaseApprovalService BuildService(ContentDbContext contentDbContext, IUserService userService)
     {
         return new ReleaseApprovalService(
             contentDbContext,
@@ -160,12 +160,13 @@ public class ReleaseApprovalServicePermissionTests
             Mock.Of<IPublishingService>(),
             Mock.Of<IReleaseChecklistService>(),
             Mock.Of<IContentService>(),
-            Mock.Of<IPreReleaseUserService>(),
             Mock.Of<IUserResourceRoleNotificationService>(),
             Mock.Of<IReleaseFileRepository>(),
             Mock.Of<IReleaseFileService>(),
             new ReleaseApprovalOptions().ToOptionsWrapper(),
             Mock.Of<IUserReleaseRoleService>(),
+            Mock.Of<IUserReleaseRoleRepository>(),
+            Mock.Of<IUserPublicationRoleRepository>(),
             Mock.Of<IEmailTemplateService>()
         );
     }

@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -41,13 +42,14 @@ public class ReleaseAmendmentServicePermissionTests
             });
     }
 
-    private ReleaseAmendmentService BuildService(IUserService userService, ContentDbContext? context = null)
+    private static ReleaseAmendmentService BuildService(IUserService userService, ContentDbContext? context = null)
     {
         return new ReleaseAmendmentService(
             context ?? Mock.Of<ContentDbContext>(),
             userService,
             Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
-            Mock.Of<StatisticsDbContext>(MockBehavior.Strict)
+            Mock.Of<StatisticsDbContext>(MockBehavior.Strict),
+            Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict)
         );
     }
 }
