@@ -208,13 +208,19 @@ const FormEditor = ({
 
       writer.setAttribute('id', id, root);
 
+      // TODO: remove this after "EES-6786 Upgrade CKEditor" and use EditorConfig.label to set the aria-label the official way.
+      // This is a hacky workaround in order to achieve this.
+      if (label) {
+        writer.setAttribute('aria-label', label, root);
+      }
+
       if (describedBy) {
         writer.setAttribute('aria-describedby', describedBy, root);
       } else {
         writer.removeAttribute('aria-describedby', root);
       }
     },
-    [describedBy, id],
+    [describedBy, id, label],
   );
 
   const handleReady = useCallback<CKEditorProps['onReady']>(
@@ -244,9 +250,17 @@ const FormEditor = ({
         glossaryPlugin.current = editor.plugins.get<GlossaryPlugin>('Glossary');
       }
 
+      if (label) {
+        // @ts-expect-error TODO: remove this after "EES-6786 Upgrade CKEditor" and use EditorConfig.label to set the aria-label the official way.
+        // This is a hacky workaround in order to achieve this.
+        editorInstance.current.ui.view.editable.element.setAttribute(
+          'aria-label',
+          label,
+        );
+      }
       setMarkersOrder(getMarkersOrder([...editor.model.markers]));
     },
-    [changeEditingView, focusOnInit, onElementsReady, setMarkersOrder],
+    [changeEditingView, focusOnInit, label, onElementsReady, setMarkersOrder],
   );
 
   useEffect(() => {
