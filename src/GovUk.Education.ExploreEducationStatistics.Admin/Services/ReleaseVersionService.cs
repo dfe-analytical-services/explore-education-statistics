@@ -77,6 +77,7 @@ public class ReleaseVersionService(
             {
                 var prereleaseRolesAdded = await userReleaseRoleRepository
                     .Query(ResourceRoleFilter.AllButExpired)
+                    .AsNoTracking()
                     .WhereForReleaseVersion(releaseVersionId)
                     .WhereRolesIn(ReleaseRole.PrereleaseViewer)
                     .AnyAsync();
@@ -498,6 +499,7 @@ public class ReleaseVersionService(
 
         var directReleaseVersionsWithApprovalRole = await userReleaseRoleRepository
             .Query()
+            .AsNoTracking()
             .WhereForUser(userId)
             .WhereRolesIn(ReleaseRole.Approver)
             .Select(urr => urr.ReleaseVersionId)
@@ -505,6 +507,7 @@ public class ReleaseVersionService(
 
         var indirectReleaseVersionsWithApprovalRole = await userPublicationRoleRepository
             .Query()
+            .AsNoTracking()
             .WhereForUser(userId)
             .WhereRolesIn(PublicationRole.Allower)
             .SelectMany(upr => upr.Publication.Releases.SelectMany(r => r.Versions.Select(rv => rv.Id)))
@@ -515,7 +518,8 @@ public class ReleaseVersionService(
             .Distinct();
 
         var releaseVersionsForApproval = await context
-            .ReleaseVersions.Include(releaseVersion => releaseVersion.Release)
+            .ReleaseVersions.AsNoTracking()
+            .Include(releaseVersion => releaseVersion.Release)
                 .ThenInclude(release => release.Publication)
             .Where(releaseVersion =>
                 releaseVersion.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview

@@ -133,6 +133,7 @@ public class MethodologyApprovalService(
 
         var userPublicationRoles = await userPublicationRoleRepository
             .Query()
+            .AsNoTracking()
             .WhereForPublication(owningPublicationId)
             .WhereRolesIn(PublicationRole.Allower)
             .Include(upr => upr.User)

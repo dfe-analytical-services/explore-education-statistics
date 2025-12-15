@@ -530,6 +530,7 @@ public class ReleaseAmendmentService(
         // Copy all current roles apart from Prerelease Users to the Release amendment.
         var newRoles = await userReleaseRoleRepository
             .Query()
+            .AsNoTracking()
             .WhereForReleaseVersion(originalReleaseId)
             .WhereRolesNotIn(ReleaseRole.PrereleaseViewer)
             .Select(urr => new UserReleaseRole

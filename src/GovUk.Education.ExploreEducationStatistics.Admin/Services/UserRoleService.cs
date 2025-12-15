@@ -209,6 +209,7 @@ public class UserRoleService(
     {
         var releaseRoles = await userReleaseRoleRepository
             .Query()
+            .AsNoTracking()
             .WhereForUser(Guid.Parse(user.Id))
             .Select(upr => upr.Role)
             .Distinct()
@@ -216,6 +217,7 @@ public class UserRoleService(
 
         var publicationRoles = await userPublicationRoleRepository
             .Query()
+            .AsNoTracking()
             .WhereForUser(Guid.Parse(user.Id))
             .Select(upr => upr.Role)
             .Distinct()
@@ -348,6 +350,7 @@ public class UserRoleService(
             .OnSuccess(async () =>
                 await userPublicationRoleRepository
                     .Query()
+                    .AsNoTracking()
                     .WhereForUser(userId)
                     .Include(upr => upr.User)
                     .Include(upr => upr.Publication)
@@ -374,6 +377,7 @@ public class UserRoleService(
             .OnSuccess(async () =>
                 await userPublicationRoleRepository
                     .Query()
+                    .AsNoTracking()
                     .WhereForPublication(publicationId)
                     .Include(upr => upr.User)
                     .Include(upr => upr.Publication)
@@ -399,6 +403,7 @@ public class UserRoleService(
             {
                 var allReleaseRoles = await userReleaseRoleRepository
                     .Query()
+                    .AsNoTracking()
                     .WhereForUser(userId)
                     .Include(urr => urr.ReleaseVersion)
                         .ThenInclude(rv => rv.Release)

@@ -24,6 +24,7 @@ public class PublicationRepository(
     {
         var publicationsGrantedByPublicationRoleQueryable = userPublicationRoleRepository
             .Query()
+            .AsNoTracking()
             .WhereForUser(userId)
             .WhereRolesIn([PublicationRole.Owner, PublicationRole.Allower]);
 
@@ -44,6 +45,7 @@ public class PublicationRepository(
 
         var releasesGrantedByReleaseRolesQueryable = userReleaseRoleRepository
             .Query()
+            .AsNoTracking()
             .Include(urr => urr.ReleaseVersion)
                 .ThenInclude(rv => rv.Release)
                     .ThenInclude(r => r.Publication)

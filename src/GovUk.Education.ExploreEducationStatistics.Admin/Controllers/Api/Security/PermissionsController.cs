@@ -175,6 +175,7 @@ public class PermissionsController(
     {
         return await userReleaseRoleRepository
             .Query()
+            .AsNoTracking()
             .WhereForUser(userService.GetUserId())
             .WhereRolesIn(ReleaseRole.Approver)
             .AnyAsync();
@@ -184,6 +185,7 @@ public class PermissionsController(
     {
         return await userPublicationRoleRepository
             .Query()
+            .AsNoTracking()
             .WhereForUser(userService.GetUserId())
             .WhereRolesIn(PublicationRole.Allower)
             .AnyAsync();
