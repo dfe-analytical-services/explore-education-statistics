@@ -448,7 +448,7 @@ public class UserRoleService(
     {
         return await FindUserReleaseRole(userReleaseRoleId)
             .OnSuccessDo(async userReleaseRole =>
-                userService.CheckCanUpdateReleaseRole(
+                await userService.CheckCanUpdateReleaseRole(
                     userReleaseRole.ReleaseVersion.Release.Publication,
                     userReleaseRole.Role
                 )

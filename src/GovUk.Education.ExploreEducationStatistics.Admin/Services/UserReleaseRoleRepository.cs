@@ -79,9 +79,9 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUse
     public IQueryable<UserReleaseRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly) =>
         resourceRoleFilter switch
         {
-            ResourceRoleFilter.ActiveOnly => contentDbContext.UserReleaseRolesForActiveUsers,
-            ResourceRoleFilter.PendingOnly => contentDbContext.UserReleaseRolesForPendingInvites,
-            ResourceRoleFilter.AllButExpired => contentDbContext.UserReleaseRolesForActiveOrPending,
+            ResourceRoleFilter.ActiveOnly => contentDbContext.UserReleaseRoles.WhereUserIsActive(),
+            ResourceRoleFilter.PendingOnly => contentDbContext.UserReleaseRoles.WhereUserHasPendingInvite(),
+            ResourceRoleFilter.AllButExpired => contentDbContext.UserReleaseRoles.WhereUserIsActiveOrHasPendingInvite(),
             ResourceRoleFilter.All => contentDbContext.UserReleaseRoles,
             _ => throw new ArgumentOutOfRangeException(nameof(resourceRoleFilter), resourceRoleFilter, null),
         };
