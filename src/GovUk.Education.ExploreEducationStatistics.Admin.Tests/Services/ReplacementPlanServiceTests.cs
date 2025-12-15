@@ -1563,8 +1563,6 @@ public class ReplacementPlanServiceTests
             Assert.Equal(dataSetVersion.Id, replacementPlan.ApiDataSetVersionPlan.Id);
             Assert.Equal(dataSetVersion.PublicVersion, replacementPlan.ApiDataSetVersionPlan.Version);
 
-            Assert.NotNull(replacementPlan.ApiDataSetVersionPlan.MappingStatus);
-
             Assert.Equal(mappingStatus, replacementPlan.ApiDataSetVersionPlan.MappingStatus);
 
             Assert.Equal(dataSetVersion.Status, replacementPlan.ApiDataSetVersionPlan.Status);
