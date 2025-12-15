@@ -131,24 +131,8 @@ public class PreReleaseUserService(
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
             .OnSuccess(async () => await FindUserByEmail(email))
-            .OnSuccessVoid(async user =>
-            {
-                var releaseRolesToRemove = await userReleaseRoleRepository
-                    .Query(ResourceRoleFilter.All)
-                    .WhereForUser(user!.Id)
-                    .WhereForReleaseVersion(releaseVersionId)
-                    .WhereRolesIn(ReleaseRole.PrereleaseViewer)
-                    .ToListAsync();
-
-                await userReleaseRoleRepository.RemoveMany(releaseRolesToRemove);
-            });
-    }
-
-    private async Task<Either<ActionResult, User>> FindUserByEmail(string email)
-    {
-        var user = await userRepository.FindUserByEmail(email);
-
-        return user is null ? new NotFoundResult() : user;
+            .OnSuccess(async user => await FindUserPrereleaseRole(userId: user.Id, releaseVersionId: releaseVersionId))
+            .OnSuccessVoid(async userPrereleaseRole => await userReleaseRoleRepository.Remove(userPrereleaseRole));
     }
 
     private async Task<PreReleaseUserViewModel> InvitePreReleaseUser(ReleaseVersion releaseVersion, string email)
@@ -184,5 +168,23 @@ public class PreReleaseUserService(
         });
 
         return new PreReleaseUserViewModel(email);
+    }
+
+    private async Task<Either<ActionResult, User>> FindUserByEmail(string email)
+    {
+        var user = await userRepository.FindUserByEmail(email);
+
+        return user is null ? new NotFoundResult() : user;
+    }
+
+    private async Task<Either<ActionResult, UserReleaseRole>> FindUserPrereleaseRole(Guid userId, Guid releaseVersionId)
+    {
+        var userPrereleaseRole = await userReleaseRoleRepository.GetByCompositeKey(
+            userId: userId,
+            releaseVersionId: releaseVersionId,
+            role: ReleaseRole.PrereleaseViewer
+        );
+
+        return userPrereleaseRole is null ? new NotFoundResult() : userPrereleaseRole;
     }
 }
