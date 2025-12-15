@@ -56,8 +56,8 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
     private ContentDbContext _contentDbContext = null!;
     private StatisticsDbContext _statisticsDbContext = null!;
     private UsersAndRolesDbContext _usersAndRolesDbContext = null!;
-    private Mock<IProcessorClient> _processorClientMock = null!;
-    private Mock<IPublicDataApiClient> _publicDataApiClientMock = null!;
+    private IProcessorClient _processorClient = null!;
+    private IPublicDataApiClient _publicDataApiClient = null!;
     private OptimisedTestUserHolder _userHolder = null!;
 
     private Func<string> _psqlConnectionString = null!;
@@ -142,8 +142,8 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
         // Look up the Mocks surrounding mocked-out dependencies once per test class using this fixture.
         // Test classes can then use the Mocks for setups and verifications, as the Mocks will be the same ones
         // as used in the tested code itself.
-        _processorClientMock = lookups.GetMockService<IProcessorClient>();
-        _publicDataApiClientMock = lookups.GetMockService<IPublicDataApiClient>();
+        _processorClient = lookups.GetService<IProcessorClient>();
+        _publicDataApiClient = lookups.GetService<IPublicDataApiClient>();
 
         if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
         {
@@ -206,18 +206,18 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
-    public Mock<IProcessorClient> GetProcessorClientMock() => _processorClientMock;
+    public Mock<IProcessorClient> GetProcessorClientMock() => Mock.Get(_processorClient);
 
     /// <summary>
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
-    public Mock<IPublicDataApiClient> GetPublicDataApiClientMock() => _publicDataApiClientMock;
+    public Mock<IPublicDataApiClient> GetPublicDataApiClientMock() => Mock.Get(_publicDataApiClient);
 
     public override Task BeforeEachTest()
     {
-        _processorClientMock.Reset();
-        _publicDataApiClientMock.Reset();
+        ResetIfMock(_processorClient);
+        ResetIfMock(_publicDataApiClient);
 
         if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
         {
@@ -238,6 +238,20 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
         }
 
         _userHolder.SetUser(user);
+    }
+
+    private void ResetIfMock<TService>(TService service)
+        where TService : class
+    {
+        try
+        {
+            var mock = Mock.Get(service);
+            mock.Reset();
+        }
+        catch
+        {
+            // "service" is not a Mock. This is fine.
+        }
     }
 }
 

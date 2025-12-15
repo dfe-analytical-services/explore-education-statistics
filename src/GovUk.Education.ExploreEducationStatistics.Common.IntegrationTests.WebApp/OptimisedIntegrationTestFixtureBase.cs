@@ -252,19 +252,25 @@ public class OptimisedServiceAndConfigModifications
         return this;
     }
 
+    public OptimisedServiceAndConfigModifications ReplaceService<TInterface, TImplementation>(
+        ServiceLifetime serviceLifetime,
+        bool optional = false
+    )
+        where TInterface : class
+        where TImplementation : class, TInterface
+    {
+        ServiceModifications.Add(services =>
+            services.ReplaceService<TInterface, TImplementation>(serviceLifetime, optional: optional)
+        );
+        return this;
+    }
+
     public OptimisedServiceAndConfigModifications ReplaceServiceWithMock<T>(
         MockBehavior mockBehavior = MockBehavior.Strict
     )
         where T : class
     {
         ServiceModifications.Add(services => services.MockService<T>(mockBehavior));
-        return this;
-    }
-
-    public OptimisedServiceAndConfigModifications AddMock<T>(T service, bool optional = false)
-        where T : class
-    {
-        ServiceModifications.Add(services => services.MockService<T>());
         return this;
     }
 
@@ -295,8 +301,7 @@ public class OptimisedServiceCollectionLookups<TStartup>(WebApplicationFactory<T
 {
     /// <summary>
     ///
-    /// Look up a service from the factory.  If it's required to look up a mocked service, use the
-    /// <see cref="GetMockService{TService}" /> method instead.
+    /// Look up a service from the factory.
     ///
     /// </summary>
     public TService GetService<TService>()

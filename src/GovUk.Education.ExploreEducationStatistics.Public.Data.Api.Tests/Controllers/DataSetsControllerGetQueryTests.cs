@@ -2719,7 +2719,7 @@ public abstract class DataSetsControllerGetQueryTests(DataSetsControllerGetQuery
         {
             var dataSetVersion = await CommonTestDataUtil.SetupDefaultDataSetVersion(fixture.GetPublicDataDbContext());
 
-            var analyticsServiceMock = fixture.GetAnalyticsServiceMock();
+            var analyticsWriterMock = fixture.GetAnalyticsServiceMock();
 
             var expectedRequest = new DataSetQueryRequest
             {
@@ -2743,7 +2743,7 @@ public abstract class DataSetsControllerGetQueryTests(DataSetsControllerGetQuery
                 Debug = true,
             };
 
-            analyticsServiceMock
+            analyticsWriterMock
                 .Setup(s =>
                     s.CaptureDataSetVersionQuery(
                         It.Is<DataSetVersion>(dsv => dsv.Id == dataSetVersion.Id),
@@ -2772,7 +2772,7 @@ public abstract class DataSetsControllerGetQueryTests(DataSetsControllerGetQuery
                 pageSize: 3
             );
 
-            MockUtils.VerifyAllMocks(analyticsServiceMock);
+            MockUtils.VerifyAllMocks(analyticsWriterMock);
 
             var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
 

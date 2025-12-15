@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
@@ -47,22 +48,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixtu
 public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegrationTestCapability[] capabilities)
     : OptimisedIntegrationTestFixtureBase<Startup>(minimalApi: true)
 {
-    private OptimisedTestUserHolder _userHolder = null!;
+    private OptimisedTestUserHolder? _userHolder;
 
     private Func<string> _psqlConnectionString = null!;
 
-    private PublicDataDbContext _publicDataDbContext = null!;
-    private Mock<IContentApiClient> _contentApiClientMock = null!;
-    private Mock<ISearchService> _searchServiceMock = null!;
-    private Mock<IAnalyticsService> _analyticsServiceMock = null!;
+    private PublicDataDbContext? _publicDataDbContext;
+    private IContentApiClient _contentApiClient = null!;
+    private ISearchService _searchService = null!;
+    private IAnalyticsService _analyticsService = null!;
 
     private readonly TestDataSetVersionPathResolver _testDataSetVersionPathResolver = new()
     {
         Directory = "AbsenceSchool",
     };
 
-    private readonly FakeTimeProvider _timeProvider = new(DateTimeOffset.UtcNow);
-    private readonly DateTimeProvider _dateTimeProvider = new(DateTime.UtcNow);
+    private FakeTimeProvider _timeProvider = null!;
+    private DateTimeProvider _dateTimeProvider = null!;
 
     protected override void RegisterTestContainers(TestContainerRegistrations registrations)
     {
@@ -84,6 +85,9 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
             .ReplaceServiceWithMock<IAnalyticsService>(mockBehavior: MockBehavior.Loose);
 
         serviceModifications.ReplaceService<IDataSetVersionPathResolver>(_testDataSetVersionPathResolver);
+
+        _timeProvider = new FakeTimeProvider(DateTimeOffset.UtcNow);
+        _dateTimeProvider = new DateTimeProvider(_timeProvider.GetUtcNow().UtcDateTime);
 
         serviceModifications.ReplaceService<TimeProvider>(_timeProvider);
         serviceModifications.ReplaceService(_dateTimeProvider);
@@ -119,9 +123,9 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
         // Look up the Mocks surrounding mocked-out dependencies once per test class using this fixture.
         // Test classes can then use the Mocks for setups and verifications, as the Mocks will be the same ones
         // as used in the tested code itself.
-        _contentApiClientMock = lookups.GetMockService<IContentApiClient>();
-        _searchServiceMock = lookups.GetMockService<ISearchService>();
-        _analyticsServiceMock = lookups.GetMockService<IAnalyticsService>();
+        _contentApiClient = lookups.GetService<IContentApiClient>();
+        _searchService = lookups.GetService<ISearchService>();
+        _analyticsService = lookups.GetService<IAnalyticsService>();
 
         if (capabilities.Contains(PublicApiIntegrationTestCapability.Postgres))
         {
@@ -145,7 +149,10 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
     protected override async Task DisposeResources()
     {
         // Dispose of any DbContexts when the test class that was using this fixture has completed.
-        await _publicDataDbContext.DisposeAsync();
+        if (_publicDataDbContext != null)
+        {
+            await _publicDataDbContext.DisposeAsync();
+        }
     }
 
     /// <summary>
@@ -165,37 +172,37 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public PublicDataDbContext GetPublicDataDbContext() => _publicDataDbContext;
+    public PublicDataDbContext GetPublicDataDbContext() => _publicDataDbContext!;
 
     /// <summary>
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
-    public Mock<IContentApiClient> GetContentApiClientMock() => _contentApiClientMock;
+    public Mock<IContentApiClient> GetContentApiClientMock() => Mock.Get(_contentApiClient);
 
     /// <summary>
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
-    public Mock<ISearchService> GetSearchServiceMock() => _searchServiceMock;
+    public Mock<ISearchService> GetSearchServiceMock() => Mock.Get(_searchService);
 
     /// <summary>
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
-    public Mock<IAnalyticsService> GetAnalyticsServiceMock() => _analyticsServiceMock;
+    public Mock<IAnalyticsService> GetAnalyticsServiceMock() => Mock.Get(_analyticsService);
 
     public TestDataSetVersionPathResolver GetTestDataSetVersionPathResolver() => _testDataSetVersionPathResolver;
 
     public override Task BeforeEachTest()
     {
-        _contentApiClientMock.Reset();
-        _searchServiceMock.Reset();
-        _analyticsServiceMock.Reset();
+        ResetIfMock(_contentApiClient);
+        ResetIfMock(_searchService);
+        ResetIfMock(_analyticsService);
 
         if (capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
         {
-            _userHolder.SetUser(null);
+            _userHolder!.SetUser(null);
         }
 
         return Task.CompletedTask;
@@ -211,7 +218,21 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
             throw new Exception("""Cannot register test users if "useTestUserAuthentication" is false.""");
         }
 
-        _userHolder.SetUser(user);
+        _userHolder!.SetUser(user);
+    }
+
+    private void ResetIfMock<TService>(TService service)
+        where TService : class
+    {
+        try
+        {
+            var mock = Mock.Get(service);
+            mock.Reset();
+        }
+        catch
+        {
+            // "service" is not a Mock. This is fine.
+        }
     }
 }
 
@@ -219,4 +240,5 @@ public enum PublicApiIntegrationTestCapability
 {
     Postgres,
     UserAuth,
+    AnalyticsService,
 }

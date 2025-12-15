@@ -101,6 +101,94 @@ internal static class ServiceCollectionExtensions
     }
 
     /// <summary>
+    /// Replace a service that has been registered in Startup with a new implementation. The same
+    /// lifecycle that was registered in Startup will be used to register the new service.
+    /// </summary>
+    public static IServiceCollection ReplaceService<TInterface, TImplementation>(
+        this IServiceCollection services,
+        Func<IServiceProvider, TInterface> replacement,
+        ServiceLifetime serviceLifetime,
+        bool optional = false
+    )
+        where TInterface : class
+        where TImplementation : class, TInterface
+    {
+        // Remove the default service descriptor that was provided by Startup.cs (or already altered afterward by
+        // other test amendments to the WebApplicationFactory).
+        var descriptors = services.Where(d => d.ServiceType == typeof(TInterface)).ToList();
+
+        var descriptor = descriptors.SingleOrDefault(d => d.ImplementationType == typeof(TImplementation));
+
+        if (descriptor == null)
+        {
+            if (optional)
+            {
+                return services;
+            }
+
+            throw new ArgumentNullException(
+                $"No implementation of type {typeof(TImplementation).Name} implementing interface "
+                    + $"{typeof(TInterface).Name} was found to replace."
+            );
+        }
+
+        services.Remove(descriptor);
+
+        // Add the replacement.
+        return serviceLifetime switch
+        {
+            ServiceLifetime.Singleton => services.AddSingleton(replacement),
+            ServiceLifetime.Scoped => services.AddScoped(replacement),
+            ServiceLifetime.Transient => services.AddTransient(replacement),
+            _ => throw new ArgumentOutOfRangeException(
+                $"Cannot register test service with {nameof(ServiceLifetime)}.{descriptor.Lifetime}"
+            ),
+        };
+    }
+
+    /// <summary>
+    /// Replace a service that has been registered in Startup with a new implementation. The same
+    /// lifecycle that was registered in Startup will be used to register the new service.
+    /// </summary>
+    public static IServiceCollection ReplaceService<TInterface, TImplementation>(
+        this IServiceCollection services,
+        ServiceLifetime serviceLifetime,
+        bool optional = false
+    )
+        where TInterface : class
+        where TImplementation : class, TInterface
+    {
+        // Remove the default service descriptor that was provided by Startup.cs (or already altered afterward by
+        // other test amendments to the WebApplicationFactory).
+        var descriptors = services.Where(d => d.ServiceType == typeof(TInterface)).ToList();
+
+        var descriptor = descriptors.SingleOrDefault();
+
+        if (descriptor == null)
+        {
+            if (optional)
+            {
+                return services;
+            }
+
+            throw new ArgumentNullException($"No service of type {typeof(TInterface).Name} was found to replace.");
+        }
+
+        services.Remove(descriptor);
+
+        // Add the replacement.
+        return serviceLifetime switch
+        {
+            ServiceLifetime.Singleton => services.AddSingleton<TInterface, TImplementation>(),
+            ServiceLifetime.Scoped => services.AddScoped<TInterface, TImplementation>(),
+            ServiceLifetime.Transient => services.AddTransient<TInterface, TImplementation>(),
+            _ => throw new ArgumentOutOfRangeException(
+                $"Cannot register test service with {nameof(ServiceLifetime)}.{descriptor.Lifetime}"
+            ),
+        };
+    }
+
+    /// <summary>
     /// Replace a service that has been registered in Startup with a Mock. The same
     /// lifecycle that was registered in Startup will be used to register the Mock.
     /// </summary>
