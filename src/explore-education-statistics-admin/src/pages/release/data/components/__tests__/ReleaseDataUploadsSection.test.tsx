@@ -1397,10 +1397,7 @@ describe('ReleaseDataUploadsSection', () => {
     return within(table).getAllByRole('row');
   }
 
-  function renderWithTestConfig(
-    children: React.ReactNode,
-    enableReplacementFeatureFlag: boolean = false,
-  ) {
+  function renderWithTestConfig(children: React.ReactNode) {
     const defaultTestConfig = {
       appInsightsKey: '',
       publicAppUrl: 'http://localhost',
@@ -1425,12 +1422,7 @@ describe('ReleaseDataUploadsSection', () => {
     };
     return render(
       <ReleaseVersionContextProvider releaseVersion={testRelease}>
-        <TestConfigContextProvider
-          config={{
-            ...defaultTestConfig,
-            enableReplacementOfPublicApiDataSets: enableReplacementFeatureFlag,
-          }}
-        >
+        <TestConfigContextProvider config={defaultTestConfig}>
           {children}
         </TestConfigContextProvider>
       </ReleaseVersionContextProvider>,

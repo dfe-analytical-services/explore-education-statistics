@@ -34,7 +34,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -378,7 +377,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.Configure<OpenIdConnectSpaClientOptions>(
             configuration.GetSection(OpenIdConnectSpaClientOptions.Section)
         );
-        services.Configure<FeatureFlagsOptions>(configuration.GetSection(FeatureFlagsOptions.Section));
         services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
         services.Configure<DataScreenerClientOptions>(
             configuration.GetRequiredSection(DataScreenerClientOptions.Section)

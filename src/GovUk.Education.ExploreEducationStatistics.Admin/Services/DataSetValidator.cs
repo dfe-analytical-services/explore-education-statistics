@@ -6,14 +6,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -21,8 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class DataSetValidator(
     ContentDbContext contentDbContext,
     IUserService userService,
-    IDataSetService dataSetService,
-    IOptions<FeatureFlagsOptions> featureFlags
+    IDataSetService dataSetService
 ) : IDataSetValidator
 {
     public async Task<Either<List<ErrorViewModel>, DataSet>> ValidateDataSet(DataSetDto dataSet)
@@ -64,12 +61,6 @@ public class DataSetValidator(
 
             if (releaseFileWithApiDataSet != null)
             {
-                if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets)
-                {
-                    errors.Add(ValidationMessages.GenerateErrorCannotReplaceDataSetWithApiDataSet(dataSet.Title));
-                    return errors;
-                }
-
                 var isBauUser = await userService.CheckIsBauUser().IsRight();
 
                 if (!isBauUser)

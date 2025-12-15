@@ -118,7 +118,7 @@ describe('DraftApiDataSetsTable', () => {
       previousReleaseIds: [],
     },
   ];
-  const baseDataSetProps: DraftApiDataSetSummary = {
+  const patchDataSetProps: DraftApiDataSetSummary = {
     id: 'data-set-7',
     title: 'Data set 7 title',
     summary: 'Data set 7 summary',
@@ -132,11 +132,25 @@ describe('DraftApiDataSetsTable', () => {
     },
   };
 
+  const baseDataSetProps: DraftApiDataSetSummary = {
+    id: 'data-set-8',
+    title: 'Data set 8 title',
+    summary: 'Data set 8 summary',
+    status: 'Published',
+    previousReleaseIds: [],
+    draftVersion: {
+      id: 'version-8',
+      version: '2.0',
+      status: 'Draft',
+      type: 'Major',
+    },
+  };
+
   const patchDataSet: DraftApiDataSetSummary[] = [
     {
-      ...baseDataSetProps,
+      ...patchDataSetProps,
       draftVersion: {
-        ...baseDataSetProps.draftVersion,
+        ...patchDataSetProps.draftVersion,
         status: 'Mapping',
       },
     },
@@ -420,7 +434,7 @@ describe('DraftApiDataSetsTable', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
-  test('it renders Remove Draft button if working with a PATCH draft version but the feature flag is off', () => {
+  test('it doesnt render Remove Draft button if working with a PATCH draft version', () => {
     render(
       <DraftApiDataSetsTable
         canUpdateRelease
@@ -428,29 +442,6 @@ describe('DraftApiDataSetsTable', () => {
         publicationId="publication-1"
         releaseVersionId="release-1"
       />,
-    );
-
-    const rows = within(screen.getByRole('table')).getAllByRole('row');
-
-    expect(rows).toHaveLength(2);
-
-    const row1Cells = within(rows[1]).getAllByRole('cell');
-
-    expect(row1Cells[0]).toHaveTextContent('v2.0.1');
-    expect(row1Cells[1]).toHaveTextContent('Data set 7 title');
-    expect(row1Cells[2]).toHaveTextContent('Action required');
-    expect(row1Cells[3]).toHaveTextContent('Remove draft for Data set 7 title');
-  });
-
-  test('it doesnt render Remove Draft button if working with a PATCH draft version but the feature flag is on', () => {
-    render(
-      <DraftApiDataSetsTable
-        canUpdateRelease
-        dataSets={patchDataSet}
-        publicationId="publication-1"
-        releaseVersionId="release-1"
-      />,
-      true,
     );
 
     const rows = within(screen.getByRole('table')).getAllByRole('row');
@@ -483,15 +474,15 @@ describe('DraftApiDataSetsTable', () => {
 
     const row1Cells = within(rows[1]).getAllByRole('cell');
 
-    expect(row1Cells[0]).toHaveTextContent('v2.0.1');
-    expect(row1Cells[1]).toHaveTextContent('Data set 7 title');
+    expect(row1Cells[0]).toHaveTextContent('v2.0');
+    expect(row1Cells[1]).toHaveTextContent('Data set 8 title');
     expect(row1Cells[2]).toHaveTextContent('Finalising');
     expect(row1Cells[3]).not.toHaveTextContent(
-      'Remove draft for Data set 7 title',
+      'Remove draft for Data set 8 title',
     );
   });
 
-  test('it renders Remove Draft button if working with a Ready draft version', () => {
+  test('it renders Remove Draft button if working with a Ready draft version that is not patch', () => {
     render(
       <DraftApiDataSetsTable
         canUpdateRelease
@@ -507,16 +498,13 @@ describe('DraftApiDataSetsTable', () => {
 
     const row1Cells = within(rows[1]).getAllByRole('cell');
 
-    expect(row1Cells[0]).toHaveTextContent('v2.0.1');
-    expect(row1Cells[1]).toHaveTextContent('Data set 7 title');
+    expect(row1Cells[0]).toHaveTextContent('v2.0');
+    expect(row1Cells[1]).toHaveTextContent('Data set 8 title');
     expect(row1Cells[2]).toHaveTextContent('Ready');
-    expect(row1Cells[3]).toHaveTextContent('Remove draft for Data set 7 title');
+    expect(row1Cells[3]).toHaveTextContent('Remove draft for Data set 8 title');
   });
 
-  function render(
-    element: ReactNode,
-    enableReplacementOfPublicApiDataSets?: boolean,
-  ) {
+  function render(element: ReactNode) {
     const defaultTestConfig = {
       appInsightsKey: '',
       publicAppUrl: 'http://localhost',
@@ -545,8 +533,6 @@ describe('DraftApiDataSetsTable', () => {
         <TestConfigContextProvider
           config={{
             ...defaultTestConfig,
-            enableReplacementOfPublicApiDataSets:
-              enableReplacementOfPublicApiDataSets ?? false,
           }}
         >
           {element}

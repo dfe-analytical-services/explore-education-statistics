@@ -3,7 +3,6 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -107,9 +106,6 @@ public static class ProcessorHostBuilder
                         )
                         .AddSingleton<DateTimeProvider>()
                         .Configure<AppOptions>(hostBuilderContext.Configuration.GetSection(AppOptions.Section))
-                        .Configure<FeatureFlagsOptions>(
-                            hostBuilderContext.Configuration.GetSection(FeatureFlagsOptions.Section)
-                        )
                         .Configure<DataFilesOptions>(
                             hostBuilderContext.Configuration.GetSection(DataFilesOptions.Section)
                         );

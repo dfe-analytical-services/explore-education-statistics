@@ -121,7 +121,7 @@ public class RemoveDataSetTestFixture
         instance.SetupApiLinkedDataFixtures(dataFixture, dataSetVersionStatus, isPublished: releaseVersionPublished);
         instance.SetupApiLinkedReplaceByIds(replacedById, replacingId);
         await instance.SetupStatsAndContentDbContext(statisticsDbContext, contentDbContext);
-        instance.SetUpMocksForCheckApiLinkedServices();
+        instance.SetUpFootnotesAndDataBlocksMocks();
         instance.SetUpMocksForApiLinkedValidationErrors();
 
         return instance;
@@ -230,7 +230,7 @@ public class RemoveDataSetTestFixture
         await statisticsDbContext.SaveChangesAsync();
     }
 
-    public void SetUpMocksForCheckApiLinkedServices()
+    public void SetUpFootnotesAndDataBlocksMocks()
     {
         var deleteDataBlockPlan = new DeleteDataBlockPlanViewModel();
         var footnote = new Footnote { Id = Guid.NewGuid() };
@@ -248,6 +248,11 @@ public class RemoveDataSetTestFixture
             .Setup(service => service.GetFootnotes(ReleaseVersion.Id, Subject.Id))
             .ReturnsAsync([footnote]);
 
+        SetUpDeleteDataBlockMocks(deleteDataBlockPlan);
+    }
+
+    public void SetUpDeleteDataBlockMocks(DeleteDataBlockPlanViewModel deleteDataBlockPlan)
+    {
         DataBlockService
             .Setup(service => service.GetDeletePlan(ReleaseVersion.Id, It.Is<Subject>(s => s.Id == Subject.Id)))
             .ReturnsAsync(deleteDataBlockPlan);
@@ -257,7 +262,7 @@ public class RemoveDataSetTestFixture
             .ReturnsAsync(Unit.Instance);
     }
 
-    public void SetUpMocksForDeleteApiLinkedServices()
+    public void SetUpDeleteVersionMocks()
     {
         DataSetVersionService
             .Setup(service => service.DeleteVersion(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))

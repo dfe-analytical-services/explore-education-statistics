@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -16,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -32,7 +26,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
@@ -66,7 +59,6 @@ public class ReleaseVersionService(
     IUserReleaseInviteRepository userReleaseInviteRepository,
     IUserReleaseRoleRepository userReleaseRoleRepository,
     IReleaseSlugValidator releaseSlugValidator,
-    IOptions<FeatureFlagsOptions> featureFlags,
     ILogger<ReleaseVersionService> logger
 ) : IReleaseVersionService
 {
@@ -690,10 +682,7 @@ public class ReleaseVersionService(
     private async Task<Either<ActionResult, Unit>> DeleteDraftApiDataSetVersion(DeleteDataFilePlanViewModel deletePlan)
     {
         // Skip when Status == DataSetVersionStatus.Published;
-        if (
-            !featureFlags.Value.EnableReplacementOfPublicApiDataSets
-            || deletePlan.ApiDataSetVersionPlan is null or { Valid: false }
-        )
+        if (deletePlan.ApiDataSetVersionPlan is null or { Valid: false })
         {
             return Unit.Instance;
         }
@@ -838,17 +827,6 @@ public class ReleaseVersionService(
             return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
         }
 
-        if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets && releaseFile.PublicApiDataSetId is not null)
-        {
-            return ValidationUtils.ValidationResult(
-                new ErrorViewModel
-                {
-                    Code = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Code,
-                    Message = ValidationMessages.CannotDeleteApiDataSetReleaseFile.Message,
-                    Detail = new ApiDataSetErrorDetail(releaseFile.PublicApiDataSetId.Value),
-                }
-            );
-        }
         return Unit.Instance;
     }
 
@@ -881,8 +859,7 @@ public class ReleaseVersionService(
 
     private bool ShouldAllowApiDataSetDeletion(DataSetVersionStatus? dataSetVersionStatus)
     {
-        return featureFlags.Value.EnableReplacementOfPublicApiDataSets
-            && DataSetVersionAuthExtensions.PublicStatuses.All(status => status != dataSetVersionStatus);
+        return DataSetVersionAuthExtensions.PublicStatuses.All(status => status != dataSetVersionStatus);
     }
 
     private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseVersionId)

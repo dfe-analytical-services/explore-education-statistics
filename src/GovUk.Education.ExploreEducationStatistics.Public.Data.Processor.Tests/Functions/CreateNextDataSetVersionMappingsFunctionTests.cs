@@ -388,13 +388,9 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
         ProcessorFunctionsIntegrationTestFixture fixture
     ) : CreateNextDataSetVersionMappingsFunctionTests(fixture)
     {
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task Success(bool enableDataSetVersionReplacement)
+        [Fact]
+        public async Task Success()
         {
-            SetDataSetVersionReplacementFeatureFlag(enableDataSetVersionReplacement);
-
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
             await AddTestData<PublicDataDbContext>(context =>
             {
@@ -491,70 +487,59 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
 
             var nextDataSetVersion = updatedDataSet.Versions.FirstOrDefault((a) => a.SemVersion() == expectedVersion);
 
-            if (enableDataSetVersionReplacement)
-            {
-                Assert.NotNull(nextDataSetVersion);
-                // Assert that the new DataSetVersion is not set as the latest live version,
-                Assert.Equal(nextDataSetVersion, updatedDataSet.LatestDraftVersion);
-                Assert.NotEqual(nextDataSetVersion, updatedDataSet.LatestLiveVersion);
-                Assert.Equal(liveVersion.Id, updatedDataSet.LatestLiveVersion!.Id);
+            Assert.NotNull(nextDataSetVersion);
+            // Assert that the new DataSetVersion is not set as the latest live version,
+            Assert.Equal(nextDataSetVersion, updatedDataSet.LatestDraftVersion);
+            Assert.NotEqual(nextDataSetVersion, updatedDataSet.LatestLiveVersion);
+            Assert.Equal(liveVersion.Id, updatedDataSet.LatestLiveVersion!.Id);
 
-                //Assert the patch version expected has been created
-                Assert.Equal(updatedDataSet.Id, nextDataSetVersion.DataSetId);
-                Assert.Equal(1, nextDataSetVersion.VersionMajor);
-                Assert.Equal(1, nextDataSetVersion.VersionMinor);
-                Assert.Equal(1, nextDataSetVersion.VersionPatch);
+            //Assert the patch version expected has been created
+            Assert.Equal(updatedDataSet.Id, nextDataSetVersion.DataSetId);
+            Assert.Equal(1, nextDataSetVersion.VersionMajor);
+            Assert.Equal(1, nextDataSetVersion.VersionMinor);
+            Assert.Equal(1, nextDataSetVersion.VersionPatch);
 
-                Assert.Equal("1.1.1", nextDataSetVersion.PublicVersion);
+            Assert.Equal("1.1.1", nextDataSetVersion.PublicVersion);
 
-                // Assert a single import was created.
-                var dataSetVersionImport = Assert.Single(nextDataSetVersion.Imports);
-                Assert.Equal(nextDataSetVersion.Id, dataSetVersionImport.DataSetVersionId);
-                Assert.NotEqual(Guid.Empty, dataSetVersionImport.InstanceId);
-                Assert.Equal(DataSetVersionImportStage.Pending, dataSetVersionImport.Stage);
+            // Assert a single import was created.
+            var dataSetVersionImport = Assert.Single(nextDataSetVersion.Imports);
+            Assert.Equal(nextDataSetVersion.Id, dataSetVersionImport.DataSetVersionId);
+            Assert.NotEqual(Guid.Empty, dataSetVersionImport.InstanceId);
+            Assert.Equal(DataSetVersionImportStage.Pending, dataSetVersionImport.Stage);
 
-                // Assert the response view model values match the created data set version and import.
-                Assert.Equal(updatedDataSet.Id, responseViewModel.DataSetId);
-                Assert.Equal(nextDataSetVersion.Id, responseViewModel.DataSetVersionId);
-                Assert.Equal(dataSetVersionImport.InstanceId, responseViewModel.InstanceId);
+            // Assert the response view model values match the created data set version and import.
+            Assert.Equal(updatedDataSet.Id, responseViewModel.DataSetId);
+            Assert.Equal(nextDataSetVersion.Id, responseViewModel.DataSetVersionId);
+            Assert.Equal(dataSetVersionImport.InstanceId, responseViewModel.InstanceId);
 
-                // Assert the processing orchestrator was scheduled with the correct arguments
-                Assert.NotNull(processNextDataSetVersionContext);
-                Assert.NotNull(startOrchestrationOptions);
-                Assert.Equal(
-                    new ProcessDataSetVersionContext { DataSetVersionId = nextDataSetVersion.Id },
-                    processNextDataSetVersionContext
-                );
-                Assert.Equal(
-                    new StartOrchestrationOptions { InstanceId = dataSetVersionImport.InstanceId.ToString() },
-                    startOrchestrationOptions
-                );
+            // Assert the processing orchestrator was scheduled with the correct arguments
+            Assert.NotNull(processNextDataSetVersionContext);
+            Assert.NotNull(startOrchestrationOptions);
+            Assert.Equal(
+                new ProcessDataSetVersionContext { DataSetVersionId = nextDataSetVersion.Id },
+                processNextDataSetVersionContext
+            );
+            Assert.Equal(
+                new StartOrchestrationOptions { InstanceId = dataSetVersionImport.InstanceId.ToString() },
+                startOrchestrationOptions
+            );
 
-                durableTaskClientMock.Verify(
-                    t =>
-                        t.ScheduleNewOrchestrationInstanceAsync(
-                            nameof(
-                                ProcessNextDataSetVersionMappingsFunctionOrchestration.ProcessNextDataSetVersionMappings
-                            ),
-                            It.IsAny<object>(),
-                            It.IsAny<StartOrchestrationOptions>(),
-                            It.IsAny<CancellationToken>()
+            durableTaskClientMock.Verify(
+                t =>
+                    t.ScheduleNewOrchestrationInstanceAsync(
+                        nameof(
+                            ProcessNextDataSetVersionMappingsFunctionOrchestration.ProcessNextDataSetVersionMappings
                         ),
-                    Times.Once
-                );
-            }
-            else
-            {
-                Assert.Null(nextDataSetVersion);
-            }
+                        It.IsAny<object>(),
+                        It.IsAny<StartOrchestrationOptions>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task NonExistingDataSetVersionToReplaceProvided_ReturnsDataSetVersionNotFoundProblem(
-            bool enableDataSetVersionReplacement
-        )
+        [Fact]
+        public async Task NonExistingDataSetVersionToReplaceProvided_ReturnsDataSetVersionNotFoundProblem()
         {
             // Arrange
             var durableTaskClientMock = new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient");
@@ -563,7 +548,6 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
                 (_, [UsedImplicitly] input, _, _) => Assert.IsAssignableFrom<ProcessDataSetVersionContext>(input)
             );
 
-            SetDataSetVersionReplacementFeatureFlag(enableDataSetVersionReplacement);
             var (dataSet, _) = await AddDataSetAndLatestLiveVersion();
             var (releaseFile, _) = await AddDataAndMetadataFiles(publicationId: dataSet.PublicationId);
             var nonExistingDataSetVersionToReplace = Guid.NewGuid();
@@ -577,32 +561,19 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
             );
 
             // Assert
-            if (enableDataSetVersionReplacement)
-            {
-                result.AssertBadRequestWithValidationErrors([
-                    new ErrorViewModel
-                    {
-                        Code = ValidationMessages.NextDataSetVersionNotFound.Code,
-                        Message = ValidationMessages.NextDataSetVersionNotFound.Message,
-                        Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetId).ToLowerFirst(),
-                    },
-                ]);
-            }
-            else
-            {
-                result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
-            }
+            result.AssertBadRequestWithValidationErrors([
+                new ErrorViewModel
+                {
+                    Code = ValidationMessages.NextDataSetVersionNotFound.Code,
+                    Message = ValidationMessages.NextDataSetVersionNotFound.Message,
+                    Path = nameof(NextDataSetVersionMappingsCreateRequest.DataSetId).ToLowerFirst(),
+                },
+            ]);
         }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task ReleaseFileInSameReleaseSeriesAsCurrentLiveVersion_SkipsValidationProblem(
-            bool enableDataSetVersionReplacement
-        )
+        [Fact]
+        public async Task ReleaseFileInSameReleaseSeriesAsCurrentLiveVersion_SkipsValidationProblem()
         {
-            SetDataSetVersionReplacementFeatureFlag(enableDataSetVersionReplacement);
-
             var (dataSet, liveDataSetVersion) = await AddDataSetAndLatestLiveVersion();
 
             var nextDataFile = await SetupDataFileBeingAmended(liveDataSetVersion);
@@ -613,24 +584,12 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
                 dataSetVersionToReplace: liveDataSetVersion.Id
             );
 
-            if (enableDataSetVersionReplacement)
-            {
-                var validationProblem = result.AssertBadRequestWithValidationProblem();
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
 
-                validationProblem.AssertDoesNotHaveError(
-                    expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.ReleaseFileId).ToLowerFirst(),
-                    expectedCode: ValidationMessages.FileMustBeInDifferentRelease.Code
-                );
-            }
-            else
-            {
-                var validationProblem = result.AssertBadRequestWithValidationProblem();
-
-                validationProblem.AssertHasError(
-                    expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.ReleaseFileId).ToLowerFirst(),
-                    expectedCode: ValidationMessages.FileMustBeInDifferentRelease.Code
-                );
-            }
+            validationProblem.AssertDoesNotHaveError(
+                expectedPath: nameof(NextDataSetVersionMappingsCreateRequest.ReleaseFileId).ToLowerFirst(),
+                expectedCode: ValidationMessages.FileMustBeInDifferentRelease.Code
+            );
         }
     }
 

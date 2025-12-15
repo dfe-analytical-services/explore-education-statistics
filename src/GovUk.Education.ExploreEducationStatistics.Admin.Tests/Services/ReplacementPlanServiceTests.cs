@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -21,7 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -1416,38 +1414,25 @@ public class ReplacementPlanServiceTests
     /// </summary>
     /// <param name="dataSetVersionStatus">The data set version status of the replaced file's API data set version</param>
     /// <param name="majorVersionUpdate">Whether the user has uploaded a file that results in a major version update</param>
-    /// <param name="enableReplacementOfPublicApiDataSets">Whether the feature flag for EES-5779 is switched on or off</param>
     /// <param name="expectedValidValue">The expected value for the scenario set up</param>
     [Theory]
     //When user has uploaded major version data set
-    [InlineData(DataSetVersionStatus.Published, true, true, false)]
-    [InlineData(DataSetVersionStatus.Mapping, true, true, false)]
-    [InlineData(DataSetVersionStatus.Draft, true, true, false)]
-    [InlineData(DataSetVersionStatus.Published, true, false, false)]
-    [InlineData(DataSetVersionStatus.Mapping, true, false, false)]
-    [InlineData(DataSetVersionStatus.Draft, true, false, false)]
+    [InlineData(DataSetVersionStatus.Published, true, false)]
+    [InlineData(DataSetVersionStatus.Mapping, true, false)]
+    [InlineData(DataSetVersionStatus.Draft, true, false)]
     //When user has uploaded minor version
-    [InlineData(DataSetVersionStatus.Published, false, true, false)]
-    [InlineData(DataSetVersionStatus.Mapping, false, true, false)]
-    [InlineData(DataSetVersionStatus.Draft, false, true, true)]
-    [InlineData(DataSetVersionStatus.Published, false, false, false)]
-    [InlineData(DataSetVersionStatus.Mapping, false, false, false)]
-    [InlineData(DataSetVersionStatus.Draft, false, false, false)]
+    [InlineData(DataSetVersionStatus.Published, false, false)]
+    [InlineData(DataSetVersionStatus.Mapping, false, false)]
+    [InlineData(DataSetVersionStatus.Draft, false, true)]
     //When API data set version status is not appropriate to be replaced
-    [InlineData(DataSetVersionStatus.Processing, false, true, false)]
-    [InlineData(DataSetVersionStatus.Failed, false, true, false)]
-    [InlineData(DataSetVersionStatus.Deprecated, false, true, false)]
-    [InlineData(DataSetVersionStatus.Withdrawn, false, true, false)]
-    [InlineData(DataSetVersionStatus.Cancelled, false, true, false)]
-    [InlineData(DataSetVersionStatus.Processing, false, false, false)]
-    [InlineData(DataSetVersionStatus.Failed, false, false, false)]
-    [InlineData(DataSetVersionStatus.Deprecated, false, false, false)]
-    [InlineData(DataSetVersionStatus.Withdrawn, false, false, false)]
-    [InlineData(DataSetVersionStatus.Cancelled, false, false, false)]
+    [InlineData(DataSetVersionStatus.Processing, false, false)]
+    [InlineData(DataSetVersionStatus.Failed, false, false)]
+    [InlineData(DataSetVersionStatus.Deprecated, false, false)]
+    [InlineData(DataSetVersionStatus.Withdrawn, false, false)]
+    [InlineData(DataSetVersionStatus.Cancelled, false, false)]
     public async Task GetReplacementPlan_FileIsLinkedToPublicApiDataSet_ReplacementValidated(
         DataSetVersionStatus dataSetVersionStatus,
         bool majorVersionUpdate,
-        bool enableReplacementOfPublicApiDataSets,
         bool expectedValidValue
     )
     {
@@ -1527,23 +1512,18 @@ public class ReplacementPlanServiceTests
             .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
             .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
 
+        var mappingStatus = new MappingStatusViewModel
+        {
+            FiltersComplete = majorVersionUpdate,
+            LocationsComplete = majorVersionUpdate,
+            HasDeletionChanges = majorVersionUpdate,
+            FiltersHaveMajorChange = majorVersionUpdate,
+            LocationsHaveMajorChange = majorVersionUpdate,
+        };
         var dataSetVersionMappingService = new Mock<IDataSetVersionMappingService>(Strict);
         dataSetVersionMappingService
             .Setup(service => service.GetMappingStatus(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(
-                new MappingStatusViewModel
-                {
-                    FiltersComplete = majorVersionUpdate,
-                    LocationsComplete = majorVersionUpdate,
-                    HasDeletionChanges = majorVersionUpdate,
-                    FiltersHaveMajorChange = majorVersionUpdate,
-                    LocationsHaveMajorChange = majorVersionUpdate,
-                }
-            );
-
-        var options = Microsoft.Extensions.Options.Options.Create(
-            new FeatureFlagsOptions() { EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets }
-        );
+            .ReturnsAsync(mappingStatus);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -1565,8 +1545,7 @@ public class ReplacementPlanServiceTests
                 timePeriodService: timePeriodService.Object,
                 locationRepository: locationRepository.Object,
                 releaseFileRepository: releaseFileRepository.Object,
-                dataSetVersionMappingService: dataSetVersionMappingService.Object,
-                featureFlags: options
+                dataSetVersionMappingService: dataSetVersionMappingService.Object
             );
 
             var result = await replacementPlanService.GetReplacementPlan(
@@ -1583,15 +1562,9 @@ public class ReplacementPlanServiceTests
             Assert.Equal(dataSet.Title, replacementPlan.ApiDataSetVersionPlan.DataSetTitle);
             Assert.Equal(dataSetVersion.Id, replacementPlan.ApiDataSetVersionPlan.Id);
             Assert.Equal(dataSetVersion.PublicVersion, replacementPlan.ApiDataSetVersionPlan.Version);
-            if (enableReplacementOfPublicApiDataSets)
-            {
-                Assert.Equal(expectedValidValue, replacementPlan.ApiDataSetVersionPlan.Valid);
-            }
-            else
-            {
-                Assert.Null(replacementPlan.ApiDataSetVersionPlan.MappingStatus);
-                Assert.False(replacementPlan.ApiDataSetVersionPlan.Valid);
-            }
+
+            Assert.Equal(mappingStatus, replacementPlan.ApiDataSetVersionPlan.MappingStatus);
+
             Assert.Equal(dataSetVersion.Status, replacementPlan.ApiDataSetVersionPlan.Status);
 
             Assert.Equal(replacementPlan.ApiDataSetVersionPlan.Valid, expectedValidValue);
@@ -2160,13 +2133,9 @@ public class ReplacementPlanServiceTests
         IDataSetVersionService? dataSetVersionService = null,
         ITimePeriodService? timePeriodService = null,
         IDataSetVersionMappingService? dataSetVersionMappingService = null,
-        IReleaseFileRepository? releaseFileRepository = null,
-        IOptions<FeatureFlagsOptions>? featureFlags = null
+        IReleaseFileRepository? releaseFileRepository = null
     )
     {
-        featureFlags ??= Microsoft.Extensions.Options.Options.Create(
-            new FeatureFlagsOptions() { EnableReplacementOfPublicApiDataSets = false }
-        );
         return new ReplacementPlanService(
             contentDbContext,
             statisticsDbContext,
@@ -2178,8 +2147,7 @@ public class ReplacementPlanServiceTests
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             AlwaysTrueUserService().Object,
             dataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
-            releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict),
-            featureFlags
+            releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict)
         );
     }
 }
