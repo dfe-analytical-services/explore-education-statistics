@@ -1,6 +1,7 @@
 #nullable enable
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -12,11 +13,9 @@ using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
@@ -82,8 +81,16 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(rvr =>
+                            rvr.UserHasAnyRoleOnPublication(
+                                UserId,
+                                OwningPublication.Id,
+                                ResourceRoleFilter.ActiveOnly,
+                                It.IsAny<CancellationToken>(),
+                                PublicationRole.Owner
+                            )
+                        )
+                        .ReturnsAsync(false);
                 }
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
@@ -136,8 +143,16 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(rvr =>
+                            rvr.UserHasAnyRoleOnPublication(
+                                UserId,
+                                OwningPublication.Id,
+                                ResourceRoleFilter.ActiveOnly,
+                                It.IsAny<CancellationToken>(),
+                                PublicationRole.Owner
+                            )
+                        )
+                        .ReturnsAsync(false);
                 }
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
@@ -189,9 +204,19 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                         .Setup(s => s.GetOwningPublication(DraftFirstVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
+                    var isOwnerRole = role == PublicationRole.Owner;
+
                     userPublicationRoleRepository
-                        .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(ListOf(role));
+                        .Setup(rvr =>
+                            rvr.UserHasAnyRoleOnPublication(
+                                UserId,
+                                OwningPublication.Id,
+                                ResourceRoleFilter.ActiveOnly,
+                                It.IsAny<CancellationToken>(),
+                                PublicationRole.Owner
+                            )
+                        )
+                        .ReturnsAsync(isOwnerRole);
 
                     var user = DataFixture.AuthenticatedUser(userId: UserId);
                     var authContext = CreateAuthContext(user, DraftFirstVersion);
@@ -201,12 +226,12 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
 
                     // Verify that the presence of a Publication Owner role for this user that is related to a
                     // Publication that uses this Methodology will pass the handler test
-                    Assert.Equal(role == Owner, authContext.HasSucceeded);
+                    Assert.Equal(isOwnerRole, authContext.HasSucceeded);
                 });
         }
 
         [Fact]
-        public async Task UserWithNoPublicationRolesCannotDeleteDraftMethodology()
+        public async Task UserWithoutPublicationOwnerRoleCannotDeleteDraftMethodology()
         {
             var (handler, methodologyRepository, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
@@ -215,8 +240,16 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        PublicationRole.Owner
+                    )
+                )
+                .ReturnsAsync(false);
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
             var authContext = CreateAuthContext(user, DraftFirstVersion);
@@ -258,9 +291,19 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                         .Setup(s => s.GetOwningPublication(DraftAmendmentVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
+                    var isOwnerRole = role == PublicationRole.Owner;
+
                     userPublicationRoleRepository
-                        .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(ListOf(role));
+                        .Setup(rvr =>
+                            rvr.UserHasAnyRoleOnPublication(
+                                UserId,
+                                OwningPublication.Id,
+                                ResourceRoleFilter.ActiveOnly,
+                                It.IsAny<CancellationToken>(),
+                                PublicationRole.Owner
+                            )
+                        )
+                        .ReturnsAsync(isOwnerRole);
 
                     var user = DataFixture.AuthenticatedUser(userId: UserId);
                     var authContext = CreateAuthContext(user, DraftAmendmentVersion);
@@ -270,7 +313,7 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
 
                     // Verify that the presence of a Publication Owner role for this user that is related to a
                     // Publication that uses this Methodology will pass the handler test
-                    Assert.Equal(role == Owner, authContext.HasSucceeded);
+                    Assert.Equal(isOwnerRole, authContext.HasSucceeded);
                 });
         }
 

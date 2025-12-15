@@ -1,6 +1,7 @@
 #nullable enable
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -12,11 +13,9 @@ using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
@@ -62,8 +61,16 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(rvr =>
+                            rvr.UserHasAnyRoleOnPublication(
+                                UserId,
+                                OwningPublication.Id,
+                                ResourceRoleFilter.ActiveOnly,
+                                It.IsAny<CancellationToken>(),
+                                PublicationRole.Owner
+                            )
+                        )
+                        .ReturnsAsync(false);
                 }
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
@@ -112,6 +119,8 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async role =>
                 {
+                    var isOwnerRole = role == PublicationRole.Owner;
+
                     var (handler, methodologyRepository, methodologyVersionRepository, userPublicationRoleRepository) =
                         CreateHandlerAndDependencies();
 
@@ -124,8 +133,16 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(ListOf(role));
+                        .Setup(rvr =>
+                            rvr.UserHasAnyRoleOnPublication(
+                                UserId,
+                                OwningPublication.Id,
+                                ResourceRoleFilter.ActiveOnly,
+                                It.IsAny<CancellationToken>(),
+                                PublicationRole.Owner
+                            )
+                        )
+                        .ReturnsAsync(isOwnerRole);
 
                     var user = DataFixture.AuthenticatedUser(userId: UserId);
                     var authContext = CreateAuthContext(user, MethodologyVersion);
@@ -135,7 +152,7 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
 
                     // Verify that the user can create an Amendment, as they have a Publication Owner role on a Publication
                     // that uses this Methodology.
-                    Assert.Equal(role == Owner, authContext.HasSucceeded);
+                    Assert.Equal(isOwnerRole, authContext.HasSucceeded);
                 });
         }
 
@@ -154,8 +171,16 @@ public class MakeAmendmentOfSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        PublicationRole.Owner
+                    )
+                )
+                .ReturnsAsync(false);
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
             var authContext = CreateAuthContext(user, MethodologyVersion);

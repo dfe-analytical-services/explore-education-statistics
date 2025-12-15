@@ -2,9 +2,10 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.Extensions.Logging;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
@@ -17,7 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public class ViewReleaseStatusHistoryAuthorizationHandlerTests
 {
-    public class ClaimTests
+    private readonly DataFixture _fixture = new();
+
+    public class ClaimTests : ViewReleaseStatusHistoryAuthorizationHandlerTests
     {
         [Fact]
         public async Task ViewReleaseStatusHistoryAuthorizationHandler_ReleaseRoles()
@@ -30,7 +33,7 @@ public class ViewReleaseStatusHistoryAuthorizationHandlerTests
         }
     }
 
-    public class ReleaseRoleTests
+    public class ReleaseRoleTests : ViewReleaseStatusHistoryAuthorizationHandlerTests
     {
         [Fact]
         public async Task ViewReleaseStatusHistoryAuthorizationHandler_ReleaseRoles()
@@ -44,14 +47,16 @@ public class ViewReleaseStatusHistoryAuthorizationHandlerTests
         }
     }
 
-    public class PublicationRoleTests
+    public class PublicationRoleTests : ViewReleaseStatusHistoryAuthorizationHandlerTests
     {
         [Fact]
         public async Task ViewReleaseStatusHistoryAuthorizationHandler_PublicationRoles()
         {
             await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseStatusHistoryRequirement>(
                 CreateHandler,
-                new ReleaseVersion { Publication = new Publication() },
+                _fixture
+                    .DefaultReleaseVersion()
+                    .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication())),
                 PublicationRole.Owner,
                 PublicationRole.Allower
             );
@@ -63,10 +68,7 @@ public class ViewReleaseStatusHistoryAuthorizationHandlerTests
         return new ViewReleaseStatusHistoryAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                userReleaseRoleRepository: new UserReleaseRoleRepository(
-                    contentDbContext: contentDbContext,
-                    logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
-                ),
+                userReleaseRoleRepository: new UserReleaseRoleRepository(contentDbContext: contentDbContext),
                 userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext: contentDbContext),
                 preReleaseService: Mock.Of<IPreReleaseService>(Strict)
             )

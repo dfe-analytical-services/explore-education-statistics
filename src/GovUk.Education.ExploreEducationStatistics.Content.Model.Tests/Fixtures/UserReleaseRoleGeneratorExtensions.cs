@@ -53,7 +53,7 @@ public static class UserReleaseRoleGeneratorExtensions
     ) => setters.Set(urr => urr.ReleaseVersion, releaseVersion).Set(urr => urr.ReleaseVersionId, releaseVersion.Id);
 
     public static InstanceSetters<UserReleaseRole> SetUser(this InstanceSetters<UserReleaseRole> setters, User user) =>
-        setters.Set(urr => urr.User, user);
+        setters.Set(urr => urr.User, user).Set(urr => urr.UserId, user.Id);
 
     public static InstanceSetters<UserReleaseRole> SetRole(
         this InstanceSetters<UserReleaseRole> setters,

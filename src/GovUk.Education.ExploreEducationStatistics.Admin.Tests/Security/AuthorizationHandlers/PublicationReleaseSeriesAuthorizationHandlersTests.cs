@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.Extensions.Logging;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
@@ -43,10 +42,7 @@ public class PublicationReleaseSeriesAuthorizationHandlersTests
             ContentDbContext contentDbContext
         )
         {
-            var userReleaseRoleRepository = new UserReleaseRoleRepository(
-                contentDbContext,
-                logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
-            );
+            var userReleaseRoleRepository = new UserReleaseRoleRepository(contentDbContext);
 
             var userPublicationRoleRepository = new UserPublicationRoleRepository(contentDbContext);
 

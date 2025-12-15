@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -37,8 +38,16 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
             if (!expectedToPassByClaimAlone)
             {
                 userPublicationRoleRepository
-                    .Setup(s => s.ListRolesByUserAndPublication(UserId, Publication.Id))
-                    .ReturnsAsync(new List<PublicationRole>());
+                    .Setup(rvr =>
+                        rvr.UserHasAnyRoleOnPublication(
+                            UserId,
+                            Publication.Id,
+                            ResourceRoleFilter.ActiveOnly,
+                            It.IsAny<CancellationToken>(),
+                            new[] { PublicationRole.Owner, PublicationRole.Allower }
+                        )
+                    )
+                    .ReturnsAsync(false);
             }
 
             var handler = CreateHandler(userPublicationRoleRepository.Object);
@@ -63,11 +72,20 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
     {
         await ForEachPublicationRoleAsync(async role =>
         {
-            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+            var isApproverOrOwner = ListOf(PublicationRole.Owner, PublicationRole.Allower).Contains(role);
 
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, Publication.Id))
-                .ReturnsAsync(ListOf(role));
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        Publication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        new[] { PublicationRole.Owner, PublicationRole.Allower }
+                    )
+                )
+                .ReturnsAsync(isApproverOrOwner);
 
             var handler = CreateHandler(userPublicationRoleRepository.Object);
 
@@ -82,10 +100,7 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
 
             VerifyAllMocks(userPublicationRoleRepository);
 
-            Assert.Equal(
-                ListOf(PublicationRole.Owner, PublicationRole.Allower).Contains(role),
-                authContext.HasSucceeded
-            );
+            Assert.Equal(isApproverOrOwner, authContext.HasSucceeded);
         });
     }
 

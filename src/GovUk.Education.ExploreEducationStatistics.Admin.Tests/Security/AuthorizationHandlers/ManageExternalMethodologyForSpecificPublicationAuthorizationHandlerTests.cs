@@ -1,9 +1,9 @@
 #nullable enable
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -13,7 +13,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
@@ -45,8 +44,16 @@ public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
                 if (!expectedToPassByClaimAlone)
                 {
                     userPublicationRoleRepository
-                        .Setup(s => s.ListRolesByUserAndPublication(UserId, Publication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(rvr =>
+                            rvr.UserHasAnyRoleOnPublication(
+                                UserId,
+                                Publication.Id,
+                                ResourceRoleFilter.ActiveOnly,
+                                It.IsAny<CancellationToken>(),
+                                PublicationRole.Owner
+                            )
+                        )
+                        .ReturnsAsync(false);
                 }
 
                 await handler.HandleAsync(authContext);
@@ -73,8 +80,16 @@ public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
             var authContext = CreateAuthContext(user, Publication);
 
             userPublicationRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, Publication.Id))
-                .ReturnsAsync(CollectionUtils.ListOf(Owner));
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        Publication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        PublicationRole.Owner
+                    )
+                )
+                .ReturnsAsync(true);
 
             await handler.HandleAsync(authContext);
             VerifyAllMocks(userPublicationRoleRepository);
@@ -93,8 +108,16 @@ public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
             var authContext = CreateAuthContext(user, Publication);
 
             userPublicationRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, Publication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        Publication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        PublicationRole.Owner
+                    )
+                )
+                .ReturnsAsync(false);
 
             await handler.HandleAsync(authContext);
             VerifyAllMocks(userPublicationRoleRepository);
