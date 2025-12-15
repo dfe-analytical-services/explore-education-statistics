@@ -41,6 +41,7 @@ Add data guidance to subjects
 
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_1_NAME}
@@ -95,7 +96,7 @@ Upload replacement data that result in major API version
     user uploads subject replacement    ${SUBJECT_1_NAME}    absence_school_major_auto.csv
     ...    absence_school_major_auto.meta.csv    ${PUBLIC_API_FILES_DIR}
     user waits until page contains element    testid:Data file replacements table
-    user resolves on-going replacement    ${SUBJECT_1_NAME}
+    user confirms replacement upload    ${SUBJECT_1_NAME}    Error
     user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains element    testid:Replacement Title
@@ -131,7 +132,7 @@ Upload replacement data
     user uploads subject replacement    ${SUBJECT_1_NAME}    absence_school_minor_manual.csv
     ...    absence_school_minor_manual.meta.csv    ${PUBLIC_API_FILES_DIR}
     user waits until page contains element    testid:Data file replacements table
-    user resolves on-going replacement    ${SUBJECT_1_NAME}
+    user confirms replacement upload    ${SUBJECT_1_NAME}    Error
     user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains element    testid:Replacement Title
@@ -326,22 +327,3 @@ Add release note for amendment
 
 Approve amendment release
     user approves release for immediate publication
-
-
-*** Keywords ***
-user resolves on-going replacement
-    [Arguments]
-    ...    ${SUBJECT_NAME}
-    ${statusText}=    Get Text    xpath=//tr[td[1][text()[contains(.,'${SUBJECT_NAME}')]]]/td[3]/strong
-    user clicks button in table cell    1    4    View details    testid:Data file replacements table
-    user waits until modal is visible    Data set details
-
-    IF    '${statusText}' == 'Pending review'
-        user acknowledges any warnings in modal
-        user clicks button    Continue import with warnings
-    ELSE
-        User waits until h3 is visible    Screener test failures
-        user clicks button    Continue import (override failures)
-    END
-
-    user waits until data file replacement is in status    ${SUBJECT_NAME}    Error

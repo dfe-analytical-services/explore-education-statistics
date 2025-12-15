@@ -1512,19 +1512,18 @@ public class ReplacementPlanServiceTests
             .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
             .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
 
+        var mappingStatus = new MappingStatusViewModel
+        {
+            FiltersComplete = majorVersionUpdate,
+            LocationsComplete = majorVersionUpdate,
+            HasDeletionChanges = majorVersionUpdate,
+            FiltersHaveMajorChange = majorVersionUpdate,
+            LocationsHaveMajorChange = majorVersionUpdate,
+        };
         var dataSetVersionMappingService = new Mock<IDataSetVersionMappingService>(Strict);
         dataSetVersionMappingService
             .Setup(service => service.GetMappingStatus(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(
-                new MappingStatusViewModel
-                {
-                    FiltersComplete = majorVersionUpdate,
-                    LocationsComplete = majorVersionUpdate,
-                    HasDeletionChanges = majorVersionUpdate,
-                    FiltersHaveMajorChange = majorVersionUpdate,
-                    LocationsHaveMajorChange = majorVersionUpdate,
-                }
-            );
+            .ReturnsAsync(mappingStatus);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -1566,12 +1565,7 @@ public class ReplacementPlanServiceTests
 
             Assert.NotNull(replacementPlan.ApiDataSetVersionPlan.MappingStatus);
 
-            var mappingIsValid =
-                replacementPlan.ApiDataSetVersionPlan.MappingStatus.FiltersHaveMajorChange
-                == replacementPlan.ApiDataSetVersionPlan.MappingStatus.LocationsHaveMajorChange
-                == replacementPlan.ApiDataSetVersionPlan.MappingStatus.HasDeletionChanges
-                == majorVersionUpdate;
-            Assert.True(mappingIsValid);
+            Assert.Equal(mappingStatus, replacementPlan.ApiDataSetVersionPlan.MappingStatus);
 
             Assert.Equal(dataSetVersion.Status, replacementPlan.ApiDataSetVersionPlan.Status);
 

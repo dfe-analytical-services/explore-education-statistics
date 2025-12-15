@@ -644,6 +644,7 @@ user confirms upload to complete import
 user confirms replacement upload
     [Arguments]
     ...    ${SUBJECT_NAME}
+    ...    ${EXPECTED_STATUS}=Ready
     ${statusText}=    Get Text    xpath=//tr[td[1][text()[contains(.,'${SUBJECT_NAME}')]]]/td[3]/strong
     user clicks button in table cell    1    4    View details    testid:Data file replacements table
     user waits until modal is visible    Data set details
@@ -656,7 +657,7 @@ user confirms replacement upload
         user clicks button    Continue import (override failures)
     END
 
-    user waits until data file replacement is in status    ${SUBJECT_NAME}    Ready
+    user waits until data file replacement is in status    ${SUBJECT_NAME}    ${EXPECTED_STATUS}
 
 user waits until data upload is completed
     [Arguments]
