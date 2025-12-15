@@ -1,8 +1,8 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -11,7 +11,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
@@ -42,8 +41,16 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
                 if (!expectedToPassByClaimAlone)
                 {
                     userPublicationRoleRepository
-                        .Setup(s => s.ListRolesByUserAndPublication(UserId, Publication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(s =>
+                            s.UserHasAnyRoleOnPublication(
+                                UserId,
+                                Publication.Id,
+                                ResourceRoleFilter.ActiveOnly,
+                                It.IsAny<CancellationToken>(),
+                                PublicationRole.Owner
+                            )
+                        )
+                        .ReturnsAsync(false);
                 }
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
@@ -73,9 +80,18 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
 
                 var handler = SetupHandler(userPublicationRoleRepository.Object);
 
+                var hasOwnerRole = publicationRole == PublicationRole.Owner;
                 userPublicationRoleRepository
-                    .Setup(s => s.ListRolesByUserAndPublication(UserId, Publication.Id))
-                    .ReturnsAsync(CollectionUtils.ListOf(publicationRole));
+                    .Setup(s =>
+                        s.UserHasAnyRoleOnPublication(
+                            UserId,
+                            Publication.Id,
+                            ResourceRoleFilter.ActiveOnly,
+                            It.IsAny<CancellationToken>(),
+                            PublicationRole.Owner
+                        )
+                    )
+                    .ReturnsAsync(hasOwnerRole);
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
@@ -89,7 +105,7 @@ public class AdoptMethodologyForSpecificPublicationAuthorizationHandlerTests
                 VerifyAllMocks(userPublicationRoleRepository);
 
                 // As the user has Publication Owner role on the Publication they are allowed to adopt any methodology
-                Assert.Equal(publicationRole == Owner, authContext.HasSucceeded);
+                Assert.Equal(hasOwnerRole, authContext.HasSucceeded);
             });
         }
     }

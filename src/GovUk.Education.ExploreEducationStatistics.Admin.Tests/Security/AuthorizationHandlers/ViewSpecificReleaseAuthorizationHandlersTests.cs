@@ -9,8 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
-using Microsoft.Extensions.Logging;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
@@ -25,13 +25,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public class ViewSpecificReleaseAuthorizationHandlersTests
 {
-    private static readonly ReleaseVersion ReleaseVersion = new()
-    {
-        Id = Guid.NewGuid(),
-        Publication = new Publication { Id = Guid.NewGuid() },
-    };
-
-    private static readonly DataFixture DataFixture = new();
+    private static readonly DataFixture _fixture = new();
+    private static readonly ReleaseVersion _releaseVersion = _fixture
+        .DefaultReleaseVersion()
+        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
     public class ClaimsTests
     {
@@ -43,10 +40,10 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
             await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, ViewReleaseRequirement>(
                 contentDbContext =>
                 {
-                    contentDbContext.Attach(ReleaseVersion);
+                    contentDbContext.Attach(_releaseVersion);
                     return CreateHandler(contentDbContext);
                 },
-                ReleaseVersion,
+                _releaseVersion,
                 claimsExpectedToSucceed: AccessAllReleases
             );
         }
@@ -60,11 +57,11 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
             await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseRequirement>(
                 contentDbContext =>
                 {
-                    contentDbContext.Attach(ReleaseVersion);
+                    contentDbContext.Attach(_releaseVersion);
                     return CreateHandler(contentDbContext);
                 },
-                ReleaseVersion,
-                rolesExpectedToSucceed: new[] { PublicationRole.Owner, PublicationRole.Allower }
+                _releaseVersion,
+                rolesExpectedToSucceed: [PublicationRole.Owner, PublicationRole.Allower]
             );
         }
     }
@@ -78,10 +75,10 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseRequirement>(
                 contentDbContext =>
                 {
-                    contentDbContext.Attach(ReleaseVersion);
+                    contentDbContext.Attach(_releaseVersion);
                     return CreateHandler(contentDbContext);
                 },
-                ReleaseVersion,
+                _releaseVersion,
                 rolesExpectedToSucceed: [ReleaseRole.Contributor, ReleaseRole.Approver]
             );
         }
@@ -89,21 +86,20 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
         [Fact]
         public async Task PreReleaseUser_WithinPreReleaseAccessWindow()
         {
-            var userId = Guid.NewGuid();
+            User user = _fixture.DefaultUser();
 
             var successScenario = new ReleaseVersionHandlerTestScenario
             {
-                Entity = ReleaseVersion,
-                User = DataFixture.AuthenticatedUser(userId: userId),
-                UserReleaseRoles = new List<UserReleaseRole>
-                {
-                    new()
-                    {
-                        ReleaseVersionId = ReleaseVersion.Id,
-                        UserId = userId,
-                        Role = ReleaseRole.PrereleaseViewer,
-                    },
-                },
+                Entity = _releaseVersion,
+                User = _fixture.AuthenticatedUser(userId: user.Id),
+                UserReleaseRoles =
+                [
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(_releaseVersion)
+                        .WithUser(user)
+                        .WithRole(ReleaseRole.PrereleaseViewer),
+                ],
                 ExpectedToPass = true,
                 UnexpectedFailMessage = "Expected the test to succeed because the Pre Release window is currently open",
             };
@@ -111,7 +107,7 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
             var preReleaseService = new Mock<IPreReleaseService>(Strict);
 
             preReleaseService
-                .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTimeOffset>()))
+                .Setup(s => s.GetPreReleaseWindowStatus(_releaseVersion, It.IsAny<DateTimeOffset>()))
                 .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
 
             // Assert that a User who specifically has the Pre Release role will cause this handler to succeed
@@ -127,21 +123,20 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
         [Fact]
         public async Task PreReleaseUser_OutsidePreReleaseAccessWindow()
         {
-            var userId = Guid.NewGuid();
+            User user = _fixture.DefaultUser();
 
             var failureScenario = new ReleaseVersionHandlerTestScenario
             {
-                Entity = ReleaseVersion,
-                User = DataFixture.AuthenticatedUser(userId: userId),
-                UserReleaseRoles = new List<UserReleaseRole>
-                {
-                    new()
-                    {
-                        ReleaseVersionId = ReleaseVersion.Id,
-                        UserId = userId,
-                        Role = ReleaseRole.PrereleaseViewer,
-                    },
-                },
+                Entity = _releaseVersion,
+                User = _fixture.AuthenticatedUser(userId: user.Id),
+                UserReleaseRoles =
+                [
+                    _fixture
+                        .DefaultUserReleaseRole()
+                        .WithReleaseVersion(_releaseVersion)
+                        .WithUser(user)
+                        .WithRole(ReleaseRole.PrereleaseViewer),
+                ],
                 ExpectedToPass = false,
                 UnexpectedPassMessage =
                     "Expected the test to fail because the Pre Release window is not open at the " + "current time",
@@ -156,7 +151,7 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
                     var preReleaseService = new Mock<IPreReleaseService>(Strict);
 
                     preReleaseService
-                        .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTimeOffset>()))
+                        .Setup(s => s.GetPreReleaseWindowStatus(_releaseVersion, It.IsAny<DateTimeOffset>()))
                         .Returns(new PreReleaseWindowStatus { Access = access });
 
                     // Assert that a User who specifically has the Pre Release role will cause this handler to fail
@@ -164,7 +159,7 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
                     await AssertReleaseVersionHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
                         contentDbContext =>
                         {
-                            contentDbContext.Attach(ReleaseVersion);
+                            contentDbContext.Attach(_releaseVersion);
                             return CreateHandler(contentDbContext, preReleaseService.Object);
                         },
                         failureScenario
@@ -183,11 +178,8 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
         return new ViewSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(
                 releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                userReleaseRoleRepository: new UserReleaseRoleRepository(
-                    contentDbContext: contentDbContext,
-                    logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
-                ),
-                userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext: contentDbContext),
+                userReleaseRoleRepository: new UserReleaseRoleRepository(contentDbContext),
+                userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext),
                 preReleaseService: preReleaseService
                     ?? new PreReleaseService(
                         new PreReleaseAccessOptions

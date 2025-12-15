@@ -9,30 +9,35 @@ public static class UserPublicationRoleGeneratorExtensions
         fixture.Generator<UserPublicationRole>().WithDefaults();
 
     public static Generator<UserPublicationRole> WithDefaults(this Generator<UserPublicationRole> generator) =>
-        generator.ForInstance(d => d.SetDefaults());
+        generator.ForInstance(s => s.SetDefaults());
 
     public static Generator<UserPublicationRole> WithPublication(
         this Generator<UserPublicationRole> generator,
-        Publication Publication
-    ) => generator.ForInstance(d => d.SetPublication(Publication));
+        Publication publication
+    ) => generator.ForInstance(s => s.SetPublication(publication));
+
+    public static Generator<UserPublicationRole> WithPublicationId(
+        this Generator<UserPublicationRole> generator,
+        Guid publicationId
+    ) => generator.ForInstance(s => s.SetPublicationId(publicationId));
 
     public static Generator<UserPublicationRole> WithPublications(
         this Generator<UserPublicationRole> generator,
-        IEnumerable<Publication> Publications
+        IEnumerable<Publication> publications
     )
     {
-        Publications.ForEach((Publication, index) => generator.ForIndex(index, s => s.SetPublication(Publication)));
+        publications.ForEach((publication, index) => generator.ForIndex(index, s => s.SetPublication(publication)));
 
         return generator;
     }
 
     public static Generator<UserPublicationRole> WithUser(this Generator<UserPublicationRole> generator, User user) =>
-        generator.ForInstance(d => d.SetUser(user));
+        generator.ForInstance(s => s.SetUser(user));
 
     public static Generator<UserPublicationRole> WithRole(
         this Generator<UserPublicationRole> generator,
         PublicationRole role
-    ) => generator.ForInstance(d => d.SetRole(role));
+    ) => generator.ForInstance(s => s.SetRole(role));
 
     public static Generator<UserPublicationRole> WithRoles(
         this Generator<UserPublicationRole> generator,
@@ -45,20 +50,25 @@ public static class UserPublicationRoleGeneratorExtensions
     }
 
     public static InstanceSetters<UserPublicationRole> SetDefaults(this InstanceSetters<UserPublicationRole> setters) =>
-        setters.SetDefault(p => p.Id).SetDefault(p => p.PublicationId).SetDefault(p => p.UserId);
+        setters.SetDefault(upr => upr.Id).SetDefault(upr => upr.PublicationId).SetDefault(upr => upr.UserId);
 
     public static InstanceSetters<UserPublicationRole> SetPublication(
         this InstanceSetters<UserPublicationRole> setters,
-        Publication Publication
-    ) => setters.Set(d => d.Publication, Publication);
+        Publication publication
+    ) => setters.Set(upr => upr.Publication, publication).SetPublicationId(publication.Id);
+
+    public static InstanceSetters<UserPublicationRole> SetPublicationId(
+        this InstanceSetters<UserPublicationRole> setters,
+        Guid publicationId
+    ) => setters.Set(upr => upr.PublicationId, publicationId);
 
     public static InstanceSetters<UserPublicationRole> SetUser(
         this InstanceSetters<UserPublicationRole> setters,
         User user
-    ) => setters.Set(d => d.User, user);
+    ) => setters.Set(upr => upr.User, user).Set(upr => upr.UserId, user.Id);
 
     public static InstanceSetters<UserPublicationRole> SetRole(
         this InstanceSetters<UserPublicationRole> setters,
         PublicationRole role
-    ) => setters.Set(d => d.Role, role);
+    ) => setters.Set(upr => upr.Role, role);
 }

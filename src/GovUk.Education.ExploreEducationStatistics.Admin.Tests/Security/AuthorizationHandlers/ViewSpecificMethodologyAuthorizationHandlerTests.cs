@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -68,12 +69,28 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync((ReleaseVersion?)null);
 
                     userPublicationRoleRepository
-                        .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(rvr =>
+                            rvr.UserHasAnyRoleOnPublication(
+                                UserId,
+                                OwningPublication.Id,
+                                ResourceRoleFilter.ActiveOnly,
+                                It.IsAny<CancellationToken>(),
+                                new[] { PublicationRole.Owner, PublicationRole.Allower }
+                            )
+                        )
+                        .ReturnsAsync(false);
 
                     userReleaseRoleRepository
-                        .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<ReleaseRole>());
+                        .Setup(rvr =>
+                            rvr.UserHasAnyRoleOnPublication(
+                                UserId,
+                                OwningPublication.Id,
+                                ResourceRoleFilter.ActiveOnly,
+                                It.IsAny<CancellationToken>(),
+                                AuthorizationHandlerService.ReleaseEditorAndApproverRoles.ToArray()
+                            )
+                        )
+                        .ReturnsAsync(false);
                 }
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
@@ -99,7 +116,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
     public class PublicationRoleTests
     {
         [Fact]
-        public async Task PublicationOwnerCanViewMethodology()
+        public async Task PublicationOwnerOrApproverCanViewMethodology()
         {
             await ForEachPublicationRoleAsync(async publicationRole =>
             {
@@ -116,18 +133,34 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                     .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
-                var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Allower)
+                var isOwnerOrApprover = ListOf(PublicationRole.Owner, PublicationRole.Allower)
                     .Contains(publicationRole);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(ListOf(publicationRole));
+                    .Setup(rvr =>
+                        rvr.UserHasAnyRoleOnPublication(
+                            UserId,
+                            OwningPublication.Id,
+                            ResourceRoleFilter.ActiveOnly,
+                            It.IsAny<CancellationToken>(),
+                            new[] { PublicationRole.Owner, PublicationRole.Allower }
+                        )
+                    )
+                    .ReturnsAsync(isOwnerOrApprover);
 
                 userReleaseRoleRepository
-                    .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync([]);
+                    .Setup(rvr =>
+                        rvr.UserHasAnyRoleOnPublication(
+                            UserId,
+                            OwningPublication.Id,
+                            ResourceRoleFilter.ActiveOnly,
+                            It.IsAny<CancellationToken>(),
+                            AuthorizationHandlerService.ReleaseEditorAndApproverRoles.ToArray()
+                        )
+                    )
+                    .ReturnsAsync(false);
 
-                if (!expectedToPassByRole)
+                if (!isOwnerOrApprover)
                 {
                     methodologyRepository
                         .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
@@ -151,7 +184,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
 
                 // As the user has Publication Owner role on the owning Publication of this Methodology, they are
                 // allowed to view it.
-                Assert.Equal(expectedToPassByRole, authContext.HasSucceeded);
+                Assert.Equal(isOwnerOrApprover, authContext.HasSucceeded);
             });
         }
     }
@@ -161,11 +194,11 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
         [Fact]
         public async Task EditorsOrApproversOnAnyOwningPublicationReleaseCanViewMethodology()
         {
-            var expectedReleaseRolesToPass = ListOf(ReleaseRole.Approver, ReleaseRole.Contributor);
-
             await ForEachReleaseRoleAsync(async releaseRole =>
             {
-                var expectedToPassByReleaseRole = expectedReleaseRolesToPass.Contains(releaseRole);
+                var isEditorOrApprover = AuthorizationHandlerService.ReleaseEditorAndApproverRoles.Contains(
+                    releaseRole
+                );
 
                 var (
                     handler,
@@ -180,11 +213,11 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                     .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
-                if (!expectedToPassByReleaseRole)
+                if (!isEditorOrApprover)
                 {
                     methodologyRepository
                         .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
-                        .ReturnsAsync(new List<Guid> { OwningPublication.Id });
+                        .ReturnsAsync([OwningPublication.Id]);
 
                     releaseVersionRepository
                         .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
@@ -192,12 +225,28 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 }
 
                 userPublicationRoleRepository
-                    .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(new List<PublicationRole>());
+                    .Setup(rvr =>
+                        rvr.UserHasAnyRoleOnPublication(
+                            UserId,
+                            OwningPublication.Id,
+                            ResourceRoleFilter.ActiveOnly,
+                            It.IsAny<CancellationToken>(),
+                            new[] { PublicationRole.Owner, PublicationRole.Allower }
+                        )
+                    )
+                    .ReturnsAsync(false);
 
                 userReleaseRoleRepository
-                    .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(ListOf(releaseRole));
+                    .Setup(rvr =>
+                        rvr.UserHasAnyRoleOnPublication(
+                            UserId,
+                            OwningPublication.Id,
+                            ResourceRoleFilter.ActiveOnly,
+                            It.IsAny<CancellationToken>(),
+                            AuthorizationHandlerService.ReleaseEditorAndApproverRoles.ToArray()
+                        )
+                    )
+                    .ReturnsAsync(isEditorOrApprover);
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
@@ -217,7 +266,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
 
                 // As the user has a role on any Release of the owning Publication of this Methodology,
                 // they are allowed to view it.
-                Assert.Equal(expectedToPassByReleaseRole, authContext.HasSucceeded);
+                Assert.Equal(isEditorOrApprover, authContext.HasSucceeded);
             });
         }
 
@@ -247,27 +296,45 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        new[] { PublicationRole.Owner, PublicationRole.Allower }
+                    )
+                )
+                .ReturnsAsync(false);
 
             userReleaseRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        AuthorizationHandlerService.ReleaseEditorAndApproverRoles.ToArray()
+                    )
+                )
+                .ReturnsAsync(false);
 
             methodologyRepository
                 .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
-                .ReturnsAsync(new List<Guid> { preReleaseForConnectedPublication.PublicationId });
+                .ReturnsAsync([preReleaseForConnectedPublication.PublicationId]);
 
             releaseVersionRepository
                 .Setup(s => s.GetLatestReleaseVersion(preReleaseForConnectedPublication.PublicationId, default))
                 .ReturnsAsync(preReleaseForConnectedPublication);
 
             userReleaseRoleRepository
-                .Setup(s =>
-                    s.UserHasRoleOnReleaseVersion(
+                .Setup(rvr =>
+                    rvr.UserHasRoleOnReleaseVersion(
                         UserId,
                         preReleaseForConnectedPublication.Id,
-                        ReleaseRole.PrereleaseViewer
+                        ReleaseRole.PrereleaseViewer,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(true);
@@ -331,27 +398,45 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        new[] { PublicationRole.Owner, PublicationRole.Allower }
+                    )
+                )
+                .ReturnsAsync(false);
 
             userReleaseRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        AuthorizationHandlerService.ReleaseEditorAndApproverRoles.ToArray()
+                    )
+                )
+                .ReturnsAsync(false);
 
             methodologyRepository
                 .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
-                .ReturnsAsync(new List<Guid> { preReleaseForConnectedPublication.PublicationId });
+                .ReturnsAsync([preReleaseForConnectedPublication.PublicationId]);
 
             releaseVersionRepository
                 .Setup(s => s.GetLatestReleaseVersion(preReleaseForConnectedPublication.PublicationId, default))
                 .ReturnsAsync(preReleaseForConnectedPublication);
 
             userReleaseRoleRepository
-                .Setup(s =>
-                    s.UserHasRoleOnReleaseVersion(
+                .Setup(rvr =>
+                    rvr.UserHasRoleOnReleaseVersion(
                         UserId,
                         preReleaseForConnectedPublication.Id,
-                        ReleaseRole.PrereleaseViewer
+                        ReleaseRole.PrereleaseViewer,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(true);
@@ -414,16 +499,32 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        new[] { PublicationRole.Owner, PublicationRole.Allower }
+                    )
+                )
+                .ReturnsAsync(false);
 
             userReleaseRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        AuthorizationHandlerService.ReleaseEditorAndApproverRoles.ToArray()
+                    )
+                )
+                .ReturnsAsync(false);
 
             methodologyRepository
                 .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
-                .ReturnsAsync(new List<Guid> { latestReleaseVersion.PublicationId });
+                .ReturnsAsync([latestReleaseVersion.PublicationId]);
 
             releaseVersionRepository
                 .Setup(s => s.GetLatestReleaseVersion(latestReleaseVersion.PublicationId, default))
@@ -477,16 +578,32 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        new[] { PublicationRole.Owner, PublicationRole.Allower }
+                    )
+                )
+                .ReturnsAsync(false);
 
             userReleaseRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        AuthorizationHandlerService.ReleaseEditorAndApproverRoles.ToArray()
+                    )
+                )
+                .ReturnsAsync(false);
 
             methodologyRepository
                 .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
-                .ReturnsAsync(new List<Guid> { latestReleaseVersion.PublicationId });
+                .ReturnsAsync([latestReleaseVersion.PublicationId]);
 
             releaseVersionRepository
                 .Setup(s => s.GetLatestReleaseVersion(latestReleaseVersion.PublicationId, default))
@@ -531,16 +648,32 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        new[] { PublicationRole.Owner, PublicationRole.Allower }
+                    )
+                )
+                .ReturnsAsync(false);
 
             userReleaseRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        AuthorizationHandlerService.ReleaseEditorAndApproverRoles.ToArray()
+                    )
+                )
+                .ReturnsAsync(false);
 
             methodologyRepository
                 .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
-                .ReturnsAsync(new List<Guid> { OwningPublication.Id });
+                .ReturnsAsync([OwningPublication.Id]);
 
             releaseVersionRepository
                 .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
@@ -588,12 +721,28 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(new List<Guid> { OwningPublication.Id });
 
             userPublicationRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        new[] { PublicationRole.Owner, PublicationRole.Allower }
+                    )
+                )
+                .ReturnsAsync(false);
 
             userReleaseRoleRepository
-                .Setup(s => s.ListRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .Setup(rvr =>
+                    rvr.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        AuthorizationHandlerService.ReleaseEditorAndApproverRoles.ToArray()
+                    )
+                )
+                .ReturnsAsync(false);
 
             releaseVersionRepository
                 .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))

@@ -2,10 +2,10 @@
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -41,7 +41,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
             {
                 var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
-                var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
+                ClaimsPrincipal user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
 
                 var authContext = CreateAuthContext(user, Publication);
 
@@ -50,8 +50,16 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
                 if (!expectedToPassByClaimAlone)
                 {
                     userPublicationRoleRepository
-                        .Setup(s => s.ListRolesByUserAndPublication(UserId, Publication.Id))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(rvr =>
+                            rvr.UserHasAnyRoleOnPublication(
+                                UserId,
+                                Publication.Id,
+                                ResourceRoleFilter.ActiveOnly,
+                                It.IsAny<CancellationToken>(),
+                                PublicationRole.Owner
+                            )
+                        )
+                        .ReturnsAsync(false);
                 }
 
                 await handler.HandleAsync(authContext);
@@ -90,20 +98,29 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
             {
                 var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
-                var user = DataFixture.AuthenticatedUser(userId: UserId);
+                ClaimsPrincipal user = DataFixture.AuthenticatedUser(userId: UserId);
 
                 var authContext = CreateAuthContext(user, Publication);
 
+                var isOwnerRole = publicationRole == PublicationRole.Owner;
+
                 userPublicationRoleRepository
-                    .Setup(s => s.ListRolesByUserAndPublication(UserId, Publication.Id))
-                    .ReturnsAsync(CollectionUtils.ListOf(publicationRole));
+                    .Setup(rvr =>
+                        rvr.UserHasAnyRoleOnPublication(
+                            UserId,
+                            Publication.Id,
+                            ResourceRoleFilter.ActiveOnly,
+                            It.IsAny<CancellationToken>(),
+                            PublicationRole.Owner
+                        )
+                    )
+                    .ReturnsAsync(isOwnerRole);
 
                 await handler.HandleAsync(authContext);
                 MockUtils.VerifyAllMocks(userPublicationRoleRepository);
 
                 // A user with the publication owner role is allowed to create a new release
-                var expectedToPassByRole = publicationRole == PublicationRole.Owner;
-                Assert.Equal(expectedToPassByRole, authContext.HasSucceeded);
+                Assert.Equal(isOwnerRole, authContext.HasSucceeded);
             });
         }
 
