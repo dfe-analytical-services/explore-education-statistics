@@ -1,7 +1,7 @@
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -10,21 +10,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
 public class ViewSpecificPublicationRequirement : IAuthorizationRequirement { }
 
-public class ViewSpecificPublicationAuthorizationHandler
-    : AuthorizationHandler<ViewSpecificPublicationRequirement, Publication>
+public class ViewSpecificPublicationAuthorizationHandler(
+    IUserReleaseRoleRepository userReleaseRoleRepository,
+    AuthorizationHandlerService authorizationHandlerService
+) : AuthorizationHandler<ViewSpecificPublicationRequirement, Publication>
 {
-    private readonly ContentDbContext _contentDbContext;
-    private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-    public ViewSpecificPublicationAuthorizationHandler(
-        ContentDbContext contentDbContext,
-        AuthorizationHandlerService authorizationHandlerService
-    )
-    {
-        _contentDbContext = contentDbContext;
-        _authorizationHandlerService = authorizationHandlerService;
-    }
-
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         ViewSpecificPublicationRequirement requirement,
@@ -47,7 +37,7 @@ public class ViewSpecificPublicationAuthorizationHandler
 
         // If the user has any PublicationRole on the Publication, they can see it.
         if (
-            await _authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
                 context.User.GetUserId(),
                 publication.Id,
                 [.. validPublicationRoles]
@@ -60,8 +50,9 @@ public class ViewSpecificPublicationAuthorizationHandler
 
         // If the user has any ReleaseRoles on any of the Publication's Releases, they can see it.
         if (
-            await _contentDbContext
-                .UserReleaseRolesForActiveUsers.WhereForUser(context.User.GetUserId())
+            await userReleaseRoleRepository
+                .Query()
+                .WhereForUser(context.User.GetUserId())
                 .AnyAsync(r => r.ReleaseVersion.Release.PublicationId == publication.Id)
         )
         {

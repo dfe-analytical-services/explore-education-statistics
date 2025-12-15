@@ -84,9 +84,10 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
     ) =>
         resourceRoleFilter switch
         {
-            ResourceRoleFilter.ActiveOnly => contentDbContext.UserPublicationRolesForActiveUsers,
-            ResourceRoleFilter.PendingOnly => contentDbContext.UserPublicationRolesForPendingInvites,
-            ResourceRoleFilter.AllButExpired => contentDbContext.UserPublicationRolesForActiveOrPending,
+            ResourceRoleFilter.ActiveOnly => contentDbContext.UserPublicationRoles.WhereUserIsActive(),
+            ResourceRoleFilter.PendingOnly => contentDbContext.UserPublicationRoles.WhereUserHasPendingInvite(),
+            ResourceRoleFilter.AllButExpired =>
+                contentDbContext.UserPublicationRoles.WhereUserIsActiveOrHasPendingInvite(),
             ResourceRoleFilter.All => contentDbContext.UserPublicationRoles,
             _ => throw new ArgumentOutOfRangeException(nameof(resourceRoleFilter), resourceRoleFilter, null),
         };
