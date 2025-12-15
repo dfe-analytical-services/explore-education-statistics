@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
-using LinqToDB;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -30,11 +30,13 @@ public class UserResourceRoleNotificationService(
 
         var userReleaseRoles = await userReleaseRoleRepository
             .Query(ResourceRoleFilter.PendingOnly)
+            .AsNoTracking()
             .WhereForUser(user.Id)
             .ToListAsync(cancellationToken);
 
         var userPublicationRoles = await userPublicationRoleRepository
             .Query(ResourceRoleFilter.PendingOnly)
+            .AsNoTracking()
             .WhereForUser(user.Id)
             .ToListAsync(cancellationToken);
 

@@ -312,12 +312,14 @@ public class ThemeService(
 
         return await userReleaseRoleRepository
             .Query()
+            .AsNoTracking()
             .WhereForUser(userId)
             .WhereRolesNotIn(ReleaseRole.PrereleaseViewer)
             .Select(userReleaseRole => userReleaseRole.ReleaseVersion.Release.Publication.Theme)
             .Concat(
                 userPublicationRoleRepository
                     .Query()
+                    .AsNoTracking()
                     .WhereForUser(userId)
                     .WhereRolesIn([PublicationRole.Owner, PublicationRole.Allower])
                     .Select(userPublicationRole => userPublicationRole.Publication.Theme)

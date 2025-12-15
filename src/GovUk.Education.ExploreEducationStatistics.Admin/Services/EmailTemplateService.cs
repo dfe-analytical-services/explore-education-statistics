@@ -234,6 +234,7 @@ public class EmailTemplateService(
     {
         return await userReleaseRoleRepository
             .Query(ResourceRoleFilter.PendingOnly)
+            .AsNoTracking()
             .Where(urr => userReleaseRoleIds.Contains(urr.Id))
             .Include(urr => urr.ReleaseVersion)
                 .ThenInclude(rv => rv.Release)
@@ -245,6 +246,7 @@ public class EmailTemplateService(
     {
         return await userPublicationRoleRepository
             .Query(ResourceRoleFilter.PendingOnly)
+            .AsNoTracking()
             .Where(upr => userPublicationRoleIds.Contains(upr.Id))
             .Include(upr => upr.Publication)
             .ToListAsync();

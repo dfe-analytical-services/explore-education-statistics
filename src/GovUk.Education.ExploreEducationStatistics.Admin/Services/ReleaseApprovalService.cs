@@ -173,6 +173,7 @@ public class ReleaseApprovalService(
 
         var userPublicationRoles = await userPublicationRoleRepository
             .Query()
+            .AsNoTracking()
             .WhereForPublication(releaseVersion.Release.PublicationId)
             .WhereRolesIn(PublicationRole.Allower)
             .Include(upr => upr.User)
@@ -197,6 +198,7 @@ public class ReleaseApprovalService(
     {
         var unsentUserReleaseRoleInvites = await userReleaseRoleRepository
             .Query(ResourceRoleFilter.PendingOnly)
+            .AsNoTracking()
             .WhereForReleaseVersion(releaseVersion.Id)
             .WhereRolesIn(ReleaseRole.PrereleaseViewer)
             .WhereEmailNotSent()

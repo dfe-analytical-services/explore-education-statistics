@@ -37,6 +37,7 @@ public class PreReleaseUserService(
             .OnSuccess(async _ =>
                 await userReleaseRoleRepository
                     .Query(ResourceRoleFilter.All)
+                    .AsNoTracking()
                     .WhereForReleaseVersion(releaseVersionId)
                     .WhereRolesIn(ReleaseRole.PrereleaseViewer)
                     .Select(r => new PreReleaseUserViewModel(r.User.Email.ToLower()))
