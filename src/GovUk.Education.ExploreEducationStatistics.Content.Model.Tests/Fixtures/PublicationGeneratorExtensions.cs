@@ -74,6 +74,9 @@ public static class PublicationGeneratorExtensions
     public static Generator<Publication> WithSlug(this Generator<Publication> generator, string slug) =>
         generator.ForInstance(s => s.SetSlug(slug));
 
+    public static Generator<Publication> WithTitle(this Generator<Publication> generator, string title) =>
+        generator.ForInstance(s => s.SetTitle(title));
+
     public static Generator<Publication> WithUpdated(this Generator<Publication> generator, DateTime? updated = null)
     {
         return generator.ForInstance(s => s.SetUpdated(updated));
@@ -263,6 +266,9 @@ public static class PublicationGeneratorExtensions
 
     public static InstanceSetters<Publication> SetSlug(this InstanceSetters<Publication> setters, string slug) =>
         setters.Set(p => p.Slug, slug);
+
+    public static InstanceSetters<Publication> SetTitle(this InstanceSetters<Publication> setters, string title) =>
+        setters.Set(p => p.Title, title);
 
     public static InstanceSetters<Publication> SetRedirects(
         this InstanceSetters<Publication> setters,

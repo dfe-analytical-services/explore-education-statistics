@@ -28,11 +28,19 @@ public class EmailTemplateService(
         HashSet<Guid> userPublicationRoleIds
     )
     {
-        var url = appOptions.Value.Url;
-        var template = notifyOptions.Value.InviteWithRolesTemplateId;
-
         List<UserReleaseRole> userReleaseRoles = await GetUserReleaseRoles(userReleaseRoleIds);
         List<UserPublicationRole> userPublicationRoles = await GetUserPublicationRoles(userPublicationRoleIds);
+
+        if (
+            userReleaseRoles.Any(urr => urr.User.Email != email)
+            || userPublicationRoles.Any(urr => urr.User.Email != email)
+        )
+        {
+            throw new ArgumentException("Not all user role IDs match the provided email address");
+        }
+
+        var url = appOptions.Value.Url;
+        var template = notifyOptions.Value.InviteWithRolesTemplateId;
 
         var releaseRoleList = userReleaseRoles
             .OrderBy(invite => invite.ReleaseVersion.Release.Publication.Title)
@@ -236,6 +244,7 @@ public class EmailTemplateService(
             .Query(ResourceRoleFilter.PendingOnly)
             .AsNoTracking()
             .Where(urr => userReleaseRoleIds.Contains(urr.Id))
+            .Include(urr => urr.User)
             .Include(urr => urr.ReleaseVersion)
                 .ThenInclude(rv => rv.Release)
                     .ThenInclude(r => r.Publication)
@@ -248,6 +257,7 @@ public class EmailTemplateService(
             .Query(ResourceRoleFilter.PendingOnly)
             .AsNoTracking()
             .Where(upr => userPublicationRoleIds.Contains(upr.Id))
+            .Include(urr => urr.User)
             .Include(upr => upr.Publication)
             .ToListAsync();
     }
