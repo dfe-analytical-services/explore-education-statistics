@@ -204,7 +204,7 @@ public class DataSetFileService(
             .Where(rf =>
                 rf.File.DataSetFileId == dataSetFileId
                 && rf.ReleaseVersion.Published.HasValue
-                && DateTime.UtcNow >= rf.ReleaseVersion.Published.Value
+                && DateTimeOffset.UtcNow >= rf.ReleaseVersion.Published.Value
             )
             .OrderByDescending(rf => rf.ReleaseVersion.Version)
             .FirstOrDefaultAsync(cancellationToken);
@@ -291,7 +291,7 @@ public class DataSetFileService(
             .Where(rf =>
                 rf.File.DataSetFileId == dataSetFileId
                 && rf.ReleaseVersion.Published.HasValue
-                && DateTime.UtcNow >= rf.ReleaseVersion.Published.Value
+                && DateTimeOffset.UtcNow >= rf.ReleaseVersion.Published.Value
             )
             .OrderByDescending(rf => rf.ReleaseVersion.Version)
             .FirstOrDefaultAsync(cancellationToken);

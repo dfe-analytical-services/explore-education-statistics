@@ -10,7 +10,7 @@ public interface IReleaseService
 
     Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(
         Guid releaseVersionId,
-        DateTime? expectedPublishDate = null
+        DateTimeOffset? expectedPublishDate = null
     );
 
     Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> List(string publicationSlug);

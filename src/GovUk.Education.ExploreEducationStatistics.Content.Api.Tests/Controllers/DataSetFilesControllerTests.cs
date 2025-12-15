@@ -960,8 +960,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 var publication2Release1Version1 = publication2.Releases[0].Versions[0];
 
                 // Apply a descending sequence of published dates to the releases
-                publication1Release1Version1.Published = DateTime.UtcNow.AddDays(-1);
-                publication2Release1Version1.Published = DateTime.UtcNow.AddDays(-2);
+                publication1Release1Version1.Published = DateTimeOffset.UtcNow.AddDays(-1);
+                publication2Release1Version1.Published = DateTimeOffset.UtcNow.AddDays(-2);
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
                     publication1Release1Version1
@@ -1016,8 +1016,8 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 var publication2Release1Version1 = publication2.Releases[0].Versions[0];
 
                 // Apply an ascending sequence of published dates to the releases
-                publication1Release1Version1.Published = DateTime.UtcNow.AddDays(-2);
-                publication2Release1Version1.Published = DateTime.UtcNow.AddDays(-1);
+                publication1Release1Version1.Published = DateTimeOffset.UtcNow.AddDays(-2);
+                publication2Release1Version1.Published = DateTimeOffset.UtcNow.AddDays(-1);
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
                     publication1Release1Version1

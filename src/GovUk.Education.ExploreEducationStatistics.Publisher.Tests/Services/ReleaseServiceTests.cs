@@ -312,9 +312,13 @@ public class ReleaseServiceTests
             )
             .GenerateList(2);
 
-        var actualPublishedDate = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var actualPublishedDate = new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
-        var releaseFile = new ReleaseFile { Published = actualPublishedDate, ReleaseVersionId = releaseVersion.Id };
+        var releaseFile = new ReleaseFile
+        {
+            Published = actualPublishedDate.UtcDateTime,
+            ReleaseVersionId = releaseVersion.Id,
+        };
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -364,7 +368,7 @@ public class ReleaseServiceTests
                 Assert.Null(parent.LatestDraftVersionId);
             });
 
-            Assert.Equal(actualPublishedDate, contentDbContext.ReleaseFiles.First().Published);
+            Assert.Equal(actualPublishedDate.UtcDateTime, contentDbContext.ReleaseFiles.First().Published);
         }
     }
 
@@ -437,7 +441,7 @@ public class ReleaseServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = BuildReleaseService(contentDbContext: contentDbContext);
-            await service.CompletePublishing(releaseVersion.Id, DateTime.UtcNow);
+            await service.CompletePublishing(releaseVersion.Id, DateTimeOffset.UtcNow);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -523,7 +527,7 @@ public class ReleaseServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = BuildReleaseService(contentDbContext: contentDbContext);
-            await service.CompletePublishing(releaseVersion.Id, DateTime.UtcNow);
+            await service.CompletePublishing(releaseVersion.Id, DateTimeOffset.UtcNow);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -569,7 +573,7 @@ public class ReleaseServiceTests
             UpdatePublishedDate = true,
         };
 
-        var actualPublishedDate = DateTime.UtcNow;
+        var actualPublishedDate = DateTimeOffset.UtcNow;
 
         var contentDbContextId = Guid.NewGuid().ToString();
 

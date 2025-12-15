@@ -56,7 +56,7 @@ public class StageReleaseContentFunction(
                 );
 
             await contentService.UpdateContentStaged(
-                expectedPublishDate: nextScheduledPublishingTime.UtcDateTime,
+                expectedPublishDate: nextScheduledPublishingTime.ToUniversalTime(),
                 releaseVersionIds: message.ReleasePublishingKeys.ToReleaseVersionIds()
             );
             await UpdateContentStage(message, Scheduled);

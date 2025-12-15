@@ -49,7 +49,7 @@ public record KeyStatisticsMigrationReportReleaseVersionDto
 
     public required List<KeyStatisticsMigrationReportKeyStatisticDto> KeyStatistics { get; init; }
 
-    public required DateTime? Published { get; init; }
+    public required DateTimeOffset? Published { get; init; }
 
     public required int Version { get; init; }
 }

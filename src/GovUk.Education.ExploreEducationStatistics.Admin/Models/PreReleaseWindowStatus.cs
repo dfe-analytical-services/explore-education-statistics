@@ -8,9 +8,9 @@ public class PreReleaseWindowStatus
     [JsonConverter(typeof(StringEnumConverter))]
     public PreReleaseAccess Access { get; set; }
 
-    public DateTime Start { get; set; }
+    public DateTimeOffset Start { get; set; }
 
-    public DateTime ScheduledPublishDate { get; set; }
+    public DateTimeOffset ScheduledPublishDate { get; set; }
 }
 
 public enum PreReleaseAccess

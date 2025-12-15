@@ -177,7 +177,7 @@ public class AuthorizationHandlerService(
             )
         )
         {
-            var windowStatus = preReleaseService.GetPreReleaseWindowStatus(releaseVersion, DateTime.UtcNow);
+            var windowStatus = preReleaseService.GetPreReleaseWindowStatus(releaseVersion, DateTimeOffset.UtcNow);
             if (windowStatus.Access == PreReleaseAccess.Within)
             {
                 return true;

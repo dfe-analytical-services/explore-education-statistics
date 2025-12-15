@@ -13,7 +13,9 @@ public class ReleaseServiceMockBuilder
 
     public ReleaseServiceMockBuilder()
     {
-        _mock.Setup(m => m.CompletePublishing(It.IsAny<Guid>(), It.IsAny<DateTime>())).Returns(Task.CompletedTask);
+        _mock
+            .Setup(m => m.CompletePublishing(It.IsAny<Guid>(), It.IsAny<DateTimeOffset>()))
+            .Returns(Task.CompletedTask);
     }
 
     public ReleaseServiceMockBuilder WhereGetReturns(ReleaseVersion releaseVersion)
@@ -41,7 +43,7 @@ public class ReleaseServiceMockBuilder
     {
         public void CompletePublishingWasCalled(Guid releaseVersionId)
         {
-            mock.Verify(m => m.CompletePublishing(releaseVersionId, It.IsAny<DateTime>()), Times.Once);
+            mock.Verify(m => m.CompletePublishing(releaseVersionId, It.IsAny<DateTimeOffset>()), Times.Once);
         }
     }
 }

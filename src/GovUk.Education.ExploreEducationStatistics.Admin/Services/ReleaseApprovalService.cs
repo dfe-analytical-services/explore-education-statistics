@@ -1,5 +1,4 @@
 #nullable enable
-using System.Globalization;
 using Cronos;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -91,8 +90,8 @@ public class ReleaseApprovalService(
                 releaseVersion.UpdatePublishedDate = request.UpdatePublishedDate ?? false;
                 releaseVersion.PublishScheduled =
                     request.PublishMethod == PublishMethod.Immediate
-                        ? timeProvider.GetUtcNow().UtcDateTime
-                        : request.PublishScheduledDate;
+                        ? timeProvider.GetUtcNow()
+                        : request.PublishScheduled?.GetUkStartOfDayUtc();
 
                 var releaseStatus = new ReleaseStatus
                 {
@@ -254,21 +253,14 @@ public class ReleaseApprovalService(
         )
         {
             // Publish date must be set
-            if (string.IsNullOrEmpty(request.PublishScheduled))
+            if (request.PublishScheduled == null)
             {
                 return ValidationActionResult(PublishDateCannotBeEmpty);
             }
 
-            var publishDate = DateTime.ParseExact(
-                request.PublishScheduled,
-                "yyyy-MM-dd",
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.None
-            );
-
             // Check if publishing will occur on the publish date as there may be no scheduled occurrences
             // of the two Azure Functions which perform publishing.
-            if (!CheckPublishDateCanBeScheduled(publishDate))
+            if (!CheckPublishDateCanBeScheduled(request.PublishScheduled.Value))
             {
                 return ValidationActionResult(PublishDateCannotBeScheduled);
             }
@@ -277,7 +269,7 @@ public class ReleaseApprovalService(
         return Unit.Instance;
     }
 
-    private bool CheckPublishDateCanBeScheduled(DateTime publishDate)
+    private bool CheckPublishDateCanBeScheduled(DateOnly publishDate)
     {
         // Publishing a scheduled release relies on two Azure Functions which are triggered by cron expressions.
         // These notes will refer to them as functions (1) and (2):
@@ -296,11 +288,11 @@ public class ReleaseApprovalService(
         // (inclusive) and midnight the following day (exclusive), UK time.
 
         var ukTimeZone = TimeZoneUtils.GetUkTimeZone();
-        var fromUtc = TimeZoneInfo.ConvertTimeToUtc(publishDate.Date, ukTimeZone);
+        var fromUtc = publishDate.GetUkStartOfDayUtc();
         var toUtc = fromUtc.AddDays(1).AddTicks(-1);
 
         // The publish date cannot be scheduled if it's already passed
-        var nowUtc = timeProvider.GetUtcNow().UtcDateTime;
+        var nowUtc = timeProvider.GetUtcNow();
 
         if (nowUtc > toUtc)
         {
@@ -335,10 +327,10 @@ public class ReleaseApprovalService(
         return false;
     }
 
-    private static DateTime? GetNextOccurrenceForCronExpression(
+    private static DateTimeOffset? GetNextOccurrenceForCronExpression(
         string cronExpression,
-        DateTime fromUtc,
-        DateTime toUtc,
+        DateTimeOffset fromUtc,
+        DateTimeOffset toUtc,
         TimeZoneInfo timeZone,
         bool fromInclusive = true,
         bool toInclusive = true

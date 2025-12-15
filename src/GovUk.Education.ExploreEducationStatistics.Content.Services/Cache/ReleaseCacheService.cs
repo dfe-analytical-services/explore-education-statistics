@@ -45,7 +45,7 @@ public class ReleaseCacheService(
 
     public Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateReleaseStaged(
         Guid releaseVersionId,
-        DateTime expectedPublishDate,
+        DateTimeOffset expectedPublishDate,
         string publicationSlug,
         string? releaseSlug = null
     )

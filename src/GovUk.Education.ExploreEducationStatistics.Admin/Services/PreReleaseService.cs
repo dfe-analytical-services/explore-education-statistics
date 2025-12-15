@@ -1,21 +1,13 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class PreReleaseService : IPreReleaseService
+public class PreReleaseService(IOptions<PreReleaseAccessOptions> options) : IPreReleaseService
 {
-    private readonly AccessWindowOptions _preReleaseOptions;
-
-    public PreReleaseService(IOptions<PreReleaseAccessOptions> options)
-    {
-        _preReleaseOptions = options.Value.AccessWindow;
-    }
-
     public PreReleaseWindow GetPreReleaseWindow(ReleaseVersion releaseVersion)
     {
         if (!releaseVersion.PublishScheduled.HasValue)
@@ -28,7 +20,7 @@ public class PreReleaseService : IPreReleaseService
         return new PreReleaseWindow { Start = GetStartTime(publishScheduled), ScheduledPublishDate = publishScheduled };
     }
 
-    public PreReleaseWindowStatus GetPreReleaseWindowStatus(ReleaseVersion releaseVersion, DateTime referenceTime)
+    public PreReleaseWindowStatus GetPreReleaseWindowStatus(ReleaseVersion releaseVersion, DateTimeOffset referenceTime)
     {
         if (releaseVersion.Live)
         {
@@ -51,12 +43,16 @@ public class PreReleaseService : IPreReleaseService
         };
     }
 
-    private DateTime GetStartTime(DateTime publishScheduled)
+    private DateTimeOffset GetStartTime(DateTimeOffset publishScheduled)
     {
-        return publishScheduled.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeStart);
+        return publishScheduled.AddMinutes(-options.Value.AccessWindow.MinutesBeforeReleaseTimeStart);
     }
 
-    private static PreReleaseAccess GetAccess(ReleaseVersion releaseVersion, DateTime startTime, DateTime referenceTime)
+    private static PreReleaseAccess GetAccess(
+        ReleaseVersion releaseVersion,
+        DateTimeOffset startTime,
+        DateTimeOffset referenceTime
+    )
     {
         if (
             !releaseVersion.PublishScheduled.HasValue
@@ -66,7 +62,7 @@ public class PreReleaseService : IPreReleaseService
             return PreReleaseAccess.NoneSet;
         }
 
-        if (referenceTime.IsBefore(startTime))
+        if (referenceTime < startTime)
         {
             return PreReleaseAccess.Before;
         }

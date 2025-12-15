@@ -414,10 +414,10 @@ public class ReleaseVersionService(
                     return ValidationActionResult(ReleaseNotPublished);
                 }
 
-                var newPublishedDate = request.Published?.ToUniversalTime() ?? DateTime.UtcNow;
+                var newPublishedDate = request.Published?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
 
                 // Prevent assigning a future date since it would have the effect of un-publishing the release
-                if (newPublishedDate > DateTime.UtcNow)
+                if (newPublishedDate > DateTimeOffset.UtcNow)
                 {
                     return ValidationActionResult(ReleasePublishedCannotBeFutureDate);
                 }

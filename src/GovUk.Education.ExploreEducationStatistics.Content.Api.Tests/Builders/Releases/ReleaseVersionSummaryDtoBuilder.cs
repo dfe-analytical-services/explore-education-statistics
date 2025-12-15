@@ -9,8 +9,8 @@ public class ReleaseVersionSummaryDtoBuilder
     private Guid _releaseId = Guid.NewGuid();
     private bool _isLatestRelease = true;
     private string? _label = "Label";
-    private DateTime _lastUpdated = new(2025, 9, 1, 8, 30, 0, DateTimeKind.Utc);
-    private DateTime _published = new(2025, 8, 1, 8, 30, 0, DateTimeKind.Utc);
+    private DateTimeOffset _lastUpdated = new(2025, 9, 1, 8, 30, 0, TimeSpan.Zero);
+    private DateTimeOffset _published = new(2025, 8, 1, 8, 30, 0, TimeSpan.Zero);
     private PublishingOrganisationDto[] _publishingOrganisations = [new PublishingOrganisationDtoBuilder().Build()];
     private string _slug = "Slug";
     private string _title = "Title";
@@ -63,13 +63,13 @@ public class ReleaseVersionSummaryDtoBuilder
         return this;
     }
 
-    public ReleaseVersionSummaryDtoBuilder WithLastUpdated(DateTime lastUpdated)
+    public ReleaseVersionSummaryDtoBuilder WithLastUpdated(DateTimeOffset lastUpdated)
     {
         _lastUpdated = lastUpdated;
         return this;
     }
 
-    public ReleaseVersionSummaryDtoBuilder WithPublished(DateTime published)
+    public ReleaseVersionSummaryDtoBuilder WithPublished(DateTimeOffset published)
     {
         _published = published;
         return this;
