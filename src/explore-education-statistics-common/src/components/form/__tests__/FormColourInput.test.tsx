@@ -39,7 +39,7 @@ describe('FormColourInput', () => {
     expect(options[3]).toEqual(modal.getByLabelText('Custom'));
 
     expect(
-      modal.queryByRole('button', { name: 'Select custom colour' }),
+      modal.queryByRole('heading', { name: 'Choose a custom colour:' }),
     ).not.toBeInTheDocument();
 
     expect(modal.getByRole('button', { name: 'Confirm' })).toBeInTheDocument();
@@ -75,7 +75,7 @@ describe('FormColourInput', () => {
     expect(options[3]).toEqual(modal.getByLabelText('Custom'));
 
     expect(
-      modal.queryByRole('button', { name: 'Select custom colour' }),
+      modal.queryByRole('heading', { name: 'Choose a custom colour:' }),
     ).not.toBeInTheDocument();
 
     expect(modal.getByRole('button', { name: 'Confirm' })).toBeInTheDocument();
@@ -111,7 +111,7 @@ describe('FormColourInput', () => {
     expect(options[3]).toBeChecked();
 
     expect(
-      modal.getByRole('button', { name: 'Select custom colour' }),
+      modal.getByRole('heading', { name: 'Choose a custom colour:' }),
     ).toBeInTheDocument();
 
     expect(modal.getByRole('button', { name: 'Confirm' })).toBeInTheDocument();

@@ -46,5 +46,7 @@
 }
 
 .coloursList {
-  column-count: 2;
+  @include govuk-media-query($from: tablet) {
+    column-count: 2;
+  }
 }

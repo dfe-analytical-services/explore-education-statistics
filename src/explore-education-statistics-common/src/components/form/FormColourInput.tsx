@@ -4,12 +4,10 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import FormRadioGroup, {
   RadioOption,
 } from '@common/components/form/FormRadioGroup';
-import Button from '@common/components/Button';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import useToggle from '@common/hooks/useToggle';
 import { Colour } from '@common/modules/charts/util/chartUtils';
-import React, { useEffect, useState } from 'react';
-import { SketchPicker } from '@hello-pangea/color-picker';
+import React, { useState } from 'react';
+import { ColorResult, SketchPicker } from '@hello-pangea/color-picker';
 
 export interface FormColourInputProps extends FormBaseInputProps {
   colours: Colour[];
@@ -19,7 +17,7 @@ export interface FormColourInputProps extends FormBaseInputProps {
 }
 
 export default function FormColourInput({
-  colours = [],
+  colours,
   itemLabel,
   initialValue,
   label,
@@ -27,36 +25,16 @@ export default function FormColourInput({
   onConfirm,
 }: FormColourInputProps) {
   // Select first colour from palette if no initial value.
-  const initialColour = initialValue ?? colours[0].value;
+  const initialColourValue = initialValue ?? colours[0].value;
   const initialColourFromPalette = colours.find(
-    colour => colour.value === initialColour,
+    colour => colour.value === initialColourValue,
   );
-  const isCustomColour = !initialColourFromPalette;
+  const initialSelectedValue = initialColourFromPalette
+    ? initialColourFromPalette.value
+    : 'custom';
 
-  const [showPicker, togglePicker] = useToggle(false);
-  const [selectedColour, setSelectedColour] = useState<string>(
-    initialColourFromPalette ? initialColourFromPalette.value : 'custom',
-  );
-  const [selectedCustomColour, setSelectedCustomColour] = useState<
-    string | undefined
-  >(isCustomColour ? initialColour : undefined);
-
-  useEffect(() => {
-    const handleWindowKeyDown = (event: KeyboardEvent) => {
-      if (showPicker && event.key === 'Escape') {
-        togglePicker.off();
-      }
-    };
-    window.addEventListener('keydown', handleWindowKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleWindowKeyDown);
-    };
-  }, [showPicker, togglePicker]);
-
-  const options: RadioOption[] = colours.map(colour => {
-    return { label: colour.label, value: colour.value, swatch: colour.value };
-  });
+  const [selectedColour, setSelectedColour] =
+    useState<string>(initialSelectedValue);
 
   return (
     <ModalConfirm
@@ -68,43 +46,79 @@ export default function FormColourInput({
             {` ${
               initialColourFromPalette
                 ? initialColourFromPalette.label
-                : selectedCustomColour
+                : initialColourValue
             }, click to change colour ${itemLabel ? `for ${itemLabel}` : ''}`}
           </VisuallyHidden>
           <div className={styles.inner}>
             <div
               aria-hidden
               className={styles.swatch}
-              style={{ backgroundColor: initialColour }}
+              style={{ backgroundColor: initialColourValue }}
             />
           </div>
         </button>
       }
-      onConfirm={() => onConfirm?.(selectedCustomColour ?? selectedColour)}
+      onConfirm={() => {
+        onConfirm?.(selectedColour);
+      }}
     >
-      {showPicker && (
-        <div className={styles.popover}>
-          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-          <div
-            className={styles.cover}
-            data-testid="picker-overlay"
-            onClick={togglePicker.off}
-          />
-          <SketchPicker
-            color={selectedCustomColour}
-            disableAlpha
-            presetColors={[]}
-            onChange={result => setSelectedCustomColour(result.hex)}
-          />
-        </div>
-      )}
+      <FormColourInputInner
+        colours={colours}
+        initialColourValue={initialColourValue}
+        initialColourIsCustom={!initialColourFromPalette}
+        name={name}
+        onChange={value => {
+          setSelectedColour(value);
+        }}
+      />
+    </ModalConfirm>
+  );
+}
+
+interface FormColourInputInnerProps {
+  colours: Colour[];
+  initialColourValue: string;
+  initialColourIsCustom: boolean;
+  name: string;
+  onChange: (value: string) => void;
+}
+
+function FormColourInputInner({
+  colours,
+  initialColourValue,
+  initialColourIsCustom,
+  name,
+  onChange,
+}: FormColourInputInnerProps) {
+  const [selectedColourOption, setSelectedColourOption] = useState<string>(
+    initialColourIsCustom ? 'custom' : initialColourValue,
+  );
+  const [selectedCustomColour, setSelectedCustomColour] = useState<
+    string | undefined
+  >(initialColourIsCustom ? initialColourValue : undefined);
+  const options: RadioOption[] = colours.map(colour => {
+    return { label: colour.label, value: colour.value, swatch: colour.value };
+  });
+  const getCustomColourValue = (selectedValue: string) => {
+    if (selectedValue !== 'custom') {
+      return undefined;
+    }
+    return !selectedCustomColour ? colours[0].value : selectedValue;
+  };
+  const handleCustomColourChange = (result: ColorResult) => {
+    setSelectedCustomColour(result.hex);
+    onChange(result.hex);
+  };
+
+  return (
+    <>
       <FormRadioGroup
         className={styles.coloursList}
         name={`${name}-colour-picker`}
         id={`${name}-colour-picker`}
         legend="Select a colour"
         legendHidden
-        value={selectedColour}
+        value={selectedColourOption}
         options={[
           ...options,
           {
@@ -115,21 +129,26 @@ export default function FormColourInput({
         ]}
         order={[]}
         onChange={event => {
-          setSelectedColour(event?.target.value);
-          if (event?.target.value !== 'custom') {
-            setSelectedCustomColour(undefined);
-          }
+          setSelectedColourOption(event?.target.value);
+          setSelectedCustomColour(getCustomColourValue(event?.target.value));
+          onChange(event?.target.value);
         }}
       />
-      {selectedColour === 'custom' && (
-        <Button
-          className="govuk-!-margin-0"
-          variant="secondary"
-          onClick={togglePicker.on}
-        >
-          Select custom colour
-        </Button>
+
+      {selectedColourOption === 'custom' && (
+        <>
+          <h3>Choose a custom colour:</h3>
+          {/* Disable the colour picker for tests as it causes errors */}
+          {process.env.NODE_ENV !== 'test' && (
+            <SketchPicker
+              color={selectedCustomColour}
+              disableAlpha
+              presetColors={[]}
+              onChange={handleCustomColourChange}
+            />
+          )}
+        </>
       )}
-    </ModalConfirm>
+    </>
   );
 }
