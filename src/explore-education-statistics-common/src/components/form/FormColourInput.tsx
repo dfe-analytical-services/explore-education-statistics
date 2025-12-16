@@ -129,9 +129,11 @@ function FormColourInputInner({
         ]}
         order={[]}
         onChange={event => {
-          setSelectedColourOption(event?.target.value);
-          setSelectedCustomColour(getCustomColourValue(event?.target.value));
-          onChange(event?.target.value);
+          const value = event?.target.value;
+          const customColour = getCustomColourValue(value);
+          setSelectedColourOption(value);
+          setSelectedCustomColour(customColour);
+          onChange(customColour ?? value);
         }}
       />
 
