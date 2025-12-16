@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -69,7 +70,7 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUse
         CancellationToken cancellationToken = default
     )
     {
-        return await Query()
+        return await Query(ResourceRoleFilter.All)
             .WhereForUser(userId)
             .WhereForReleaseVersion(releaseVersionId)
             .WhereRolesIn(role)
@@ -139,7 +140,7 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUse
         params ReleaseRole[] rolesToInclude
     )
     {
-        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<ReleaseRole>();
+        var rolesToCheck = rolesToInclude.IsNullOrEmpty() ? EnumUtil.GetEnumsArray<ReleaseRole>() : rolesToInclude;
 
         return await Query(resourceRoleFilter)
             .WhereForUser(userId)
@@ -156,7 +157,7 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUse
         params ReleaseRole[] rolesToInclude
     )
     {
-        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<ReleaseRole>();
+        var rolesToCheck = rolesToInclude.IsNullOrEmpty() ? EnumUtil.GetEnumsArray<ReleaseRole>() : rolesToInclude;
 
         return await Query(resourceRoleFilter)
             .WhereForUser(userId)

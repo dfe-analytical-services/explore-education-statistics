@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -14,23 +15,35 @@ public abstract class UserPublicationRoleRepositoryTests
 {
     private readonly DataFixture _fixture = new();
 
+    public static readonly TheoryData<Func<DataFixture, User>> AllTypesOfUser =
+    [
+        // Active User
+        fixture => fixture.DefaultUser(),
+        // User with Pending Invite
+        fixture => fixture.DefaultUserWithPendingInvite(),
+        // User with Expired Invite
+        fixture => fixture.DefaultUserWithExpiredInvite(),
+        // Soft Deleted User (These ones shouldn't ever have associated roles, as they
+        // get removed when the user is soft deleted. But is added here for completeness)
+        fixture => fixture.DefaultSoftDeletedUser(),
+    ];
+
     public class CreateTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
-        public async Task Create()
+        public async Task Success()
         {
             User user = _fixture.DefaultUser();
-
             User createdBy = _fixture.DefaultUser();
 
-            var publication = new Publication();
+            Publication publication = _fixture.DefaultPublication();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Users.AddRangeAsync(user, createdBy);
-                await contentDbContext.Publications.AddAsync(publication);
+                contentDbContext.Users.AddRange(user, createdBy);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -38,7 +51,12 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                var result = await repository.Create(user.Id, publication.Id, PublicationRole.Owner, createdBy.Id);
+                var result = await repository.Create(
+                    userId: user.Id,
+                    publicationId: publication.Id,
+                    role: PublicationRole.Owner,
+                    createdById: createdBy.Id
+                );
 
                 Assert.NotEqual(Guid.Empty, result.Id);
                 Assert.Equal(user.Id, result.UserId);
@@ -65,23 +83,46 @@ public abstract class UserPublicationRoleRepositoryTests
         }
     }
 
-    public class UserHasRoleOnPublication_TrueIfRoleExistsTests : UserPublicationRoleRepositoryTests
+    public class CreateManyIfNotExistsTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
-        public async Task UserHasRoleOnPublication_TrueIfRoleExists()
+        public async Task Success()
         {
-            var userPublicationRole = new UserPublicationRole
-            {
-                User = _fixture.DefaultUser().Generate(),
-                Publication = new Publication(),
-                Role = PublicationRole.Owner,
-            };
+            User user = _fixture.DefaultUser();
+            User createdBy = _fixture.DefaultUser();
+
+            var existingRoleCreatedDate = DateTime.UtcNow.AddDays(-2);
+            var newRolesCreatedDate = DateTime.UtcNow;
+
+            Publication publication1 = _fixture.DefaultPublication();
+            Publication publication2 = _fixture.DefaultPublication();
+
+            UserPublicationRole existingUserPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUserId(user.Id)
+                .WithPublicationId(publication1.Id)
+                .WithRole(PublicationRole.Owner)
+                .WithCreated(existingRoleCreatedDate)
+                .WithCreatedById(createdBy.Id);
+
+            var newUserPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithUserId(user.Id)
+                .WithCreated(newRolesCreatedDate)
+                .WithCreatedById(createdBy.Id)
+                .ForIndex(0, s => s.SetPublicationId(publication1.Id).SetRole(PublicationRole.Allower))
+                .ForIndex(1, s => s.SetPublicationId(publication2.Id).SetRole(PublicationRole.Owner))
+                .GenerateList(2);
+
+            UserPublicationRole[] allUserPublicationRoles = [.. newUserPublicationRoles, existingUserPublicationRole];
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole);
+                contentDbContext.Users.AddRange(user, createdBy);
+                contentDbContext.Publications.AddRange(publication1, publication2);
+                contentDbContext.UserPublicationRoles.Add(existingUserPublicationRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -89,99 +130,77 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                Assert.True(
-                    await repository.UserHasRoleOnPublication(
-                        userPublicationRole.UserId,
-                        userPublicationRole.PublicationId,
-                        PublicationRole.Owner
-                    )
+                await repository.CreateManyIfNotExists(allUserPublicationRoles);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
+
+                // Should only have created 2 new roles, as one already existed
+                Assert.Equal(3, userPublicationRoles.Count);
+
+                // Existing role should be unchanged
+                Assert.Contains(
+                    userPublicationRoles,
+                    upr =>
+                        upr.Id == existingUserPublicationRole.Id
+                        && upr.UserId == user.Id
+                        && upr.PublicationId == publication1.Id
+                        && upr.Role == PublicationRole.Owner
+                        && upr.Created == existingRoleCreatedDate
+                        && upr.CreatedById == createdBy.Id
+                        && upr.EmailSent == null
                 );
-            }
-        }
 
-        [Fact]
-        public async Task UserHasRoleOnPublication_FalseIfRoleDoesNotExist()
-        {
-            var publication = new Publication();
+                Assert.Contains(
+                    userPublicationRoles,
+                    upr =>
+                        upr.UserId == user.Id
+                        && upr.PublicationId == publication1.Id
+                        && upr.Role == PublicationRole.Allower
+                        && upr.Created == newRolesCreatedDate
+                        && upr.CreatedById == createdBy.Id
+                        && upr.EmailSent == null
+                );
 
-            // Setup a role but for a different publication to make sure it has no influence
-            var userPublicationRoleOtherPublication = new UserPublicationRole
-            {
-                User = _fixture.DefaultUser().Generate(),
-                Publication = new Publication(),
-                Role = PublicationRole.Owner,
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRoleOtherPublication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = CreateRepository(contentDbContext);
-
-                Assert.False(
-                    await repository.UserHasRoleOnPublication(
-                        userPublicationRoleOtherPublication.UserId,
-                        publication.Id,
-                        PublicationRole.Owner
-                    )
+                Assert.Contains(
+                    userPublicationRoles,
+                    upr =>
+                        upr.UserId == user.Id
+                        && upr.PublicationId == publication2.Id
+                        && upr.Role == PublicationRole.Owner
+                        && upr.Created == newRolesCreatedDate
+                        && upr.CreatedById == createdBy.Id
+                        && upr.EmailSent == null
                 );
             }
         }
     }
 
-    public class ListDistinctRolesByUserTests : UserPublicationRoleRepositoryTests
+    public class GetByIdTests : UserPublicationRoleRepositoryTests
     {
-        [Fact]
-        public async Task Success()
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task Success(Func<DataFixture, User> userFactory)
         {
-            User user1 = _fixture.DefaultUser();
-            User user2 = _fixture.DefaultUser();
+            var user = userFactory(_fixture);
+            User createdBy = _fixture.DefaultUser();
 
-            Publication publication1 = _fixture.DefaultPublication();
-            Publication publication2 = _fixture.DefaultPublication();
-
-            var userPublicationRoles = new List<UserPublicationRole>
-            {
-                _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(user1)
-                    .WithPublication(publication1)
-                    .WithRole(PublicationRole.Owner)
-                    .Generate(),
-                // Roles for different publication. One duplicate role.
-                _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(user1)
-                    .WithPublication(publication2)
-                    .WithRole(PublicationRole.Owner)
-                    .Generate(),
-                _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(user1)
-                    .WithPublication(publication2)
-                    .WithRole(PublicationRole.Allower)
-                    .Generate(),
-                // Role for different user
-                _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(user2)
-                    .WithPublication(publication1)
-                    .WithRole(PublicationRole.Owner)
-                    .Generate(),
-            };
+            UserPublicationRole userPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_fixture.DefaultPublication())
+                .WithCreated(DateTime.UtcNow.AddDays(-2))
+                .WithCreatedById(createdBy.Id)
+                .WithEmailSent(DateTime.UtcNow.AddDays(-1));
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(userPublicationRoles);
+                contentDbContext.Users.Add(createdBy);
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -189,104 +208,53 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                var result = await repository.ListDistinctRolesByUser(user1.Id);
+                var result = await repository.GetById(userPublicationRole.Id);
 
-                // Expect only distinct roles to be returned, therefore the 2nd "Owner" role is filtered out.
-                Assert.Equal([PublicationRole.Owner, PublicationRole.Allower], result);
+                Assert.NotNull(result);
+                Assert.Equal(userPublicationRole.Id, result.Id);
+                Assert.Equal(userPublicationRole.UserId, result.UserId);
+                Assert.Equal(userPublicationRole.PublicationId, result.PublicationId);
+                Assert.Equal(userPublicationRole.Role, result.Role);
+                Assert.Equal(userPublicationRole.Created, result.Created);
+                Assert.Equal(userPublicationRole.CreatedById, result.CreatedById);
+                Assert.Equal(userPublicationRole.EmailSent, result.EmailSent);
             }
         }
 
-        // This test will be changed when we start introducing the use of the NEW publication roles in the
-        // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
-        // filter out any usage of the NEW roles.
         [Fact]
-        public async Task InvalidRolesNotReturned()
+        public async Task RoleDoesNotExist_ReturnsNull()
         {
-            User user = _fixture.DefaultUser();
+            var repository = CreateRepository();
 
-            Publication publication = _fixture.DefaultPublication();
+            var result = await repository.GetById(Guid.NewGuid());
 
-            var userPublicationRoles = new List<UserPublicationRole>
-            {
-                _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(user)
-                    .WithPublication(publication)
-                    .WithRole(PublicationRole.Approver)
-                    .Generate(),
-                _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(user)
-                    .WithPublication(publication)
-                    .WithRole(PublicationRole.Drafter)
-                    .Generate(),
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddRangeAsync(userPublicationRoles);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = CreateRepository(contentDbContext);
-
-                var result = await repository.ListDistinctRolesByUser(user.Id);
-
-                Assert.Empty(result);
-            }
+            Assert.Null(result);
         }
     }
 
-    public class ListRolesByUserAndPublicationTests : UserPublicationRoleRepositoryTests
+    public class GetByCompositeKeyTests : UserPublicationRoleRepositoryTests
     {
-        [Fact]
-        public async Task Success()
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task Success(Func<DataFixture, User> userFactory)
         {
-            User user1 = _fixture.DefaultUser();
-            User user2 = _fixture.DefaultUser();
+            var user = userFactory(_fixture);
+            User createdBy = _fixture.DefaultUser();
 
-            Publication publication1 = _fixture.DefaultPublication();
-            Publication publication2 = _fixture.DefaultPublication();
-
-            var userPublicationRoles = new List<UserPublicationRole>
-            {
-                _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(user1)
-                    .WithPublication(publication1)
-                    .WithRole(PublicationRole.Owner)
-                    .Generate(),
-                _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(user1)
-                    .WithPublication(publication1)
-                    .WithRole(PublicationRole.Allower)
-                    .Generate(),
-                // Different role for different publication.
-                _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(user1)
-                    .WithPublication(publication2)
-                    .WithRole(PublicationRole.Allower)
-                    .Generate(),
-                // Different role for different user
-                _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(user2)
-                    .WithPublication(publication1)
-                    .WithRole(PublicationRole.Allower)
-                    .Generate(),
-            };
+            UserPublicationRole userPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_fixture.DefaultPublication())
+                .WithCreated(DateTime.UtcNow.AddDays(-2))
+                .WithCreatedById(createdBy.Id)
+                .WithEmailSent(DateTime.UtcNow.AddDays(-1));
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(userPublicationRoles);
+                contentDbContext.Users.Add(createdBy);
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -294,55 +262,67 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                var result = await repository.ListRolesByUserAndPublication(
-                    userId: user1.Id,
-                    publicationId: publication1.Id
+                var result = await repository.GetByCompositeKey(
+                    userId: userPublicationRole.UserId,
+                    publicationId: userPublicationRole.PublicationId,
+                    role: userPublicationRole.Role
                 );
 
-                Assert.Equal([PublicationRole.Owner, PublicationRole.Allower], result);
+                Assert.NotNull(result);
+                Assert.Equal(userPublicationRole.Id, result.Id);
+                Assert.Equal(userPublicationRole.UserId, result.UserId);
+                Assert.Equal(userPublicationRole.PublicationId, result.PublicationId);
+                Assert.Equal(userPublicationRole.Role, result.Role);
+                Assert.Equal(userPublicationRole.Created, result.Created);
+                Assert.Equal(userPublicationRole.CreatedById, result.CreatedById);
+                Assert.Equal(userPublicationRole.EmailSent, result.EmailSent);
             }
         }
 
-        // This test will be changed when we start introducing the use of the NEW publication roles in the
-        // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
-        // filter out any usage of the NEW roles.
         [Fact]
-        public async Task InvalidRolesNotReturned()
+        public async Task RoleDoesNotExist_ReturnsNull()
         {
-            User user = _fixture.DefaultUser();
+            var repository = CreateRepository();
 
-            Publication publication = _fixture.DefaultPublication();
+            var result = await repository.GetByCompositeKey(
+                userId: Guid.NewGuid(),
+                publicationId: Guid.NewGuid(),
+                role: PublicationRole.Owner
+            );
 
-            var userPublicationRoles = new List<UserPublicationRole>
-            {
-                // Invalid role
-                _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(user)
-                    .WithPublication(publication)
-                    .WithRole(PublicationRole.Approver)
-                    .Generate(),
-                // Invalid role
-                _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(user)
-                    .WithPublication(publication)
-                    .WithRole(PublicationRole.Drafter)
-                    .Generate(),
-                // Valid role
-                _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(user)
-                    .WithPublication(publication)
-                    .WithRole(PublicationRole.Allower)
-                    .Generate(),
-            };
+            Assert.Null(result);
+        }
+    }
+
+    public class QueryTests : UserPublicationRoleRepositoryTests
+    {
+        [Fact]
+        public async Task ActiveOnlyFilter_ReturnsAllRolesForActiveUsers()
+        {
+            User activeUser1 = _fixture.DefaultUser();
+            User activeUser2 = _fixture.DefaultUser();
+            User userWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            User userWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
+            User softDeletedUser = _fixture.DefaultSoftDeletedUser();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithPublication(_fixture.DefaultPublication())
+                // These should be returned
+                .ForIndex(0, s => s.SetUser(activeUser1))
+                .ForIndex(1, s => s.SetUser(activeUser1))
+                .ForIndex(2, s => s.SetUser(activeUser2))
+                // These should not
+                .ForIndex(3, s => s.SetUser(userWithPendingInvite))
+                .ForIndex(4, s => s.SetUser(userWithExpiredInvite))
+                .ForIndex(5, s => s.SetUser(softDeletedUser))
+                .GenerateList(6);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(userPublicationRoles);
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -350,12 +330,184 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                var result = await repository.ListRolesByUserAndPublication(
-                    userId: user.Id,
-                    publicationId: publication.Id
-                );
+                var resultingQueryableWithExplicitFilter = repository.Query(ResourceRoleFilter.ActiveOnly);
 
-                Assert.Equal([PublicationRole.Allower], result);
+                // Don't apply any further filtering to the queryable, and just execute it to get all results
+                var resultsWithExplicitFilter = await resultingQueryableWithExplicitFilter.ToListAsync();
+
+                Assert.Equal(3, resultsWithExplicitFilter.Count);
+                Assert.Single(resultsWithExplicitFilter, upr => upr.Id == userPublicationRoles[0].Id);
+                Assert.Single(resultsWithExplicitFilter, upr => upr.Id == userPublicationRoles[1].Id);
+                Assert.Single(resultsWithExplicitFilter, upr => upr.Id == userPublicationRoles[2].Id);
+
+                // Also test that the default filter is ActiveOnly
+                var resultingQueryableWithUnspecifiedFilter = repository.Query();
+
+                // Don't apply any further filtering to the queryable, and just execute it to get all results
+                var resultsWithUnspecifiedFilter = await resultingQueryableWithUnspecifiedFilter.ToListAsync();
+
+                Assert.Equal(resultsWithExplicitFilter, resultsWithUnspecifiedFilter);
+            }
+        }
+
+        [Fact]
+        public async Task PendingOnlyFilter_ReturnsAllRolesForPendingUserInvites()
+        {
+            User userWithPendingInvite1 = _fixture.DefaultUserWithPendingInvite();
+            User userWithPendingInvite2 = _fixture.DefaultUserWithPendingInvite();
+            User activeUser = _fixture.DefaultUser();
+            User userWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
+            User softDeletedUser = _fixture.DefaultSoftDeletedUser();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithPublication(_fixture.DefaultPublication())
+                // These should be returned
+                .ForIndex(0, s => s.SetUser(userWithPendingInvite1))
+                .ForIndex(1, s => s.SetUser(userWithPendingInvite1))
+                .ForIndex(2, s => s.SetUser(userWithPendingInvite2))
+                // These should not
+                .ForIndex(3, s => s.SetUser(activeUser))
+                .ForIndex(4, s => s.SetUser(userWithExpiredInvite))
+                .ForIndex(5, s => s.SetUser(softDeletedUser))
+                .GenerateList(6);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var resultingQueryable = repository.Query(ResourceRoleFilter.PendingOnly);
+
+                // Don't apply any further filtering to the queryable, and just execute it to get all results
+                var results = await resultingQueryable.ToListAsync();
+
+                Assert.Equal(3, results.Count);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[0].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[1].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[2].Id);
+            }
+        }
+
+        [Fact]
+        public async Task AllButExpiredFilter_ReturnsAllRolesForActiveUsersOrPendingUserInvites()
+        {
+            User activeUser1 = _fixture.DefaultUser();
+            User activeUser2 = _fixture.DefaultUser();
+            User userWithPendingInvite1 = _fixture.DefaultUserWithPendingInvite();
+            User userWithPendingInvite2 = _fixture.DefaultUserWithPendingInvite();
+            User userWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
+            User softDeletedUser = _fixture.DefaultSoftDeletedUser();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithPublication(_fixture.DefaultPublication())
+                // These should be returned
+                .ForIndex(0, s => s.SetUser(activeUser1))
+                .ForIndex(1, s => s.SetUser(activeUser1))
+                .ForIndex(2, s => s.SetUser(activeUser2))
+                .ForIndex(3, s => s.SetUser(userWithPendingInvite1))
+                .ForIndex(4, s => s.SetUser(userWithPendingInvite1))
+                .ForIndex(5, s => s.SetUser(userWithPendingInvite2))
+                // These should not
+                .ForIndex(6, s => s.SetUser(userWithExpiredInvite))
+                .ForIndex(7, s => s.SetUser(softDeletedUser))
+                .GenerateList(8);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var resultingQueryable = repository.Query(ResourceRoleFilter.AllButExpired);
+
+                // Don't apply any further filtering to the queryable, and just execute it to get all results
+                var results = await resultingQueryable.ToListAsync();
+
+                Assert.Equal(6, results.Count);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[0].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[1].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[2].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[3].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[4].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[5].Id);
+            }
+        }
+
+        [Fact]
+        public async Task AllFilter_ReturnsAllRoles()
+        {
+            User activeUser1 = _fixture.DefaultUser();
+            User activeUser2 = _fixture.DefaultUser();
+            User userWithPendingInvite1 = _fixture.DefaultUserWithPendingInvite();
+            User userWithPendingInvite2 = _fixture.DefaultUserWithPendingInvite();
+            User userWithExpiredInvite1 = _fixture.DefaultUserWithExpiredInvite();
+            User userWithExpiredInvite2 = _fixture.DefaultUserWithExpiredInvite();
+            User softDeletedUser1 = _fixture.DefaultSoftDeletedUser();
+            User softDeletedUser2 = _fixture.DefaultSoftDeletedUser();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithPublication(_fixture.DefaultPublication())
+                // These should ALL be returned
+                .ForIndex(0, s => s.SetUser(activeUser1))
+                .ForIndex(1, s => s.SetUser(activeUser1))
+                .ForIndex(2, s => s.SetUser(activeUser2))
+                .ForIndex(3, s => s.SetUser(userWithPendingInvite1))
+                .ForIndex(4, s => s.SetUser(userWithPendingInvite1))
+                .ForIndex(5, s => s.SetUser(userWithPendingInvite2))
+                .ForIndex(6, s => s.SetUser(userWithExpiredInvite1))
+                .ForIndex(7, s => s.SetUser(userWithExpiredInvite1))
+                .ForIndex(8, s => s.SetUser(userWithExpiredInvite2))
+                .ForIndex(9, s => s.SetUser(softDeletedUser1))
+                .ForIndex(10, s => s.SetUser(softDeletedUser1))
+                .ForIndex(11, s => s.SetUser(softDeletedUser2))
+                .GenerateList(12);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var resultingQueryable = repository.Query(ResourceRoleFilter.All);
+
+                // Don't apply any further filtering to the queryable, and just execute it to get all results
+                var results = await resultingQueryable.ToListAsync();
+
+                Assert.Equal(12, results.Count);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[0].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[1].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[2].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[3].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[4].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[5].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[6].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[7].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[8].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[9].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[10].Id);
+                Assert.Single(results, upr => upr.Id == userPublicationRoles[11].Id);
             }
         }
     }
@@ -373,12 +525,11 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             var email = "test@test.com";
 
-            var userPublicationRole = _fixture
+            UserPublicationRole userPublicationRole = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(_fixture.DefaultUser().WithEmail(email).Generate())
                 .WithPublication(_fixture.DefaultPublication())
-                .WithRole(publicationRole)
-                .Generate();
+                .WithRole(publicationRole);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -422,11 +573,6 @@ public abstract class UserPublicationRoleRepositoryTests
                 .WithUser(user1)
                 .WithPublication(publication1)
                 .WithRole(PublicationRole.Allower);
-            UserPublicationInvite userPublicationInvite1 = _fixture
-                .DefaultUserPublicationInvite()
-                .WithEmail(user1.Email)
-                .WithPublication(publication1)
-                .WithRole(PublicationRole.Allower);
 
             User user2 = _fixture.DefaultUser().WithEmail("test2@test.com");
             Publication publication2 = _fixture.DefaultPublication();
@@ -435,22 +581,12 @@ public abstract class UserPublicationRoleRepositoryTests
                 .WithUser(user2)
                 .WithPublication(publication2)
                 .WithRole(PublicationRole.Owner);
-            UserPublicationInvite userPublicationInvite2 = _fixture
-                .DefaultUserPublicationInvite()
-                .WithEmail(user2.Email)
-                .WithPublication(publication2)
-                .WithRole(PublicationRole.Owner);
 
             User user3 = _fixture.DefaultUser().WithEmail("test3@test.com");
             Publication publication3 = _fixture.DefaultPublication();
             UserPublicationRole userPublicationRole3 = _fixture
                 .DefaultUserPublicationRole()
                 .WithUser(user3)
-                .WithPublication(publication3)
-                .WithRole(PublicationRole.Allower);
-            UserPublicationInvite userPublicationInvite3 = _fixture
-                .DefaultUserPublicationInvite()
-                .WithEmail(user3.Email)
                 .WithPublication(publication3)
                 .WithRole(PublicationRole.Allower);
 
@@ -462,11 +598,6 @@ public abstract class UserPublicationRoleRepositoryTests
                     userPublicationRole1,
                     userPublicationRole2,
                     userPublicationRole3
-                );
-                contentDbContext.UserPublicationInvites.AddRange(
-                    userPublicationInvite1,
-                    userPublicationInvite2,
-                    userPublicationInvite3
                 );
                 await contentDbContext.SaveChangesAsync();
             }
@@ -602,10 +733,1492 @@ public abstract class UserPublicationRoleRepositoryTests
         }
     }
 
+    public class UserHasRoleOnPublicationTests : UserPublicationRoleRepositoryTests
+    {
+        [Fact]
+        public async Task ActiveOnlyFilter_RoleExists_TrueIfRoleIsForActiveUser()
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            UserPublicationRole userPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(targetActiveUser)
+                .WithPublication(targetPublication)
+                .WithRole(targetRole);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.True(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.ActiveOnly
+                    )
+                );
+
+                // Also test that the default filter is ActiveOnly
+                Assert.True(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task ActiveOnlyFilter_RoleExists_FalseIfRoleIsNotForActiveUser()
+        {
+            User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            User targetUserWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
+            User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
+
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // Target role is for a PENDING User Invite
+                .ForIndex(
+                    0,
+                    s => s.SetUser(targetUserWithPendingInvite).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                // Target role is for an EXPIRED User Invite
+                .ForIndex(
+                    1,
+                    s => s.SetUser(targetUserWithExpiredInvite).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                // Target role is for a SOFT DELETED User
+                .ForIndex(
+                    2,
+                    s => s.SetUser(targetSoftDeletedUser).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                .GenerateList(3);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                // Each of these should return false as the roles are not for ACTIVE Users
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetUserWithPendingInvite.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.ActiveOnly
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetUserWithExpiredInvite.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.ActiveOnly
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetSoftDeletedUser.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.ActiveOnly
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task ActiveOnlyFilter_RoleDoesNotExist_False()
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // TARGET ACTIVE user + publication but DIFFERENT role
+                .ForIndex(
+                    0,
+                    s => s.SetUser(targetActiveUser).SetPublication(targetPublication).SetRole(PublicationRole.Allower)
+                )
+                // TARGET ACTIVE user + role but DIFFERENT publication
+                .ForIndex(
+                    1,
+                    s => s.SetUser(targetActiveUser).SetPublication(_fixture.DefaultPublication()).SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT ACTIVE user
+                .ForIndex(
+                    2,
+                    s => s.SetUser(_fixture.DefaultUser()).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                .GenerateList(3);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.ActiveOnly
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task PendingOnlyFilter_RoleExists_TrueIfRoleIsForPendingUserInvite()
+        {
+            User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            UserPublicationRole userPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(targetUserWithPendingInvite)
+                .WithPublication(targetPublication)
+                .WithRole(targetRole);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.True(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetUserWithPendingInvite.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.PendingOnly
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task PendingOnlyFilter_RoleExists_FalseIfRoleIsNotForPendingUserInvite()
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            User targetUserWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
+            User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
+
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // Target role is for a ACTIVE User
+                .ForIndex(0, s => s.SetUser(targetActiveUser).SetPublication(targetPublication).SetRole(targetRole))
+                // Target role is for an EXPIRED User Invite
+                .ForIndex(
+                    1,
+                    s => s.SetUser(targetUserWithExpiredInvite).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                // Target role is for a SOFT DELETED User
+                .ForIndex(
+                    2,
+                    s => s.SetUser(targetSoftDeletedUser).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                .GenerateList(3);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                // Each of these should return false as the roles are not for PENDING User Invites
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.PendingOnly
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetUserWithExpiredInvite.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.PendingOnly
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetSoftDeletedUser.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.PendingOnly
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task PendingOnlyFilter_RoleDoesNotExist_False()
+        {
+            User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // TARGET PENDING user invite + publication but DIFFERENT role
+                .ForIndex(
+                    0,
+                    s =>
+                        s.SetUser(targetUserWithPendingInvite)
+                            .SetPublication(targetPublication)
+                            .SetRole(PublicationRole.Allower)
+                )
+                // TARGET PENDING user invite + role but DIFFERENT publication
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetUser(targetUserWithPendingInvite)
+                            .SetPublication(_fixture.DefaultPublication())
+                            .SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT PENDING user invite
+                .ForIndex(
+                    2,
+                    s =>
+                        s.SetUser(_fixture.DefaultUserWithPendingInvite())
+                            .SetPublication(targetPublication)
+                            .SetRole(targetRole)
+                )
+                .GenerateList(3);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetUserWithPendingInvite.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.PendingOnly
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task AllButExpiredFilter_RoleExists_TrueIfRoleIsForActiveUserOrPendingUserInvite()
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithPublication(targetPublication)
+                .WithRole(targetRole)
+                .ForIndex(0, s => s.SetUser(targetActiveUser))
+                .ForIndex(1, s => s.SetUser(targetUserWithPendingInvite))
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                // Both of these should return true as the roles are for an ACTIVE User and a PENDING User Invite
+                Assert.True(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.AllButExpired
+                    )
+                );
+                Assert.True(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetUserWithPendingInvite.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.AllButExpired
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task AllButExpiredFilter_RoleExists_FalseIfRoleIsNotForActiveUserOrPendingUserInvite()
+        {
+            User targetUserWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
+            User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
+
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // Target role is for an EXPIRED User Invite
+                .ForIndex(
+                    0,
+                    s => s.SetUser(targetUserWithExpiredInvite).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                // Target role is for a SOFT DELETED User
+                .ForIndex(
+                    1,
+                    s => s.SetUser(targetSoftDeletedUser).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                // Each of these should return false as the roles are not for ACTIVE Users or PENDING User Invites
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetUserWithExpiredInvite.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.AllButExpired
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetSoftDeletedUser.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.AllButExpired
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task AllButExpiredFilter_RoleDoesNotExist_False()
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // TARGET ACTIVE user + publication but DIFFERENT role
+                .ForIndex(
+                    0,
+                    s => s.SetUser(targetActiveUser).SetPublication(targetPublication).SetRole(PublicationRole.Allower)
+                )
+                // TARGET ACTIVE user + role but DIFFERENT publication
+                .ForIndex(
+                    1,
+                    s => s.SetUser(targetActiveUser).SetPublication(_fixture.DefaultPublication()).SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT ACTIVE user
+                .ForIndex(
+                    2,
+                    s => s.SetUser(_fixture.DefaultUser()).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                // TARGET PENDING user invite + publication but DIFFERENT role
+                .ForIndex(
+                    3,
+                    s =>
+                        s.SetUser(targetUserWithPendingInvite)
+                            .SetPublication(targetPublication)
+                            .SetRole(PublicationRole.Allower)
+                )
+                // TARGET PENDING user invite + role but DIFFERENT publication
+                .ForIndex(
+                    4,
+                    s =>
+                        s.SetUser(targetUserWithPendingInvite)
+                            .SetPublication(_fixture.DefaultPublication())
+                            .SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT PENDING user invite
+                .ForIndex(
+                    5,
+                    s =>
+                        s.SetUser(_fixture.DefaultUserWithPendingInvite())
+                            .SetPublication(targetPublication)
+                            .SetRole(targetRole)
+                )
+                .GenerateList(6);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.AllButExpired
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetUserWithPendingInvite.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.AllButExpired
+                    )
+                );
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task AllFilter_RoleExists_TrueIrrelevantOfTypeOfUser(Func<DataFixture, User> userFactory)
+        {
+            var targetUser = userFactory(_fixture);
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            UserPublicationRole userPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(targetUser)
+                .WithPublication(targetPublication)
+                .WithRole(targetRole);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.True(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetUser.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.All
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task AllFilter_RoleDoesNotExist_False()
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            User targetUserWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
+            User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // TARGET ACTIVE user + publication but DIFFERENT role
+                .ForIndex(
+                    0,
+                    s => s.SetUser(targetActiveUser).SetPublication(targetPublication).SetRole(PublicationRole.Allower)
+                )
+                // TARGET ACTIVE user + role but DIFFERENT publication
+                .ForIndex(
+                    1,
+                    s => s.SetUser(targetActiveUser).SetPublication(_fixture.DefaultPublication()).SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT ACTIVE user
+                .ForIndex(
+                    2,
+                    s => s.SetUser(_fixture.DefaultUser()).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                // TARGET PENDING user invite + publication but DIFFERENT role
+                .ForIndex(
+                    3,
+                    s =>
+                        s.SetUser(targetUserWithPendingInvite)
+                            .SetPublication(targetPublication)
+                            .SetRole(PublicationRole.Allower)
+                )
+                // TARGET PENDING user invite + role but DIFFERENT publication
+                .ForIndex(
+                    4,
+                    s =>
+                        s.SetUser(targetUserWithPendingInvite)
+                            .SetPublication(_fixture.DefaultPublication())
+                            .SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT PENDING user invite
+                .ForIndex(
+                    5,
+                    s =>
+                        s.SetUser(_fixture.DefaultUserWithPendingInvite())
+                            .SetPublication(targetPublication)
+                            .SetRole(targetRole)
+                )
+                // TARGET EXPIRED user invite + publication but DIFFERENT role
+                .ForIndex(
+                    6,
+                    s =>
+                        s.SetUser(targetUserWithExpiredInvite)
+                            .SetPublication(targetPublication)
+                            .SetRole(PublicationRole.Allower)
+                )
+                // TARGET EXPIRED user invite + role but DIFFERENT publication
+                .ForIndex(
+                    7,
+                    s =>
+                        s.SetUser(targetUserWithExpiredInvite)
+                            .SetPublication(_fixture.DefaultPublication())
+                            .SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT EXPIRED user invite
+                .ForIndex(
+                    8,
+                    s =>
+                        s.SetUser(_fixture.DefaultUserWithExpiredInvite())
+                            .SetPublication(targetPublication)
+                            .SetRole(targetRole)
+                )
+                // TARGET SOFT DELETED user + publication but DIFFERENT role
+                .ForIndex(
+                    9,
+                    s =>
+                        s.SetUser(targetSoftDeletedUser)
+                            .SetPublication(targetPublication)
+                            .SetRole(PublicationRole.Allower)
+                )
+                // TARGET SOFT DELETED user + role but DIFFERENT publication
+                .ForIndex(
+                    10,
+                    s =>
+                        s.SetUser(targetSoftDeletedUser)
+                            .SetPublication(_fixture.DefaultPublication())
+                            .SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT SOFT DELETED user
+                .ForIndex(
+                    11,
+                    s =>
+                        s.SetUser(_fixture.DefaultSoftDeletedUser())
+                            .SetPublication(targetPublication)
+                            .SetRole(targetRole)
+                )
+                .GenerateList(12);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.All
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetUserWithPendingInvite.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.All
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetUserWithExpiredInvite.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.All
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasRoleOnPublication(
+                        userId: targetSoftDeletedUser.Id,
+                        publicationId: targetPublication.Id,
+                        role: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.All
+                    )
+                );
+            }
+        }
+    }
+
+    public class UserHasAnyRoleOnPublicationTests : UserPublicationRoleRepositoryTests
+    {
+        [Fact]
+        public async Task ExistingRoleNotInRolesToInclude_False()
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRolesToInclude = PublicationRole.Owner;
+
+            UserPublicationRole userPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(targetActiveUser)
+                .WithPublication(targetPublication)
+                .WithRole(PublicationRole.Allower);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRolesToInclude
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task EmptyRolesToInclude_TrueForAllRolesForMatchingUserAndPublication()
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            Publication targetPublication = _fixture.DefaultPublication();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(targetActiveUser)
+                .WithPublication(targetPublication)
+                .ForIndex(0, s => s.SetRole(PublicationRole.Owner))
+                .ForIndex(1, s => s.SetRole(PublicationRole.Allower))
+                .GenerateList(2);
+
+            var contentDbContextId1 = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId1))
+            {
+                contentDbContext.UserPublicationRoles.Add(userPublicationRoles[0]);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId1))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.True(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id
+                    )
+                );
+            }
+
+            var contentDbContextId2 = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId2))
+            {
+                contentDbContext.UserPublicationRoles.Add(userPublicationRoles[1]);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId2))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.True(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task ActiveOnlyFilter_RoleExists_TrueIfRoleIsForActiveUser()
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            UserPublicationRole userPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(targetActiveUser)
+                .WithPublication(targetPublication)
+                .WithRole(targetRole);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.True(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.ActiveOnly
+                    )
+                );
+
+                // Also test that the default filter is ActiveOnly
+                Assert.True(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task ActiveOnlyFilter_RoleExists_FalseIfRoleIsNotForActiveUser()
+        {
+            User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            User targetUserWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
+            User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
+
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // Target role is for a PENDING User Invite
+                .ForIndex(
+                    0,
+                    s => s.SetUser(targetUserWithPendingInvite).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                // Target role is for an EXPIRED User Invite
+                .ForIndex(
+                    1,
+                    s => s.SetUser(targetUserWithExpiredInvite).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                // Target role is for a SOFT DELETED User
+                .ForIndex(
+                    2,
+                    s => s.SetUser(targetSoftDeletedUser).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                .GenerateList(3);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                // Each of these should return false as the roles are not for ACTIVE Users
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetUserWithPendingInvite.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.ActiveOnly
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetUserWithExpiredInvite.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.ActiveOnly
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetSoftDeletedUser.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.ActiveOnly
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task ActiveOnlyFilter_RoleDoesNotExist_False()
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // TARGET ACTIVE user + publication but DIFFERENT role
+                .ForIndex(
+                    0,
+                    s => s.SetUser(targetActiveUser).SetPublication(targetPublication).SetRole(PublicationRole.Allower)
+                )
+                // TARGET ACTIVE user + role but DIFFERENT publication
+                .ForIndex(
+                    1,
+                    s => s.SetUser(targetActiveUser).SetPublication(_fixture.DefaultPublication()).SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT ACTIVE user
+                .ForIndex(
+                    2,
+                    s => s.SetUser(_fixture.DefaultUser()).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                .GenerateList(3);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.ActiveOnly
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task PendingOnlyFilter_RoleExists_TrueIfRoleIsForPendingUserInvite()
+        {
+            User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            UserPublicationRole userPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(targetUserWithPendingInvite)
+                .WithPublication(targetPublication)
+                .WithRole(targetRole);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.True(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetUserWithPendingInvite.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.PendingOnly
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task PendingOnlyFilter_RoleExists_FalseIfRoleIsNotForPendingUserInvite()
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            User targetUserWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
+            User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
+
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // Target role is for a ACTIVE User
+                .ForIndex(0, s => s.SetUser(targetActiveUser).SetPublication(targetPublication).SetRole(targetRole))
+                // Target role is for an EXPIRED User Invite
+                .ForIndex(
+                    1,
+                    s => s.SetUser(targetUserWithExpiredInvite).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                // Target role is for a SOFT DELETED User
+                .ForIndex(
+                    2,
+                    s => s.SetUser(targetSoftDeletedUser).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                .GenerateList(3);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                // Each of these should return false as the roles are not for PENDING User Invites
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.PendingOnly
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetUserWithExpiredInvite.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.PendingOnly
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetSoftDeletedUser.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.PendingOnly
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task PendingOnlyFilter_RoleDoesNotExist_False()
+        {
+            User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // TARGET PENDING user invite + publication but DIFFERENT role
+                .ForIndex(
+                    0,
+                    s =>
+                        s.SetUser(targetUserWithPendingInvite)
+                            .SetPublication(targetPublication)
+                            .SetRole(PublicationRole.Allower)
+                )
+                // TARGET PENDING user invite + role but DIFFERENT publication
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetUser(targetUserWithPendingInvite)
+                            .SetPublication(_fixture.DefaultPublication())
+                            .SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT PENDING user invite
+                .ForIndex(
+                    2,
+                    s =>
+                        s.SetUser(_fixture.DefaultUserWithPendingInvite())
+                            .SetPublication(targetPublication)
+                            .SetRole(targetRole)
+                )
+                .GenerateList(3);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetUserWithPendingInvite.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.PendingOnly
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task AllButExpiredFilter_RoleExists_TrueIfRoleIsForActiveUserOrPendingUserInvite()
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithPublication(targetPublication)
+                .WithRole(targetRole)
+                .ForIndex(0, s => s.SetUser(targetActiveUser))
+                .ForIndex(1, s => s.SetUser(targetUserWithPendingInvite))
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                // Both of these should return true as the roles are for an ACTIVE User and a PENDING User Invite
+                Assert.True(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.AllButExpired
+                    )
+                );
+                Assert.True(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetUserWithPendingInvite.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.AllButExpired
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task AllButExpiredFilter_RoleExists_FalseIfRoleIsNotForActiveUserOrPendingUserInvite()
+        {
+            User targetUserWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
+            User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
+
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // Target role is for an EXPIRED User Invite
+                .ForIndex(
+                    0,
+                    s => s.SetUser(targetUserWithExpiredInvite).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                // Target role is for a SOFT DELETED User
+                .ForIndex(
+                    1,
+                    s => s.SetUser(targetSoftDeletedUser).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                // Each of these should return false as the roles are not for ACTIVE Users or PENDING User Invites
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetUserWithExpiredInvite.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.AllButExpired
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetSoftDeletedUser.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.AllButExpired
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task AllButExpiredFilter_RoleDoesNotExist_False()
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // TARGET ACTIVE user + publication but DIFFERENT role
+                .ForIndex(
+                    0,
+                    s => s.SetUser(targetActiveUser).SetPublication(targetPublication).SetRole(PublicationRole.Allower)
+                )
+                // TARGET ACTIVE user + role but DIFFERENT publication
+                .ForIndex(
+                    1,
+                    s => s.SetUser(targetActiveUser).SetPublication(_fixture.DefaultPublication()).SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT ACTIVE user
+                .ForIndex(
+                    2,
+                    s => s.SetUser(_fixture.DefaultUser()).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                // TARGET PENDING user invite + publication but DIFFERENT role
+                .ForIndex(
+                    3,
+                    s =>
+                        s.SetUser(targetUserWithPendingInvite)
+                            .SetPublication(targetPublication)
+                            .SetRole(PublicationRole.Allower)
+                )
+                // TARGET PENDING user invite + role but DIFFERENT publication
+                .ForIndex(
+                    4,
+                    s =>
+                        s.SetUser(targetUserWithPendingInvite)
+                            .SetPublication(_fixture.DefaultPublication())
+                            .SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT PENDING user invite
+                .ForIndex(
+                    5,
+                    s =>
+                        s.SetUser(_fixture.DefaultUserWithPendingInvite())
+                            .SetPublication(targetPublication)
+                            .SetRole(targetRole)
+                )
+                .GenerateList(6);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.AllButExpired
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetUserWithPendingInvite.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.AllButExpired
+                    )
+                );
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task AllFilter_RoleExists_TrueIrrelevantOfTypeOfUser(Func<DataFixture, User> userFactory)
+        {
+            var targetUser = userFactory(_fixture);
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            UserPublicationRole userPublicationRole = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(targetUser)
+                .WithPublication(targetPublication)
+                .WithRole(targetRole);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.True(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetUser.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.All
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task AllFilter_RoleDoesNotExist_False()
+        {
+            User targetActiveUser = _fixture.DefaultUser();
+            User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            User targetUserWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
+            User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
+            Publication targetPublication = _fixture.DefaultPublication();
+            var targetRole = PublicationRole.Owner;
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                // TARGET ACTIVE user + publication but DIFFERENT role
+                .ForIndex(
+                    0,
+                    s => s.SetUser(targetActiveUser).SetPublication(targetPublication).SetRole(PublicationRole.Allower)
+                )
+                // TARGET ACTIVE user + role but DIFFERENT publication
+                .ForIndex(
+                    1,
+                    s => s.SetUser(targetActiveUser).SetPublication(_fixture.DefaultPublication()).SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT ACTIVE user
+                .ForIndex(
+                    2,
+                    s => s.SetUser(_fixture.DefaultUser()).SetPublication(targetPublication).SetRole(targetRole)
+                )
+                // TARGET PENDING user invite + publication but DIFFERENT role
+                .ForIndex(
+                    3,
+                    s =>
+                        s.SetUser(targetUserWithPendingInvite)
+                            .SetPublication(targetPublication)
+                            .SetRole(PublicationRole.Allower)
+                )
+                // TARGET PENDING user invite + role but DIFFERENT publication
+                .ForIndex(
+                    4,
+                    s =>
+                        s.SetUser(targetUserWithPendingInvite)
+                            .SetPublication(_fixture.DefaultPublication())
+                            .SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT PENDING user invite
+                .ForIndex(
+                    5,
+                    s =>
+                        s.SetUser(_fixture.DefaultUserWithPendingInvite())
+                            .SetPublication(targetPublication)
+                            .SetRole(targetRole)
+                )
+                // TARGET EXPIRED user invite + publication but DIFFERENT role
+                .ForIndex(
+                    6,
+                    s =>
+                        s.SetUser(targetUserWithExpiredInvite)
+                            .SetPublication(targetPublication)
+                            .SetRole(PublicationRole.Allower)
+                )
+                // TARGET EXPIRED user invite + role but DIFFERENT publication
+                .ForIndex(
+                    7,
+                    s =>
+                        s.SetUser(targetUserWithExpiredInvite)
+                            .SetPublication(_fixture.DefaultPublication())
+                            .SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT EXPIRED user invite
+                .ForIndex(
+                    8,
+                    s =>
+                        s.SetUser(_fixture.DefaultUserWithExpiredInvite())
+                            .SetPublication(targetPublication)
+                            .SetRole(targetRole)
+                )
+                // TARGET SOFT DELETED user + publication but DIFFERENT role
+                .ForIndex(
+                    9,
+                    s =>
+                        s.SetUser(targetSoftDeletedUser)
+                            .SetPublication(targetPublication)
+                            .SetRole(PublicationRole.Allower)
+                )
+                // TARGET SOFT DELETED user + role but DIFFERENT publication
+                .ForIndex(
+                    10,
+                    s =>
+                        s.SetUser(targetSoftDeletedUser)
+                            .SetPublication(_fixture.DefaultPublication())
+                            .SetRole(targetRole)
+                )
+                // TARGET publication + role but DIFFERENT SOFT DELETED user
+                .ForIndex(
+                    11,
+                    s =>
+                        s.SetUser(_fixture.DefaultSoftDeletedUser())
+                            .SetPublication(targetPublication)
+                            .SetRole(targetRole)
+                )
+                .GenerateList(12);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetActiveUser.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.All
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetUserWithPendingInvite.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.All
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetUserWithExpiredInvite.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.All
+                    )
+                );
+                Assert.False(
+                    await repository.UserHasAnyRoleOnPublication(
+                        userId: targetSoftDeletedUser.Id,
+                        publicationId: targetPublication.Id,
+                        rolesToInclude: targetRole,
+                        resourceRoleFilter: ResourceRoleFilter.All
+                    )
+                );
+            }
+        }
+    }
+
     public class MarkEmailAsSentTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
-        public async Task UnsuppliedEmailSentDate_UpdatesEmailSentDateToUtcNow()
+        public async Task Success()
         {
             UserPublicationRole userPublicationRole = _fixture.DefaultUserPublicationRole();
 
@@ -638,83 +2251,6 @@ public abstract class UserPublicationRoleRepositoryTests
         }
 
         [Fact]
-        public async Task SuppliedEmailSentDate_UpdatesEmailSentDateToSuppliedDate()
-        {
-            UserPublicationRole userPublicationRole = _fixture.DefaultUserPublicationRole();
-
-            var emailSentDate = DateTimeOffset.UtcNow.AddDays(-2);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = CreateRepository(contentDbContext);
-
-                await repository.MarkEmailAsSent(
-                    userId: userPublicationRole.UserId,
-                    publicationId: userPublicationRole.PublicationId,
-                    role: userPublicationRole.Role,
-                    emailSent: emailSentDate
-                );
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var updatedUserPublicationRole = await contentDbContext.UserPublicationRoles.SingleAsync();
-
-                Assert.Equal(userPublicationRole.Id, updatedUserPublicationRole.Id);
-                updatedUserPublicationRole.EmailSent.AssertEqual(emailSentDate);
-            }
-        }
-
-        [Fact]
-        public async Task SuppliedEmailSentDateNotInUtc_EmailSentDateIsStoredAsUniversalTime()
-        {
-            UserPublicationRole userPublicationRole = _fixture.DefaultUserPublicationRole();
-
-            // Supply a local date with a +2 hour offset (not UTC)
-            var emailSentDateWithOffset = new DateTimeOffset(2025, 1, 15, 10, 0, 0, TimeSpan.FromHours(2));
-            var expectedUtcDate = emailSentDateWithOffset.ToUniversalTime();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = CreateRepository(contentDbContext);
-
-                await repository.MarkEmailAsSent(
-                    userId: userPublicationRole.UserId,
-                    publicationId: userPublicationRole.PublicationId,
-                    role: userPublicationRole.Role,
-                    emailSent: emailSentDateWithOffset
-                );
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var updatedUserPublicationRole = await contentDbContext.UserPublicationRoles.SingleAsync();
-
-                Assert.Equal(userPublicationRole.Id, updatedUserPublicationRole.Id);
-
-                // The stored value should be in UTC
-                Assert.Equal(expectedUtcDate, updatedUserPublicationRole.EmailSent);
-                Assert.Equal(TimeSpan.Zero, updatedUserPublicationRole.EmailSent!.Value.Offset);
-            }
-        }
-
-        [Fact]
         public async Task UserPublicationRoleDoesNotExist_Throws()
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
@@ -731,8 +2267,10 @@ public abstract class UserPublicationRoleRepositoryTests
         }
     }
 
-    private static UserPublicationRoleRepository CreateRepository(ContentDbContext contentDbContext)
+    private static UserPublicationRoleRepository CreateRepository(ContentDbContext? contentDbContext = null)
     {
+        contentDbContext ??= InMemoryApplicationDbContext();
+
         return new(contentDbContext);
     }
 }
