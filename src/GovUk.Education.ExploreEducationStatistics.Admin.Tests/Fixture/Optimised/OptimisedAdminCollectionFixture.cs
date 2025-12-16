@@ -58,7 +58,7 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
     private UsersAndRolesDbContext _usersAndRolesDbContext = null!;
     private IProcessorClient _processorClient = null!;
     private IPublicDataApiClient _publicDataApiClient = null!;
-    private OptimisedTestUserHolder _userHolder = null!;
+    private OptimisedTestUserHolder? _userHolder;
 
     private Func<string> _psqlConnectionString = null!;
     private Func<string> _azuriteConnectionString = null!;
@@ -139,9 +139,10 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
         _statisticsDbContext = lookups.GetService<StatisticsDbContext>();
         _usersAndRolesDbContext = lookups.GetService<UsersAndRolesDbContext>();
 
-        // Look up the Mocks surrounding mocked-out dependencies once per test class using this fixture.
-        // Test classes can then use the Mocks for setups and verifications, as the Mocks will be the same ones
-        // as used in the tested code itself.
+        // Look up commonly mocked-out dependencies once per test class using this fixture. If the test collection
+        // needs these as mocks, they can access them using the respective "GetXMock" method in this fixture e.g.
+        // "GetProcessorClientMock()". We look up just the plain services here because an individual test collection
+        // fixture may have chosen to inject a real service here rather than the standard mock.
         _processorClient = lookups.GetService<IProcessorClient>();
         _publicDataApiClient = lookups.GetService<IPublicDataApiClient>();
 
@@ -214,6 +215,10 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
     /// </summary>
     public Mock<IPublicDataApiClient> GetPublicDataApiClientMock() => Mock.Get(_publicDataApiClient);
 
+    /// <summary>
+    /// This method is run prior to each individual test in a collection. Here we reset any commonly-used mocks and
+    /// ensure no users are set to handle HttpClient requests by default.
+    /// </summary>
     public override Task BeforeEachTest()
     {
         ResetIfMock(_processorClient);
@@ -221,7 +226,7 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
 
         if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
         {
-            _userHolder.SetUser(null);
+            _userHolder!.SetUser(null);
         }
 
         return Task.CompletedTask;
@@ -237,9 +242,15 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
             throw new Exception("""Cannot register test users if "useTestUserAuthentication" is false.""");
         }
 
-        _userHolder.SetUser(user);
+        _userHolder!.SetUser(user);
     }
 
+    /// <summary>
+    /// Resets a mock for a given service if the service has been mocked.
+    ///
+    /// We support this not necessarily being a mock because a fixture subclass may have chosen to inject a real
+    /// service in place of a service that is generally mocked out.
+    /// </summary>
     private void ResetIfMock<TService>(TService service)
         where TService : class
     {

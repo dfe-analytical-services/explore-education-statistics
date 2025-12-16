@@ -120,9 +120,10 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
         // calling "DisposeAsync" on this fixture.
         _publicDataDbContext = lookups.GetService<PublicDataDbContext>();
 
-        // Look up the Mocks surrounding mocked-out dependencies once per test class using this fixture.
-        // Test classes can then use the Mocks for setups and verifications, as the Mocks will be the same ones
-        // as used in the tested code itself.
+        // Look up commonly mocked-out dependencies once per test class using this fixture. If the test collection
+        // needs these as mocks, they can access them using the respective "GetXMock" method in this fixture e.g.
+        // "GetContentApiClientMock()". We look up just the plain services here because an individual test collection
+        // fixture may have chosen to inject a real service here rather than the standard mock.
         _contentApiClient = lookups.GetService<IContentApiClient>();
         _searchService = lookups.GetService<ISearchService>();
         _analyticsService = lookups.GetService<IAnalyticsService>();
@@ -194,6 +195,10 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
 
     public TestDataSetVersionPathResolver GetTestDataSetVersionPathResolver() => _testDataSetVersionPathResolver;
 
+    /// <summary>
+    /// This method is run prior to each individual test in a collection. Here we reset any commonly-used mocks and
+    /// ensure no users are set to handle HttpClient requests by default.
+    /// </summary>
     public override Task BeforeEachTest()
     {
         ResetIfMock(_contentApiClient);
@@ -221,6 +226,12 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
         _userHolder!.SetUser(user);
     }
 
+    /// <summary>
+    /// Resets a mock for a given service if the service has been mocked.
+    ///
+    /// We support this not necessarily being a mock because a fixture subclass may have chosen to inject a real
+    /// service in place of a service that is generally mocked out.
+    /// </summary>
     private void ResetIfMock<TService>(TService service)
         where TService : class
     {

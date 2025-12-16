@@ -7,6 +7,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
 public static class HttpContextAccessorMockExtensions
 {
+    /// <summary>
+    /// A Moq setup to expect an HTTP header to be present with an optional value.
+    /// </summary>
     public static Mock<IHttpContextAccessor> SetupHasHeader(
         this Mock<IHttpContextAccessor> accessor,
         string headerName,
@@ -16,6 +19,9 @@ public static class HttpContextAccessorMockExtensions
         return SetupHeaderCall(accessor, headerName, true, headerValue);
     }
 
+    /// <summary>
+    /// A Moq setup to expect an HTTP header not to be present.
+    /// </summary>
     public static Mock<IHttpContextAccessor> SetupDoesNotHaveHeader(
         this Mock<IHttpContextAccessor> accessor,
         string headerName

@@ -11,7 +11,7 @@
 /// </summary>
 public class DateTimeProvider
 {
-    private DateTime? _fixedDateTimeUtc;
+    private readonly DateTime? _fixedDateTimeUtc;
 
     /// <summary>
     /// Allows a fixed DateTime to be provided for testing.
@@ -19,13 +19,8 @@ public class DateTimeProvider
     /// <param name="fixedDateTimeUtc"></param>
     public DateTimeProvider(DateTime? fixedDateTimeUtc = null)
     {
-        SetFixedDateTimeUtc(fixedDateTimeUtc);
+        _fixedDateTimeUtc = fixedDateTimeUtc;
     }
 
     public DateTime UtcNow => _fixedDateTimeUtc ?? DateTime.UtcNow;
-
-    public void SetFixedDateTimeUtc(DateTime? utcNow)
-    {
-        _fixedDateTimeUtc = utcNow;
-    }
 }
