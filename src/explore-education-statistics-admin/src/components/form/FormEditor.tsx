@@ -400,6 +400,7 @@ const FormEditor = ({
               aria-describedby={describedBy}
               id={id}
               value={value}
+              aria-label={label || undefined}
               onBlur={() => {
                 if (onBlur) {
                   onBlur();
