@@ -207,7 +207,7 @@ describe('DataFileUploadForm', () => {
       type: 'application/csv',
     });
 
-    await user.type(screen.getByLabelText('Title'), 'Test title');
+    await user.type(screen.getByLabelText('Data file title'), 'Test title');
     await user.click(screen.getByLabelText('CSV files'));
     await user.upload(screen.getByLabelText('Upload data file'), file);
     await user.upload(screen.getByLabelText('Upload metadata file'), metaFile);
@@ -249,7 +249,7 @@ describe('DataFileUploadForm', () => {
       type: 'application/zip',
     });
 
-    await user.type(screen.getByLabelText('Title'), 'Test title');
+    await user.type(screen.getByLabelText('Data file title'), 'Test title');
     await user.click(screen.getByLabelText('ZIP file'));
     await user.upload(screen.getByLabelText('Upload ZIP file'), file);
 
@@ -426,7 +426,7 @@ describe('DataFileUploadForm', () => {
         onSubmit={noop}
       />,
     );
-    expect(screen.getByLabelText('Title')).toBeInTheDocument();
+    expect(screen.getByLabelText('Data file title')).toBeInTheDocument();
   });
 
   test('does not show title field for data replacement', () => {
@@ -491,7 +491,7 @@ describe('DataFileUploadForm', () => {
         onSubmit={noop}
       />,
     );
-    await user.type(screen.getByLabelText('Title'), 'Test title');
+    await user.type(screen.getByLabelText('Data file title'), 'Test title');
     await user.tab();
     expect(
       screen.getByText(

@@ -365,9 +365,9 @@ Check created table has footnotes
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Save data block as a featured table
-    user enters text into element    label:Name    UI Test data block name 1
+    user enters text into element    label:Data block name    UI Test data block name 1
     user enters text into element    label:Table title    UI Test table title 1
-    user enters text into element    label:Source    UI Test source 1
+    user enters text into element    label:Data source    UI Test source 1
 
     user clicks checkbox    Set as a featured table for this publication
     user waits until page contains element    label:Featured table name
@@ -407,9 +407,9 @@ Create table again
     user clicks button    Create table
 
 Save data block as a featured table again
-    user enters text into element    label:Name    UI Test data block name 2
+    user enters text into element    label:Data block name    UI Test data block name 2
     user enters text into element    label:Table title    UI Test table title 2
-    user enters text into element    label:Source    UI Test source 2
+    user enters text into element    label:Data source    UI Test source 2
 
     user clicks checkbox    Set as a featured table for this publication
     user waits until page contains element    label:Featured table name

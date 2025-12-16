@@ -156,14 +156,14 @@ user creates data block
     user waits until results table appears    %{WAIT_LONG}
 
     # Save data block.
-    user enters text into element    label:Name    ${data_block_name}
+    user enters text into element    label:Data block name    ${data_block_name}
 
     IF    "${table_title}" != "${EMPTY}"
         user enters text into element    label:Table title    ${table_title}
     END
 
     IF    "${table_source}" != "${EMPTY}"
-        user enters text into element    label:Source    ${table_source}
+        user enters text into element    label:Data source    ${table_source}
     END
 
     user clicks button    Save data block
