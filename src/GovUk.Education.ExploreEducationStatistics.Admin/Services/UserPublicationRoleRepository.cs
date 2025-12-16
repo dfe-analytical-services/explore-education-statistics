@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -145,7 +146,7 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
         params PublicationRole[] rolesToInclude
     )
     {
-        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<PublicationRole>();
+        var rolesToCheck = rolesToInclude.IsNullOrEmpty() ? EnumUtil.GetEnumsArray<PublicationRole>() : rolesToInclude;
 
         return await Query(resourceRoleFilter)
             .WhereForUser(userId)
