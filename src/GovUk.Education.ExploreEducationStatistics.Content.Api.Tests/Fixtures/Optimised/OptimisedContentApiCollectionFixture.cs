@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures.Optimised;
 
@@ -59,6 +60,7 @@ public abstract class OptimisedContentApiCollectionFixture(params ContentApiInte
         serviceModifications
             .AddInMemoryDbContext<ContentDbContext>(databaseName: $"{nameof(ContentDbContext)}_{Guid.NewGuid()}")
             .AddInMemoryDbContext<StatisticsDbContext>(databaseName: $"{nameof(StatisticsDbContext)}_{Guid.NewGuid()}")
+            .ReplaceServiceWithMock<IMemoryCacheService>(mockBehavior: MockBehavior.Loose)
             .AddControllers<Startup>();
 
         if (capabilities.Contains(ContentApiIntegrationTestCapability.Azurite))
@@ -81,13 +83,6 @@ public abstract class OptimisedContentApiCollectionFixture(params ContentApiInte
         // calling "DisposeAsync" on this fixture.
         _contentDbContext = lookups.GetService<ContentDbContext>();
         _statisticsDbContext = lookups.GetService<StatisticsDbContext>();
-
-        // Look up commonly mocked-out dependencies once per test class using this fixture. If the test collection
-        // needs these as mocks, they can access them using the respective "GetXMock" method in this fixture e.g.
-        // "GetProcessorClientMock()". We look up just the plain services here because an individual test collection
-        // fixture may have chosen to inject a real service here rather than the standard mock.
-        // _processorClient = lookups.GetService<IProcessorClient>();
-        // _publicDataApiClient = lookups.GetService<IPublicDataApiClient>();
 
         return Task.CompletedTask;
     }

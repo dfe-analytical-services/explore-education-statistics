@@ -32,6 +32,10 @@ public static class DbContextTestExtensions
             }
 #pragma warning restore EF1002
         }
+        else if (context.Database.IsInMemory())
+        {
+            await context.Database.EnsureDeletedAsync();
+        }
         else
         {
             throw new NotImplementedException(
