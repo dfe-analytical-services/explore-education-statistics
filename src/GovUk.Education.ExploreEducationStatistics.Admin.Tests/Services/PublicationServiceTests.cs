@@ -3496,7 +3496,12 @@ public class PublicationServiceTests
             AdminMapper(),
             new PersistenceHelper<ContentDbContext>(context),
             userService ?? AlwaysTrueUserService().Object,
-            publicationRepository ?? new PublicationRepository(context),
+            publicationRepository
+                ?? new PublicationRepository(
+                    context: context,
+                    userReleaseRoleRepository: new UserReleaseRoleRepository(context),
+                    userPublicationRoleRepository: new UserPublicationRoleRepository(context)
+                ),
             releaseVersionRepository ?? new ReleaseVersionRepository(context),
             methodologyService ?? Mock.Of<IMethodologyService>(Strict),
             publicationCacheService ?? _publicationCacheServiceMockBuilder.Build(),
