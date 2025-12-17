@@ -250,17 +250,9 @@ const FormEditor = ({
         glossaryPlugin.current = editor.plugins.get<GlossaryPlugin>('Glossary');
       }
 
-      if (label) {
-        // @ts-expect-error TODO: remove this after "EES-6786 Upgrade CKEditor" and use EditorConfig.label to set the aria-label the official way.
-        // This is a hacky workaround in order to achieve this.
-        editorInstance.current.ui.view.editable.element.setAttribute(
-          'aria-label',
-          label,
-        );
-      }
       setMarkersOrder(getMarkersOrder([...editor.model.markers]));
     },
-    [changeEditingView, focusOnInit, label, onElementsReady, setMarkersOrder],
+    [changeEditingView, focusOnInit, onElementsReady, setMarkersOrder],
   );
 
   useEffect(() => {
