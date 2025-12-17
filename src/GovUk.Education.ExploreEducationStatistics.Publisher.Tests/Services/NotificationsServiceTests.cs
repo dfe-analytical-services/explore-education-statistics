@@ -1,4 +1,3 @@
-using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -157,12 +156,51 @@ public abstract class NotificationsServiceTests
                 )
                 .GenerateList();
 
+            // Only users associated with the affected publication, and with active accounts, should receive emails
             var otherPublicationTeam = _dataFixture
                 .DefaultUserPublicationRole()
-                .WithPublication(otherPublication)
                 .WithRole(PublicationRole.Owner)
-                .WithUser(_dataFixture.DefaultUser().WithEmail("other-publication-owner@example.com"))
-                .GenerateList(1);
+                // Active user, but different publication
+                .ForIndex(
+                    0,
+                    s =>
+                        s.SetPublication(otherPublication)
+                            .SetUser(_dataFixture.DefaultUser().WithEmail("other-publication-owner@example.com"))
+                )
+                // Affected publication, but Pending User Invite
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetPublication(affectedPublication)
+                            .SetUser(
+                                _dataFixture
+                                    .DefaultUserWithPendingInvite()
+                                    .WithEmail("affected-publication-pending-invite@example.com")
+                            )
+                )
+                // Affected publication, but Expired User Invite
+                .ForIndex(
+                    2,
+                    s =>
+                        s.SetPublication(affectedPublication)
+                            .SetUser(
+                                _dataFixture
+                                    .DefaultUserWithExpiredInvite()
+                                    .WithEmail("affected-publication-expired-invite@example.com")
+                            )
+                )
+                // Affected publication, but Soft Deleted User
+                .ForIndex(
+                    3,
+                    s =>
+                        s.SetPublication(affectedPublication)
+                            .SetUser(
+                                _dataFixture
+                                    .DefaultSoftDeletedUser()
+                                    .WithEmail("affected-publication-soft-deleted-user@example.com")
+                            )
+                )
+                .GenerateList(4);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
