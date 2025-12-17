@@ -114,38 +114,6 @@ public abstract class OptimisedContentApiCollectionFixture(params ContentApiInte
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
     public StatisticsDbContext GetStatisticsDbContext() => _statisticsDbContext;
-
-    /// <summary>
-    /// This method is run prior to each individual test in a collection. Here we reset any commonly-used mocks and
-    /// ensure no users are set to handle HttpClient requests by default.
-    /// </summary>
-    public override Task BeforeEachTest()
-    {
-        // ResetIfMock(_processorClient);
-        // ResetIfMock(_publicDataApiClient);
-
-        return Task.CompletedTask;
-    }
-
-    // /// <summary>
-    // /// Resets a mock for a given service if the service has been mocked.
-    // ///
-    // /// We support this not necessarily being a mock because a fixture subclass may have chosen to inject a real
-    // /// service in place of a service that is generally mocked out.
-    // /// </summary>
-    // private void ResetIfMock<TService>(TService service)
-    //     where TService : class
-    // {
-    //     try
-    //     {
-    //         var mock = Mock.Get(service);
-    //         mock.Reset();
-    //     }
-    //     catch
-    //     {
-    //         // "service" is not a Mock. This is fine.
-    //     }
-    // }
 }
 
 public enum ContentApiIntegrationTestCapability
