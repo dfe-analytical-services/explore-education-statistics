@@ -282,7 +282,7 @@ public class UserManagementService(
                     .UserPublicationRoles.Select(userPublicationRole => new UserPublicationRole
                     {
                         UserId = user.Id,
-                        ResourceId = userPublicationRole.PublicationId,
+                        PublicationId = userPublicationRole.PublicationId,
                         Role = userPublicationRole.PublicationRole,
                         Created = request.CreatedDate?.UtcDateTime ?? DateTime.UtcNow,
                         CreatedById = userService.GetUserId(),
