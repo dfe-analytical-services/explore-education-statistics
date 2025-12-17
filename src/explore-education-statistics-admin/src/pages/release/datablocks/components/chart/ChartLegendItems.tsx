@@ -117,7 +117,6 @@ export default function ChartLegendItems({
             const allowColourSelection =
               !mapDataSetConfig?.categoricalDataConfig?.length ||
               currentItems[index].sequentialCategoryColours;
-
             return (
               <div
                 key={item.id}
@@ -155,6 +154,7 @@ export default function ChartLegendItems({
                         <FormFieldColourInput
                           name={`items.${index}.colour`}
                           label="Colour"
+                          itemLabel={currentItems[index].label}
                           colours={colours}
                           formGroup={false}
                           showError={false}

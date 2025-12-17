@@ -103,7 +103,7 @@ function toLegendConfig({
   const getDefaultConfig = (): LegendItemConfiguration => {
     return {
       label: generateDefaultDataSetLabel(dataSet, filter),
-      colour: colours[index % colours.length],
+      colour: colours.map(colour => colour.value)[index % colours.length],
     };
   };
 

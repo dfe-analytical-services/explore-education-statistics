@@ -3,7 +3,20 @@
 .button {
   align-items: center;
   background: #fff;
+  border: 0;
   cursor: pointer;
+  display: flex;
+  height: 100%;
+  padding: 0;
+
+  &:focus {
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+  }
+}
+
+.inner {
+  align-items: center;
+  border: 2px solid;
   display: flex;
   height: 100%;
   margin-left: govuk-spacing(2);
@@ -30,4 +43,10 @@
   position: fixed;
   right: 0;
   top: 0;
+}
+
+.coloursList {
+  @include govuk-media-query($from: tablet) {
+    column-count: 2;
+  }
 }

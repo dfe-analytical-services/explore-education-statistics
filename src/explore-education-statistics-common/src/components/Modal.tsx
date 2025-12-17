@@ -81,6 +81,7 @@ const Modal = ({
           data-testid="modal-underlay"
         >
           <Dialog.Content
+            aria-describedby={undefined}
             aria-labelledby={titleId}
             className={classNames(styles.dialog, className, {
               [styles.fullScreen]: fullScreen,
