@@ -5,6 +5,7 @@ import {
   EntraIdAuthentication
 } from '../types.bicep'
 
+import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
 import { abbreviations } from '../../common/abbreviations.bicep'
@@ -59,7 +60,7 @@ param userAssignedManagedIdentityParams {
 param entraIdAuthentication EntraIdAuthentication?
 
 @description('Specifies the SKU for the Function App hosting plan')
-param sku object
+param sku AppServicePlanSku
 
 @description('Specifies the Key Vault name that this Function App will be permitted to get and list secrets from')
 param keyVaultName string
