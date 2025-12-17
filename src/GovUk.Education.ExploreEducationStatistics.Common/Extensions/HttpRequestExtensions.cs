@@ -58,7 +58,8 @@ public static class HttpRequestExtensions
 
         return accept?.Any(acceptedType =>
                 mediaTypes.Any(type => exact ? type.Equals(acceptedType) : type.IsSubsetOf(acceptedType))
-            ) ?? false;
+            )
+            ?? false;
     }
 
     public static async Task<TJsonType?> GetJsonBody<TJsonType>(this HttpRequest request, bool allowEmptyBody = true)
