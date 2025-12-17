@@ -1,4 +1,5 @@
 import { cpuPercentageConfig, memoryPercentageConfig } from '../../../public-api/components/alerts/dynamicAlertConfig.bicep'
+import { AppServicePlanSku } from 'types.bicep'
 
 @description('Specifies the App Service plan name')
 param planName string
@@ -7,7 +8,7 @@ param planName string
 param location string
 
 @description('The SKU for the plan')
-param sku object
+param sku AppServicePlanSku
 
 @description('The kind of plan to deploy. Impacted by application type and desired OS. See https://github.com/Azure/app-service-linux-docs/blob/master/Things_You_Should_Know/kind_property.md#app-service-resource-kind-reference.')
 param kind 
