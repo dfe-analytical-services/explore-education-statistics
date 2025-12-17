@@ -34,4 +34,5 @@ steps:
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
               screenerDockerImageTag='$(screenerDockerImageTag)' \
               screenerAppRegistrationClientId='$(screenerAppRegistrationClientId)' \
-              devopsServicePrincipalId="$servicePrincipalId"
+              devopsServicePrincipalId="$servicePrincipalId" \
+              deployAlerts="$(deployAlerts)"
