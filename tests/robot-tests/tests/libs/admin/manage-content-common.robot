@@ -666,7 +666,7 @@ get editor toolbar
 
 get editor
     [Arguments]    ${block}
-    ${editor}=    lookup or return webelement    css:[aria-label^="Editor editing area: main"]    ${block}
+    ${editor}=    lookup or return webelement    css:[aria-label$="Press Alt+0 for help."]    ${block}
     [Return]    ${editor}
 
 get comments sidebar
