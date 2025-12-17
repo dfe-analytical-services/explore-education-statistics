@@ -60,7 +60,7 @@ public class UpdateSpecificCommentAuthorizationHandler : AuthorizationHandler<Up
     {
         var contentBlock = context
             .ContentBlocks.Include(block => block.ContentSection)
-            .ThenInclude(contentSection => contentSection!.ReleaseVersion)
+                .ThenInclude(contentSection => contentSection!.ReleaseVersion)
             .First(block => block.Id == comment.ContentBlockId);
 
         return contentBlock.ContentSection?.ReleaseVersion;

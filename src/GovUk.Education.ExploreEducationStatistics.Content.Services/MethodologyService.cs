@@ -101,7 +101,7 @@ public class MethodologyService : IMethodologyService
     {
         return await _contentDbContext
             .PublicationMethodologies.Include(pm => pm.Publication)
-            .ThenInclude(p => p.Contact)
+                .ThenInclude(p => p.Contact)
             .Where(pm => pm.MethodologyId == methodologyId && pm.Publication.LatestPublishedReleaseVersionId != null)
             .Select(pm => new PublicationSummaryViewModel
             {
@@ -130,7 +130,7 @@ public class MethodologyService : IMethodologyService
     {
         return await _contentDbContext
             .Methodologies.Include(m => m.LatestPublishedVersion)
-            .ThenInclude(mv => mv!.Methodology)
+                .ThenInclude(mv => mv!.Methodology)
             .Where(m => m.LatestPublishedVersion != null)
             .Select(m => m.LatestPublishedVersion)
             .OfType<MethodologyVersion>()

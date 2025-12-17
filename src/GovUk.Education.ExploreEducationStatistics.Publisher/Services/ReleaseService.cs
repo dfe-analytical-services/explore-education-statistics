@@ -25,7 +25,7 @@ public class ReleaseService(ContentDbContext contentDbContext, IReleaseVersionRe
         return await contentDbContext
             .ReleaseVersions.Include(rv => rv.PreviousVersion)
             .Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .Where(rv => releaseVersionIds.Contains(rv.Id) && rv.PreviousVersionId != null)
             .ToListAsync();
     }
@@ -80,7 +80,7 @@ public class ReleaseService(ContentDbContext contentDbContext, IReleaseVersionRe
     {
         var releaseVersion = await contentDbContext
             .ReleaseVersions.Include(rv => rv.DataBlockVersions)
-            .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
             .SingleAsync(rv => rv.Id == releaseVersionId);
 
         contentDbContext.ReleaseVersions.Update(releaseVersion);

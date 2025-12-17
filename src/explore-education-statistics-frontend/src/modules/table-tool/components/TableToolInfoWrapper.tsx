@@ -52,6 +52,7 @@ export default function TableToolInfoWrapper({
       <TableToolInfo
         contactDetails={publication?.contact}
         methodologyLinks={getMethodologyLinks()}
+        publishingOrganisations={fullPublication?.publishingOrganisations}
         releaseLink={
           <Link
             to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.latestRelease.slug}`}

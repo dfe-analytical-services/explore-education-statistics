@@ -41,10 +41,9 @@ Upload subject
 Add data guidance
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
 
-    user waits until page contains element    id:dataGuidanceForm-content
     user waits until page contains element    id:dataGuidance-dataFiles
-    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    Dates test subject
 
     user checks summary list contains    Filename    dates.csv
@@ -558,7 +557,7 @@ Verify existing data guidance for amendment
     user checks element value should be    ${editor}    Dates test subject test data guidance content
 
 Update existing data guidance for amendment
-    user enters text into element    id:dataGuidanceForm-content    Amended test data guidance content
+    user adds main data guidance content    Amended test data guidance content
     user enters text into data guidance data file content editor    Dates test subject
     ...    Amended Dates test subject test data guidance content
 

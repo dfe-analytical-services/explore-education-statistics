@@ -13,6 +13,7 @@ import ReleasePageContentSection from '@common/modules/find-statistics/component
 import ReleaseDataPageCardLink, {
   ReleaseDataPageCardLinkGrid,
 } from '@common/modules/release/components/ReleaseDataPageCardLink';
+import ReleaseDataSetFileSummary from '@common/modules/release/components/ReleaseDataSetFileSummary';
 import pageSections from '@common/modules/release/data/releaseExploreDataPageSections';
 import {
   PublicationSummaryRedesign,
@@ -20,7 +21,6 @@ import {
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
 import Link from '@frontend/components/Link';
-import ReleaseDataSetFileSummary from '@frontend/modules/find-statistics/components/ReleaseDataSetFileSummary';
 import downloadService from '@frontend/services/downloadService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
@@ -151,6 +151,12 @@ const ReleaseExploreDataPage = ({
           <ReleaseDataSetFileSummary
             dataSetFile={dataset}
             expanded={showAllDataSetDetails}
+            renderLink={
+              <Link to={`/data-catalogue/data-set/${dataset.dataSetFileId}`}>
+                Data set information page{' '}
+                <VisuallyHidden>for {dataset.title}</VisuallyHidden>
+              </Link>
+            }
           />
         </ReleaseDataListItem>
       ))}
@@ -408,6 +414,7 @@ const ReleaseExploreDataPage = ({
       <ContactUsSection
         publicationContact={publicationSummary.contact}
         publicationTitle={publicationSummary.title}
+        publishingOrganisations={releaseVersionSummary.publishingOrganisations}
       />
     </>
   );

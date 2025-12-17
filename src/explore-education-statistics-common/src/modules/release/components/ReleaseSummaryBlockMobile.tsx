@@ -5,12 +5,14 @@ import Modal from '@common/components/Modal';
 import { releaseTypesToIcons } from '@common/modules/release/components/ReleaseSummaryBlock';
 import styles from '@common/modules/release/components/ReleaseSummaryBlockMobile.module.scss';
 import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
+import { Organisation } from '@common/services/types/organisation';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import React, { ReactNode } from 'react';
 
 interface Props {
   isEditing?: boolean;
   lastUpdated?: string | Date;
+  publishingOrganisations?: Organisation[];
   releaseType: ReleaseType;
   renderProducerLink: ReactNode;
   renderSubscribeLink?: ReactNode;
@@ -21,6 +23,7 @@ interface Props {
 export default function ReleaseSummaryBlockMobile({
   isEditing,
   lastUpdated,
+  publishingOrganisations,
   releaseType,
   renderProducerLink,
   renderSubscribeLink,
@@ -54,7 +57,11 @@ export default function ReleaseSummaryBlockMobile({
               </ButtonText>
             }
           >
-            <ReleaseTypeSection showHeading={false} type={releaseType} />
+            <ReleaseTypeSection
+              publishingOrganisations={publishingOrganisations}
+              showHeading={false}
+              type={releaseType}
+            />
           </Modal>
 
           <div className={styles.updatesContainer}>

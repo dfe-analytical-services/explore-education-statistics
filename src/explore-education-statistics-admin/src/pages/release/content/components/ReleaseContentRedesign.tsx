@@ -36,13 +36,17 @@ export const releasePageTabSections = {
 export type ReleasePageTabSectionItems = typeof releasePageTabSections;
 export type ReleasePageTabSectionKey = keyof ReleasePageTabSectionItems;
 
+interface Props {
+  isPra?: boolean;
+  handleFeaturedTableItemClick?: (id: string) => void;
+  transformFeaturedTableLinks?: (url: string, text: string) => void;
+}
+
 const ReleaseContent = ({
   isPra = false,
+  handleFeaturedTableItemClick,
   transformFeaturedTableLinks,
-}: {
-  isPra?: boolean;
-  transformFeaturedTableLinks?: (url: string, text: string) => void;
-}) => {
+}: Props) => {
   const { release } = useReleaseContentState();
   const { setActiveSection } = useEditingContext();
 
@@ -100,6 +104,7 @@ const ReleaseContent = ({
       {!isMobileMedia && (
         <ReleaseSummaryBlock
           lastUpdated={updates[0]?.on}
+          publishingOrganisations={release.publishingOrganisations}
           releaseDate={release.published}
           releaseType={release.type}
           renderProducerLink={
@@ -151,6 +156,7 @@ const ReleaseContent = ({
         <ReleasePageTabExploreData
           hidden={activeTabSection !== 'explore'}
           isPra={isPra}
+          handleFeaturedTableItemClick={handleFeaturedTableItemClick}
         />
       )}
       {renderedTabs.includes('methodology') && (

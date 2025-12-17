@@ -197,36 +197,34 @@ public class EducationInNumbersServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            contentDbContext.EducationInNumbersPages.AddRange(
-                [
-                    new EducationInNumbersPage
-                    {
-                        Slug = "test-1",
-                        Published = new DateTimeOffset(2000, 01, 01, 0, 0, 0, TimeSpan.Zero),
-                        Created = new DateTimeOffset(2000, 01, 01, 0, 0, 0, TimeSpan.Zero),
-                    },
-                    new EducationInNumbersPage
-                    {
-                        Slug = "test-2",
-                        Published = new DateTimeOffset(2000, 01, 01, 0, 0, 0, TimeSpan.Zero),
-                        Created = new DateTimeOffset(2000, 01, 01, 0, 0, 0, TimeSpan.Zero),
-                        Updated = new DateTimeOffset(2001, 01, 01, 0, 0, 0, TimeSpan.Zero),
-                    },
-                    new EducationInNumbersPage
-                    {
-                        Slug = "test-3",
-                        Published = new DateTimeOffset(2000, 01, 01, 0, 0, 0, TimeSpan.Zero),
-                        Created = new DateTimeOffset(2000, 01, 01, 0, 0, 0, TimeSpan.Zero),
-                        Updated = new DateTimeOffset(2002, 01, 01, 0, 0, 0, TimeSpan.Zero),
-                    },
-                    // unpublished so won't appear
-                    new EducationInNumbersPage
-                    {
-                        Slug = "test-4",
-                        Created = new DateTimeOffset(2003, 01, 01, 0, 0, 0, TimeSpan.Zero),
-                    },
-                ]
-            );
+            contentDbContext.EducationInNumbersPages.AddRange([
+                new EducationInNumbersPage
+                {
+                    Slug = "test-1",
+                    Published = new DateTimeOffset(2000, 01, 01, 0, 0, 0, TimeSpan.Zero),
+                    Created = new DateTimeOffset(2000, 01, 01, 0, 0, 0, TimeSpan.Zero),
+                },
+                new EducationInNumbersPage
+                {
+                    Slug = "test-2",
+                    Published = new DateTimeOffset(2000, 01, 01, 0, 0, 0, TimeSpan.Zero),
+                    Created = new DateTimeOffset(2000, 01, 01, 0, 0, 0, TimeSpan.Zero),
+                    Updated = new DateTimeOffset(2001, 01, 01, 0, 0, 0, TimeSpan.Zero),
+                },
+                new EducationInNumbersPage
+                {
+                    Slug = "test-3",
+                    Published = new DateTimeOffset(2000, 01, 01, 0, 0, 0, TimeSpan.Zero),
+                    Created = new DateTimeOffset(2000, 01, 01, 0, 0, 0, TimeSpan.Zero),
+                    Updated = new DateTimeOffset(2002, 01, 01, 0, 0, 0, TimeSpan.Zero),
+                },
+                // unpublished so won't appear
+                new EducationInNumbersPage
+                {
+                    Slug = "test-4",
+                    Created = new DateTimeOffset(2003, 01, 01, 0, 0, 0, TimeSpan.Zero),
+                },
+            ]);
             await contentDbContext.SaveChangesAsync();
         }
 

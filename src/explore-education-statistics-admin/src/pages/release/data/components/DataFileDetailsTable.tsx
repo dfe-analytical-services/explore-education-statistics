@@ -7,7 +7,6 @@ import FormattedDate from '@common/components/FormattedDate';
 import Tag from '@common/components/Tag';
 import { useQuery } from '@tanstack/react-query';
 import React, { ReactNode } from 'react';
-import { useConfig } from '@admin/contexts/ConfigContext';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 import getDataSetVersionStatusText from './utils/getDataSetVersionStatusText';
@@ -30,14 +29,10 @@ const DataFileDetailsTable = ({
   onStatusChange,
   onReplacementStatusChange,
 }: Props) => {
-  const {
-    enableReplacementOfPublicApiDataSets: isNewReplaceDsvFeatureEnabled,
-  } = useConfig();
-  const replacementFileHasApi = isNewReplaceDsvFeatureEnabled
-    ? (replacementDataFile?.publicApiDataSetId !== undefined ||
-        dataFile.publicApiDataSetId !== undefined) &&
-      dataFile.replacedBy !== undefined
-    : false;
+  const replacementFileHasApi =
+    (replacementDataFile?.publicApiDataSetId !== undefined ||
+      dataFile.publicApiDataSetId !== undefined) &&
+    dataFile.replacedBy !== undefined;
 
   const publicApiDataSetId =
     dataFile.publicApiDataSetId ?? replacementDataFile?.publicApiDataSetId;

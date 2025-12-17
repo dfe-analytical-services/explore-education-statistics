@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -20,7 +21,7 @@ using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers;
 
-public class TableBuilderMetaControllerTests : CacheServiceTestFixture
+public class TableBuilderMetaControllerTests
 {
     private readonly DataFixture _dataFixture = new();
 
@@ -178,20 +179,26 @@ public class TableBuilderMetaControllerTests : CacheServiceTestFixture
             Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
             Mock<IReleaseSubjectService> releaseSubjectService,
             Mock<ISubjectMetaService> subjectMetaService,
-            Mock<IBlobCacheService> cacheService
+            Mock<IPublicBlobCacheService> cacheService
         ) mocks
     ) BuildControllerAndMocks()
     {
         var contentPersistenceHelper = MockPersistenceHelper<ContentDbContext>();
         var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
         var subjectMetaService = new Mock<ISubjectMetaService>(Strict);
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
 
         var controller = new TableBuilderMetaController(
             contentPersistenceHelper.Object,
             releaseSubjectService.Object,
-            subjectMetaService.Object
+            subjectMetaService.Object,
+            publicBlobCacheService.Object,
+            Mock.Of<ILogger<TableBuilderMetaController>>()
         );
 
-        return (controller, (contentPersistenceHelper, releaseSubjectService, subjectMetaService, BlobCacheService));
+        return (
+            controller,
+            (contentPersistenceHelper, releaseSubjectService, subjectMetaService, publicBlobCacheService)
+        );
     }
 }

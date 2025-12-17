@@ -153,7 +153,7 @@ public class EmailTemplateService(
     {
         return await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(releaseVersion =>
             {

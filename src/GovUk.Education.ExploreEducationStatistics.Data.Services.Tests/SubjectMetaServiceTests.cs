@@ -460,19 +460,12 @@ public class SubjectMetaServiceTests
             Assert.Empty(viewModel.TimePeriod.Options);
 
             var fileFilterHierarchy = releaseFile.File.FilterHierarchies[0];
-            viewModel.FilterHierarchies.AssertDeepEqualTo(
+            viewModel.FilterHierarchies.AssertDeepEqualTo([
                 [
-                    [
-                        new DataSetFileFilterHierarchyTierViewModel(
-                            0,
-                            filter1Id,
-                            filter2Id,
-                            fileFilterHierarchy.Tiers[0]
-                        ),
-                        new DataSetFileFilterHierarchyTierViewModel(1, filter2Id, null, fileFilterHierarchy.Tiers[1]),
-                    ],
-                ]
-            );
+                    new DataSetFileFilterHierarchyTierViewModel(0, filter1Id, filter2Id, fileFilterHierarchy.Tiers[0]),
+                    new DataSetFileFilterHierarchyTierViewModel(1, filter2Id, null, fileFilterHierarchy.Tiers[1]),
+                ],
+            ]);
         }
     }
 

@@ -1,5 +1,5 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -7,19 +7,17 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Functions;
 
-[Collection(CacheTestFixture.CollectionName)]
 public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixture fixture)
     : PublisherFunctionsIntegrationTest(fixture)
 {
-    public class PublishTaxonomyTests(
-        PublisherFunctionsIntegrationTestFixture fixture,
-        CacheServiceTestFixture cacheFixture
-    ) : PublishTaxonomyFunctionTests(fixture), IClassFixture<CacheServiceTestFixture>
+    public class PublishTaxonomyTests(PublisherFunctionsIntegrationTestFixture fixture)
+        : PublishTaxonomyFunctionTests(fixture)
     {
         [Fact]
         public async Task MethodologyTree()
@@ -42,7 +40,7 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
 
             List<AllMethodologiesThemeViewModel> expectedMethodologyTree =
             [
-                new AllMethodologiesThemeViewModel
+                new()
                 {
                     Id = theme.Id,
                     Title = theme.Title,
@@ -66,14 +64,16 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
                 },
             ];
 
-            cacheFixture
-                .PublicBlobCacheService.Setup(s =>
+            var publicBlobCacheService = Mock.Get(GetRequiredService<IPublicBlobCacheService>());
+
+            publicBlobCacheService
+                .Setup(s =>
                     s.SetItemAsync<object>(new AllMethodologiesCacheKey(), ItIs.DeepEqualTo(expectedMethodologyTree))
                 )
                 .Returns(Task.CompletedTask);
 
-            cacheFixture
-                .PublicBlobCacheService.Setup(s =>
+            publicBlobCacheService
+                .Setup(s =>
                     s.SetItemAsync<object>(new PublicationTreeCacheKey(), new List<PublicationTreeThemeViewModel>())
                 )
                 .Returns(Task.CompletedTask);
@@ -81,7 +81,7 @@ public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixtu
             var function = GetRequiredService<PublishTaxonomyFunction>();
             await function.PublishTaxonomy(new PublishTaxonomyMessage(), new TestFunctionContext());
 
-            VerifyAllMocks(cacheFixture.PublicBlobCacheService);
+            VerifyAllMocks(publicBlobCacheService);
         }
     }
 }

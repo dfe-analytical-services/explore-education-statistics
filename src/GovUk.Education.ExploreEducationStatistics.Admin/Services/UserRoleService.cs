@@ -99,7 +99,7 @@ public class UserRoleService(
     {
         return await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .LatestReleaseVersion(releaseId: releaseId)
             .SingleOrNotFoundAsync()
             .OnSuccessDo(rv => userService.CheckCanUpdateReleaseRole(rv!.Release.Publication, role))
@@ -386,8 +386,8 @@ public class UserRoleService(
             {
                 var allReleaseRoles = await contentDbContext
                     .UserReleaseRoles.Include(userReleaseRole => userReleaseRole.ReleaseVersion)
-                    .ThenInclude(releaseVersion => releaseVersion.Release)
-                    .ThenInclude(release => release.Publication)
+                        .ThenInclude(releaseVersion => releaseVersion.Release)
+                            .ThenInclude(release => release.Publication)
                     .Where(userReleaseRole => userReleaseRole.UserId == userId)
                     .ToListAsync();
 
@@ -439,8 +439,8 @@ public class UserRoleService(
                     query
                         .Include(userReleaseRole => userReleaseRole.User)
                         .Include(userReleaseRole => userReleaseRole.ReleaseVersion)
-                        .ThenInclude(releaseVersion => releaseVersion.Release)
-                        .ThenInclude(release => release.Publication)
+                            .ThenInclude(releaseVersion => releaseVersion.Release)
+                                .ThenInclude(release => release.Publication)
             )
             .OnSuccess(async userReleaseRole =>
             {

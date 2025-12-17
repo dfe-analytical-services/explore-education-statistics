@@ -7,9 +7,11 @@ import {
 } from '@common/services/types/methodology';
 import { ReleaseType } from '@common/services/types/releaseType';
 import React, { ReactNode } from 'react';
+import { Organisation } from '@common/services/types/organisation';
 
 interface Props {
   publication: Publication;
+  publishingOrganisations?: Organisation[];
   releaseType: ReleaseType;
   renderExternalMethodologyLink: (
     externalMethodology: ExternalMethodology,
@@ -20,6 +22,7 @@ interface Props {
 
 export default function ReleaseHelpAndSupportSection({
   publication,
+  publishingOrganisations,
   releaseType,
   renderMethodologyLink,
   renderExternalMethodologyLink,
@@ -56,9 +59,16 @@ export default function ReleaseHelpAndSupportSection({
         </>
       )}
 
-      <ReleaseTypeSection type={releaseType} />
+      <ReleaseTypeSection
+        publishingOrganisations={publishingOrganisations}
+        type={releaseType}
+      />
 
-      <ContactUsSection publicationContact={contact} publicationTitle={title} />
+      <ContactUsSection
+        publicationContact={contact}
+        publicationTitle={title}
+        publishingOrganisations={publishingOrganisations}
+      />
     </div>
   );
 }

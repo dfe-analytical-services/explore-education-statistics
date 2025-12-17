@@ -10,6 +10,7 @@ import {
   MapCategoricalData,
   MapLegendItem,
 } from '@common/modules/charts/types/chart';
+import { getScale } from 'color2k';
 
 export default function generateFeaturesAndDataGroups({
   deprecatedCategoricalDataConfig,
@@ -31,16 +32,15 @@ export default function generateFeaturesAndDataGroups({
 } {
   const selectedDataSetKey = dataSetConfig.dataKey;
 
-  const isCategoricalData =
-    dataSetConfig?.categoricalDataConfig?.length ||
-    deprecatedCategoricalDataConfig?.length;
+  const categoricalDataConfig = dataSetConfig.categoricalDataConfig?.length
+    ? dataSetConfig.categoricalDataConfig
+    : deprecatedCategoricalDataConfig;
 
-  const { features, legendItems } = isCategoricalData
+  const { features, legendItems } = categoricalDataConfig?.length
     ? getCategoricalDataFeatures({
-        categoricalDataConfig: dataSetConfig.categoricalDataConfig?.length
-          ? dataSetConfig.categoricalDataConfig
-          : deprecatedCategoricalDataConfig,
+        categoricalDataConfig,
         dataSetCategories,
+        dataSetConfig,
         selectedDataSetKey,
       })
     : getNumericDataFeatures({
@@ -55,13 +55,29 @@ export default function generateFeaturesAndDataGroups({
 function getCategoricalDataFeatures({
   categoricalDataConfig,
   dataSetCategories,
+  dataSetConfig,
   selectedDataSetKey,
 }: {
-  categoricalDataConfig?: MapCategoricalData[];
+  categoricalDataConfig: MapCategoricalData[];
   dataSetCategories: MapDataSetCategory[];
+  dataSetConfig: MapDataSetCategoryConfig;
   selectedDataSetKey: string;
 }) {
   const defaultColour = 'rgba(0,0,0,0)';
+
+  const dataGroups = dataSetConfig.config.sequentialCategoryColours
+    ? categoricalDataConfig?.map((config, index) => {
+        const colourScale = getScale('#fff', dataSetConfig.config.colour);
+        const groupProportion = 1 / categoricalDataConfig.length;
+
+        return {
+          ...config,
+          colour: colourScale(
+            index / categoricalDataConfig.length + groupProportion,
+          ),
+        };
+      })
+    : categoricalDataConfig;
 
   const features: MapFeatureCollection = {
     type: 'FeatureCollection',
@@ -69,7 +85,7 @@ function getCategoricalDataFeatures({
       (acc, { dataSets, filter, geoJson }) => {
         const value = dataSets?.[selectedDataSetKey]?.value;
 
-        const matchingDataGroup = categoricalDataConfig?.find(
+        const matchingDataGroup = dataGroups?.find(
           dataClass => dataClass.value === value,
         );
 
@@ -93,7 +109,7 @@ function getCategoricalDataFeatures({
   return {
     features,
     categoricalDataConfig,
-    legendItems: categoricalDataConfig ?? [],
+    legendItems: dataGroups,
   };
 }
 

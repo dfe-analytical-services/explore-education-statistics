@@ -119,7 +119,7 @@ const DataBlockSourceWizard = ({
 }: DataBlockSourceWizardProps) => {
   return (
     <div className="govuk-!-margin-bottom-8">
-      <h2 className="govuk-heading-m">Data source</h2>
+      <h3>Data source</h3>
       <p>Configure data source for the data block</p>
       {dataBlock && dataBlock.charts.length > 0 && (
         <WarningMessage>
@@ -133,11 +133,12 @@ const DataBlockSourceWizard = ({
         hidePublicationStep
         initialState={tableToolState}
         showTableQueryErrorDownload={false}
+        stepHeadingTag="h4"
         finalStep={({ query, table, tableHeaders, onReorder }) => (
           <WizardStep size="l">
             {wizardStepProps => (
               <>
-                <WizardStepHeading {...wizardStepProps}>
+                <WizardStepHeading {...wizardStepProps} stepHeadingTag="h4">
                   {dataBlock ? 'Update data block' : 'Create data block'}
                 </WizardStepHeading>
 

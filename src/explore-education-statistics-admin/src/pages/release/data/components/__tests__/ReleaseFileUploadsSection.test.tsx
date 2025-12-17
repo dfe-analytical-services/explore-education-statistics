@@ -69,11 +69,7 @@ describe('ReleaseFileUploadsSection', () => {
     const sections = screen.getAllByTestId('accordionSection');
 
     const section1 = within(sections[0]);
-
-    expect(
-      section1.getByRole('button', { name: /Test file 1/ }),
-    ).toBeInTheDocument();
-
+    expect(sections[0]).toHaveTextContent('Test file 1');
     expect(section1.getByTestId('Title')).toHaveTextContent('Test file 1');
     expect(section1.getByTestId('File')).toHaveTextContent('file-1.docx');
     expect(section1.getByTestId('File size')).toHaveTextContent('50 Kb');
@@ -86,11 +82,7 @@ describe('ReleaseFileUploadsSection', () => {
     );
 
     const section2 = within(sections[1]);
-
-    expect(
-      section2.getByRole('button', { name: /Test file 2/ }),
-    ).toBeInTheDocument();
-
+    expect(sections[1]).toHaveTextContent('Test file 2');
     expect(section2.getByTestId('Title')).toHaveTextContent('Test file 2');
     expect(section2.getByTestId('File')).toHaveTextContent('file-2.docx');
     expect(section2.getByTestId('File size')).toHaveTextContent('100 Kb');
@@ -134,13 +126,13 @@ describe('ReleaseFileUploadsSection', () => {
 
       expect(
         within(sections[1]).getByRole('button', {
-          name: 'Delete file',
+          name: /Delete file/,
         }),
       ).toBeInTheDocument();
 
       await user.click(
         within(sections[1]).getByRole('button', {
-          name: 'Delete file',
+          name: /Delete file/,
         }),
       );
 
@@ -173,7 +165,7 @@ describe('ReleaseFileUploadsSection', () => {
 
       await user.click(
         within(sections[1]).getByRole('button', {
-          name: 'Delete file',
+          name: /Delete file/,
         }),
       );
 
@@ -209,11 +201,7 @@ describe('ReleaseFileUploadsSection', () => {
 
       const updatedSections = screen.getAllByTestId('accordionSection');
 
-      expect(
-        within(updatedSections[0]).getByRole('button', {
-          name: /Test file 1/,
-        }),
-      ).toBeInTheDocument();
+      expect(updatedSections[0]).toHaveTextContent('Test file 1');
     });
   });
 
@@ -390,26 +378,13 @@ describe('ReleaseFileUploadsSection', () => {
 
       expect(sections).toHaveLength(3);
 
-      const section1 = within(sections[0]);
+      expect(sections[0]).toHaveTextContent('Test file 1');
 
-      expect(
-        section1.getByRole('button', { name: /Test file 1/ }),
-      ).toBeInTheDocument();
-
-      const section2 = within(sections[1]);
-
-      expect(
-        section2.getByRole('button', { name: /Test file 2/ }),
-      ).toBeInTheDocument();
+      expect(sections[1]).toHaveTextContent('Test file 2');
 
       const section3 = within(sections[2]);
-
-      expect(
-        section3.getByRole('button', { name: /Test file 3/ }),
-      ).toBeInTheDocument();
-
+      expect(sections[2]).toHaveTextContent('Test file 3');
       expect(section3.getByTestId('Title')).toHaveTextContent('Test file 3');
-
       expect(section3.getByTestId('File')).toHaveTextContent('test-file.docx');
       expect(section3.getByTestId('File size')).toHaveTextContent('150 Kb');
       expect(section3.getByTestId('Summary')).toHaveTextContent(

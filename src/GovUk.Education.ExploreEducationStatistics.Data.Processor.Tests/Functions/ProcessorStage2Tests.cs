@@ -280,7 +280,7 @@ public class ProcessorStage2Tests
         {
             var filters = await statisticsDbContext
                 .Filter.Include(f => f.FilterGroups)
-                .ThenInclude(fg => fg.FilterItems)
+                    .ThenInclude(fg => fg.FilterItems)
                 .Where(f => f.SubjectId == scenario.GetSubjectId())
                 .ToListAsync();
 

@@ -92,7 +92,7 @@ const PrototypeFilters = ({
       <h2 className="govuk-heading-m govuk-!-margin-top-6">Advanced filters</h2>
 
       <Accordion id="filters">
-        <AccordionSection heading="Release type" goToTop={false}>
+        <AccordionSection heading="Release type" backToTop={false}>
           <h3 className="govuk-!-margin-bottom-0">Filter by release type</h3>
           <a
             href="#"

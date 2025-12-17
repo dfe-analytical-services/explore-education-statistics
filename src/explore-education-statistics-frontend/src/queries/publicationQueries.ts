@@ -1,5 +1,4 @@
 import publicationService, {
-  PreReleaseAccessListSummary,
   PublicationMethodologiesList,
   PublicationReleaseSeriesItem,
   PublicationSummaryRedesign,
@@ -88,19 +87,6 @@ const publicationQueries = {
       ],
       queryFn: () =>
         publicationService.getReleaseVersionRelatedInformation(
-          publicationSlug,
-          releaseSlug,
-        ),
-    };
-  },
-  getPreReleaseAccessList(
-    publicationSlug: string,
-    releaseSlug: string,
-  ): UseQueryOptions<PreReleaseAccessListSummary> {
-    return {
-      queryKey: ['preReleaseAccessList', publicationSlug, releaseSlug],
-      queryFn: () =>
-        publicationService.getPreReleaseAccessList(
           publicationSlug,
           releaseSlug,
         ),

@@ -44,6 +44,7 @@ Add data guidance to subjects
 
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME_1}
@@ -180,6 +181,7 @@ Add data guidance to second release
 
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME_4}
@@ -218,7 +220,7 @@ Add headline text block to Content page for the second release
     user adds content to headlines text block    Headline text block text
 
 Validate checklist error for a draft API data set which shows mapping error
-    user edits release status
+    user clicks link    Publishing checklist
     user checks checklist errors contains
     ...    1 issue that must be resolved before this release can be published.
     user checks checklist errors contains link
@@ -238,6 +240,7 @@ Add data guidance to the third release
 
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME_5}
@@ -280,7 +283,7 @@ Add headline text block to Content page for the third release
     user adds content to headlines text block    Headline text block text
 
 Validate checklist error for a draft API data set which shows mapping error for the third release
-    user edits release status
+    user clicks link    Publishing checklist
     user checks checklist errors contains
     ...    1 issue that must be resolved before this release can be published.
     user checks checklist errors contains link

@@ -39,8 +39,8 @@ public class ReleasePublishingFeedbackFunction(
         {
             await contentDbContext
                 .ReleasePublishingFeedback.Include(feedback => feedback.ReleaseVersion)
-                .ThenInclude(releaseVersion => releaseVersion.Release)
-                .ThenInclude(release => release.Publication)
+                    .ThenInclude(releaseVersion => releaseVersion.Release)
+                        .ThenInclude(release => release.Publication)
                 .SingleOrNotFoundAsync(
                     feedback => feedback.Id == message.ReleasePublishingFeedbackId,
                     cancellationToken

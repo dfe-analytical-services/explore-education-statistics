@@ -5,9 +5,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extension
 
 public static class DataSetVersionAuthExtensions
 {
-    public static readonly IReadOnlyList<DataSetVersionStatus> PublicStatuses = new List<DataSetVersionStatus>(
-        [DataSetVersionStatus.Published, DataSetVersionStatus.Withdrawn, DataSetVersionStatus.Deprecated]
-    );
+    public static readonly IReadOnlyList<DataSetVersionStatus> PublicStatuses = new List<DataSetVersionStatus>([
+        DataSetVersionStatus.Published,
+        DataSetVersionStatus.Withdrawn,
+        DataSetVersionStatus.Deprecated,
+    ]);
 
     public static readonly IReadOnlyList<DataSetVersionStatus> PrivateStatuses = EnumUtil
         .GetEnums<DataSetVersionStatus>()

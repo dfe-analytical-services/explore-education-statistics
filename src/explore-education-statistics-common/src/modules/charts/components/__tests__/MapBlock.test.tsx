@@ -1,6 +1,8 @@
 import render from '@common-test/render';
 import React from 'react';
 import {
+  testCategoricalMapConfiguration,
+  testGeoJsonFeature,
   testMapConfiguration,
   testMapTableData,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
@@ -17,6 +19,13 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { within } from '@testing-library/dom';
 import { screen, waitFor } from '@testing-library/react';
 import { produce } from 'immer';
+import {
+  Indicator,
+  LocationFilter,
+  TimePeriodFilter,
+} from '@common/modules/table-tool/types/filters';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { TableDataResult } from '@common/services/tableBuilderService';
 
 describe('MapBlock', () => {
   const testFullTable = mapFullTable(testMapTableData);
@@ -72,6 +81,141 @@ describe('MapBlock', () => {
     expect(legendColours[2].style.backgroundColor).toBe('rgb(145, 161, 201)');
     expect(legendColours[3].style.backgroundColor).toBe('rgb(108, 130, 183)');
     expect(legendColours[4].style.backgroundColor).toBe('rgb(71, 99, 165)');
+  });
+
+  test('renders legends and polygons correctly for categorical data', async () => {
+    const testCategoricalMeta: FullTableMeta = {
+      filters: {},
+      footnotes: [],
+      indicators: [
+        new Indicator({
+          label: 'Indicator 1',
+          name: 'indicator-1-name',
+          unit: '',
+          value: 'indicator-1',
+        }),
+        new Indicator({
+          label: 'Indicator 2',
+          name: 'indicator-2-name',
+          unit: '',
+          value: 'indicator-2',
+        }),
+      ],
+      locations: [
+        new LocationFilter({
+          value: 'location-1-value',
+          label: 'Location 1',
+          level: 'region',
+          geoJson: testGeoJsonFeature,
+        }),
+        new LocationFilter({
+          value: 'location-2-value',
+          label: 'Location 2',
+          level: 'region',
+          geoJson: testGeoJsonFeature,
+        }),
+        new LocationFilter({
+          value: 'location-3-value',
+          label: 'Location 3',
+          level: 'region',
+          geoJson: testGeoJsonFeature,
+        }),
+      ],
+      boundaryLevels: [
+        {
+          id: 15,
+          label: 'Regions England BUC 2022/12',
+        },
+      ],
+      publicationName: 'Publication 1',
+      subjectName: 'Subject 1',
+      timePeriodRange: [
+        new TimePeriodFilter({
+          year: 2024,
+          code: 'CY',
+          label: '2024',
+          order: 0,
+        }),
+      ],
+      geoJsonAvailable: true,
+    };
+
+    const testCategoricalData: TableDataResult[] = [
+      {
+        filters: [],
+        geographicLevel: 'region',
+        locationId: 'location-1-value',
+        measures: {
+          'indicator-1': 'small',
+        },
+        timePeriod: '2024_CY',
+      },
+      {
+        filters: [],
+        geographicLevel: 'region',
+        locationId: 'location-2-value',
+        measures: {
+          'indicator-1': 'medium',
+        },
+        timePeriod: '2024_CY',
+      },
+
+      {
+        filters: [],
+        geographicLevel: 'region',
+        locationId: 'location-3-value',
+        measures: {
+          'indicator-1': 'large',
+        },
+        timePeriod: '2024_CY',
+      },
+    ];
+
+    const testCategoricalMapProps: MapBlockProps = {
+      ...testCategoricalMapConfiguration,
+      boundaryLevel: 1,
+      id: 'testMap',
+      axes: testCategoricalMapConfiguration.axes as MapBlockProps['axes'],
+      legend: testCategoricalMapConfiguration.legend as LegendConfiguration,
+      meta: testCategoricalMeta,
+      data: testCategoricalData,
+      height: 600,
+      onBoundaryLevelChange,
+    };
+    const { container } = render(<MapBlock {...testCategoricalMapProps} />);
+
+    await waitFor(() => {
+      const paths = container.querySelectorAll<HTMLElement>(
+        '.leaflet-container svg:not(.leaflet-attribution-flag) path',
+      );
+
+      expect(paths).toHaveLength(4);
+
+      // Location polygons
+      expect(paths[0]).toHaveAttribute('fill', '#12436D');
+      expect(paths[1]).toHaveAttribute('fill', '#801650');
+      expect(paths[2]).toHaveAttribute('fill', '#28A197');
+      // UK polygon
+      expect(paths[3]).toHaveAttribute('fill', '#003078');
+    });
+
+    expect(
+      await screen.findByLabelText('1. Select data to view'),
+    ).toBeInTheDocument();
+
+    const legendItems = screen.getAllByTestId('mapBlock-legend-item');
+
+    expect(legendItems).toHaveLength(3);
+    expect(legendItems[0]).toHaveTextContent('small');
+    expect(legendItems[1]).toHaveTextContent('medium');
+    expect(legendItems[2]).toHaveTextContent('large');
+
+    const legendColours = screen.getAllByTestId('mapBlock-legend-colour');
+
+    expect(legendColours).toHaveLength(3);
+    expect(legendColours[0].style.backgroundColor).toBe('rgb(18, 67, 109)');
+    expect(legendColours[1].style.backgroundColor).toBe('rgb(128, 22, 80)');
+    expect(legendColours[2].style.backgroundColor).toBe('rgb(40, 161, 151)');
   });
 
   test('renders legend groups correctly with custom 1 d.p decimal places', async () => {

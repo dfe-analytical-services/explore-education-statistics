@@ -11,6 +11,7 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import methodologyQueries from '@admin/queries/methodologyQueries';
@@ -126,6 +127,7 @@ const AdminDashboardPage = () => {
               <li>
                 <Link to="/contact-us" target="_blank">
                   Contact us
+                  <VisuallyHidden> about general enquiries</VisuallyHidden>
                 </Link>
               </li>
             </ul>

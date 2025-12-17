@@ -1002,6 +1002,111 @@ describe('ChartLegendConfiguration', () => {
     });
   });
 
+  test('shows the sequential colours checkbox for data sets with categorical data in maps', () => {
+    render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={mapBlockDefinition}
+          meta={testCategoricalMeta}
+          data={testCategoricalData}
+          axisMajor={{
+            dataSets: [
+              {
+                order: 0,
+                indicator: 'indicator-1',
+                filters: [],
+                timePeriod: '2024_CY',
+              },
+              {
+                order: 1,
+                indicator: 'indicator-2',
+                filters: [],
+                timePeriod: '2024_CY',
+              },
+            ],
+            groupBy: 'locations',
+            referenceLines: [],
+            type: 'major',
+          }}
+          legend={{
+            position: 'bottom',
+            items: [],
+          }}
+          mapDataSetConfigs={testMapDataSetConfigs}
+          onSubmit={noop}
+          onChange={noop}
+          onReorderCategories={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    const legendItems = screen.getAllByRole('group');
+    expect(legendItems).toHaveLength(2);
+    expect(
+      within(legendItems[0]).getByRole('checkbox', {
+        name: 'Sequential colours',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(legendItems[1]).getByRole('checkbox', {
+        name: 'Sequential colours',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  test('clicking the sequential colours checkbox shows the colour field', async () => {
+    const { user } = render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={mapBlockDefinition}
+          meta={testCategoricalMeta}
+          data={testCategoricalData}
+          axisMajor={{
+            dataSets: [
+              {
+                order: 0,
+                indicator: 'indicator-1',
+                filters: [],
+                timePeriod: '2024_CY',
+              },
+              {
+                order: 1,
+                indicator: 'indicator-2',
+                filters: [],
+                timePeriod: '2024_CY',
+              },
+            ],
+            groupBy: 'locations',
+            referenceLines: [],
+            type: 'major',
+          }}
+          legend={{
+            position: 'bottom',
+            items: [],
+          }}
+          mapDataSetConfigs={testMapDataSetConfigs}
+          onSubmit={noop}
+          onChange={noop}
+          onReorderCategories={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    const legendItems = screen.getAllByRole('group');
+    expect(legendItems).toHaveLength(2);
+    expect(
+      within(legendItems[0]).queryByLabelText('Colour'),
+    ).not.toBeInTheDocument();
+
+    await user.click(
+      within(legendItems[0]).getByRole('checkbox', {
+        name: 'Sequential colours',
+      }),
+    );
+
+    expect(within(legendItems[0]).getByLabelText('Colour')).toBeInTheDocument();
+  });
+
   describe('reorder categories in map key', () => {
     test('shows the reorder button for data sets with categorical data in maps', () => {
       render(

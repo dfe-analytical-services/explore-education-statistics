@@ -271,7 +271,7 @@ public class DataSetVersionService(
 
         return await contentDbContext
             .ReleaseFiles.Include(rf => rf.ReleaseVersion)
-            .ThenInclude(rv => rv.Release)
+                .ThenInclude(rv => rv.Release)
             .Include(rf => rf.File)
             .Where(releaseFile => dataSetVersionsByReleaseFileId.Keys.Contains(releaseFile.Id))
             .ToDictionaryAsync(rf => dataSetVersionsByReleaseFileId[rf.Id].Id, rf => rf, cancellationToken);
@@ -428,7 +428,7 @@ public class DataSetVersionService(
             .ReleaseFiles.AsNoTracking()
             .Where(rf => rf.Id == dataSetVersion.Release.ReleaseFileId)
             .Include(rf => rf.ReleaseVersion)
-            .ThenInclude(rv => rv.Release)
+                .ThenInclude(rv => rv.Release)
             .Include(rf => rf.File)
             .SingleAsync(cancellationToken);
     }

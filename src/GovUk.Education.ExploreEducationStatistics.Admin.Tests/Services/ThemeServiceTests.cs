@@ -275,9 +275,10 @@ public class ThemeServiceTests
 
         Publication publication1 = _fixture
             .DefaultPublication()
-            .WithReleases(
-                [_fixture.DefaultRelease(publishedVersions: 1), _fixture.DefaultRelease(publishedVersions: 1)]
-            )
+            .WithReleases([
+                _fixture.DefaultRelease(publishedVersions: 1),
+                _fixture.DefaultRelease(publishedVersions: 1),
+            ])
             .WithTheme(theme);
 
         Publication publication2 = _fixture

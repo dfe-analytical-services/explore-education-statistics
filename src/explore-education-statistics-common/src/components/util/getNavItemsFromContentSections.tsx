@@ -29,7 +29,7 @@ export default function getNavItemsFromContentSections(
     const { heading, content: sectionContent } = section;
     const subNavItems = sectionContent
       .flatMap(block => {
-        if (block.type === 'HtmlBlock') {
+        if (block.type === 'HtmlBlock' && block.body) {
           return getNavItemsFromHtml({
             html: block.body,
             blockId: block.id,

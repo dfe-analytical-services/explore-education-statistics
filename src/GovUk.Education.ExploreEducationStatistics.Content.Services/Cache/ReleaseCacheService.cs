@@ -1,5 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -7,32 +7,42 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 
-public class ReleaseCacheService(IReleaseService releaseService, IPublicBlobStorageService publicBlobStorageService)
-    : IReleaseCacheService
+public class ReleaseCacheService(
+    IReleaseService releaseService,
+    IPublicBlobStorageService publicBlobStorageService,
+    IPublicBlobCacheService publicBlobCacheService,
+    ILogger<ReleaseCacheService> logger
+) : IReleaseCacheService
 {
-    [BlobCache(typeof(ReleaseCacheKey), ServiceName = "public")]
     public Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(
         string publicationSlug,
         string? releaseSlug = null
     )
     {
-        return releaseService.GetRelease(publicationSlug, releaseSlug);
+        return publicBlobCacheService.GetOrCreateAsync(
+            cacheKey: new ReleaseCacheKey(publicationSlug: publicationSlug, releaseSlug: releaseSlug),
+            createIfNotExistsFn: () => releaseService.GetRelease(publicationSlug, releaseSlug),
+            logger: logger
+        );
     }
 
-    [BlobCache(typeof(ReleaseCacheKey), forceUpdate: true, ServiceName = "public")]
     public Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateRelease(
         Guid releaseVersionId,
         string publicationSlug,
         string? releaseSlug = null
     )
     {
-        return releaseService.GetRelease(releaseVersionId);
+        return publicBlobCacheService.Update(
+            cacheKey: new ReleaseCacheKey(publicationSlug: publicationSlug, releaseSlug: releaseSlug),
+            createFn: () => releaseService.GetRelease(releaseVersionId),
+            logger: logger
+        );
     }
 
-    [BlobCache(typeof(ReleaseStagedCacheKey), forceUpdate: true, ServiceName = "public")]
     public Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateReleaseStaged(
         Guid releaseVersionId,
         DateTime expectedPublishDate,
@@ -40,7 +50,11 @@ public class ReleaseCacheService(IReleaseService releaseService, IPublicBlobStor
         string? releaseSlug = null
     )
     {
-        return releaseService.GetRelease(releaseVersionId, expectedPublishDate);
+        return publicBlobCacheService.Update(
+            cacheKey: new ReleaseStagedCacheKey(publicationSlug: publicationSlug, releaseSlug: releaseSlug),
+            createFn: () => releaseService.GetRelease(releaseVersionId, expectedPublishDate),
+            logger: logger
+        );
     }
 
     public async Task<Either<ActionResult, Unit>> RemoveRelease(string publicationSlug, string releaseSlug)

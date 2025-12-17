@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -271,23 +272,30 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        BlobCacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel))).ReturnsAsync(null!);
-
-        BlobCacheService.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults)).Returns(Task.CompletedTask);
-
         var dataBlockService = new Mock<IDataBlockService>();
 
         dataBlockService
             .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(dataBlockService: dataBlockService.Object).CreateClient();
+        var app = SetupApp(dataBlockService: dataBlockService.Object);
+        var client = app.CreateClient();
+
+        var publicBlobCacheService = Mock.Get(app.Services.GetRequiredService<IPublicBlobCacheService>());
+
+        publicBlobCacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+            .ReturnsAsync(null!);
+
+        publicBlobCacheService
+            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+            .Returns(Task.CompletedTask);
 
         var response = await client.GetAsync(
             $"http://localhost/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}"
         );
 
-        VerifyAllMocks(BlobCacheService, dataBlockService);
+        VerifyAllMocks(publicBlobCacheService, dataBlockService);
 
         response.AssertOk(_tableBuilderResults);
     }
@@ -341,7 +349,8 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             context.DataBlockParents.Add(dataBlockParent);
         });
 
-        var client = SetupApp().CreateClient();
+        var app = SetupApp();
+        var client = app.CreateClient();
 
         var publishedDate = dataBlockParent.LatestPublishedVersion!.Published!.Value;
 
@@ -358,7 +367,9 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             }
         );
 
-        VerifyAllMocks(BlobCacheService);
+        var publicBlobCacheService = Mock.Get(app.Services.GetRequiredService<IPublicBlobCacheService>());
+
+        VerifyAllMocks(publicBlobCacheService);
 
         response.AssertNotModified();
     }
@@ -399,17 +410,24 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        BlobCacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel))).ReturnsAsync(null!);
-
-        BlobCacheService.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults)).Returns(Task.CompletedTask);
-
         var dataBlockService = new Mock<IDataBlockService>(Strict);
 
         dataBlockService
             .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(dataBlockService: dataBlockService.Object).CreateClient();
+        var app = SetupApp(dataBlockService: dataBlockService.Object);
+        var client = app.CreateClient();
+
+        var publicBlobCacheService = Mock.Get(app.Services.GetRequiredService<IPublicBlobCacheService>());
+
+        publicBlobCacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+            .ReturnsAsync(null!);
+
+        publicBlobCacheService
+            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+            .Returns(Task.CompletedTask);
 
         var publishedDate = dataBlockParent.LatestPublishedVersion!.Published!.Value;
 
@@ -427,7 +445,7 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             }
         );
 
-        VerifyAllMocks(BlobCacheService, dataBlockService);
+        VerifyAllMocks(publicBlobCacheService, dataBlockService);
 
         response.AssertOk(_tableBuilderResults);
     }
@@ -468,17 +486,24 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        BlobCacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel))).ReturnsAsync(null!);
-
-        BlobCacheService.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults)).Returns(Task.CompletedTask);
-
         var dataBlockService = new Mock<IDataBlockService>(Strict);
 
         dataBlockService
             .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(dataBlockService: dataBlockService.Object).CreateClient();
+        var app = SetupApp(dataBlockService: dataBlockService.Object);
+        var client = app.CreateClient();
+
+        var publicBlobCacheService = Mock.Get(app.Services.GetRequiredService<IPublicBlobCacheService>());
+
+        publicBlobCacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+            .ReturnsAsync(null!);
+
+        publicBlobCacheService
+            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+            .Returns(Task.CompletedTask);
 
         // The latest published DataBlockVersion has been published since the caller last requested it, so we
         // consider this "Modified" by the published date alone.
@@ -493,7 +518,7 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             }
         );
 
-        VerifyAllMocks(BlobCacheService, dataBlockService);
+        VerifyAllMocks(publicBlobCacheService, dataBlockService);
 
         response.AssertOk(_tableBuilderResults);
     }
@@ -503,12 +528,10 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
-                ]
-            );
+            .WithReleases([
+                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
+            ]);
 
         var release = publication.Releases.Single(r => r.Year == 2021);
         var releaseVersion = release.Versions.Single();
@@ -539,21 +562,28 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        BlobCacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel))).ReturnsAsync(null!);
-
-        BlobCacheService.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults)).Returns(Task.CompletedTask);
-
         var dataBlockService = new Mock<IDataBlockService>(Strict);
 
         dataBlockService
             .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(dataBlockService: dataBlockService.Object).CreateClient();
+        var app = SetupApp(dataBlockService: dataBlockService.Object);
+        var client = app.CreateClient();
+
+        var publicBlobCacheService = Mock.Get(app.Services.GetRequiredService<IPublicBlobCacheService>());
+
+        publicBlobCacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+            .ReturnsAsync(null!);
+
+        publicBlobCacheService
+            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+            .Returns(Task.CompletedTask);
 
         var response = await client.GetAsync($"/api/tablebuilder/fast-track/{dataBlockParent.Id}");
 
-        VerifyAllMocks(BlobCacheService, dataBlockService);
+        VerifyAllMocks(publicBlobCacheService, dataBlockService);
 
         var viewModel = response.AssertOk<FastTrackViewModel>();
         Assert.Equal(dataBlockParent.Id, viewModel.DataBlockParentId);
@@ -600,13 +630,16 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             context.DataBlockParents.Add(dataBlockParentWithNoPublishedVersion);
         });
 
-        var client = SetupApp().CreateClient();
+        var app = SetupApp();
+        var client = app.CreateClient();
 
         var response = await client.GetAsync(
             $"/api/tablebuilder/fast-track/{dataBlockParentWithNoPublishedVersion.Id}"
         );
 
-        VerifyAllMocks(BlobCacheService);
+        var publicBlobCacheService = Mock.Get(app.Services.GetRequiredService<IPublicBlobCacheService>());
+
+        VerifyAllMocks(publicBlobCacheService);
 
         response.AssertNotFound();
     }
@@ -616,12 +649,10 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     {
         Publication publication = _dataFixture
             .DefaultPublication()
-            .WithReleases(
-                [
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                    _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
-                ]
-            );
+            .WithReleases([
+                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
+            ]);
 
         var release2020 = publication.Releases.Single(r => r.Year == 2020);
         var release2021 = publication.Releases.Single(r => r.Year == 2021);
@@ -655,21 +686,28 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        BlobCacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel))).ReturnsAsync(null!);
-
-        BlobCacheService.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults)).Returns(Task.CompletedTask);
-
         var dataBlockService = new Mock<IDataBlockService>(Strict);
 
         dataBlockService
             .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(dataBlockService: dataBlockService.Object).CreateClient();
+        var app = SetupApp(dataBlockService: dataBlockService.Object);
+        var client = app.CreateClient();
+
+        var publicBlobCacheService = Mock.Get(app.Services.GetRequiredService<IPublicBlobCacheService>());
+
+        publicBlobCacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+            .ReturnsAsync(null!);
+
+        publicBlobCacheService
+            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+            .Returns(Task.CompletedTask);
 
         var response = await client.GetAsync($"/api/tablebuilder/fast-track/{dataBlockParent.Id}");
 
-        VerifyAllMocks(BlobCacheService, dataBlockService);
+        VerifyAllMocks(publicBlobCacheService, dataBlockService);
 
         var viewModel = response.AssertOk<FastTrackViewModel>();
         Assert.Equal(dataBlockParent.Id, viewModel.DataBlockParentId);
@@ -688,8 +726,6 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     {
         return TestApp.ConfigureServices(services =>
         {
-            services.ReplaceService(BlobCacheService);
-
             services.AddTransient(_ => dataBlockService ?? Mock.Of<IDataBlockService>(Strict));
             services.AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict));
         });

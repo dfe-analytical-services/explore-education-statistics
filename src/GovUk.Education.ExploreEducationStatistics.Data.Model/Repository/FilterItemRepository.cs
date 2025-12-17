@@ -124,7 +124,7 @@ public class FilterItemRepository(
         return await statisticsDbContext
             .FilterItem.AsNoTracking()
             .Include(fi => fi.FilterGroup)
-            .ThenInclude(fg => fg.Filter)
+                .ThenInclude(fg => fg.Filter)
             .Where(fi => filterItemIds.Contains(fi.Id))
             .ToListAsync();
     }

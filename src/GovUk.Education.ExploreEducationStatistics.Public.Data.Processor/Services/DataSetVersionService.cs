@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -27,7 +26,6 @@ internal class DataSetVersionService(
     PublicDataDbContext publicDataDbContext,
     IReleaseFileRepository releaseFileRepository,
     IDataSetVersionPathResolver dataSetVersionPathResolver,
-    IOptions<FeatureFlagsOptions> featureFlags,
     IOptions<AppOptions> options
 ) : IDataSetVersionService
 {
@@ -63,7 +61,7 @@ internal class DataSetVersionService(
             .OnSuccess(ds => ValidateCanCreateNextDataSetVersion(ds, dataSetVersionToReplaceId))
             .OnSuccess(dataSet =>
                 (
-                    featureFlags.Value.EnableReplacementOfPublicApiDataSets && dataSetVersionToReplaceId is not null
+                    dataSetVersionToReplaceId is not null
                         ? ValidateDataSetVersionToReplace(dataSet, dataSetVersionToReplaceId.Value)
                         : (DataSetVersion?)null
                 ).OnSuccess(previousDataSetVersionToReplace => (dataSet, previousDataSetVersionToReplace))
@@ -464,7 +462,7 @@ internal class DataSetVersionService(
         var releaseFile = await contentDbContext
             .ReleaseFiles.Include(rf => rf.File)
             .Include(rf => rf.ReleaseVersion)
-            .ThenInclude(r => r.Release)
+                .ThenInclude(r => r.Release)
             .FirstOrDefaultAsync(rf => rf.Id == releaseFileId, cancellationToken);
 
         return releaseFile is null
@@ -490,27 +488,23 @@ internal class DataSetVersionService(
             )
         )
         {
-            return ValidationUtils.ValidationResult(
-                [
-                    CreateReleaseFileIdError(
-                        message: ValidationMessages.FileHasApiDataSetVersion,
-                        releaseFileId: releaseFile.Id
-                    ),
-                ]
-            );
+            return ValidationUtils.ValidationResult([
+                CreateReleaseFileIdError(
+                    message: ValidationMessages.FileHasApiDataSetVersion,
+                    releaseFileId: releaseFile.Id
+                ),
+            ]);
         }
 
         // ReleaseFile must relate to a ReleaseVersion in Draft approval status
         if (releaseFile.ReleaseVersion.ApprovalStatus != ReleaseApprovalStatus.Draft)
         {
-            return ValidationUtils.ValidationResult(
-                [
-                    CreateReleaseFileIdError(
-                        message: ValidationMessages.FileReleaseVersionNotDraft,
-                        releaseFileId: releaseFile.Id
-                    ),
-                ]
-            );
+            return ValidationUtils.ValidationResult([
+                CreateReleaseFileIdError(
+                    message: ValidationMessages.FileReleaseVersionNotDraft,
+                    releaseFileId: releaseFile.Id
+                ),
+            ]);
         }
 
         List<ErrorViewModel> errors = [];
@@ -549,7 +543,7 @@ internal class DataSetVersionService(
 
         var previousReleaseFileIds = dataSet.Versions.Select(version => version.Release.ReleaseFileId).ToList();
 
-        if (featureFlags.Value.EnableReplacementOfPublicApiDataSets && dataSetVersionToReplace is not null)
+        if (dataSetVersionToReplace is not null)
         {
             //`dataSetVersionToReplace` gets initiated when in an amendment.
             //When in an amendment, we are modifying one of the previous release ID and so the
@@ -591,10 +585,9 @@ internal class DataSetVersionService(
         CancellationToken cancellationToken
     )
     {
-        var nextVersion =
-            featureFlags.Value.EnableReplacementOfPublicApiDataSets && previousVersionToPatch is not null
-                ? previousVersionToPatch.NextPatchVersion()
-                : dataSet.LatestLiveVersion?.DefaultNextVersion() ?? new SemVersion(major: 1, minor: 0, patch: 0);
+        var nextVersion = previousVersionToPatch is not null
+            ? previousVersionToPatch.NextPatchVersion()
+            : dataSet.LatestLiveVersion?.DefaultNextVersion() ?? new SemVersion(major: 1, minor: 0, patch: 0);
 
         var dataSetVersion = new DataSetVersion
         {

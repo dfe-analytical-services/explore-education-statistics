@@ -5,13 +5,14 @@ import classNames from 'classnames';
 import kebabCase from 'lodash/kebabCase';
 import React, { createElement, memo, ReactNode } from 'react';
 import styles from './AccordionSection.module.scss';
-import GoToTopLink from './GoToTopLink';
+import BackToTopLink from './BackToTopLink';
 
 export type ToggleHandler = (open: boolean, id: string) => void;
 
 export interface AccordionSectionProps {
   anchorLinkIdPrefix?: string;
   anchorLinkUrl?: (id: string) => string;
+  backToTop?: boolean;
   caption?: ReactNode | string;
   children?:
     | ReactNode
@@ -21,7 +22,6 @@ export interface AccordionSectionProps {
         contentId: string;
       }) => ReactNode);
   className?: string;
-  goToTop?: boolean;
   header?: ReactNode;
   heading: string;
   /**
@@ -49,10 +49,10 @@ export const accordionSectionClasses = classes;
 const AccordionSection = ({
   anchorLinkIdPrefix = 'section',
   anchorLinkUrl,
+  backToTop = true,
   caption,
   className,
   children,
-  goToTop = true,
   header,
   heading,
   headingTag = 'h2',
@@ -131,7 +131,7 @@ const AccordionSection = ({
           ? children({ open, contentId, headingId })
           : children}
 
-        {goToTop && <GoToTopLink />}
+        {backToTop && <BackToTopLink />}
       </div>
     </div>
   );

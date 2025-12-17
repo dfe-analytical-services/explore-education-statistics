@@ -93,28 +93,26 @@ public class ReleaseAmendmentServiceTests
                     }
                 )
             )
-            .WithUpdates(
-                [
-                    // 'On' is deliberately set in local time with DateTime.Now to match how ReleaseNoteService creates Updates.
-                    // TODO EES-6490 Convert 'On' from DateTime to DateTimeOffset
-                    new Update
-                    {
-                        Id = Guid.NewGuid(),
-                        On = DateTime.Now.AddDays(-4),
-                        Reason = "Reason 1",
-                        Created = DateTime.UtcNow.AddDays(-6),
-                        CreatedById = Guid.NewGuid(),
-                    },
-                    new Update
-                    {
-                        Id = Guid.NewGuid(),
-                        On = DateTime.Now.AddDays(-5),
-                        Reason = "Reason 2",
-                        Created = DateTime.UtcNow.AddDays(-2),
-                        CreatedById = Guid.NewGuid(),
-                    },
-                ]
-            )
+            .WithUpdates([
+                // 'On' is deliberately set in local time with DateTime.Now to match how ReleaseNoteService creates Updates.
+                // TODO EES-6490 Convert 'On' from DateTime to DateTimeOffset
+                new Update
+                {
+                    Id = Guid.NewGuid(),
+                    On = DateTime.Now.AddDays(-4),
+                    Reason = "Reason 1",
+                    Created = DateTime.UtcNow.AddDays(-6),
+                    CreatedById = Guid.NewGuid(),
+                },
+                new Update
+                {
+                    Id = Guid.NewGuid(),
+                    On = DateTime.Now.AddDays(-5),
+                    Reason = "Reason 2",
+                    Created = DateTime.UtcNow.AddDays(-2),
+                    CreatedById = Guid.NewGuid(),
+                },
+            ])
             .WithKeyStatistics(
                 ListOf<KeyStatistic>(
                     new KeyStatisticText { Title = "key stat text" },
@@ -670,21 +668,21 @@ public class ReleaseAmendmentServiceTests
             .Include(releaseVersion => releaseVersion.Release)
             .Include(releaseVersion => releaseVersion.PublishingOrganisations)
             .Include(releaseVersion => releaseVersion.Content)
-            .ThenInclude(section => section.Content)
-            .ThenInclude(section => section.Comments)
+                .ThenInclude(section => section.Content)
+                    .ThenInclude(section => section.Comments)
             .Include(releaseVersion => releaseVersion.Content)
-            .ThenInclude(section => section.Content)
-            .ThenInclude(section => (section as EmbedBlockLink)!.EmbedBlock)
+                .ThenInclude(section => section.Content)
+                    .ThenInclude(section => (section as EmbedBlockLink)!.EmbedBlock)
             .Include(releaseVersion => releaseVersion.DataBlockVersions)
-            .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
-            .ThenInclude(dataBlockParent => dataBlockParent.LatestDraftVersion)
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                    .ThenInclude(dataBlockParent => dataBlockParent.LatestDraftVersion)
             .Include(releaseVersion => releaseVersion.DataBlockVersions)
-            .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
-            .ThenInclude(dataBlockParent => dataBlockParent.LatestPublishedVersion)
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                    .ThenInclude(dataBlockParent => dataBlockParent.LatestPublishedVersion)
             .Include(releaseVersion => releaseVersion.DataBlockVersions)
             .Include(releaseVersion => releaseVersion.Updates)
             .Include(releaseVersion => releaseVersion.KeyStatistics)
-            .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock)
+                .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock)
             .Include(releaseVersion => releaseVersion.FeaturedTables)
             .First(rv => rv.Id == amendmentId);
     }

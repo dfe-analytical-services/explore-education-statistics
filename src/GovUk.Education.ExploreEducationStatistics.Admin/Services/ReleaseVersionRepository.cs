@@ -24,7 +24,7 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
     {
         return await _contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .Include(rv => rv.ReleaseStatuses)
             .Where(rv => releaseApprovalStatuses.Contains(rv.ApprovalStatus))
             .ToListAsync();
@@ -58,7 +58,7 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
 
         return await _contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .Include(rv => rv.ReleaseStatuses)
             .Where(rv => releaseApprovalStatuses.Contains(rv.ApprovalStatus))
             .Where(rv => allReleaseVersionIds.Contains(rv.Id))

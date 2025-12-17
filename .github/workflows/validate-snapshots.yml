@@ -32,10 +32,8 @@ jobs:
       - name: tune linux network
         run: sudo ethtool -K eth0 tx off rx off
 
-      # Using actions/checkout@v5 due to issue
-      # https://github.com/peter-evans/create-pull-request/issues/4228
       - name: checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup python
         uses: actions/setup-python@v6
@@ -65,7 +63,7 @@ jobs:
 
       - name: Create pull request
         id: cpr
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ env.GH_TOKEN }}
           commit-message: 'chore(tests): update test snapshots'
@@ -87,7 +85,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ env.GH_TOKEN }}
 

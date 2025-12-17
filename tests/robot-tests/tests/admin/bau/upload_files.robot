@@ -184,7 +184,7 @@ Change ancillary file
     user opens accordion section    Test 2    id:file-uploads
 
     ${section}=    user gets accordion section content element    Test 2    id:file-uploads
-    user clicks link    Edit file    ${section}
+    user clicks link containing text    Edit file    ${section}
 
     user waits until h2 is visible    Edit ancillary file
     user enters text into element    label:Title    Test 2 updated

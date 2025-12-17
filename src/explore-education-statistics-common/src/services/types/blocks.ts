@@ -16,7 +16,7 @@ export interface BaseBlock {
 
 export interface HtmlBlock extends BaseBlock {
   type: 'HtmlBlock';
-  body: string;
+  body?: string;
 }
 
 export type ContentBlock = HtmlBlock;

@@ -1,0 +1,92 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using Microsoft.Extensions.Logging;
+
+namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+
+public static class BlobCacheServiceExtensions
+{
+    public static async Task<TResult> GetOrCreateAsync<TResult, TLogger>(
+        this IBlobCacheService service,
+        IBlobCacheKey cacheKey,
+        Func<Task<TResult>> createIfNotExistsFn,
+        ILogger<TLogger> logger
+    )
+        where TLogger : class
+        where TResult : class
+    {
+        var unboxedResultType = typeof(TResult).GetUnboxedResultTypePath().Last();
+
+        var existingCacheEntry = await service.GetItemAsync(cacheKey: cacheKey, targetType: unboxedResultType);
+
+        if (existingCacheEntry != null)
+        {
+            if (existingCacheEntry.TryBoxToResult(typeof(TResult), out var boxedResult))
+            {
+                return (TResult)boxedResult!;
+            }
+
+            logger.LogWarning(
+                "Unable to box result of cached type {UnboxedType} to {BoxedType} with cache key {CacheKey}. "
+                    + "Bypassing caching and returning fresh result.",
+                existingCacheEntry.GetType().Name,
+                typeof(TResult).Name,
+                cacheKey
+            );
+        }
+
+        return await service.CreateAndSetCacheEntry(
+            cacheKey: cacheKey,
+            createIfNotExistsFn: createIfNotExistsFn,
+            logger: logger
+        );
+    }
+
+    public static Task<TResult> Update<TResult, TLogger>(
+        this IBlobCacheService service,
+        IBlobCacheKey cacheKey,
+        Func<Task<TResult>> createFn,
+        ILogger<TLogger> logger
+    )
+        where TLogger : class
+        where TResult : class
+    {
+        return service.CreateAndSetCacheEntry(cacheKey: cacheKey, createIfNotExistsFn: createFn, logger: logger);
+    }
+
+    private static async Task<TResult> CreateAndSetCacheEntry<TResult, TLogger>(
+        this IBlobCacheService service,
+        IBlobCacheKey cacheKey,
+        Func<Task<TResult>> createIfNotExistsFn,
+        ILogger<TLogger> logger
+    )
+        where TLogger : class
+        where TResult : class?
+    {
+        var newCacheEntry = await createIfNotExistsFn.Invoke();
+
+        if (newCacheEntry == null)
+        {
+            logger.LogWarning(
+                "Cacheable result of type {ResultType} with cache key {CacheKey} is null. Not adding to cache.",
+                typeof(TResult).Name,
+                cacheKey
+            );
+            return null!;
+        }
+
+        if (!newCacheEntry.TryUnboxResult(out var unboxedEntry))
+        {
+            logger.LogWarning(
+                "Unable to unbox type of new result {BoxedType} to an unboxed type for caching with cache key {CacheKey}. "
+                    + "Bypassing setting this object in the cache.",
+                newCacheEntry.GetType().Name,
+                cacheKey
+            );
+            return newCacheEntry;
+        }
+
+        await service.SetItemAsync(cacheKey, unboxedEntry);
+        return newCacheEntry;
+    }
+}

@@ -39,14 +39,14 @@ Upload another subject (for deletion later)
 Add data guidance to subject
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance    %{WAIT_MEDIUM}
-    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
+    user adds main data guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}
     ...    data guidance content
 
 Add data guidance to second Subject
     user waits until h2 is visible    Public data guidance
-    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
+    user adds main data guidance content
     user waits until page contains accordion section    ${SECOND_SUBJECT}    15
     user enters text into data guidance data file content editor    ${SECOND_SUBJECT}
     ...    data guidance content
@@ -253,7 +253,7 @@ Create release amendment
 Replace subject data
     user uploads subject replacement    ${SUBJECT_NAME}    dates.csv    dates.meta.csv
     user waits until page contains element    testid:Data file replacements table
-    user confirms replacement upload    ${SUBJECT_NAME}
+    user confirms replacement upload    ${SUBJECT_NAME}    Error
     user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains    Footnotes: ERROR    %{WAIT_MEDIUM}

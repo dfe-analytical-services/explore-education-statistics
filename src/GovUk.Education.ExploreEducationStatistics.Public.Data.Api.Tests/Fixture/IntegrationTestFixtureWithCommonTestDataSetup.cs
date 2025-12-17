@@ -23,14 +23,12 @@ public abstract class IntegrationTestFixtureWithCommonTestDataSetup(TestApplicat
             .WithMetaSummary(
                 DataFixture
                     .DefaultDataSetVersionMetaSummary()
-                    .WithGeographicLevels(
-                        [
-                            GeographicLevel.Country,
-                            GeographicLevel.LocalAuthority,
-                            GeographicLevel.Region,
-                            GeographicLevel.School,
-                        ]
-                    )
+                    .WithGeographicLevels([
+                        GeographicLevel.Country,
+                        GeographicLevel.LocalAuthority,
+                        GeographicLevel.Region,
+                        GeographicLevel.School,
+                    ])
             )
             .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
             .ForIndex(1, dsv => dsv.SetVersionNumber(1, 1))

@@ -2,7 +2,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -11,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -20,7 +20,7 @@ using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInf
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers;
 
-public class PublicationControllerTests : CacheServiceTestFixture
+public class PublicationControllerTests
 {
     [Fact]
     public async Task ListLatestReleaseSubjects()
@@ -45,11 +45,13 @@ public class PublicationControllerTests : CacheServiceTestFixture
             .cacheKeyService.Setup(s => s.CreateCacheKeyForReleaseSubjects(latestReleaseVersionId))
             .ReturnsAsync(cacheKey);
 
-        mocks.cacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(List<SubjectViewModel>))).ReturnsAsync(null!);
+        mocks
+            .publicBlobCacheService.Setup(s => s.GetItemAsync(cacheKey, typeof(List<SubjectViewModel>)))
+            .ReturnsAsync(null!);
 
         mocks.releaseService.Setup(s => s.ListSubjects(latestReleaseVersionId)).ReturnsAsync(subjects);
 
-        mocks.cacheService.Setup(s => s.SetItemAsync<object>(cacheKey, subjects)).Returns(Task.CompletedTask);
+        mocks.publicBlobCacheService.Setup(s => s.SetItemAsync<object>(cacheKey, subjects)).Returns(Task.CompletedTask);
 
         var result = await controller.ListLatestReleaseSubjects(publication.Id);
         VerifyAllMocks(mocks);
@@ -155,19 +157,22 @@ public class PublicationControllerTests : CacheServiceTestFixture
             Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
             Mock<IReleaseService> releaseService,
             Mock<ICacheKeyService> cacheKeyService,
-            Mock<IBlobCacheService> cacheService
+            Mock<IPublicBlobCacheService> publicBlobCacheService
         ) mocks
     ) BuildControllerAndMocks()
     {
         var contentPersistenceHelper = MockPersistenceHelper<ContentDbContext>();
         var releaseService = new Mock<IReleaseService>(Strict);
         var cacheKeyService = new Mock<ICacheKeyService>(Strict);
+        var publicBlobCacheService = new Mock<IPublicBlobCacheService>(Strict);
         var controller = new PublicationController(
             contentPersistenceHelper.Object,
             releaseService.Object,
-            cacheKeyService.Object
+            cacheKeyService.Object,
+            publicBlobCacheService.Object,
+            logger: Mock.Of<ILogger<PublicationController>>()
         );
 
-        return (controller, (contentPersistenceHelper, releaseService, cacheKeyService, BlobCacheService));
+        return (controller, (contentPersistenceHelper, releaseService, cacheKeyService, publicBlobCacheService));
     }
 }

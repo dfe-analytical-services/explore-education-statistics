@@ -3,6 +3,7 @@ import ReleasePageContentSection from '@common/modules/find-statistics/component
 import {
   PublicationMethodologiesList,
   PublicationSummaryRedesign,
+  ReleaseVersionSummary,
 } from '@common/services/publicationService';
 import getUrlAttributes from '@common/utils/url/getUrlAttributes';
 import Link from '@frontend/components/Link';
@@ -11,11 +12,13 @@ import React from 'react';
 interface Props {
   methodologiesSummary: PublicationMethodologiesList;
   publicationSummary: PublicationSummaryRedesign;
+  releaseVersionSummary: ReleaseVersionSummary;
 }
 
 const ReleaseMethodologyPage = ({
   methodologiesSummary,
   publicationSummary,
+  releaseVersionSummary,
 }: Props) => {
   const { methodologies, externalMethodology } = methodologiesSummary;
 
@@ -66,6 +69,7 @@ const ReleaseMethodologyPage = ({
       <ContactUsSection
         publicationContact={publicationSummary.contact}
         publicationTitle={publicationSummary.title}
+        publishingOrganisations={releaseVersionSummary.publishingOrganisations}
       />
     </>
   );

@@ -454,6 +454,11 @@ user clicks footnote subject checkbox
     user clicks element    ${checkbox}
     checkbox should be selected    ${checkbox}
 
+user adds main data guidance content
+    [Arguments]    ${text}=Test data guidance content
+    user waits until page contains element    id:dataGuidanceForm-content
+    user enters text into element    id:dataGuidanceForm-content    ${text}
+
 user gets data guidance data file content editor
     [Arguments]    ${accordion_heading}
     user waits until page contains element    id:dataGuidance-dataFiles
@@ -639,6 +644,7 @@ user confirms upload to complete import
 user confirms replacement upload
     [Arguments]
     ...    ${SUBJECT_NAME}
+    ...    ${EXPECTED_STATUS}=Ready
     ${statusText}=    Get Text    xpath=//tr[td[1][text()[contains(.,'${SUBJECT_NAME}')]]]/td[3]/strong
     user clicks button in table cell    1    4    View details    testid:Data file replacements table
     user waits until modal is visible    Data set details
@@ -651,7 +657,7 @@ user confirms replacement upload
         user clicks button    Continue import (override failures)
     END
 
-    user waits until data file replacement is in status    ${SUBJECT_NAME}    Ready
+    user waits until data file replacement is in status    ${SUBJECT_NAME}    ${EXPECTED_STATUS}
 
 user waits until data upload is completed
     [Arguments]
@@ -1111,8 +1117,8 @@ user clicks edit data block link
     ...    ${data_block_name}
     user clicks element    testid:Edit data block ${data_block_name}
     user waits until page finishes loading
-    user waits until h2 is visible    ${data_block_name}
-    user waits until h2 is visible    Data block details
+    user waits until h3 is visible    ${data_block_name}
+    user waits until h3 is visible    Data block details
 
 user creates legacy release
     [Arguments]

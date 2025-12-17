@@ -1,8 +1,11 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -60,7 +63,10 @@ public class ThemeControllerTests
     {
         return new ThemeController(
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-            themeService ?? Mock.Of<IThemeService>(Strict)
+            themeService ?? Mock.Of<IThemeService>(Strict),
+            memoryCacheService: Mock.Of<IMemoryCacheService>(),
+            logger: Mock.Of<ILogger<ThemeController>>(),
+            timeProvider: new FakeTimeProvider(DateTime.UtcNow)
         );
     }
 }

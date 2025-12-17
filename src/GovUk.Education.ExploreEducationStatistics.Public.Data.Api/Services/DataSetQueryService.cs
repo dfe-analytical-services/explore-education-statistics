@@ -127,7 +127,7 @@ internal class DataSetQueryService(
             ? await publicDataDbContext
                 .DataSets.AsNoTracking()
                 .Include(ds => ds.LatestLiveVersion)
-                .ThenInclude(dsv => dsv != null ? dsv.DataSet : null)
+                    .ThenInclude(dsv => dsv != null ? dsv.DataSet : null)
                 .Where(ds => ds.Id == dataSetId)
                 .Select(ds => ds.LatestLiveVersion!)
                 .SingleOrNotFoundAsync(cancellationToken)

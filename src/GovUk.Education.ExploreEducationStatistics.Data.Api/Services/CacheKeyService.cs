@@ -16,7 +16,7 @@ public class CacheKeyService(ContentDbContext contentDbContext) : ICacheKeyServi
     {
         var releaseVersion = await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .SingleAsync(rv => rv.Id == releaseVersionId);
 
         return new ReleaseSubjectsCacheKey(

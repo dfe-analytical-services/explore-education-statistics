@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistic
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -11,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -19,7 +21,7 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics;
 
-public class TableBuilderControllerTests : CacheServiceTestFixture
+public class TableBuilderControllerTests
 {
     private readonly DataFixture _fixture = new();
 
@@ -62,12 +64,9 @@ public class TableBuilderControllerTests : CacheServiceTestFixture
         var dataBlockService = new Mock<IDataBlockService>(Strict);
         var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
-        var controller = BuildController(
-            dataBlockService: dataBlockService.Object,
-            tableBuilderService: tableBuilderService.Object
-        );
+        var privateBlobCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-        BlobCacheService
+        privateBlobCacheService
             .Setup(s =>
                 s.GetItemAsync(
                     ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(dataBlockVersion)),
@@ -90,7 +89,7 @@ public class TableBuilderControllerTests : CacheServiceTestFixture
             )
             .ReturnsAsync(TableBuilderResults);
 
-        BlobCacheService
+        privateBlobCacheService
             .Setup(s =>
                 s.SetItemAsync<object>(
                     ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(dataBlockVersion)),
@@ -98,6 +97,12 @@ public class TableBuilderControllerTests : CacheServiceTestFixture
                 )
             )
             .Returns(Task.CompletedTask);
+
+        var controller = BuildController(
+            dataBlockService: dataBlockService.Object,
+            tableBuilderService: tableBuilderService.Object,
+            privateBlobCacheService: privateBlobCacheService.Object
+        );
 
         var result = await controller.QueryForDataBlock(
             releaseVersionId: ReleaseVersionId,
@@ -138,13 +143,16 @@ public class TableBuilderControllerTests : CacheServiceTestFixture
 
     private static TableBuilderController BuildController(
         ITableBuilderService? tableBuilderService = null,
-        IDataBlockService? dataBlockService = null
+        IDataBlockService? dataBlockService = null,
+        IPrivateBlobCacheService? privateBlobCacheService = null
     )
     {
         return new TableBuilderController(
             tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict),
             AlwaysTrueUserService().Object,
-            dataBlockService ?? Mock.Of<IDataBlockService>(Strict)
+            dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
+            privateBlobCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
+            Mock.Of<ILogger<TableBuilderController>>()
         );
     }
 }

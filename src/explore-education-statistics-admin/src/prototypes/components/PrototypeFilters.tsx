@@ -83,7 +83,7 @@ const PrototypeFilters = ({
       <h2 className="govuk-heading-m govuk-!-margin-top-6">Other filters</h2>
 
       <Accordion id="filters">
-        <AccordionSection heading="Release type" goToTop={false}>
+        <AccordionSection heading="Release type" backToTop={false}>
           <FormRadioGroup
             className="govuk-!-padding-left-2"
             id="releaseType"

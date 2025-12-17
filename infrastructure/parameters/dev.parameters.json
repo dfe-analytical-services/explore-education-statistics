@@ -119,9 +119,6 @@
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
       "value": true
     },
-    "enableReplacementOfPublicApiDataSets" : {
-      "value": true
-    },
     "additionalAdminAllowedOrigins": {
       "value": [
         "https://localhost:5021",
@@ -132,6 +129,9 @@
       "value": [
         "http://localhost:3000"
       ]
+    },
+    "publicAppCompressionDisable": {
+      "value": true
     }
   }
 }

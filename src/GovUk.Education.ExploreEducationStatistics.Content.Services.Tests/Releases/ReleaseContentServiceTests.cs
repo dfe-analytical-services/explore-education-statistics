@@ -33,17 +33,15 @@ public abstract class ReleaseContentServiceTests
                     _dataFixture
                         .DefaultDataBlockVersion()
                         .WithReleaseVersion(releaseVersion)
-                        .WithCharts(
-                            [
-                                new InfographicChart
-                                {
-                                    Title = "Chart title",
-                                    FileId = "file-id",
-                                    Height = 400,
-                                    Width = 500,
-                                },
-                            ]
-                        )
+                        .WithCharts([
+                            new InfographicChart
+                            {
+                                Title = "Chart title",
+                                FileId = "file-id",
+                                Height = 400,
+                                Width = 500,
+                            },
+                        ])
                 )
                 .GenerateTuple3();
 
@@ -78,13 +76,11 @@ public abstract class ReleaseContentServiceTests
                 _dataFixture
                     .DefaultContentSection()
                     .WithHeading("Section 1")
-                    .WithContentBlocks(
-                        [
-                            _dataFixture.DefaultHtmlBlock().WithBody("<p>Section 1 block 1 content</p>"),
-                            contentDataBlockParent.LatestPublishedVersion!.ContentBlock,
-                            _dataFixture.DefaultHtmlBlock().WithBody("<p>Section 1 block 3 content</p>"),
-                        ]
-                    ),
+                    .WithContentBlocks([
+                        _dataFixture.DefaultHtmlBlock().WithBody("<p>Section 1 block 1 content</p>"),
+                        contentDataBlockParent.LatestPublishedVersion!.ContentBlock,
+                        _dataFixture.DefaultHtmlBlock().WithBody("<p>Section 1 block 3 content</p>"),
+                    ]),
                 _dataFixture
                     .DefaultContentSection()
                     .WithHeading("Section 2")
@@ -92,9 +88,9 @@ public abstract class ReleaseContentServiceTests
                 _dataFixture
                     .DefaultContentSection()
                     .WithHeading("Section 3")
-                    .WithContentBlocks(
-                        [_dataFixture.DefaultEmbedBlockLink().WithEmbedBlock(_dataFixture.DefaultEmbedBlock())]
-                    ),
+                    .WithContentBlocks([
+                        _dataFixture.DefaultEmbedBlockLink().WithEmbedBlock(_dataFixture.DefaultEmbedBlock()),
+                    ]),
             ];
 
             var contextId = Guid.NewGuid().ToString();

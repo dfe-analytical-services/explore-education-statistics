@@ -41,6 +41,7 @@ import React, {
 import { generatePath, useLocation } from 'react-router';
 import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 import { useConfig } from '@admin/contexts/ConfigContext';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 
 interface MethodologyLink {
   key: string;
@@ -192,6 +193,7 @@ const ReleaseContent = ({
             isEditing={editingMode === 'edit'}
             lastUpdated={release.updates[0]?.on}
             latestRelease={release.latestRelease}
+            publishingOrganisations={release.publishingOrganisations}
             nextReleaseDate={release.nextReleaseDate}
             releaseDate={release.published ?? release.publishScheduled}
             releaseType={release.type}
@@ -325,7 +327,7 @@ const ReleaseContent = ({
               </ul>
             </nav>
 
-            <h2 className="govuk-heading-s">Related information</h2>
+            <h3 className="govuk-heading-s">Related information</h3>
             <ul className="govuk-list" data-testid="related-information">
               <li>
                 <Link
@@ -367,15 +369,17 @@ const ReleaseContent = ({
                 </li>
               )}
               <li>
-                <a href="#contact-us">Contact us</a>
+                <a href="#contact-us">
+                  Contact us<VisuallyHidden> about this release</VisuallyHidden>
+                </a>
               </li>
             </ul>
 
             {!!releaseSeries.length && (
               <>
-                <h2 className="govuk-heading-s" id="past-releases">
+                <h3 className="govuk-heading-s" id="past-releases">
                   Releases in this series
-                </h2>
+                </h3>
 
                 <Details
                   className="govuk-!-margin-bottom-4"
@@ -419,12 +423,12 @@ const ReleaseContent = ({
 
             {allMethodologies.length > 0 && (
               <>
-                <h2
+                <h3
                   className="govuk-heading-s govuk-!-padding-top-0"
                   id="methodologies"
                 >
                   Methodologies
-                </h2>
+                </h3>
                 <ul className="govuk-list" data-testid="methodologies-list">
                   {allMethodologies.map(methodology => (
                     <li key={methodology.key}>
@@ -459,6 +463,7 @@ const ReleaseContent = ({
         <ReleaseDataAndFiles
           downloadFiles={release.downloadFiles}
           hasDataGuidance={release.hasDataGuidance}
+          headingClassName="govuk-heading-l"
           renderAllFilesLink={
             <ButtonText
               preventDoubleClick
@@ -548,6 +553,7 @@ const ReleaseContent = ({
 
       <ReleaseHelpAndSupportSection
         publication={release.publication}
+        publishingOrganisations={release.publishingOrganisations}
         releaseType={release.type}
         renderExternalMethodologyLink={externalMethodology => {
           const externalMethodologyAttributes = getUrlAttributes(

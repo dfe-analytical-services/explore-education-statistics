@@ -48,8 +48,8 @@ public class PublicationRepository : Content.Model.Repository.PublicationReposit
 
         var releasesGrantedByReleaseRolesQueryable = _context
             .UserReleaseRoles.Include(userReleaseRole => userReleaseRole.ReleaseVersion)
-            .ThenInclude(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(rv => rv.Release)
+                    .ThenInclude(r => r.Publication)
             .Where(userReleaseRole =>
                 userReleaseRole.UserId == userId && userReleaseRole.Role != ReleaseRole.PrereleaseViewer
             );

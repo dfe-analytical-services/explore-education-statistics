@@ -188,6 +188,42 @@ public abstract class PublicationsControllerTests
         }
     }
 
+    public class GetPublicationTitleTests : PublicationsControllerTests
+    {
+        [Fact]
+        public async Task WhenServiceReturnsPublicationTitle_ReturnsOk()
+        {
+            // Arrange
+            var publicationTitle = new PublicationTitleDtoBuilder().Build();
+            _publicationsService.WhereHasPublicationTitle(publicationTitle);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetPublicationTitle(PublicationSlug);
+
+            // Assert
+            _publicationsService.Assert.GetPublicationTitleWasCalled(PublicationSlug);
+            result.AssertOkResult(publicationTitle);
+        }
+
+        [Fact]
+        public async Task WhenServiceReturnsNotFound_ReturnsNotFound()
+        {
+            // Arrange
+            _publicationsService.WhereGetPublicationTitleReturnsNotFound(PublicationSlug);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetPublicationTitle(PublicationSlug);
+
+            // Assert
+            _publicationsService.Assert.GetPublicationTitleWasCalled(PublicationSlug);
+            result.AssertNotFoundResult();
+        }
+    }
+
     private PublicationsController BuildController() =>
         new(
             _publicationMethodologiesService.Build(),

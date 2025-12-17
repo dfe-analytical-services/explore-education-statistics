@@ -69,6 +69,7 @@ public abstract class ReleaseVersionsServiceTests
                     Assert.Equal(release.TimePeriodCoverage.GetEnumLabel(), result.CoverageTitle);
                     Assert.Equal(release.YearTitle, result.YearTitle);
                     Assert.Equal(releaseVersion.Type, result.Type);
+                    Assert.Equal(releaseVersion.PreReleaseAccessList, result.PreReleaseAccessList);
                     Assert.Equal(expectedUpdateCount, result.UpdateCount);
                 });
             }

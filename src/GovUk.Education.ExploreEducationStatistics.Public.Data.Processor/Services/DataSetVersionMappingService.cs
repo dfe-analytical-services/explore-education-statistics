@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -12,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
@@ -20,8 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Servi
 internal class DataSetVersionMappingService(
     IDataSetMetaService dataSetMetaService,
     PublicDataDbContext publicDataDbContext,
-    ContentDbContext contentDbContext,
-    IOptions<FeatureFlagsOptions> featureFlags
+    ContentDbContext contentDbContext
 ) : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes = [MappingType.AutoNone];
@@ -36,21 +33,16 @@ internal class DataSetVersionMappingService(
     {
         var nextVersion = await publicDataDbContext
             .DataSetVersions.Include(dsv => dsv.DataSet)
-            .ThenInclude(ds => ds.LatestLiveVersion)
+                .ThenInclude(ds => ds.LatestLiveVersion)
             .Include(dataSetVersion => dataSetVersion.DataSet)
-            .ThenInclude(dataSet => dataSet.Versions)
+                .ThenInclude(dataSet => dataSet.Versions)
             .SingleAsync(dsv => dsv.Id == nextDataSetVersionId, cancellationToken);
 
-        var sourceVersion =
-            featureFlags.Value.EnableReplacementOfPublicApiDataSets && dataSetVersionToReplaceId is not null
-                ? nextVersion.DataSet.Versions.SingleOrDefault(v => v.Id == dataSetVersionToReplaceId)
-                : nextVersion.DataSet.LatestLiveVersion;
+        var sourceVersion = dataSetVersionToReplaceId is not null
+            ? nextVersion.DataSet.Versions.SingleOrDefault(v => v.Id == dataSetVersionToReplaceId)
+            : nextVersion.DataSet.LatestLiveVersion;
 
-        if (
-            featureFlags.Value.EnableReplacementOfPublicApiDataSets
-            && dataSetVersionToReplaceId is not null
-            && sourceVersion is null
-        )
+        if (dataSetVersionToReplaceId is not null && sourceVersion is null)
         {
             return VersionToReplaceNotFoundError();
         }
@@ -509,7 +501,7 @@ internal class DataSetVersionMappingService(
         return await publicDataDbContext
             .LocationMetas.AsNoTracking()
             .Include(meta => meta.OptionLinks)
-            .ThenInclude(link => link.Option)
+                .ThenInclude(link => link.Option)
             .Where(meta => meta.DataSetVersionId == dataSetVersionId)
             .ToListAsync(cancellationToken);
     }
@@ -519,7 +511,7 @@ internal class DataSetVersionMappingService(
         return await publicDataDbContext
             .FilterMetas.AsNoTracking()
             .Include(meta => meta.OptionLinks)
-            .ThenInclude(link => link.Option)
+                .ThenInclude(link => link.Option)
             .Where(meta => meta.DataSetVersionId == dataSetVersionId)
             .ToListAsync(cancellationToken);
     }

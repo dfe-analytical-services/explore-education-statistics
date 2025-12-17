@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -21,7 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -36,8 +34,7 @@ public class ReplacementPlanService(
     ITimePeriodService timePeriodService,
     IUserService userService,
     IDataSetVersionMappingService dataSetVersionMappingService,
-    IReleaseFileRepository releaseFileRepository,
-    IOptions<FeatureFlagsOptions> featureFlags
+    IReleaseFileRepository releaseFileRepository
 ) : IReplacementPlanService
 {
     private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
@@ -85,11 +82,6 @@ public class ReplacementPlanService(
             Valid = false,
         };
 
-        if (!featureFlags.Value.EnableReplacementOfPublicApiDataSets)
-        {
-            return apiDataSetVersionPlan;
-        }
-
         var mappingStatus = await dataSetVersionMappingService.GetMappingStatus(
             replacementApiDataSetVersion.Id,
             cancellationToken
@@ -125,10 +117,7 @@ public class ReplacementPlanService(
         CancellationToken cancellationToken
     )
     {
-        return await GetLinkedDataSetVersion(
-                featureFlags.Value.EnableReplacementOfPublicApiDataSets ? replacementReleaseFile : originalReleaseFile,
-                cancellationToken
-            )
+        return await GetLinkedDataSetVersion(replacementReleaseFile, cancellationToken)
             .OnSuccess(async replacementApiDataSetVersion =>
             {
                 var replacementSubjectId = replacementReleaseFile.File.SubjectId!.Value;
@@ -424,7 +413,7 @@ public class ReplacementPlanService(
             .FilterItem.AsQueryable()
             .Where(filterItem => dataBlock.Query.GetFilterItemIds().Contains(filterItem.Id))
             .Include(filterItem => filterItem.FilterGroup)
-            .ThenInclude(filterGroup => filterGroup.Filter)
+                .ThenInclude(filterGroup => filterGroup.Filter)
             .ToList()
             .GroupBy(filterItem => filterItem.FilterGroup.Filter)
             .OrderBy(filter => filter.Key.Label, LabelComparer)

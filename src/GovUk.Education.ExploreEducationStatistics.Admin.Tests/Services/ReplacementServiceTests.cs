@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -28,7 +27,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Moq;
 using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -596,12 +594,8 @@ public class ReplacementServiceTests
         }
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Replace_FileIsLinkedToPublicApiDataSet_SuccessIfFeatureFlagIsOnOrValidationProblemIfNot(
-        bool enableReplacementOfPublicApiDataSets
-    )
+    [Fact]
+    public async Task Replace_FileIsLinkedToPublicApiDataSet_Success()
     {
         DataSet dataSet = _fixture.DefaultDataSet();
 
@@ -693,17 +687,11 @@ public class ReplacementServiceTests
                     LocationsHaveMajorChange = false,
                 }
             );
-        var options = Microsoft.Extensions.Options.Options.Create(
-            new FeatureFlagsOptions() { EnableReplacementOfPublicApiDataSets = enableReplacementOfPublicApiDataSets }
-        );
 
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
-        if (enableReplacementOfPublicApiDataSets)
-        {
-            releaseVersionService
-                .Setup(service => service.RemoveDataFiles(It.IsAny<Guid>(), It.IsAny<Guid>()))
-                .ReturnsAsync(Unit.Instance);
-        }
+        releaseVersionService
+            .Setup(service => service.RemoveDataFiles(It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .ReturnsAsync(Unit.Instance);
 
         var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
         releaseFileRepository
@@ -737,8 +725,7 @@ public class ReplacementServiceTests
                     locationRepository: locationRepository.Object,
                     timePeriodService: timePeriodService.Object,
                     dataSetVersionService: dataSetVersionService.Object,
-                    dataSetVersionMappingService: dataSetVersionMappingService.Object,
-                    featureFlags: options
+                    dataSetVersionMappingService: dataSetVersionMappingService.Object
                 )
             );
 
@@ -747,21 +734,8 @@ public class ReplacementServiceTests
                 originalFileId: originalFile.Id
             );
 
-            if (enableReplacementOfPublicApiDataSets)
-            {
-                VerifyAllMocks(
-                    locationRepository,
-                    timePeriodService,
-                    dataSetVersionService,
-                    dataSetVersionMappingService
-                );
-                result.AssertRight();
-            }
-            else
-            {
-                VerifyAllMocks(locationRepository, timePeriodService, dataSetVersionService);
-                result.AssertBadRequest(ReplacementMustBeValid);
-            }
+            VerifyAllMocks(locationRepository, timePeriodService, dataSetVersionService, dataSetVersionMappingService);
+            result.AssertRight();
         }
     }
 
@@ -2697,15 +2671,15 @@ public class ReplacementServiceTests
     {
         return await context
             .Footnote.Include(footnote => footnote.Filters)
-            .ThenInclude(filterFootnote => filterFootnote.Filter)
+                .ThenInclude(filterFootnote => filterFootnote.Filter)
             .Include(footnote => footnote.FilterGroups)
-            .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
+                .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
             .Include(footnote => footnote.FilterItems)
-            .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
+                .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
             .Include(footnote => footnote.Indicators)
-            .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
+                .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
             .Include(footnote => footnote.Subjects)
-            .ThenInclude(subjectFootnote => subjectFootnote.Subject)
+                .ThenInclude(subjectFootnote => subjectFootnote.Subject)
             .SingleAsync(footnote => footnote.Id == id);
     }
 
@@ -2717,14 +2691,9 @@ public class ReplacementServiceTests
         IDataSetVersionService? dataSetVersionService = null,
         ITimePeriodService? timePeriodService = null,
         IDataSetVersionMappingService? dataSetVersionMappingService = null,
-        IReleaseFileRepository? releaseFileRepository = null,
-        IOptions<FeatureFlagsOptions>? featureFlags = null
+        IReleaseFileRepository? releaseFileRepository = null
     )
     {
-        featureFlags ??= Microsoft.Extensions.Options.Options.Create(
-            new FeatureFlagsOptions() { EnableReplacementOfPublicApiDataSets = false }
-        );
-
         return new ReplacementPlanService(
             contentDbContext,
             statisticsDbContext,
@@ -2736,8 +2705,7 @@ public class ReplacementServiceTests
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             AlwaysTrueUserService().Object,
             dataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
-            releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict),
-            featureFlags
+            releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict)
         );
     }
 

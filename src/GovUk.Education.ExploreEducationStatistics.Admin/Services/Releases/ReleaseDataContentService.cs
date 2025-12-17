@@ -39,7 +39,7 @@ public class ReleaseDataContentService(ContentDbContext contentDbContext, IUserS
         contentDbContext
             .ReleaseVersions.AsNoTracking()
             .Include(rv => rv.Content.Where(cs => cs.Type == ContentSectionType.RelatedDashboards))
-            .ThenInclude(cs => cs.Content)
+                .ThenInclude(cs => cs.Content)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken);
 
     private async Task<ReleaseDataContentDataSetDto[]> GetDataSets(
@@ -50,8 +50,13 @@ public class ReleaseDataContentService(ContentDbContext contentDbContext, IUserS
         var releaseFiles = await contentDbContext
             .ReleaseFiles.AsNoTracking()
             .Include(rf => rf.File)
-            .ThenInclude(f => f.DataSetFileVersionGeographicLevels)
-            .Where(rf => rf.ReleaseVersionId == releaseVersion.Id && rf.File.Type == FileType.Data)
+                .ThenInclude(f => f.DataSetFileVersionGeographicLevels)
+            .Where(rf => rf.ReleaseVersionId == releaseVersion.Id)
+            .Where(rf => rf.File.Type == FileType.Data)
+            .Where(rf => rf.File.ReplacingId == null)
+            .Where(rf =>
+                contentDbContext.DataImports.Any(di => di.FileId == rf.FileId && di.Status == DataImportStatus.COMPLETE)
+            )
             .OrderBy(rf => rf.Order)
             .ToArrayAsync(cancellationToken);
         return releaseFiles.Select(ReleaseDataContentDataSetDto.FromReleaseFile).ToArray();
@@ -78,7 +83,8 @@ public class ReleaseDataContentService(ContentDbContext contentDbContext, IUserS
         var releaseFiles = await contentDbContext
             .ReleaseFiles.AsNoTracking()
             .Include(rf => rf.File)
-            .Where(rf => rf.ReleaseVersionId == releaseVersion.Id && rf.File.Type == FileType.Ancillary)
+            .Where(rf => rf.ReleaseVersionId == releaseVersion.Id)
+            .Where(rf => rf.File.Type == FileType.Ancillary)
             .OrderBy(rf => rf.Order)
             .ToArrayAsync(cancellationToken);
         return releaseFiles.Select(ReleaseDataContentSupportingFileDto.FromReleaseFile).ToArray();

@@ -87,7 +87,7 @@ public class PublicationService : IPublicationService
     {
         var themes = await _contentDbContext
             .Themes.Include(theme => theme.Publications)
-            .ThenInclude(publication => publication.SupersededBy)
+                .ThenInclude(publication => publication.SupersededBy)
             .ToListAsync();
 
         return await themes
@@ -247,7 +247,7 @@ public class PublicationService : IPublicationService
     ) =>
         await _contentDbContext
             .Publications.Include(p => p.LatestPublishedReleaseVersion)
-            .ThenInclude(rv => rv!.Release)
+                .ThenInclude(rv => rv!.Release)
             .Where(p =>
                 // Is published
                 p.LatestPublishedReleaseVersionId.HasValue

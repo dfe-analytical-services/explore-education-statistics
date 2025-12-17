@@ -12,6 +12,7 @@ import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ContentHtml from '@common/components/ContentHtml';
 import WarningMessage from '@common/components/WarningMessage';
+import Link from '@admin/components/Link';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import ReleaseDataGuidanceDataFile from '@common/modules/release/components/ReleaseDataGuidanceDataFile';
@@ -27,17 +28,6 @@ export interface DataGuidanceFormValues {
     content: string;
   }[];
 }
-
-const initialReleaseDataGuidance = `
-<h3>Description</h3>
-<p>---</p>
-
-<h3>Coverage</h3>
-<p>---</p>
-
-<h3>File formats and conventions</h3>
-<p>---</p>
-`;
 
 interface Props {
   releaseVersionId: string;
@@ -110,7 +100,7 @@ const ReleaseDataGuidanceSection = ({
             {dataGuidance.dataSets.length > 0 ? (
               <FormProvider
                 initialValues={{
-                  content: dataGuidance.content || initialReleaseDataGuidance,
+                  content: dataGuidance.content,
                   dataSets: dataGuidance.dataSets.map(dataSet => ({
                     fileId: dataSet.fileId,
                     content: dataSet.content,
@@ -153,6 +143,20 @@ const ReleaseDataGuidanceSection = ({
                         <FormFieldEditor<DataGuidanceFormValues>
                           name="content"
                           label="Main guidance content"
+                          hint={
+                            <>
+                              We recommend including individual sections
+                              providing a description, information about
+                              coverage and details of file formats and
+                              conventions. For best practice examples, refer to
+                              the{' '}
+                              <Link to="https://dfe-analytical-services.github.io/analysts-guide/statistics-production/examples.html#public-data-guidance---overview">
+                                data guidance support on the Analyst's Guide
+                                (opens in new tab)
+                              </Link>
+                              .
+                            </>
+                          }
                         />
                       ) : (
                         <>

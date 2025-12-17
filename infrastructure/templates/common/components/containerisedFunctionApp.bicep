@@ -8,6 +8,7 @@ import {
   EntraIdAuthentication
 } from '../../public-api/types.bicep'
 
+import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
 import { abbreviations } from '../../common/abbreviations.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../../public-api/components/alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../../public-api/components/alerts/dynamicAlertConfig.bicep'
@@ -69,7 +70,7 @@ param appServicePlanName string
 param applicationInsightsConnectionString string
 
 @description('Specifies the SKU for the Function App hosting plan')
-param sku object
+param sku AppServicePlanSku
 
 @description('Function App Plan : operating system')
 param operatingSystem 'Windows' | 'Linux' = 'Linux'
@@ -161,7 +162,7 @@ var fileServiceAlerts = alerts != null
     }
   : null
 
-module appServicePlanModule '../../public-api/components/appServicePlan.bicep' = {
+module appServicePlanModule 'app-service-plan/appServicePlan.bicep' = {
   name: appServicePlanName
   params: {
     planName: appServicePlanName

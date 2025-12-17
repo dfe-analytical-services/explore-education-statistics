@@ -63,9 +63,8 @@ Upload subject
 Add data guidance
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
-    user waits until page contains element    id:dataGuidanceForm-content
     user waits until page contains element    id:dataGuidance-dataFiles
-    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
+    user adds main data guidance content
     user enters text into data guidance data file content editor    Dates test subject
     ...    Dates test subject test data guidance content
     user clicks button    Save guidance

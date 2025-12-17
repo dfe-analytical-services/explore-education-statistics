@@ -1,13 +1,22 @@
+import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import classNames from 'classnames';
 import React from 'react';
 
 interface Props {
-  id: string;
+  id?: string;
   maxLength: number;
+  name: string;
   value?: string;
 }
-export default function FormCharacterCount({ id, maxLength, value }: Props) {
+export default function FormCharacterCount({
+  id: customId,
+  maxLength,
+  name,
+  value,
+}: Props) {
   const remaining = maxLength - (value?.trim().length ?? 0);
+  const { fieldId } = useFormIdContext();
+  const id = fieldId(name, customId);
 
   return (
     <div

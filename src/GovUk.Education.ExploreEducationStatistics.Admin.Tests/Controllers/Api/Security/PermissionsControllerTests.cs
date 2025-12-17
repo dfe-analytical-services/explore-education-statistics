@@ -1,19 +1,31 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Security;
 
-public class PermissionsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class PermissionsControllerTestsFixture()
+    : OptimisedAdminCollectionFixture(capabilities: [AdminIntegrationTestCapability.UserAuth]);
+
+[CollectionDefinition(nameof(PermissionsControllerTestsFixture))]
+public class PermissionsControllerTestsCollection : ICollectionFixture<PermissionsControllerTestsFixture>;
+
+[Collection(nameof(PermissionsControllerTestsFixture))]
+public class PermissionsControllerTests(PermissionsControllerTestsFixture fixture)
 {
+    private static readonly DataFixture DataFixture = new();
+
     [Fact]
     public async Task GetGlobalPermissions_AuthenticatedUser()
     {
-        var client = TestApp.SetUser(DataFixture.AuthenticatedUser()).CreateClient();
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Authenticated);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -33,7 +45,7 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     [Fact]
     public async Task GetGlobalPermissions_BauUser()
     {
-        var client = TestApp.SetUser(DataFixture.BauUser()).CreateClient();
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Bau);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -57,20 +69,22 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     {
         var user = DataFixture.AnalystUser().Generate();
 
-        await TestApp.AddTestData<ContentDbContext>(context =>
-        {
-            // Add test data that gives the user access to a Release without being an Approver.
-            context.UserReleaseRoles.Add(
-                new UserReleaseRole { UserId = user.GetUserId(), Role = ReleaseRole.Contributor }
-            );
+        await fixture
+            .GetContentDbContext()
+            .AddTestData(context =>
+            {
+                // Add test data that gives the user access to a Release without being an Approver.
+                context.UserReleaseRoles.Add(
+                    new UserReleaseRole { UserId = user.GetUserId(), Role = ReleaseRole.Contributor }
+                );
 
-            // Add test data that gives the user access to a Publication without being an Approver.
-            context.UserPublicationRoles.Add(
-                new UserPublicationRole { UserId = user.GetUserId(), Role = PublicationRole.Owner }
-            );
-        });
+                // Add test data that gives the user access to a Publication without being an Approver.
+                context.UserPublicationRoles.Add(
+                    new UserPublicationRole { UserId = user.GetUserId(), Role = PublicationRole.Owner }
+                );
+            });
 
-        var client = TestApp.SetUser(user).CreateClient();
+        var client = fixture.CreateClient(user: user);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -93,14 +107,16 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     {
         var user = DataFixture.AnalystUser().Generate();
 
-        await TestApp.AddTestData<ContentDbContext>(context =>
-        {
-            context.UserReleaseRoles.Add(
-                new UserReleaseRole { UserId = user.GetUserId(), Role = ReleaseRole.Approver }
-            );
-        });
+        await fixture
+            .GetContentDbContext()
+            .AddTestData(context =>
+            {
+                context.UserReleaseRoles.Add(
+                    new UserReleaseRole { UserId = user.GetUserId(), Role = ReleaseRole.Approver }
+                );
+            });
 
-        var client = TestApp.SetUser(user).CreateClient();
+        var client = fixture.CreateClient(user: user);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -123,14 +139,16 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     {
         var user = DataFixture.AnalystUser().Generate();
 
-        await TestApp.AddTestData<ContentDbContext>(context =>
-        {
-            context.UserReleaseRoles.Add(
-                new UserReleaseRole { UserId = user.GetUserId(), Role = ReleaseRole.Approver }
-            );
-        });
+        await fixture
+            .GetContentDbContext()
+            .AddTestData(context =>
+            {
+                context.UserReleaseRoles.Add(
+                    new UserReleaseRole { UserId = user.GetUserId(), Role = ReleaseRole.Approver }
+                );
+            });
 
-        var client = TestApp.SetUser(user).CreateClient();
+        var client = fixture.CreateClient(user: user);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -151,7 +169,7 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     [Fact]
     public async Task GetGlobalPermissions_PreReleaseUser()
     {
-        var client = TestApp.SetUser(DataFixture.PreReleaseUser()).CreateClient();
+        var client = fixture.CreateClient(user: OptimisedTestUsers.PreReleaseUser);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -171,7 +189,7 @@ public class PermissionsControllerTests(TestApplicationFactory testApp) : Integr
     [Fact]
     public async Task GetGlobalPermissions_UnauthenticatedUser()
     {
-        var response = await TestApp.CreateClient().GetAsync("/api/permissions/access");
+        var response = await fixture.CreateClient().GetAsync("/api/permissions/access");
         response.AssertUnauthorized();
     }
 }

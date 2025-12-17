@@ -356,12 +356,10 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(ProcessorFun
                         .DefaultReleaseVersion()
                         .WithRelease(DataFixture.DefaultRelease().WithPublicationId(publicationId))
                 )
-                .WithFiles(
-                    [
-                        DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
-                        DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
-                    ]
-                )
+                .WithFiles([
+                    DataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId),
+                    DataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId),
+                ])
                 .GenerateTuple2();
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.AddRange(dataFile, metaFile));

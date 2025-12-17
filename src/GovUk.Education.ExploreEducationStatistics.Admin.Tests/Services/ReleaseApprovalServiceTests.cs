@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -20,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -246,7 +246,7 @@ public class ReleaseApprovalServiceTests
         }
 
         // Set up the current time in UTC
-        var dateTimeProvider = new DateTimeProvider(
+        var timeProvider = new FakeTimeProvider(
             DateTime.Parse("2023-01-01T00:00:00Z", styles: DateTimeStyles.RoundtripKind)
         );
 
@@ -259,11 +259,7 @@ public class ReleaseApprovalServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var releaseService = BuildService(
-                context,
-                dateTimeProvider: dateTimeProvider,
-                options: options.ToOptionsWrapper()
-            );
+            var releaseService = BuildService(context, timeProvider: timeProvider, options: options.ToOptionsWrapper());
 
             // Request a publish day which is earlier than today
             var result = await releaseService.CreateReleaseStatus(
@@ -302,7 +298,7 @@ public class ReleaseApprovalServiceTests
         // Set up a current time in UTC which crosses a day boundary in British Summer Time.
         // Date is 6th June UTC but 7th June in British Summer Time which is the timezone we expect the user to be
         // located in and the Publisher functions to be running in.
-        var dateTimeProvider = new DateTimeProvider(
+        var timeProvider = new FakeTimeProvider(
             DateTime.Parse("2023-06-06T23:00:00Z", styles: DateTimeStyles.RoundtripKind)
         );
 
@@ -315,11 +311,7 @@ public class ReleaseApprovalServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var releaseService = BuildService(
-                context,
-                dateTimeProvider: dateTimeProvider,
-                options: options.ToOptionsWrapper()
-            );
+            var releaseService = BuildService(context, timeProvider: timeProvider, options: options.ToOptionsWrapper());
 
             // Request a publish day which is the same as the UTC day but earlier than the BST day
             var result = await releaseService.CreateReleaseStatus(
@@ -356,7 +348,7 @@ public class ReleaseApprovalServiceTests
         }
 
         // Set up a current time in UTC after the first publishing function has run
-        var dateTimeProvider = new DateTimeProvider(
+        var timeProvider = new FakeTimeProvider(
             DateTime.Parse("2023-01-01T01:00:00Z", styles: DateTimeStyles.RoundtripKind)
         );
 
@@ -369,11 +361,7 @@ public class ReleaseApprovalServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var releaseService = BuildService(
-                context,
-                dateTimeProvider: dateTimeProvider,
-                options: options.ToOptionsWrapper()
-            );
+            var releaseService = BuildService(context, timeProvider: timeProvider, options: options.ToOptionsWrapper());
 
             // Request a publish day which is today
             var result = await releaseService.CreateReleaseStatus(
@@ -412,7 +400,7 @@ public class ReleaseApprovalServiceTests
         // Set up a current time in UTC after the first publishing function has run.
         // Based on a time now of 2023-06-06T23:30:00Z the cron schedule in the UK timezone will have had an
         // occurrence at 2023-06-06T23:30:00Z and the next occurrence will not be until 2023-06-07T23:00:00Z.
-        var dateTimeProvider = new DateTimeProvider(
+        var timeProvider = new FakeTimeProvider(
             DateTime.Parse("2023-06-06T23:30:00Z", styles: DateTimeStyles.RoundtripKind)
         );
 
@@ -425,11 +413,7 @@ public class ReleaseApprovalServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var releaseService = BuildService(
-                context,
-                dateTimeProvider: dateTimeProvider,
-                options: options.ToOptionsWrapper()
-            );
+            var releaseService = BuildService(context, timeProvider: timeProvider, options: options.ToOptionsWrapper());
 
             // Request a publish day which is today
             var result = await releaseService.CreateReleaseStatus(
@@ -466,7 +450,7 @@ public class ReleaseApprovalServiceTests
         }
 
         // Set up the current time in UTC
-        var dateTimeProvider = new DateTimeProvider(
+        var timeProvider = new FakeTimeProvider(
             DateTime.Parse("2023-01-01T12:00:00Z", styles: DateTimeStyles.RoundtripKind)
         );
 
@@ -479,11 +463,7 @@ public class ReleaseApprovalServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var releaseService = BuildService(
-                context,
-                dateTimeProvider: dateTimeProvider,
-                options: options.ToOptionsWrapper()
-            );
+            var releaseService = BuildService(context, timeProvider: timeProvider, options: options.ToOptionsWrapper());
 
             // Request a publish day in the future which has no scheduled occurrence
             var result = await releaseService.CreateReleaseStatus(
@@ -520,7 +500,7 @@ public class ReleaseApprovalServiceTests
         }
 
         // Set up the current time in UTC
-        var dateTimeProvider = new DateTimeProvider(
+        var timeProvider = new FakeTimeProvider(
             DateTime.Parse("2023-01-01T23:20:00Z", styles: DateTimeStyles.RoundtripKind)
         );
 
@@ -534,11 +514,7 @@ public class ReleaseApprovalServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var releaseService = BuildService(
-                context,
-                dateTimeProvider: dateTimeProvider,
-                options: options.ToOptionsWrapper()
-            );
+            var releaseService = BuildService(context, timeProvider: timeProvider, options: options.ToOptionsWrapper());
 
             var result = await releaseService.CreateReleaseStatus(
                 releaseVersion.Id,
@@ -1920,7 +1896,7 @@ public class ReleaseApprovalServiceTests
 
     private ReleaseApprovalService BuildService(
         ContentDbContext contentDbContext,
-        DateTimeProvider? dateTimeProvider = null,
+        TimeProvider? timeProvider = null,
         IPublishingService? publishingService = null,
         IReleaseFileRepository? releaseFileRepository = null,
         IReleaseFileService? releaseFileService = null,
@@ -1939,7 +1915,7 @@ public class ReleaseApprovalServiceTests
 
         return new ReleaseApprovalService(
             contentDbContext,
-            dateTimeProvider ?? new DateTimeProvider(),
+            timeProvider ?? new FakeTimeProvider(DateTime.UtcNow),
             userService.Object,
             publishingService ?? Mock.Of<IPublishingService>(MockBehavior.Strict),
             releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(MockBehavior.Strict),

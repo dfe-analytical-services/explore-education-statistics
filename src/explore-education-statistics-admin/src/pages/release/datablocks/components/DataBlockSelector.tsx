@@ -13,7 +13,6 @@ import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React, { useMemo } from 'react';
 import { generatePath, useHistory } from 'react-router';
 import ButtonLink from '@admin/components/ButtonLink';
-import FormLabel from '@common/components/form/FormLabel';
 
 const emptyDataBlocks: ReleaseDataBlockSummary[] = [];
 
@@ -57,50 +56,44 @@ const DataBlockSelector = ({
   );
 
   return (
-    <>
-      <FormLabel
-        id="selectedDataBlock"
+    <div className="dfe-flex dfe-align-items--center dfe-flex-wrap govuk-!-margin-top-1">
+      <FormSelect
         label={
           canUpdate
             ? 'Select a data block to edit'
             : 'Select a data block to view'
         }
+        labelClassName="govuk-!-width-full govuk-!-margin-bottom-1"
+        id="selectedDataBlock"
+        name="selectedDataBlock"
+        disabled={isLoading}
+        order={FormSelect.unordered}
+        value={dataBlockId}
+        options={dataBlockOptions}
+        onChange={e => {
+          history.push(
+            generatePath<ReleaseDataBlockRouteParams>(
+              releaseDataBlockEditRoute.path,
+              {
+                publicationId,
+                releaseVersionId,
+                dataBlockId: e.target.value,
+              },
+            ),
+          );
+        }}
       />
-      <div className="dfe-flex dfe-align-items--center govuk-!-margin-top-1">
-        <FormSelect
-          hideLabel
-          label=""
-          id="selectedDataBlock"
-          name="selectedDataBlock"
-          disabled={isLoading}
-          order={FormSelect.unordered}
-          value={dataBlockId}
-          options={dataBlockOptions}
-          onChange={e => {
-            history.push(
-              generatePath<ReleaseDataBlockRouteParams>(
-                releaseDataBlockEditRoute.path,
-                {
-                  publicationId,
-                  releaseVersionId,
-                  dataBlockId: e.target.value,
-                },
-              ),
-            );
-          }}
-        />
-        {canUpdate && (
-          <>
-            <p className="govuk-!-font-weight-bold govuk-!-margin-right-4 govuk-!-margin-left-4 govuk-!-margin-bottom-0">
-              or
-            </p>
-            <ButtonLink className="govuk-!-margin-0" to={releaseDataBlockPath}>
-              Create another data block
-            </ButtonLink>
-          </>
-        )}
-      </div>
-    </>
+      {canUpdate && (
+        <>
+          <p className="govuk-!-font-weight-bold govuk-!-margin-right-4 govuk-!-margin-left-4 govuk-!-margin-bottom-0">
+            or
+          </p>
+          <ButtonLink className="govuk-!-margin-0" to={releaseDataBlockPath}>
+            Create another data block
+          </ButtonLink>
+        </>
+      )}
+    </div>
   );
 };
 

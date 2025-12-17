@@ -95,10 +95,6 @@ public class ContentDbContext : DbContext
     public virtual DbSet<EinTile> EinTiles { get; set; }
 
     [DbFunction]
-    public virtual IQueryable<FreeTextRank> PublicationsFreeTextTable(string searchTerm) =>
-        FromExpression(() => PublicationsFreeTextTable(searchTerm));
-
-    [DbFunction]
     public virtual IQueryable<FreeTextRank> ReleaseFilesFreeTextTable(string searchTerm) =>
         FromExpression(() => ReleaseFilesFreeTextTable(searchTerm));
 

@@ -28,7 +28,7 @@ public class ReleasePublishingStatusService(
         var releaseVersion = await context
             .ReleaseVersions.AsNoTracking()
             .Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .FirstAsync(rv => rv.Id == releasePublishingKey.ReleaseVersionId);
 
         var releaseStatus = new ReleasePublishingStatus(

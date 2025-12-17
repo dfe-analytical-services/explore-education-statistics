@@ -82,9 +82,11 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
 
             await AddTestData<ContentDbContext>(context =>
             {
-                context.ReleaseFiles.AddRange(
-                    [previousReleaseFile, targetReleaseFileWithOldFile, .. targetReleaseFilesWithNewFiles]
-                );
+                context.ReleaseFiles.AddRange([
+                    previousReleaseFile,
+                    targetReleaseFileWithOldFile,
+                    .. targetReleaseFilesWithNewFiles,
+                ]);
             });
 
             DataSet otherDataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
@@ -169,9 +171,11 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
             }
 
             await AddTestData<ContentDbContext>(context =>
-                context.ReleaseFiles.UpdateRange(
-                    [previousReleaseFile, targetReleaseFileWithOldFile, .. targetReleaseFilesWithNewFiles]
-                )
+                context.ReleaseFiles.UpdateRange([
+                    previousReleaseFile,
+                    targetReleaseFileWithOldFile,
+                    .. targetReleaseFilesWithNewFiles,
+                ])
             );
 
             foreach (var targetDataSetVersion in targetDataSetVersions)

@@ -46,7 +46,7 @@ public class ReleaseContentService(ContentDbContext contentDbContext) : IRelease
         contentDbContext
             .ReleaseVersions.AsNoTracking()
             .Include(rv => rv.Content)
-            .ThenInclude(cs => cs.Content)
+                .ThenInclude(cs => cs.Content)
             .Include(rv => rv.KeyStatistics)
             .LatestReleaseVersions(publication.Id, releaseSlug, publishedOnly: true)
             .SingleOrNotFoundAsync(cancellationToken);

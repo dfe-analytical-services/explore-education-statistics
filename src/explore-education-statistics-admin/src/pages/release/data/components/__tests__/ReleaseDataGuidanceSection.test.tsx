@@ -89,38 +89,6 @@ describe('ReleaseDataGuidanceSection', () => {
       });
     });
 
-    test('renders empty guidance correctly', async () => {
-      releaseDataGuidanceService.getDataGuidance.mockResolvedValue({
-        ...testDataGuidance,
-        content: '',
-      });
-
-      render(
-        <ReleaseDataGuidanceSection
-          releaseVersionId="release-1"
-          canUpdateRelease
-        />,
-      );
-
-      await waitFor(() => {
-        expect(
-          screen.getByLabelText('Main guidance content'),
-        ).toBeInTheDocument();
-      });
-
-      const mainGuidanceContent = screen.getByLabelText(
-        'Main guidance content',
-      ) as HTMLTextAreaElement;
-
-      const mainGuidanceContentValue = mainGuidanceContent.value;
-
-      expect(mainGuidanceContentValue).toContain('<h3>Description</h3>');
-      expect(mainGuidanceContentValue).toContain('<h3>Coverage</h3>');
-      expect(mainGuidanceContentValue).toContain(
-        '<h3>File formats and conventions</h3>',
-      );
-    });
-
     test('renders correct message when there are no data sets', async () => {
       releaseDataGuidanceService.getDataGuidance.mockResolvedValue({
         ...testDataGuidance,
@@ -191,7 +159,7 @@ describe('ReleaseDataGuidanceSection', () => {
 
       await user.click(
         dataSet1.getByRole('button', {
-          name: 'Variable names and descriptions',
+          name: /Variable names and descriptions/,
         }),
       );
 
@@ -211,7 +179,7 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
       expect(dataSet1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
 
-      await user.click(dataSet1.getByRole('button', { name: 'Footnotes' }));
+      await user.click(dataSet1.getByRole('button', { name: /Footnotes/ }));
 
       const dataSet1Footnotes = within(
         dataSet1.getByTestId('Footnotes'),
@@ -239,7 +207,7 @@ describe('ReleaseDataGuidanceSection', () => {
 
       await user.click(
         dataSet2.getByRole('button', {
-          name: 'Variable names and descriptions',
+          name: /Variable names and descriptions/,
         }),
       );
 
@@ -259,7 +227,7 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
       expect(dataSet2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
 
-      await user.click(dataSet2.getByRole('button', { name: 'Footnotes' }));
+      await user.click(dataSet2.getByRole('button', { name: /Footnotes/ }));
 
       const dataSet2Footnotes = within(
         dataSet2.getByTestId('Footnotes'),
@@ -335,7 +303,7 @@ describe('ReleaseDataGuidanceSection', () => {
 
       await user.click(
         dataSet1.getByRole('button', {
-          name: 'Variable names and descriptions',
+          name: /Variable names and descriptions/,
         }),
       );
 
@@ -355,7 +323,7 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
       expect(dataSet1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
 
-      await user.click(dataSet1.getByRole('button', { name: 'Footnotes' }));
+      await user.click(dataSet1.getByRole('button', { name: /Footnotes/ }));
 
       const dataSet1Footnotes = within(
         dataSet1.getByTestId('Footnotes'),
@@ -393,7 +361,7 @@ describe('ReleaseDataGuidanceSection', () => {
 
       await user.click(
         dataSet2.getByRole('button', {
-          name: 'Variable names and descriptions',
+          name: /Variable names and descriptions/,
         }),
       );
 
@@ -413,7 +381,7 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
       expect(dataSet2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
 
-      await user.click(dataSet2.getByRole('button', { name: 'Footnotes' }));
+      await user.click(dataSet2.getByRole('button', { name: /Footnotes/ }));
 
       const dataSet2Footnotes = within(
         dataSet2.getByTestId('Footnotes'),
@@ -803,7 +771,7 @@ describe('ReleaseDataGuidanceSection', () => {
 
       await user.click(
         dataSet1.getByRole('button', {
-          name: 'Variable names and descriptions',
+          name: /Variable names and descriptions/,
         }),
       );
 
@@ -823,7 +791,7 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
       expect(dataSet1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
 
-      await user.click(dataSet1.getByRole('button', { name: 'Footnotes' }));
+      await user.click(dataSet1.getByRole('button', { name: /Footnotes/ }));
 
       const dataSet1Footnotes = within(
         dataSet1.getByTestId('Footnotes'),
@@ -854,7 +822,7 @@ describe('ReleaseDataGuidanceSection', () => {
 
       await user.click(
         dataSet2.getByRole('button', {
-          name: 'Variable names and descriptions',
+          name: /Variable names and descriptions/,
         }),
       );
 
@@ -874,7 +842,7 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
       expect(dataSet2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
 
-      await user.click(dataSet2.getByRole('button', { name: 'Footnotes' }));
+      await user.click(dataSet2.getByRole('button', { name: /Footnotes/ }));
 
       const dataSet2Footnotes = within(
         dataSet2.getByTestId('Footnotes'),

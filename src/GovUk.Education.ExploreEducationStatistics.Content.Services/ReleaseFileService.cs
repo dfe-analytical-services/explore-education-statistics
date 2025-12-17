@@ -46,8 +46,8 @@ public class ReleaseFileService(
     {
         var releaseFiles = await contentDbContext
             .ReleaseFiles.Include(rf => rf.ReleaseVersion)
-            .ThenInclude(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(rv => rv.Release)
+                    .ThenInclude(r => r.Publication)
             .Include(rf => rf.File)
             .Where(rf => AllowedFileTypes.Contains(rf.File.Type))
             .Where(rf => request.Ids.Contains(rf.Id))
@@ -123,7 +123,7 @@ public class ReleaseFileService(
     {
         return await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
-            .ThenInclude(r => r.Publication)
+                .ThenInclude(r => r.Publication)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccessVoid(async releaseVersion =>

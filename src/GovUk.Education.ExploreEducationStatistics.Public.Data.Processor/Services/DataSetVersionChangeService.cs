@@ -168,21 +168,17 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         // - Deletions
         // - Updates
         // - Additions
-        publicDataDbContext.FilterMetaChanges.AddRange(
-            [
-                .. metaDeletions.NaturalOrderBy(c => c.PreviousState!.Label),
-                .. metaUpdates.NaturalOrderBy(c => c.PreviousState!.Label),
-                .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Label),
-            ]
-        );
+        publicDataDbContext.FilterMetaChanges.AddRange([
+            .. metaDeletions.NaturalOrderBy(c => c.PreviousState!.Label),
+            .. metaUpdates.NaturalOrderBy(c => c.PreviousState!.Label),
+            .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Label),
+        ]);
 
-        publicDataDbContext.FilterOptionMetaChanges.AddRange(
-            [
-                .. optionMetaDeletions.NaturalOrderBy(c => c.PreviousState!.Option.Label),
-                .. optionMetaUpdates.NaturalOrderBy(c => c.PreviousState!.Option.Label),
-                .. optionMetaAdditions.NaturalOrderBy(c => c.CurrentState!.Option.Label),
-            ]
-        );
+        publicDataDbContext.FilterOptionMetaChanges.AddRange([
+            .. optionMetaDeletions.NaturalOrderBy(c => c.PreviousState!.Option.Label),
+            .. optionMetaUpdates.NaturalOrderBy(c => c.PreviousState!.Option.Label),
+            .. optionMetaAdditions.NaturalOrderBy(c => c.CurrentState!.Option.Label),
+        ]);
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
@@ -300,20 +296,16 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         // - Deletions
         // - Updates
         // - Additions
-        publicDataDbContext.LocationMetaChanges.AddRange(
-            [
-                .. metaDeletions.NaturalOrderBy(c => c.PreviousState!.Level.GetEnumLabel()),
-                .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Level.GetEnumLabel()),
-            ]
-        );
+        publicDataDbContext.LocationMetaChanges.AddRange([
+            .. metaDeletions.NaturalOrderBy(c => c.PreviousState!.Level.GetEnumLabel()),
+            .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Level.GetEnumLabel()),
+        ]);
 
-        publicDataDbContext.LocationOptionMetaChanges.AddRange(
-            [
-                .. optionMetaDeletions.NaturalOrderBy(c => c.PreviousState!.Option.Label),
-                .. optionMetaUpdates.NaturalOrderBy(c => c.PreviousState!.Option.Label),
-                .. optionMetaAdditions.NaturalOrderBy(c => c.CurrentState!.Option.Label),
-            ]
-        );
+        publicDataDbContext.LocationOptionMetaChanges.AddRange([
+            .. optionMetaDeletions.NaturalOrderBy(c => c.PreviousState!.Option.Label),
+            .. optionMetaUpdates.NaturalOrderBy(c => c.PreviousState!.Option.Label),
+            .. optionMetaAdditions.NaturalOrderBy(c => c.CurrentState!.Option.Label),
+        ]);
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
@@ -420,13 +412,11 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
         // - Deletions
         // - Updates
         // - Additions
-        publicDataDbContext.IndicatorMetaChanges.AddRange(
-            [
-                .. metaDeletions.NaturalOrderBy(c => c.PreviousState!.Label),
-                .. metaUpdates.NaturalOrderBy(c => c.PreviousState!.Label),
-                .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Label),
-            ]
-        );
+        publicDataDbContext.IndicatorMetaChanges.AddRange([
+            .. metaDeletions.NaturalOrderBy(c => c.PreviousState!.Label),
+            .. metaUpdates.NaturalOrderBy(c => c.PreviousState!.Label),
+            .. metaAdditions.NaturalOrderBy(c => c.CurrentState!.Label),
+        ]);
 
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
     }
@@ -482,7 +472,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
     {
         return await publicDataDbContext
             .FilterMetas.Include(m => m.OptionLinks)
-            .ThenInclude(l => l.Option)
+                .ThenInclude(l => l.Option)
             .Where(m => m.DataSetVersionId == dataSetVersionId)
             .ToDictionaryAsync(
                 m => m.PublicId,
@@ -517,7 +507,7 @@ internal class DataSetVersionChangeService(PublicDataDbContext publicDataDbConte
     {
         return await publicDataDbContext
             .LocationMetas.Include(lm => lm.OptionLinks)
-            .ThenInclude(oml => oml.Option)
+                .ThenInclude(oml => oml.Option)
             .Where(lm => lm.DataSetVersionId == previousVersionId)
             .ToDictionaryAsync(
                 lm => lm.Level,

@@ -1,7 +1,7 @@
 #nullable enable
 using System.Net.Mime;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
@@ -15,38 +15,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 [ApiController]
 [Route("api")]
 [Produces(MediaTypeNames.Application.Json)]
-public class DataSetFilesController : ControllerBase
+public class DataSetFilesController(
+    IDataSetFileService dataSetFileService,
+    IMemoryCacheService memoryCacheService,
+    ILogger<DataSetFilesController> logger,
+    TimeProvider timeProvider
+) : ControllerBase
 {
-    private readonly IDataSetFileService _dataSetFileService;
-
-    public DataSetFilesController(IDataSetFileService dataSetFileService)
-    {
-        _dataSetFileService = dataSetFileService;
-    }
-
     [HttpGet("data-set-files")]
-    [MemoryCache(typeof(ListDataSetFilesCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
-    public async Task<ActionResult<PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
+    public Task<ActionResult<PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
         [FromQuery] DataSetFileListRequest request,
         CancellationToken cancellationToken = default
     )
     {
-        return await _dataSetFileService
-            .ListDataSetFiles(
-                themeId: request.ThemeId,
-                publicationId: request.PublicationId,
-                releaseVersionId: request.ReleaseId,
-                geographicLevel: request.GeographicLevelEnum,
-                latestOnly: request.LatestOnly,
-                dataSetType: request.DataSetType,
-                searchTerm: request.SearchTerm,
-                sort: request.Sort,
-                sortDirection: request.SortDirection,
-                page: request.Page,
-                pageSize: request.PageSize,
-                cancellationToken: cancellationToken
-            )
-            .HandleFailuresOrOk();
+        return memoryCacheService.GetOrCreateAsync(
+            cacheKey: new ListDataSetFilesCacheKey(request),
+            createIfNotExistsFn: () =>
+                dataSetFileService
+                    .ListDataSetFiles(
+                        themeId: request.ThemeId,
+                        publicationId: request.PublicationId,
+                        releaseVersionId: request.ReleaseId,
+                        geographicLevel: request.GeographicLevelEnum,
+                        latestOnly: request.LatestOnly,
+                        dataSetType: request.DataSetType,
+                        searchTerm: request.SearchTerm,
+                        sort: request.Sort,
+                        sortDirection: request.SortDirection,
+                        page: request.Page,
+                        pageSize: request.PageSize,
+                        cancellationToken: cancellationToken
+                    )
+                    .HandleFailuresOrOk(),
+            durationInSeconds: 10,
+            expiryScheduleCron: HalfHourlyExpirySchedule,
+            timeProvider: timeProvider,
+            logger: logger
+        );
     }
 
     [HttpGet("data-set-files/{dataSetFileId:guid}")]
@@ -55,7 +60,7 @@ public class DataSetFilesController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        return await _dataSetFileService.GetDataSetFile(dataSetFileId, cancellationToken).HandleFailuresOrOk();
+        return await dataSetFileService.GetDataSetFile(dataSetFileId, cancellationToken).HandleFailuresOrOk();
     }
 
     [HttpGet("data-set-files/{dataSetFileId:guid}/download")]
@@ -63,11 +68,11 @@ public class DataSetFilesController : ControllerBase
     {
         HttpContext.Response.Headers["X-Robots-Tag"] = "noindex";
 
-        return await _dataSetFileService.DownloadDataSetFile(dataSetFileId, cancellationToken);
+        return await dataSetFileService.DownloadDataSetFile(dataSetFileId, cancellationToken);
     }
 
     [HttpGet("data-set-files/sitemap-items")]
     public async Task<ActionResult<List<DataSetSitemapItemViewModel>>> ListSitemapItems(
         CancellationToken cancellationToken = default
-    ) => await _dataSetFileService.ListSitemapItems(cancellationToken).HandleFailuresOrOk();
+    ) => await dataSetFileService.ListSitemapItems(cancellationToken).HandleFailuresOrOk();
 }

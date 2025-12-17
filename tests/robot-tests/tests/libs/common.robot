@@ -554,6 +554,10 @@ user clicks element
     ${element}=    lookup or return webelement    ${selector}    ${parent}
     user scrolls to element    ${element}
     wait until element is enabled    ${element}
+
+    # Look up the element again prior to clicking, as scrolling can often lead to DOM elements being refreshed.
+    # This lets us reduce the number of StaleElementReferenceExceptions.
+    ${element}=    lookup or return webelement    ${selector}    ${parent}
     click element    ${element}
 
 user clicks link

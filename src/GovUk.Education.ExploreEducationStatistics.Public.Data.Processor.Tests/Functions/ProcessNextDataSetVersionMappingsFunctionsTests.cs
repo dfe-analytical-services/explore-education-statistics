@@ -162,15 +162,13 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
             {
                 GeographicLevelMeta = DataFixture
                     .DefaultGeographicLevelMeta()
-                    .WithLevels(
-                        [
-                            GeographicLevel.Country,
-                            GeographicLevel.Region,
-                            GeographicLevel.LocalAuthority,
-                            // Replaced by school in next version
-                            GeographicLevel.Institution,
-                        ]
-                    ),
+                    .WithLevels([
+                        GeographicLevel.Country,
+                        GeographicLevel.Region,
+                        GeographicLevel.LocalAuthority,
+                        // Replaced by school in next version
+                        GeographicLevel.Institution,
+                    ]),
             };
 
             var (instanceId, _, nextVersion) = await CreateNextDataSetVersionAndDataFiles(

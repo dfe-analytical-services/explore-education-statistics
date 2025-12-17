@@ -337,6 +337,13 @@
         "description": "Google Analytics tracking ID for the public app. Leave as empty string to disable Google Analytics"
       }
     },
+    "publicAppCompressionDisable": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Disables response compression for the public app. This is required to prevent double compression in conjunction with the CDN. WARN: Also used in next config!"
+      }
+    },
     "notifyInviteWithRolesTemplateId": {
       "type": "securestring",
       "defaultValue": "change-me",
@@ -594,13 +601,6 @@
         "description": "Override cron expression for all entities cached in memory"
       }
     },
-    "requestTimeoutsTableBuilderQuery": {
-      "type": "int",
-      "defaultValue": 210000,
-      "metadata": {
-        "description": "Timeout in milliseconds for a table builder query to return results before cancelling the request in the API"
-      }
-    },
     "tableBuilderMaxTableCellsAllowed": {
       "type": "int",
       "defaultValue": 25000,
@@ -796,13 +796,6 @@
       "defaultValue": false,
       "metadata": {
         "description": "Replaces Notify exceptions with logged messages only when team-only API keys are used and a recipient email address is not valid for that key."
-      }
-    },
-    "enableReplacementOfPublicApiDataSets": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Feature flag to control the replacement of public API data sets"
       }
     },
     "additionalAdminAllowedOrigins": {
@@ -1511,7 +1504,6 @@
         "PublicApp__BasicAuthPassword": "[parameters('publicAppBasicAuthPassword')]",
         "Analytics__Enabled": "[parameters('analyticsEnabled')]",
         "Analytics__BasePath": "[parameters('analyticsFileShareMountPath')]",
-        "RequestTimeouts__TableBuilderQuery": "[parameters('requestTimeoutsTableBuilderQuery')]",
         "TableBuilder__MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
       }
     },
@@ -2037,8 +2029,7 @@
         "PublicDataProcessor__Url": "[concat('https://', variables('publicDataProcessorName'), '.azurewebsites.net')]",
         "PublicDataProcessor__AppRegistrationClientId": "[parameters('publicDataProcessorAppRegistrationClientId')]",
         "DataScreener__Url": "[concat('https://', variables('dataScreenerName'), '.azurewebsites.net', '/api/screen')]",
-        "DataScreener__AppRegistrationClientId": "[parameters('screenerAppRegistrationClientId')]",
-        "FeatureFlags__EnableReplacementOfPublicApiDataSets": "[parameters('enableReplacementOfPublicApiDataSets')]"
+        "DataScreener__AppRegistrationClientId": "[parameters('screenerAppRegistrationClientId')]"
       }
     },
     {
@@ -2350,7 +2341,8 @@
         "PUBLIC_API_BASE_URL": "[concat('https://', parameters('publicApiUrl'))]",
         "PUBLIC_API_DOCS_URL": "[concat('https://', parameters('publicApiDocsUrl'))]",
         "WEBSITE_NODE_DEFAULT_VERSION": "22.20.0",
-        "WEBSITES_PORT": 3000
+        "WEBSITES_PORT": 3000,
+        "WEBSITES_DISABLE_CONTENT_COMPRESSION": "[parameters('publicAppCompressionDisable')]"
       }
     },
     {
@@ -3640,8 +3632,7 @@
         "EventGrid__EventTopics__0__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint]",
         "EventGrid__EventTopics__1__Key": "ReleaseVersionChangedEvent",
         "EventGrid__EventTopics__1__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseVersionChanged')), '2025-02-15').endpoint]",
-        "PublicDataDbExists": "[parameters('publicDataDbExists')]",
-        "FeatureFlags__EnableReplacementOfPublicApiDataSets": "[parameters('enableReplacementOfPublicApiDataSets')]"
+        "PublicDataDbExists": "[parameters('publicDataDbExists')]"
       }
     },
     {
@@ -4493,6 +4484,9 @@
           },
           "resourceGroup": {
             "value": "[resourceGroup().name]"
+          },
+          "workspaceResourceId": {
+            "value": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspace'))]"
           }
         }
       },

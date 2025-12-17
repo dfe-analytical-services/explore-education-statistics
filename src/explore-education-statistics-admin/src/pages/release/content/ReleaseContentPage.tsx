@@ -47,6 +47,11 @@ const ReleaseContentPageLoaded = () => {
         totalUnresolvedComments,
         totalUnsavedBlocks,
       }) => {
+        const handleFeaturedTableItemClick = (dataBlockId: string) => {
+          setEditingMode('table-preview');
+          setPreviewFeaturedTableId(dataBlockId);
+        };
+
         const transformFeaturedTableLinks = (url: string, text: string) => {
           return (
             <ButtonText
@@ -60,8 +65,7 @@ const ReleaseContentPageLoaded = () => {
                   table => table.dataBlockParentId === dataBlockParentId,
                 );
                 if (featuredTable) {
-                  setEditingMode('table-preview');
-                  setPreviewFeaturedTableId(featuredTable.dataBlockId);
+                  handleFeaturedTableItemClick(featuredTable.dataBlockId);
                 }
               }}
             >
@@ -129,8 +133,15 @@ const ReleaseContentPageLoaded = () => {
                   <>
                     {previewRedesign && editingMode === 'preview' ? (
                       <ReleaseContentRedesign
+                        handleFeaturedTableItemClick={
+                          canPreviewRelease
+                            ? handleFeaturedTableItemClick
+                            : undefined
+                        }
                         transformFeaturedTableLinks={
-                          transformFeaturedTableLinks
+                          canPreviewRelease
+                            ? transformFeaturedTableLinks
+                            : undefined
                         }
                       />
                     ) : (

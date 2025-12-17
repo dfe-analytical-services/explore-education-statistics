@@ -46,21 +46,14 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.ObservationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api;
 
 [ExcludeFromCodeCoverage]
-public class Startup
+public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
 {
-    private IConfiguration Configuration { get; }
-    private IHostEnvironment HostEnvironment { get; }
-
-    public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
-    {
-        Configuration = configuration;
-        HostEnvironment = hostEnvironment;
-    }
+    private IConfiguration Configuration { get; } = configuration;
+    private IHostEnvironment HostEnvironment { get; } = hostEnvironment;
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -153,10 +146,11 @@ public class Startup
                 sasService: provider.GetRequiredService<IBlobSasService>()
             )
         );
-        services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
-            provider.GetRequiredService<IPublicBlobStorageService>(),
-            provider.GetRequiredService<ILogger<BlobCacheService>>()
-        ));
+
+        services.AddTransient<IPublicBlobCacheService, PublicBlobCacheService>();
+        // Some shared services allow for either a public or private BlobCacheService to be injected.
+        // In the case of the Data API, it will always be using the public cache.
+        services.AddTransient<IBlobCacheService, PublicBlobCacheService>();
         services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
         services.AddTransient<ITableBuilderService, TableBuilderService>();
         services.AddTransient<IDataBlockService, DataBlockService>();
@@ -262,13 +256,6 @@ public class Startup
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        // Enable caching and register any caching services.
-        CacheAspect.Enabled = true;
-        BlobCacheAttribute.AddService("default", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
-        // Enable cancellation aspects and register request timeout configuration.
-        CancellationTokenTimeoutAspect.Enabled = true;
-        CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));
-
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();

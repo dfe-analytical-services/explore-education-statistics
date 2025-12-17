@@ -84,7 +84,7 @@ const useCKEditorConfig = ({
 
   const config: EditorConfig = useMemo(() => {
     return {
-      toolbar,
+      toolbar: ['accessibilityHelp', '|', ...toolbar],
       heading: toolbar.includes('heading')
         ? {
             options: [
