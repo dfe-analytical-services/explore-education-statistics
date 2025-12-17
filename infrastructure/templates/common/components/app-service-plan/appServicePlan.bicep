@@ -1,4 +1,5 @@
-import { cpuPercentageConfig, memoryPercentageConfig } from 'alerts/dynamicAlertConfig.bicep'
+import { cpuPercentageConfig, memoryPercentageConfig } from '../../../public-api/components/alerts/dynamicAlertConfig.bicep'
+import { AppServicePlanSku } from 'types.bicep'
 
 @description('Specifies the App Service plan name')
 param planName string
@@ -7,7 +8,7 @@ param planName string
 param location string
 
 @description('The SKU for the plan')
-param sku object
+param sku AppServicePlanSku
 
 @description('The kind of plan to deploy. Impacted by application type and desired OS. See https://github.com/Azure/app-service-linux-docs/blob/master/Things_You_Should_Know/kind_property.md#app-service-resource-kind-reference.')
 param kind 
@@ -38,7 +39,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   tags: tagValues
 }
 
-module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
+module cpuPercentageAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {
   name: '${planName}CpuPercentageDeploy'
   params: {
     resourceName: planName
@@ -55,7 +56,7 @@ module cpuPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null
   ]
 }
 
-module memoryPercentageAlert 'alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
+module memoryPercentageAlert '../../../public-api/components/alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.memoryPercentage) {
   name: '${planName}MemoryPercentageDeploy'
   params: {
     resourceName: planName

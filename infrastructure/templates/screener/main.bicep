@@ -1,5 +1,6 @@
 import { IpRange } from '../common/types.bicep'
 import { abbreviations } from '../common/abbreviations.bicep'
+import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -39,8 +40,15 @@ param deployAlerts bool = false
 @description('Specifies whether or not the Screener Function App already exists.')
 param screenerFunctionAppExists bool = true
 
-@description('The Docker image tag for the data screener. This value should represent a pipeline build number')
+@description('The Docker image tag for the data screener. This value should represent a pipeline build number.')
 param screenerDockerImageTag string = ''
+
+@description('SKU for the Screener API Function App\'s App Service Plan.')
+param screenerFunctionAppSku AppServicePlanSku = {
+  name: 'EP1'
+  tier: 'ElasticPremium'
+  family: 'EP'
+}
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: resourceNames.existingResources.keyVault
@@ -85,6 +93,7 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     screenerDockerImageTag: screenerDockerImageTag
     resourceNames: resourceNames
     functionAppExists: screenerFunctionAppExists
+    sku: screenerFunctionAppSku
     functionAppFirewallRules: union(
       [
         {

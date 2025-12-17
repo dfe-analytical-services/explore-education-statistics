@@ -2,6 +2,7 @@ import { IpRange, FirewallRule, AzureFileShareMount } from '../types.bicep'
 import { abbreviations } from '../../common/abbreviations.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../../public-api/components/alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../../public-api/components/alerts/dynamicAlertConfig.bicep'
+import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -87,7 +88,7 @@ param healthCheckPath string?
 param userAssignedIdentityName string = ''
 
 @description('Specifies the SKU for the Function App hosting plan.')
-param sku object
+param sku AppServicePlanSku
 
 @description('Specifies the Key Vault name that this Function App will be permitted to get and list secrets from.')
 param keyVaultName string
@@ -155,7 +156,7 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   name: userAssignedIdentityName
 }
 
-module appServicePlanModule '../../public-api/components/appServicePlan.bicep' = {
+module appServicePlanModule 'app-service-plan/appServicePlan.bicep' = {
   name: '${appServicePlanName}ModuleDeploy'
   params: {
     planName: appServicePlanName
