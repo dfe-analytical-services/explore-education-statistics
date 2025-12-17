@@ -238,6 +238,7 @@ public class UserRoleServicePermissionTests
         IReleaseVersionRepository? releaseVersionRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserRepository? userRepository = null,
         UserManager<ApplicationUser>? userManager = null,
         IUserService? userService = null
     )
@@ -255,6 +256,7 @@ public class UserRoleServicePermissionTests
             releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict),
             userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict),
+            userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict),
             userManager ?? MockUserManager().Object
         );
     }
