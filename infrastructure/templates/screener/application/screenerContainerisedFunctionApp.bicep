@@ -1,12 +1,5 @@
-import {
-  FirewallRule
-  IpRange
-} from '../../common/types.bicep'
-
-import {
-  AppServicePlanSku
-} from '../../common/components/app-service-plan/types.bicep'
-
+import { FirewallRule, IpRange } from '../../common/types.bicep'
+import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
 import { ResourceNames } from '../types.bicep'
 
 @description('Specifies common resource naming variables.')
