@@ -33,6 +33,7 @@ public class UserRoleService(
     IReleaseVersionRepository releaseVersionRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserRepository userRepository,
     UserManager<ApplicationUser> identityUserManager
 ) : IUserRoleService
 {
@@ -346,7 +347,7 @@ public class UserRoleService(
     {
         return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(_ => contentPersistenceHelper.CheckEntityExists<User>(userId))
+            .OnSuccess(_ => FindActiveUser(userId))
             .OnSuccess(async () =>
                 await userPublicationRoleRepository
                     .Query()
@@ -398,7 +399,7 @@ public class UserRoleService(
     {
         return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(_ => contentPersistenceHelper.CheckEntityExists<User>(userId))
+            .OnSuccess(_ => FindActiveUser(userId))
             .OnSuccess(async () =>
             {
                 var allReleaseRoles = await userReleaseRoleRepository
@@ -476,8 +477,7 @@ public class UserRoleService(
             .CheckCanManageAllUsers()
             .OnSuccess(async _ =>
             {
-                return await contentPersistenceHelper
-                    .CheckEntityExists<User>(userId)
+                return await FindActiveUser(userId)
                     .OnSuccess(async _ =>
                     {
                         await userReleaseRoleRepository.RemoveForUser(userId);
@@ -525,6 +525,9 @@ public class UserRoleService(
 
         return Unit.Instance;
     }
+
+    private async Task<Either<ActionResult, User>> FindActiveUser(Guid userId) =>
+        await userRepository.FindActiveUserById(userId) ?? new Either<ActionResult, User>(new NotFoundResult());
 
     private async Task<Either<ActionResult, UserPublicationRole>> FindUserPublicationRole(Guid userPublicationRoleId) =>
         await userPublicationRoleRepository.GetById(userPublicationRoleId)
