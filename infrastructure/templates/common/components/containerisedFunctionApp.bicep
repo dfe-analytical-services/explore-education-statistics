@@ -161,7 +161,7 @@ var fileServiceAlerts = alerts != null
     }
   : null
 
-module appServicePlanModule 'app-service-plan/appServicePlan.bicep' = {
+module appServicePlanModule '../../public-api/components/appServicePlan.bicep' = {
   name: appServicePlanName
   params: {
     planName: appServicePlanName

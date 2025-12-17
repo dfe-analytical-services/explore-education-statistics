@@ -155,7 +155,7 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   name: userAssignedIdentityName
 }
 
-module appServicePlanModule 'app-service-plan/appServicePlan.bicep' = {
+module appServicePlanModule '../../public-api/components/appServicePlan.bicep' = {
   name: '${appServicePlanName}ModuleDeploy'
   params: {
     planName: appServicePlanName

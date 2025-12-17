@@ -110,7 +110,7 @@ var identity = userAssignedManagedIdentityParams != null
       type: 'SystemAssigned'
     }
 
-module appServicePlanModule '../../common/components/app-service-plan/appServicePlan.bicep' = {
+module appServicePlanModule 'appServicePlan.bicep' = {
   name: appServicePlanName
   params: {
     planName: appServicePlanName
