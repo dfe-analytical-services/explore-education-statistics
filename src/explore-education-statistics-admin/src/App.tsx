@@ -24,6 +24,7 @@ import { Route, Switch, useHistory } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 import { LastLocationContextProvider } from './contexts/LastLocationContext';
+import 'ckeditor5/ckeditor5.css';
 
 const queryClient = new QueryClient();
 

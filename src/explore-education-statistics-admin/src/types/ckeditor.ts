@@ -63,6 +63,8 @@ export interface AlignmentConfig {
 
 export interface EditorConfig {
   toolbar: (ToolbarOption | ToolbarGroup)[];
+  label: string;
+  licenseKey: string;
   extraPlugins?: Plugin[];
   image?: {
     toolbar: string[];

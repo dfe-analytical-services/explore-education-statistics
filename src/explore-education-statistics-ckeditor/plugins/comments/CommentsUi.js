@@ -1,5 +1,4 @@
-import ButtonView from '@ckeditor/ckeditor5-ui/src/button/buttonview';
-import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
+import { ButtonView, Plugin } from 'ckeditor5';
 import CommentIcon from './comment-icon.svg';
 
 export default class CommentsUI extends Plugin {

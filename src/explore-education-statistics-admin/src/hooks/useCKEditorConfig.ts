@@ -36,6 +36,7 @@ const useCKEditorConfig = ({
   onClickAddGlossaryItem,
   onImageUpload,
   onImageUploadCancel,
+  label,
 }: {
   allowComments?: boolean;
   allowedHeadings?: string[];
@@ -57,6 +58,7 @@ const useCKEditorConfig = ({
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
   onRemoveCommentMarker?: (commentId: string) => void;
+  label: string;
 }) => {
   const {
     removeComment,
@@ -137,6 +139,8 @@ const useCKEditorConfig = ({
         },
         defaultProtocol: 'https://',
       },
+      label,
+      licenseKey: 'GPL',
       extraPlugins:
         hasImageUpload && onImageUpload
           ? [customUploadAdapterPlugin(onImageUpload, onImageUploadCancel)]
