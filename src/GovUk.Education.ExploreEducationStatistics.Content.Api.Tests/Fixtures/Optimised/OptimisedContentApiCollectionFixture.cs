@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Moq;
@@ -43,13 +44,13 @@ public abstract class OptimisedContentApiCollectionFixture(params ContentApiInte
     private ContentDbContext _contentDbContext = null!;
     private StatisticsDbContext _statisticsDbContext = null!;
 
-    private Func<string> _azuriteConnectionString = null!;
+    private AzuriteWrapper _azuriteWrapper = null!;
 
     protected override void RegisterTestContainers(TestContainerRegistrations registrations)
     {
         if (capabilities.Contains(ContentApiIntegrationTestCapability.Azurite))
         {
-            _azuriteConnectionString = registrations.RegisterAzuriteContainer();
+            _azuriteWrapper = registrations.RegisterAzuriteContainer();
         }
     }
 
@@ -66,7 +67,7 @@ public abstract class OptimisedContentApiCollectionFixture(params ContentApiInte
         if (capabilities.Contains(ContentApiIntegrationTestCapability.Azurite))
         {
             serviceModifications.AddAzurite(
-                connectionString: _azuriteConnectionString(),
+                connectionString: _azuriteWrapper.GetConnectionString(),
                 connectionStringKeys: ["PublicStorage"]
             );
         }
@@ -114,6 +115,25 @@ public abstract class OptimisedContentApiCollectionFixture(params ContentApiInte
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
     public StatisticsDbContext GetStatisticsDbContext() => _statisticsDbContext;
+
+    public override async Task BeforeEachTest()
+    {
+        // In-memory DbContexts can be cleared down by default with no speed penalty.
+        // Proper DbContexts add considerable time to a full project run if clearing
+        // between every test, and therefore we don't clear them down by default.
+        await _contentDbContext.ClearTestDataIfInMemory();
+        await _statisticsDbContext.ClearTestDataIfInMemory();
+    }
+
+    protected AzuriteWrapper GetAzuriteWrapper()
+    {
+        if (!capabilities.Contains(ContentApiIntegrationTestCapability.Azurite))
+        {
+            throw new Exception("Cannot get AzuriteWrapper if not using the Azurite capability.");
+        }
+
+        return _azuriteWrapper;
+    }
 }
 
 public enum ContentApiIntegrationTestCapability

@@ -34,13 +34,23 @@ public static class DbContextTestExtensions
         }
         else if (context.Database.IsInMemory())
         {
-            await context.Database.EnsureDeletedAsync();
+            await context.ClearTestDataIfInMemory();
         }
         else
         {
             throw new NotImplementedException(
                 $"Clearing test data is not supported for type {context.Database.ProviderName}"
             );
+        }
+    }
+
+    public static async Task ClearTestDataIfInMemory<TDbContext>(this TDbContext context)
+        where TDbContext : DbContext
+    {
+        if (context.Database.IsInMemory())
+        {
+            await context.Database.EnsureDeletedAsync();
+            context.ChangeTracker.Clear();
         }
     }
 }

@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azu
 
 public static class TestContainerRegistrationsAzuriteExtensions
 {
-    public static Func<string> RegisterAzuriteContainer(this TestContainerRegistrations registrations)
+    public static AzuriteWrapper RegisterAzuriteContainer(this TestContainerRegistrations registrations)
     {
         var container = new AzuriteBuilder()
             .WithImage("mcr.microsoft.com/azure-storage/azurite:3.34.0")
@@ -13,6 +13,6 @@ public static class TestContainerRegistrationsAzuriteExtensions
             .Build();
 
         registrations.RegisterContainer(container);
-        return () => container.GetConnectionString();
+        return new AzuriteWrapper(() => container.GetConnectionString());
     }
 }

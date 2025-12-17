@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgre
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -61,7 +62,7 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
     private OptimisedTestUserHolder? _userHolder;
 
     private Func<string> _psqlConnectionString = null!;
-    private Func<string> _azuriteConnectionString = null!;
+    private AzuriteWrapper _azuriteWrapper = null!;
 
     protected override void RegisterTestContainers(TestContainerRegistrations registrations)
     {
@@ -72,7 +73,7 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
 
         if (capabilities.Contains(AdminIntegrationTestCapability.Azurite))
         {
-            _azuriteConnectionString = registrations.RegisterAzuriteContainer();
+            _azuriteWrapper = registrations.RegisterAzuriteContainer();
         }
     }
 
@@ -96,7 +97,7 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
         if (capabilities.Contains(AdminIntegrationTestCapability.Azurite))
         {
             serviceModifications.AddAzurite(
-                connectionString: _azuriteConnectionString(),
+                connectionString: _azuriteWrapper.GetConnectionString(),
                 connectionStringKeys: ["PublicStorage", "PublisherStorage", "CoreStorage"]
             );
         }
@@ -219,7 +220,7 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
     /// This method is run prior to each individual test in a collection. Here we reset any commonly-used mocks and
     /// ensure no users are set to handle HttpClient requests by default.
     /// </summary>
-    public override Task BeforeEachTest()
+    public override async Task BeforeEachTest()
     {
         ResetIfMock(_processorClient);
         ResetIfMock(_publicDataApiClient);
@@ -229,7 +230,12 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
             _userHolder!.SetUser(null);
         }
 
-        return Task.CompletedTask;
+        // In-memory DbContexts can be cleared down by default with no speed penalty.
+        // Proper DbContexts add considerable time to a full project run if clearing
+        // between every test, and therefore we don't clear them down by default.
+        await _contentDbContext.ClearTestDataIfInMemory();
+        await _statisticsDbContext.ClearTestDataIfInMemory();
+        await _publicDataDbContext.ClearTestDataIfInMemory();
     }
 
     /// <summary>
