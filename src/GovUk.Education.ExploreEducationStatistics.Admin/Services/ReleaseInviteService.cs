@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -40,7 +41,7 @@ public class ReleaseInviteService(
             .OnSuccessDo(publication => userService.CheckCanUpdateReleaseRole(publication, ReleaseRole.Contributor))
             .OnSuccessDo(() => ValidateReleaseVersionIds(publicationId, releaseVersionIds))
             .OnSuccessVoid(async publication =>
-                InviteContributor(
+                await InviteContributor(
                     email: email,
                     publicationTitle: publication!.Title,
                     releaseVersionIds: releaseVersionIds
