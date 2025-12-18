@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -198,7 +197,7 @@ public class ReleaseApprovalService(
     private async Task SendPreReleaseUserInviteEmails(ReleaseVersion releaseVersion)
     {
         var unsentUserReleaseRoleInvites = await userReleaseRoleRepository
-            .Query(ResourceRoleFilter.PendingOnly)
+            .Query(ResourceRoleFilter.AllButExpired)
             .AsNoTracking()
             .WhereForReleaseVersion(releaseVersion.Id)
             .WhereRolesIn(ReleaseRole.PrereleaseViewer)
