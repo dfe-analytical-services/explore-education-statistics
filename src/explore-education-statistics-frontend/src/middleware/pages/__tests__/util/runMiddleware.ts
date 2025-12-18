@@ -11,6 +11,15 @@ export default function runMiddleware(
   const fetchEvent = new NextFetchEvent({
     page,
     request,
+    context: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      waitUntil: (promise: Promise<any>) => {
+        // In a real environment, this extends the request lifetime.
+        // For manual execution/testing, strictly tracking this is usually not required
+        // unless you are testing side effects.
+        return promise;
+      },
+    },
   });
 
   return middleware(request, fetchEvent, () => NextResponse.next());

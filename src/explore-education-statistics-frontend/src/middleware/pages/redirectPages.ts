@@ -1,3 +1,4 @@
+import 'urlpattern-polyfill';
 import { Dictionary } from '@common/types';
 import redirectService, { Redirects } from '@frontend/services/redirectService';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
