@@ -74,7 +74,8 @@ public class PreReleaseUserService(
                         var userHasPreReleaseRole = await userReleaseRoleRepository.UserHasRoleOnReleaseVersion(
                             userId: existingUser.Id,
                             releaseVersionId: releaseVersionId,
-                            role: ReleaseRole.PrereleaseViewer
+                            role: ReleaseRole.PrereleaseViewer,
+                            resourceRoleFilter: ResourceRoleFilter.AllButExpired
                         );
 
                         if (!userHasPreReleaseRole)
