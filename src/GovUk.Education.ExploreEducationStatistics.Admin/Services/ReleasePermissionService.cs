@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -26,6 +27,8 @@ public class ReleasePermissionService(
         ReleaseRole[]? rolesToInclude = null
     )
     {
+        var rolesToCheck = rolesToInclude.IsNullOrEmpty() ? EnumUtil.GetEnumsArray<ReleaseRole>() : rolesToInclude;
+
         return await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Publication))
             .OnSuccessDo(releaseVersion => userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
@@ -35,7 +38,7 @@ public class ReleasePermissionService(
                     .Query()
                     .AsNoTracking()
                     .WhereForReleaseVersion(releaseVersionId)
-                    .WhereRolesIn(rolesToInclude)
+                    .WhereRolesIn(rolesToCheck)
                     .ToListAsync();
 
                 return userReleaseRoles
