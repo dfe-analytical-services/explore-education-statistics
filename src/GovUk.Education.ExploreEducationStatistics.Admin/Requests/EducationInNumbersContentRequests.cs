@@ -1,7 +1,5 @@
 #nullable enable
-using System.Numerics;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
