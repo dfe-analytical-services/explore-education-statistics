@@ -125,6 +125,9 @@ public abstract class OptimisedContentApiCollectionFixture(params ContentApiInte
         await _statisticsDbContext.ClearTestDataIfInMemory();
     }
 
+    /// <summary>
+    /// Retrieve the Azurity convenience class for the purposes of test data cleardown, etc.
+    /// </summary>
     protected AzuriteWrapper GetAzuriteWrapper()
     {
         if (!capabilities.Contains(ContentApiIntegrationTestCapability.Azurite))

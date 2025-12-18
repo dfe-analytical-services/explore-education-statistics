@@ -9,11 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures.Opt
 
 /// <summary>
 ///
-/// A Collection-level test fixture to be used by Content API integration tests.
-///
-/// A number of capabilities are supported by this fixture, and each subclass can specify the capabilities that they
-/// need.  The relevant configuration changes and Test Containers will then be put in place to support this for the
-/// lifetime of this fixture.
+/// A Collection-level test fixture to be used by Data API integration tests.
 ///
 /// This fixture is intended to be used specifically as a Collection-level fixture, and thus is able to provide
 /// reusable components that might otherwise not be thread-safe e.g. DbContexts. The reason why this is possible

@@ -88,7 +88,10 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
                         context.ReleaseFiles.AddRange(publication2Release1Version1Files);
                     });
 
-                var query = new DataSetFileListRequest(ReleaseId: publication1.Releases[0].Versions[0].Id);
+                var query = new DataSetFileListRequest(
+                    ReleaseId: publication1.Releases[0].Versions[0].Id,
+                    Sort: DataSetsListRequestSortBy.Title
+                );
                 var response = await ListDataSetFiles(query);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
