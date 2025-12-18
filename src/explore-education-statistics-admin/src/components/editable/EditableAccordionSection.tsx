@@ -59,7 +59,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
         <FormTextInput
           id={`${id}-editHeading`}
           name="heading"
-          label="Edit Heading"
+          label="Section title"
           autoFocus
           value={newHeading}
           onChange={e => {

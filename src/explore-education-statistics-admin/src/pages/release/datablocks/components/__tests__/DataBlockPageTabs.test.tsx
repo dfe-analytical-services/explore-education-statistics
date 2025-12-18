@@ -149,9 +149,11 @@ describe('DataBlockPageTabs', () => {
       expect(stepHeadings[3]).toHaveTextContent('Step 4 Choose your filters');
       expect(stepHeadings[4]).toHaveTextContent('Step 5 Update data block');
 
-      expect(screen.getByLabelText('Name')).toHaveValue('Test data block');
+      expect(screen.getByLabelText('Data block name')).toHaveValue(
+        'Test data block',
+      );
       expect(screen.getByLabelText('Table title')).toHaveValue('Test title');
-      expect(screen.getByLabelText('Source')).toHaveValue('Test source');
+      expect(screen.getByLabelText('Data source')).toHaveValue('Test source');
     });
   });
 
@@ -263,14 +265,18 @@ describe('DataBlockPageTabs', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByLabelText('Name')).toHaveValue('Test data block');
+        expect(screen.getByLabelText('Data block name')).toHaveValue(
+          'Test data block',
+        );
         expect(screen.getByLabelText('Table title')).toHaveValue('Test title');
-        expect(screen.getByLabelText('Source')).toHaveValue('Test source');
+        expect(screen.getByLabelText('Data source')).toHaveValue('Test source');
       });
 
-      const nameInput = screen.getByLabelText('Name');
+      const nameInput = screen.getByLabelText('Data block name');
       const titleInput = screen.getByLabelText('Table title');
-      const sourceInput = screen.getByLabelText('Source');
+      const sourceInput = screen.getByLabelText('Data source', {
+        selector: 'input',
+      });
 
       await userEvent.clear(nameInput);
       await userEvent.type(nameInput, 'Updated test data block');

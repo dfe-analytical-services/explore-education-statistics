@@ -870,7 +870,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'text/csv',
       });
 
-      await user.type(screen.getByLabelText('Title'), 'Test title');
+      await user.type(screen.getByLabelText('Data file title'), 'Test title');
 
       await user.upload(screen.getByLabelText('Upload data file'), dataFile);
       await user.upload(
@@ -915,7 +915,10 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'application/zip',
       });
 
-      await user.type(screen.getByLabelText('Title'), 'Test zip title');
+      await user.type(
+        screen.getByLabelText('Data file title'),
+        'Test zip title',
+      );
 
       await user.click(screen.getByLabelText('ZIP file'));
 
@@ -1008,7 +1011,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'text/csv',
       });
 
-      await user.type(screen.getByLabelText('Title'), 'Test title');
+      await user.type(screen.getByLabelText('Data file title'), 'Test title');
 
       await user.upload(screen.getByLabelText('Upload data file'), dataFile);
       await user.upload(
@@ -1081,7 +1084,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'application/zip',
       });
 
-      await user.type(screen.getByLabelText('Title'), 'Test title');
+      await user.type(screen.getByLabelText('Data file title'), 'Test title');
 
       await user.click(screen.getByLabelText('ZIP file'));
 
