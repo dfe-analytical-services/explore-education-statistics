@@ -39,7 +39,7 @@ describe('EditableTileGroupBlock', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Edit group heading' }),
+      screen.getByRole('button', { name: /Edit group heading/ }),
     ).toBeInTheDocument();
   });
 
@@ -56,10 +56,10 @@ describe('EditableTileGroupBlock', () => {
     expect(screen.queryByTestId('tile-group-heading')).not.toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Add group heading' }),
+      screen.getByRole('button', { name: /Add group heading/ }),
     ).toBeInTheDocument();
 
-    user.click(screen.getByRole('button', { name: 'Add group heading' }));
+    user.click(screen.getByRole('button', { name: /Add group heading/ }));
 
     await waitFor(() => {
       expect(screen.getByLabelText('Edit heading')).toBeInTheDocument();

@@ -3,13 +3,15 @@ import { methodologyToolbarConfigFull } from '@admin/config/ckEditorConfig';
 import { EditableContentBlock as EditableContentBlockType } from '@admin/services/types/content';
 import useToggle from '@common/hooks/useToggle';
 import isBrowser from '@common/utils/isBrowser';
-import React, { useCallback } from 'react';
+import React, { ReactNode, useCallback } from 'react';
 import useMethodologyImageUpload from '@admin/pages/methodology/hooks/useMethodologyImageUpload';
 import { insertMethodologyIdPlaceholders } from '@common/modules/methodology/utils/methodologyImageUrls';
 import useMethodologyImageAttributeTransformer from '@common/modules/methodology/hooks/useMethodologyImageAttributeTransformer';
 
 interface Props {
   allowImages?: boolean;
+  editButtonLabel?: ReactNode | string;
+  removeButtonLabel?: ReactNode | string;
   methodologyId: string;
   block: EditableContentBlockType;
   editable?: boolean;
@@ -19,6 +21,8 @@ interface Props {
 
 const MethodologyEditableBlock = ({
   allowImages = false,
+  editButtonLabel,
+  removeButtonLabel,
   methodologyId,
   block,
   editable = true,
@@ -54,12 +58,14 @@ const MethodologyEditableBlock = ({
       return (
         <EditableContentBlock
           editable={editable && !isBrowser('IE')}
+          editButtonLabel={editButtonLabel}
           id={blockId}
           isEditing={isEditing}
           label="Content block"
           hideLabel
-          value={block.body || ''}
+          removeButtonLabel={removeButtonLabel}
           toolbarConfig={methodologyToolbarConfigFull}
+          value={block.body || ''}
           transformImageAttributes={transformImageAttributes}
           onCancel={toggleEditing.off}
           onEditing={toggleEditing.on}

@@ -1,6 +1,7 @@
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import noop from 'lodash/noop';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 
@@ -148,6 +149,33 @@ describe('EditableBlockWrapper', () => {
       </EditableBlockWrapper>,
     );
 
+    expect(
+      screen.queryByRole('button', { name: 'Remove block' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders with custom edit and remove labels', async () => {
+    render(
+      <EditableBlockWrapper
+        editButtonLabel="Custom edit label"
+        removeButtonLabel="Custom remove label"
+        onEdit={noop}
+        onDelete={noop}
+      >
+        <div>Child block</div>
+      </EditableBlockWrapper>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Custom edit label' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Edit block' }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Custom remove label' }),
+    ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Remove block' }),
     ).not.toBeInTheDocument();

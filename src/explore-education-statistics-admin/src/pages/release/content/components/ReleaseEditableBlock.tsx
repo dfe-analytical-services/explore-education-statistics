@@ -24,7 +24,7 @@ import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockT
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
 import isBrowser from '@common/utils/isBrowser';
-import React, { useCallback, useEffect } from 'react';
+import React, { ReactNode, useCallback, useEffect } from 'react';
 import { generatePath } from 'react-router';
 import useToggle from '@common/hooks/useToggle';
 
@@ -33,8 +33,10 @@ interface Props {
   allowImages?: boolean;
   block: EditableBlock;
   editable?: boolean;
+  editButtonLabel?: ReactNode | string;
   publicationId: string;
   releaseVersionId: string;
+  removeButtonLabel?: ReactNode | string;
   sectionId: string;
   sectionKey: ContentSectionKeys;
   visible?: boolean;
@@ -46,8 +48,10 @@ const ReleaseEditableBlock = ({
   allowImages = false,
   block,
   editable = true,
+  editButtonLabel,
   publicationId,
   releaseVersionId,
+  removeButtonLabel,
   sectionId,
   sectionKey,
   visible,
@@ -346,6 +350,7 @@ const ReleaseEditableBlock = ({
             onAdd={toggleCommentAddForm.on}
           >
             <EditableBlockWrapper
+              editButtonLabel={editButtonLabel}
               dataBlockEditLink={generatePath<ReleaseDataBlockRouteParams>(
                 releaseDataBlockEditRoute.path,
                 {
@@ -354,6 +359,7 @@ const ReleaseEditableBlock = ({
                   dataBlockId: block.id,
                 },
               )}
+              removeButtonLabel={removeButtonLabel}
               onDelete={editable ? handleDelete : undefined}
             >
               <Gate condition={!!visible}>
@@ -379,8 +385,10 @@ const ReleaseEditableBlock = ({
             onAdd={toggleCommentAddForm.on}
           >
             <EditableEmbedBlock
-              editable={editable}
               block={block}
+              editable={editable}
+              editButtonLabel={editButtonLabel}
+              removeButtonLabel={removeButtonLabel}
               visible={visible}
               onDelete={handleDeleteEmbedBlock}
               onSubmit={handleSaveEmbedBlock}
@@ -394,6 +402,7 @@ const ReleaseEditableBlock = ({
             actionThrottle={lockThrottle}
             allowComments={allowComments}
             editable={editable && !isBrowser('IE')}
+            editButtonLabel={editButtonLabel}
             hideLabel
             id={blockId}
             isEditing={isLockedByUser}
@@ -401,6 +410,7 @@ const ReleaseEditableBlock = ({
             label="Content block"
             locked={locked}
             lockedBy={isLockedByOtherUser ? lockedBy : undefined}
+            removeButtonLabel={removeButtonLabel}
             toolbarConfig={releaseToolbarConfigFull}
             transformImageAttributes={transformImageAttributes}
             value={block.body || ''}

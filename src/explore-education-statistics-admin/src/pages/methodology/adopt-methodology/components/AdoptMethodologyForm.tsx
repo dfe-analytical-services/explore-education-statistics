@@ -17,6 +17,7 @@ import Form from '@common/components/form/Form';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 
 const errorMappings = [
   mapFieldErrors<FormValues>({
@@ -46,7 +47,13 @@ const AdoptMethodologyForm = ({ methodologies, onCancel, onSubmit }: Props) => {
           label: methodology.title,
           value: methodology.methodologyId,
           hint: (
-            <Details summary="More details" className="govuk-!-margin-bottom-2">
+            <Details
+              summary="More details"
+              summaryAfter={
+                <VisuallyHidden>{` about ${methodology.owningPublication.title}`}</VisuallyHidden>
+              }
+              className="govuk-!-margin-bottom-2"
+            >
               <SummaryList className="govuk-!-margin-bottom-3">
                 <SummaryListItem term="Owning publication">
                   {methodology.owningPublication?.title}

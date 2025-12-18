@@ -3,8 +3,12 @@ import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlo
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import MethodologyEditableBlock from '@admin/pages/methodology/edit-methodology/content/components/MethodologyEditableBlock';
-import { EditableContentBlock } from '@admin/services/types/content';
+import {
+  EditableBlock,
+  EditableContentBlock,
+} from '@admin/services/types/content';
 import Button from '@common/components/Button';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import MethodologyBlock from '@admin/pages/methodology/components/MethodologyBlock';
@@ -131,6 +135,26 @@ const MethodologyAccordionSection = ({
     [methodologyId, sectionId, sectionKey, updateContentSectionHeading],
   );
 
+  const getBlockButtonLabels = (block: EditableBlock) => {
+    const blockIndex = blocks.findIndex(htmlBlock => htmlBlock.id === block.id);
+    const sectionContext =
+      blocks.length > 1 ? `${blockIndex + 1} in ${heading}` : `in ${heading}`;
+    return {
+      editLabel: (
+        <>
+          Edit<VisuallyHidden> text</VisuallyHidden> block
+          <VisuallyHidden> {sectionContext}</VisuallyHidden>
+        </>
+      ),
+      removeLabel: (
+        <>
+          Remove<VisuallyHidden> text</VisuallyHidden> block
+          <VisuallyHidden> {sectionContext}</VisuallyHidden>
+        </>
+      ),
+    };
+  };
+
   return (
     <EditableAccordionSection
       {...props}
@@ -153,7 +177,14 @@ const MethodologyAccordionSection = ({
             }
           }}
         >
-          {isReordering ? 'Save section order' : 'Reorder this section'}
+          {isReordering ? (
+            'Save section order'
+          ) : (
+            <>
+              Reorder this section
+              <VisuallyHidden>{`: ${heading}`}</VisuallyHidden>
+            </>
+          )}
         </Button>
       }
       onHeadingChange={handleHeadingChange}
@@ -166,16 +197,21 @@ const MethodologyAccordionSection = ({
         renderBlock={block => (
           <MethodologyBlock methodologyId={methodologyId} block={block} />
         )}
-        renderEditableBlock={block => (
-          <MethodologyEditableBlock
-            allowImages
-            block={block}
-            editable={!isReordering}
-            methodologyId={methodologyId}
-            onSave={updateBlockInAccordionSection}
-            onDelete={removeBlockFromAccordionSection}
-          />
-        )}
+        renderEditableBlock={block => {
+          const { editLabel, removeLabel } = getBlockButtonLabels(block);
+          return (
+            <MethodologyEditableBlock
+              allowImages
+              block={block}
+              editable={!isReordering}
+              editButtonLabel={editLabel}
+              methodologyId={methodologyId}
+              removeButtonLabel={removeLabel}
+              onSave={updateBlockInAccordionSection}
+              onDelete={removeBlockFromAccordionSection}
+            />
+          );
+        }}
       />
       {editingMode === 'edit' && !isReordering && (
         <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
@@ -184,7 +220,7 @@ const MethodologyAccordionSection = ({
             onClick={addBlockToAccordionSection}
             ref={addTextBlockButton}
           >
-            Add text block
+            Add text block<VisuallyHidden>{` to ${heading}`}</VisuallyHidden>
           </Button>
         </div>
       )}

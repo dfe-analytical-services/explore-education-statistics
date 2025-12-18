@@ -1066,7 +1066,7 @@ Save and validate infographic chart embeds correctly
     user checks infographic chart contains alt    ${datablock}    Test chart alt
 
 Delete embedded data block
-    user clicks button    Remove block
+    user clicks element    testid:remove-block
     user clicks button    Confirm
 
 Delete chart from data block

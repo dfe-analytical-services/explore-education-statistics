@@ -251,8 +251,18 @@ const ReleaseContent = ({
                     <ReleaseEditableBlock
                       allowComments
                       block={block}
+                      editButtonLabel={
+                        <>
+                          Edit<VisuallyHidden> summary</VisuallyHidden> block
+                        </>
+                      }
                       publicationId={release.publication.id}
                       releaseVersionId={release.id}
+                      removeButtonLabel={
+                        <>
+                          Remove<VisuallyHidden> summary</VisuallyHidden> block
+                        </>
+                      }
                       sectionId={release.summarySection.id}
                       sectionKey="summarySection"
                       onAfterDeleteBlock={onAfterDeleteSummaryBlock}
