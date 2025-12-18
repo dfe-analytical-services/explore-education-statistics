@@ -14,7 +14,7 @@ export function DraftStatusGuidanceModal() {
       showClose
       triggerButton={
         <ButtonText>
-          <InfoIcon description="Guidance on draft statuses" />
+          Draft status guidance <InfoIcon />
         </ButtonText>
       }
     >
@@ -49,7 +49,7 @@ export function IssuesGuidanceModal() {
       showClose
       triggerButton={
         <ButtonText>
-          <InfoIcon description="Guidance on draft release issues" />
+          Errors and warnings guidance <InfoIcon />
         </ButtonText>
       }
     >
@@ -77,7 +77,7 @@ export function PublishedStatusGuidanceModal() {
       showClose
       triggerButton={
         <ButtonText>
-          <InfoIcon description="Guidance on statuses" />
+          Published status guidance <InfoIcon />
         </ButtonText>
       }
     >
@@ -101,7 +101,7 @@ export function ScheduledStagesGuidanceModal() {
       showClose
       triggerButton={
         <ButtonText>
-          <InfoIcon description="Guidance on publication stages" />
+          Publication stages guidance <InfoIcon />
         </ButtonText>
       }
     >
@@ -147,7 +147,7 @@ export function ScheduledStatusGuidanceModal() {
       showClose
       triggerButton={
         <ButtonText>
-          <InfoIcon description="Guidance on scheduled statuses" />
+          Scheduled status guidance <InfoIcon />
         </ButtonText>
       }
     >

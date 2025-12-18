@@ -104,7 +104,9 @@ describe('DataFilesReplacementTableRow', () => {
     expect(cells[1]).toHaveTextContent('1,000 B');
     expect(cells[2]).toHaveTextContent('Ready');
     expect(
-      within(cells[3]).getByRole('link', { name: 'View details' }),
+      within(cells[3]).getByRole('link', {
+        name: 'View details for Test File',
+      }),
     ).toBeInTheDocument();
     expect(
       within(cells[3]).getByRole('button', { name: 'Confirm replacement' }),
@@ -143,7 +145,9 @@ describe('DataFilesReplacementTableRow', () => {
     expect(cells[1]).toHaveTextContent('1,000 B');
     expect(cells[2]).toHaveTextContent('Error');
     expect(
-      within(cells[3]).getByRole('link', { name: 'View details' }),
+      within(cells[3]).getByRole('link', {
+        name: 'View details for Test File',
+      }),
     ).toBeInTheDocument();
     expect(
       within(cells[3]).queryByRole('button', { name: 'Confirm replacement' }),
@@ -184,7 +188,9 @@ describe('DataFilesReplacementTableRow', () => {
     expect(cells[1]).toHaveTextContent('1,000 B');
     expect(cells[2]).toHaveTextContent('Importing');
     expect(
-      within(cells[3]).getByRole('link', { name: 'View details' }),
+      within(cells[3]).getByRole('link', {
+        name: 'View details for Test File',
+      }),
     ).toBeInTheDocument();
     expect(
       within(cells[3]).queryByRole('button', { name: 'Confirm replacement' }),
@@ -236,7 +242,9 @@ describe('DataFilesReplacementTableRow', () => {
     expect(cells[1]).toHaveTextContent('1,000 B');
     expect(cells[2]).toHaveTextContent('Ready');
     expect(
-      within(cells[3]).getByRole('link', { name: 'View details' }),
+      within(cells[3]).getByRole('link', {
+        name: 'View details for Test File',
+      }),
     ).toBeInTheDocument();
     expect(
       within(cells[3]).queryByRole('button', { name: 'Confirm replacement' }),
@@ -289,7 +297,9 @@ describe('DataFilesReplacementTableRow', () => {
     expect(cells[1]).toHaveTextContent('1,000 B');
     expect(cells[2]).toHaveTextContent('Ready');
     expect(
-      within(cells[3]).getByRole('link', { name: 'View details' }),
+      within(cells[3]).getByRole('link', {
+        name: 'View details for Test File',
+      }),
     ).toBeInTheDocument();
     expect(
       within(cells[3]).queryByRole('button', { name: 'Confirm replacement' }),
@@ -342,7 +352,9 @@ describe('DataFilesReplacementTableRow', () => {
     expect(cells[1]).toHaveTextContent('1,000 B');
     expect(cells[2]).toHaveTextContent('Ready');
     expect(
-      within(cells[3]).getByRole('link', { name: 'View details' }),
+      within(cells[3]).getByRole('link', {
+        name: 'View details for Test File',
+      }),
     ).toBeInTheDocument();
     expect(
       within(cells[3]).getByRole('button', { name: 'Confirm replacement' }),

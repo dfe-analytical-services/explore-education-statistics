@@ -17,6 +17,7 @@ import {
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import React from 'react';
 import { generatePath } from 'react-router';
@@ -69,7 +70,12 @@ export default function DataFilesTableRow({
           <Modal
             showClose
             title="Data file details"
-            triggerButton={<ButtonText>View details</ButtonText>}
+            triggerButton={
+              <ButtonText>
+                View details
+                <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
+              </ButtonText>
+            }
           >
             <DataFileSummaryList
               dataFile={dataFile}
@@ -93,6 +99,7 @@ export default function DataFilesTableRow({
                       )}
                     >
                       Edit title
+                      <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
                     </Link>
                     <Modal
                       open={showReplacementModal}
@@ -100,6 +107,7 @@ export default function DataFilesTableRow({
                       triggerButton={
                         <ButtonText onClick={toggleReplacementModal.on}>
                           Replace data
+                          <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
                         </ButtonText>
                       }
                     >
@@ -121,7 +129,10 @@ export default function DataFilesTableRow({
                     showClose
                     title="Cannot delete files"
                     triggerButton={
-                      <ButtonText variant="warning">Delete files</ButtonText>
+                      <ButtonText variant="warning">
+                        Delete files
+                        <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
+                      </ButtonText>
                     }
                   >
                     <p>

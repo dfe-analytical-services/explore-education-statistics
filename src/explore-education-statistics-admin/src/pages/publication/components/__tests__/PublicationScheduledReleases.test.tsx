@@ -83,7 +83,9 @@ describe('PublicationScheduledReleases', () => {
     });
 
     expect(
-      within(row1Cells[2]).getByRole('button', { name: 'View stages' }),
+      within(row1Cells[2]).getByRole('button', {
+        name: 'View stages for Release 1',
+      }),
     ).toBeInTheDocument();
     expect(
       within(row1Cells[3]).getByText('1 January 2022'),
@@ -99,7 +101,9 @@ describe('PublicationScheduledReleases', () => {
     expect(within(row2Cells[0]).getByText('Release 2')).toBeInTheDocument();
     expect(within(row2Cells[1]).getByText('Scheduled')).toBeInTheDocument();
     expect(
-      within(row2Cells[2]).getByRole('button', { name: 'View stages' }),
+      within(row2Cells[2]).getByRole('button', {
+        name: 'View stages for Release 2',
+      }),
     ).toBeInTheDocument();
     expect(
       within(row2Cells[3]).getByText('2 January 2022'),

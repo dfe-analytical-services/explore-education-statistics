@@ -17,6 +17,7 @@ import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tag from '@common/components/Tag';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import React, { useEffect } from 'react';
 import { generatePath } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
@@ -148,6 +149,7 @@ export default function DataFilesReplacementTableRow({
             )}
           >
             View details
+            <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
           </Link>
           <>
             {(canCancel || replacementDataFile.status === 'COMPLETE') &&

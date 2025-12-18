@@ -240,7 +240,7 @@ describe('ReleaseDataUploadsSection', () => {
     expect(replacementRow1.getByTestId('Size')).toHaveTextContent('50 Kb');
     expect(replacementRow1.getByTestId('Status')).toHaveTextContent('Ready');
     expect(replacementRow1.getByTestId('Actions')).toHaveTextContent(
-      'View details',
+      'View details for Test data 1',
     );
     expect(replacementRow1.getByTestId('Actions')).toHaveTextContent(
       'Cancel replacement',
@@ -257,7 +257,7 @@ describe('ReleaseDataUploadsSection', () => {
     expect(replacementRow2.getByTestId('Size')).toHaveTextContent('100 Kb');
     expect(replacementRow2.getByTestId('Status')).toHaveTextContent('Ready');
     expect(replacementRow2.getByTestId('Actions')).toHaveTextContent(
-      'View details',
+      'View details for Test data 2',
     );
     expect(replacementRow2.getByTestId('Actions')).toHaveTextContent(
       'Cancel replacement',
@@ -403,7 +403,9 @@ describe('ReleaseDataUploadsSection', () => {
       const dataFileRow = within(dataFileRows[1]);
 
       await user.click(
-        dataFileRow.getByRole('button', { name: 'View details' }),
+        dataFileRow.getByRole('button', {
+          name: 'View details for Test data 2',
+        }),
       );
 
       expect(await screen.findByText('Data file details')).toBeInTheDocument();
@@ -467,14 +469,18 @@ describe('ReleaseDataUploadsSection', () => {
 
       expect(fileTableRow1.getByTestId('Status')).toHaveTextContent('Queued');
       expect(
-        fileTableRow1.queryByRole('button', { name: 'Delete files' }),
+        fileTableRow1.queryByRole('button', {
+          name: 'Delete files for Test data 1',
+        }),
       ).not.toBeInTheDocument();
 
       const fileTableRow2 = within(fileTableRows[2]);
 
       expect(fileTableRow2.getByTestId('Status')).toHaveTextContent('Complete');
       expect(
-        fileTableRow2.getByRole('button', { name: 'Delete files' }),
+        fileTableRow2.getByRole('button', {
+          name: 'Delete files for Test data 2',
+        }),
       ).toBeInTheDocument();
     });
 
@@ -526,11 +532,15 @@ describe('ReleaseDataUploadsSection', () => {
       expect(fileTableRows).toHaveLength(3);
 
       expect(
-        within(fileTableRows[2]).getByRole('button', { name: 'Delete files' }),
+        within(fileTableRows[2]).getByRole('button', {
+          name: 'Delete files for Test data 2',
+        }),
       ).toBeInTheDocument();
 
       await user.click(
-        within(fileTableRows[2]).getByRole('button', { name: 'Delete files' }),
+        within(fileTableRows[2]).getByRole('button', {
+          name: 'Delete files for Test data 2',
+        }),
       );
 
       expect(
@@ -606,11 +616,15 @@ describe('ReleaseDataUploadsSection', () => {
       expect(fileTableRows).toHaveLength(3);
 
       expect(
-        within(fileTableRows[2]).getByRole('button', { name: 'Delete files' }),
+        within(fileTableRows[2]).getByRole('button', {
+          name: 'Delete files for Test data 2',
+        }),
       ).toBeInTheDocument();
 
       await user.click(
-        within(fileTableRows[2]).getByRole('button', { name: 'Delete files' }),
+        within(fileTableRows[2]).getByRole('button', {
+          name: 'Delete files for Test data 2',
+        }),
       );
 
       expect(
@@ -663,7 +677,9 @@ describe('ReleaseDataUploadsSection', () => {
       expect(fileTableRows).toHaveLength(2);
 
       await user.click(
-        within(fileTableRows[1]).getByRole('button', { name: 'Delete files' }),
+        within(fileTableRows[1]).getByRole('button', {
+          name: 'Delete files for Test data 1',
+        }),
       );
 
       expect(

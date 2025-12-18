@@ -6,6 +6,7 @@ import {
 } from '@admin/pages/publication/components/PublicationGuidance';
 import { ReleaseVersionSummaryWithPermissions } from '@admin/services/releaseVersionService';
 import InsetText from '@common/components/InsetText';
+import ButtonGroup from '@common/components/ButtonGroup';
 import React from 'react';
 
 interface Props {
@@ -24,36 +25,38 @@ const PublicationDraftReleases = ({
   }
 
   return (
-    <table
-      className="dfe-hide-empty-cells"
-      data-testid="publication-draft-releases"
-    >
-      <thead>
-        <tr>
-          <th className="govuk-!-width-one-third">Release period</th>
-          <th className={`${styles.statusColumn} dfe-white-space--nowrap`}>
-            Status <DraftStatusGuidanceModal />
-          </th>
-          <th className="dfe-white-space--nowrap">
-            Errors <IssuesGuidanceModal />
-          </th>
-          <th className="dfe-white-space--nowrap">
-            Warnings <IssuesGuidanceModal />
-          </th>
-          <th className="govuk-!-width-one-quarter">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {releases.map(release => (
-          <DraftReleaseRow
-            key={release.id}
-            publicationId={publicationId}
-            release={release}
-            onAmendmentDelete={onAmendmentDelete}
-          />
-        ))}
-      </tbody>
-    </table>
+    <>
+      <table
+        className="dfe-hide-empty-cells"
+        data-testid="publication-draft-releases"
+      >
+        <thead>
+          <tr>
+            <th className="govuk-!-width-one-third">Release period</th>
+            <th className={`${styles.statusColumn} dfe-white-space--nowrap`}>
+              Status
+            </th>
+            <th className="dfe-white-space--nowrap">Errors</th>
+            <th className="dfe-white-space--nowrap">Warnings</th>
+            <th className="govuk-!-width-one-quarter">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {releases.map(release => (
+            <DraftReleaseRow
+              key={release.id}
+              publicationId={publicationId}
+              release={release}
+              onAmendmentDelete={onAmendmentDelete}
+            />
+          ))}
+        </tbody>
+      </table>
+      <ButtonGroup>
+        <IssuesGuidanceModal />
+        <DraftStatusGuidanceModal />
+      </ButtonGroup>
+    </>
   );
 };
 
