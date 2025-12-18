@@ -331,8 +331,7 @@ public class ReleaseVersionsController : ControllerBase
         return await _releasePublishingStatusService.GetReleaseStatusAsync(releaseVersionId).HandleFailuresOrOk();
     }
 
-    // We intend to change this route, to make these endpoints more consistent, as per EES-5895
-    [HttpGet("releases/{releaseVersionId:guid}/checklist")]
+    [HttpGet("releaseVersions/{releaseVersionId:guid}/checklist")]
     public async Task<ActionResult<ReleaseChecklistViewModel>> GetChecklist(Guid releaseVersionId)
     {
         return await _releaseChecklistService.GetChecklist(releaseVersionId).HandleFailuresOrOk();

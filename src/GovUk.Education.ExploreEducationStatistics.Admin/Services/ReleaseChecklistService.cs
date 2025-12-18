@@ -243,6 +243,23 @@ public class ReleaseChecklistService : IReleaseChecklistService
             warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoPublicPreReleaseAccessList));
         }
 
+        var releaseVersionContentInclude = await _contentDbContext
+            .ReleaseVersions.Include(rv => rv.Content)
+                .ThenInclude(cs => cs.Content)
+                    .ThenInclude(cb => cb.Comments)
+            .FirstAsync(rv => rv.Id == releaseVersion.Id);
+
+        if (
+            releaseVersionContentInclude.Content.Any(contentSection =>
+                contentSection.Content.Any(contentBlock =>
+                    contentBlock.Comments.Any(comment => comment.Resolved == null)
+                )
+            )
+        )
+        {
+            warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.UnresolvedComments));
+        }
+
         return warnings;
     }
 

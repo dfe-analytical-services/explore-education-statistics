@@ -239,6 +239,14 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
               releaseRouteParams,
             )}#${releasePreReleaseAccessPageTabs.publicAccessList.id}`,
           };
+        case 'UnresolvedComments':
+          return {
+            message: 'The content has unresolved comments',
+            link: generatePath<ReleaseRouteParams>(
+              releaseContentRoute.path,
+              releaseRouteParams,
+            ),
+          };
         default:
           // Show warning code, even if there is no mapping,
           // as this is better than having invisible warnings.
