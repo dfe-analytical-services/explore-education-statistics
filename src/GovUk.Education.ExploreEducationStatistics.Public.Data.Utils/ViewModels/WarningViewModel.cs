@@ -1,4 +1,4 @@
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.ViewModels;
 
 /// <summary>
 /// A warning that points to a potential issue. This is not a critical error,

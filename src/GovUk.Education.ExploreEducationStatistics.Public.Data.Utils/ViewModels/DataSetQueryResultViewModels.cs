@@ -1,31 +1,13 @@
 using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.ViewModels;
 
 /// <summary>
 /// A paginated list of results from a data set query.
 /// </summary>
-//public record DataSetQueryPaginatedResultsViewModel(
-//    List<DataSetQueryResultViewModel> Results,
-//    int TotalResults,
-//    int Page,
-//    int PageSize
-//) : PaginatedListViewModel<DataSetQueryResultViewModel>(Results, TotalResults, Page, PageSize)
-//{
-//    /// <summary>
-//    /// A list of warnings, highlighting any potential issues with the request.
-//    /// </summary>
-//    public required List<WarningViewModel> Warnings { get; init; }
-//}
-public record DataSetQueryPaginatedResultsViewModel( // Clone of view model from Public.Data.Api
-    List<DataSetQueryResultViewModel> Results,
-    int TotalResults,
-    int Page,
-    int PageSize
-) : PaginatedListViewModel<DataSetQueryResultViewModel>(Results, TotalResults, Page, PageSize)
+public record DataSetQueryPaginatedResultsViewModel : PaginatedListViewModel<DataSetQueryResultViewModel>
 {
     /// <summary>
     /// A list of warnings, highlighting any potential issues with the request.
