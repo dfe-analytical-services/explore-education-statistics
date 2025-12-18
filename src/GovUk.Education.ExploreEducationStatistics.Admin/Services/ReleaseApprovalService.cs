@@ -197,7 +197,7 @@ public class ReleaseApprovalService(
     private async Task SendPreReleaseUserInviteEmails(ReleaseVersion releaseVersion)
     {
         var unsentUserReleaseRoleInvites = await userReleaseRoleRepository
-            .Query(ResourceRoleFilter.PendingOnly)
+            .Query(ResourceRoleFilter.AllButExpired)
             .AsNoTracking()
             .WhereForReleaseVersion(releaseVersion.Id)
             .WhereRolesIn(ReleaseRole.PrereleaseViewer)
