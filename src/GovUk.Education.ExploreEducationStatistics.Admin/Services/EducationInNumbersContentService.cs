@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Profiling.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -345,6 +346,20 @@ public class EducationInNumbersContentService(
                 LinkUrl = null,
                 LinkText = null,
             },
+            EinTileType.ApiQueryStatTile => new EinApiQueryStatTile
+            {
+                Id = Guid.NewGuid(),
+                EinParentBlockId = parentBlockId,
+                Order = order ?? tileList.Count,
+                Title = "",
+                DataSetId = null,
+                Query = "",
+                DecimalPlaces = null,
+                IndicatorUnit = null,
+                IsLatestVersion = false,
+                QueryResult = "",
+                Version = "",
+            },
             _ => throw new Exception($"{nameof(EinTile)} type {type} not found"),
         };
 
@@ -388,7 +403,7 @@ public class EducationInNumbersContentService(
         return EinTileViewModel.FromModel(tileToUpdate);
     }
 
-    public async Task<Either<ActionResult, EinTileViewModel>> UpdateApiQueryStatTile(
+    public async Task<Either<ActionResult?, EinTileViewModel>> UpdateApiQueryStatTile(
         Guid pageId,
         Guid tileId,
         EinApiQueryStatTileUpdateRequest request
@@ -413,7 +428,7 @@ public class EducationInNumbersContentService(
                 int majorVersion;
                 int minorVersion;
                 int patchVersion;
-                if (Version.TryParse(request.Version, out Version version))
+                if (Version.TryParse(request.Version, out Version? version))
                 {
                     majorVersion = version.Major;
                     minorVersion = version.Minor;
@@ -445,19 +460,22 @@ public class EducationInNumbersContentService(
                     return new BadRequestObjectResult("Warnings returned, {queryResults.Warnings}");
                 }
 
-                if (queryResults.Paging.TotalResults < queryResults.Paging.PageSize)
+                if (queryResults.Paging.TotalResults > queryResults.Paging.PageSize)
                 {
-                    return new BadRequestObjectResult("");
+                    // @MarkFix could collate results from multiple pages into a single array
+                    return new BadRequestObjectResult("Results need to all fit on the first page");
                 }
-                // @MarkFix pages shouldn't be greater than one
+
                 // @MarkFix check one result for NAT and latest year
+                // @MarkFix fetch meta data
 
                 tileToUpdate.Title = request.Title;
                 tileToUpdate.DataSetId = request.DataSetId;
                 tileToUpdate.Version = request.Version;
                 tileToUpdate.Query = request.Query;
-                tileToUpdate.QueryResult = queryResults.Results.ToString(); // @MarkFix as a string yeah?
+                tileToUpdate.QueryResult = queryResults.Results.ToJson();
                 tileToUpdate.IsLatestVersion = isLatestVersion;
+
                 contentDbContext.EinTiles.Update(tileToUpdate);
                 await contentDbContext.SaveChangesAsync();
 

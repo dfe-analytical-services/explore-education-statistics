@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
-using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -58,7 +57,7 @@ public enum EinTileType
 {
     // NOTE: Update ContentDbContext.ConfigureEinTile if you add a new type!
     FreeTextStatTile,
-    ApiQueryTile,
+    ApiQueryStatTile,
 }
 
 public class EinFreeTextStatTile : EinTile
@@ -74,24 +73,24 @@ public class EinApiQueryStatTile : EinTile
 {
     public string Title { get; set; } = string.Empty;
 
-    public Guid DataSetId { get; set; }
+    public Guid? DataSetId { get; set; }
 
-    public string Version { get; set; } = string.Empty;
+    public string Version { get; set; } = string.Empty; // @MarkFix can the user provide a version without a patch version?
 
-    public bool IsLatestVersion { get; set; }
+    public bool IsLatestVersion { get; set; } // @MarkFix change to string latestPublishedVersion
 
     public string Query { get; set; } = string.Empty;
 
     [JsonConverter(typeof(EnumToEnumValueJsonConverter<IndicatorUnit>))]
-    public IndicatorUnit IndicatorUnit { get; set; } = IndicatorUnit.None;
+    public IndicatorUnit? IndicatorUnit { get; set; } = null;
 
     public int? DecimalPlaces { get; set; }
 
     public string QueryResult { get; set; } = string.Empty;
+
+    public string MetaResult { get; set; } = string.Empty; // @MarkFix update migration to add
 }
 
-// @MarkFix Public API papiStatTile for MVP - i.e. one stat drawn from a papi query
-// MVP
-// - filters results by NAT and latest TimeIdentifier/TimePeriod and then should have one result
-// -- BAU must manually update the papi stat tile for the tile and then publish it - no auto update
-// - link to release that the api data set is from (like free stat text tile)
+// @MarkFix filters results by NAT and latest TimeIdentifier/TimePeriod and then should have one result
+// @MarkFix link to release that the api data set is from (like free stat text tile)
+// @MarkFix on a new release being published, check for api data sets - if it is in an EinTile, update isLatestVersion

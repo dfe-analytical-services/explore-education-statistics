@@ -157,11 +157,11 @@ public record EinFreeTextStatTileViewModel : EinTileViewModel
 public record EinApiQueryStatTileViewModel : EinTileViewModel
 {
     public string Title { get; init; } = string.Empty;
-    public Guid DataSetId { get; init; }
+    public Guid? DataSetId { get; init; }
     public string Version { get; init; } = string.Empty;
     public bool IsLatestVersion { get; init; }
     public string Query { get; init; } = string.Empty;
-    public IndicatorUnit IndicatorUnit { get; init; } // @MarkFix needs a converter?
+    public IndicatorUnit? IndicatorUnit { get; init; } // @MarkFix needs a converter?
     public int? DecimalPlaces { get; set; }
     public string QueryResult { get; set; } = string.Empty;
 
@@ -171,7 +171,7 @@ public record EinApiQueryStatTileViewModel : EinTileViewModel
         {
             Id = statTile.Id,
             Order = statTile.Order,
-            Type = EinTileType.ApiQueryTile,
+            Type = EinTileType.ApiQueryStatTile,
             Title = statTile.Title,
             DataSetId = statTile.DataSetId,
             Version = statTile.Version,
