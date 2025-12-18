@@ -509,8 +509,7 @@ public class ReleaseVersionService(
             .Distinct();
 
         var releaseVersionsForApproval = await context
-            .ReleaseVersions.AsNoTracking()
-            .Include(releaseVersion => releaseVersion.Release)
+            .ReleaseVersions.Include(releaseVersion => releaseVersion.Release)
                 .ThenInclude(release => release.Publication)
             .Where(releaseVersion =>
                 releaseVersion.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview
