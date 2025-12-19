@@ -9,7 +9,7 @@ import _releasePermissionService, {
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
-import React, { ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 
 jest.mock('@admin/services/releasePermissionService');
 const releasePermissionService = _releasePermissionService as jest.Mocked<
@@ -215,6 +215,6 @@ describe('PublicationReleaseAccess', () => {
   });
 });
 
-function render(element: ReactElement) {
+function render(element: ReactNode) {
   return baseRender(<MemoryRouter>{element}</MemoryRouter>);
 }

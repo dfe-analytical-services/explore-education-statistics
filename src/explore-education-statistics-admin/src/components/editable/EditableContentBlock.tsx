@@ -179,7 +179,7 @@ const EditableContentBlock = ({
               ref={ref}
               onClick={isEditable ? onEditing : undefined}
             >
-              <div inert="" ref={contentRef}>
+              <div inert ref={contentRef}>
                 <ContentHtml
                   getGlossaryEntry={glossaryService.getEntry}
                   html={value || '<p>This section is empty</p>'}

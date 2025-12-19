@@ -15,7 +15,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React, { ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 
 describe('EditableContentForm', () => {
   const testUser1: User = {
@@ -143,14 +143,14 @@ describe('EditableContentForm', () => {
     test('formats links before calling `onSubmit` handler', async () => {
       const handleSubmit = jest.fn();
 
-      const testContentWithLinks = `Test content 
+      const testContentWithLinks = `Test content
         <a href="https://explore-education-statistics.service.gov.uk/find-statistics/Pupil-Attendance-In-Schools?testParam=Something">
-        EES link with uppercase characters</a> 
+        EES link with uppercase characters</a>
         <a href="  https://gov.uk/TEST something  ">External link with whitespace, space to encode and uppercase characters</a>`;
 
-      const formattedContentWithLinks = `Test content 
+      const formattedContentWithLinks = `Test content
         <a href="https://explore-education-statistics.service.gov.uk/find-statistics/pupil-attendance-in-schools?testParam=Something">
-        EES link with uppercase characters</a> 
+        EES link with uppercase characters</a>
         <a href="https://gov.uk/TEST%20something">External link with whitespace, space to encode and uppercase characters</a>`;
 
       render(
@@ -173,9 +173,9 @@ describe('EditableContentForm', () => {
     test('does not remove data attributes for glossary and featured table links when formatting links', async () => {
       const handleSubmit = jest.fn();
 
-      const testContentWithLinks = `Test content 
+      const testContentWithLinks = `Test content
         <a data-glossary href="https://explore-education-statistics.service.gov.uk/glossary#absence">
-        Glossary link</a> 
+        Glossary link</a>
         <a data-featured-table href="https://explore-education-statistics.service.gov.uk/data-tables/fast-track/c85e82df-75f0-4b35-ad9e-08dc1cd00d3d?featuredTable=true">
         Featured table link</a>`;
 
@@ -570,7 +570,7 @@ describe('EditableContentForm', () => {
     });
   });
 
-  function render(element: ReactElement) {
+  function render(element: ReactNode) {
     baseRender(
       <TestConfigContextProvider>{element}</TestConfigContextProvider>,
     );

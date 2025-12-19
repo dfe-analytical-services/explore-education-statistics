@@ -1,7 +1,7 @@
 import { RefObject } from 'react';
 
 export default function copyElementToClipboard(
-  elementRef: RefObject<HTMLElement>,
+  elementRef: RefObject<HTMLElement | null>,
 ) {
   if (!elementRef.current) return;
 

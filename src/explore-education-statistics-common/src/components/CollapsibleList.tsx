@@ -7,6 +7,7 @@ import React, {
   Children,
   cloneElement,
   createElement,
+  HTMLAttributes,
   ReactElement,
   ReactNode,
   useRef,
@@ -51,8 +52,8 @@ const CollapsibleList = ({
 }: Props) => {
   const [collapsed, toggleCollapsed] = useToggle(isCollapsed);
 
-  const firstItemRef = useRef<HTMLElement>(null);
-  const firstHiddenItemRef = useRef<HTMLElement>(null);
+  const firstItemRef = useRef<HTMLLIElement>(null);
+  const firstHiddenItemRef = useRef<HTMLLIElement>(null);
 
   const getItemProperties = (index: number) => {
     if (index === 0) {
@@ -72,9 +73,16 @@ const CollapsibleList = ({
     return undefined;
   };
 
-  const listItems = Children.toArray(children).map((item, index) =>
-    cloneElement(item as ReactElement, getItemProperties(index)),
-  );
+  const listItems = Children.toArray(children).map((item, index) => {
+    if (!React.isValidElement(item)) {
+      return item;
+    }
+
+    return cloneElement(
+      item as ReactElement<HTMLAttributes<HTMLLIElement>>,
+      getItemProperties(index),
+    );
+  });
 
   const renderedListItems = collapsed
     ? listItems.slice(0, collapseAfter > 0 ? collapseAfter : 0)

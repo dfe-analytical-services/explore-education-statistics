@@ -16,7 +16,7 @@ import parseHtmlString, {
   attributesToProps,
   domToReact,
 } from 'html-react-parser';
-import React, { ReactElement, useMemo } from 'react';
+import React, { ReactNode, useMemo, type JSX } from 'react';
 
 export interface ContentHtmlProps {
   blockId?: string;
@@ -151,7 +151,7 @@ export default function ContentHtml({
  * replacing the figure/figcaption implementation (which does not
  * get read out correctly) with a standard table/caption.
  */
-function renderTable(element: Element): ReactElement | undefined {
+function renderTable(element: Element): ReactNode | undefined {
   const { children } = element;
 
   const table = children.find(
