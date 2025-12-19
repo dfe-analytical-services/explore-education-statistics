@@ -1,3 +1,5 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 public static class DateTimeOffsetExtensions
@@ -134,5 +136,5 @@ public static class DateTimeOffsetExtensions
         dateTime1.ConvertToUkTimeZone().Date == dateTime2.ConvertToUkTimeZone().Date;
 
     public static DateTimeOffset ConvertToUkTimeZone(this DateTimeOffset dateTime) =>
-        TimeZoneInfo.ConvertTime(dateTime, DateTimeExtensions.GetUkTimeZone());
+        TimeZoneInfo.ConvertTime(dateTime, TimeZoneUtils.GetUkTimeZone());
 }

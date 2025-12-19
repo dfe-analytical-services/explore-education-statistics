@@ -9,8 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -295,7 +295,7 @@ public class ReleaseApprovalService(
         // Check if the functions have a scheduled occurrence on the publish date in the range between midnight
         // (inclusive) and midnight the following day (exclusive), UK time.
 
-        var ukTimeZone = DateTimeExtensions.GetUkTimeZone();
+        var ukTimeZone = TimeZoneUtils.GetUkTimeZone();
         var fromUtc = TimeZoneInfo.ConvertTimeToUtc(publishDate.Date, ukTimeZone);
         var toUtc = fromUtc.AddDays(1).AddTicks(-1);
 
