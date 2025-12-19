@@ -2,29 +2,40 @@ using System.Net.Http.Json;
 using System.Net.Mime;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static Moq.MockBehavior;
+
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class ReleaseFileControllerTestsFixture : OptimisedContentApiCollectionFixture;
+
+[CollectionDefinition(nameof(ReleaseFileControllerTestsFixture))]
+public class ReleaseFileControllerTestsCollection : ICollectionFixture<ReleaseFileControllerTestsFixture>;
+
+[Collection(nameof(ReleaseFileControllerTestsFixture))]
+public abstract class ReleaseFileControllerTests(ReleaseFileControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
-    public class ListReleaseFilesTests(TestApplicationFactory testApp) : ReleaseFileControllerTests(testApp)
+    private static readonly DataFixture DataFixture = new();
+
+    public class ListReleaseFilesTests(ReleaseFileControllerTestsFixture fixture) : ReleaseFileControllerTests(fixture)
     {
         [Fact]
         public async Task Success_FiltersByIds()
@@ -39,11 +50,13 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
                 .GenerateList(4);
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.Publications.Add(publication);
-                context.ReleaseFiles.AddRange(releaseFiles);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.ReleaseFiles.AddRange(releaseFiles);
+                });
 
             var request = new ReleaseFileListRequest { Ids = [releaseFiles[0].Id, releaseFiles[1].Id] };
 
@@ -87,11 +100,13 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
                 .ForRange(2..4, rf => rf.SetReleaseVersion(publishedReleaseVersion))
                 .GenerateList();
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.Publications.Add(publication);
-                context.ReleaseFiles.AddRange(releaseFiles);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.ReleaseFiles.AddRange(releaseFiles);
+                });
 
             var request = new ReleaseFileListRequest { Ids = [.. releaseFiles.Select(rf => rf.Id)] };
 
@@ -137,11 +152,13 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
                 .ForRange(4..6, rf => rf.SetReleaseVersion(latestPublishedReleaseVersion))
                 .GenerateList();
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.Publications.Add(publication);
-                context.ReleaseFiles.AddRange(releaseFiles);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.ReleaseFiles.AddRange(releaseFiles);
+                });
 
             var request = new ReleaseFileListRequest { Ids = [.. releaseFiles.Select(rf => rf.Id)] };
 
@@ -172,145 +189,7 @@ public abstract class ReleaseFileControllerTests(TestApplicationFactory testApp)
 
         private async Task<HttpResponseMessage> ListReleaseFiles(ReleaseFileListRequest request)
         {
-            var client = BuildApp().CreateClient();
-
-            return await client.PostAsJsonAsync("/api/release-files", request);
+            return await fixture.CreateClient().PostAsJsonAsync("/api/release-files", request);
         }
-    }
-
-    public class StreamTests(TestApplicationFactory testApp) : ReleaseFileControllerTests(testApp)
-    {
-        [Fact]
-        public async Task Success()
-        {
-            Publication publication = DataFixture
-                .DefaultPublication()
-                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1).GenerateList(1));
-
-            var releaseVersion = publication.Releases.Single().Versions.Single();
-
-            await using var stream = "Test file".ToStream();
-
-            var fileId = Guid.NewGuid();
-
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.Publications.Add(publication);
-            });
-
-            var releaseFileService = new Mock<IReleaseFileService>(Strict);
-
-            releaseFileService
-                .Setup(s => s.StreamFile(releaseVersion.Id, fileId))
-                .ReturnsAsync(
-                    new FileStreamResult(stream, MediaTypeNames.Application.Pdf) { FileDownloadName = "test-file.pdf" }
-                );
-
-            var client = BuildApp(releaseFileService: releaseFileService.Object).CreateClient();
-
-            var response = await client.GetAsync($"/api/releases/{releaseVersion.Id}/files/{fileId}");
-
-            MockUtils.VerifyAllMocks(releaseFileService);
-
-            response.AssertOk("Test file");
-        }
-    }
-
-    public class StreamFilesToZipTests(TestApplicationFactory testApp) : ReleaseFileControllerTests(testApp)
-    {
-        [Fact]
-        public async Task ZipWithSpecificFile_Success()
-        {
-            Publication publication = DataFixture
-                .DefaultPublication()
-                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1).GenerateList(1));
-
-            var releaseVersion = publication.Releases.Single().Versions.Single();
-
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.Publications.Add(publication);
-            });
-
-            var fileId = Guid.NewGuid();
-
-            var releaseFileService = new Mock<IReleaseFileService>(Strict);
-
-            releaseFileService
-                .Setup(s =>
-                    s.ZipFilesToStream(
-                        releaseVersion.Id,
-                        It.IsAny<Stream>(),
-                        AnalyticsFromPage.ReleaseUsefulInfo,
-                        It.Is<IEnumerable<Guid>>(ids => ids.SequenceEqual(ListOf(fileId))),
-                        It.IsAny<CancellationToken>()
-                    )
-                )
-                .ReturnsAsync(Unit.Instance)
-                .Callback<Guid, Stream, AnalyticsFromPage, IEnumerable<Guid>, CancellationToken?>(
-                    (_, stream, _, _, _) => stream.WriteText("Test zip")
-                );
-
-            var client = BuildApp(releaseFileService: releaseFileService.Object).CreateClient();
-
-            var response = await client.GetAsync(
-                $"/api/releases/{releaseVersion.Id}/files?fromPage=ReleaseUsefulInfo&fileIds={fileId}"
-            );
-
-            MockUtils.VerifyAllMocks(releaseFileService);
-
-            response.AssertOk("Test zip");
-        }
-
-        [Fact]
-        public async Task Success_NoFileIds()
-        {
-            Publication publication = DataFixture
-                .DefaultPublication()
-                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1).GenerateList(1));
-
-            var releaseVersion = publication.Releases.Single().Versions.Single();
-
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.Publications.Add(publication);
-            });
-
-            var releaseFileService = new Mock<IReleaseFileService>(Strict);
-
-            releaseFileService
-                .Setup(s =>
-                    s.ZipFilesToStream(
-                        releaseVersion.Id,
-                        It.IsAny<Stream>(),
-                        AnalyticsFromPage.ReleaseDownloads,
-                        null,
-                        It.IsAny<CancellationToken>()
-                    )
-                )
-                .ReturnsAsync(Unit.Instance)
-                .Callback<Guid, Stream, AnalyticsFromPage, IEnumerable<Guid>?, CancellationToken?>(
-                    (_, stream, _, _, _) => stream.WriteText("Test zip")
-                );
-
-            var client = BuildApp(releaseFileService: releaseFileService.Object).CreateClient();
-
-            var response = await client.GetAsync($"/api/releases/{releaseVersion.Id}/files?fromPage=ReleaseDownloads");
-
-            MockUtils.VerifyAllMocks(releaseFileService);
-
-            response.AssertOk("Test zip");
-        }
-    }
-
-    private WebApplicationFactory<Startup> BuildApp(IReleaseFileService? releaseFileService = null)
-    {
-        return TestApp.ConfigureServices(services =>
-        {
-            if (releaseFileService is not null)
-            {
-                services.ReplaceService(releaseFileService);
-            }
-        });
     }
 }

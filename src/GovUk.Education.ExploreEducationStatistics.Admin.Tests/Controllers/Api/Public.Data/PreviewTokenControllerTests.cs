@@ -42,6 +42,11 @@ public class PreviewTokenControllerTestsFixture()
         BauPrincipal = dataFixture.BauUser();
 
         BauUser = dataFixture.DefaultUser().WithId(BauPrincipal.GetUserId()).WithEmail(BauPrincipal.GetEmail());
+    }
+
+    public override async Task BeforeEachTest()
+    {
+        await base.BeforeEachTest();
 
         await GetContentDbContext().AddTestData(context => context.Users.Add(BauUser));
     }
