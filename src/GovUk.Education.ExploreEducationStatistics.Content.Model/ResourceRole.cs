@@ -11,7 +11,7 @@ public abstract class ResourceRole<TRoleEnum, TResource>
 
     public User User { get; set; } = null!;
 
-    public Guid UserId { get; set; }
+    public required Guid UserId { get; set; }
 
     [NotMapped]
     public TResource Resource { get; set; } = null!;
@@ -19,7 +19,7 @@ public abstract class ResourceRole<TRoleEnum, TResource>
     [NotMapped]
     public Guid ResourceId { get; set; }
 
-    public TRoleEnum Role { get; set; }
+    public required TRoleEnum Role { get; set; }
 
     public DateTimeOffset? EmailSent { get; set; }
 
@@ -27,5 +27,5 @@ public abstract class ResourceRole<TRoleEnum, TResource>
 
     public User? CreatedBy { get; set; }
 
-    public DateTime? Created { get; set; }
+    public required DateTime Created { get; set; }
 }

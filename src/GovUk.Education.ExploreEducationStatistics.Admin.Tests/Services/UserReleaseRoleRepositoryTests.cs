@@ -76,7 +76,7 @@ public abstract class UserReleaseRoleRepositoryTests
                 Assert.Equal(releaseVersion.Id, userReleaseRole.ReleaseVersionId);
                 Assert.Equal(ReleaseRole.Contributor, userReleaseRole.Role);
                 Assert.Equal(createdByUser.Id, userReleaseRole.CreatedById);
-                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRole.Created!.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRole.Created).Milliseconds, 0, 1500);
                 Assert.Null(userReleaseRole.EmailSent);
             }
         }

@@ -1389,19 +1389,17 @@ public class ReleaseApprovalServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-        var userReleaseRole1 = new UserReleaseRole
-        {
-            User = _fixture.DefaultUser().WithEmail("test@test.com"),
-            ReleaseVersion = releaseVersion,
-            Role = ReleaseRole.Approver,
-        };
+        UserReleaseRole userReleaseRole1 = _fixture
+            .DefaultUserReleaseRole()
+            .WithUser(_fixture.DefaultUser())
+            .WithReleaseVersion(releaseVersion)
+            .WithRole(ReleaseRole.Approver);
 
-        var userReleaseRole2 = new UserReleaseRole
-        {
-            User = _fixture.DefaultUser().WithEmail("test2@test.com"),
-            ReleaseVersion = releaseVersion,
-            Role = ReleaseRole.Approver,
-        };
+        UserReleaseRole userReleaseRole2 = _fixture
+            .DefaultUserReleaseRole()
+            .WithUser(_fixture.DefaultUser())
+            .WithReleaseVersion(releaseVersion)
+            .WithRole(ReleaseRole.Approver);
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -1597,19 +1595,17 @@ public class ReleaseApprovalServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-        var userReleaseRole1 = new UserReleaseRole
-        {
-            User = _fixture.DefaultUser().WithEmail("test@test.com"),
-            ReleaseVersion = releaseVersion,
-            Role = ReleaseRole.Approver,
-        };
+        UserReleaseRole userReleaseRole1 = _fixture
+            .DefaultUserReleaseRole()
+            .WithUser(_fixture.DefaultUser())
+            .WithReleaseVersion(releaseVersion)
+            .WithRole(ReleaseRole.Approver);
 
-        var userReleaseRole2 = new UserReleaseRole
-        {
-            User = _fixture.DefaultUser().WithEmail("test2@test.com"),
-            ReleaseVersion = releaseVersion,
-            Role = ReleaseRole.Approver,
-        };
+        UserReleaseRole userReleaseRole2 = _fixture
+            .DefaultUserReleaseRole()
+            .WithUser(_fixture.DefaultUser())
+            .WithReleaseVersion(releaseVersion)
+            .WithRole(ReleaseRole.Approver);
 
         var contextId = Guid.NewGuid().ToString();
 

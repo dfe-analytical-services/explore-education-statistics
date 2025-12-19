@@ -64,13 +64,13 @@ public abstract class ReleaseInviteServiceTests
                             && l[0].ReleaseVersionId == releaseVersionIds.ElementAt(0)
                             && l[0].Role == ReleaseRole.Contributor
                             && l[0].CreatedById == CreatedById
-                            && Math.Abs((l[0].Created!.Value - DateTime.UtcNow).Milliseconds)
+                            && Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
                                 <= AssertExtensions.TimeWithinMillis
                             && l[1].UserId == userToCreate.Id
                             && l[1].ReleaseVersionId == releaseVersionIds.ElementAt(1)
                             && l[1].Role == ReleaseRole.Contributor
                             && l[1].CreatedById == CreatedById
-                            && Math.Abs((l[1].Created!.Value - DateTime.UtcNow).Milliseconds)
+                            && Math.Abs((l[1].Created - DateTime.UtcNow).Milliseconds)
                                 <= AssertExtensions.TimeWithinMillis
                         ),
                         It.IsAny<CancellationToken>()
@@ -184,13 +184,13 @@ public abstract class ReleaseInviteServiceTests
                             && l[0].ReleaseVersionId == newReleaseVersionIds.ElementAt(0)
                             && l[0].Role == ReleaseRole.Contributor
                             && l[0].CreatedById == CreatedById
-                            && Math.Abs((l[0].Created!.Value - DateTime.UtcNow).Milliseconds)
+                            && Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
                                 <= AssertExtensions.TimeWithinMillis
                             && l[1].UserId == user.Id
                             && l[1].ReleaseVersionId == newReleaseVersionIds.ElementAt(1)
                             && l[1].Role == ReleaseRole.Contributor
                             && l[1].CreatedById == CreatedById
-                            && Math.Abs((l[1].Created!.Value - DateTime.UtcNow).Milliseconds)
+                            && Math.Abs((l[1].Created - DateTime.UtcNow).Milliseconds)
                                 <= AssertExtensions.TimeWithinMillis
                         ),
                         It.IsAny<CancellationToken>()
@@ -287,7 +287,7 @@ public abstract class ReleaseInviteServiceTests
                             && l[0].ReleaseVersionId == releaseVersionIds.ElementAt(0)
                             && l[0].Role == ReleaseRole.Contributor
                             && l[0].CreatedById == CreatedById
-                            && Math.Abs((l[0].Created!.Value - DateTime.UtcNow).Milliseconds)
+                            && Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
                                 <= AssertExtensions.TimeWithinMillis
                         ),
                         It.IsAny<CancellationToken>()
@@ -362,7 +362,7 @@ public abstract class ReleaseInviteServiceTests
                             && l[0].ReleaseVersionId == releaseVersionIds.ElementAt(0)
                             && l[0].Role == ReleaseRole.Contributor
                             && l[0].CreatedById == CreatedById
-                            && Math.Abs((l[0].Created!.Value - DateTime.UtcNow).Milliseconds)
+                            && Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
                                 <= AssertExtensions.TimeWithinMillis
                         ),
                         It.IsAny<CancellationToken>()

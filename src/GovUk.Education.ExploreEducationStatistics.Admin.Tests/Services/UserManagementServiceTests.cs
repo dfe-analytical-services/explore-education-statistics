@@ -457,7 +457,7 @@ public abstract class UserManagementServiceTests
                             && upr[0].Role == publicationRole
                             && createdDate.HasValue
                                 ? upr[0].Created == createdDate
-                                : Math.Abs((upr[0].Created - DateTime.UtcNow)!.Value.Milliseconds)
+                                : Math.Abs((upr[0].Created - DateTime.UtcNow).Milliseconds)
                                     <= AssertExtensions.TimeWithinMillis
                                     && upr[0].CreatedById == CreatedById
                         ),
@@ -638,13 +638,13 @@ public abstract class UserManagementServiceTests
                             && upr[0].UserId == userToCreate.Id
                             && upr[0].PublicationId == publications[2].Id
                             && upr[0].Role == publicationRole1
-                            && Math.Abs((upr[0].Created - DateTime.UtcNow)!.Value.Milliseconds)
+                            && Math.Abs((upr[0].Created - DateTime.UtcNow).Milliseconds)
                                 <= AssertExtensions.TimeWithinMillis
                             && upr[0].CreatedById == CreatedById
                             && upr[1].UserId == userToCreate.Id
                             && upr[1].PublicationId == publications[3].Id
                             && upr[1].Role == publicationRole2
-                            && Math.Abs((upr[1].Created - DateTime.UtcNow)!.Value.Milliseconds)
+                            && Math.Abs((upr[1].Created - DateTime.UtcNow).Milliseconds)
                                 <= AssertExtensions.TimeWithinMillis
                             && upr[1].CreatedById == CreatedById
                         ),

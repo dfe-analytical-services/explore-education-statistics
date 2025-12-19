@@ -484,20 +484,17 @@ public class ReleasePermissionServiceTests
                         && l[0].ReleaseVersionId == releaseVersion.Id
                         && l[0].Role == Contributor
                         && l[0].CreatedById == UserId
-                        && Math.Abs((l[0].Created - DateTime.UtcNow)!.Value.Milliseconds)
-                            <= AssertExtensions.TimeWithinMillis
+                        && Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds) <= AssertExtensions.TimeWithinMillis
                         && l[1].UserId == userReleaseRoles[2].UserId
                         && l[1].ReleaseVersionId == releaseVersion.Id
                         && l[1].Role == Contributor
                         && l[1].CreatedById == UserId
-                        && Math.Abs((l[1].Created - DateTime.UtcNow)!.Value.Milliseconds)
-                            <= AssertExtensions.TimeWithinMillis
+                        && Math.Abs((l[1].Created - DateTime.UtcNow).Milliseconds) <= AssertExtensions.TimeWithinMillis
                         && l[2].UserId == userReleaseRoles[3].UserId
                         && l[2].ReleaseVersionId == releaseVersion.Id
                         && l[2].Role == Contributor
                         && l[2].CreatedById == UserId
-                        && Math.Abs((l[2].Created - DateTime.UtcNow)!.Value.Milliseconds)
-                            <= AssertExtensions.TimeWithinMillis
+                        && Math.Abs((l[2].Created - DateTime.UtcNow).Milliseconds) <= AssertExtensions.TimeWithinMillis
                     ),
                     It.IsAny<CancellationToken>()
                 )

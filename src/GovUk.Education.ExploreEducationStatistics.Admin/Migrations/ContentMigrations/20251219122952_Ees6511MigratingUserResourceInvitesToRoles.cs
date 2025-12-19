@@ -1,15 +1,15 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+﻿using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 #nullable disable
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     /// <inheritdoc />
-    public partial class Ees6511AddingUniqueIndexToUserResourceRoles : Migration
+    public partial class Ees6511MigratingUserResourceInvitesToRoles : Migration
     {
-        private const string MigrationId = "20251208181950";
+        private const string MigrationId = "20251219122952";
 
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,6 +27,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 oldType: "nvarchar(max)"
             );
 
+            migrationBuilder.AlterColumn<DateTime>(
+                name: "Created",
+                table: "UserReleaseRoles",
+                type: "datetime2",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                oldClrType: typeof(DateTime),
+                oldType: "datetime2",
+                oldNullable: true
+            );
+
             migrationBuilder.AlterColumn<string>(
                 name: "Role",
                 table: "UserPublicationRoles",
@@ -34,6 +45,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)"
+            );
+
+            migrationBuilder.AlterColumn<DateTime>(
+                name: "Created",
+                table: "UserPublicationRoles",
+                type: "datetime2",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                oldClrType: typeof(DateTime),
+                oldType: "datetime2",
+                oldNullable: true
             );
 
             migrationBuilder.CreateIndex(
@@ -53,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             // Migrate existing UserPublicationInvites/UserReleaseInvites to corresponding UserPublicationRoles/UserReleaseRoles
             migrationBuilder.SqlFromFile(
                 MigrationConstants.ContentMigrationsPath,
-                $"{MigrationId}_{nameof(Ees6511AddingUniqueIndexToUserResourceRoles)}.sql"
+                $"{MigrationId}_{nameof(Ees6511MigratingUserResourceInvitesToRoles)}.sql"
             );
         }
 
@@ -79,6 +101,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 oldType: "nvarchar(450)"
             );
 
+            migrationBuilder.AlterColumn<DateTime>(
+                name: "Created",
+                table: "UserReleaseRoles",
+                type: "datetime2",
+                nullable: true,
+                oldClrType: typeof(DateTime),
+                oldType: "datetime2"
+            );
+
             migrationBuilder.AlterColumn<string>(
                 name: "Role",
                 table: "UserPublicationRoles",
@@ -86,6 +117,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(450)"
+            );
+
+            migrationBuilder.AlterColumn<DateTime>(
+                name: "Created",
+                table: "UserPublicationRoles",
+                type: "datetime2",
+                nullable: true,
+                oldClrType: typeof(DateTime),
+                oldType: "datetime2"
             );
 
             migrationBuilder.CreateIndex(

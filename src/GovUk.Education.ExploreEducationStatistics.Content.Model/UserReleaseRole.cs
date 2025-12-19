@@ -9,7 +9,7 @@ public class UserReleaseRole : ResourceRole<ReleaseRole, ReleaseVersion>
         set => Resource = value;
     }
 
-    public Guid ReleaseVersionId
+    public required Guid ReleaseVersionId
     {
         get => ResourceId;
         set => ResourceId = value;

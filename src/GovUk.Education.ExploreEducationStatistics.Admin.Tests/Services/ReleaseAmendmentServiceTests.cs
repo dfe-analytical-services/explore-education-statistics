@@ -232,41 +232,29 @@ public class ReleaseAmendmentServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-        var approverReleaseRole = new UserReleaseRole
-        {
-            Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
-            Role = ReleaseRole.Approver,
-            ReleaseVersion = originalReleaseVersion,
-            ReleaseVersionId = originalReleaseVersion.Id,
-        };
+        UserReleaseRole approverReleaseRole = _fixture
+            .DefaultUserReleaseRole()
+            .WithUser(_fixture.DefaultUser())
+            .WithReleaseVersion(originalReleaseVersion)
+            .WithRole(ReleaseRole.Approver);
 
-        var approverReleaseRoleForDifferentReleaseVersion = new UserReleaseRole
-        {
-            Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
-            Role = ReleaseRole.Approver,
-            ReleaseVersion = otherReleaseVersion,
-            ReleaseVersionId = otherReleaseVersion.Id,
-        };
+        UserReleaseRole approverReleaseRoleForDifferentReleaseVersion = _fixture
+            .DefaultUserReleaseRole()
+            .WithUser(_fixture.DefaultUser())
+            .WithReleaseVersion(otherReleaseVersion)
+            .WithRole(ReleaseRole.Approver);
 
-        var contributorReleaseRole = new UserReleaseRole
-        {
-            Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
-            Role = ReleaseRole.Contributor,
-            ReleaseVersion = originalReleaseVersion,
-            ReleaseVersionId = originalReleaseVersion.Id,
-        };
+        UserReleaseRole contributorReleaseRole = _fixture
+            .DefaultUserReleaseRole()
+            .WithUser(_fixture.DefaultUser())
+            .WithReleaseVersion(originalReleaseVersion)
+            .WithRole(ReleaseRole.Contributor);
 
-        var prereleaseReleaseRole = new UserReleaseRole
-        {
-            Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
-            Role = ReleaseRole.PrereleaseViewer,
-            ReleaseVersion = originalReleaseVersion,
-            ReleaseVersionId = originalReleaseVersion.Id,
-        };
+        UserReleaseRole prereleaseReleaseRole = _fixture
+            .DefaultUserReleaseRole()
+            .WithUser(_fixture.DefaultUser())
+            .WithReleaseVersion(originalReleaseVersion)
+            .WithRole(ReleaseRole.PrereleaseViewer);
 
         var userReleaseRoles = new List<UserReleaseRole>
         {
