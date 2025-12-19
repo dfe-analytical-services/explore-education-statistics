@@ -14,7 +14,7 @@ public class OptimisedTestUserHolder
 {
     private ClaimsPrincipal? _user;
 
-    public void SetUser(ClaimsPrincipal user)
+    public void SetUser(ClaimsPrincipal? user)
     {
         _user = user;
     }

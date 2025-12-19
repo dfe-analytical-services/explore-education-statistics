@@ -17,7 +17,8 @@ public class PageFeedbackControllerTestsFixture()
 public class PageFeedbackControllerTestsCollection : ICollectionFixture<PageFeedbackControllerTestsFixture>;
 
 [Collection(nameof(PageFeedbackControllerTestsFixture))]
-public class PageFeedbackControllerTests(PageFeedbackControllerTestsFixture fixture) : IAsyncLifetime
+public class PageFeedbackControllerTests(PageFeedbackControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private static readonly DateTime Now = DateTime.UtcNow;
     private const string BaseUrl = "api/feedback/page";
@@ -65,15 +66,12 @@ public class PageFeedbackControllerTests(PageFeedbackControllerTestsFixture fixt
         },
     ];
 
-    public async Task InitializeAsync()
+    public override async Task InitializeAsync()
     {
+        await base.InitializeAsync();
+
         // Arrange
         await fixture.GetContentDbContext().AddTestData(context => context.PageFeedback.AddRange(_globalFeedback));
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
     }
 
     [Fact]

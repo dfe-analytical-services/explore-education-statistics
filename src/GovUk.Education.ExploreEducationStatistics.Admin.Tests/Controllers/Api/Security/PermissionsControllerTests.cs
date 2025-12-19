@@ -19,6 +19,7 @@ public class PermissionsControllerTestsCollection : ICollectionFixture<Permissio
 
 [Collection(nameof(PermissionsControllerTestsFixture))]
 public class PermissionsControllerTests(PermissionsControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private static readonly DataFixture DataFixture = new();
 

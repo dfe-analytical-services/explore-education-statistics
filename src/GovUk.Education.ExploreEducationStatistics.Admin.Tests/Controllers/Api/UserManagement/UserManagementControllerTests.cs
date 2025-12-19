@@ -1,8 +1,11 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.UserManagement;
 
@@ -14,11 +17,12 @@ public class UserManagementControllerTestsFixture()
 public class UserManagementControllerTestsCollection : ICollectionFixture<UserManagementControllerTestsFixture>;
 
 [Collection(nameof(UserManagementControllerTestsFixture))]
-public class UserManagementControllerTests
+public abstract class UserManagementControllerTests(UserManagementControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private static readonly DataFixture DataFixture = new();
 
-    public class DeleteUserTests(UserManagementControllerTestsFixture fixture) : UserManagementControllerTests
+    public class DeleteUserTests(UserManagementControllerTestsFixture fixture) : UserManagementControllerTests(fixture)
     {
         [Theory]
         [InlineData("BAU User", false)]

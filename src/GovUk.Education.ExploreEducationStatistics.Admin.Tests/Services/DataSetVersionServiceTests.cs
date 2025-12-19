@@ -12,6 +12,8 @@ using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -33,12 +35,13 @@ public class DataSetVersionServiceTestsFixture()
 public class DataSetVersionServiceTestsCollection : ICollectionFixture<DataSetVersionServiceTestsFixture>;
 
 [Collection(nameof(DataSetVersionServiceTestsFixture))]
-public abstract class DataSetVersionServiceTests
+public abstract class DataSetVersionServiceTests(DataSetVersionServiceTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private static readonly DataFixture DataFixture = new();
 
     public class GetStatusesForReleaseVersionTests(DataSetVersionServiceTestsFixture fixture)
-        : DataSetVersionServiceTests
+        : DataSetVersionServiceTests(fixture)
     {
         /// <summary>
         /// Test that each DataSetVersion status is reported correctly.
@@ -118,7 +121,7 @@ public abstract class DataSetVersionServiceTests
     }
 
     public class UpdateVersionsForReleaseVersionTests(DataSetVersionServiceTestsFixture fixture)
-        : DataSetVersionServiceTests
+        : DataSetVersionServiceTests(fixture)
     {
         [Fact]
         public async Task Success()
