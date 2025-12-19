@@ -10,5 +10,5 @@ public record PublishedPublicationSummaryViewModel
 
     public string Summary { get; init; } = string.Empty;
 
-    public DateTime Published { get; init; }
+    public DateTimeOffset Published { get; init; }
 }

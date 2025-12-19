@@ -34,11 +34,11 @@ public abstract class PublicationsSitemapServiceTests
             // Set explicit published dates to test ordering items in the sitemap
             // Publication 1 has the most recently published release and should appear first
             // In publication 1, release 2 is published after release 1 and should appear first
-            publication1Release1.Versions[0].Published = DateTime.Parse("2025-02-01T09:30:00Z");
-            publication1Release2.Versions[0].Published = DateTime.Parse("2025-02-02T09:30:00Z");
+            publication1Release1.Versions[0].Published = DateTimeOffset.Parse("2025-02-01T09:30:00Z");
+            publication1Release2.Versions[0].Published = DateTimeOffset.Parse("2025-02-02T09:30:00Z");
             // In publication 2, release 1 is published after release 2 and should appear first
-            publication2Release1.Versions[0].Published = DateTime.Parse("2025-01-02T09:30:00Z");
-            publication2Release2.Versions[0].Published = DateTime.Parse("2025-01-01T09:30:00Z");
+            publication2Release1.Versions[0].Published = DateTimeOffset.Parse("2025-01-02T09:30:00Z");
+            publication2Release2.Versions[0].Published = DateTimeOffset.Parse("2025-01-01T09:30:00Z");
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))

@@ -3,7 +3,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 
 public interface IReleaseVersionRepository
 {
-    Task<DateTime> GetPublishedDate(Guid releaseVersionId, DateTime actualPublishedDate);
+    Task<DateTimeOffset> GetPublishedDate(Guid releaseVersionId, DateTimeOffset actualPublishedDate);
 
     /// <summary>
     /// Retrieves the latest published version of a release matching a given slug associated with a publication.

@@ -623,7 +623,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                     Id = Guid.NewGuid(),
                     Publication = new Publication { Id = Guid.NewGuid() },
                     ApprovalStatus = status,
-                    Published = DateTime.Now,
+                    Published = DateTimeOffset.UtcNow,
                 };
 
                 var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
@@ -720,7 +720,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                     Id = Guid.NewGuid(),
                     Publication = new Publication { Id = Guid.NewGuid() },
                     ApprovalStatus = status,
-                    Published = DateTime.Now,
+                    Published = DateTimeOffset.UtcNow,
                 };
 
                 var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);

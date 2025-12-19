@@ -130,7 +130,7 @@ public class ContentService : IContentService
         );
     }
 
-    public async Task UpdateContentStaged(DateTime expectedPublishDate, params Guid[] releaseVersionIds)
+    public async Task UpdateContentStaged(DateTimeOffset expectedPublishDate, params Guid[] releaseVersionIds)
     {
         var releaseVersions = await _contentDbContext
             .ReleaseVersions.Where(rv => releaseVersionIds.Contains(rv.Id))

@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -27,7 +26,7 @@ public record ManageContentPageViewModel
 
         public required string ReleaseName { get; init; }
 
-        public required DateTime? Published { get; init; }
+        public required DateTimeOffset? Published { get; init; }
 
         public required string Slug { get; init; }
 
@@ -65,8 +64,7 @@ public record ManageContentPageViewModel
 
         public bool HasDataGuidance => DownloadFiles.Any(file => file.Type == FileType.Data);
 
-        [JsonConverter(typeof(DateTimeToDateJsonConverter))]
-        public required DateTime? PublishScheduled { get; init; }
+        public required DateOnly? PublishScheduled { get; init; }
 
         public required PartialDate? NextReleaseDate { get; init; }
 

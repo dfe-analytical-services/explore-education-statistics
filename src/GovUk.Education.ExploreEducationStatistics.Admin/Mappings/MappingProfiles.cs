@@ -60,9 +60,7 @@ public class MappingProfiles : CommonMappingProfile
                 dest => dest.PublishScheduled,
                 m =>
                     m.MapFrom(rv =>
-                        rv.PublishScheduled.HasValue
-                            ? rv.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?)null
+                        rv.PublishScheduled.HasValue ? rv.PublishScheduled.Value.ToUkDateOnly() : (DateOnly?)null
                     )
             )
             .ForMember(
@@ -82,9 +80,7 @@ public class MappingProfiles : CommonMappingProfile
                 dest => dest.PublishScheduled,
                 m =>
                     m.MapFrom(model =>
-                        model.PublishScheduled.HasValue
-                            ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?)null
+                        model.PublishScheduled.HasValue ? model.PublishScheduled.Value.ToUkDateOnly() : (DateOnly?)null
                     )
             );
 
@@ -153,9 +149,7 @@ public class MappingProfiles : CommonMappingProfile
                 model => model.PublishScheduled,
                 m =>
                     m.MapFrom(rv =>
-                        rv.PublishScheduled.HasValue
-                            ? rv.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?)null
+                        rv.PublishScheduled.HasValue ? rv.PublishScheduled.Value.ToUkDateOnly() : (DateOnly?)null
                     )
             )
             .ForMember(

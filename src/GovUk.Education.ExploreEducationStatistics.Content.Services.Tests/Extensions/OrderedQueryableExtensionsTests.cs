@@ -19,7 +19,7 @@ public class OrderedQueryableExtensionsTests
         var publications = _dataFixture.DefaultPublication().Generate(6);
 
         var publicationsResult = new List<FreeTextValueResult<Publication>>();
-        var publishedDate = DateTime.UtcNow;
+        var publishedDate = DateTimeOffset.UtcNow;
 
         for (var i = 0; i < publications.Count(); i++)
         {

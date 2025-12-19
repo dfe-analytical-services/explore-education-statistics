@@ -522,11 +522,6 @@ public class ContentDbContext : DbContext
 
         modelBuilder
             .Entity<ReleaseVersion>()
-            .Property(rv => rv.Published)
-            .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
-
-        modelBuilder
-            .Entity<ReleaseVersion>()
             .HasMany(rv => rv.PublishingOrganisations)
             .WithMany()
             .UsingEntity(
@@ -548,11 +543,6 @@ public class ContentDbContext : DbContext
             .Entity<ReleaseVersion>()
             .Property(rv => rv.NextReleaseDate)
             .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<PartialDate>(v));
-
-        modelBuilder
-            .Entity<ReleaseVersion>()
-            .Property(rv => rv.PublishScheduled)
-            .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
         modelBuilder
             .Entity<ReleaseVersion>()

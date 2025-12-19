@@ -26,7 +26,7 @@ public class ReleaseCacheServiceTests
     private readonly ReleaseCacheViewModel _releaseViewModel = new(ReleaseVersionId)
     {
         NextReleaseDate = new PartialDate(),
-        Published = DateTime.UtcNow,
+        Published = DateTimeOffset.UtcNow,
         PublishingOrganisations =
         [
             new OrganisationViewModel
@@ -291,7 +291,7 @@ public class ReleaseCacheServiceTests
     [Fact]
     public async Task UpdateReleaseStaged()
     {
-        var expectedPublishDate = DateTime.UtcNow;
+        var expectedPublishDate = DateTimeOffset.UtcNow;
         var cacheKey = new ReleaseStagedCacheKey(PublicationSlug, ReleaseSlug);
 
         var releaseService = new Mock<IReleaseService>(Strict);
@@ -326,7 +326,7 @@ public class ReleaseCacheServiceTests
     [Fact]
     public async Task UpdateReleaseStaged_LatestRelease()
     {
-        var expectedPublishDate = DateTime.UtcNow;
+        var expectedPublishDate = DateTimeOffset.UtcNow;
         var cacheKey = new ReleaseStagedCacheKey(PublicationSlug);
 
         var releaseService = new Mock<IReleaseService>(Strict);

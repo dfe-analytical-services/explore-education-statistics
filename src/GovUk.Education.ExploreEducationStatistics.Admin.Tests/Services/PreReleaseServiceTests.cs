@@ -1,5 +1,4 @@
 #nullable enable
-using System.Globalization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -10,9 +9,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class PreReleaseServiceTests
 {
-    private static readonly DateTime DefaultScheduledPublishDate = new(2003, 11, 15, 0, 0, 0, DateTimeKind.Utc);
-    private static readonly DateTime DefaultActuallyPublishedDate = new(2003, 11, 15, 9, 30, 0, DateTimeKind.Utc);
-    private static readonly DateTime DateWithinPreReleaseAccessWindow = new(2003, 11, 14, 10, 24, 0, DateTimeKind.Utc);
+    private static readonly DateTimeOffset DefaultScheduledPublishDate = new(2003, 11, 15, 0, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset DefaultActuallyPublishedDate = new(2003, 11, 15, 9, 30, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset DateWithinAccessWindow = new(2003, 11, 14, 10, 24, 0, TimeSpan.Zero);
 
     private readonly PreReleaseService _service = new(
         new PreReleaseAccessOptions
@@ -47,7 +46,7 @@ public class PreReleaseServiceTests
             ApprovalStatus = ReleaseApprovalStatus.Approved,
         };
 
-        var referenceTime = DateTime.Parse(referenceTimeString, styles: DateTimeStyles.AdjustToUniversal);
+        var referenceTime = DateTimeOffset.Parse(referenceTimeString);
 
         var result = _service.GetPreReleaseWindowStatus(releaseVersion, referenceTime);
 
@@ -64,10 +63,10 @@ public class PreReleaseServiceTests
             ApprovalStatus = ReleaseApprovalStatus.Approved,
         };
 
-        var result = _service.GetPreReleaseWindowStatus(testReleaseVersion, DateWithinPreReleaseAccessWindow);
+        var result = _service.GetPreReleaseWindowStatus(testReleaseVersion, DateWithinAccessWindow);
 
         Assert.Equal(PreReleaseAccess.Within, result.Access);
-        Assert.Equal(new DateTime(2003, 11, 14, 0, 0, 0, DateTimeKind.Utc), result.Start);
+        Assert.Equal(new DateTimeOffset(2003, 11, 14, 0, 0, 0, TimeSpan.Zero), result.Start);
         Assert.Equal(DefaultScheduledPublishDate, result.ScheduledPublishDate);
     }
 
@@ -83,7 +82,7 @@ public class PreReleaseServiceTests
 
         var preReleaseWindowStatus = _service.GetPreReleaseWindowStatus(
             testReleaseVersionInReview,
-            DateWithinPreReleaseAccessWindow
+            DateWithinAccessWindow
         );
         Assert.Equal(PreReleaseAccess.NoneSet, preReleaseWindowStatus.Access);
     }
@@ -100,7 +99,7 @@ public class PreReleaseServiceTests
 
         var preReleaseWindowStatus = _service.GetPreReleaseWindowStatus(
             testReleaseVersionInDraft,
-            DateWithinPreReleaseAccessWindow
+            DateWithinAccessWindow
         );
         Assert.Equal(PreReleaseAccess.NoneSet, preReleaseWindowStatus.Access);
     }
@@ -116,7 +115,7 @@ public class PreReleaseServiceTests
 
         var preReleaseWindowStatus = _service.GetPreReleaseWindowStatus(
             releaseVersionWithNoScheduledPublishDate,
-            DateTime.UtcNow
+            DateTimeOffset.UtcNow
         );
 
         Assert.Equal(PreReleaseAccess.After, preReleaseWindowStatus.Access);

@@ -24,7 +24,7 @@ public record ReleaseSummaryViewModel
 
     public required string CoverageTitle { get; init; }
 
-    public DateTime? Published { get; init; }
+    public DateTimeOffset? Published { get; init; }
 
     public PartialDate? NextReleaseDate { get; init; }
 

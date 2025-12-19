@@ -15,9 +15,9 @@ public record ReleaseVersionSummaryDto
 
     public required string? Label { get; init; }
 
-    public required DateTime LastUpdated { get; init; }
+    public required DateTimeOffset LastUpdated { get; init; }
 
-    public required DateTime Published { get; init; }
+    public required DateTimeOffset Published { get; init; }
 
     public required PublishingOrganisationDto[] PublishingOrganisations { get; init; }
 

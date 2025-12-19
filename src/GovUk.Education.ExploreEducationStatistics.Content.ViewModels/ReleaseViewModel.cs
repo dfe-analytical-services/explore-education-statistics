@@ -19,7 +19,7 @@ public record ReleaseViewModel
 
     public PartialDate? NextReleaseDate { get; }
 
-    public DateTime? Published { get; }
+    public DateTimeOffset? Published { get; }
 
     public string Slug { get; }
 

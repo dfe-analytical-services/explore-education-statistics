@@ -14,12 +14,12 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     /// <summary>
     /// The last date the release version was published - this should be set when the PublishScheduled date is reached and the release is published.
     /// </summary>
-    public DateTime? Published { get; set; }
+    public DateTimeOffset? Published { get; set; }
 
     /// <summary>
     /// The date that the release version is scheduled to be published - when this time is reached then the release should be published and the Published date set.
     /// </summary>
-    public DateTime? PublishScheduled { get; set; }
+    public DateTimeOffset? PublishScheduled { get; set; }
 
     [NotMapped]
     public bool Live => Published.HasValue && UtcNow >= Published.Value;
