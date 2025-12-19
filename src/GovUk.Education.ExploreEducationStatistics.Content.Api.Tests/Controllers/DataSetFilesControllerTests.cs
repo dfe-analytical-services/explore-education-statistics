@@ -1500,10 +1500,10 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
         {
             Assert.Equal(releaseFiles.Count, viewModels.Count);
             Assert.All(
-                releaseFiles.Zip(viewModels),
-                tuple =>
+                releaseFiles,
+                releaseFile =>
                 {
-                    var (releaseFile, viewModel) = tuple;
+                    var viewModel = viewModels.Single(vm => vm.FileId == releaseFile.FileId);
 
                     var releaseVersion = releaseFile.ReleaseVersion;
                     var release = releaseVersion.Release;

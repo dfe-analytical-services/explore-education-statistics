@@ -44,9 +44,16 @@ public static class DbContextTestExtensions
         }
     }
 
-    public static async Task ClearTestDataIfInMemory<TDbContext>(this TDbContext context)
+    public static async Task ClearTestDataIfInMemory<TDbContext>(this TDbContext? context)
         where TDbContext : DbContext
     {
+        // If a DbContext's Database property is null, it is most likely a Mock.
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (context == null || context.Database == null)
+        {
+            return;
+        }
+
         if (context.Database.IsInMemory())
         {
             await context.Database.EnsureDeletedAsync();
