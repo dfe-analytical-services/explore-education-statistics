@@ -606,32 +606,24 @@ public abstract class UserPublicationRoleRepositoryTests
         [Fact]
         public async Task IgnoresNewPermissionsSystemRoles()
         {
-            User activeUser1 = _fixture.DefaultUser();
-            User activeUser2 = _fixture.DefaultUser();
-            User userWithPendingInvite1 = _fixture.DefaultUserWithPendingInvite();
-            User userWithPendingInvite2 = _fixture.DefaultUserWithPendingInvite();
-            User userWithExpiredInvite1 = _fixture.DefaultUserWithExpiredInvite();
-            User userWithExpiredInvite2 = _fixture.DefaultUserWithExpiredInvite();
-            User softDeletedUser1 = _fixture.DefaultSoftDeletedUser();
-            User softDeletedUser2 = _fixture.DefaultSoftDeletedUser();
+            User activeUser = _fixture.DefaultUser();
+            User userWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
+            User userWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
+            User softDeletedUser = _fixture.DefaultSoftDeletedUser();
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
                 .WithPublication(_fixture.DefaultPublication())
                 // These should ALL be filtered out
-                .ForIndex(0, s => s.SetUser(activeUser1).SetRole(PublicationRole.Approver))
-                .ForIndex(1, s => s.SetUser(activeUser1).SetRole(PublicationRole.Drafter))
-                .ForIndex(2, s => s.SetUser(activeUser2).SetRole(PublicationRole.Approver))
-                .ForIndex(3, s => s.SetUser(userWithPendingInvite1).SetRole(PublicationRole.Approver))
-                .ForIndex(4, s => s.SetUser(userWithPendingInvite1).SetRole(PublicationRole.Drafter))
-                .ForIndex(5, s => s.SetUser(userWithPendingInvite2).SetRole(PublicationRole.Approver))
-                .ForIndex(6, s => s.SetUser(userWithExpiredInvite1).SetRole(PublicationRole.Approver))
-                .ForIndex(7, s => s.SetUser(userWithExpiredInvite1).SetRole(PublicationRole.Drafter))
-                .ForIndex(8, s => s.SetUser(userWithExpiredInvite2).SetRole(PublicationRole.Approver))
-                .ForIndex(9, s => s.SetUser(softDeletedUser1).SetRole(PublicationRole.Approver))
-                .ForIndex(10, s => s.SetUser(softDeletedUser1).SetRole(PublicationRole.Drafter))
-                .ForIndex(11, s => s.SetUser(softDeletedUser2).SetRole(PublicationRole.Approver))
-                .GenerateList(12);
+                .ForIndex(0, s => s.SetUser(activeUser).SetRole(PublicationRole.Approver))
+                .ForIndex(1, s => s.SetUser(activeUser).SetRole(PublicationRole.Drafter))
+                .ForIndex(2, s => s.SetUser(userWithPendingInvite).SetRole(PublicationRole.Approver))
+                .ForIndex(3, s => s.SetUser(userWithPendingInvite).SetRole(PublicationRole.Drafter))
+                .ForIndex(4, s => s.SetUser(userWithExpiredInvite).SetRole(PublicationRole.Approver))
+                .ForIndex(5, s => s.SetUser(userWithExpiredInvite).SetRole(PublicationRole.Drafter))
+                .ForIndex(6, s => s.SetUser(softDeletedUser).SetRole(PublicationRole.Approver))
+                .ForIndex(7, s => s.SetUser(softDeletedUser).SetRole(PublicationRole.Drafter))
+                .GenerateList(8);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
