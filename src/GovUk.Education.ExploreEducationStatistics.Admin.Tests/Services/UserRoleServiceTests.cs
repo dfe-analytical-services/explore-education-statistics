@@ -785,9 +785,8 @@ public abstract class UserRoleServiceTests
 
             UserReleaseRole userReleaseRole = _dataFixture
                 .DefaultUserReleaseRole()
-                .WithUser(_user)
+                .WithUserId(_user.Id)
                 .WithReleaseVersion(releaseVersion)
-                .WithCreatedById(_user.Id)
                 .WithRole(ReleaseRole.Contributor);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -801,7 +800,6 @@ public abstract class UserRoleServiceTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.Publications.Add(publication);
                 contentDbContext.UserReleaseRoles.Add(userReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -811,7 +809,7 @@ public abstract class UserRoleServiceTests
                 .Setup(mock =>
                     mock.UserHasRoleOnReleaseVersion(
                         _user.Id,
-                        release.Versions[0].Id,
+                        releaseVersion.Id,
                         ReleaseRole.Contributor,
                         ResourceRoleFilter.ActiveOnly,
                         It.IsAny<CancellationToken>()
