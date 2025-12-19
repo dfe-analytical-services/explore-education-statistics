@@ -2,9 +2,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
+namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 
 /// <summary>
 ///
@@ -19,15 +20,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Web
 /// </summary>
 public class OptimisedServiceAndConfigModifications
 {
-    internal readonly List<Action<IServiceCollection>> ServiceModifications = new();
-    internal readonly List<Action<IConfigurationBuilder>> ConfigModifications = new();
+    private readonly List<Action<IServiceCollection>> _serviceModifications = new();
+    private readonly List<Action<IConfigurationBuilder>> _configModifications = new();
+    private readonly List<Action<IHostBuilder>> _hostBuilderModifications = new();
+
+    public IList<Action<IServiceCollection>> GetServiceModifications() => _serviceModifications.AsReadOnly();
+
+    public IList<Action<IConfigurationBuilder>> GetConfigModifications() => _configModifications.AsReadOnly();
+
+    public IList<Action<IHostBuilder>> GetHostBuilderModifications() => _hostBuilderModifications.AsReadOnly();
 
     /// <summary>
     /// Add a one-off Controller to the WebApplicationFactory.
     /// </summary>
     public OptimisedServiceAndConfigModifications AddController(Type controllerType)
     {
-        ServiceModifications.Add(services =>
+        _serviceModifications.Add(services =>
             services.AddControllers().AddApplicationPart(controllerType.Assembly).AddControllersAsServices()
         );
         return this;
@@ -39,7 +47,7 @@ public class OptimisedServiceAndConfigModifications
     public OptimisedServiceAndConfigModifications AddControllers<TStartup>()
         where TStartup : class
     {
-        ServiceModifications.Add(services =>
+        _serviceModifications.Add(services =>
             services.AddControllers().AddApplicationPart(typeof(TStartup).Assembly).AddControllersAsServices()
         );
         return this;
@@ -51,7 +59,7 @@ public class OptimisedServiceAndConfigModifications
     public OptimisedServiceAndConfigModifications AddInMemoryDbContext<TDbContext>(string? databaseName = null)
         where TDbContext : DbContext
     {
-        ServiceModifications.Add(services =>
+        _serviceModifications.Add(services =>
         {
             // Remove the default DbContext descriptor that was provided by Startup.cs.
             var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<TDbContext>));
@@ -83,7 +91,7 @@ public class OptimisedServiceAndConfigModifications
     public OptimisedServiceAndConfigModifications AddDbContext<TDbContext>(Action<DbContextOptionsBuilder> options)
         where TDbContext : DbContext
     {
-        ServiceModifications.Add(services => services.AddDbContext<TDbContext>(options));
+        _serviceModifications.Add(services => services.AddDbContext<TDbContext>(options));
         return this;
     }
 
@@ -94,7 +102,7 @@ public class OptimisedServiceAndConfigModifications
     public OptimisedServiceAndConfigModifications AddSingleton<TService>()
         where TService : class
     {
-        ServiceModifications.Add(services => services.AddSingleton<TService>());
+        _serviceModifications.Add(services => services.AddSingleton<TService>());
         return this;
     }
 
@@ -105,7 +113,7 @@ public class OptimisedServiceAndConfigModifications
     public OptimisedServiceAndConfigModifications AddSingleton<TService>(TService service)
         where TService : class
     {
-        ServiceModifications.Add(services => services.AddSingleton(service));
+        _serviceModifications.Add(services => services.AddSingleton(service));
         return this;
     }
 
@@ -119,7 +127,7 @@ public class OptimisedServiceAndConfigModifications
         where TAuthenticationHandler : AuthenticationHandler<TAuthenticationHandlerOptions>
         where TAuthenticationHandlerOptions : AuthenticationSchemeOptions, new()
     {
-        ServiceModifications.Add(services =>
+        _serviceModifications.Add(services =>
             services
                 .AddAuthentication(schemeName)
                 .AddScheme<TAuthenticationHandlerOptions, TAuthenticationHandler>(schemeName, null)
@@ -137,7 +145,7 @@ public class OptimisedServiceAndConfigModifications
     )
         where TService : class
     {
-        ServiceModifications.Add(services =>
+        _serviceModifications.Add(services =>
         {
             // Remove the default service descriptor that was provided by Startup.cs.
             var descriptors = services.Where(d => d.ServiceType == typeof(TService)).ToList();
@@ -194,7 +202,7 @@ public class OptimisedServiceAndConfigModifications
         where TInterface : class
         where TImplementation : class, TInterface
     {
-        ServiceModifications.Add(services =>
+        _serviceModifications.Add(services =>
         {
             // Remove the default service descriptor that was provided by Startup.cs (or already altered afterward by
             // other test amendments to the WebApplicationFactory).
@@ -255,7 +263,7 @@ public class OptimisedServiceAndConfigModifications
         IEnumerable<KeyValuePair<string, string?>> appsettings
     )
     {
-        ConfigModifications.Add(config => config.AddInMemoryCollection(appsettings));
+        _configModifications.Add(config => config.AddInMemoryCollection(appsettings));
         return this;
     }
 
@@ -265,7 +273,13 @@ public class OptimisedServiceAndConfigModifications
     public OptimisedServiceAndConfigModifications ConfigureService<TService>(Action<TService> configurFn)
         where TService : class
     {
-        ServiceModifications.Add(services => services.Configure(configurFn));
+        _serviceModifications.Add(services => services.Configure(configurFn));
+        return this;
+    }
+
+    public OptimisedServiceAndConfigModifications AddHostBuilderModifications(Action<IHostBuilder> action)
+    {
+        _hostBuilderModifications.Add(action);
         return this;
     }
 }

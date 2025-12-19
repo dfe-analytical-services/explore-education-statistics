@@ -1,8 +1,7 @@
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
+namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 
 /// <summary>
 ///
@@ -10,8 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Web
 /// Through using this helper class to perform service lookups, we prevent direct access to the factory from tests.
 ///
 /// </summary>
-public class OptimisedServiceCollectionLookups<TStartup>(WebApplicationFactory<TStartup> factory)
-    where TStartup : class
+public class OptimisedServiceCollectionLookups(IServiceProvider services)
 {
     /// <summary>
     ///
@@ -21,7 +19,7 @@ public class OptimisedServiceCollectionLookups<TStartup>(WebApplicationFactory<T
     public TService GetService<TService>()
         where TService : class
     {
-        return factory.Services.GetRequiredService<TService>();
+        return services.GetRequiredService<TService>();
     }
 
     /// <summary>
@@ -32,6 +30,6 @@ public class OptimisedServiceCollectionLookups<TStartup>(WebApplicationFactory<T
     public Mock<TService> GetMockService<TService>()
         where TService : class
     {
-        return Mock.Get(factory.Services.GetRequiredService<TService>());
+        return Mock.Get(services.GetRequiredService<TService>());
     }
 }
