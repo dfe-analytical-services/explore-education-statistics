@@ -90,10 +90,10 @@ const FormEditor = ({
   onImageUpload,
   onImageUploadCancel,
 }: FormEditorProps) => {
-  const editorInstance = useRef<EditorType>();
-  const commentsPlugin = useRef<CommentsPlugin>();
-  const featuredTablesPlugin = useRef<FeaturedTablesPlugin>();
-  const glossaryPlugin = useRef<GlossaryPlugin>();
+  const editorInstance = useRef<EditorType>(undefined);
+  const commentsPlugin = useRef<CommentsPlugin>(undefined);
+  const featuredTablesPlugin = useRef<FeaturedTablesPlugin>(undefined);
+  const glossaryPlugin = useRef<GlossaryPlugin>(undefined);
   const editorRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
   const { currentInteraction, selectedComment, setMarkersOrder } =
     useCommentsContext();

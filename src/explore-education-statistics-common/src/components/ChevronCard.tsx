@@ -1,6 +1,12 @@
 import styles from '@common/components/ChevronCard.module.scss';
 import classNames from 'classnames';
-import React, { cloneElement, ReactElement, ReactNode } from 'react';
+import React, {
+  cloneElement,
+  HTMLAttributes,
+  ReactElement,
+  ReactNode,
+  type JSX,
+} from 'react';
 
 interface Props {
   as?: keyof JSX.IntrinsicElements;
@@ -9,7 +15,7 @@ interface Props {
   description: string;
   descriptionAfter?: ReactNode;
   headingSize?: 'l' | 'm' | 's';
-  link?: ReactNode;
+  link?: ReactElement<HTMLAttributes<HTMLElement>>;
   noBorder?: boolean;
   noChevron?: boolean;
 }
@@ -46,7 +52,7 @@ export default function ChevronCard({
           })}
         >
           {link &&
-            cloneElement(link as ReactElement, {
+            cloneElement(link, {
               className: classNames(styles.link, {
                 [styles.linkWithChevron]: !noChevron,
               }),

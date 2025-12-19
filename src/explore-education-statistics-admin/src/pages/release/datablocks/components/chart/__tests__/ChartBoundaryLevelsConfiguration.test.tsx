@@ -12,7 +12,7 @@ import { defaultDataGrouping } from '@common/modules/charts/util/getMapDataSetCa
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 import { MapBoundaryLevelConfig } from '../types/mapConfig';
 
 describe('ChartBoundaryLevelsConfiguration', () => {
@@ -80,7 +80,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
     ],
   };
 
-  function render(element: ReactElement) {
+  function render(element: ReactNode) {
     return baseRender(
       <ChartBuilderFormsContextProvider
         initialForms={{

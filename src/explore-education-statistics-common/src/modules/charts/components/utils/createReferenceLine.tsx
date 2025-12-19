@@ -10,8 +10,7 @@ import React, { ReactElement } from 'react';
 import { ReferenceLine, ReferenceLineProps } from 'recharts';
 import { AxisDomainItem } from 'recharts/types/util/types';
 
-interface Props
-  extends Omit<ReferenceLineProps, 'label' | 'position' | 'style'> {
+interface Props {
   axis: Axis;
   axisDomain?: [AxisDomainItem, AxisDomainItem];
   axisType: AxisType;
@@ -49,7 +48,6 @@ export default function createReferenceLine({
   style = 'dashed',
   x,
   y,
-  ...props
 }: Props): ReactElement {
   const getStyleProps = () => {
     switch (style) {
