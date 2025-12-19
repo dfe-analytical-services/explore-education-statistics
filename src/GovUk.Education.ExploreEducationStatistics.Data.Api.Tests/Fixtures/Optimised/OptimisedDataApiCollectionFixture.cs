@@ -42,8 +42,8 @@ public abstract class OptimisedDataApiCollectionFixture : OptimisedIntegrationTe
     )
     {
         serviceModifications
-            .AddInMemoryDbContext<ContentDbContext>(databaseName: $"{nameof(ContentDbContext)}_{Guid.NewGuid()}")
-            .AddInMemoryDbContext<StatisticsDbContext>(databaseName: $"{nameof(StatisticsDbContext)}_{Guid.NewGuid()}")
+            .AddInMemoryDbContext<ContentDbContext>()
+            .AddInMemoryDbContext<StatisticsDbContext>()
             .AddControllers<Startup>();
     }
 

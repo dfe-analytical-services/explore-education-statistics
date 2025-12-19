@@ -60,8 +60,8 @@ public abstract class OptimisedContentApiCollectionFixture(params ContentApiInte
     )
     {
         serviceModifications
-            .AddInMemoryDbContext<ContentDbContext>(databaseName: $"{nameof(ContentDbContext)}_{Guid.NewGuid()}")
-            .AddInMemoryDbContext<StatisticsDbContext>(databaseName: $"{nameof(StatisticsDbContext)}_{Guid.NewGuid()}")
+            .AddInMemoryDbContext<ContentDbContext>()
+            .AddInMemoryDbContext<StatisticsDbContext>()
             .ReplaceServiceWithMock<IMemoryCacheService>(mockBehavior: MockBehavior.Loose)
             .AddControllers<Startup>();
 

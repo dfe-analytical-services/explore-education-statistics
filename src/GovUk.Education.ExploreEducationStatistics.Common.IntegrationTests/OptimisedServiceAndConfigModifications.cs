@@ -59,6 +59,8 @@ public class OptimisedServiceAndConfigModifications
     public OptimisedServiceAndConfigModifications AddInMemoryDbContext<TDbContext>(string? databaseName = null)
         where TDbContext : DbContext
     {
+        var dbContextName = databaseName ?? $"{nameof(TDbContext)}_{Guid.NewGuid()}";
+
         _serviceModifications.Add(services =>
         {
             // Remove the default DbContext descriptor that was provided by Startup.cs.
@@ -76,10 +78,7 @@ public class OptimisedServiceAndConfigModifications
 
             // Add the new In-Memory replacement.
             services.AddDbContext<TDbContext>(options =>
-                options.UseInMemoryDatabase(
-                    databaseName ?? nameof(TDbContext),
-                    builder => builder.EnableNullChecks(false)
-                )
+                options.UseInMemoryDatabase(dbContextName, builder => builder.EnableNullChecks(false))
             );
         });
         return this;

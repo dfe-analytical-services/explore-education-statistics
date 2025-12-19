@@ -83,11 +83,9 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
     )
     {
         serviceModifications
-            .AddInMemoryDbContext<ContentDbContext>(databaseName: $"{nameof(ContentDbContext)}_{Guid.NewGuid()}")
-            .AddInMemoryDbContext<StatisticsDbContext>(databaseName: $"{nameof(StatisticsDbContext)}_{Guid.NewGuid()}")
-            .AddInMemoryDbContext<UsersAndRolesDbContext>(
-                databaseName: $"{nameof(UsersAndRolesDbContext)}_{Guid.NewGuid()}"
-            )
+            .AddInMemoryDbContext<ContentDbContext>()
+            .AddInMemoryDbContext<StatisticsDbContext>()
+            .AddInMemoryDbContext<UsersAndRolesDbContext>()
             .ReplaceServiceWithMock<IProcessorClient>()
             .ReplaceServiceWithMock<IPublicDataApiClient>()
             .ReplaceServiceWithMock<IDataProcessorClient>()
