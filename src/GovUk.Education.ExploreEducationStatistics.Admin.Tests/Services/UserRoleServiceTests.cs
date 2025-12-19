@@ -296,7 +296,13 @@ public abstract class UserRoleServiceTests
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .ReturnsAsync(new UserPublicationRole());
+                .ReturnsAsync(
+                    _dataFixture
+                        .DefaultUserPublicationRole()
+                        .WithUser(_dataFixture.DefaultUser())
+                        .WithPublication(_dataFixture.DefaultPublication())
+                        .Generate()
+                );
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -728,7 +734,19 @@ public abstract class UserRoleServiceTests
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .ReturnsAsync(new UserReleaseRole());
+                .ReturnsAsync(
+                    _dataFixture
+                        .DefaultUserReleaseRole()
+                        .WithUser(_dataFixture.DefaultUser())
+                        .WithReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(
+                                    _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+                                )
+                        )
+                        .Generate()
+                );
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -765,13 +783,12 @@ public abstract class UserRoleServiceTests
             var release = publication.Releases.Single();
             var releaseVersion = release.Versions.Single();
 
-            var userReleaseRole = new UserReleaseRole
-            {
-                UserId = _user.Id,
-                ReleaseVersion = releaseVersion,
-                Role = ReleaseRole.Contributor,
-                CreatedById = _user.Id,
-            };
+            UserReleaseRole userReleaseRole = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithUser(_user)
+                .WithReleaseVersion(releaseVersion)
+                .WithCreatedById(_user.Id)
+                .WithRole(ReleaseRole.Contributor);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();

@@ -25,6 +25,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -1238,11 +1239,18 @@ public class MethodologyApprovalServiceTests
         userReleaseRoleService
             .Setup(mock => mock.ListLatestActiveUserReleaseRolesByPublication(publication.Id, ReleaseRole.Approver))
             .ReturnsAsync([
-                new()
-                {
-                    Role = ReleaseRole.Approver,
-                    User = _dataFixture.DefaultUser().WithEmail("release-approver@email.com"),
-                },
+                _dataFixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(_dataFixture.DefaultUser().WithEmail("release-approver@email.com"))
+                    .WithReleaseVersion(
+                        _dataFixture
+                            .DefaultReleaseVersion()
+                            .WithRelease(
+                                _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+                            )
+                    )
+                    .WithRole(ReleaseRole.Approver)
+                    .Generate(),
             ]);
 
         userPublicationRoleRepository

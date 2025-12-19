@@ -657,7 +657,19 @@ public abstract class PreReleaseUserServiceTests
                             It.IsAny<CancellationToken>()
                         )
                     )
-                    .ReturnsAsync(new UserReleaseRole());
+                    .ReturnsAsync(
+                        _dataFixture
+                            .DefaultUserReleaseRole()
+                            .WithUser(_dataFixture.DefaultUser())
+                            .WithReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(
+                                        _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+                                    )
+                            )
+                            .Generate()
+                    );
             }
 
             var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(
@@ -894,7 +906,19 @@ public abstract class PreReleaseUserServiceTests
                             It.IsAny<CancellationToken>()
                         )
                     )
-                    .ReturnsAsync(new UserReleaseRole());
+                    .ReturnsAsync(
+                        _dataFixture
+                            .DefaultUserReleaseRole()
+                            .WithUser(_dataFixture.DefaultUser())
+                            .WithReleaseVersion(
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(
+                                        _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+                                    )
+                            )
+                            .Generate()
+                    );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
