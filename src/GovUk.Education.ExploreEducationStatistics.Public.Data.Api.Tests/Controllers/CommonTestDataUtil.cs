@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;

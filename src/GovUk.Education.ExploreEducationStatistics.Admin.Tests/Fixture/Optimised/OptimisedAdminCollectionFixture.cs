@@ -3,6 +3,7 @@ using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
@@ -124,7 +125,7 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
         }
     }
 
-    protected override Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    protected override Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
     {
         if (capabilities.Contains(AdminIntegrationTestCapability.UserAuth))
         {

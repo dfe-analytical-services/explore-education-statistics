@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Hosting;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
+namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp;
 
 /// <summary>
 ///
@@ -20,13 +20,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Web
 ///   1. Allows the subclass to register any Test Containers that it needs, by the subclass overriding the
 ///      <see cref="RegisterTestContainers"/> method.
 ///   2. Starts any Test Containers that the subclass needs.
-///   3. Builds a new WebApplicationFactoryBuilder that will allow us to  create a WebApplicationFactory that is based
-///      on <see cref="TStartup"/> but with amendments made to allow testing.
+///   3. Builds a new FunctionAppHostBuilder that will allow us to create an IHost that supports integration testing.
 ///   4. Asks the subclass for any modifications it requires to registered services and configuration prior to the
-///      WebApplicationFactory being built, by the subclass overriding the
-///      <see cref="ConfigureServicesAndConfiguration" /> method.
-///   5. Applies any ServiceCollection and IConfigurationBuilder modifications that the subclass asked for to the
-///      builder.
+///      IHost being built, by the subclass overriding the <see cref="ConfigureServicesAndConfiguration" /> method.
+///   5. Applies any ServiceCollection, IConfigurationBuilder and IHostBuilder modifications that the subclass asked
+///      for to the IHost.
 ///   6. Lets the subclass look up any services that it needs after the factory has been constructed, by overriding the
 ///      <see cref="AfterFactoryConstructed"/> method.
 /// 5. The tests in the collection run in sequence, all using this single instance of the fixture subclass.
@@ -37,18 +35,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Web
 ///      subclass overriding the <see cref="DisposeResources"/> methods.
 ///
 /// </summary>
-///
-/// <param name="minimalApi">
-///
-/// This parameter controls the mechanism involved when building the WebApplicationFactory, as classic MVC projects and
-/// minimal API projects require different approaches.
-///
-/// </param>
-public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimalApi = false) : IAsyncLifetime
-    where TStartup : class
+public abstract class OptimisedFunctionAppIntegrationTestFixtureBase : IAsyncLifetime
 {
     private TestContainerRegistrations _testContainers = null!;
-    private WebApplicationFactory<TStartup> _factory = null!;
+    private IHost _host = null!;
 
     public async Task InitializeAsync()
     {
@@ -67,22 +57,21 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimal
 
         // Build the standard WebApplicationFactory builder based on the configuration in TStartup, choosing the
         // correct approach based on the type of project being tested.
-        OptimisedWebApplicationFactoryBuilderBase<TStartup> factoryBuilder = minimalApi
-            ? new OptimisedWebApplicationFactoryMinimalApiBuilder<TStartup>()
-            : new OptimisedWebApplicationFactoryMvcBuilder<TStartup>();
+        var hostBuilderFactory = new OptimisedFunctionAppHostBuilder();
 
         // Build the final WebApplicationFactory, originally based on TStartup but with standard integration
         // testing support added by the WebApplicationFactory builder and then the fixture subclass' requested
         // service and configuration changes applied over the top.
-        _factory = factoryBuilder.Build(
+        _host = hostBuilderFactory.Build(
             serviceModifications: [.. modifications.GetServiceModifications()],
-            configModifications: [.. modifications.GetConfigModifications()]
+            configModifications: [.. modifications.GetConfigModifications()],
+            hostBuilderModifications: [.. modifications.GetHostBuilderModifications()]
         );
 
         // Finally, allow the fixture subclass to perform any actions post-factory creation and prior to any
         // tests from its collection starting. This might include looking up any services that the tests in the
         // collection might need, setting up some collection-level global test data etc.
-        var lookups = new OptimisedServiceCollectionLookups(_factory.Services);
+        var lookups = new OptimisedServiceCollectionLookups(_host.Services);
         await AfterFactoryConstructed(lookups);
     }
 
@@ -121,14 +110,6 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimal
     public virtual Task BeforeEachTest()
     {
         return Task.CompletedTask;
-    }
-
-    /// <summary>
-    /// Creates an HttpClient that can be used to send HTTP requests to the WebApplicationFactory.
-    /// </summary>
-    public HttpClient CreateClient()
-    {
-        return _factory.CreateClient();
     }
 
     protected virtual Task DisposeResources()

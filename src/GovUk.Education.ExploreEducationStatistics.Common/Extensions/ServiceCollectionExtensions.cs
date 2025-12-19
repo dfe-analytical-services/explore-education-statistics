@@ -19,11 +19,27 @@ public static class ServiceCollectionExtensions
         Action<DbContextOptionsBuilder>? optionsConfiguration = null
     )
         where TDbContext : DbContext =>
-        hostBuilderContext.HostingEnvironment.IsDevelopment()
+        AddFunctionAppPsqlDbContext<TDbContext>(
+            services,
+            connectionString,
+            hostBuilderContext.HostingEnvironment,
+            hostBuilderContext.Configuration,
+            optionsConfiguration
+        );
+
+    public static IServiceCollection AddFunctionAppPsqlDbContext<TDbContext>(
+        this IServiceCollection services,
+        string connectionString,
+        IHostEnvironment hostEnvironment,
+        IConfiguration configuration,
+        Action<DbContextOptionsBuilder>? optionsConfiguration = null
+    )
+        where TDbContext : DbContext =>
+        hostEnvironment.IsDevelopment()
             ? services.AddDevelopmentPsqlDbContext<TDbContext>(connectionString)
             : services.AddFunctionAppManagedIdentityPsqlDbContext<TDbContext>(
                 connectionString,
-                hostBuilderContext.Configuration,
+                configuration,
                 optionsConfiguration
             );
 
