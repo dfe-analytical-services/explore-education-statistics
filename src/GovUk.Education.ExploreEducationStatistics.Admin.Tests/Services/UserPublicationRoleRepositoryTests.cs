@@ -230,6 +230,47 @@ public abstract class UserPublicationRoleRepositoryTests
 
             Assert.Null(result);
         }
+
+        // This is a temporary test to ensure that the new permissions system roles are excluded in all results
+        // via the global query filter
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task IgnoresNewPermissionsSystemRoles(Func<DataFixture, User> userFactory)
+        {
+            var user = userFactory(_fixture);
+            User createdBy = _fixture.DefaultUser();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_fixture.DefaultPublication())
+                .WithCreated(DateTime.UtcNow.AddDays(-2))
+                .WithCreatedById(createdBy.Id)
+                .WithEmailSent(DateTime.UtcNow.AddDays(-1))
+                .ForIndex(0, s => s.SetRole(PublicationRole.Approver))
+                .ForIndex(1, s => s.SetRole(PublicationRole.Drafter))
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(createdBy);
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var result1 = await repository.GetById(userPublicationRoles[0].Id);
+                var result2 = await repository.GetById(userPublicationRoles[1].Id);
+
+                Assert.Null(result1);
+                Assert.Null(result2);
+            }
+        }
     }
 
     public class GetByCompositeKeyTests : UserPublicationRoleRepositoryTests
@@ -291,6 +332,55 @@ public abstract class UserPublicationRoleRepositoryTests
             );
 
             Assert.Null(result);
+        }
+
+        // This is a temporary test to ensure that the new permissions system roles are excluded in all results
+        // via the global query filter
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task IgnoresNewPermissionsSystemRoles(Func<DataFixture, User> userFactory)
+        {
+            var user = userFactory(_fixture);
+            User createdBy = _fixture.DefaultUser();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(_fixture.DefaultPublication())
+                .WithCreated(DateTime.UtcNow.AddDays(-2))
+                .WithCreatedById(createdBy.Id)
+                .WithEmailSent(DateTime.UtcNow.AddDays(-1))
+                .ForIndex(0, s => s.SetRole(PublicationRole.Approver))
+                .ForIndex(1, s => s.SetRole(PublicationRole.Drafter))
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Users.Add(createdBy);
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var result1 = await repository.GetByCompositeKey(
+                    userId: userPublicationRoles[0].UserId,
+                    publicationId: userPublicationRoles[0].PublicationId,
+                    role: userPublicationRoles[0].Role
+                );
+                var result2 = await repository.GetByCompositeKey(
+                    userId: userPublicationRoles[1].UserId,
+                    publicationId: userPublicationRoles[1].PublicationId,
+                    role: userPublicationRoles[1].Role
+                );
+
+                Assert.Null(result1);
+                Assert.Null(result2);
+            }
         }
     }
 
@@ -508,6 +598,59 @@ public abstract class UserPublicationRoleRepositoryTests
                 Assert.Single(results, upr => upr.Id == userPublicationRoles[9].Id);
                 Assert.Single(results, upr => upr.Id == userPublicationRoles[10].Id);
                 Assert.Single(results, upr => upr.Id == userPublicationRoles[11].Id);
+            }
+        }
+
+        // This is a temporary test to ensure that the new permissions system roles are excluded in all results
+        // via the global query filter
+        [Fact]
+        public async Task IgnoresNewPermissionsSystemRoles()
+        {
+            User activeUser1 = _fixture.DefaultUser();
+            User activeUser2 = _fixture.DefaultUser();
+            User userWithPendingInvite1 = _fixture.DefaultUserWithPendingInvite();
+            User userWithPendingInvite2 = _fixture.DefaultUserWithPendingInvite();
+            User userWithExpiredInvite1 = _fixture.DefaultUserWithExpiredInvite();
+            User userWithExpiredInvite2 = _fixture.DefaultUserWithExpiredInvite();
+            User softDeletedUser1 = _fixture.DefaultSoftDeletedUser();
+            User softDeletedUser2 = _fixture.DefaultSoftDeletedUser();
+
+            var userPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .WithPublication(_fixture.DefaultPublication())
+                // These should ALL be filtered out
+                .ForIndex(0, s => s.SetUser(activeUser1).SetRole(PublicationRole.Approver))
+                .ForIndex(1, s => s.SetUser(activeUser1).SetRole(PublicationRole.Drafter))
+                .ForIndex(2, s => s.SetUser(activeUser2).SetRole(PublicationRole.Approver))
+                .ForIndex(3, s => s.SetUser(userWithPendingInvite1).SetRole(PublicationRole.Approver))
+                .ForIndex(4, s => s.SetUser(userWithPendingInvite1).SetRole(PublicationRole.Drafter))
+                .ForIndex(5, s => s.SetUser(userWithPendingInvite2).SetRole(PublicationRole.Approver))
+                .ForIndex(6, s => s.SetUser(userWithExpiredInvite1).SetRole(PublicationRole.Approver))
+                .ForIndex(7, s => s.SetUser(userWithExpiredInvite1).SetRole(PublicationRole.Drafter))
+                .ForIndex(8, s => s.SetUser(userWithExpiredInvite2).SetRole(PublicationRole.Approver))
+                .ForIndex(9, s => s.SetUser(softDeletedUser1).SetRole(PublicationRole.Approver))
+                .ForIndex(10, s => s.SetUser(softDeletedUser1).SetRole(PublicationRole.Drafter))
+                .ForIndex(11, s => s.SetUser(softDeletedUser2).SetRole(PublicationRole.Approver))
+                .GenerateList(12);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                var resultingQueryable = repository.Query(ResourceRoleFilter.All);
+
+                // Don't apply any further filtering to the queryable, and just execute it to get all results
+                var results = await resultingQueryable.ToListAsync();
+
+                Assert.Empty(results);
             }
         }
     }
