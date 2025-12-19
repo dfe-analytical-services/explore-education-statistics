@@ -11,7 +11,9 @@ using Newtonsoft.Json;
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests;
 
 /// <summary>
-/// Generic test application startup for use in integration tests.
+/// Generic test application startup for use in Common integration tests. For API projects, see
+/// the specific integration test support in the
+/// GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.* projects.
 /// </summary>
 /// <remarks>
 /// Use in combination with <see cref="TestApplicationFactory{TStartup}"/>

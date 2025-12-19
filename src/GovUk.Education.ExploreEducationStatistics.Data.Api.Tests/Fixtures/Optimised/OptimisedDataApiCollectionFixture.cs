@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -6,15 +5,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Moq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures.Optimised;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures.Optimised;
 
 /// <summary>
 ///
-/// A Collection-level test fixture to be used by Content API integration tests.
-///
-/// A number of capabilities are supported by this fixture, and each subclass can specify the capabilities that they
-/// need.  The relevant configuration changes and Test Containers will then be put in place to support this for the
-/// lifetime of this fixture.
+/// A Collection-level test fixture to be used by Data API integration tests.
 ///
 /// This fixture is intended to be used specifically as a Collection-level fixture, and thus is able to provide
 /// reusable components that might otherwise not be thread-safe e.g. DbContexts. The reason why this is possible
@@ -38,21 +33,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures.
 ///
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public abstract class OptimisedContentApiCollectionFixture(params ContentApiIntegrationTestCapability[] capabilities)
-    : OptimisedIntegrationTestFixtureBase<Startup>
+public abstract class OptimisedDataApiCollectionFixture : OptimisedIntegrationTestFixtureBase<Startup>
 {
     private ContentDbContext _contentDbContext = null!;
     private StatisticsDbContext _statisticsDbContext = null!;
-
-    private AzuriteWrapper _azuriteWrapper = null!;
-
-    protected override void RegisterTestContainers(TestContainerRegistrations registrations)
-    {
-        if (capabilities.Contains(ContentApiIntegrationTestCapability.Azurite))
-        {
-            _azuriteWrapper = registrations.RegisterAzuriteContainer();
-        }
-    }
 
     protected override void ConfigureServicesAndConfiguration(
         OptimisedServiceAndConfigModifications serviceModifications
@@ -61,20 +45,7 @@ public abstract class OptimisedContentApiCollectionFixture(params ContentApiInte
         serviceModifications
             .AddInMemoryDbContext<ContentDbContext>(databaseName: $"{nameof(ContentDbContext)}_{Guid.NewGuid()}")
             .AddInMemoryDbContext<StatisticsDbContext>(databaseName: $"{nameof(StatisticsDbContext)}_{Guid.NewGuid()}")
-            .ReplaceServiceWithMock<IMemoryCacheService>(mockBehavior: MockBehavior.Loose)
             .AddControllers<Startup>();
-
-        if (capabilities.Contains(ContentApiIntegrationTestCapability.Azurite))
-        {
-            serviceModifications.AddAzurite(
-                connectionString: _azuriteWrapper.GetConnectionString(),
-                connectionStringKeys: ["PublicStorage"]
-            );
-        }
-        else
-        {
-            serviceModifications.ReplaceServiceWithMock<IPublicBlobStorageService>();
-        }
     }
 
     protected override Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
@@ -124,22 +95,4 @@ public abstract class OptimisedContentApiCollectionFixture(params ContentApiInte
         await _contentDbContext.ClearTestDataIfInMemory();
         await _statisticsDbContext.ClearTestDataIfInMemory();
     }
-
-    /// <summary>
-    /// Retrieve the Azurity convenience class for the purposes of test data cleardown, etc.
-    /// </summary>
-    protected AzuriteWrapper GetAzuriteWrapper()
-    {
-        if (!capabilities.Contains(ContentApiIntegrationTestCapability.Azurite))
-        {
-            throw new Exception("Cannot get AzuriteWrapper if not using the Azurite capability.");
-        }
-
-        return _azuriteWrapper;
-    }
-}
-
-public enum ContentApiIntegrationTestCapability
-{
-    Azurite,
 }

@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
