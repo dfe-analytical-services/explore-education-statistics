@@ -51,23 +51,23 @@ describe('ReleaseContentAccordionSection', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Edit section title' }),
+      screen.getByRole('button', { name: /Edit section title/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Reorder this section' }),
+      screen.getByRole('button', { name: /Reorder this section/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Remove this section' }),
+      screen.getByRole('button', { name: /Remove this section/ }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Add text block' }),
+      screen.getByRole('button', { name: /Add text block/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Add data block' }),
+      screen.getByRole('button', { name: /Add data block/ }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Embed a URL' }),
+      screen.queryByRole('button', { name: /Embed a URL/ }),
     ).not.toBeInTheDocument();
   });
 
@@ -110,23 +110,23 @@ describe('ReleaseContentAccordionSection', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Edit section title' }),
+      screen.getByRole('button', { name: /Edit section title/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Reorder this section' }),
+      screen.getByRole('button', { name: /Reorder this section/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Remove this section' }),
+      screen.getByRole('button', { name: /Remove this section/ }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Add text block' }),
+      screen.getByRole('button', { name: /Add text block/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Add data block' }),
+      screen.getByRole('button', { name: /Add data block/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Embed a URL' }),
+      screen.getByRole('button', { name: /Embed a URL/ }),
     ).toBeInTheDocument();
   });
 
@@ -159,23 +159,23 @@ describe('ReleaseContentAccordionSection', () => {
     );
 
     expect(
-      screen.queryByRole('button', { name: 'Edit section title' }),
+      screen.queryByRole('button', { name: /Edit section title/ }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Reorder this section' }),
+      screen.queryByRole('button', { name: /Reorder this section/ }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Remove this section' }),
+      screen.queryByRole('button', { name: /Remove this section/ }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByRole('button', { name: 'Add text block' }),
+      screen.queryByRole('button', { name: /Add text block/ }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Add data block' }),
+      screen.queryByRole('button', { name: /Add data block/ }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Embed a URL' }),
+      screen.queryByRole('button', { name: /Embed a URL/ }),
     ).not.toBeInTheDocument();
   });
 
@@ -307,11 +307,11 @@ describe('ReleaseContentAccordionSection', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Edit section title' }),
+      screen.getByRole('button', { name: /Edit section title/ }),
     ).not.toBeAriaDisabled();
 
     const reorderButton = screen.getByRole('button', {
-      name: 'Reorder this section',
+      name: /Reorder this section/,
     });
     expect(reorderButton).toBeAriaDisabled();
     expect(getDescribedBy(reorderButton)).toHaveTextContent(
@@ -319,7 +319,7 @@ describe('ReleaseContentAccordionSection', () => {
     );
 
     const removeButton = screen.getByRole('button', {
-      name: 'Remove this section',
+      name: /Remove this section/,
     });
     expect(removeButton).toBeAriaDisabled();
     expect(getDescribedBy(removeButton)).toHaveTextContent(

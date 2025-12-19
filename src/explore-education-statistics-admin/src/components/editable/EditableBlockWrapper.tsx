@@ -10,8 +10,10 @@ import React, { ReactNode } from 'react';
 
 export interface EditableBlockProps {
   dataBlockEditLink?: string;
+  editButtonLabel?: ReactNode | string;
   isLoading?: boolean;
   lockedBy?: UserDetails;
+  removeButtonLabel?: ReactNode | string;
   onEdit?: () => void;
   onDelete?: () => void;
   onEmbedBlockEdit?: () => void;
@@ -20,8 +22,10 @@ export interface EditableBlockProps {
 const EditableBlockWrapper = ({
   children,
   dataBlockEditLink,
+  editButtonLabel,
   isLoading = false,
   lockedBy,
+  removeButtonLabel = 'Remove block',
   onEdit,
   onDelete,
   onEmbedBlockEdit,
@@ -49,23 +53,30 @@ const EditableBlockWrapper = ({
                 ariaDisabled={!!lockedTooltip}
                 disabled={isLoading}
                 ref={ref}
+                testId="edit-block"
                 variant="secondary"
                 onClick={() => onEdit()}
               >
-                Edit block
+                {editButtonLabel ?? 'Edit block'}
               </Button>
             )}
           </Tooltip>
         )}
 
         {dataBlockEditLink && (
-          <ButtonLink to={dataBlockEditLink} variant="secondary">
-            Edit data block
+          <ButtonLink
+            test-id="edit-data-block"
+            to={dataBlockEditLink}
+            variant="secondary"
+          >
+            {editButtonLabel ?? 'Edit data block'}
           </ButtonLink>
         )}
 
         {onEmbedBlockEdit && (
-          <Button onClick={onEmbedBlockEdit}>Edit embedded URL</Button>
+          <Button test-id="edit-embed-block" onClick={onEmbedBlockEdit}>
+            {editButtonLabel ?? 'Edit embedded URL'}
+          </Button>
         )}
 
         {onDelete && (
@@ -78,9 +89,10 @@ const EditableBlockWrapper = ({
                     ariaDisabled={!!lockedTooltip}
                     disabled={isLoading}
                     ref={ref}
+                    testId="remove-block"
                     variant="warning"
                   >
-                    Remove block
+                    {removeButtonLabel}
                   </Button>
                 }
                 onConfirm={onDelete}

@@ -10,6 +10,7 @@ import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBl
 import Button from '@common/components/Button';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import React, { useCallback, useRef } from 'react';
 import AddSecondaryStats from './AddSecondaryStats';
@@ -67,6 +68,16 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
             <ReleaseEditableBlock
               allowComments
               block={block}
+              editButtonLabel={
+                <>
+                  Edit<VisuallyHidden> headlines</VisuallyHidden> block
+                </>
+              }
+              removeButtonLabel={
+                <>
+                  Remove<VisuallyHidden> headlines</VisuallyHidden> block
+                </>
+              }
               publicationId={release.publication.id}
               releaseVersionId={release.id}
               sectionId={release.headlinesSection.id}

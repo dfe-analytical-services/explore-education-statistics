@@ -15,11 +15,13 @@ import FreeTextStatTile from '@common/modules/education-in-numbers/components/Fr
 import FreeTextStatTileWrapper from '@common/modules/education-in-numbers/components/FreeTextStatTileWrapper';
 import { EinTileGroupBlock } from '@common/services/types/einBlocks';
 import reorder from '@common/utils/reorder';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 
 interface Props {
   block: EinTileGroupBlock;
   editable: boolean;
+  groupButtonsLabel?: ReactNode | string;
+  removeButtonLabel?: ReactNode | string;
   sectionId: string;
   onSave?: (content: string) => void;
   onDelete: () => void;
@@ -28,6 +30,8 @@ interface Props {
 const EditableTileGroupBlock = ({
   block,
   editable,
+  groupButtonsLabel,
+  removeButtonLabel,
   sectionId,
   onDelete,
   onSave,
@@ -75,7 +79,10 @@ const EditableTileGroupBlock = ({
   };
 
   return (
-    <EditableBlockWrapper onDelete={editable ? onDelete : undefined}>
+    <EditableBlockWrapper
+      removeButtonLabel={removeButtonLabel}
+      onDelete={editable ? onDelete : undefined}
+    >
       {isEditingHeading ? (
         <FormTextInput
           className="govuk-!-margin-bottom-2"
@@ -126,7 +133,8 @@ const EditableTileGroupBlock = ({
                 variant="secondary"
                 onClick={toggleEditingHeading}
               >
-                {title ? 'Edit' : 'Add'} group heading
+                {title ? 'Edit group heading' : 'Add group heading'}
+                <VisuallyHidden> for {groupButtonsLabel}</VisuallyHidden>
               </Button>
 
               <Button
@@ -135,11 +143,13 @@ const EditableTileGroupBlock = ({
                 onClick={handleAddStatTile}
               >
                 Add new tile
+                <VisuallyHidden> in {groupButtonsLabel}</VisuallyHidden>
               </Button>
 
               {groupTiles.length > 1 && !isReordering && (
                 <Button variant="secondary" onClick={toggleIsReordering.on}>
                   Reorder tiles
+                  <VisuallyHidden> in {groupButtonsLabel}</VisuallyHidden>
                 </Button>
               )}
             </>

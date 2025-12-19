@@ -316,8 +316,8 @@ user starts editing accordion section text block
 
 user starts editing text block
     [Arguments]    ${parent}
-    user clicks button    Edit block    ${parent}
-    user waits until parent does not contain button    ${parent}    Edit block
+    user clicks element    testid:edit-block    ${parent}
+    user waits until parent does not contain    ${parent}    testid:edit-block
     user waits until parent contains element    ${parent}    css:[role="textbox"]
     ${element}=    get child element    ${parent}    css:[role="textbox"]
     user waits until element is enabled    ${element}
@@ -593,7 +593,7 @@ user saves autosaving text block
     user clicks button    Save & close    ${parent}
     user waits until page finishes loading
     user waits until parent does not contain button    ${parent}    Save & close    %{WAIT_SMALL}
-    user waits until element contains    ${parent}    Edit block    %{WAIT_SMALL}
+    user waits until element contains    ${parent}    Edit    %{WAIT_SMALL}
 
 user checks accordion section text block contains
     [Arguments]
@@ -632,7 +632,7 @@ user deletes editable accordion section content block
     ...    ${parent}=[data-testid="accordion"]
 
     ${block}=    get accordion section block    ${section_name}    ${block_num}    ${parent}
-    user clicks button    Remove block    ${block}
+    user clicks element    testid:remove-block    ${block}
     user clicks button    Confirm
     user waits until page finishes loading
     sleep    0.75

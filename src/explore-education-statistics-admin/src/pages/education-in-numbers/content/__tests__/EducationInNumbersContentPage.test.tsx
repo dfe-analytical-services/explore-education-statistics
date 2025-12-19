@@ -148,48 +148,42 @@ describe('EducationInNumbersContentPage', () => {
 
     const section1 = sections[0];
     await waitFor(() => {
-      expect(
-        within(section1).getByRole('button', { name: /Section 1/ }),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Section 1')).toBeInTheDocument();
     });
     expect(within(section1).getByText('Section 1 content')).toBeInTheDocument();
     expect(
-      within(section1).getByRole('button', { name: 'Edit section title' }),
+      within(section1).getByRole('button', { name: /Edit section title/ }),
     ).toBeInTheDocument();
     expect(
-      within(section1).getByRole('button', { name: 'Reorder this section' }),
+      within(section1).getByRole('button', { name: /Reorder this section/ }),
     ).toBeInTheDocument();
     expect(
-      within(section1).getByRole('button', { name: 'Remove this section' }),
+      within(section1).getByRole('button', { name: /Remove this section/ }),
     ).toBeInTheDocument();
     expect(
-      within(section1).getByRole('button', { name: 'Edit block' }),
+      within(section1).getByRole('button', { name: /Edit text block/ }),
     ).toBeInTheDocument();
     expect(
-      within(section1).getByRole('button', { name: 'Remove block' }),
+      within(section1).getByRole('button', { name: /Remove text block/ }),
     ).toBeInTheDocument();
 
     const section2 = sections[1];
-    await waitFor(() => {
-      expect(
-        within(section2).getByRole('button', { name: /Section 2/ }),
-      ).toBeInTheDocument();
-    });
+    expect(screen.getByText('Section 2')).toBeInTheDocument();
     expect(within(section2).getByText('Section 2 content')).toBeInTheDocument();
     expect(
-      within(section2).getByRole('button', { name: 'Edit section title' }),
+      within(section2).getByRole('button', { name: /Edit section title/ }),
     ).toBeInTheDocument();
     expect(
-      within(section2).getByRole('button', { name: 'Reorder this section' }),
+      within(section2).getByRole('button', { name: /Reorder this section/ }),
     ).toBeInTheDocument();
     expect(
-      within(section2).getByRole('button', { name: 'Remove this section' }),
+      within(section2).getByRole('button', { name: /Remove this section/ }),
     ).toBeInTheDocument();
     expect(
-      within(section2).getByRole('button', { name: 'Edit block' }),
+      within(section2).getByRole('button', { name: /Edit text block/ }),
     ).toBeInTheDocument();
     expect(
-      within(section2).getByRole('button', { name: 'Remove block' }),
+      within(section2).getByRole('button', { name: /Remove text block/ }),
     ).toBeInTheDocument();
 
     expect(
@@ -231,23 +225,23 @@ describe('EducationInNumbersContentPage', () => {
     });
     expect(within(section1).getByText('Section 1 content')).toBeInTheDocument();
     expect(
-      within(section1).queryByRole('button', { name: 'Edit section title' }),
+      within(section1).queryByRole('button', { name: /Edit section title/ }),
     ).not.toBeInTheDocument();
     expect(
       within(section1).queryByRole('button', {
-        name: 'Reorder this section',
+        name: /Reorder this section/,
       }),
     ).not.toBeInTheDocument();
     expect(
       within(section1).queryByRole('button', {
-        name: 'Remove this section',
+        name: /Remove this section/,
       }),
     ).not.toBeInTheDocument();
     expect(
-      within(section1).queryByRole('button', { name: 'Edit block' }),
+      within(section1).queryByRole('button', { name: /Edit block/ }),
     ).not.toBeInTheDocument();
     expect(
-      within(section1).queryByRole('button', { name: 'Remove block' }),
+      within(section1).queryByRole('button', { name: /Remove block/ }),
     ).not.toBeInTheDocument();
 
     const section2 = sections[1];
@@ -258,23 +252,23 @@ describe('EducationInNumbersContentPage', () => {
     });
     expect(within(section2).getByText('Section 2 content')).toBeInTheDocument();
     expect(
-      within(section2).queryByRole('button', { name: 'Edit section title' }),
+      within(section2).queryByRole('button', { name: /Edit section title/ }),
     ).not.toBeInTheDocument();
     expect(
       within(section2).queryByRole('button', {
-        name: 'Reorder this section',
+        name: /Reorder this section/,
       }),
     ).not.toBeInTheDocument();
     expect(
       within(section2).queryByRole('button', {
-        name: 'Remove this section',
+        name: /Remove this section/,
       }),
     ).not.toBeInTheDocument();
     expect(
-      within(section2).queryByRole('button', { name: 'Edit block' }),
+      within(section2).queryByRole('button', { name: /Edit block/ }),
     ).not.toBeInTheDocument();
     expect(
-      within(section2).queryByRole('button', { name: 'Remove block' }),
+      within(section2).queryByRole('button', { name: /Remove block/ }),
     ).not.toBeInTheDocument();
 
     expect(
