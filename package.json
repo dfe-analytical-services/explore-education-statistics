@@ -18,6 +18,7 @@
     "@next/eslint-plugin-next": "15.5.9",
     "@types/jest": "^29.5.3",
     "@types/lodash": "^4.14.195",
+    "@types/minimatch": "^6.0.0",
     "@types/node": "^18.17.5",
     "@types/signal-exit": "^3.0.1",
     "@types/split2": "^4.2.0",
