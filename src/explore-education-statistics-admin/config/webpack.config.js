@@ -309,7 +309,7 @@ module.exports = webpackEnv => {
         './dist/cpexcel.js': false,
         '@admin': paths.appSrc,
         '@common': 'explore-education-statistics-common/src',
-        react: require.resolve('react'),
+        react: path.dirname(require.resolve('react')),
       },
       fallback: {
         path: require.resolve('path-browserify'),
@@ -331,7 +331,7 @@ module.exports = webpackEnv => {
           babelRuntimeRegenerator,
           // EES - Add extra allowed files for compatibility
           // with our custom import aliases
-          require.resolve('react'),
+          path.dirname(require.resolve('react')),
         ]),
       ],
     },
