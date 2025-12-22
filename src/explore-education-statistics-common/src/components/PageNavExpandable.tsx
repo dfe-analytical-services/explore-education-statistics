@@ -17,7 +17,7 @@ export default function PageNavExpandable({
   const [isScrollHandlingBlocked, toggleScrollHandlingBlocked] =
     useToggle(false);
 
-  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setActiveSection(items[0].id);

@@ -8,7 +8,7 @@ import _releaseVersionService, {
 import { PaginatedList } from '@common/services/types/pagination';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React, { ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('@admin/services/publicationService');
@@ -331,6 +331,6 @@ describe('PublicationUnpublishedReleases', () => {
   });
 });
 
-function render(element: ReactElement) {
+function render(element: ReactNode) {
   return baseRender(<MemoryRouter>{element}</MemoryRouter>);
 }

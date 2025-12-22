@@ -8,7 +8,7 @@ import baseRender from '@common-test/render';
 import { defaultDataGrouping } from '@common/modules/charts/util/getMapDataSetCategoryConfigs';
 import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
-import React, { ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 
 describe('ChartDataGroupingsConfiguration', () => {
   const testTable = testFullTable;
@@ -35,7 +35,7 @@ describe('ChartDataGroupingsConfiguration', () => {
   };
 
   function render(
-    element: ReactElement,
+    element: ReactNode,
     initialForms: ChartBuilderForms = testFormState,
   ) {
     return baseRender(

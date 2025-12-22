@@ -1,7 +1,7 @@
 import ApiDataSetVersionSummaryList from '@admin/pages/release/data/components/ApiDataSetVersionSummaryList';
 import { ApiDataSetDraftVersion } from '@admin/services/apiDataSetService';
 import { render as baseRender, screen, within } from '@testing-library/react';
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
 describe('ApiDataSetVersionSummaryList', () => {
@@ -311,7 +311,7 @@ describe('ApiDataSetVersionSummaryList', () => {
     ).toBeInTheDocument();
   });
 
-  function render(ui: ReactElement) {
+  function render(ui: ReactNode) {
     return baseRender(<MemoryRouter>{ui}</MemoryRouter>);
   }
 });

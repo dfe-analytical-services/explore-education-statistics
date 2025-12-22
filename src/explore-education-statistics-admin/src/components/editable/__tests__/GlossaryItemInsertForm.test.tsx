@@ -5,7 +5,7 @@ import baseRender from '@common-test/render';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React, { ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 
 jest.mock('@admin/services/glossaryService');
 
@@ -194,7 +194,7 @@ describe('GlossaryItemInsertForm ', () => {
     expect(handleSubmit).not.toHaveBeenCalled();
   });
 
-  function render(element: ReactElement) {
+  function render(element: ReactNode) {
     baseRender(
       <TestConfigContextProvider>{element}</TestConfigContextProvider>,
     );

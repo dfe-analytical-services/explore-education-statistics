@@ -9,7 +9,7 @@ import _apiDataSetService from '@frontend/services/apiDataSetService';
 import { screen, within } from '@testing-library/react';
 import { times } from 'lodash';
 import { MemoryRouterProvider } from 'next-router-mock/MemoryRouterProvider';
-import React, { ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 
 jest.mock('@frontend/services/apiDataSetService');
 
@@ -281,7 +281,7 @@ describe('DataSetFileApiVersionHistory', () => {
     expect(row3Cells[2]).toHaveTextContent('Withdrawn');
   });
 
-  function render(ui: ReactElement) {
+  function render(ui: ReactNode) {
     return baseRender(<MemoryRouterProvider>{ui}</MemoryRouterProvider>);
   }
 });

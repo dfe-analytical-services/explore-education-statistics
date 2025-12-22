@@ -1,5 +1,5 @@
 import styles from '@common/components/ChevronGrid.module.scss';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, type JSX } from 'react';
 
 interface Props {
   as?: keyof JSX.IntrinsicElements;

@@ -36,9 +36,18 @@ export default function useReleasePublishingStatus({
     text: '',
   });
 
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelTimer = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current); // Use clearTimeout for setTimeout
+      timeoutRef.current = null;
+    }
+  }, []);
 
   const fetchNextStatus = useCallback(async () => {
+    cancelTimer();
+
     const status = await releaseVersionService.getReleaseVersionStatus(
       releaseVersionId,
     );
@@ -66,13 +75,7 @@ export default function useReleasePublishingStatus({
       }
     }
     forceCheck();
-  }, [releaseVersionId, onChange, refreshPeriod]);
-
-  function cancelTimer() {
-    if (timeoutRef.current) {
-      clearInterval(timeoutRef.current);
-    }
-  }
+  }, [cancelTimer, releaseVersionId, onChange, refreshPeriod]);
 
   useEffect(() => {
     fetchNextStatus();
@@ -81,7 +84,7 @@ export default function useReleasePublishingStatus({
       // cleans up the timeout
       cancelTimer();
     };
-  }, [fetchNextStatus]);
+  }, [fetchNextStatus, cancelTimer]);
 
   useEffect(() => {
     if (currentStatus && currentStatus.overallStage) {
@@ -93,7 +96,7 @@ export default function useReleasePublishingStatus({
 
       setStatusDetail(status);
     }
-  }, [currentStatus]);
+  }, [currentStatus, cancelTimer]);
 
   return { currentStatus, currentStatusDetail };
 }
