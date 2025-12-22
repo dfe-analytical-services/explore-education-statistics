@@ -151,7 +151,8 @@ public class DataBlockService : IDataBlockService
                             && rf.File.Type == FileType.Data
                         )
                         .Select(rf => rf.Name)
-                        .SingleAsync() ?? "";
+                        .SingleAsync()
+                    ?? "";
 
                 var featuredTable = await _context.FeaturedTables.SingleOrDefaultAsync(ft =>
                     ft.DataBlockId == dataBlockVersion.Id

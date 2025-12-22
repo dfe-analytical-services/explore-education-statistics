@@ -585,11 +585,8 @@ public class ReplacementPlanService(
         // If the replacement subject contains the same location by id then use it,
         // otherwise try to find a location with the same code
         var target =
-            replacementSubjectMeta.Locations.SingleOrDefault(l => l.Id == location.Id)?.Id ?? FindReplacementLocation(
-                replacementSubjectMeta,
-                level,
-                code
-            );
+            replacementSubjectMeta.Locations.SingleOrDefault(l => l.Id == location.Id)?.Id
+            ?? FindReplacementLocation(replacementSubjectMeta, level, code);
 
         return new LocationAttributeReplacementViewModel(
             id: location.Id,
