@@ -32,7 +32,7 @@ public static class DateTimeOffsetExtensions
     public static DateTimeOffset GetUkStartOfDayUtc(this DateTimeOffset dateTimeOffset)
     {
         // Convert the date and time to the UK time zone
-        var inUkZone = TimeZoneInfo.ConvertTime(dateTimeOffset, UkTimeZone);
+        var inUkZone = dateTimeOffset.ConvertToUkTimeZone();
 
         // Get the date component of that date in the UK time zone (DateTime at midnight)
         var ukMidnightDateTime = inUkZone.Date;
