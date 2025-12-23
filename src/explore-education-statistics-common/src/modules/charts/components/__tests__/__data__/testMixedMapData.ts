@@ -133,6 +133,7 @@ export const testMixedMeta: FullTableMeta = {
     }),
   ],
   geoJsonAvailable: true,
+  isCroppedTable: false,
 };
 
 export const testMixedMapConfiguration: Chart = {

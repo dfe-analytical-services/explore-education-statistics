@@ -42,14 +42,6 @@ const TableQueryError = ({
   const { errorMessage, downloadOptionMessage, nonDownloadOptionMessage } =
     useMemo<ErrorMessageText>(() => {
       switch (errorCode) {
-        case 'QueryExceedsMaxAllowableTableSize':
-          return {
-            errorMessage:
-              'Could not create table as the filters chosen may exceed the maximum allowed table size.',
-            downloadOptionMessage:
-              'Select different filters or download the subject data.',
-            nonDownloadOptionMessage: 'Select different filters and try again.',
-          };
         case 'RequestCancelled':
           return {
             errorMessage:
