@@ -83,7 +83,6 @@ public enum ValidationErrorMessages
     PublishDateCannotBeScheduled,
 
     // Release update
-    ReleasePublishedCannotBeFutureDate,
     ReleaseNotPublished,
     UpdateRequestForPublishedReleaseVersionInvalid,
     ReleaseUndergoingPublishing,

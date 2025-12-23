@@ -17,6 +17,14 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     public DateTimeOffset? Published { get; set; }
 
     /// <summary>
+    /// The date that is displayed as the published date for the release version.
+    /// For first versions, this matches <c>Published</c>. For newer versions,
+    /// this defaults to the previous version's date unless <c>UpdatePublishedDate</c>
+    /// is set during signoff to use the current time when publishing.
+    /// </summary>
+    public DateTimeOffset? PublishedDisplayDate { get; set; }
+
+    /// <summary>
     /// The date that the release version is scheduled to be published - when this time is reached then the release should be published and the Published date set.
     /// </summary>
     public DateTimeOffset? PublishScheduled { get; set; }

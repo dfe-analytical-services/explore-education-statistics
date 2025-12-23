@@ -46,6 +46,11 @@ public static class ReleaseVersionGeneratorExtensions
         DateTimeOffset published
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetPublished(published));
 
+    public static Generator<ReleaseVersion> WithPublishedDisplayDate(
+        this Generator<ReleaseVersion> generator,
+        DateTimeOffset publishedDisplayDate
+    ) => generator.ForInstance(releaseVersion => releaseVersion.SetPublishedDisplayDate(publishedDisplayDate));
+
     public static Generator<ReleaseVersion> WithPublishScheduled(
         this Generator<ReleaseVersion> generator,
         DateTimeOffset publishScheduled
@@ -293,6 +298,11 @@ public static class ReleaseVersionGeneratorExtensions
         this InstanceSetters<ReleaseVersion> setters,
         DateTimeOffset published
     ) => setters.Set(releaseVersion => releaseVersion.Published, published);
+
+    public static InstanceSetters<ReleaseVersion> SetPublishedDisplayDate(
+        this InstanceSetters<ReleaseVersion> setters,
+        DateTimeOffset publishedDisplayDate
+    ) => setters.Set(releaseVersion => releaseVersion.PublishedDisplayDate, publishedDisplayDate);
 
     public static InstanceSetters<ReleaseVersion> SetPublishScheduled(
         this InstanceSetters<ReleaseVersion> setters,

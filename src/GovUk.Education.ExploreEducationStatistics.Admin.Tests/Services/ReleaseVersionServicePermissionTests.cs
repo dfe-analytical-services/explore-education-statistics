@@ -299,7 +299,7 @@ public class ReleaseVersionServicePermissionTests
     }
 
     [Fact]
-    public async Task UpdateReleasePublished()
+    public async Task UpdatePublishedDisplayDate()
     {
         ReleaseVersion releaseVersion = _dataFixture
             .DefaultReleaseVersion()
@@ -315,7 +315,10 @@ public class ReleaseVersionServicePermissionTests
 
                 var service = BuildService(contentDbContext: contextDbContext, userService: userService.Object);
 
-                return await service.UpdateReleasePublished(releaseVersion.Id, new ReleasePublishedUpdateRequest());
+                return await service.UpdatePublishedDisplayDate(
+                    releaseVersion.Id,
+                    new ReleaseVersionPublishedDisplayDateUpdateRequest()
+                );
             });
     }
 
