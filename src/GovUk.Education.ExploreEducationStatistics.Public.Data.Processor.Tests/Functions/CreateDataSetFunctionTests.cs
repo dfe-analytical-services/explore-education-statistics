@@ -1,15 +1,17 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.DurableTask;
@@ -19,13 +21,36 @@ using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
-    : ProcessorFunctionsIntegrationTest(fixture)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class CreateDataSetFunctionTestsFixture()
+    : OptimisedPublicDataProcessorCollectionFixture(
+        capabilities: [PublicDataProcessorIntegrationTestCapability.Postgres]
+    )
 {
-    public class CreateDataSetTests(ProcessorFunctionsIntegrationTestFixture fixture)
-        : CreateDataSetFunctionTests(fixture)
+    public CreateDataSetFunction Function = null!;
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+
+        Function = lookups.GetService<CreateDataSetFunction>();
+    }
+}
+
+[CollectionDefinition(nameof(CreateDataSetFunctionTestsFixture))]
+public class CreateDataSetFunctionTestsCollection : ICollectionFixture<CreateDataSetFunctionTestsFixture>;
+
+[Collection(nameof(CreateDataSetFunctionTestsFixture))]
+public abstract class CreateDataSetFunctionTests(CreateDataSetFunctionTestsFixture fixture)
+    : OptimisedFunctionAppIntegrationTestBase(fixture)
+{
+    private static readonly DataFixture DataFixture = new();
+
+    public class CreateDataSetTests(CreateDataSetFunctionTestsFixture fixture) : CreateDataSetFunctionTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -47,10 +72,12 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
                 ])
                 .GenerateTuple2();
 
-            await AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.AddRange(releaseFile, releaseMetaFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.AddRange(releaseFile, releaseMetaFile);
+                });
 
             var durableTaskClientMock = new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient");
 
@@ -85,13 +112,13 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
 
             var responseViewModel = result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
             // Assert a single data set was created
             var dataSet = Assert.Single(
-                await publicDataDbContext
+                await fixture
+                    .GetPublicDataDbContext()
                     .DataSets.Include(ds => ds.Versions)
                         .ThenInclude(dsv => dsv.Imports)
+                    .Where(ds => ds.PublicationId == publication.Id)
                     .ToListAsync()
             );
 
@@ -183,17 +210,21 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
                 .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
                 .WithDataSet(dataSet);
 
-            await AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
-            await AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSets.Add(dataSet);
-                context.SaveChanges();
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSets.Add(dataSet);
+                    context.SaveChanges();
 
-                context.DataSetVersions.Add(dataSetVersion);
-            });
+                    context.DataSetVersions.Add(dataSetVersion);
+                });
 
             var result = await CreateDataSet(releaseFileId: releaseFile.Id);
 
@@ -223,10 +254,12 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
                 ])
                 .GenerateTuple2();
 
-            await AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.AddRange(releaseFile, releaseMetaFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.AddRange(releaseFile, releaseMetaFile);
+                });
 
             var result = await CreateDataSet(releaseFileId: releaseFile.Id);
 
@@ -250,10 +283,12 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
                 .WithReleaseVersion(publication.Releases.Single().Versions.Single())
                 .WithFile(DataFixture.DefaultFile(FileType.Ancillary));
 
-            await AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             var result = await CreateDataSet(releaseFileId: releaseFile.Id);
 
@@ -277,10 +312,12 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
                 .WithReleaseVersion(publication.Releases.Single().Versions.Single())
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
-            await AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             var result = await CreateDataSet(releaseFileId: releaseFile.Id);
 
@@ -294,8 +331,7 @@ public abstract class CreateDataSetFunctionTests(ProcessorFunctionsIntegrationTe
 
         private async Task<IActionResult> CreateDataSet(Guid releaseFileId, DurableTaskClient? durableTaskClient = null)
         {
-            var function = GetRequiredService<CreateDataSetFunction>();
-            return await function.CreateDataSet(
+            return await fixture.Function.CreateDataSet(
                 new DataSetCreateRequest { ReleaseFileId = releaseFileId },
                 durableTaskClient ?? new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient").Object,
                 CancellationToken.None
