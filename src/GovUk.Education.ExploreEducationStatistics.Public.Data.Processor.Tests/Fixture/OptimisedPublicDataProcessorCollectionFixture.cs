@@ -3,10 +3,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
@@ -50,6 +50,10 @@ public class OptimisedPublicDataProcessorCollectionFixture(
     private AzuriteWrapper _azuriteWrapper = null!;
 
     private PublicDataDbContext? _publicDataDbContext;
+    private ContentDbContext _contentDbContext = null!;
+
+    private IPrivateBlobStorageService _privateBlobStorageService = null!;
+
     private IDataSetVersionPathResolver _dataSetVersionPathResolver = null!;
 
     protected override void RegisterTestContainers(TestContainerRegistrations registrations)
@@ -71,6 +75,8 @@ public class OptimisedPublicDataProcessorCollectionFixture(
     {
         serviceModifications.AddHostBuilderModifications(hostBuilder => hostBuilder.ConfigureProcessorHostBuilder());
 
+        serviceModifications.AddInMemoryDbContext<ContentDbContext>(databaseName: Guid.NewGuid().ToString());
+
         if (capabilities.Contains(PublicDataProcessorIntegrationTestCapability.Postgres))
         {
             serviceModifications.AddPostgres<PublicDataDbContext>(_psqlConnectionString());
@@ -84,7 +90,7 @@ public class OptimisedPublicDataProcessorCollectionFixture(
         {
             serviceModifications.AddAzurite(
                 connectionString: _azuriteWrapper.GetConnectionString(),
-                connectionStringKeys: ["CoreStorage"]
+                connectionStringKeys: ["App:PrivateStorageConnectionString"]
             );
         }
         else
@@ -92,8 +98,11 @@ public class OptimisedPublicDataProcessorCollectionFixture(
             serviceModifications.ReplaceServiceWithMock<IPrivateBlobStorageService>();
         }
 
-        _dataSetVersionPathResolver = new TestDataSetVersionPathResolver();
-        serviceModifications.ReplaceService(_dataSetVersionPathResolver);
+        var dataFilesBasePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+        serviceModifications.AddInMemoryCollection([
+            new KeyValuePair<string, string?>("DataFiles:BasePath", dataFilesBasePath),
+        ]);
 
         serviceModifications.AddSingleton<CreateDataSetFunction>();
         serviceModifications.AddSingleton<CompleteInitialDataSetVersionProcessingFunction>();
@@ -118,6 +127,10 @@ public class OptimisedPublicDataProcessorCollectionFixture(
         // per startup of a test class that uses this fixture and are disposed of at the end of its lifetime, via XUnit
         // calling "DisposeAsync" on this fixture.
         _publicDataDbContext = lookups.GetService<PublicDataDbContext>();
+        _contentDbContext = lookups.GetService<ContentDbContext>();
+
+        _dataSetVersionPathResolver = lookups.GetService<IDataSetVersionPathResolver>();
+        _privateBlobStorageService = lookups.GetService<IPrivateBlobStorageService>();
 
         if (capabilities.Contains(PublicDataProcessorIntegrationTestCapability.Postgres))
         {
@@ -145,6 +158,8 @@ public class OptimisedPublicDataProcessorCollectionFixture(
         {
             await _publicDataDbContext.DisposeAsync();
         }
+
+        await _contentDbContext.DisposeAsync();
     }
 
     /// <summary>
@@ -152,7 +167,14 @@ public class OptimisedPublicDataProcessorCollectionFixture(
     /// </summary>
     public PublicDataDbContext GetPublicDataDbContext() => _publicDataDbContext!;
 
+    /// <summary>
+    /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
+    /// </summary>
+    public ContentDbContext GetContentDbContext() => _contentDbContext;
+
     public IDataSetVersionPathResolver GetDataSetVersionPathResolver() => _dataSetVersionPathResolver;
+
+    public IPrivateBlobStorageService GetPrivateBlobStorageService() => _privateBlobStorageService;
 
     /// <summary>
     /// This method is run prior to each individual test in a collection. Here we reset any commonly-used mocks and
@@ -161,6 +183,7 @@ public class OptimisedPublicDataProcessorCollectionFixture(
     public override Task BeforeEachTest()
     {
         ResetIfMock(_publicDataDbContext);
+        ResetIfMock(_contentDbContext);
 
         return Task.CompletedTask;
     }
