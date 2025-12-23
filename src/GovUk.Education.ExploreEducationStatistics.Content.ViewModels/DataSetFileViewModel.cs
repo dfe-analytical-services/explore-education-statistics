@@ -49,7 +49,7 @@ public record DataSetFileReleaseViewModel
 
     public required bool IsSuperseded { get; init; }
 
-    public required DateTime Published { get; init; }
+    public required DateTimeOffset Published { get; init; }
 
     public DateTime LastUpdated { get; init; }
 

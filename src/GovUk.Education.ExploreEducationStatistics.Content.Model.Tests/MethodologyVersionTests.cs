@@ -54,7 +54,7 @@ public class MethodologyVersionTests
     [Fact]
     public void ScheduledForPublishingWithPublishedRelease_TrueWhenScheduledWithLiveRelease()
     {
-        var liveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Published = DateTime.UtcNow };
+        var liveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Published = DateTimeOffset.UtcNow };
 
         var methodology = new MethodologyVersion
         {

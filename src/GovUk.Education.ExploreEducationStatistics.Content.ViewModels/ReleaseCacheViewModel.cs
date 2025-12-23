@@ -30,7 +30,7 @@ public record ReleaseCacheViewModel(Guid Id)
 
     public PartialDate? NextReleaseDate { get; set; }
 
-    public DateTime? Published { get; set; }
+    public DateTimeOffset? Published { get; set; }
 
     public List<OrganisationViewModel> PublishingOrganisations { get; init; } = [];
 

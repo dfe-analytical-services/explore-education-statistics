@@ -18,9 +18,9 @@ public record PublicationReleaseEntryDto : PublicationReleaseEntryBaseDto
 
     public required string? Label { get; init; }
 
-    public required DateTime LastUpdated { get; init; }
+    public required DateTimeOffset LastUpdated { get; init; }
 
-    public required DateTime Published { get; init; }
+    public required DateTimeOffset Published { get; init; }
 
     public required string Slug { get; init; }
 
@@ -31,8 +31,8 @@ public record PublicationReleaseEntryDto : PublicationReleaseEntryBaseDto
     public static PublicationReleaseEntryDto FromRelease(
         Release release,
         bool isLatestRelease,
-        DateTime lastUpdated,
-        DateTime published
+        DateTimeOffset lastUpdated,
+        DateTimeOffset published
     ) =>
         new()
         {

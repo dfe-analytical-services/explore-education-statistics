@@ -86,7 +86,7 @@ public class ContentBlockLockServiceTests
             Assert.Equal("Jane Doe", viewModel.LockedBy.DisplayName);
             Assert.Equal("jane@test.com", viewModel.LockedBy.Email);
 
-            Assert.True(DateTime.UtcNow > viewModel.Locked);
+            Assert.True(DateTimeOffset.UtcNow > viewModel.Locked);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -164,7 +164,7 @@ public class ContentBlockLockServiceTests
             Assert.Equal("Jane Doe", viewModel.LockedBy.DisplayName);
             Assert.Equal("jane@test.com", viewModel.LockedBy.Email);
 
-            Assert.True(DateTime.UtcNow > viewModel.Locked);
+            Assert.True(DateTimeOffset.UtcNow > viewModel.Locked);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -260,7 +260,7 @@ public class ContentBlockLockServiceTests
             Assert.Equal("Jane Doe", viewModel.LockedBy.DisplayName);
             Assert.Equal("jane@test.com", viewModel.LockedBy.Email);
 
-            Assert.True(DateTime.UtcNow > viewModel.Locked);
+            Assert.True(DateTimeOffset.UtcNow > viewModel.Locked);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -345,7 +345,7 @@ public class ContentBlockLockServiceTests
             Assert.Equal("Jane Doe", viewModel.LockedBy.DisplayName);
             Assert.Equal("jane@test.com", viewModel.LockedBy.Email);
 
-            Assert.True(DateTime.UtcNow > viewModel.Locked);
+            Assert.True(DateTimeOffset.UtcNow > viewModel.Locked);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -508,7 +508,7 @@ public class ContentBlockLockServiceTests
             Assert.Equal("Jane Doe", viewModel1.LockedBy.DisplayName);
             Assert.Equal("jane@test.com", viewModel1.LockedBy.Email);
 
-            Assert.True(DateTime.UtcNow > viewModel1.Locked);
+            Assert.True(DateTimeOffset.UtcNow > viewModel1.Locked);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))

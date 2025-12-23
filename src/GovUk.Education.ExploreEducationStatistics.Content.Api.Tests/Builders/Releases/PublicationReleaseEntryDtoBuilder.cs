@@ -7,8 +7,8 @@ public class PublicationReleaseEntryDtoBuilder
     private Guid _releaseId = Guid.NewGuid();
     private bool _isLatestRelease;
     private string? _label = "Label";
-    private DateTime _lastUpdated = new(2025, 9, 1, 8, 30, 0, DateTimeKind.Utc);
-    private DateTime _published = new(2025, 8, 1, 8, 30, 0, DateTimeKind.Utc);
+    private DateTimeOffset _lastUpdated = new(2025, 9, 1, 8, 30, 0, TimeSpan.Zero);
+    private DateTimeOffset _published = new(2025, 8, 1, 8, 30, 0, TimeSpan.Zero);
     private string _slug = "Slug";
     private string _title = "Title";
     private string _coverageTitle = "Calendar year";
@@ -46,13 +46,13 @@ public class PublicationReleaseEntryDtoBuilder
         return this;
     }
 
-    public PublicationReleaseEntryDtoBuilder WithLastUpdated(DateTime lastUpdated)
+    public PublicationReleaseEntryDtoBuilder WithLastUpdated(DateTimeOffset lastUpdated)
     {
         _lastUpdated = lastUpdated;
         return this;
     }
 
-    public PublicationReleaseEntryDtoBuilder WithPublished(DateTime published)
+    public PublicationReleaseEntryDtoBuilder WithPublished(DateTimeOffset published)
     {
         _published = published;
         return this;

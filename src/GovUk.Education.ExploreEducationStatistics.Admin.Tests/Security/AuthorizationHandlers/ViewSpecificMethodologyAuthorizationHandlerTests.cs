@@ -273,7 +273,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .Setup(s =>
                     s.GetPreReleaseWindowStatus(
                         It.Is<ReleaseVersion>(rv => rv.Id == preReleaseForConnectedPublication.Id),
-                        It.IsAny<DateTime>()
+                        It.IsAny<DateTimeOffset>()
                     )
                 )
                 .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
@@ -353,7 +353,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .Setup(s =>
                     s.GetPreReleaseWindowStatus(
                         It.Is<ReleaseVersion>(rv => rv.Id == preReleaseForConnectedPublication.Id),
-                        It.IsAny<DateTime>()
+                        It.IsAny<DateTimeOffset>()
                     )
                 )
                 .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Before });
@@ -452,7 +452,7 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 Id = Guid.NewGuid(),
                 PublicationId = Guid.NewGuid(),
                 ApprovalStatus = ReleaseApprovalStatus.Approved,
-                Published = DateTime.UtcNow,
+                Published = DateTimeOffset.UtcNow,
             };
 
             var (

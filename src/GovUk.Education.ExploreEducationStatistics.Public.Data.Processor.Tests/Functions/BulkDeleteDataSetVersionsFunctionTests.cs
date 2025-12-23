@@ -53,7 +53,7 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
                 .WithPublication(publication)
                 .WithRelease(release)
                 .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-                .WithPublished(DateTime.UtcNow)
+                .WithPublished(DateTimeOffset.UtcNow)
                 .WithVersion(0);
 
             ReleaseVersion targetReleaseVersion = DataFixture
@@ -306,7 +306,7 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
                 .WithPublication(publication)
                 .WithRelease(release1)
                 .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-                .WithPublished(DateTime.UtcNow)
+                .WithPublished(DateTimeOffset.UtcNow)
                 .WithVersion(0);
 
             ReleaseVersion release2Version1 = DataFixture
@@ -314,7 +314,7 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(ProcessorFunctionsI
                 .WithPublication(publication)
                 .WithRelease(release2)
                 .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-                .WithPublished(DateTime.UtcNow)
+                .WithPublished(DateTimeOffset.UtcNow)
                 .WithVersion(0);
 
             ReleaseVersion release2Version2 = DataFixture

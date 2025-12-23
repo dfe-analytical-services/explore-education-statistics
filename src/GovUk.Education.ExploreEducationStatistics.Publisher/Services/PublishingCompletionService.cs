@@ -51,7 +51,7 @@ public class PublishingCompletionService(
 
         await releaseVersionIdsToUpdate
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(releaseId => releaseService.CompletePublishing(releaseId, DateTime.UtcNow));
+            .ForEachAwaitAsync(releaseId => releaseService.CompletePublishing(releaseId, DateTimeOffset.UtcNow));
 
         await releaseVersionIdsToUpdate
             .ToAsyncEnumerable()

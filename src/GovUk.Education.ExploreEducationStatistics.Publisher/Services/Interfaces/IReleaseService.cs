@@ -17,5 +17,5 @@ public interface IReleaseService
         IReadOnlyList<Guid>? includeUnpublishedVersionIds = null
     );
 
-    Task CompletePublishing(Guid releaseVersionId, DateTime actualPublishedDate);
+    Task CompletePublishing(Guid releaseVersionId, DateTimeOffset actualPublishedDate);
 }

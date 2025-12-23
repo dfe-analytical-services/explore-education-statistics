@@ -59,9 +59,9 @@ public class ContentBlockLockService(
             throw new ArgumentException($"Active user with id {userId} does not exist", nameof(userId));
         }
 
-        var now = DateTime.UtcNow;
+        var now = DateTimeOffset.UtcNow;
 
-        block.Locked = now;
+        block.Locked = now.UtcDateTime;
         block.LockedById = user.Id;
 
         contentDbContext.ContentBlocks.Update(block);

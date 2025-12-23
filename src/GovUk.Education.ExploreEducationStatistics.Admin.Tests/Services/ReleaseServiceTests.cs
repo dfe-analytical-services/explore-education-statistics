@@ -447,7 +447,7 @@ public abstract class ReleaseServiceTests
             var releaseVersion = _dataFixture
                 .DefaultReleaseVersion()
                 .WithRelease(release)
-                .WithPublished(new DateTime(2025, 04, 01, 09, 16, 00)) // Release Version is live (ie has been published)
+                .WithPublished(new DateTimeOffset(2025, 4, 1, 9, 16, 0, TimeSpan.Zero)) // Release Version is live (ie has been published)
                 .Generate();
 
             var dbContextId = Guid.NewGuid().ToString();
@@ -604,7 +604,7 @@ public abstract class ReleaseServiceTests
             var releaseVersion = _dataFixture
                 .DefaultReleaseVersion()
                 .WithRelease(release)
-                .WithPublished(new DateTime(2025, 04, 01, 09, 16, 00)) // Release Version is live (ie has been published)
+                .WithPublished(new DateTimeOffset(2025, 4, 1, 9, 16, 0, TimeSpan.Zero)) // Release Version is live (ie has been published)
                 .Generate();
 
             await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());

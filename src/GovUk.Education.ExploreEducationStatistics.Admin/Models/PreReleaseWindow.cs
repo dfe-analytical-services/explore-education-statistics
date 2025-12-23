@@ -2,7 +2,7 @@
 
 public class PreReleaseWindow
 {
-    public DateTime Start { get; set; }
+    public DateTimeOffset Start { get; set; }
 
-    public DateTime ScheduledPublishDate { get; set; }
+    public DateTimeOffset ScheduledPublishDate { get; set; }
 }

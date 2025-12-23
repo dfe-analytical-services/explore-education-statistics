@@ -329,7 +329,7 @@ public abstract class PublicationsControllerTests(PublicationsControllerTestsFix
                             .SetDefault(f => f.Title)
                             .SetDefault(f => f.Slug)
                             .SetDefault(f => f.Summary)
-                            .Set(f => f.Published, f => f.Date.Past())
+                            .Set(f => f.Published, f => f.Date.PastOffset())
                     );
 
                 var contentApiClientMock = fixture.GetContentApiClientMock();
@@ -434,7 +434,7 @@ public abstract class PublicationsControllerTests(PublicationsControllerTestsFix
                 PublishedPublicationSummaryViewModel publication = DataFixture
                     .Generator<PublishedPublicationSummaryViewModel>()
                     .ForInstance(s => s.Set(f => f.Id, Guid.NewGuid))
-                    .ForInstance(s => s.Set(f => f.Published, f => f.Date.Past()));
+                    .ForInstance(s => s.Set(f => f.Published, f => f.Date.PastOffset()));
 
                 var contentApiClientMock = fixture.GetContentApiClientMock();
 
