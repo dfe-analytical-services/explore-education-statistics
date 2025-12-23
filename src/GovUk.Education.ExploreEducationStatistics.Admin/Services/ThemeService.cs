@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -19,8 +20,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -36,6 +35,8 @@ public class ThemeService(
     IReleaseVersionService releaseVersionService,
     IAdminEventRaiser eventRaiser,
     IPublicationCacheService publicationCacheService,
+    IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
     ILogger<ThemeService> logger
 ) : IThemeService
 {
@@ -309,22 +310,20 @@ public class ThemeService(
     {
         var userId = userService.GetUserId();
 
-        return await contentDbContext
-            .UserReleaseRoles.AsQueryable()
-            .Where(userReleaseRole =>
-                userReleaseRole.UserId == userId && userReleaseRole.Role != ReleaseRole.PrereleaseViewer
-            )
-            .Select(userReleaseRole => userReleaseRole.ReleaseVersion.Publication)
+        return await userReleaseRoleRepository
+            .Query()
+            .AsNoTracking()
+            .WhereForUser(userId)
+            .WhereRolesNotIn(ReleaseRole.PrereleaseViewer)
+            .Select(userReleaseRole => userReleaseRole.ReleaseVersion.Release.Publication.Theme)
             .Concat(
-                contentDbContext
-                    .UserPublicationRoles.AsQueryable()
-                    .Where(userPublicationRole =>
-                        userPublicationRole.UserId == userId
-                        && ListOf(Owner, Allower).Contains(userPublicationRole.Role)
-                    )
-                    .Select(userPublicationRole => userPublicationRole.Publication)
+                userPublicationRoleRepository
+                    .Query()
+                    .AsNoTracking()
+                    .WhereForUser(userId)
+                    .WhereRolesIn([PublicationRole.Owner, PublicationRole.Allower])
+                    .Select(userPublicationRole => userPublicationRole.Publication.Theme)
             )
-            .Select(publication => publication.Theme)
             .Distinct()
             .ToListAsync();
     }

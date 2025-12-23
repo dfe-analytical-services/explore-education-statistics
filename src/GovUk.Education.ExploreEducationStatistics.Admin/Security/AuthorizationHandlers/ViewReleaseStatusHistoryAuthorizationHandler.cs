@@ -31,11 +31,11 @@ public class ViewReleaseStatusHistoryAuthorizationHandler
         }
 
         if (
-            await _authorizationHandlerService.HasRolesOnPublicationOrReleaseVersion(
+            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrReleaseVersion(
                 context.User.GetUserId(),
                 releaseVersion.PublicationId,
                 releaseVersion.Id,
-                ListOf(PublicationRole.Owner, PublicationRole.Allower),
+                SetOf(PublicationRole.Owner, PublicationRole.Allower),
                 UnrestrictedReleaseViewerRoles
             )
         )

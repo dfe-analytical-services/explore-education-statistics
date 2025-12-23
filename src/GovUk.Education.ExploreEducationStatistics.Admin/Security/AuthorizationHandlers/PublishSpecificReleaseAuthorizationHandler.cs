@@ -36,12 +36,12 @@ public class PublishSpecificReleaseAuthorizationHandler
         }
 
         if (
-            await _authorizationHandlerService.HasRolesOnPublicationOrReleaseVersion(
+            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrReleaseVersion(
                 context.User.GetUserId(),
                 releaseVersion.PublicationId,
                 releaseVersion.Id,
-                ListOf(PublicationRole.Owner),
-                ListOf(ReleaseRole.Approver)
+                SetOf(PublicationRole.Owner),
+                SetOf(ReleaseRole.Approver)
             )
         )
         {

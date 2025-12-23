@@ -147,16 +147,6 @@ public class UserManagementServicePermissionTests
 
                 userService.Setup(mock => mock.GetUserId()).Returns(CreatedById);
 
-                var userPublicationInviteRepository = new Mock<IUserPublicationInviteRepository>(Strict);
-                userPublicationInviteRepository
-                    .Setup(mock => mock.RemoveByUserEmail(user.Email, It.IsAny<CancellationToken>()))
-                    .Returns(Task.CompletedTask);
-
-                var userReleaseInviteRepository = new Mock<IUserReleaseInviteRepository>(Strict);
-                userReleaseInviteRepository
-                    .Setup(mock => mock.RemoveByUserEmail(user.Email, It.IsAny<CancellationToken>()))
-                    .Returns(Task.CompletedTask);
-
                 var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
                 userReleaseRoleRepository
                     .Setup(mock => mock.RemoveForUser(user.Id, It.IsAny<CancellationToken>()))
@@ -185,8 +175,6 @@ public class UserManagementServicePermissionTests
                     usersAndRolesDbContext: usersAndRolesDbContext,
                     userService: userService.Object,
                     userRepository: userRepository.Object,
-                    userPublicationInviteRepository: userPublicationInviteRepository.Object,
-                    userReleaseInviteRepository: userReleaseInviteRepository.Object,
                     userPublicationRoleRepository: userPublicationRoleRepository.Object,
                     userReleaseRoleRepository: userReleaseRoleRepository.Object,
                     userManager: userManager.Object
@@ -194,14 +182,7 @@ public class UserManagementServicePermissionTests
 
                 var result = await service.DeleteUser(user.Email);
 
-                VerifyAllMocks(
-                    userRepository,
-                    userPublicationInviteRepository,
-                    userReleaseInviteRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository,
-                    userManager
-                );
+                VerifyAllMocks(userRepository, userPublicationRoleRepository, userReleaseRoleRepository, userManager);
 
                 return result;
             });
@@ -211,14 +192,12 @@ public class UserManagementServicePermissionTests
         ContentDbContext? contentDbContext = null,
         UsersAndRolesDbContext? usersAndRolesDbContext = null,
         IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
-        IEmailTemplateService? emailTemplateService = null,
         IUserRoleService? userRoleService = null,
         IUserRepository? userRepository = null,
         IUserService? userService = null,
-        IUserReleaseInviteRepository? userReleaseInviteRepository = null,
-        IUserPublicationInviteRepository? userPublicationInviteRepository = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+        IUserResourceRoleNotificationService? userResourceRoleNotificationService = null,
         UserManager<ApplicationUser>? userManager = null
     )
     {
@@ -229,14 +208,12 @@ public class UserManagementServicePermissionTests
             usersAndRolesDbContext,
             contentDbContext,
             usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
-            emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
             userRoleService ?? Mock.Of<IUserRoleService>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
             userService ?? AlwaysTrueUserService(CreatedById).Object,
-            userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict),
-            userPublicationInviteRepository ?? Mock.Of<IUserPublicationInviteRepository>(Strict),
             userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+            userResourceRoleNotificationService ?? Mock.Of<IUserResourceRoleNotificationService>(Strict),
             userManager ?? MockUserManager().Object
         );
     }

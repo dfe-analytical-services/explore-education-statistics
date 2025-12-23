@@ -654,8 +654,18 @@ public class ContentDbContext : DbContext
     {
         modelBuilder
             .Entity<UserPublicationRole>()
+            .HasIndex(upr => new
+            {
+                upr.UserId,
+                upr.PublicationId,
+                upr.Role,
+            })
+            .IsUnique();
+
+        modelBuilder
+            .Entity<UserPublicationRole>()
             .Property(upr => upr.Created)
-            .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
         modelBuilder
             .Entity<UserPublicationRole>()
@@ -680,8 +690,18 @@ public class ContentDbContext : DbContext
     {
         modelBuilder
             .Entity<UserReleaseRole>()
+            .HasIndex(urr => new
+            {
+                urr.UserId,
+                urr.ReleaseVersionId,
+                urr.Role,
+            })
+            .IsUnique();
+
+        modelBuilder
+            .Entity<UserReleaseRole>()
             .Property(userReleaseRole => userReleaseRole.Created)
-            .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
         modelBuilder
             .Entity<UserReleaseRole>()

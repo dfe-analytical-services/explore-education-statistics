@@ -2,9 +2,10 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.Extensions.Logging;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
@@ -18,35 +19,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public class DeleteSpecificReleaseAuthorizationHandlerTests
 {
+    private static readonly DataFixture _dataFixture = new();
+
     public class ClaimsTests
     {
         [Fact]
         public async Task DeleteSpecificReleaseAuthorizationHandler_NotAmendment()
         {
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                .WithVersion(0)
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
             // Assert that no users can delete the first version of a release
             await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, DeleteSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion { ApprovalStatus = ReleaseApprovalStatus.Draft, Version = 0 }
+                releaseVersion
             );
         }
 
         [Fact]
         public async Task DeleteSpecificReleaseAuthorizationHandler_AmendmentButApproved()
         {
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithVersion(1)
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
             // Assert that no users can delete an amendment release version that is approved
             await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, DeleteSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion { ApprovalStatus = ReleaseApprovalStatus.Approved, Version = 1 }
+                releaseVersion
             );
         }
 
         [Fact]
         public async Task DeleteSpecificReleaseAuthorizationHandler_UnapprovedAmendment()
         {
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                .WithVersion(1)
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
             // Assert that users with the "DeleteAllReleaseAmendments" claim can delete an amendment release version that is not yet approved
             await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, DeleteSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion { ApprovalStatus = ReleaseApprovalStatus.Draft, Version = 1 },
+                releaseVersion,
                 DeleteAllReleaseAmendments
             );
         }
@@ -57,12 +78,11 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
         [Fact]
         public async Task DeleteSpecificReleaseAuthorizationHandler_NotAmendment()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication { Id = Guid.NewGuid() },
-                ApprovalStatus = ReleaseApprovalStatus.Draft,
-                Version = 0,
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                .WithVersion(0)
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
             // Assert that no User Publication roles will allow deleting the first version of a release
             await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
@@ -74,12 +94,11 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
         [Fact]
         public async Task DeleteSpecificReleaseAuthorizationHandler_AmendmentButApproved()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication { Id = Guid.NewGuid() },
-                ApprovalStatus = ReleaseApprovalStatus.Approved,
-                Version = 1,
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithVersion(1)
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
             // Assert that no User Publication roles will allow deleting an amendment release version when it is Approved
             await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
@@ -91,22 +110,15 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
         [Fact]
         public async Task DeleteSpecificReleaseAuthorizationHandler_UnapprovedAmendment()
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication { Id = Guid.NewGuid() },
-                ApprovalStatus = ReleaseApprovalStatus.Draft,
-                Version = 1,
-            };
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                .WithVersion(1)
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
             // Assert that users with the Publication Owner role on an amendment release version can delete if it is not yet approved
             await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
-                contentDbContext =>
-                {
-                    contentDbContext.Add(releaseVersion);
-                    contentDbContext.SaveChanges();
-
-                    return CreateHandler(contentDbContext);
-                },
+                CreateHandler,
                 releaseVersion,
                 Owner
             );
@@ -118,55 +130,55 @@ public class DeleteSpecificReleaseAuthorizationHandlerTests
         [Fact]
         public async Task DeleteSpecificReleaseAuthorizationHandler_NotAmendment()
         {
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                .WithVersion(0)
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
             // Assert that no User Release roles will allow deleting the first version of a release
             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion
-                {
-                    Publication = new Publication { Id = Guid.NewGuid() },
-                    ApprovalStatus = ReleaseApprovalStatus.Draft,
-                    Version = 0,
-                }
+                releaseVersion
             );
         }
 
         [Fact]
         public async Task DeleteSpecificReleaseAuthorizationHandler_AmendmentButApproved()
         {
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithVersion(1)
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
             // Assert that no User Release roles will allow deleting an amendment release version when it is Approved
             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion
-                {
-                    Publication = new Publication { Id = Guid.NewGuid() },
-                    ApprovalStatus = ReleaseApprovalStatus.Approved,
-                    Version = 1,
-                }
+                releaseVersion
             );
         }
 
         [Fact]
         public async Task DeleteSpecificReleaseAuthorizationHandler_UnapprovedAmendment()
         {
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                .WithVersion(1)
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
             // Assert that no User Release roles will allow an amendment release version to be deleted if it is not yet approved
             await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
                 CreateHandler,
-                new ReleaseVersion
-                {
-                    Publication = new Publication { Id = Guid.NewGuid() },
-                    ApprovalStatus = ReleaseApprovalStatus.Draft,
-                    Version = 1,
-                }
+                releaseVersion
             );
         }
     }
 
     private static DeleteSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
-        var userReleaseRoleRepository = new UserReleaseRoleRepository(
-            contentDbContext,
-            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
-        );
+        var userReleaseRoleRepository = new UserReleaseRoleRepository(contentDbContext);
 
         var userPublicationRoleRepository = new UserPublicationRoleRepository(contentDbContext);
 

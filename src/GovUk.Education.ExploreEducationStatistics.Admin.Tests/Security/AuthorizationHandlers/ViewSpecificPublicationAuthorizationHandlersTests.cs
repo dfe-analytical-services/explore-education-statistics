@@ -7,8 +7,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
@@ -21,10 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
 public class ViewSpecificPublicationAuthorizationHandlersTests
 {
-    private readonly Guid _userId = Guid.NewGuid();
-
-    private readonly Publication _publication = new() { Id = Guid.NewGuid() };
-
     private readonly DataFixture _fixture = new();
 
     [Fact]
@@ -34,7 +30,7 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
         // (and no other claim allows this)
         await AssertHandlerSucceedsWithCorrectClaims<Publication, ViewSpecificPublicationRequirement>(
             context => CreateHandler(context),
-            _publication,
+            _fixture.DefaultPublication(),
             AccessAllPublications
         );
     }
@@ -51,32 +47,30 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
     [Fact]
     public async Task HasRoleOnAnyChildReleaseAuthorizationHandler_NoReleasesOnThisPublicationForThisUser()
     {
-        var releaseVersionOnAnotherPublication = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-            PublicationId = Guid.NewGuid(),
-        };
+        Publication thisPublication = _fixture.DefaultPublication();
+        User thisUser = _fixture.DefaultUser();
 
-        var releaseVersionOnThisPublication = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-            PublicationId = _publication.Id,
-        };
+        ReleaseVersion releaseVersionOnAnotherPublication = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-        var releaseRoleForDifferentPublication = new UserReleaseRole
-        {
-            UserId = _userId,
-            ReleaseVersion = releaseVersionOnAnotherPublication,
-        };
+        ReleaseVersion releaseVersionOnThisPublication = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease().WithPublication(thisPublication));
 
-        var releaseRoleForDifferentUser = new UserReleaseRole
-        {
-            UserId = Guid.NewGuid(),
-            ReleaseVersion = releaseVersionOnThisPublication,
-        };
+        UserReleaseRole releaseRoleForDifferentPublication = _fixture
+            .DefaultUserReleaseRole()
+            .WithUser(thisUser)
+            .WithReleaseVersion(releaseVersionOnAnotherPublication);
+
+        UserReleaseRole releaseRoleForDifferentUser = _fixture
+            .DefaultUserReleaseRole()
+            .WithReleaseVersion(releaseVersionOnThisPublication);
 
         await AssertHasRoleOnAnyChildReleaseHandlesOk(
-            false,
+            expectedToSucceed: false,
+            user: thisUser,
+            publication: thisPublication,
             releaseRoleForDifferentPublication,
             releaseRoleForDifferentUser
         );
@@ -85,43 +79,49 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
     [Fact]
     public async Task HasRoleOnAnyChildReleaseAuthorizationHandler_HasRoleOnAReleaseOfThisPublication()
     {
-        var releaseVersionOnThisPublication = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-            PublicationId = _publication.Id,
-        };
+        Publication thisPublication = _fixture.DefaultPublication();
+        User thisUser = _fixture.DefaultUser();
 
-        var roleOnThisPublication = new UserReleaseRole
-        {
-            UserId = _userId,
-            ReleaseVersion = releaseVersionOnThisPublication,
-        };
+        ReleaseVersion releaseVersionOnThisPublication = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease().WithPublication(thisPublication));
 
-        await AssertHasRoleOnAnyChildReleaseHandlesOk(true, roleOnThisPublication);
+        UserReleaseRole roleOnThisPublication = _fixture
+            .DefaultUserReleaseRole()
+            .WithUser(thisUser)
+            .WithReleaseVersion(releaseVersionOnThisPublication);
+
+        await AssertHasRoleOnAnyChildReleaseHandlesOk(
+            expectedToSucceed: true,
+            user: thisUser,
+            publication: thisPublication,
+            roleOnThisPublication
+        );
     }
 
     private async Task AssertHasRoleOnAnyChildReleaseHandlesOk(
         bool expectedToSucceed,
+        User user,
+        Publication publication,
         params UserReleaseRole[] releaseRoles
     )
     {
-        await using (var context = DbUtils.InMemoryApplicationDbContext())
-        {
-            context.UserReleaseRoles.AddRange(releaseRoles);
-            await context.SaveChangesAsync();
+        await using var context = DbUtils.InMemoryApplicationDbContext();
 
-            var handler = CreateHandler(context: context);
+        context.UserReleaseRoles.AddRange(releaseRoles);
+        await context.SaveChangesAsync();
 
-            var authContext = new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] { new ViewSpecificPublicationRequirement() },
-                _fixture.AuthenticatedUser(userId: _userId),
-                _publication
-            );
+        var handler = CreateHandler(context: context);
 
-            await handler.HandleAsync(authContext);
+        var authContext = new AuthorizationHandlerContext(
+            [new ViewSpecificPublicationRequirement()],
+            _fixture.AuthenticatedUser(userId: user.Id),
+            publication
+        );
 
-            Assert.Equal(expectedToSucceed, authContext.HasSucceeded);
-        }
+        await handler.HandleAsync(authContext);
+
+        Assert.Equal(expectedToSucceed, authContext.HasSucceeded);
     }
 
     private static ViewSpecificPublicationAuthorizationHandler CreateHandler(
@@ -132,15 +132,13 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
         IPreReleaseService? preReleaseService = null
     )
     {
+        userReleaseRoleRepository ??= new UserReleaseRoleRepository(contentDbContext: context);
+
         return new ViewSpecificPublicationAuthorizationHandler(
-            context,
+            userReleaseRoleRepository,
             new AuthorizationHandlerService(
                 releaseVersionRepository ?? new ReleaseVersionRepository(context),
-                userReleaseRoleRepository
-                    ?? new UserReleaseRoleRepository(
-                        contentDbContext: context,
-                        logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
-                    ),
+                userReleaseRoleRepository,
                 userPublicationRoleRepository ?? new UserPublicationRoleRepository(contentDbContext: context),
                 preReleaseService ?? Mock.Of<IPreReleaseService>(Strict)
             )

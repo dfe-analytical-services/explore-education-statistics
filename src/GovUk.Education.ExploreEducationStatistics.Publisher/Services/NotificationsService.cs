@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -42,7 +43,8 @@ public class NotificationsService(ContentDbContext context, INotifierClient noti
             .SelectManyAwait(async releaseVersion =>
             {
                 var publicationRoles = await context
-                    .UserPublicationRoles.Include(upr => upr.User)
+                    .UserPublicationRoles.WhereUserIsActive()
+                    .Include(upr => upr.User)
                     .Where(upr => upr.PublicationId == releaseVersion.Release.PublicationId)
                     .ToListAsync();
 

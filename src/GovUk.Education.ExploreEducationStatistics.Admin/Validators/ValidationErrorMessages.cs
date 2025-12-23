@@ -35,7 +35,6 @@ public enum ValidationErrorMessages
     NoInvitableEmails,
     NotAllReleasesBelongToPublication,
     UserAlreadyHasReleaseRoleInvites,
-    UserAlreadyHasReleaseRoles,
 
     // Methodology
     MethodologyCannotDependOnPublishedRelease,

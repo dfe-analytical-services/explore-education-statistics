@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -11,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +33,7 @@ public class UserRoleService(
     IReleaseVersionRepository releaseVersionRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserRepository userRepository,
     UserManager<ApplicationUser> identityUserManager
 ) : IUserRoleService
 {
@@ -205,8 +208,22 @@ public class UserRoleService(
 
     private async Task<List<string>> GetRequiredGlobalRoleNamesForResourceRoles(ApplicationUser user)
     {
-        var releaseRoles = await userReleaseRoleRepository.GetDistinctRolesByUser(Guid.Parse(user.Id));
-        var publicationRoles = await userPublicationRoleRepository.GetDistinctRolesByUser(Guid.Parse(user.Id));
+        var releaseRoles = await userReleaseRoleRepository
+            .Query()
+            .AsNoTracking()
+            .WhereForUser(Guid.Parse(user.Id))
+            .Select(upr => upr.Role)
+            .Distinct()
+            .ToListAsync();
+
+        var publicationRoles = await userPublicationRoleRepository
+            .Query()
+            .AsNoTracking()
+            .WhereForUser(Guid.Parse(user.Id))
+            .Select(upr => upr.Role)
+            .Distinct()
+            .ToListAsync();
+
         var requiredGlobalRoleNames = releaseRoles
             .Select(GetAssociatedGlobalRoleNameForReleaseRole)
             .Concat(publicationRoles.Select(GetAssociatedGlobalRoleNameForPublicationRole))
@@ -330,24 +347,25 @@ public class UserRoleService(
     {
         return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(_ => contentPersistenceHelper.CheckEntityExists<User>(userId))
+            .OnSuccess(_ => FindActiveUser(userId))
             .OnSuccess(async () =>
-            {
-                return await contentDbContext
-                    .UserPublicationRoles.Include(userPublicationRole => userPublicationRole.Publication)
-                    .Include(userPublicationRole => userPublicationRole.User)
-                    .Where(userPublicationRole => userPublicationRole.UserId == userId)
-                    .OrderBy(userPublicationRole => userPublicationRole.Publication.Title)
-                    .Select(userPublicationRole => new UserPublicationRoleViewModel
+                await userPublicationRoleRepository
+                    .Query()
+                    .AsNoTracking()
+                    .WhereForUser(userId)
+                    .Include(upr => upr.User)
+                    .Include(upr => upr.Publication)
+                    .OrderBy(upr => upr.Publication.Title)
+                    .Select(upr => new UserPublicationRoleViewModel
                     {
-                        Id = userPublicationRole.Id,
-                        Publication = userPublicationRole.Publication.Title,
-                        Role = userPublicationRole.Role,
-                        UserName = userPublicationRole.User.DisplayName,
-                        Email = userPublicationRole.User.Email,
+                        Id = upr.Id,
+                        Publication = upr.Publication.Title,
+                        Role = upr.Role,
+                        UserName = upr.User.DisplayName,
+                        Email = upr.User.Email,
                     })
-                    .ToListAsync();
-            });
+                    .ToListAsync()
+            );
     }
 
     public async Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForPublication(
@@ -358,37 +376,39 @@ public class UserRoleService(
             .CheckEntityExists<Publication>(publicationId)
             .OnSuccess(userService.CheckCanViewPublication)
             .OnSuccess(async () =>
-            {
-                return (
-                    await contentDbContext
-                        .UserPublicationRoles.Include(userPublicationRole => userPublicationRole.Publication)
-                        .Include(userPublicationRole => userPublicationRole.User)
-                        .Where(userPublicationRole => userPublicationRole.PublicationId == publicationId)
-                        .Select(userPublicationRole => new UserPublicationRoleViewModel
-                        {
-                            Id = userPublicationRole.Id,
-                            Publication = userPublicationRole.Publication.Title,
-                            Role = userPublicationRole.Role,
-                            UserName = userPublicationRole.User.DisplayName,
-                            Email = userPublicationRole.User.Email,
-                        })
-                        .ToListAsync()
-                ).OrderBy(userPublicationRole => userPublicationRole.UserName).ToList();
-            });
+                await userPublicationRoleRepository
+                    .Query()
+                    .AsNoTracking()
+                    .WhereForPublication(publicationId)
+                    .Include(upr => upr.User)
+                    .Include(upr => upr.Publication)
+                    .OrderBy(upr => upr.User.DisplayName)
+                    .Select(upr => new UserPublicationRoleViewModel
+                    {
+                        Id = upr.Id,
+                        Publication = upr.Publication.Title,
+                        Role = upr.Role,
+                        UserName = upr.User.DisplayName,
+                        Email = upr.User.Email,
+                    })
+                    .ToListAsync()
+            );
     }
 
     public async Task<Either<ActionResult, List<UserReleaseRoleViewModel>>> GetReleaseRoles(Guid userId)
     {
         return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(_ => contentPersistenceHelper.CheckEntityExists<User>(userId))
+            .OnSuccess(_ => FindActiveUser(userId))
             .OnSuccess(async () =>
             {
-                var allReleaseRoles = await contentDbContext
-                    .UserReleaseRoles.Include(userReleaseRole => userReleaseRole.ReleaseVersion)
-                        .ThenInclude(releaseVersion => releaseVersion.Release)
-                            .ThenInclude(release => release.Publication)
-                    .Where(userReleaseRole => userReleaseRole.UserId == userId)
+                var allReleaseRoles = await userReleaseRoleRepository
+                    .Query()
+                    .AsNoTracking()
+                    .WhereForUser(userId)
+                    .Include(urr => urr.ReleaseVersion)
+                        .ThenInclude(rv => rv.Release)
+                            .ThenInclude(r => r.Publication)
                     .ToListAsync();
 
                 var latestReleaseRoles = await allReleaseRoles
@@ -417,7 +437,7 @@ public class UserRoleService(
     {
         return await userService
             .CheckCanManageAllUsers()
-            .OnSuccess(() => contentPersistenceHelper.CheckEntityExists<UserPublicationRole>(userPublicationRoleId))
+            .OnSuccess(() => FindUserPublicationRole(userPublicationRoleId))
             .OnSuccessVoid(async role =>
             {
                 await userPublicationRoleRepository.Remove(role);
@@ -432,30 +452,22 @@ public class UserRoleService(
 
     public async Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid userReleaseRoleId)
     {
-        return await contentPersistenceHelper
-            .CheckEntityExists<UserReleaseRole>(
-                userReleaseRoleId,
-                query =>
-                    query
-                        .Include(userReleaseRole => userReleaseRole.User)
-                        .Include(userReleaseRole => userReleaseRole.ReleaseVersion)
-                            .ThenInclude(releaseVersion => releaseVersion.Release)
-                                .ThenInclude(release => release.Publication)
+        return await FindUserReleaseRole(userReleaseRoleId)
+            .OnSuccessDo(async userReleaseRole =>
+                await userService.CheckCanUpdateReleaseRole(
+                    userReleaseRole.ReleaseVersion.Release.Publication,
+                    userReleaseRole.Role
+                )
             )
-            .OnSuccess(async userReleaseRole =>
+            .OnSuccessVoid(async userReleaseRole =>
             {
-                return await userService
-                    .CheckCanUpdateReleaseRole(userReleaseRole.ReleaseVersion.Release.Publication, userReleaseRole.Role)
-                    .OnSuccessVoid(async () =>
-                    {
-                        await userReleaseRoleRepository.Remove(userReleaseRole);
+                await userReleaseRoleRepository.Remove(userReleaseRole);
 
-                        var associatedGlobalRoleName = GetAssociatedGlobalRoleNameForReleaseRole(userReleaseRole.Role);
+                var associatedGlobalRoleName = GetAssociatedGlobalRoleNameForReleaseRole(userReleaseRole.Role);
 
-                        await usersAndRolesPersistenceHelper
-                            .CheckEntityExists<ApplicationUser, string>(userReleaseRole.UserId.ToString())
-                            .OnSuccessDo(user => DowngradeFromGlobalRoleIfRequired(user, associatedGlobalRoleName));
-                    });
+                await usersAndRolesPersistenceHelper
+                    .CheckEntityExists<ApplicationUser, string>(userReleaseRole.UserId.ToString())
+                    .OnSuccessDo(user => DowngradeFromGlobalRoleIfRequired(user, associatedGlobalRoleName));
             });
     }
 
@@ -465,8 +477,7 @@ public class UserRoleService(
             .CheckCanManageAllUsers()
             .OnSuccess(async _ =>
             {
-                return await contentPersistenceHelper
-                    .CheckEntityExists<User>(userId)
+                return await FindActiveUser(userId)
                     .OnSuccess(async _ =>
                     {
                         await userReleaseRoleRepository.RemoveForUser(userId);
@@ -507,11 +518,27 @@ public class UserRoleService(
         ReleaseRole role
     )
     {
-        if (await userReleaseRoleRepository.HasUserReleaseRole(userId, releaseVersionId, role))
+        if (await userReleaseRoleRepository.UserHasRoleOnReleaseVersion(userId, releaseVersionId, role))
         {
             return ValidationActionResult(UserAlreadyHasResourceRole);
         }
 
         return Unit.Instance;
     }
+
+    private async Task<Either<ActionResult, User>> FindActiveUser(Guid userId) =>
+        await userRepository.FindActiveUserById(userId) ?? new Either<ActionResult, User>(new NotFoundResult());
+
+    private async Task<Either<ActionResult, UserPublicationRole>> FindUserPublicationRole(Guid userPublicationRoleId) =>
+        await userPublicationRoleRepository.GetById(userPublicationRoleId)
+        ?? new Either<ActionResult, UserPublicationRole>(new NotFoundResult());
+
+    private async Task<Either<ActionResult, UserReleaseRole>> FindUserReleaseRole(Guid userReleaseRoleId) =>
+        await userReleaseRoleRepository
+            .Query(ResourceRoleFilter.All)
+            .Where(urr => urr.Id == userReleaseRoleId)
+            .Include(userReleaseRole => userReleaseRole.ReleaseVersion)
+                .ThenInclude(releaseVersion => releaseVersion.Release)
+                    .ThenInclude(release => release.Publication)
+            .SingleOrNotFoundAsync();
 }

@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -16,19 +17,32 @@ public class EmailTemplateService(
     IPreReleaseService preReleaseService,
     IEmailService emailService,
     IOptions<AppOptions> appOptions,
-    IOptions<NotifyOptions> notifyOptions
+    IOptions<NotifyOptions> notifyOptions,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
+    IUserReleaseRoleRepository userReleaseRoleRepository
 ) : IEmailTemplateService
 {
-    public Either<ActionResult, Unit> SendInviteEmail(
+    public async Task<Either<ActionResult, Unit>> SendInviteEmail(
         string email,
-        List<UserReleaseInvite> userReleaseInvites,
-        List<UserPublicationInvite> userPublicationInvites
+        HashSet<Guid> userReleaseRoleIds,
+        HashSet<Guid> userPublicationRoleIds
     )
     {
+        List<UserReleaseRole> userReleaseRoles = await GetUserReleaseRoles(userReleaseRoleIds);
+        List<UserPublicationRole> userPublicationRoles = await GetUserPublicationRoles(userPublicationRoleIds);
+
+        if (
+            userReleaseRoles.Any(urr => urr.User.Email != email)
+            || userPublicationRoles.Any(urr => urr.User.Email != email)
+        )
+        {
+            throw new ArgumentException("Not all user role IDs match the provided email address");
+        }
+
         var url = appOptions.Value.Url;
         var template = notifyOptions.Value.InviteWithRolesTemplateId;
 
-        var releaseRoleList = userReleaseInvites
+        var releaseRoleList = userReleaseRoles
             .OrderBy(invite => invite.ReleaseVersion.Release.Publication.Title)
             .ThenBy(invite => invite.ReleaseVersion.Release.Title)
             .ThenBy(invite => invite.Role.ToString())
@@ -40,7 +54,7 @@ public class EmailTemplateService(
         // The transformation step here is necessary to ensure that the email still uses the name 'Approver' for the
         // temporarily named 'Allower' role, as this is the name used in the UI. This will be removed in the future;
         // likely in STEP 9 (EES-6196) of the permissions rework approach (NO TICKET HAS BEEN CREATED FOR THIS YET).
-        var publicationRoleList = userPublicationInvites
+        var publicationRoleList = userPublicationRoles
             .OrderBy(invite => invite.Publication.Title)
             .ThenBy(invite => invite.Role)
             .Select(invite => $"* {invite.Publication.Title} - {TransformPublicationRole(invite.Role)}")
@@ -222,6 +236,30 @@ public class EmailTemplateService(
         };
 
         return emailService.SendEmail(email, template, emailValues);
+    }
+
+    private async Task<List<UserReleaseRole>> GetUserReleaseRoles(HashSet<Guid> userReleaseRoleIds)
+    {
+        return await userReleaseRoleRepository
+            .Query(ResourceRoleFilter.PendingOnly)
+            .AsNoTracking()
+            .Where(urr => userReleaseRoleIds.Contains(urr.Id))
+            .Include(urr => urr.User)
+            .Include(urr => urr.ReleaseVersion)
+                .ThenInclude(rv => rv.Release)
+                    .ThenInclude(r => r.Publication)
+            .ToListAsync();
+    }
+
+    private async Task<List<UserPublicationRole>> GetUserPublicationRoles(HashSet<Guid> userPublicationRoleIds)
+    {
+        return await userPublicationRoleRepository
+            .Query(ResourceRoleFilter.PendingOnly)
+            .AsNoTracking()
+            .Where(upr => userPublicationRoleIds.Contains(upr.Id))
+            .Include(urr => urr.User)
+            .Include(upr => upr.Publication)
+            .ToListAsync();
     }
 
     private static string TransformPublicationRole(PublicationRole role)

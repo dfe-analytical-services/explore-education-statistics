@@ -1,7 +1,9 @@
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -11,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
 public static class ReleaseVersionAuthorizationHandlersTestUtil
 {
-    private static readonly DataFixture DataFixture = new();
+    private static readonly DataFixture _fixture = new();
 
     /**
      * Assert that the given handler succeeds when a user has any of the "rolesExpectedToSucceed" on the supplied
@@ -60,9 +62,8 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
         ReleaseRole[] rolesExpectedToSucceed
     )
     {
-        var userId = Guid.NewGuid();
-
-        var user = DataFixture.AuthenticatedUser(userId: userId);
+        User internalUser = _fixture.DefaultUser();
+        ClaimsPrincipal identityUser = _fixture.AuthenticatedUser(userId: internalUser.Id);
 
         var rolesList = new List<UserReleaseRole>();
 
@@ -73,12 +74,7 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
             .ForEach(roleExpectedToSucceed =>
             {
                 rolesList.Add(
-                    new UserReleaseRole
-                    {
-                        ReleaseVersionId = releaseVersion.Id,
-                        UserId = Guid.NewGuid(),
-                        Role = roleExpectedToSucceed,
-                    }
+                    _fixture.DefaultUserReleaseRole().WithReleaseVersion(releaseVersion).WithRole(roleExpectedToSucceed)
                 );
             });
 
@@ -88,19 +84,12 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
             .ToList()
             .ForEach(roleExpectedToSucceed =>
             {
-                rolesList.Add(
-                    new UserReleaseRole
-                    {
-                        ReleaseVersionId = Guid.NewGuid(),
-                        UserId = userId,
-                        Role = roleExpectedToSucceed,
-                    }
-                );
+                rolesList.Add(_fixture.DefaultUserReleaseRole().WithUser(internalUser).WithRole(roleExpectedToSucceed));
             });
 
         var notInTeamScenario = new ReleaseVersionHandlerTestScenario
         {
-            User = user,
+            User = identityUser,
             Entity = releaseVersion,
             UserReleaseRoles = rolesList,
             ExpectedToPass = false,
@@ -117,20 +106,16 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
         var scenarios = GetEnums<ReleaseRole>()
             .Select(role =>
             {
-                var userId = Guid.NewGuid();
-
-                var user = DataFixture.AuthenticatedUser(userId: userId);
+                User internalUser = _fixture.DefaultUser();
+                ClaimsPrincipal identityUser = _fixture.AuthenticatedUser(userId: internalUser.Id);
 
                 // add a new UserReleaseRole for the current User and ReleaseRole under test
-                var rolesList = new List<UserReleaseRole>
-                {
-                    new UserReleaseRole
-                    {
-                        ReleaseVersionId = releaseVersion.Id,
-                        UserId = userId,
-                        Role = role,
-                    },
-                };
+                var rolesList = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(internalUser)
+                    .WithReleaseVersion(releaseVersion)
+                    .WithRole(role)
+                    .GenerateList(1);
 
                 // add some roles to unrelated Users to ensure that only the current User is being
                 // taken into consideration
@@ -139,12 +124,10 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
                     .ForEach(roleExpectedToSucceed =>
                     {
                         rolesList.Add(
-                            new UserReleaseRole
-                            {
-                                ReleaseVersionId = releaseVersion.Id,
-                                UserId = Guid.NewGuid(),
-                                Role = roleExpectedToSucceed,
-                            }
+                            _fixture
+                                .DefaultUserReleaseRole()
+                                .WithReleaseVersion(releaseVersion)
+                                .WithRole(roleExpectedToSucceed)
                         );
                     });
 
@@ -155,18 +138,13 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
                     .ForEach(roleExpectedToSucceed =>
                     {
                         rolesList.Add(
-                            new UserReleaseRole
-                            {
-                                ReleaseVersionId = Guid.NewGuid(),
-                                UserId = userId,
-                                Role = roleExpectedToSucceed,
-                            }
+                            _fixture.DefaultUserReleaseRole().WithUser(internalUser).WithRole(roleExpectedToSucceed)
                         );
                     });
 
                 return new ReleaseVersionHandlerTestScenario
                 {
-                    User = user,
+                    User = identityUser,
                     Entity = releaseVersion,
                     UserReleaseRoles = rolesList,
                     ExpectedToPass = rolesExpectedToSucceed.Contains(role),
@@ -183,9 +161,8 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
         PublicationRole[] rolesExpectedToSucceed
     )
     {
-        var userId = Guid.NewGuid();
-
-        var user = DataFixture.AuthenticatedUser(userId: userId);
+        User internalUser = _fixture.DefaultUser();
+        ClaimsPrincipal identityUser = _fixture.AuthenticatedUser(userId: internalUser.Id);
 
         var rolesList = new List<UserPublicationRole>();
 
@@ -196,12 +173,10 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
             .ForEach(roleExpectedToSucceed =>
             {
                 rolesList.Add(
-                    new UserPublicationRole
-                    {
-                        PublicationId = releaseVersion.Publication.Id,
-                        UserId = Guid.NewGuid(),
-                        Role = roleExpectedToSucceed,
-                    }
+                    _fixture
+                        .DefaultUserPublicationRole()
+                        .WithPublication(releaseVersion.Release.Publication)
+                        .WithRole(roleExpectedToSucceed)
                 );
             });
 
@@ -212,18 +187,13 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
             .ForEach(roleExpectedToSucceed =>
             {
                 rolesList.Add(
-                    new UserPublicationRole
-                    {
-                        PublicationId = Guid.NewGuid(),
-                        UserId = userId,
-                        Role = roleExpectedToSucceed,
-                    }
+                    _fixture.DefaultUserPublicationRole().WithUser(internalUser).WithRole(roleExpectedToSucceed)
                 );
             });
 
         var notInTeamScenario = new ReleaseVersionHandlerTestScenario
         {
-            User = user,
+            User = identityUser,
             Entity = releaseVersion,
             UserPublicationRoles = rolesList,
             ExpectedToPass = false,
@@ -240,20 +210,16 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
         var scenarios = GetEnums<PublicationRole>()
             .Select(role =>
             {
-                var userId = Guid.NewGuid();
-
-                var user = DataFixture.AuthenticatedUser(userId: userId);
+                User internalUser = _fixture.DefaultUser();
+                ClaimsPrincipal identityUser = _fixture.AuthenticatedUser(userId: internalUser.Id);
 
                 // add a new UserPublicationRole for the current User and PublicationRole under test
-                var rolesList = new List<UserPublicationRole>
-                {
-                    new UserPublicationRole
-                    {
-                        PublicationId = releaseVersion.Publication.Id,
-                        UserId = userId,
-                        Role = role,
-                    },
-                };
+                var rolesList = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(internalUser)
+                    .WithPublication(releaseVersion.Release.Publication)
+                    .WithRole(role)
+                    .GenerateList(1);
 
                 // add some roles to unrelated Users to ensure that only the current User is being
                 // taken into consideration
@@ -262,12 +228,10 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
                     .ForEach(roleExpectedToSucceed =>
                     {
                         rolesList.Add(
-                            new UserPublicationRole
-                            {
-                                PublicationId = releaseVersion.Publication.Id,
-                                UserId = Guid.NewGuid(),
-                                Role = roleExpectedToSucceed,
-                            }
+                            _fixture
+                                .DefaultUserPublicationRole()
+                                .WithPublication(releaseVersion.Release.Publication)
+                                .WithRole(roleExpectedToSucceed)
                         );
                     });
 
@@ -278,18 +242,13 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
                     .ForEach(roleExpectedToSucceed =>
                     {
                         rolesList.Add(
-                            new UserPublicationRole
-                            {
-                                PublicationId = Guid.NewGuid(),
-                                UserId = userId,
-                                Role = roleExpectedToSucceed,
-                            }
+                            _fixture.DefaultUserPublicationRole().WithUser(internalUser).WithRole(roleExpectedToSucceed)
                         );
                     });
 
                 return new ReleaseVersionHandlerTestScenario
                 {
-                    User = user,
+                    User = identityUser,
                     Entity = releaseVersion,
                     UserPublicationRoles = rolesList,
                     ExpectedToPass = rolesExpectedToSucceed.Contains(role),
@@ -313,12 +272,12 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
         {
             if (scenario.UserPublicationRoles != null)
             {
-                await context.AddRangeAsync(scenario.UserPublicationRoles);
+                context.AddRange(scenario.UserPublicationRoles);
             }
 
             if (scenario.UserReleaseRoles != null)
             {
-                await context.AddRangeAsync(scenario.UserReleaseRoles);
+                context.AddRange(scenario.UserReleaseRoles);
             }
 
             await context.SaveChangesAsync();
@@ -332,7 +291,7 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
     }
 
     public static async Task AssertHandlerOnlySucceedsWithReleaseRoles<TRequirement, TEntity>(
-        Guid releaseVersionId,
+        ReleaseVersion releaseVersion,
         TEntity handleRequirementArgument,
         Action<ContentDbContext> addToDbHandler,
         Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
@@ -341,7 +300,8 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
         where TRequirement : IAuthorizationRequirement
     {
         var allReleaseRoles = GetEnums<ReleaseRole>();
-        var userId = Guid.NewGuid();
+        User internalUser = _fixture.DefaultUser();
+        ClaimsPrincipal identityUser = _fixture.AuthenticatedUser(userId: internalUser.Id);
 
         await allReleaseRoles
             .ToAsyncEnumerable()
@@ -351,23 +311,22 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
                 await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
                     addToDbHandler(contentDbContext);
-                    await contentDbContext.AddAsync(
-                        new UserReleaseRole
-                        {
-                            UserId = userId,
-                            Role = role,
-                            ReleaseVersionId = releaseVersionId,
-                        }
+                    contentDbContext.Add(
+                        _fixture
+                            .DefaultUserReleaseRole()
+                            .WithUser(internalUser)
+                            .WithReleaseVersion(releaseVersion)
+                            .WithRole(role)
+                            .Generate()
                     );
                     await contentDbContext.SaveChangesAsync();
                 }
 
                 await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    var user = DataFixture.AuthenticatedUser(userId: userId);
                     var authContext = new AuthorizationHandlerContext(
-                        new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
-                        user,
+                        [Activator.CreateInstance<TRequirement>()],
+                        identityUser,
                         handleRequirementArgument
                     );
 
@@ -393,10 +352,9 @@ public static class ReleaseVersionAuthorizationHandlersTestUtil
 
         await using (var contentDbContext = InMemoryApplicationDbContext("no-release-role"))
         {
-            var user = DataFixture.AuthenticatedUser(userId: userId);
             var authContext = new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
-                user,
+                [Activator.CreateInstance<TRequirement>()],
+                identityUser,
                 handleRequirementArgument
             );
 

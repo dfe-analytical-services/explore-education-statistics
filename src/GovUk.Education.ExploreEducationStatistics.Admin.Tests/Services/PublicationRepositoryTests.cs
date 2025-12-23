@@ -1,9 +1,15 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
+using MockQueryable;
+using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -19,80 +25,120 @@ public class PublicationRepositoryTests
 
         Theme theme = _dataFixture.DefaultTheme();
 
-        // Set up publication and release roles for the user
-
-        UserPublicationRole userPublicationRoleApprover = _dataFixture
+        var userPublicationRoles = _dataFixture
             .DefaultUserPublicationRole()
             .WithUser(user)
-            .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme))
-            .WithRole(PublicationRole.Allower);
+            .ForIndex(
+                0,
+                s =>
+                    s.SetPublication(_dataFixture.DefaultPublication().WithTheme(theme))
+                        .SetRole(PublicationRole.Allower)
+            )
+            .ForIndex(
+                1,
+                s => s.SetPublication(_dataFixture.DefaultPublication().WithTheme(theme)).SetRole(PublicationRole.Owner)
+            )
+            .GenerateList(2);
 
-        UserPublicationRole userPublicationRoleOwner = _dataFixture
-            .DefaultUserPublicationRole()
-            .WithUser(user)
-            .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme))
-            .WithRole(PublicationRole.Owner);
-
-        UserReleaseRole userReleaseRoleContributor = _dataFixture
+        var userReleaseRoles = _dataFixture
             .DefaultUserReleaseRole()
             .WithUser(user)
-            .WithReleaseVersion(
-                _dataFixture
-                    .DefaultReleaseVersion()
-                    .WithRelease(
-                        _dataFixture
-                            .DefaultRelease()
-                            .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme))
-                    )
+            .ForIndex(
+                0,
+                s =>
+                    s.SetReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(
+                                    _dataFixture
+                                        .DefaultRelease()
+                                        .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme))
+                                )
+                        )
+                        .SetRole(ReleaseRole.Contributor)
             )
-            .WithRole(ReleaseRole.Contributor);
-
-        UserReleaseRole userReleaseRolePreRelease = _dataFixture
-            .DefaultUserReleaseRole()
-            .WithUser(user)
-            .WithReleaseVersion(
-                _dataFixture
-                    .DefaultReleaseVersion()
-                    .WithRelease(
-                        _dataFixture
-                            .DefaultRelease()
-                            .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme))
-                    )
+            .ForIndex(
+                1,
+                s =>
+                    s.SetReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(
+                                    _dataFixture
+                                        .DefaultRelease()
+                                        .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme))
+                                )
+                        )
+                        .SetRole(ReleaseRole.Approver)
             )
-            .WithRole(ReleaseRole.PrereleaseViewer);
+            // This one should be excluded from results
+            .ForIndex(
+                2,
+                s =>
+                    s.SetReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(
+                                    _dataFixture
+                                        .DefaultRelease()
+                                        .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme))
+                                )
+                        )
+                        .SetRole(ReleaseRole.PrereleaseViewer)
+            )
+            .GenerateList(3);
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            contentDbContext.Users.Add(user);
-            contentDbContext.Themes.Add(theme);
-            contentDbContext.UserPublicationRoles.AddRange(userPublicationRoleApprover, userPublicationRoleOwner);
-            contentDbContext.UserReleaseRoles.AddRange(userReleaseRoleContributor, userReleaseRolePreRelease);
+            contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+            contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
             await contentDbContext.SaveChangesAsync();
         }
 
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
+        userPublicationRoleRepository
+            .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
+            .Returns(userPublicationRoles.BuildMock());
+
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
+            .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
+            .Returns(userReleaseRoles.BuildMock());
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            var service = new PublicationRepository(contentDbContext);
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
+            );
+
             var result = await service.ListPublicationsForUser(userId: user.Id, themeId: theme.Id);
 
             // Result should contain all publications except the one associated with the
             // Release.PrereleaseViewer role
-            Assert.Equal(3, result.Count);
+            Assert.Equal(4, result.Count);
 
-            Assert.Equal(userPublicationRoleApprover.PublicationId, result[0].Id);
+            Assert.Equal(userPublicationRoles[0].PublicationId, result[0].Id);
             Assert.Empty(result[0].ReleaseVersions); // ListPublicationsForUser doesn't hydrate releases
             Assert.Empty(result[0].Methodologies); // ListPublicationsForUser doesn't hydrate methodologies
 
-            Assert.Equal(userPublicationRoleOwner.PublicationId, result[1].Id);
+            Assert.Equal(userPublicationRoles[1].PublicationId, result[1].Id);
             Assert.Empty(result[1].ReleaseVersions);
             Assert.Empty(result[1].Methodologies);
 
-            Assert.Equal(userReleaseRoleContributor.ReleaseVersion.Release.PublicationId, result[2].Id);
+            Assert.Equal(userReleaseRoles[0].ReleaseVersion.Release.PublicationId, result[2].Id);
             Assert.Empty(result[2].ReleaseVersions);
             Assert.Empty(result[2].Methodologies);
+
+            Assert.Equal(userReleaseRoles[1].ReleaseVersion.Release.PublicationId, result[3].Id);
+            Assert.Empty(result[3].ReleaseVersions);
+            Assert.Empty(result[3].Methodologies);
         }
+
+        MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
     }
 
     [Fact]
@@ -100,72 +146,117 @@ public class PublicationRepositoryTests
     {
         User user = _dataFixture.DefaultUser();
 
-        // Set up publication and release roles for the user
-        // Publications are all in different themes
-
-        UserPublicationRole userPublicationRoleApprover = _dataFixture
+        var userPublicationRoles = _dataFixture
             .DefaultUserPublicationRole()
             .WithUser(user)
-            .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()))
-            .WithRole(PublicationRole.Allower);
+            .ForIndex(
+                0,
+                s =>
+                    s.SetPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()))
+                        .SetRole(PublicationRole.Allower)
+            )
+            .ForIndex(
+                1,
+                s =>
+                    s.SetPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()))
+                        .SetRole(PublicationRole.Owner)
+            )
+            .GenerateList(2);
 
-        UserPublicationRole userPublicationRoleOwner = _dataFixture
-            .DefaultUserPublicationRole()
-            .WithUser(user)
-            .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()))
-            .WithRole(PublicationRole.Owner);
-
-        UserReleaseRole userReleaseRoleContributor = _dataFixture
+        var userReleaseRoles = _dataFixture
             .DefaultUserReleaseRole()
             .WithUser(user)
-            .WithReleaseVersion(
-                _dataFixture
-                    .DefaultReleaseVersion()
-                    .WithRelease(
-                        _dataFixture
-                            .DefaultRelease()
-                            .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()))
-                    )
+            .ForIndex(
+                0,
+                s =>
+                    s.SetReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(
+                                    _dataFixture
+                                        .DefaultRelease()
+                                        .WithPublication(
+                                            _dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme())
+                                        )
+                                )
+                        )
+                        .SetRole(ReleaseRole.Contributor)
             )
-            .WithRole(ReleaseRole.Contributor);
-
-        UserReleaseRole userReleaseRolePreRelease = _dataFixture
-            .DefaultUserReleaseRole()
-            .WithUser(user)
-            .WithReleaseVersion(
-                _dataFixture
-                    .DefaultReleaseVersion()
-                    .WithRelease(
-                        _dataFixture
-                            .DefaultRelease()
-                            .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()))
-                    )
+            .ForIndex(
+                1,
+                s =>
+                    s.SetReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(
+                                    _dataFixture
+                                        .DefaultRelease()
+                                        .WithPublication(
+                                            _dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme())
+                                        )
+                                )
+                        )
+                        .SetRole(ReleaseRole.Approver)
             )
-            .WithRole(ReleaseRole.PrereleaseViewer);
+            // This one should be excluded from results
+            .ForIndex(
+                2,
+                s =>
+                    s.SetReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(
+                                    _dataFixture
+                                        .DefaultRelease()
+                                        .WithPublication(
+                                            _dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme())
+                                        )
+                                )
+                        )
+                        .SetRole(ReleaseRole.PrereleaseViewer)
+            )
+            .GenerateList(3);
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            contentDbContext.Users.Add(user);
-            contentDbContext.UserPublicationRoles.AddRange(userPublicationRoleApprover, userPublicationRoleOwner);
-            contentDbContext.UserReleaseRoles.AddRange(userReleaseRoleContributor, userReleaseRolePreRelease);
+            contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
+            contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
             await contentDbContext.SaveChangesAsync();
         }
 
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
+        userPublicationRoleRepository
+            .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
+            .Returns(userPublicationRoles.BuildMock());
+
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
+            .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
+            .Returns(userReleaseRoles.BuildMock());
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            var service = new PublicationRepository(contentDbContext);
-            var result = await service.ListPublicationsForUser(userId: user.Id, themeId: null);
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
+            );
+
+            var result = await service.ListPublicationsForUser(userId: user.Id);
 
             // Result should contain all publications except the one associated with the
             // Release.PrereleaseViewer role
-            Assert.Equal(3, result.Count);
+            Assert.Equal(4, result.Count);
 
-            Assert.Equal(userPublicationRoleApprover.PublicationId, result[0].Id);
-            Assert.Equal(userPublicationRoleOwner.PublicationId, result[1].Id);
-            Assert.Equal(userReleaseRoleContributor.ReleaseVersion.Release.PublicationId, result[2].Id);
+            Assert.Equal(userPublicationRoles[0].PublicationId, result[0].Id);
+            Assert.Equal(userPublicationRoles[1].PublicationId, result[1].Id);
+            Assert.Equal(userReleaseRoles[0].ReleaseVersion.Release.PublicationId, result[2].Id);
+            Assert.Equal(userReleaseRoles[1].ReleaseVersion.Release.PublicationId, result[3].Id);
         }
+
+        MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
     }
 
     [Fact]
@@ -201,20 +292,36 @@ public class PublicationRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            contentDbContext.Users.Add(user);
             contentDbContext.Themes.Add(theme);
             contentDbContext.UserReleaseRoles.Add(userReleaseRole);
             contentDbContext.UserPublicationRoles.Add(userPublicationRole);
             await contentDbContext.SaveChangesAsync();
         }
 
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
+        userPublicationRoleRepository
+            .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
+            .Returns(new[] { userPublicationRole }.BuildMock());
+
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
+            .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
+            .Returns(new[] { userReleaseRole }.BuildMock());
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            var service = new PublicationRepository(contentDbContext);
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
+            );
+
             var result = await service.ListPublicationsForUser(userId: user.Id, themeId: theme.Id);
 
             Assert.Empty(result);
         }
+
+        MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
     }
 
     [Fact]
@@ -251,19 +358,35 @@ public class PublicationRepositoryTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
             contentDbContext.Users.Add(user);
-            contentDbContext.Themes.Add(theme);
             contentDbContext.UserReleaseRoles.Add(userReleaseRole);
             contentDbContext.UserPublicationRoles.Add(userPublicationRole);
             await contentDbContext.SaveChangesAsync();
         }
 
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
+        userPublicationRoleRepository
+            .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
+            .Returns(new[] { userPublicationRole }.BuildMock());
+
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
+            .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
+            .Returns(new[] { userReleaseRole }.BuildMock());
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            var service = new PublicationRepository(contentDbContext);
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
+            );
+
             var result = await service.ListPublicationsForUser(userId: user.Id, themeId: theme.Id);
 
             Assert.Empty(result);
         }
+
+        MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
     }
 
     [Fact]
@@ -298,19 +421,34 @@ public class PublicationRepositoryTests
         {
             contentDbContext.Users.Add(user);
             contentDbContext.Publications.Add(publication);
-            contentDbContext.UserReleaseRoles.Add(userReleaseRole);
-            contentDbContext.UserPublicationRoles.Add(userPublicationRole);
             await contentDbContext.SaveChangesAsync();
         }
 
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
+        userPublicationRoleRepository
+            .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
+            .Returns(new[] { userPublicationRole }.BuildMock());
+
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
+            .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
+            .Returns(new[] { userReleaseRole }.BuildMock());
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            var service = new PublicationRepository(contentDbContext);
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                userPublicationRoleRepository: userPublicationRoleRepository.Object,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
+            );
+
             var publications = await service.ListPublicationsForUser(userId: user.Id, themeId: publication.ThemeId);
 
             var resultPublication = Assert.Single(publications);
             Assert.Equal(publication.Id, resultPublication.Id);
         }
+
+        MockUtils.VerifyAllMocks(userPublicationRoleRepository, userReleaseRoleRepository);
     }
 
     [Fact]
@@ -339,12 +477,25 @@ public class PublicationRepositoryTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publicationService = new PublicationRepository(contentDbContext);
+            var publicationService = BuildService(contentDbContext);
             var publications = await publicationService.QueryPublicationsForTheme(theme1.Id).ToListAsync();
 
             Assert.Equal(2, publications.Count);
             Assert.Equal(theme1.Publications[0].Title, publications[0].Title);
             Assert.Equal(theme1.Publications[1].Title, publications[1].Title);
         }
+    }
+
+    private static PublicationRepository BuildService(
+        ContentDbContext? contentDbContext = null,
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null
+    )
+    {
+        return new(
+            contentDbContext ?? Mock.Of<ContentDbContext>(),
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict),
+            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict)
+        );
     }
 }
