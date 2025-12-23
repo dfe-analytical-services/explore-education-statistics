@@ -673,3 +673,16 @@ get comments sidebar
     [Arguments]    ${block}
     ${comments}=    lookup or return webelement    testid:comments-sidebar    ${block}
     [Return]    ${comments}
+
+user adds comment to selected text
+    [Arguments]    ${block}    ${text}
+    ${toolbar}=    get editor toolbar    ${block}
+    ${button}=    user gets button element    Add comment    ${toolbar}
+    user checks element does not have class    ${button}    ck-disabled
+    user clicks element    ${button}
+
+    ${comments}=    get comments sidebar    ${block}
+    user waits until parent contains element    ${comments}    label:Comment
+    ${textarea}=    get child element    ${comments}    label:Comment
+    user enters text into element    ${textarea}    ${text}
+    user clicks button    Add comment    ${comments}

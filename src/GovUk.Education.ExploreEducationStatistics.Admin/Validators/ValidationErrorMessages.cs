@@ -114,6 +114,7 @@ public enum ValidationErrorMessages
     NoFeaturedTables,
     NoPublicPreReleaseAccessList,
     MethodologyNotApproved,
+    UnresolvedComments,
 
     // Footnotes
     FootnotesDifferFromReleaseFootnotes,

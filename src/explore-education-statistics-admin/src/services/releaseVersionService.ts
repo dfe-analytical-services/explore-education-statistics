@@ -169,7 +169,8 @@ export type ReleaseVersionChecklistWarning =
         | 'NoNextReleaseDate'
         | 'NoDataFiles'
         | 'NoFeaturedTables'
-        | 'NoPublicPreReleaseAccessList';
+        | 'NoPublicPreReleaseAccessList'
+        | 'UnresolvedComments';
     }
   | {
       code: 'NoFootnotesOnSubjects';
@@ -265,7 +266,7 @@ const releaseVersionService = {
   },
 
   getReleaseVersionChecklist(id: string): Promise<ReleaseVersionChecklist> {
-    return client.get(`/releases/${id}/checklist`);
+    return client.get(`/releaseVersions/${id}/checklist`);
   },
 
   createReleaseVersionAmendment(id: string): Promise<IdResponse> {
