@@ -1,5 +1,4 @@
-import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
-import { scrollViewportToShowTarget } from '@ckeditor/ckeditor5-utils/src/dom/scroll';
+import { scrollViewportToShowTarget, Plugin } from 'ckeditor5';
 import AddCommentCommand from './AddCommentCommand';
 import AddCommentPlaceholderCommand from './AddCommentPlaceholderCommand';
 import SelectCommentCommand from './SelectCommentCommand';

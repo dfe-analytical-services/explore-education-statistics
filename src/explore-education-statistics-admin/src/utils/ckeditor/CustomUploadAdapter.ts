@@ -1,5 +1,5 @@
+import { FileLoader } from 'ckeditor5';
 import { UploadAdapter, ImageUploadResult } from '@admin/types/ckeditor';
-import { FileLoader } from '@ckeditor/ckeditor5-upload';
 
 export type ImageProgressHandler = (current: number, total: number) => void;
 
