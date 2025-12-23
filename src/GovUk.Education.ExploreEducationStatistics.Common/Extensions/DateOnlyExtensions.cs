@@ -4,20 +4,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 public static class DateOnlyExtensions
 {
+    private static TimeZoneInfo UkTimeZone => TimeZoneUtils.GetUkTimeZone();
+
     public static DateTimeOffset GetUkStartOfDayUtc(this DateOnly date)
     {
-        // Get a DateTime representing the date at midnight
-        var startOfDay = date.ToDateTime(TimeOnly.MinValue, DateTimeKind.Unspecified); // Date is 00:00:00 (midnight) of that day
+        // Get a DateTime representing the date at 00:00:00 (midnight)
+        var midnightDateTime = date.ToDateTime(TimeOnly.MinValue, DateTimeKind.Unspecified);
 
-        var ukTimeZone = TimeZoneUtils.GetUkTimeZone();
+        // Treat the date as midnight in the UK time zone and convert it to UTC
+        var ukMidnightDateTimeInUtc = TimeZoneInfo.ConvertTimeToUtc(midnightDateTime, UkTimeZone);
 
-        // Get the offset from UTC for the date at midnight in the UK, taking into account daylight saving time
-        var ukOffset = ukTimeZone.GetUtcOffset(startOfDay);
-
-        // Create a DateTimeOffset with the correct offset from UTC for the date
-        var ukStartOfDay = new DateTimeOffset(startOfDay, ukOffset);
-
-        // Convert the DateTimeOffset to UTC
-        return ukStartOfDay.ToUniversalTime();
+        // Return a DateTimeOffset in UTC
+        return new DateTimeOffset(ukMidnightDateTimeInUtc, TimeSpan.Zero);
     }
 }
