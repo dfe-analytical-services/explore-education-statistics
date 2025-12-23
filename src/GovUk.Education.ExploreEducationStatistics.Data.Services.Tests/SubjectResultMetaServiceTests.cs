@@ -61,7 +61,12 @@ public class SubjectResultMetaServiceTests
         await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
         var service = BuildService(statisticsDbContext);
 
-        var result = await service.GetSubjectMeta(releaseVersionId: Guid.NewGuid(), query, []);
+        var result = await service.GetSubjectMeta(
+            releaseVersionId: Guid.NewGuid(),
+            query,
+            observations: [],
+            isCroppedTable: false
+        );
 
         result.AssertNotFound();
     }
@@ -153,7 +158,7 @@ public class SubjectResultMetaServiceTests
                 timePeriodService: timePeriodService.Object
             );
 
-            var result = await service.GetSubjectMeta(releaseVersion.Id, query, observations);
+            var result = await service.GetSubjectMeta(releaseVersion.Id, query, observations, isCroppedTable: false);
 
             VerifyAllMocks(
                 boundaryLevelRepository,
@@ -311,7 +316,7 @@ public class SubjectResultMetaServiceTests
                 options: options
             );
 
-            var result = await service.GetSubjectMeta(releaseVersion.Id, query, observations);
+            var result = await service.GetSubjectMeta(releaseVersion.Id, query, observations, isCroppedTable: false);
 
             VerifyAllMocks(
                 boundaryLevelRepository,

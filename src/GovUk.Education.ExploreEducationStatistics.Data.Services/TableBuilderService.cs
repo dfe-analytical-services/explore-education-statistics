@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -22,8 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.Utils.TableBuilderUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
@@ -32,13 +29,13 @@ public class TableBuilderService : ITableBuilderService
 {
     private readonly StatisticsDbContext _statisticsDbContext;
     private readonly ContentDbContext _contentDbContext;
-    private readonly IFilterItemRepository _filterItemRepository;
     private readonly ILocationService _locationService;
     private readonly IObservationService _observationService;
     private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
     private readonly ISubjectResultMetaService _subjectResultMetaService;
     private readonly ISubjectCsvMetaService _subjectCsvMetaService;
     private readonly ISubjectRepository _subjectRepository;
+    private readonly ITableBuilderQueryOptimiser _tableBuilderQueryOptimiser;
     private readonly IUserService _userService;
     private readonly TableBuilderOptions _options;
     private readonly LocationsOptions _locationOptions;
@@ -46,13 +43,13 @@ public class TableBuilderService : ITableBuilderService
     public TableBuilderService(
         StatisticsDbContext statisticsDbContext,
         ContentDbContext contentDbContext,
-        IFilterItemRepository filterItemRepository,
         ILocationService locationService,
         IObservationService observationService,
         IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
         ISubjectResultMetaService subjectResultMetaService,
         ISubjectCsvMetaService subjectCsvMetaService,
         ISubjectRepository subjectRepository,
+        ITableBuilderQueryOptimiser tableBuilderQueryOptimiser,
         IUserService userService,
         IOptions<TableBuilderOptions> options,
         IOptions<LocationsOptions> locationOptions
@@ -60,13 +57,13 @@ public class TableBuilderService : ITableBuilderService
     {
         _statisticsDbContext = statisticsDbContext;
         _contentDbContext = contentDbContext;
-        _filterItemRepository = filterItemRepository;
         _locationService = locationService;
         _observationService = observationService;
         _statisticsPersistenceHelper = statisticsPersistenceHelper;
         _subjectResultMetaService = subjectResultMetaService;
         _subjectCsvMetaService = subjectCsvMetaService;
         _subjectRepository = subjectRepository;
+        _tableBuilderQueryOptimiser = tableBuilderQueryOptimiser;
         _userService = userService;
         _options = options.Value;
         _locationOptions = locationOptions.Value;
@@ -77,6 +74,8 @@ public class TableBuilderService : ITableBuilderService
         CancellationToken cancellationToken = default
     )
     {
+        query.EnableCropping = true;
+
         return await FindLatestPublishedReleaseVersionId(query.SubjectId)
             .OnSuccess(releaseVersionId => Query(releaseVersionId, query, cancellationToken));
     }
@@ -89,17 +88,18 @@ public class TableBuilderService : ITableBuilderService
     {
         return await CheckReleaseSubjectExists(subjectId: query.SubjectId, releaseVersionId: releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
-            .OnSuccessDo(() => CheckQueryHasValidTableSize(query))
             .OnSuccess(() => ListQueryObservations(query, cancellationToken))
-            .OnSuccess(async observations =>
+            .OnSuccess(async queryObservations =>
             {
+                var (observations, isCroppedTable) = queryObservations;
+
                 if (!observations.Any())
                 {
                     return new TableBuilderResultViewModel();
                 }
 
                 return await _subjectResultMetaService
-                    .GetSubjectMeta(releaseVersionId, query, observations)
+                    .GetSubjectMeta(releaseVersionId, query, observations, isCroppedTable)
                     .OnSuccess(subjectMetaViewModel =>
                     {
                         return new TableBuilderResultViewModel
@@ -120,12 +120,13 @@ public class TableBuilderService : ITableBuilderService
         CancellationToken cancellationToken = default
     )
     {
-        return await CheckReleaseSubjectExists(subjectId: query.SubjectId, releaseVersionId: releaseVersionId)
+        return await CheckReleaseSubjectExists(query.SubjectId, releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
-            .OnSuccessDo(() => CheckQueryHasValidTableSize(query))
             .OnSuccess(() => ListQueryObservations(query, cancellationToken))
-            .OnSuccess(async observations =>
+            .OnSuccess(async queryObservations =>
             {
+                var (observations, _) = queryObservations;
+
                 if (observations.Count == 0)
                 {
                     return [];
@@ -158,78 +159,56 @@ public class TableBuilderService : ITableBuilderService
         CancellationToken cancellationToken = default
     )
     {
-        return await CheckReleaseSubjectExists(subjectId: query.SubjectId, releaseVersionId: releaseVersionId)
+        return await CheckReleaseSubjectExists(query.SubjectId, releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
-            .OnSuccessDo(() => CheckQueryHasValidTableSize(query))
-            .OnSuccess(releaseSubject =>
-                ListQueryObservations(query, cancellationToken)
-                    .OnSuccessCombineWith(observations =>
-                        _subjectCsvMetaService.GetSubjectCsvMeta(releaseSubject, query, observations, cancellationToken)
-                    )
-            )
-            .OnSuccessVoid(async tuple =>
+            .OnSuccessVoid(async releaseSubject =>
             {
-                await using var writer = new StreamWriter(stream, leaveOpen: true);
-                await using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture, leaveOpen: true);
+                var (observations, _) = await ListQueryObservations(query, cancellationToken);
 
-                var (observations, meta) = tuple;
+                await _subjectCsvMetaService
+                    .GetSubjectCsvMeta(releaseSubject, query, observations, cancellationToken)
+                    .OnSuccessVoid(async meta =>
+                    {
+                        await using var writer = new StreamWriter(stream, leaveOpen: true);
+                        await using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture, leaveOpen: true);
 
-                await WriteCsvHeaderRow(csv, meta);
-                await WriteCsvRows(csv, observations, meta, cancellationToken);
+                        await WriteCsvHeaderRow(csv, meta);
+                        await WriteCsvRows(csv, observations, meta, cancellationToken);
+                    });
             });
     }
 
-    private async Task<Either<ActionResult, List<Observation>>> ListQueryObservations(
+    private async Task<(List<Observation>, bool)> ListQueryObservations(
         FullTableQuery query,
         CancellationToken cancellationToken
     )
     {
+        var requiresCropping = query.EnableCropping && await _tableBuilderQueryOptimiser.IsCroppingRequired(query);
+
+        if (requiresCropping)
+        {
+            query = await _tableBuilderQueryOptimiser.CropQuery(query, cancellationToken);
+        }
+
         await _observationService.GetMatchedObservations(query, cancellationToken);
 
         var matchedObservationIds = _statisticsDbContext.MatchedObservations.Select(o => o.Id);
 
-        return await _statisticsDbContext
+        if (
+            query.EnableCropping
+            && await matchedObservationIds.CountAsync(cancellationToken) > _options.CroppedTableMaxRows
+        )
+        {
+            matchedObservationIds = matchedObservationIds.Take(_options.CroppedTableMaxRows);
+        }
+
+        var results = _statisticsDbContext
             .Observation.AsNoTracking()
             .Include(o => o.Location)
             .Include(o => o.FilterItems)
-            .Where(o => matchedObservationIds.Contains(o.Id))
-            .ToListAsync(cancellationToken);
-    }
+            .Where(o => matchedObservationIds.Contains(o.Id));
 
-    private async Task<Either<ActionResult, Unit>> CheckQueryHasValidTableSize(FullTableQuery query)
-    {
-        if (await GetMaximumTableCellCount(query) > _options.MaxTableCellsAllowed)
-        {
-            return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
-        }
-
-        return Unit.Instance;
-    }
-
-    private async Task<int> GetMaximumTableCellCount(FullTableQuery query)
-    {
-        var filterItemIds = query.GetFilterItemIds();
-
-        var countsOfFilterItemsByFilter =
-            filterItemIds.Count == 0
-                ? new List<int>()
-                : (await _filterItemRepository.CountFilterItemsByFilter(filterItemIds))
-                    .Select(pair =>
-                    {
-                        var (_, count) = pair;
-                        return count;
-                    })
-                    .ToList();
-
-        // TODO Accessing time periods for the Subject by altering the Importer to store them would improve accuracy
-        // here rather than assuming the Subject has all time periods between the start and end range.
-
-        return MaximumTableCellCount(
-            countOfIndicators: query.Indicators.Count(),
-            countOfLocations: query.LocationIds.Count,
-            countOfTimePeriods: TimePeriodUtil.Range(query.TimePeriod).Count,
-            countsOfFilterItemsByFilter: countsOfFilterItemsByFilter
-        );
+        return (await results.ToListAsync(cancellationToken), requiresCropping);
     }
 
     private async Task<Either<ActionResult, Guid>> FindLatestPublishedReleaseVersionId(Guid subjectId)
