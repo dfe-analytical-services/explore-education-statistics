@@ -243,24 +243,19 @@ public class ReleaseChecklistService : IReleaseChecklistService
             warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoPublicPreReleaseAccessList));
         }
 
-        var releaseVersionContentInclude = await _contentDbContext
-            .ReleaseVersions.Include(rv => rv.Content)
-                .ThenInclude(cs => cs.Content)
-                    .ThenInclude(cb => cb.Comments)
-            .FirstAsync(rv => rv.Id == releaseVersion.Id);
-
-        if (
-            releaseVersionContentInclude.Content.Any(contentSection =>
-                contentSection.Content.Any(contentBlock =>
-                    contentBlock.Comments.Any(comment => comment.Resolved == null)
-                )
-            )
-        )
+        if (await HasUnresolvedComments(releaseVersion.Id))
         {
             warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.UnresolvedComments));
         }
 
         return warnings;
+    }
+
+    private async Task<bool> HasUnresolvedComments(Guid releaseVersionId)
+    {
+        return await _contentDbContext
+            .Comment.Where(c => c.ContentBlock.ContentSection!.ReleaseVersionId == releaseVersionId)
+            .AnyAsync(c => c.Resolved == null);
     }
 
     private async Task<List<Subject>> GetSubjectsWithNoFootnotes(
