@@ -24,6 +24,8 @@ public abstract class DateTimeOffsetExtensionsTests
         )
         {
             var actual = dateTimeOffset.GetUkStartOfDayUtc();
+
+            Assert.Equal(TimeSpan.Zero, actual.Offset);
             Assert.True(
                 expectedDateTimeOffset.Equals(actual),
                 $"Expected: {expectedDateTimeOffset:o}\nActual:   {actual:o}\nDescription: {description}"
@@ -49,6 +51,7 @@ public abstract class DateTimeOffsetExtensionsTests
         )
         {
             var actual = dateTimeOffset.ToUkDateOnly();
+
             Assert.True(
                 expectedDateOnly.Equals(actual),
                 $"Expected: {expectedDateOnly:o}\nActual:   {actual:o}\nDescription: {description}"
