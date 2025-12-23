@@ -1,21 +1,59 @@
 using Dapper;
+using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TestData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using InterpolatedSql.Dapper;
 using Microsoft.EntityFrameworkCore;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
-    : ProcessorFunctionsIntegrationTest(fixture)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class ImportDataFunctionTestsFixture()
+    : OptimisedPublicDataProcessorCollectionFixture(
+        capabilities: [PublicDataProcessorIntegrationTestCapability.Postgres]
+    )
+{
+    public ImportMetadataFunction ImportMetadataFunction = null!;
+    public ImportDataFunction ImportDataFunction = null!;
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+
+        ImportMetadataFunction = lookups.GetService<ImportMetadataFunction>();
+        ImportDataFunction = lookups.GetService<ImportDataFunction>();
+    }
+
+    public override async Task BeforeEachTest()
+    {
+        await base.BeforeEachTest();
+
+        // The expected test data in a great deal of these tests is dependent on id sequences
+        // beginning at 1, so for simplicity we reset data between each test.
+        await GetPublicDataDbContext().ClearTestData();
+    }
+}
+
+[CollectionDefinition(nameof(ImportDataFunctionTestsFixture))]
+public class ImportDataFunctionTestsCollection : ICollectionFixture<ImportDataFunctionTestsFixture>;
+
+[Collection(nameof(ImportDataFunctionTestsFixture))]
+public abstract class ImportDataFunctionTests(ImportDataFunctionTestsFixture fixture)
+    : OptimisedFunctionAppIntegrationTestBase(fixture)
 {
     private const DataSetVersionImportStage Stage = DataSetVersionImportStage.ImportingData;
 
@@ -25,26 +63,29 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
         ProcessorTestData.LargeDataSet,
     ];
 
-    public class ImportDataTests(ProcessorFunctionsIntegrationTestFixture fixture) : ImportDataFunctionTests(fixture)
+    public class ImportDataTests(ImportDataFunctionTestsFixture fixture) : ImportDataFunctionTests(fixture)
     {
         [Theory]
         [MemberData(nameof(DataSets))]
         public async Task Success(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportData(testData, dataSetVersion, instanceId);
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var savedImport = await publicDataDbContext
+            var savedImport = await fixture
+                .GetPublicDataDbContext()
                 .DataSetVersionImports.Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
 
             Assert.Equal(Stage, savedImport.Stage);
             Assert.Equal(DataSetVersionStatus.Processing, savedImport.DataSetVersion.Status);
 
-            AssertDataSetVersionDirectoryContainsOnlyFiles(
+            CommonTestDataUtils.AssertDataSetVersionDirectoryContainsOnlyFiles(
+                fixture.GetDataSetVersionPathResolver(),
                 dataSetVersion,
                 [DataSetFilenames.CsvDataFile, DataSetFilenames.CsvMetadataFile, DataSetFilenames.DuckDbDatabaseFile]
             );
@@ -54,7 +95,10 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
         [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectRowCount(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportData(testData, dataSetVersion, instanceId);
 
@@ -76,7 +120,10 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
         [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectColumns(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportData(testData, dataSetVersion, instanceId);
 
@@ -107,7 +154,10 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
         [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectDistinctGeographicLevels(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportData(testData, dataSetVersion, instanceId);
 
@@ -132,7 +182,10 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
         [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectDistinctLocationOptions(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportData(testData, dataSetVersion, instanceId);
 
@@ -168,7 +221,10 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
         [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectDistinctFilterOptions(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportData(testData, dataSetVersion, instanceId);
 
@@ -207,7 +263,10 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
         [MemberData(nameof(DataSets))]
         public async Task DuckDbDataTable_CorrectDistinctTimePeriods(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportData(testData, dataSetVersion, instanceId);
 
@@ -241,14 +300,23 @@ public abstract class ImportDataFunctionTests(ProcessorFunctionsIntegrationTestF
 
         private async Task ImportData(ProcessorTestData testData, DataSetVersion dataSetVersion, Guid instanceId)
         {
-            SetupCsvDataFilesForDataSetVersion(testData, dataSetVersion);
+            CommonTestDataUtils.SetupCsvDataFilesForDataSetVersion(
+                fixture.GetDataSetVersionPathResolver(),
+                testData,
+                dataSetVersion
+            );
 
             // Prepare the metadata before calling the ImportData function
-            var importMetadataFunction = GetRequiredService<ImportMetadataFunction>();
-            await importMetadataFunction.ImportMetadata(instanceId, CancellationToken.None);
+            await fixture.ImportMetadataFunction.ImportMetadata(instanceId, CancellationToken.None);
 
-            var importDataFunction = GetRequiredService<ImportDataFunction>();
-            await importDataFunction.ImportData(instanceId, CancellationToken.None);
+            await fixture.ImportDataFunction.ImportData(instanceId, CancellationToken.None);
         }
+    }
+
+    protected DuckDbConnection GetDuckDbConnection(DataSetVersion dataSetVersion)
+    {
+        return DuckDbConnection.CreateFileConnectionReadOnly(
+            fixture.GetDataSetVersionPathResolver().DuckDbPath(dataSetVersion)
+        );
     }
 }
