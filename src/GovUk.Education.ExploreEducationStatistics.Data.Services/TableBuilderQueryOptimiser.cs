@@ -56,7 +56,7 @@ public class TableBuilderQueryOptimiser(
 
             if (timePeriods.Count > maxSelections)
             {
-                var croppedTimePeriods = timePeriods.Take(maxSelections);
+                var croppedTimePeriods = timePeriods.TakeLast(maxSelections);
                 query.TimePeriod.StartYear = croppedTimePeriods.First().Year;
                 query.TimePeriod.StartCode = croppedTimePeriods.First().TimeIdentifier;
                 query.TimePeriod.EndYear = croppedTimePeriods.Last().Year;

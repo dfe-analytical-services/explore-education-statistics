@@ -92,7 +92,8 @@ public class TableBuilderQueryOptimiserTests
         _filterItemRepository.Verify();
 
         Assert.NotNull(result.TimePeriod);
-        Assert.Equal(2004, result.TimePeriod?.EndYear);
+        Assert.Equal(2016, result.TimePeriod?.StartYear);
+        Assert.Equal(2020, result.TimePeriod?.EndYear);
     }
 
     [Fact]
@@ -132,7 +133,8 @@ public class TableBuilderQueryOptimiserTests
             _filterItemRepository.Verify();
 
             Assert.NotNull(result.TimePeriod);
-            Assert.Equal(2004, result.TimePeriod?.EndYear);
+            Assert.Equal(2016, result.TimePeriod?.StartYear);
+            Assert.Equal(2020, result.TimePeriod?.EndYear);
             Assert.Single(result.LocationIds);
         }
     }

@@ -199,7 +199,7 @@ public class TableBuilderService : ITableBuilderService
             && await matchedObservationIds.CountAsync(cancellationToken) > _options.CroppedTableMaxRows
         )
         {
-            requiresCropping = true;
+            matchedObservationIds = matchedObservationIds.Take(_options.CroppedTableMaxRows);
         }
 
         var results = _statisticsDbContext
@@ -207,11 +207,6 @@ public class TableBuilderService : ITableBuilderService
             .Include(o => o.Location)
             .Include(o => o.FilterItems)
             .Where(o => matchedObservationIds.Contains(o.Id));
-
-        if (requiresCropping)
-        {
-            results = results.Take(_options.CroppedTableMaxRows);
-        }
 
         return (await results.ToListAsync(cancellationToken), requiresCropping);
     }
