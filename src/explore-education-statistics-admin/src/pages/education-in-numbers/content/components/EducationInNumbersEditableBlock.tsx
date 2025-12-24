@@ -19,7 +19,7 @@ interface Props {
   onSave: (blockId: string, content: string, blockType: EinBlockType) => void;
   onDelete: (blockId: string) => void;
   sectionHeading?: string;
-  ix?: number;
+  contentBlockNumber?: number;
 }
 
 const EducationInNumbersEditableBlock = ({
@@ -32,7 +32,7 @@ const EducationInNumbersEditableBlock = ({
   onSave,
   onDelete,
   sectionHeading,
-  ix = 0,
+  contentBlockNumber,
 }: Props) => {
   const blockId = `block-${block.id}`;
 
@@ -53,7 +53,7 @@ const EducationInNumbersEditableBlock = ({
   }, [block.id, onDelete]);
 
   const labelWithHeading = sectionHeading
-    ? `Content block ${ix} for ${sectionHeading} section`
+    ? `Content block ${contentBlockNumber} for ${sectionHeading} section`
     : 'Content block';
 
   switch (block.type) {

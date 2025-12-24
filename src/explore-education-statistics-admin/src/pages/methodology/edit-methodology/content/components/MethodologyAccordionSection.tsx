@@ -197,7 +197,7 @@ const MethodologyAccordionSection = ({
         renderBlock={block => (
           <MethodologyBlock methodologyId={methodologyId} block={block} />
         )}
-        renderEditableBlock={(block, ix) => {
+        renderEditableBlock={(block, contentBlockIndex) => {
           const { editLabel, removeLabel } = getBlockButtonLabels(block);
           return (
             <MethodologyEditableBlock
@@ -209,7 +209,7 @@ const MethodologyAccordionSection = ({
               removeButtonLabel={removeLabel}
               onSave={updateBlockInAccordionSection}
               onDelete={removeBlockFromAccordionSection}
-              ix={ix}
+              contentBlockNumber={contentBlockIndex}
               sectionHeading={heading}
             />
           );

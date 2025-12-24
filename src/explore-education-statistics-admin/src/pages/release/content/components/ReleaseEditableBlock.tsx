@@ -42,7 +42,7 @@ interface Props {
   visible?: boolean;
   onAfterDeleteBlock?: () => void;
   sectionHeading?: string;
-  ix?: number;
+  contentBlockNumber?: number;
 }
 
 const ReleaseEditableBlock = ({
@@ -59,7 +59,7 @@ const ReleaseEditableBlock = ({
   visible,
   onAfterDeleteBlock,
   sectionHeading,
-  ix = 0,
+  contentBlockNumber,
 }: Props) => {
   const {
     addUnsavedBlock,
@@ -440,31 +440,22 @@ const ReleaseEditableBlock = ({
   }
 
   function getVoiceActivationFriendlyLabel(): string {
-    let label: string;
     switch (sectionKey) {
       case 'summarySection':
-        label = 'Summary block';
-        break;
+        return 'Summary block';
       case 'keyStatisticsSecondarySection':
-        label = 'Headline facts and figures block';
-        break;
+        return 'Key Statistics Secondary block';
       case 'headlinesSection':
-        label = 'Headlines Section';
-        break;
+        return 'Headline facts and figures block';
       case 'relatedDashboardsSection':
-        label = 'Related Dashboards block';
-        break;
+        return 'Related Dashboards block';
       case 'content':
-        label = sectionHeading
-          ? `Content block ${ix} for ${sectionHeading} section`
+        return sectionHeading
+          ? `Content block ${contentBlockNumber} for ${sectionHeading} section`
           : 'Content block';
-        break;
       default:
-        label = 'Content block';
-        break;
+        return 'Content block';
     }
-
-    return label;
   }
 
   return (
