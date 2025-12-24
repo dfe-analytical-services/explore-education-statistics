@@ -432,7 +432,7 @@ user adds image to accordion section text block
 
     user clicks button    Change image text alternative
     user enters text into element    label:Text alternative    ${alt_text}
-    user clicks element    css:button.ck-button-save
+    user clicks element    css:button.ck-button-action
     sleep    5
     user clicks element    xpath://div[@title="Insert paragraph after block"]
 
@@ -470,7 +470,7 @@ user adds image to accordion section text block with retry
     wait until keyword succeeds    ${timeout}    %{WAIT_SMALL} sec    user clicks button
     ...    Change image text alternative
     user enters text into element    label:Text alternative    ${alt_text}
-    user clicks element    css:button.ck-button-save
+    user clicks element    css:button.ck-button-action
     sleep    5
     user scrolls up    100
     wait until keyword succeeds    ${timeout}    %{WAIT_SMALL} sec    user clicks element
