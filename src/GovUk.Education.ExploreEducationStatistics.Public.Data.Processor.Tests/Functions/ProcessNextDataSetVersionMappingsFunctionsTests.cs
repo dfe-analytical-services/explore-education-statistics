@@ -1,36 +1,87 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TestData;
 using Microsoft.EntityFrameworkCore;
+
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorFunctionsIntegrationTestFixture fixture)
-    : ProcessorFunctionsIntegrationTest(fixture)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class ProcessNextDataSetVersionMappingsFunctionsTestsFixture()
+    : OptimisedPublicDataProcessorCollectionFixture(
+        capabilities: [PublicDataProcessorIntegrationTestCapability.Postgres]
+    )
 {
-    public abstract class CreateMappingsTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public ProcessNextDataSetVersionMappingsFunctions Function = null!;
+
+    protected override void ConfigureServicesAndConfiguration(
+        OptimisedServiceAndConfigModifications serviceModifications
+    )
+    {
+        base.ConfigureServicesAndConfiguration(serviceModifications);
+
+        var dataFilesBasePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+        serviceModifications.AddInMemoryCollection([
+            new KeyValuePair<string, string?>("DataFiles:BasePath", dataFilesBasePath),
+        ]);
+    }
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+
+        Function = lookups.GetService<ProcessNextDataSetVersionMappingsFunctions>();
+    }
+}
+
+[CollectionDefinition(nameof(ProcessNextDataSetVersionMappingsFunctionsTestsFixture))]
+public class ProcessNextDataSetVersionMappingsFunctionsTestsCollection
+    : ICollectionFixture<ProcessNextDataSetVersionMappingsFunctionsTestsFixture>;
+
+[Collection(nameof(ProcessNextDataSetVersionMappingsFunctionsTestsFixture))]
+public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
+    ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture
+) : OptimisedFunctionAppIntegrationTestBase(fixture)
+{
+    private static readonly DataFixture DataFixture = new();
+
+    public abstract class CreateMappingsTests(ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture)
         : ProcessNextDataSetVersionMappingsFunctionsTests(fixture)
     {
         protected const DataSetVersionImportStage Stage = DataSetVersionImportStage.CreatingMappings;
 
         protected async Task CreateMappings(Guid instanceId)
         {
-            var function = GetRequiredService<ProcessNextDataSetVersionMappingsFunctions>();
-            await function.CreateMappings(instanceId, CancellationToken.None);
+            await fixture.Function.CreateMappings(instanceId, CancellationToken.None);
         }
     }
 
-    public class CreateMappingMiscTests(ProcessorFunctionsIntegrationTestFixture fixture) : CreateMappingsTests(fixture)
+    public class CreateMappingMiscTests(ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture)
+        : CreateMappingsTests(fixture)
     {
+        public override async Task InitializeAsync()
+        {
+            await base.InitializeAsync();
+
+            // This set of tests commonly persist sets of metadata based on fixed ProcessorTestData values.
+            // As such, they are sensitive to previously-inserted data by other tests and so for simplicity,
+            // we ensure previous test data is torn down prior to running the tests.
+            await fixture.GetPublicDataDbContext().ClearTestData();
+        }
+
         [Fact]
         public async Task Success_ImportStatus()
         {
@@ -38,7 +89,8 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
 
             await CreateMappings(instanceId);
 
-            var savedImport = await GetDbContext<PublicDataDbContext>()
+            var savedImport = await fixture
+                .GetPublicDataDbContext()
                 .DataSetVersionImports.Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
 
@@ -297,7 +349,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
         }
     }
 
-    public class CreateMappingsLocationsTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class CreateMappingsLocationsTests(ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture)
         : CreateMappingsTests(fixture)
     {
         [Fact]
@@ -350,7 +402,9 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                 )
                 .GenerateList();
 
-            await AddTestData<PublicDataDbContext>(context => context.LocationMetas.AddRange(initialLocationMeta));
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context => context.LocationMetas.AddRange(initialLocationMeta));
 
             await CreateMappings(instanceId);
 
@@ -446,7 +500,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
         }
     }
 
-    public class CreateMappingsFiltersTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class CreateMappingsFiltersTests(ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture)
         : CreateMappingsTests(fixture)
     {
         [Fact]
@@ -462,7 +516,9 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                 .WithOptions(() => DataFixture.DefaultFilterOptionMeta().GenerateList(2))
                 .GenerateList(2);
 
-            await AddTestData<PublicDataDbContext>(context => context.FilterMetas.AddRange(initialFilterMeta));
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context => context.FilterMetas.AddRange(initialFilterMeta));
 
             await CreateMappings(instanceId);
 
@@ -524,19 +580,18 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
         }
     }
 
-    public abstract class ApplyAutoMappingsTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public abstract class ApplyAutoMappingsTests(ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture)
         : ProcessNextDataSetVersionMappingsFunctionsTests(fixture)
     {
         protected const DataSetVersionImportStage Stage = DataSetVersionImportStage.AutoMapping;
 
         protected async Task ApplyAutoMappings(Guid instanceId)
         {
-            var function = GetRequiredService<ProcessNextDataSetVersionMappingsFunctions>();
-            await function.ApplyAutoMappings(instanceId, CancellationToken.None);
+            await fixture.Function.ApplyAutoMappings(instanceId, CancellationToken.None);
         }
     }
 
-    public class ApplyAutoMappingsMiscTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class ApplyAutoMappingsMiscTests(ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture)
         : ApplyAutoMappingsTests(fixture)
     {
         [Fact]
@@ -546,21 +601,24 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                 Stage.PreviousStage()
             );
 
-            await AddTestData<PublicDataDbContext>(context =>
-                context.DataSetVersionMappings.Add(
-                    new DataSetVersionMapping
-                    {
-                        SourceDataSetVersionId = originalVersion.Id,
-                        TargetDataSetVersionId = nextVersion.Id,
-                        LocationMappingPlan = new LocationMappingPlan(),
-                        FilterMappingPlan = new FilterMappingPlan(),
-                    }
-                )
-            );
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                    context.DataSetVersionMappings.Add(
+                        new DataSetVersionMapping
+                        {
+                            SourceDataSetVersionId = originalVersion.Id,
+                            TargetDataSetVersionId = nextVersion.Id,
+                            LocationMappingPlan = new LocationMappingPlan(),
+                            FilterMappingPlan = new FilterMappingPlan(),
+                        }
+                    )
+                );
 
             await ApplyAutoMappings(instanceId);
 
-            var savedImport = await GetDbContext<PublicDataDbContext>()
+            var savedImport = await fixture
+                .GetPublicDataDbContext()
                 .DataSetVersionImports.Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
 
@@ -581,7 +639,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                 .WithTargetDataSetVersionId(nextVersion.Id)
                 .WithHasDeletedIndicators(true);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -603,7 +661,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                 .WithTargetDataSetVersionId(nextVersion.Id)
                 .WithHasDeletedGeographicLevels(true);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -625,7 +683,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                 .WithTargetDataSetVersionId(nextVersion.Id)
                 .WithHasDeletedTimePeriods(true);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -635,7 +693,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
         }
     }
 
-    public class ApplyAutoMappingsLocationsTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class ApplyAutoMappingsLocationsTests(ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture)
         : ApplyAutoMappingsTests(fixture)
     {
         [Fact]
@@ -679,7 +737,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                         )
                 );
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -775,7 +833,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                         )
                 );
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -853,7 +911,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                         )
                 );
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -918,7 +976,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                         )
                 );
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -972,7 +1030,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                         )
                 );
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -1060,7 +1118,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                         )
                 );
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -1138,7 +1196,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                 // Has deleted indicators that cannot be mapped
                 .WithHasDeletedIndicators(true);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -1182,7 +1240,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                 // Has deleted geographic levels that cannot be mapped
                 .WithHasDeletedGeographicLevels(true);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -1226,7 +1284,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                 // Has deleted time periods that cannot be mapped
                 .WithHasDeletedTimePeriods(true);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -1237,7 +1295,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
         }
     }
 
-    public class ApplyAutoMappingsFiltersTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class ApplyAutoMappingsFiltersTests(ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture)
         : ApplyAutoMappingsTests(fixture)
     {
         [Fact]
@@ -1290,7 +1348,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                         )
                 );
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -1421,7 +1479,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                         )
                 );
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -1535,7 +1593,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                         )
                 );
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -1627,7 +1685,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                         )
                 );
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -1719,7 +1777,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                 // Has deleted indicators that cannot be mapped
                 .WithHasDeletedIndicators(true);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -1763,7 +1821,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                 // Has deleted geographic levels that cannot be mapped
                 .WithHasDeletedGeographicLevels(true);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -1807,7 +1865,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
                 // Has deleted time periods that cannot be mapped
                 .WithHasDeletedTimePeriods(true);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ApplyAutoMappings(instanceId);
 
@@ -1819,7 +1877,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
     }
 
     public class CompleteNextDataSetVersionMappingsMappingProcessingTests(
-        ProcessorFunctionsIntegrationTestFixture fixture
+        ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture
     ) : ProcessNextDataSetVersionMappingsFunctionsTests(fixture)
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.ManualMapping;
@@ -1829,14 +1887,12 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
         {
             var (instanceId, _, nextVersion) = await CreateNextDataSetVersionAndDataFiles(Stage.PreviousStage());
 
-            var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
-            Directory.CreateDirectory(dataSetVersionPathResolver.DirectoryPath(nextVersion));
+            Directory.CreateDirectory(fixture.GetDataSetVersionPathResolver().DirectoryPath(nextVersion));
 
             await CompleteProcessing(instanceId);
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var savedImport = await publicDataDbContext
+            var savedImport = await fixture
+                .GetPublicDataDbContext()
                 .DataSetVersionImports.Include(i => i.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
 
@@ -1848,8 +1904,7 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
 
         private async Task CompleteProcessing(Guid instanceId)
         {
-            var function = GetRequiredService<ProcessNextDataSetVersionMappingsFunctions>();
-            await function.CompleteNextDataSetVersionMappingProcessing(instanceId, CancellationToken.None);
+            await fixture.Function.CompleteNextDataSetVersionMappingProcessing(instanceId, CancellationToken.None);
         }
     }
 
@@ -1862,13 +1917,19 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
         DataSetVersionMeta? initialVersionMeta = null
     )
     {
-        var (initialDataSetVersion, nextDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-            initialVersionMeta: initialVersionMeta ?? GetDefaultInitialDataSetVersionMeta(),
-            nextVersionImportStage: importStage,
-            nextVersionStatus: DataSetVersionStatus.Processing
-        );
+        var (initialDataSetVersion, nextDataSetVersion, instanceId) =
+            await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                publicDataDbContext: fixture.GetPublicDataDbContext(),
+                initialVersionMeta: initialVersionMeta ?? GetDefaultInitialDataSetVersionMeta(),
+                nextVersionImportStage: importStage,
+                nextVersionStatus: DataSetVersionStatus.Processing
+            );
 
-        SetupCsvDataFilesForDataSetVersion(ProcessorTestData.AbsenceSchool, nextDataSetVersion);
+        CommonTestDataUtils.SetupCsvDataFilesForDataSetVersion(
+            dataSetVersionPathResolver: fixture.GetDataSetVersionPathResolver(),
+            ProcessorTestData.AbsenceSchool,
+            nextDataSetVersion
+        );
 
         ReleaseFile releaseFile = DataFixture
             .DefaultReleaseFile()
@@ -1878,19 +1939,20 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
             .WithPublicApiDataSetId(nextDataSetVersion.DataSetId)
             .WithPublicApiDataSetVersion(nextDataSetVersion.SemVersion());
 
-        await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+        await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Add(releaseFile));
 
         return (instanceId, initialDataSetVersion, nextDataSetVersion);
     }
 
     private async Task<DataSetVersion> GetDataSetVersion(DataSetVersion nextVersion)
     {
-        return await GetDbContext<PublicDataDbContext>().DataSetVersions.SingleAsync(dsv => dsv.Id == nextVersion.Id);
+        return await fixture.GetPublicDataDbContext().DataSetVersions.SingleAsync(dsv => dsv.Id == nextVersion.Id);
     }
 
     private async Task<DataSetVersionMapping> GetDataSetVersionMapping(DataSetVersion nextVersion)
     {
-        return await GetDbContext<PublicDataDbContext>()
+        return await fixture
+            .GetPublicDataDbContext()
             .DataSetVersionMappings.Include(mapping => mapping.TargetDataSetVersion)
             .SingleAsync(mapping => mapping.TargetDataSetVersionId == nextVersion.Id);
     }
@@ -1909,7 +1971,8 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(ProcessorF
     {
         Assert.Equal(expectedVersion, mapping.TargetDataSetVersion.SemVersion().ToString());
 
-        var updatedReleaseFile = await GetDbContext<ContentDbContext>()
+        var updatedReleaseFile = await fixture
+            .GetContentDbContext()
             .ReleaseFiles.SingleAsync(rf => rf.PublicApiDataSetId == mapping.TargetDataSetVersion.DataSetId);
 
         Assert.Equal(expectedVersion, updatedReleaseFile.PublicApiDataSetVersion?.ToString());
