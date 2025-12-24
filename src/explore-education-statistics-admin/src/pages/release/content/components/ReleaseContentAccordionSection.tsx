@@ -293,7 +293,7 @@ const ReleaseContentAccordionSection = ({
                 visible={open}
               />
             )}
-            renderEditableBlock={block => {
+            renderEditableBlock={(block, ix) => {
               const { editLabel, removeLabel } = getBlockButtonLabels(block);
               return (
                 <ReleaseEditableBlock
@@ -309,6 +309,8 @@ const ReleaseContentAccordionSection = ({
                   releaseVersionId={release.id}
                   visible={open}
                   onAfterDeleteBlock={onAfterDeleteBlock}
+                  sectionHeading={heading}
+                  ix={ix}
                 />
               );
             }}

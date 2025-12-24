@@ -41,6 +41,8 @@ interface Props {
   sectionKey: ContentSectionKeys;
   visible?: boolean;
   onAfterDeleteBlock?: () => void;
+  sectionHeading?: string;
+  ix?: number;
 }
 
 const ReleaseEditableBlock = ({
@@ -56,6 +58,8 @@ const ReleaseEditableBlock = ({
   sectionKey,
   visible,
   onAfterDeleteBlock,
+  sectionHeading,
+  ix = 0,
 }: Props) => {
   const {
     addUnsavedBlock,
@@ -336,6 +340,8 @@ const ReleaseEditableBlock = ({
 
   const blockId = `block-${block.id}`;
 
+  const labelWithHeading = getVoiceActivationFriendlyLabel();
+
   function renderBlock() {
     switch (block.type) {
       case 'DataBlock':
@@ -407,7 +413,7 @@ const ReleaseEditableBlock = ({
             id={blockId}
             isEditing={isLockedByUser}
             isLoading={isLocking}
-            label="Content block"
+            label={labelWithHeading}
             locked={locked}
             lockedBy={isLockedByOtherUser ? lockedBy : undefined}
             removeButtonLabel={removeButtonLabel}
@@ -431,6 +437,32 @@ const ReleaseEditableBlock = ({
       default:
         return <div>Unable to edit content</div>;
     }
+  }
+
+  function getVoiceActivationFriendlyLabel(): string {
+    let label: string;
+    switch (sectionKey) {
+      case 'summarySection':
+        label = 'Summary Section';
+        break;
+      case 'keyStatisticsSecondarySection':
+        label = 'Key Statistics Secondary Section';
+        break;
+      case 'headlinesSection':
+        label = 'Headlines Section';
+        break;
+      case 'relatedDashboardsSection':
+        label = 'Related Dashboards Section';
+        break;
+      case 'content':
+      default:
+        label = 'Content block';
+        break;
+    }
+
+    return sectionHeading
+      ? `Content block${ix ? ` ${ix}` : ''} for ${sectionHeading} section`
+      : label;
   }
 
   return (
