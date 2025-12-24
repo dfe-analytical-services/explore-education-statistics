@@ -443,26 +443,28 @@ const ReleaseEditableBlock = ({
     let label: string;
     switch (sectionKey) {
       case 'summarySection':
-        label = 'Summary Section';
+        label = 'Summary block';
         break;
       case 'keyStatisticsSecondarySection':
-        label = 'Key Statistics Secondary Section';
+        label = 'Headline facts and figures block';
         break;
       case 'headlinesSection':
         label = 'Headlines Section';
         break;
       case 'relatedDashboardsSection':
-        label = 'Related Dashboards Section';
+        label = 'Related Dashboards block';
         break;
       case 'content':
+        label = sectionHeading
+          ? `Content block ${ix} for ${sectionHeading} section`
+          : 'Content block';
+        break;
       default:
         label = 'Content block';
         break;
     }
 
-    return sectionHeading
-      ? `Content block ${ix} for ${sectionHeading} section`
-      : label;
+    return label;
   }
 
   return (

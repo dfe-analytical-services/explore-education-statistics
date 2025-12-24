@@ -73,7 +73,6 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
       />
     );
   }
-  const hasMoreThanOneBlock = blocks.length > 1;
 
   return (
     <div>
@@ -85,7 +84,7 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
           data-scroll
           data-testid="editableSectionBlock"
         >
-          {renderEditableBlock(block, hasMoreThanOneBlock ? ix + 1 : 0)}
+          {renderEditableBlock(block, ix + 1)}
         </div>
       ))}
     </div>
