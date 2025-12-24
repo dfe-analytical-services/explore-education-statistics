@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
@@ -44,11 +45,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Web
 /// minimal API projects require different approaches.
 ///
 /// </param>
-public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimalApi = false) : IAsyncLifetime
+public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(Type[] dbContextTypes, bool minimalApi = false)
+    : IAsyncLifetime
     where TStartup : class
 {
     private TestContainerRegistrations _testContainers = null!;
     private WebApplicationFactory<TStartup> _factory = null!;
+
+    protected TestDbContextHolder TestTestDbContexts = null!;
 
     public async Task InitializeAsync()
     {
@@ -78,6 +82,10 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimal
             serviceModifications: [.. modifications.GetServiceModifications()],
             configModifications: [.. modifications.GetConfigModifications()]
         );
+
+        // Look up all required DbContexts and make them available to the fixture subclass.
+        var dbContexts = dbContextTypes.Select(type => _factory.Services.GetService(type)).Cast<DbContext>().ToArray();
+        TestTestDbContexts = new TestDbContextHolder(dbContexts);
 
         // Finally, allow the fixture subclass to perform any actions post-factory creation and prior to any
         // tests from its collection starting. This might include looking up any services that the tests in the
@@ -116,11 +124,16 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimal
     /// <summary>
     /// A method that can be overridden by subclasses of this fixture to perform actions before each test
     /// in a collection runs e.g. resetting any shared Mocks that were dirtied in previous tests in the
-    /// collection, unsettings users from handling requests etc.
+    /// collection, unsetting users from handling requests etc.
     /// </summary>
-    public virtual Task BeforeEachTest()
+    public virtual async Task BeforeEachTest()
     {
-        return Task.CompletedTask;
+        // In-memory DbContexts can be cleared down by default with no speed penalty.
+        // Proper DbContexts add considerable time to a full project run if clearing
+        // between every test, and therefore we don't clear them down by default.
+        await TestTestDbContexts.ClearInMemoryTestData();
+
+        TestTestDbContexts.ResetAnyMocks();
     }
 
     /// <summary>
@@ -139,6 +152,7 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimal
     public async Task DisposeAsync()
     {
         await _testContainers.StopAll();
+        await TestTestDbContexts.DisposeAll();
         await DisposeResources();
     }
 }

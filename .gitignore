@@ -58,6 +58,7 @@ src/explore-education-statistics-frontend/*.xml
 /tests/robot-tests/tests/visual_testing/visually_check_tables_and_charts.dev.robot.csv
 /tests/robot-tests/tests/files/.unzipped-seed-data-files
 seed-data-files.zip
+src/**/TestResults
 
 /tests/performance-tests/.env.*
 !/tests/performance-tests/.env.example.json

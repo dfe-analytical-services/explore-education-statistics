@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgre
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -52,12 +51,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimis
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTestCapability[] capabilities)
-    : OptimisedIntegrationTestFixtureBase<Startup>
+    : OptimisedIntegrationTestFixtureBase<Startup>(
+        dbContextTypes:
+        [
+            typeof(PublicDataDbContext),
+            typeof(ContentDbContext),
+            typeof(StatisticsDbContext),
+            typeof(UsersAndRolesDbContext),
+        ]
+    )
 {
-    private PublicDataDbContext _publicDataDbContext = null!;
-    private ContentDbContext _contentDbContext = null!;
-    private StatisticsDbContext _statisticsDbContext = null!;
-    private UsersAndRolesDbContext _usersAndRolesDbContext = null!;
     private IProcessorClient _processorClient = null!;
     private IPublicDataApiClient _publicDataApiClient = null!;
     private OptimisedTestUserHolder? _userHolder;
@@ -133,14 +136,6 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
             _userHolder = lookups.GetService<OptimisedTestUserHolder>();
         }
 
-        // Grab reusable DbContexts that can be used for test data setup and test assertions. These are looked up once
-        // per startup of a test class that uses this fixture and are disposed of at the end of its lifetime, via XUnit
-        // calling "DisposeAsync" on this fixture.
-        _publicDataDbContext = lookups.GetService<PublicDataDbContext>();
-        _contentDbContext = lookups.GetService<ContentDbContext>();
-        _statisticsDbContext = lookups.GetService<StatisticsDbContext>();
-        _usersAndRolesDbContext = lookups.GetService<UsersAndRolesDbContext>();
-
         // Look up commonly mocked-out dependencies once per test class using this fixture. If the test collection
         // needs these as mocks, they can access them using the respective "GetXMock" method in this fixture e.g.
         // "GetProcessorClientMock()". We look up just the plain services here because an individual test collection
@@ -150,30 +145,10 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
 
         if (capabilities.Contains(AdminIntegrationTestCapability.Postgres))
         {
-            _publicDataDbContext.Database.Migrate();
+            GetPublicDataDbContext().Database.Migrate();
         }
 
         return Task.CompletedTask;
-    }
-
-    /// <summary>
-    ///
-    /// This is called by the XUnit lifecycle management of test fixtures. Once the test suite that is using this
-    /// fixture has finished, this method is called for us to dispose of any disposable resources that we are keeping
-    /// handles on.
-    ///
-    /// For example, the reusable DbContexts that we use to seed test data and make assertions with are disposed of
-    /// here, ensuring that they do not hang around and allows the full disposal of the WebApplicationFactory instance
-    /// that was used by that test class.
-    ///
-    /// </summary>
-    protected override async Task DisposeResources()
-    {
-        // Dispose of any DbContexts when the test class that was using this fixture has completed.
-        await _publicDataDbContext.DisposeAsync();
-        await _contentDbContext.DisposeAsync();
-        await _statisticsDbContext.DisposeAsync();
-        await _usersAndRolesDbContext.DisposeAsync();
     }
 
     /// <summary>
@@ -188,22 +163,23 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public ContentDbContext GetContentDbContext() => _contentDbContext;
+    public ContentDbContext GetContentDbContext() => TestTestDbContexts.GetDbContext<ContentDbContext>();
 
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public StatisticsDbContext GetStatisticsDbContext() => _statisticsDbContext;
+    public StatisticsDbContext GetStatisticsDbContext() => TestTestDbContexts.GetDbContext<StatisticsDbContext>();
 
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public UsersAndRolesDbContext GetUsersAndRolesDbContext() => _usersAndRolesDbContext;
+    public UsersAndRolesDbContext GetUsersAndRolesDbContext() =>
+        TestTestDbContexts.GetDbContext<UsersAndRolesDbContext>();
 
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public PublicDataDbContext GetPublicDataDbContext() => _publicDataDbContext;
+    public PublicDataDbContext GetPublicDataDbContext() => TestTestDbContexts.GetDbContext<PublicDataDbContext>();
 
     /// <summary>
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
@@ -223,6 +199,8 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
     /// </summary>
     public override async Task BeforeEachTest()
     {
+        await base.BeforeEachTest();
+
         ResetIfMock(_processorClient);
         ResetIfMock(_publicDataApiClient);
 
@@ -230,13 +208,6 @@ public abstract class OptimisedAdminCollectionFixture(params AdminIntegrationTes
         {
             _userHolder!.SetUser(null);
         }
-
-        // In-memory DbContexts can be cleared down by default with no speed penalty.
-        // Proper DbContexts add considerable time to a full project run if clearing
-        // between every test, and therefore we don't clear them down by default.
-        await _contentDbContext.ClearTestDataIfInMemory();
-        await _statisticsDbContext.ClearTestDataIfInMemory();
-        await _publicDataDbContext.ClearTestDataIfInMemory();
     }
 
     /// <summary>

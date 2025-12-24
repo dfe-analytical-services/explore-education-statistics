@@ -44,13 +44,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests
 // ReSharper disable once ClassNeverInstantiated.Global
 public class OptimisedPublicDataProcessorCollectionFixture(
     params PublicDataProcessorIntegrationTestCapability[] capabilities
-) : OptimisedFunctionAppIntegrationTestFixtureBase
+)
+    : OptimisedFunctionAppIntegrationTestFixtureBase(
+        dbContextTypes: [typeof(PublicDataDbContext), typeof(ContentDbContext)]
+    )
 {
     private Func<string> _psqlConnectionString = null!;
     private AzuriteWrapper _azuriteWrapper = null!;
-
-    private PublicDataDbContext? _publicDataDbContext;
-    private ContentDbContext _contentDbContext = null!;
 
     private IPrivateBlobStorageService _privateBlobStorageService = null!;
 
@@ -126,15 +126,12 @@ public class OptimisedPublicDataProcessorCollectionFixture(
         // Grab reusable DbContexts that can be used for test data setup and test assertions. These are looked up once
         // per startup of a test class that uses this fixture and are disposed of at the end of its lifetime, via XUnit
         // calling "DisposeAsync" on this fixture.
-        _publicDataDbContext = lookups.GetService<PublicDataDbContext>();
-        _contentDbContext = lookups.GetService<ContentDbContext>();
-
         _dataSetVersionPathResolver = lookups.GetService<IDataSetVersionPathResolver>();
         _privateBlobStorageService = lookups.GetService<IPrivateBlobStorageService>();
 
         if (capabilities.Contains(PublicDataProcessorIntegrationTestCapability.Postgres))
         {
-            _publicDataDbContext.Database.Migrate();
+            GetPublicDataDbContext().Database.Migrate();
         }
 
         return Task.CompletedTask;
@@ -154,64 +151,22 @@ public class OptimisedPublicDataProcessorCollectionFixture(
     protected override async Task DisposeResources()
     {
         // Dispose of any DbContexts when the test class that was using this fixture has completed.
-        if (_publicDataDbContext != null)
-        {
-            await _publicDataDbContext.DisposeAsync();
-        }
-
-        await _contentDbContext.DisposeAsync();
+        await TestTestDbContexts.DisposeAll();
     }
 
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public PublicDataDbContext GetPublicDataDbContext() => _publicDataDbContext!;
+    public PublicDataDbContext GetPublicDataDbContext() => TestTestDbContexts.GetDbContext<PublicDataDbContext>();
 
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public ContentDbContext GetContentDbContext() => _contentDbContext;
+    public ContentDbContext GetContentDbContext() => TestTestDbContexts.GetDbContext<ContentDbContext>();
 
     public IDataSetVersionPathResolver GetDataSetVersionPathResolver() => _dataSetVersionPathResolver;
 
     public IPrivateBlobStorageService GetPrivateBlobStorageService() => _privateBlobStorageService;
-
-    /// <summary>
-    /// This method is run prior to each individual test in a collection. Here we reset any commonly-used mocks and
-    /// ensure no users are set to handle HttpClient requests by default.
-    /// </summary>
-    public override Task BeforeEachTest()
-    {
-        ResetIfMock(_publicDataDbContext);
-        ResetIfMock(_contentDbContext);
-
-        return Task.CompletedTask;
-    }
-
-    /// <summary>
-    /// Resets a mock for a given service if the service has been mocked.
-    ///
-    /// We support this not necessarily being a mock because a fixture subclass may have chosen to inject a real
-    /// service in place of a service that is generally mocked out.
-    /// </summary>
-    private void ResetIfMock<TService>(TService? service)
-        where TService : class
-    {
-        if (service == null)
-        {
-            return;
-        }
-
-        try
-        {
-            var mock = Mock.Get(service);
-            mock.Reset();
-        }
-        catch
-        {
-            // "service" is not a Mock. This is fine.
-        }
-    }
 }
 
 public enum PublicDataProcessorIntegrationTestCapability

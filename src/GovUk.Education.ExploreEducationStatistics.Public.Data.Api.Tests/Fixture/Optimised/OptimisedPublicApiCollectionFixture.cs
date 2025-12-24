@@ -46,13 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixtu
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
 public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegrationTestCapability[] capabilities)
-    : OptimisedIntegrationTestFixtureBase<Startup>(minimalApi: true)
+    : OptimisedIntegrationTestFixtureBase<Startup>(dbContextTypes: [typeof(PublicDataDbContext)], minimalApi: true)
 {
     private OptimisedTestUserHolder? _userHolder;
 
     private Func<string> _psqlConnectionString = null!;
 
-    private PublicDataDbContext? _publicDataDbContext;
     private IContentApiClient _contentApiClient = null!;
     private ISearchService _searchService = null!;
     private IAnalyticsService _analyticsService = null!;
@@ -115,11 +114,6 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
             _userHolder = lookups.GetService<OptimisedTestUserHolder>();
         }
 
-        // Grab reusable DbContexts that can be used for test data setup and test assertions. These are looked up once
-        // per startup of a test class that uses this fixture and are disposed of at the end of its lifetime, via XUnit
-        // calling "DisposeAsync" on this fixture.
-        _publicDataDbContext = lookups.GetService<PublicDataDbContext>();
-
         // Look up commonly mocked-out dependencies once per test class using this fixture. If the test collection
         // needs these as mocks, they can access them using the respective "GetXMock" method in this fixture e.g.
         // "GetContentApiClientMock()". We look up just the plain services here because an individual test collection
@@ -130,30 +124,10 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
 
         if (capabilities.Contains(PublicApiIntegrationTestCapability.Postgres))
         {
-            _publicDataDbContext.Database.Migrate();
+            GetPublicDataDbContext().Database.Migrate();
         }
 
         return Task.CompletedTask;
-    }
-
-    /// <summary>
-    ///
-    /// This is called by the XUnit lifecycle management of test fixtures. Once the test suite that is using this
-    /// fixture has finished, this method is called for us to dispose of any disposable resources that we are keeping
-    /// handles on.
-    ///
-    /// For example, the reusable DbContexts that we use to seed test data and make assertions with are disposed of
-    /// here, ensuring that they do not hang around and allows the full disposal of the WebApplicationFactory instance
-    /// that was used by that test class.
-    ///
-    /// </summary>
-    protected override async Task DisposeResources()
-    {
-        // Dispose of any DbContexts when the test class that was using this fixture has completed.
-        if (_publicDataDbContext != null)
-        {
-            await _publicDataDbContext.DisposeAsync();
-        }
     }
 
     /// <summary>
@@ -173,7 +147,7 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public PublicDataDbContext GetPublicDataDbContext() => _publicDataDbContext!;
+    public PublicDataDbContext GetPublicDataDbContext() => TestTestDbContexts.GetDbContext<PublicDataDbContext>();
 
     /// <summary>
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used

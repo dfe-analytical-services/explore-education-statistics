@@ -313,7 +313,7 @@ public abstract class ImportDataFunctionTests(ImportDataFunctionTestsFixture fix
         }
     }
 
-    protected DuckDbConnection GetDuckDbConnection(DataSetVersion dataSetVersion)
+    private DuckDbConnection GetDuckDbConnection(DataSetVersion dataSetVersion)
     {
         return DuckDbConnection.CreateFileConnectionReadOnly(
             fixture.GetDataSetVersionPathResolver().DuckDbPath(dataSetVersion)

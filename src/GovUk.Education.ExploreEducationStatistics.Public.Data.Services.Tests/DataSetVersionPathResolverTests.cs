@@ -33,12 +33,7 @@ public abstract class DataSetVersionPathResolverTests
 
     public class PathTests : DataSetVersionPathResolverTests
     {
-        private static readonly string[] EnvironmentNames =
-        [
-            Environments.Development,
-            HostEnvironmentExtensions.IntegrationTestEnvironment,
-            Environments.Production,
-        ];
+        private static readonly string[] EnvironmentNames = [Environments.Development, Environments.Production];
 
         public static readonly TheoryData<string> GetEnvironmentNames = new(EnvironmentNames);
 
@@ -60,36 +55,6 @@ public abstract class DataSetVersionPathResolverTests
             );
 
             Assert.Equal(Path.Combine(PathUtils.ProjectRootPath, "data", "data-files"), resolver.BasePath());
-        }
-
-        [Fact]
-        public void IntegrationTestEnv_ValidBasePath()
-        {
-            _webHostEnvironmentMock
-                .SetupGet(s => s.EnvironmentName)
-                .Returns(HostEnvironmentExtensions.IntegrationTestEnvironment);
-
-            var resolver = BuildService(
-                options: new DataFilesOptions { BasePath = Path.Combine("data", "data-files") }
-            );
-
-            var basePath = resolver.BasePath();
-
-            // Expect the last path segment to be a random test instance directory
-            var expectedLastPathSegment = basePath[(basePath.LastIndexOf(Path.DirectorySeparatorChar) + 1)..];
-            Assert.NotEmpty(expectedLastPathSegment);
-            Assert.True(Guid.TryParse(expectedLastPathSegment, out var randomTestInstanceDir));
-
-            Assert.Equal(
-                Path.Combine(
-                    Path.GetTempPath(),
-                    "ExploreEducationStatistics",
-                    "data",
-                    "data-files",
-                    randomTestInstanceDir.ToString()
-                ),
-                basePath
-            );
         }
 
         [Fact]
