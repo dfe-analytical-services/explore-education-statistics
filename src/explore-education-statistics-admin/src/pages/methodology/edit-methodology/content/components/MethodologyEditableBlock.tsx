@@ -58,7 +58,7 @@ const MethodologyEditableBlock = ({
   }, [block.id, onDelete]);
 
   const labelWithHeading = sectionHeading
-    ? `Content block${ix > 0 ? ` ${ix}` : ''} for ${sectionHeading} section`
+    ? `Content block ${ix} for ${sectionHeading} section`
     : 'Content block';
 
   switch (block.type) {
@@ -69,7 +69,7 @@ const MethodologyEditableBlock = ({
           editButtonLabel={editButtonLabel}
           id={blockId}
           isEditing={isEditing}
-          label={labelWithHeading}
+          label={labelWithHeading} // Because hideLabel is true, this only affects the aria-label of the ckeditor
           hideLabel
           removeButtonLabel={removeButtonLabel}
           toolbarConfig={methodologyToolbarConfigFull}

@@ -413,7 +413,7 @@ const ReleaseEditableBlock = ({
             id={blockId}
             isEditing={isLockedByUser}
             isLoading={isLocking}
-            label={labelWithHeading}
+            label={labelWithHeading} // Because hideLabel is true, this only affects the aria-label of the ckeditor
             locked={locked}
             lockedBy={isLockedByOtherUser ? lockedBy : undefined}
             removeButtonLabel={removeButtonLabel}
@@ -461,7 +461,7 @@ const ReleaseEditableBlock = ({
     }
 
     return sectionHeading
-      ? `Content block${ix ? ` ${ix}` : ''} for ${sectionHeading} section`
+      ? `Content block ${ix} for ${sectionHeading} section`
       : label;
   }
 

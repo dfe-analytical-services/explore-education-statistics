@@ -53,7 +53,7 @@ const EducationInNumbersEditableBlock = ({
   }, [block.id, onDelete]);
 
   const labelWithHeading = sectionHeading
-    ? `Content block${ix ? ` ${ix}` : ''} for ${sectionHeading} section`
+    ? `Content block ${ix} for ${sectionHeading} section`
     : 'Content block';
 
   switch (block.type) {
@@ -65,7 +65,7 @@ const EducationInNumbersEditableBlock = ({
           removeButtonLabel={removeButtonLabel}
           id={blockId}
           isEditing={isEditing}
-          label={labelWithHeading}
+          label={labelWithHeading} // Because hideLabel is true, this only affects the aria-label of the ckeditor // Because hideLabel is true, this only affects the aria-label of the ckeditor
           hideLabel
           value={block.body}
           toolbarConfig={educationInNumbersToolbarConfig}
