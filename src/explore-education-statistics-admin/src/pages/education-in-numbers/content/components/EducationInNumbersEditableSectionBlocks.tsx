@@ -14,7 +14,7 @@ export interface EditableSectionBlockProps<
   isReordering?: boolean;
   onBlocksChange?: (nextBlocks: T[]) => void;
   renderBlock: (block: T) => ReactNode;
-  renderEditableBlock: (block: T) => ReactNode;
+  renderEditableBlock: (block: T, ix?: number) => ReactNode;
 }
 
 const EditableSectionBlocks = <T extends EinContentBlock = EinContentBlock>({

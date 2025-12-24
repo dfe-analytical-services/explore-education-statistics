@@ -18,6 +18,8 @@ interface Props {
   sectionId: string;
   onSave: (blockId: string, content: string, blockType: EinBlockType) => void;
   onDelete: (blockId: string) => void;
+  sectionHeading?: string;
+  ix?: number;
 }
 
 const EducationInNumbersEditableBlock = ({
@@ -29,6 +31,8 @@ const EducationInNumbersEditableBlock = ({
   sectionId,
   onSave,
   onDelete,
+  sectionHeading,
+  ix = 0,
 }: Props) => {
   const blockId = `block-${block.id}`;
 
@@ -48,6 +52,10 @@ const EducationInNumbersEditableBlock = ({
     onDelete(block.id);
   }, [block.id, onDelete]);
 
+  const labelWithHeading = sectionHeading
+    ? `Content block${ix ? ` ${ix}` : ''} for ${sectionHeading} section`
+    : 'Content block';
+
   switch (block.type) {
     case 'HtmlBlock':
       return (
@@ -57,7 +65,7 @@ const EducationInNumbersEditableBlock = ({
           removeButtonLabel={removeButtonLabel}
           id={blockId}
           isEditing={isEditing}
-          label="Content block"
+          label={labelWithHeading}
           hideLabel
           value={block.body}
           toolbarConfig={educationInNumbersToolbarConfig}
