@@ -1,16 +1,18 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
@@ -22,12 +24,38 @@ using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
-    : ProcessorFunctionsIntegrationTest(fixture)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class CreateNextDataSetVersionMappingsFunctionTestsFixture()
+    : OptimisedPublicDataProcessorCollectionFixture(
+        capabilities: [PublicDataProcessorIntegrationTestCapability.Postgres]
+    )
 {
-    public class CreateNextDataSetVersionMappingsTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public CreateNextDataSetVersionMappingsFunction Function = null!;
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+
+        Function = lookups.GetService<CreateNextDataSetVersionMappingsFunction>();
+    }
+}
+
+[CollectionDefinition(nameof(CreateNextDataSetVersionMappingsFunctionTestsFixture))]
+public class CreateNextDataSetVersionMappingsFunctionTestsCollection
+    : ICollectionFixture<CreateNextDataSetVersionMappingsFunctionTestsFixture>;
+
+[Collection(nameof(CreateNextDataSetVersionMappingsFunctionTestsFixture))]
+public abstract class CreateNextDataSetVersionMappingsFunctionTests(
+    CreateNextDataSetVersionMappingsFunctionTestsFixture fixture
+) : OptimisedFunctionAppIntegrationTestBase(fixture)
+{
+    private static readonly DataFixture DataFixture = new();
+
+    public class CreateNextDataSetVersionMappingsTests(CreateNextDataSetVersionMappingsFunctionTestsFixture fixture)
         : CreateNextDataSetVersionMappingsFunctionTests(fixture)
     {
         [Fact]
@@ -71,13 +99,13 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
 
             var responseViewModel = result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
             // Assert only the original data set exists.
             var updatedDataSet = Assert.Single(
-                await publicDataDbContext
+                await fixture
+                    .GetPublicDataDbContext()
                     .DataSets.Include(ds => ds.Versions)
                         .ThenInclude(dsv => dsv.Imports)
+                    .Where(ds => ds.Id == dataSet.Id)
                     .ToListAsync()
             );
 
@@ -205,10 +233,12 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
                 )
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
-            await AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             // Create another DataSet and DataSetVersion which already references the ReleaseFile's Id.
             DataSet otherDataSet = DataFixture.DefaultDataSet();
@@ -218,12 +248,14 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
                 .WithDataSet(otherDataSet)
                 .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id));
 
-            await AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSets.Add(otherDataSet);
-                context.SaveChanges();
-                context.DataSetVersions.Add(otherDataSetVersion);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSets.Add(otherDataSet);
+                    context.SaveChanges();
+                    context.DataSetVersions.Add(otherDataSetVersion);
+                });
 
             var result = await CreateNextDataSetVersion(dataSetId: dataSet.Id, releaseFileId: releaseFile.Id);
 
@@ -256,10 +288,12 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
                 ])
                 .GenerateTuple2();
 
-            await AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.AddRange(releaseFile, releaseMetaFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.AddRange(releaseFile, releaseMetaFile);
+                });
 
             var result = await CreateNextDataSetVersion(dataSetId: dataSet.Id, releaseFileId: releaseFile.Id);
 
@@ -285,10 +319,12 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
                 )
                 .WithFile(DataFixture.DefaultFile(FileType.Ancillary));
 
-            await AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             var result = await CreateNextDataSetVersion(dataSetId: dataSet.Id, releaseFileId: releaseFile.Id);
 
@@ -314,10 +350,12 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
                 )
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
-            await AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             var result = await CreateNextDataSetVersion(dataSetId: dataSet.Id, releaseFileId: releaseFile.Id);
 
@@ -352,7 +390,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             var (releaseFile, _) = await AddDataAndMetadataFiles(dataSet.PublicationId);
 
@@ -385,17 +423,19 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
     }
 
     public class CreateNextDataSetVersionDataSetVersionDataSetVersionToReplaceProvided(
-        ProcessorFunctionsIntegrationTestFixture fixture
+        CreateNextDataSetVersionMappingsFunctionTestsFixture fixture
     ) : CreateNextDataSetVersionMappingsFunctionTests(fixture)
     {
         [Fact]
         public async Task Success()
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
-            await AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSets.Add(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSets.Add(dataSet);
+                });
 
             var versions = DataFixture
                 .DefaultDataSetVersion()
@@ -432,12 +472,14 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
             dataSet.Versions.AddRange(versions);
             var liveVersion = versions.Last();
 
-            await AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(versions);
-                dataSet.LatestLiveVersion = liveVersion;
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.AddRange(versions);
+                    dataSet.LatestLiveVersion = liveVersion;
+                    context.DataSets.Update(dataSet);
+                });
             var versionUnderTest = versions[1];
             var expectedVersion = versionUnderTest.SemVersion().WithPatch(1);
 
@@ -472,13 +514,13 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
 
             var responseViewModel = result.AssertOkObjectResult<ProcessDataSetVersionResponseViewModel>();
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
             // Assert only the original data set exists.
             var updatedDataSet = Assert.Single(
-                await publicDataDbContext
+                await fixture
+                    .GetPublicDataDbContext()
                     .DataSets.Include(ds => ds.Versions)
                         .ThenInclude(dsv => dsv.Imports)
+                    .Where(ds => ds.Id == dataSet.Id)
                     .ToListAsync()
             );
 
@@ -596,10 +638,12 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
     private async Task<ReleaseFile> SetupDataFileBeingAmended(DataSetVersion liveDataSetVersion)
     {
         // TODO EES-5405 Make sure liveDataSetVersion has release info with a ReleaseFileId
-        var currentReleaseFile = GetDbContext<ContentDbContext>()
+        var currentReleaseFile = fixture
+            .GetContentDbContext()
             .ReleaseFiles.Single(releaseFile => releaseFile.Id == liveDataSetVersion.Release.ReleaseFileId);
 
-        var releaseVersion = await GetDbContext<ContentDbContext>()
+        var releaseVersion = await fixture
+            .GetContentDbContext()
             .ReleaseVersions.SingleAsync(releaseVersion => releaseVersion.Id == currentReleaseFile.ReleaseVersionId);
 
         ReleaseVersion releaseAmendment = DataFixture.DefaultReleaseVersion().WithReleaseId(releaseVersion.ReleaseId);
@@ -615,10 +659,12 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
             ])
             .GenerateTuple2();
 
-        await AddTestData<ContentDbContext>(context =>
-        {
-            context.ReleaseFiles.AddRange(nextDataFile, nextMetaFile);
-        });
+        await fixture
+            .GetContentDbContext()
+            .AddTestData(context =>
+            {
+                context.ReleaseFiles.AddRange(nextDataFile, nextMetaFile);
+            });
         return nextDataFile;
     }
 
@@ -626,7 +672,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
     {
         DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-        await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+        await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
         var dataSetVersion = await AddLatestLiveDataSetVersion(dataSet);
         return (dataSet, dataSetVersion);
@@ -645,11 +691,13 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
             .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
             .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
 
-        await AddTestData<PublicDataDbContext>(context =>
-        {
-            context.DataSetVersions.Add(liveDataSetVersion);
-            context.DataSets.Update(dataSet);
-        });
+        await fixture
+            .GetPublicDataDbContext()
+            .AddTestData(context =>
+            {
+                context.DataSetVersions.Add(liveDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
 
         return liveDataSetVersion;
     }
@@ -671,7 +719,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
             ])
             .GenerateTuple2();
 
-        await AddTestData<ContentDbContext>(context => context.ReleaseFiles.AddRange(dataFile, metaFile));
+        await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.AddRange(dataFile, metaFile));
 
         return (dataFile, metaFile);
     }
@@ -699,7 +747,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
             .WithPublicApiDataSetVersion(version)
             .GenerateTuple2();
 
-        await AddTestData<ContentDbContext>(context => context.ReleaseFiles.AddRange(dataFile, metaFile));
+        await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.AddRange(dataFile, metaFile));
 
         return (dataFile, metaFile);
     }
@@ -732,9 +780,7 @@ public abstract class CreateNextDataSetVersionMappingsFunctionTests(ProcessorFun
         Guid? dataSetVersionToReplace = null
     )
     {
-        var function = GetRequiredService<CreateNextDataSetVersionMappingsFunction>();
-
-        return await function.CreateNextDataSetVersionMappings(
+        return await fixture.Function.CreateNextDataSetVersionMappings(
             new NextDataSetVersionMappingsCreateRequest
             {
                 DataSetId = dataSetId,

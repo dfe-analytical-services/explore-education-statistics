@@ -1,23 +1,20 @@
-using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Search;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Time.Testing;
 using Moq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.Optimised;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Fixture;
 
 /// <summary>
 ///
-/// A Collection-level test fixture to be used by Public API integration tests.
+/// A Collection-level test fixture to be used by the Public Data Processor integration tests.
 ///
 /// A number of capabilities are supported by this fixture, and each subclass can specify the capabilities that they
 /// need.  The relevant configuration changes and Test Containers will then be put in place to support this for the
@@ -45,31 +42,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixtu
 ///
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegrationTestCapability[] capabilities)
-    : OptimisedIntegrationTestFixtureBase<Startup>(minimalApi: true)
+public class OptimisedPublicDataProcessorCollectionFixture(
+    params PublicDataProcessorIntegrationTestCapability[] capabilities
+) : OptimisedFunctionAppIntegrationTestFixtureBase
 {
-    private OptimisedTestUserHolder? _userHolder;
-
     private Func<string> _psqlConnectionString = null!;
+    private AzuriteWrapper _azuriteWrapper = null!;
 
     private PublicDataDbContext? _publicDataDbContext;
-    private IContentApiClient _contentApiClient = null!;
-    private ISearchService _searchService = null!;
-    private IAnalyticsService _analyticsService = null!;
+    private ContentDbContext _contentDbContext = null!;
 
-    private readonly TestDataSetVersionPathResolver _testDataSetVersionPathResolver = new()
-    {
-        Directory = "AbsenceSchool",
-    };
+    private IPrivateBlobStorageService _privateBlobStorageService = null!;
 
-    private FakeTimeProvider _timeProvider = null!;
-    private DateTimeProvider _dateTimeProvider = null!;
+    private IDataSetVersionPathResolver _dataSetVersionPathResolver = null!;
 
     protected override void RegisterTestContainers(TestContainerRegistrations registrations)
     {
-        if (capabilities.Contains(PublicApiIntegrationTestCapability.Postgres))
+        if (capabilities.Contains(PublicDataProcessorIntegrationTestCapability.Postgres))
         {
             _psqlConnectionString = registrations.RegisterPostgreSqlContainer();
+        }
+
+        if (capabilities.Contains(PublicDataProcessorIntegrationTestCapability.Azurite))
+        {
+            _azuriteWrapper = registrations.RegisterAzuriteContainer();
         }
     }
 
@@ -77,22 +73,11 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
         OptimisedServiceAndConfigModifications serviceModifications
     )
     {
-        serviceModifications.AddControllers<Startup>();
+        serviceModifications.AddHostBuilderModifications(hostBuilder => hostBuilder.ConfigureProcessorHostBuilder());
 
-        serviceModifications
-            .ReplaceServiceWithMock<IContentApiClient>()
-            .ReplaceServiceWithMock<ISearchService>()
-            .ReplaceServiceWithMock<IAnalyticsService>(mockBehavior: MockBehavior.Loose);
+        serviceModifications.AddInMemoryDbContext<ContentDbContext>(databaseName: Guid.NewGuid().ToString());
 
-        serviceModifications.ReplaceService<IDataSetVersionPathResolver>(_testDataSetVersionPathResolver);
-
-        _timeProvider = new FakeTimeProvider(DateTimeOffset.UtcNow);
-        _dateTimeProvider = new DateTimeProvider(_timeProvider.GetUtcNow().UtcDateTime);
-
-        serviceModifications.ReplaceService<TimeProvider>(_timeProvider);
-        serviceModifications.ReplaceService(_dateTimeProvider);
-
-        if (capabilities.Contains(PublicApiIntegrationTestCapability.Postgres))
+        if (capabilities.Contains(PublicDataProcessorIntegrationTestCapability.Postgres))
         {
             serviceModifications.AddPostgres<PublicDataDbContext>(_psqlConnectionString());
         }
@@ -101,34 +86,53 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
             serviceModifications.AddSingleton(Mock.Of<PublicDataDbContext>());
         }
 
-        if (capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
+        if (capabilities.Contains(PublicDataProcessorIntegrationTestCapability.Azurite))
         {
-            serviceModifications.AddUserAuth();
+            serviceModifications.AddAzurite(
+                connectionString: _azuriteWrapper.GetConnectionString(),
+                connectionStringKeys: ["App:PrivateStorageConnectionString"]
+            );
         }
+        else
+        {
+            serviceModifications.ReplaceServiceWithMock<IPrivateBlobStorageService>();
+        }
+
+        var dataFilesBasePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+        serviceModifications.AddInMemoryCollection([
+            new KeyValuePair<string, string?>("DataFiles:BasePath", dataFilesBasePath),
+        ]);
+
+        serviceModifications.AddSingleton<CreateDataSetFunction>();
+        serviceModifications.AddSingleton<CompleteInitialDataSetVersionProcessingFunction>();
+        serviceModifications.AddSingleton<CreateNextDataSetVersionMappingsFunction>();
+        serviceModifications.AddSingleton<ProcessNextDataSetVersionMappingsFunctions>();
+        serviceModifications.AddSingleton<CompleteNextDataSetVersionImportFunction>();
+        serviceModifications.AddSingleton<ProcessCompletionOfNextDataSetVersionFunctions>();
+        serviceModifications.AddSingleton<DeleteDataSetVersionFunction>();
+        serviceModifications.AddSingleton<CopyCsvFilesFunction>();
+        serviceModifications.AddSingleton<ImportMetadataFunction>();
+        serviceModifications.AddSingleton<ImportDataFunction>();
+        serviceModifications.AddSingleton<WriteDataFilesFunction>();
+        serviceModifications.AddSingleton<HandleProcessingFailureFunction>();
+        serviceModifications.AddSingleton<HealthCheckFunctions>();
+        serviceModifications.AddSingleton<BulkDeleteDataSetVersionsFunction>();
+        serviceModifications.AddSingleton<StatusCheckFunction>();
     }
 
     protected override Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
     {
-        if (capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
-        {
-            // Get a reference to the component that allows us to set the user we wish to use for a particular call.
-            _userHolder = lookups.GetService<OptimisedTestUserHolder>();
-        }
-
         // Grab reusable DbContexts that can be used for test data setup and test assertions. These are looked up once
         // per startup of a test class that uses this fixture and are disposed of at the end of its lifetime, via XUnit
         // calling "DisposeAsync" on this fixture.
         _publicDataDbContext = lookups.GetService<PublicDataDbContext>();
+        _contentDbContext = lookups.GetService<ContentDbContext>();
 
-        // Look up commonly mocked-out dependencies once per test class using this fixture. If the test collection
-        // needs these as mocks, they can access them using the respective "GetXMock" method in this fixture e.g.
-        // "GetContentApiClientMock()". We look up just the plain services here because an individual test collection
-        // fixture may have chosen to inject a real service here rather than the standard mock.
-        _contentApiClient = lookups.GetService<IContentApiClient>();
-        _searchService = lookups.GetService<ISearchService>();
-        _analyticsService = lookups.GetService<IAnalyticsService>();
+        _dataSetVersionPathResolver = lookups.GetService<IDataSetVersionPathResolver>();
+        _privateBlobStorageService = lookups.GetService<IPrivateBlobStorageService>();
 
-        if (capabilities.Contains(PublicApiIntegrationTestCapability.Postgres))
+        if (capabilities.Contains(PublicDataProcessorIntegrationTestCapability.Postgres))
         {
             _publicDataDbContext.Database.Migrate();
         }
@@ -154,20 +158,8 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
         {
             await _publicDataDbContext.DisposeAsync();
         }
-    }
 
-    /// <summary>
-    /// Create an HttpClient and set a specific user to handle the request.
-    /// </summary>
-    public HttpClient CreateClient(ClaimsPrincipal user)
-    {
-        SetUser(user);
-        return base.CreateClient();
-    }
-
-    public DateTimeOffset GetUtcNow()
-    {
-        return _timeProvider.GetUtcNow();
+        await _contentDbContext.DisposeAsync();
     }
 
     /// <summary>
@@ -176,24 +168,13 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
     public PublicDataDbContext GetPublicDataDbContext() => _publicDataDbContext!;
 
     /// <summary>
-    /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
-    /// within the tested code itself.
+    /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public Mock<IContentApiClient> GetContentApiClientMock() => Mock.Get(_contentApiClient);
+    public ContentDbContext GetContentDbContext() => _contentDbContext;
 
-    /// <summary>
-    /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
-    /// within the tested code itself.
-    /// </summary>
-    public Mock<ISearchService> GetSearchServiceMock() => Mock.Get(_searchService);
+    public IDataSetVersionPathResolver GetDataSetVersionPathResolver() => _dataSetVersionPathResolver;
 
-    /// <summary>
-    /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
-    /// within the tested code itself.
-    /// </summary>
-    public Mock<IAnalyticsService> GetAnalyticsServiceMock() => Mock.Get(_analyticsService);
-
-    public TestDataSetVersionPathResolver GetTestDataSetVersionPathResolver() => _testDataSetVersionPathResolver;
+    public IPrivateBlobStorageService GetPrivateBlobStorageService() => _privateBlobStorageService;
 
     /// <summary>
     /// This method is run prior to each individual test in a collection. Here we reset any commonly-used mocks and
@@ -201,29 +182,10 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
     /// </summary>
     public override Task BeforeEachTest()
     {
-        ResetIfMock(_contentApiClient);
-        ResetIfMock(_searchService);
-        ResetIfMock(_analyticsService);
-
-        if (capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
-        {
-            _userHolder!.SetUser(null);
-        }
+        ResetIfMock(_publicDataDbContext);
+        ResetIfMock(_contentDbContext);
 
         return Task.CompletedTask;
-    }
-
-    /// <summary>
-    /// Adds a user to the test user pool so that they can be used for HttpClient calls and looked up successfully.
-    /// </summary>
-    private void SetUser(ClaimsPrincipal user)
-    {
-        if (!capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
-        {
-            throw new Exception("""Cannot register test users if "useTestUserAuthentication" is false.""");
-        }
-
-        _userHolder!.SetUser(user);
     }
 
     /// <summary>
@@ -232,9 +194,14 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
     /// We support this not necessarily being a mock because a fixture subclass may have chosen to inject a real
     /// service in place of a service that is generally mocked out.
     /// </summary>
-    private void ResetIfMock<TService>(TService service)
+    private void ResetIfMock<TService>(TService? service)
         where TService : class
     {
+        if (service == null)
+        {
+            return;
+        }
+
         try
         {
             var mock = Mock.Get(service);
@@ -247,8 +214,8 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
     }
 }
 
-public enum PublicApiIntegrationTestCapability
+public enum PublicDataProcessorIntegrationTestCapability
 {
     Postgres,
-    UserAuth,
+    Azurite,
 }

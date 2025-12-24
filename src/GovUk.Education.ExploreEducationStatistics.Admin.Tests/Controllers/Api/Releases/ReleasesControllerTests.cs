@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -66,7 +67,7 @@ public class ReleasesControllerIntegrationTestsFixture()
     public IPublicBlobCacheService PublicBlobCacheService = null!;
     public IPublisherTableStorageService PublisherTableStorageService = null!;
 
-    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
     {
         await base.AfterFactoryConstructed(lookups);
         PublicBlobCacheService = lookups.GetService<IPublicBlobCacheService>();

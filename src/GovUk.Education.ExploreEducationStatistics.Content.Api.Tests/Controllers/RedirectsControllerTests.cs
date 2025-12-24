@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -19,7 +20,7 @@ public class RedirectsControllerTestsFixture()
 {
     public IBlobCacheService BlobCacheService = null!;
 
-    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
     {
         await base.AfterFactoryConstructed(lookups);
 

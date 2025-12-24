@@ -1,26 +1,74 @@
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TestData;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using File = System.IO.File;
+
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
-    : ProcessorFunctionsIntegrationTest(fixture)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class CopyCsvFilesFunctionTestsFixture()
+    : OptimisedPublicDataProcessorCollectionFixture(
+        capabilities:
+        [
+            PublicDataProcessorIntegrationTestCapability.Azurite,
+            PublicDataProcessorIntegrationTestCapability.Postgres,
+        ]
+    )
 {
-    public class CopyCsvFilesTests(ProcessorFunctionsIntegrationTestFixture fixture)
-        : CopyCsvFilesFunctionTests(fixture)
+    public CopyCsvFilesFunction Function = null!;
+
+    protected override void ConfigureServicesAndConfiguration(
+        OptimisedServiceAndConfigModifications serviceModifications
+    )
+    {
+        base.ConfigureServicesAndConfiguration(serviceModifications);
+
+        var dataFilesBasePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+        serviceModifications.AddInMemoryCollection([
+            new KeyValuePair<string, string?>("DataFiles:BasePath", dataFilesBasePath),
+        ]);
+
+        serviceModifications.ReplaceService<IDataSetVersionPathResolver, DataSetVersionPathResolver>(
+            serviceLifetime: ServiceLifetime.Singleton
+        );
+    }
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+        Function = lookups.GetService<CopyCsvFilesFunction>();
+    }
+}
+
+[CollectionDefinition(nameof(CopyCsvFilesFunctionTestsFixture))]
+public class CopyCsvFilesFunctionTestsCollection : ICollectionFixture<CopyCsvFilesFunctionTestsFixture>;
+
+[Collection(nameof(CopyCsvFilesFunctionTestsFixture))]
+public abstract class CopyCsvFilesFunctionTests(CopyCsvFilesFunctionTestsFixture fixture)
+    : OptimisedFunctionAppIntegrationTestBase(fixture)
+{
+    private static readonly DataFixture DataFixture = new();
+
+    public class CopyCsvFilesTests(CopyCsvFilesFunctionTestsFixture fixture) : CopyCsvFilesFunctionTests(fixture)
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.CopyingCsvFiles;
 
@@ -46,18 +94,19 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
                 )
                 .GenerateTuple2();
 
-            await AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseVersions.Add(releaseVersion);
-                context.ReleaseFiles.AddRange(releaseDataFile, releaseMetaFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseVersions.Add(releaseVersion);
+                    context.ReleaseFiles.AddRange(releaseDataFile, releaseMetaFile);
+                });
 
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
                 Stage.PreviousStage(),
                 releaseFileId: releaseDataFile.Id
             );
-
-            var blobStorageService = GetRequiredService<IPrivateBlobStorageService>();
 
             var testData = ProcessorTestData.AbsenceSchool;
 
@@ -65,53 +114,53 @@ public abstract class CopyCsvFilesFunctionTests(ProcessorFunctionsIntegrationTes
 
             await using (var contentStream = sourceDataFileContent.ToStream())
             {
-                await blobStorageService.UploadStream(
-                    BlobContainers.PrivateReleaseFiles,
-                    releaseDataFile.Path(),
-                    contentStream,
-                    ContentTypes.Csv
-                );
+                await fixture
+                    .GetPrivateBlobStorageService()
+                    .UploadStream(
+                        BlobContainers.PrivateReleaseFiles,
+                        releaseDataFile.Path(),
+                        contentStream,
+                        ContentTypes.Csv
+                    );
             }
 
             var sourceMetadataFileContent = await File.ReadAllTextAsync(testData.CsvMetadataFilePath);
 
             await using (var contentStream = sourceMetadataFileContent.ToStream())
             {
-                await blobStorageService.UploadStream(
-                    BlobContainers.PrivateReleaseFiles,
-                    releaseMetaFile.Path(),
-                    contentStream,
-                    ContentTypes.Csv
-                );
+                await fixture
+                    .GetPrivateBlobStorageService()
+                    .UploadStream(
+                        BlobContainers.PrivateReleaseFiles,
+                        releaseMetaFile.Path(),
+                        contentStream,
+                        ContentTypes.Csv
+                    );
             }
 
-            var function = GetRequiredService<CopyCsvFilesFunction>();
-            await function.CopyCsvFiles(instanceId, CancellationToken.None);
+            await fixture.Function.CopyCsvFiles(instanceId, CancellationToken.None);
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var savedImport = await publicDataDbContext
+            var savedImport = await fixture
+                .GetPublicDataDbContext()
                 .DataSetVersionImports.Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
 
             Assert.Equal(Stage, savedImport.Stage);
             Assert.Equal(DataSetVersionStatus.Processing, savedImport.DataSetVersion.Status);
 
-            var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
-
-            Assert.True(Directory.Exists(dataSetVersionPathResolver.DirectoryPath(dataSetVersion)));
+            Assert.True(Directory.Exists(fixture.GetDataSetVersionPathResolver().DirectoryPath(dataSetVersion)));
             var actualDataSetVersionFiles = Directory
-                .GetFiles(dataSetVersionPathResolver.DirectoryPath(dataSetVersion))
+                .GetFiles(fixture.GetDataSetVersionPathResolver().DirectoryPath(dataSetVersion))
                 .Select(Path.GetFullPath)
                 .ToArray();
 
             Assert.Equal(2, actualDataSetVersionFiles.Length);
 
-            var expectedCsvDataPath = dataSetVersionPathResolver.CsvDataPath(dataSetVersion);
+            var expectedCsvDataPath = fixture.GetDataSetVersionPathResolver().CsvDataPath(dataSetVersion);
             Assert.Contains(expectedCsvDataPath, actualDataSetVersionFiles);
             Assert.Equal(sourceDataFileContent, await DecompressFileToString(expectedCsvDataPath));
 
-            var expectedCsvMetadataPath = dataSetVersionPathResolver.CsvMetadataPath(dataSetVersion);
+            var expectedCsvMetadataPath = fixture.GetDataSetVersionPathResolver().CsvMetadataPath(dataSetVersion);
             Assert.Contains(expectedCsvMetadataPath, actualDataSetVersionFiles);
             Assert.Equal(sourceMetadataFileContent, await File.ReadAllTextAsync(expectedCsvMetadataPath));
         }

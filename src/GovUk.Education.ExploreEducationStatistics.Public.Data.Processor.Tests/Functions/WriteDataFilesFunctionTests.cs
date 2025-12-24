@@ -1,13 +1,42 @@
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TestData;
 using Microsoft.EntityFrameworkCore;
+
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class WriteDataFilesFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
-    : ProcessorFunctionsIntegrationTest(fixture)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class WriteDataFilesFunctionTestsFixture()
+    : OptimisedPublicDataProcessorCollectionFixture(
+        capabilities: [PublicDataProcessorIntegrationTestCapability.Postgres]
+    )
+{
+    public ImportMetadataFunction ImportMetadataFunction = null!;
+    public ImportDataFunction ImportDataFunction = null!;
+    public WriteDataFilesFunction WriteDataFilesFunction = null!;
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+
+        ImportMetadataFunction = lookups.GetService<ImportMetadataFunction>();
+        ImportDataFunction = lookups.GetService<ImportDataFunction>();
+        WriteDataFilesFunction = lookups.GetService<WriteDataFilesFunction>();
+    }
+}
+
+[CollectionDefinition(nameof(WriteDataFilesFunctionTestsFixture))]
+public class WriteDataFilesFunctionTestsCollection : ICollectionFixture<WriteDataFilesFunctionTestsFixture>;
+
+[Collection(nameof(WriteDataFilesFunctionTestsFixture))]
+public abstract class WriteDataFilesFunctionTests(WriteDataFilesFunctionTestsFixture fixture)
+    : OptimisedFunctionAppIntegrationTestBase(fixture)
 {
     private static readonly string[] AllDataSetVersionFiles =
     [
@@ -25,43 +54,48 @@ public abstract class WriteDataFilesFunctionTests(ProcessorFunctionsIntegrationT
 
     private const DataSetVersionImportStage Stage = DataSetVersionImportStage.WritingDataFiles;
 
-    public static readonly TheoryData<ProcessorTestData> Data = new() { ProcessorTestData.AbsenceSchool };
+    public static readonly TheoryData<ProcessorTestData> Data = [ProcessorTestData.AbsenceSchool];
 
-    public class WriteDataTests(ProcessorFunctionsIntegrationTestFixture fixture) : WriteDataFilesFunctionTests(fixture)
+    public class WriteDataTests(WriteDataFilesFunctionTestsFixture fixture) : WriteDataFilesFunctionTests(fixture)
     {
         [Theory]
         [MemberData(nameof(Data))]
         public async Task Success(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await WriteData(testData, dataSetVersion, instanceId);
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var savedImport = await publicDataDbContext
+            var savedImport = await fixture
+                .GetPublicDataDbContext()
                 .DataSetVersionImports.Include(dataSetVersionImport => dataSetVersionImport.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
 
             Assert.Equal(Stage, savedImport.Stage);
             Assert.Equal(DataSetVersionStatus.Processing, savedImport.DataSetVersion.Status);
 
-            AssertDataSetVersionDirectoryContainsOnlyFiles(dataSetVersion, AllDataSetVersionFiles);
+            CommonTestDataUtils.AssertDataSetVersionDirectoryContainsOnlyFiles(
+                fixture.GetDataSetVersionPathResolver(),
+                dataSetVersion,
+                AllDataSetVersionFiles
+            );
         }
 
         private async Task WriteData(ProcessorTestData testData, DataSetVersion dataSetVersion, Guid instanceId)
         {
-            SetupCsvDataFilesForDataSetVersion(testData, dataSetVersion);
+            CommonTestDataUtils.SetupCsvDataFilesForDataSetVersion(
+                fixture.GetDataSetVersionPathResolver(),
+                testData,
+                dataSetVersion
+            );
 
             // Prepare the metadata and data before calling the WriteDataFiles function
-            var importMetadataFunction = GetRequiredService<ImportMetadataFunction>();
-            await importMetadataFunction.ImportMetadata(instanceId, CancellationToken.None);
-
-            var importDataFunction = GetRequiredService<ImportDataFunction>();
-            await importDataFunction.ImportData(instanceId, CancellationToken.None);
-
-            var writeDataFilesFunction = GetRequiredService<WriteDataFilesFunction>();
-            await writeDataFilesFunction.WriteDataFiles(instanceId, CancellationToken.None);
+            await fixture.ImportMetadataFunction.ImportMetadata(instanceId, CancellationToken.None);
+            await fixture.ImportDataFunction.ImportData(instanceId, CancellationToken.None);
+            await fixture.WriteDataFilesFunction.WriteDataFiles(instanceId, CancellationToken.None);
         }
     }
 }

@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -39,7 +40,7 @@ public class AnalyticsServiceTestsFixture()
             .ReplaceService<IAnalyticsService, AnalyticsService>(serviceLifetime: ServiceLifetime.Scoped);
     }
 
-    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
     {
         await base.AfterFactoryConstructed(lookups);
 

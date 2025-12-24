@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
+namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 
 public static class HostEnvironmentExtensions
 {

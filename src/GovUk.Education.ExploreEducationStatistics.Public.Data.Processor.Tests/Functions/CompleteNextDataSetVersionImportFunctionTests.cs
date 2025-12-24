@@ -1,15 +1,17 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -21,12 +23,38 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using FileType = GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators.ValidationMessages;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class CompleteNextDataSetVersionImportFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
-    : ProcessorFunctionsIntegrationTest(fixture)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class CompleteNextDataSetVersionImportFunctionTestsFixture()
+    : OptimisedPublicDataProcessorCollectionFixture(
+        capabilities: [PublicDataProcessorIntegrationTestCapability.Postgres]
+    )
 {
-    public class CompleteNextDataSetVersionImportTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public CompleteNextDataSetVersionImportFunction Function = null!;
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+
+        Function = lookups.GetService<CompleteNextDataSetVersionImportFunction>();
+    }
+}
+
+[CollectionDefinition(nameof(CompleteNextDataSetVersionImportFunctionTestsFixture))]
+public class CompleteNextDataSetVersionImportFunctionTestsCollection
+    : ICollectionFixture<CompleteNextDataSetVersionImportFunctionTestsFixture>;
+
+[Collection(nameof(CompleteNextDataSetVersionImportFunctionTestsFixture))]
+public abstract class CompleteNextDataSetVersionImportFunctionTests(
+    CompleteNextDataSetVersionImportFunctionTestsFixture fixture
+) : OptimisedFunctionAppIntegrationTestBase(fixture)
+{
+    private static readonly DataFixture DataFixture = new();
+
+    public class CompleteNextDataSetVersionImportTests(CompleteNextDataSetVersionImportFunctionTestsFixture fixture)
         : CompleteNextDataSetVersionImportFunctionTests(fixture)
     {
         public static TheoryData<DataSetVersionImportStage> NonManualMappingStages = new(
@@ -65,9 +93,8 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(ProcessorFun
                     }
                 );
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var originalDataSetVersionImport = publicDataDbContext
+            var originalDataSetVersionImport = fixture
+                .GetPublicDataDbContext()
                 .DataSetVersionImports.AsNoTracking()
                 .Single(import => import.DataSetVersionId == nextVersion.Id);
 
@@ -84,15 +111,15 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(ProcessorFun
             Assert.Equal(nextVersion.DataSetId, responseViewModel.DataSetId);
 
             // Assert that the pre-existing import entry for the next data set version is re-used.
-            var updatedDataSetVersionImport = publicDataDbContext.DataSetVersionImports.Single(import =>
-                import.DataSetVersionId == nextVersion.Id
-            );
+            var updatedDataSetVersionImport = fixture
+                .GetPublicDataDbContext()
+                .DataSetVersionImports.Single(import => import.DataSetVersionId == nextVersion.Id);
 
             Assert.Equal(originalDataSetVersionImport.Id, updatedDataSetVersionImport.Id);
 
-            var updatedDataSetVersion = await publicDataDbContext.DataSetVersions.SingleAsync(dsv =>
-                dsv.Id == nextVersion.Id
-            );
+            var updatedDataSetVersion = await fixture
+                .GetPublicDataDbContext()
+                .DataSetVersions.SingleAsync(dsv => dsv.Id == nextVersion.Id);
 
             // Assert the updated data set version is set to status 'Finalising'.
             Assert.Equal(DataSetVersionStatus.Finalising, updatedDataSetVersion.Status);
@@ -150,16 +177,14 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(ProcessorFun
         {
             var (_, _, nextVersion) = await AddDataSetAndLatestLiveAndNextVersion();
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
             // Update the next data set version's status to no longer be "Mapping".
-            var nextVersionWithIncorrectStatus = await publicDataDbContext.DataSetVersions.SingleAsync(dsv =>
-                dsv.Id == nextVersion.Id
-            );
+            var nextVersionWithIncorrectStatus = await fixture
+                .GetPublicDataDbContext()
+                .DataSetVersions.SingleAsync(dsv => dsv.Id == nextVersion.Id);
 
             nextVersionWithIncorrectStatus.Status = status;
 
-            await publicDataDbContext.SaveChangesAsync();
+            await fixture.GetPublicDataDbContext().SaveChangesAsync();
 
             var result = await CompleteNextDataSetVersionImport(dataSetVersionId: nextVersion.Id);
 
@@ -176,12 +201,12 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(ProcessorFun
         {
             var (_, _, nextVersion) = await AddDataSetAndLatestLiveAndNextVersion();
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
             // Remove the DataSetVersionMapping entry from the database.
-            var mapping = await publicDataDbContext.DataSetVersionMappings.SingleAsync();
-            publicDataDbContext.Remove(mapping);
-            await publicDataDbContext.SaveChangesAsync();
+            var mapping = await fixture
+                .GetPublicDataDbContext()
+                .DataSetVersionMappings.SingleAsync(m => m.TargetDataSetVersionId == nextVersion.Id);
+            fixture.GetPublicDataDbContext().Remove(mapping);
+            await fixture.GetPublicDataDbContext().SaveChangesAsync();
 
             var result = await CompleteNextDataSetVersionImport(dataSetVersionId: nextVersion.Id);
 
@@ -198,14 +223,14 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(ProcessorFun
         {
             var (_, _, nextVersion) = await AddDataSetAndLatestLiveAndNextVersion();
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
             // Remove the DataSetVersionMapping entry from the database.
-            var mapping = await publicDataDbContext.DataSetVersionMappings.SingleAsync();
+            var mapping = await fixture
+                .GetPublicDataDbContext()
+                .DataSetVersionMappings.SingleAsync(m => m.TargetDataSetVersionId == nextVersion.Id);
 
             mapping.LocationMappingsComplete = false;
 
-            await publicDataDbContext.SaveChangesAsync();
+            await fixture.GetPublicDataDbContext().SaveChangesAsync();
 
             var result = await CompleteNextDataSetVersionImport(dataSetVersionId: nextVersion.Id);
 
@@ -222,14 +247,14 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(ProcessorFun
         {
             var (_, _, nextVersion) = await AddDataSetAndLatestLiveAndNextVersion();
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
             // Remove the DataSetVersionMapping entry from the database.
-            var mapping = await publicDataDbContext.DataSetVersionMappings.SingleAsync();
+            var mapping = await fixture
+                .GetPublicDataDbContext()
+                .DataSetVersionMappings.SingleAsync(m => m.TargetDataSetVersionId == nextVersion.Id);
 
             mapping.FilterMappingsComplete = false;
 
-            await publicDataDbContext.SaveChangesAsync();
+            await fixture.GetPublicDataDbContext().SaveChangesAsync();
 
             var result = await CompleteNextDataSetVersionImport(dataSetVersionId: nextVersion.Id);
 
@@ -249,16 +274,14 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(ProcessorFun
         {
             var (_, _, nextVersion) = await AddDataSetAndLatestLiveAndNextVersion();
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
             // Update the next data set version's import status to no longer be "ManualMapping".
-            var importWithIncorrectStatus = await publicDataDbContext.DataSetVersionImports.SingleAsync(import =>
-                import.DataSetVersionId == nextVersion.Id
-            );
+            var importWithIncorrectStatus = await fixture
+                .GetPublicDataDbContext()
+                .DataSetVersionImports.SingleAsync(import => import.DataSetVersionId == nextVersion.Id);
 
             importWithIncorrectStatus.Stage = importStage;
 
-            await publicDataDbContext.SaveChangesAsync();
+            await fixture.GetPublicDataDbContext().SaveChangesAsync();
 
             var result = await CompleteNextDataSetVersionImport(dataSetVersionId: nextVersion.Id);
 
@@ -274,7 +297,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(ProcessorFun
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             var liveVersion = await AddLatestLiveDataSetVersion(dataSet);
             var nextVersion = await AddNextDataSetVersionAndMapping(dataSet.Id);
@@ -294,20 +317,20 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(ProcessorFun
                 .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
                 .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
 
-            await AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(liveDataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(liveDataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
             return liveDataSetVersion;
         }
 
         private async Task<DataSetVersion> AddNextDataSetVersionAndMapping(Guid dataSetId)
         {
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var dataSet = await publicDataDbContext.DataSets.SingleAsync(ds => ds.Id == dataSetId);
+            var dataSet = await fixture.GetPublicDataDbContext().DataSets.SingleAsync(ds => ds.Id == dataSetId);
 
             var (dataFile, _) = await AddDataAndMetadataFiles(dataSet.PublicationId);
 
@@ -335,12 +358,14 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(ProcessorFun
                 FilterMappingsComplete = true,
             };
 
-            await AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(nextDataSetVersion);
-                context.DataSets.Update(dataSet);
-                context.DataSetVersionMappings.Add(dataSetVersionMapping);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(nextDataSetVersion);
+                    context.DataSets.Update(dataSet);
+                    context.DataSetVersionMappings.Add(dataSetVersionMapping);
+                });
 
             return nextDataSetVersion;
         }
@@ -362,7 +387,9 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(ProcessorFun
                 ])
                 .GenerateTuple2();
 
-            await AddTestData<ContentDbContext>(context => context.ReleaseFiles.AddRange(dataFile, metaFile));
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context => context.ReleaseFiles.AddRange(dataFile, metaFile));
 
             return (dataFile, metaFile);
         }
@@ -372,8 +399,7 @@ public abstract class CompleteNextDataSetVersionImportFunctionTests(ProcessorFun
             DurableTaskClient? durableTaskClient = null
         )
         {
-            var function = GetRequiredService<CompleteNextDataSetVersionImportFunction>();
-            return await function.CompleteNextDataSetVersionImport(
+            return await fixture.Function.CompleteNextDataSetVersionImport(
                 new NextDataSetVersionCompleteImportRequest { DataSetVersionId = dataSetVersionId },
                 durableTaskClient ?? new Mock<DurableTaskClient>(MockBehavior.Strict, "TestClient").Object,
                 CancellationToken.None

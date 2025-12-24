@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -77,7 +78,7 @@ public abstract class OptimisedContentApiCollectionFixture(params ContentApiInte
         }
     }
 
-    protected override Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    protected override Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
     {
         // Grab reusable DbContexts that can be used for test data setup and test assertions. These are looked up once
         // per startup of a test class that uses this fixture and are disposed of at the end of its lifetime, via XUnit

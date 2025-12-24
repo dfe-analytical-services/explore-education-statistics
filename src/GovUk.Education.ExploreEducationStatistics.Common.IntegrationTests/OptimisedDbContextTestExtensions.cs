@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
+namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 
 public static class OptimisedDbContextTestExtensions
 {

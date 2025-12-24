@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -29,7 +30,7 @@ public class TableBuilderControllerIntegrationTestsFixture()
         modifications.ReplaceServiceWithMock<ITableBuilderService>();
     }
 
-    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
     {
         await base.AfterFactoryConstructed(lookups);
         TableBuilderServiceMock = lookups.GetMockService<ITableBuilderService>();
