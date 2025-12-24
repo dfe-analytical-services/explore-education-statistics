@@ -53,7 +53,7 @@ const EducationInNumbersEditableBlock = ({
   }, [block.id, onDelete]);
 
   const labelWithHeading = sectionHeading
-    ? `Content block ${contentBlockNumber} for ${sectionHeading} section`
+    ? `Content block ${contentBlockNumber} for the "${sectionHeading}" section`
     : 'Content block';
 
   switch (block.type) {

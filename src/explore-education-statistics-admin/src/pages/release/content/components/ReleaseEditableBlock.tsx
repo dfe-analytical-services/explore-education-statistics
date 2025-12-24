@@ -451,7 +451,7 @@ const ReleaseEditableBlock = ({
         return 'Related Dashboards block';
       case 'content':
         return sectionHeading
-          ? `Content block ${contentBlockNumber} for ${sectionHeading} section`
+          ? `Content block ${contentBlockNumber} for the "${sectionHeading}" section`
           : 'Content block';
       default:
         return 'Content block';
