@@ -17,6 +17,8 @@ interface Props {
   editable?: boolean;
   onSave: (blockId: string, content: string) => void;
   onDelete: (blockId: string) => void;
+  sectionHeading?: string;
+  contentBlockNumber?: number;
 }
 
 const MethodologyEditableBlock = ({
@@ -28,6 +30,8 @@ const MethodologyEditableBlock = ({
   editable = true,
   onSave,
   onDelete,
+  sectionHeading,
+  contentBlockNumber,
 }: Props) => {
   const blockId = `block-${block.id}`;
 
@@ -53,6 +57,10 @@ const MethodologyEditableBlock = ({
     onDelete(block.id);
   }, [block.id, onDelete]);
 
+  const labelWithHeading = sectionHeading
+    ? `Content block ${contentBlockNumber} for the "${sectionHeading}" section`
+    : 'Content block';
+
   switch (block.type) {
     case 'HtmlBlock':
       return (
@@ -61,7 +69,7 @@ const MethodologyEditableBlock = ({
           editButtonLabel={editButtonLabel}
           id={blockId}
           isEditing={isEditing}
-          label="Content block"
+          label={labelWithHeading} // Because hideLabel is true, this only affects the aria-label of the ckeditor
           hideLabel
           removeButtonLabel={removeButtonLabel}
           toolbarConfig={methodologyToolbarConfigFull}

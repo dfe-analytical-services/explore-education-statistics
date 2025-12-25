@@ -41,6 +41,8 @@ interface Props {
   sectionKey: ContentSectionKeys;
   visible?: boolean;
   onAfterDeleteBlock?: () => void;
+  sectionHeading?: string;
+  contentBlockNumber?: number;
 }
 
 const ReleaseEditableBlock = ({
@@ -56,6 +58,8 @@ const ReleaseEditableBlock = ({
   sectionKey,
   visible,
   onAfterDeleteBlock,
+  sectionHeading,
+  contentBlockNumber,
 }: Props) => {
   const {
     addUnsavedBlock,
@@ -336,6 +340,8 @@ const ReleaseEditableBlock = ({
 
   const blockId = `block-${block.id}`;
 
+  const labelWithHeading = getVoiceActivationFriendlyLabel();
+
   function renderBlock() {
     switch (block.type) {
       case 'DataBlock':
@@ -407,7 +413,7 @@ const ReleaseEditableBlock = ({
             id={blockId}
             isEditing={isLockedByUser}
             isLoading={isLocking}
-            label="Content block"
+            label={labelWithHeading} // Because hideLabel is true, this only affects the aria-label of the ckeditor
             locked={locked}
             lockedBy={isLockedByOtherUser ? lockedBy : undefined}
             removeButtonLabel={removeButtonLabel}
@@ -430,6 +436,25 @@ const ReleaseEditableBlock = ({
       }
       default:
         return <div>Unable to edit content</div>;
+    }
+  }
+
+  function getVoiceActivationFriendlyLabel(): string {
+    switch (sectionKey) {
+      case 'summarySection':
+        return 'Summary block';
+      case 'keyStatisticsSecondarySection':
+        return 'Key Statistics Secondary block';
+      case 'headlinesSection':
+        return 'Headline facts and figures block';
+      case 'relatedDashboardsSection':
+        return 'Related Dashboards block';
+      case 'content':
+        return sectionHeading
+          ? `Content block ${contentBlockNumber} for the "${sectionHeading}" section`
+          : 'Content block';
+      default:
+        return 'Content block';
     }
   }
 

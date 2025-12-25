@@ -211,11 +211,13 @@ const EducationInNumbersAccordionSection = ({
         isReordering={isReordering}
         onBlocksChange={setBlocks}
         renderBlock={block => <EinContentBlockRenderer block={block} />}
-        renderEditableBlock={block => {
+        renderEditableBlock={(block, contentBlockNumber) => {
           const { editLabel, groupButtonsLabel, removeLabel } =
             getBlockButtonLabels(block);
           return (
             <EducationInNumbersEditableBlock
+              sectionHeading={heading}
+              contentBlockNumber={contentBlockNumber}
               sectionId={sectionId}
               block={block}
               editable={!isReordering}
