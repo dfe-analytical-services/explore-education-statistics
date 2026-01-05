@@ -82,6 +82,7 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
               releaseVersionId={release.id}
               sectionId={release.headlinesSection.id}
               sectionKey="headlinesSection"
+              label="Headline facts and figures block"
               onAfterDeleteBlock={onAfterDeleteHeadlinesBlock}
             />
           )}

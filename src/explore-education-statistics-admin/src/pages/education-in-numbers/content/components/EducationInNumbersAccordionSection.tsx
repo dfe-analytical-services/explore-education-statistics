@@ -216,8 +216,11 @@ const EducationInNumbersAccordionSection = ({
             getBlockButtonLabels(block);
           return (
             <EducationInNumbersEditableBlock
-              sectionHeading={heading}
-              contentBlockNumber={contentBlockNumber}
+              label={
+                !heading
+                  ? 'Content block'
+                  : `Content block ${contentBlockNumber} for the "${heading}" section`
+              }
               sectionId={sectionId}
               block={block}
               editable={!isReordering}

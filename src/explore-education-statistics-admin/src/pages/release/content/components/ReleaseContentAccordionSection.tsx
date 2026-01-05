@@ -309,8 +309,11 @@ const ReleaseContentAccordionSection = ({
                   releaseVersionId={release.id}
                   visible={open}
                   onAfterDeleteBlock={onAfterDeleteBlock}
-                  sectionHeading={heading}
-                  contentBlockNumber={contentBlockNumber}
+                  label={
+                    !heading
+                      ? 'Content block'
+                      : `Content block ${contentBlockNumber} for the "${heading}" section`
+                  }
                 />
               );
             }}

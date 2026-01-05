@@ -265,6 +265,7 @@ const ReleaseContent = ({
                       }
                       sectionId={release.summarySection.id}
                       sectionKey="summarySection"
+                      label="Summary block"
                       onAfterDeleteBlock={onAfterDeleteSummaryBlock}
                     />
                   )}
@@ -536,6 +537,7 @@ const ReleaseContent = ({
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     sectionId={release.relatedDashboardsSection!.id}
                     sectionKey="relatedDashboardsSection"
+                    label="Related Dashboards block"
                   />
                 )}
               />

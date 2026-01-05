@@ -209,8 +209,11 @@ const MethodologyAccordionSection = ({
               removeButtonLabel={removeLabel}
               onSave={updateBlockInAccordionSection}
               onDelete={removeBlockFromAccordionSection}
-              contentBlockNumber={contentBlockIndex}
-              sectionHeading={heading}
+              label={
+                !heading
+                  ? 'Content block'
+                  : `Content block ${contentBlockIndex} for the "${heading}" section`
+              }
             />
           );
         }}
