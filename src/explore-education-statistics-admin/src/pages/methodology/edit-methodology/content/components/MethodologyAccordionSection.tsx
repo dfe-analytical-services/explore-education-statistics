@@ -197,7 +197,7 @@ const MethodologyAccordionSection = ({
         renderBlock={block => (
           <MethodologyBlock methodologyId={methodologyId} block={block} />
         )}
-        renderEditableBlock={(block, contentBlockIndex) => {
+        renderEditableBlock={(block, contentBlockNumber) => {
           const { editLabel, removeLabel } = getBlockButtonLabels(block);
           return (
             <MethodologyEditableBlock
@@ -212,7 +212,7 @@ const MethodologyAccordionSection = ({
               label={
                 !heading
                   ? 'Content block'
-                  : `Content block ${contentBlockIndex} for the "${heading}" section`
+                  : `Content block ${contentBlockNumber} for the "${heading}" section`
               }
             />
           );
