@@ -252,7 +252,7 @@ Verify that validation prevents adding an image without alt text
     user clicks element    xpath://img    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user clicks button    Change image text alternative
     user enters text into element    label:Text alternative    Alt text for the uploaded content image
-    user clicks element    css:button.ck-button-save
+    user clicks element    css:button.ck-button-action
 
     user checks accordion section text block contains image with alt text    Test section one    1
     ...    Alt text for the uploaded content image    ${RELEASE_CONTENT_EDITABLE_ACCORDION}

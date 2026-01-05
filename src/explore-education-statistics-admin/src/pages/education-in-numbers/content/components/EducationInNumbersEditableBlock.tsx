@@ -18,6 +18,7 @@ interface Props {
   sectionId: string;
   onSave: (blockId: string, content: string, blockType: EinBlockType) => void;
   onDelete: (blockId: string) => void;
+  label: string;
 }
 
 const EducationInNumbersEditableBlock = ({
@@ -29,6 +30,7 @@ const EducationInNumbersEditableBlock = ({
   sectionId,
   onSave,
   onDelete,
+  label,
 }: Props) => {
   const blockId = `block-${block.id}`;
 
@@ -57,7 +59,7 @@ const EducationInNumbersEditableBlock = ({
           removeButtonLabel={removeButtonLabel}
           id={blockId}
           isEditing={isEditing}
-          label="Content block"
+          label={label}
           hideLabel
           value={block.body}
           toolbarConfig={educationInNumbersToolbarConfig}

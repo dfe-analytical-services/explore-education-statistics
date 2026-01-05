@@ -41,6 +41,7 @@ interface Props {
   sectionKey: ContentSectionKeys;
   visible?: boolean;
   onAfterDeleteBlock?: () => void;
+  label: string;
 }
 
 const ReleaseEditableBlock = ({
@@ -56,6 +57,7 @@ const ReleaseEditableBlock = ({
   sectionKey,
   visible,
   onAfterDeleteBlock,
+  label,
 }: Props) => {
   const {
     addUnsavedBlock,
@@ -407,7 +409,7 @@ const ReleaseEditableBlock = ({
             id={blockId}
             isEditing={isLockedByUser}
             isLoading={isLocking}
-            label="Content block"
+            label={label}
             locked={locked}
             lockedBy={isLockedByOtherUser ? lockedBy : undefined}
             removeButtonLabel={removeButtonLabel}

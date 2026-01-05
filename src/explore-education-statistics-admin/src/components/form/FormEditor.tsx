@@ -345,6 +345,7 @@ const FormEditor = ({
           {process.env.NODE_ENV !== 'test' ? (
             <>
               <CKEditor
+                key={label}
                 editor={Editor}
                 config={config}
                 data={value}

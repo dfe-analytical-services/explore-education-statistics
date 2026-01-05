@@ -17,6 +17,7 @@ interface Props {
   editable?: boolean;
   onSave: (blockId: string, content: string) => void;
   onDelete: (blockId: string) => void;
+  label: string;
 }
 
 const MethodologyEditableBlock = ({
@@ -28,6 +29,7 @@ const MethodologyEditableBlock = ({
   editable = true,
   onSave,
   onDelete,
+  label,
 }: Props) => {
   const blockId = `block-${block.id}`;
 
@@ -61,7 +63,7 @@ const MethodologyEditableBlock = ({
           editButtonLabel={editButtonLabel}
           id={blockId}
           isEditing={isEditing}
-          label="Content block"
+          label={label}
           hideLabel
           removeButtonLabel={removeButtonLabel}
           toolbarConfig={methodologyToolbarConfigFull}

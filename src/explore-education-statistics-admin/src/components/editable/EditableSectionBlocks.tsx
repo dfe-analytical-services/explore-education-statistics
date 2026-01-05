@@ -14,7 +14,7 @@ export interface EditableSectionBlockProps<
   isReordering?: boolean;
   onBlocksChange?: (nextBlocks: T[]) => void;
   renderBlock: (block: T) => ReactNode;
-  renderEditableBlock: (block: T) => ReactNode;
+  renderEditableBlock: (block: T, contentBlockNumber?: number) => ReactNode;
 }
 
 const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
@@ -76,7 +76,7 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
 
   return (
     <div>
-      {blocks.map(block => (
+      {blocks.map((block, contentBlockIndex) => (
         <div
           key={block.id}
           id={`editableSectionBlocks-${block.id}`}
@@ -84,7 +84,7 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
           data-scroll
           data-testid="editableSectionBlock"
         >
-          {renderEditableBlock(block)}
+          {renderEditableBlock(block, contentBlockIndex + 1)}
         </div>
       ))}
     </div>
