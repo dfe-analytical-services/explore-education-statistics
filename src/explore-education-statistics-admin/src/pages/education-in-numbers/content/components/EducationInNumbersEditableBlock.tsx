@@ -65,7 +65,7 @@ const EducationInNumbersEditableBlock = ({
           removeButtonLabel={removeButtonLabel}
           id={blockId}
           isEditing={isEditing}
-          label={labelWithHeading} // Because hideLabel is true, this only affects the aria-label of the ckeditor // Because hideLabel is true, this only affects the aria-label of the ckeditor
+          label={labelWithHeading} // Because hideLabel is true, this only affects the aria-label of the ckeditor
           hideLabel
           value={block.body}
           toolbarConfig={educationInNumbersToolbarConfig}
