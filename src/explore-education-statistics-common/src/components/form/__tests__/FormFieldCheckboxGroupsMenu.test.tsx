@@ -147,12 +147,12 @@ describe('FormFieldCheckboxGroupsMenu', () => {
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByText('Option 1')).toBeVisible();
+      expect(
+        screen.getByRole('button', { name: 'Choose options - hide options' }),
+      ).toHaveAttribute('aria-expanded', 'true');
     });
 
-    expect(
-      screen.getByRole('button', { name: 'Choose options - hide options' }),
-    ).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('Option 1')).toBeVisible();
   });
 
   test('clicking menu does not collapse it if there is a field error', async () => {
@@ -188,12 +188,18 @@ describe('FormFieldCheckboxGroupsMenu', () => {
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByText('Option 1')).toBeVisible();
+      expect(
+        screen.getByRole('button', {
+          name: 'Choose options - hide options',
+        }),
+      ).toBeInTheDocument();
     });
 
     const button = screen.getByRole('button', {
       name: 'Choose options - hide options',
     });
+
+    expect(screen.getByText('Option 1')).toBeVisible();
 
     expect(button).toHaveAttribute('aria-expanded', 'true');
 

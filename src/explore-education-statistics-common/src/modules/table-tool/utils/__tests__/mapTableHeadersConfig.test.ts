@@ -465,9 +465,7 @@ describe('mapTableHeadersConfig', () => {
 
     expect(() => {
       mapTableHeadersConfig(headers, fullTable);
-    }).toThrowError(
-      `Invalid header type: ${JSON.stringify(headers.columns[0])}`,
-    );
+    }).toThrow(`Invalid header type: ${JSON.stringify(headers.columns[0])}`);
   });
 
   test('throws error if could not find header filter', () => {
@@ -487,7 +485,7 @@ describe('mapTableHeadersConfig', () => {
 
     expect(() => {
       mapTableHeadersConfig(headers, fullTable);
-    }).toThrowError(
+    }).toThrow(
       `Could not find matching filter for header: ${JSON.stringify(
         headers.columns[0],
       )}`,

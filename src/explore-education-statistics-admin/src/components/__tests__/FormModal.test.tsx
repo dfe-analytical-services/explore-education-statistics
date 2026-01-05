@@ -67,13 +67,13 @@ describe('FormModal', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-      await waitFor(() => {
-        expect(handleSubmit).toHaveBeenCalled();
-      });
-
       await userEvent.click(
         baseElement.querySelector('.underlay') as HTMLElement,
       );
+
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalled();
+      });
 
       expect(screen.getByText('Test Modal')).toBeInTheDocument();
     });
