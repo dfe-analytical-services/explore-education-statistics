@@ -97,7 +97,7 @@ export default function ReleaseSeriesTable({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {seriesItem.legacyLinkUrl}
+                  {seriesItem.legacyLinkUrl} (opens in new tab)
                 </a>
               )}
 
