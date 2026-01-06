@@ -622,7 +622,7 @@ describe('ReleaseContentPage', () => {
       );
 
       expect(screen.getByTestId('Produced by-value')).toHaveTextContent(
-        'Department for Education and Other Organisation',
+        'Department for Education (opens in new tab) and Other Organisation (opens in new tab)',
       );
 
       expect(

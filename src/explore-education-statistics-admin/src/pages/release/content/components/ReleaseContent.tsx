@@ -218,7 +218,7 @@ const ReleaseContent = ({
                     <Fragment key={org.id}>
                       {index > 0 && ' and '}
                       <Link unvisited to={org.url}>
-                        {org.title}
+                        {org.title} (opens in new tab)
                       </Link>
                     </Fragment>
                   ))}
@@ -228,7 +228,7 @@ const ReleaseContent = ({
                   unvisited
                   to="https://www.gov.uk/government/organisations/department-for-education"
                 >
-                  Department for Education
+                  Department for Education (opens in new tab)
                 </Link>
               )
             }
@@ -414,12 +414,14 @@ const ReleaseContent = ({
                               data-testid="other-release-item"
                             >
                               {isLegacyLink ? (
-                                <a href={legacyLinkUrl}>{description}</a>
+                                <a href={legacyLinkUrl}>
+                                  {description} (opens in new tab)
+                                </a>
                               ) : (
                                 <Link
                                   to={`${publicAppUrl}/find-statistics/${publication.slug}/${releaseSlug}`}
                                 >
-                                  {description}
+                                  {description} (opens in new tab)
                                 </Link>
                               )}
                             </li>
