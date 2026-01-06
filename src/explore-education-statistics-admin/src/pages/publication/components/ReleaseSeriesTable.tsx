@@ -108,7 +108,8 @@ export default function ReleaseSeriesTable({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {`${config.publicAppUrl}/find-statistics/${publicationSlug}/${seriesItem.releaseSlug}`}
+                  {`${config.publicAppUrl}/find-statistics/${publicationSlug}/${seriesItem.releaseSlug}`}{' '}
+                  (opens in new tab)
                 </Link>
               )}
               {!seriesItem.isLegacyLink &&
