@@ -192,7 +192,7 @@ describe('ReleaseSeriesTable', () => {
     expect(row4Cells[0]).toHaveTextContent('Legacy link 1');
     expect(
       within(row4Cells[1]).getByRole('link', {
-        name: 'http://gov.uk/1',
+        name: 'http://gov.uk/1 (opens in new tab)',
       }),
     ).toHaveAttribute('href', 'http://gov.uk/1');
     expect(row4Cells[2]).toHaveTextContent('Legacy release');
