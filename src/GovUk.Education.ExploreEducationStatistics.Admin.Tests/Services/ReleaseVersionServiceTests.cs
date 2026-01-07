@@ -35,7 +35,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
@@ -366,7 +365,7 @@ public abstract class ReleaseVersionServiceTests
 
             VerifyAllMocks(dataImportService);
 
-            result.AssertBadRequest(CannotRemoveDataFilesUntilImportComplete);
+            result.AssertBadRequest(ValidationErrorMessages.CannotRemoveDataFilesUntilImportComplete);
         }
 
         [Fact]
@@ -563,7 +562,7 @@ public abstract class ReleaseVersionServiceTests
 
             VerifyAllMocks(dataImportService);
 
-            result.AssertBadRequest(CannotRemoveDataFilesUntilImportComplete);
+            result.AssertBadRequest(ValidationErrorMessages.CannotRemoveDataFilesUntilImportComplete);
         }
 
         [Fact]
@@ -1227,7 +1226,7 @@ public abstract class ReleaseVersionServiceTests
                 );
 
                 var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder().SetValidationToFail(
-                    validationErrorMessage: SlugNotUnique,
+                    validationErrorMessage: ValidationErrorMessages.SlugNotUnique,
                     releaseSlug: expectedUpdatedReleaseSlug,
                     publicationId: publication.Id,
                     releaseId: releaseVersion.ReleaseId
@@ -1249,7 +1248,7 @@ public abstract class ReleaseVersionServiceTests
                     }
                 );
 
-                result.AssertBadRequest(SlugNotUnique);
+                result.AssertBadRequest(ValidationErrorMessages.SlugNotUnique);
             }
         }
 
@@ -1262,7 +1261,7 @@ public abstract class ReleaseVersionServiceTests
 
             var result = await releaseVersionService.UpdateReleaseVersion(It.IsAny<Guid>(), releaseUpdateRequest);
 
-            result.AssertBadRequest(ReleaseTypeInvalid);
+            result.AssertBadRequest(ValidationErrorMessages.ReleaseTypeInvalid);
         }
 
         [Fact]
@@ -2522,7 +2521,7 @@ public abstract class ReleaseVersionServiceTests
 
                 var result = await service.UpdateReleasePublished(publication.Releases[0].Versions[0].Id, request);
 
-                result.AssertBadRequest(ReleasePublishedCannotBeFutureDate);
+                result.AssertBadRequest(ValidationErrorMessages.ReleasePublishedCannotBeFutureDate);
             }
         }
 

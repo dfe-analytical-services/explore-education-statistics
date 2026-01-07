@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -26,7 +25,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
@@ -411,7 +409,7 @@ public class ReleaseVersionService(
             {
                 if (releaseVersion.Published == null)
                 {
-                    return ValidationActionResult(ReleaseNotPublished);
+                    return ValidationActionResult(ValidationErrorMessages.ReleaseNotPublished);
                 }
 
                 var newPublishedDate = request.Published?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
@@ -419,7 +417,7 @@ public class ReleaseVersionService(
                 // Prevent assigning a future date since it would have the effect of un-publishing the release
                 if (newPublishedDate > DateTimeOffset.UtcNow)
                 {
-                    return ValidationActionResult(ReleasePublishedCannotBeFutureDate);
+                    return ValidationActionResult(ValidationErrorMessages.ReleasePublishedCannotBeFutureDate);
                 }
 
                 context.ReleaseVersions.Update(releaseVersion);
@@ -720,7 +718,9 @@ public class ReleaseVersionService(
             .SingleOrNotFoundAsync()
             .OnSuccess(rf =>
                 rf.File.Type != FileType.Data
-                    ? new Either<ActionResult, ReleaseFile>(ValidationActionResult(FileTypeMustBeData))
+                    ? new Either<ActionResult, ReleaseFile>(
+                        ValidationActionResult(ValidationErrorMessages.FileTypeMustBeData)
+                    )
                     : rf
             );
     }
@@ -740,7 +740,7 @@ public class ReleaseVersionService(
         var labelChanged = releaseVersion.Release.Label != request.Label;
 
         return yearChanged || timePeriodCoverageChanged || labelChanged
-            ? ValidationActionResult(UpdateRequestForPublishedReleaseVersionInvalid)
+            ? ValidationActionResult(ValidationErrorMessages.UpdateRequestForPublishedReleaseVersionInvalid)
             : Unit.Instance;
     }
 
@@ -819,12 +819,12 @@ public class ReleaseVersionService(
 
         if (!importStatus.IsFinished())
         {
-            return ValidationActionResult(CannotRemoveDataFilesUntilImportComplete);
+            return ValidationActionResult(ValidationErrorMessages.CannotRemoveDataFilesUntilImportComplete);
         }
 
         if (!await CanUpdateDataFiles(releaseVersionId))
         {
-            return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
+            return ValidationActionResult(ValidationErrorMessages.CannotRemoveDataFilesOnceReleaseApproved);
         }
 
         return Unit.Instance;
