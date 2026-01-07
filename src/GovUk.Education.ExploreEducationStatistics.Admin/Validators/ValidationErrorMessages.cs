@@ -28,13 +28,11 @@ public enum ValidationErrorMessages
     UserAlreadyHasResourceRole,
 
     // Invite
-    InviteAlreadyAccepted,
     InviteNotFound,
     InvalidEmailAddress,
     InvalidUserRole,
     NoInvitableEmails,
     NotAllReleasesBelongToPublication,
-    UserAlreadyHasReleaseRoleInvites,
     UserAlreadyHasReleaseRoles,
 
     // Methodology
@@ -61,10 +59,6 @@ public enum ValidationErrorMessages
     FileTypeMustBeData,
     FileIdsShouldBeDistinct,
     IncorrectNumberOfFileIds,
-
-    // Data zip file
-    DataZipFileCanOnlyContainTwoFiles,
-    DataZipFileDoesNotContainCsvFiles,
 
     // Meta file
     UnableToFindMetadataFileToDelete,
