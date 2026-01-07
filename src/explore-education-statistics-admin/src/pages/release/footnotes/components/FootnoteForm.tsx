@@ -7,6 +7,7 @@ import {
   FootnoteMeta,
   SubjectSelectionType,
 } from '@admin/services/footnoteService';
+import { Element, JsonElement } from '@admin/types/ckeditor';
 import footnoteToFlatFootnote from '@admin/services/utils/footnote/footnoteToFlatFootnote';
 import {
   pluginsConfigLinksOnly,
@@ -24,9 +25,14 @@ import Yup from '@common/validation/yup';
 import deepmerge from 'deepmerge';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import getInvalidContent, {
+  InvalidContentError,
+} from '@admin/components/editable/utils/getInvalidContent';
+import WarningMessage from '@common/components/WarningMessage';
+import InvalidContentDetails from '@admin/components/editable/InvalidContentDetails';
 
 interface Props {
   cancelButton?: ReactNode;
@@ -116,13 +122,72 @@ export default function FootnoteForm({
 
     await onSubmit(sanitizedValues);
   };
-
+  const [elements, setElements] = useState<Element[] | undefined>();
+  const [invalidContentErrors, setInvalidContentErrors] = useState<
+    InvalidContentError[]
+  >([]);
+  const handleEditorChange = (editorElements?: Element[] | undefined) => {
+    setElements(editorElements);
+  };
   const validationSchema = useMemo<ObjectSchema<BaseFootnote>>(() => {
     return Yup.object({
-      content: Yup.string().required('Footnote content must be added'),
+      content: Yup.string()
+        .required('Footnote content must be added')
+        .test('validate content', (_, { createError, path }) => {
+          if (!elements?.length) {
+            return true;
+          }
+
+          // Convert to json to make it easier to process and test.
+          // Have to convert from Record<string | unknown> to unknown then to our
+          // JsonElement type to be able to access object properties
+          const elementsJson = elements.map(
+            element => element.toJSON() as unknown,
+          );
+          const invalidContent = getInvalidContent(
+            elementsJson as JsonElement[],
+          );
+
+          if (invalidContent.length) {
+            setInvalidContentErrors(invalidContent);
+
+            const invalidContentMessage =
+              invalidContent.length === 1
+                ? '1 accessibility error.'
+                : `${invalidContent.length} accessibility errors.`;
+
+            const errorMessage = invalidContent.length
+              ? `Content errors have been found: ${invalidContentMessage}`
+              : '';
+
+            return createError({
+              path,
+              message: errorMessage,
+            });
+          }
+          setInvalidContentErrors([]);
+
+          return true;
+        }),
       subjects: Yup.object(),
     });
-  }, []);
+  }, [elements]);
+
+  const contentErrorDetails = useMemo(() => {
+    if (invalidContentErrors.length) {
+      return (
+        <>
+          <WarningMessage className="govuk-!-margin-bottom-1">
+            The following problems must be resolved before saving:
+          </WarningMessage>
+          {!!invalidContentErrors.length && (
+            <InvalidContentDetails errors={invalidContentErrors} />
+          )}
+        </>
+      );
+    }
+    return null;
+  }, [invalidContentErrors]);
 
   return (
     <FormProvider
@@ -147,6 +212,8 @@ export default function FootnoteForm({
           label="Footnote"
           includePlugins={pluginsConfigLinksOnly}
           toolbarConfig={toolbarConfigLinkOnly}
+          onChange={handleEditorChange}
+          contentErrorDetails={contentErrorDetails}
         />
 
         {orderBy(
