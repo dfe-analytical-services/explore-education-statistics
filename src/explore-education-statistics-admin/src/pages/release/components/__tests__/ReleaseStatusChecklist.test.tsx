@@ -273,6 +273,7 @@ describe('ReleaseStatusChecklist', () => {
         { code: 'NoDataFiles' },
         { code: 'NoPublicPreReleaseAccessList' },
         { code: 'UnresolvedComments' },
+        { code: 'MissingUpdatedApiDataSet' },
       ],
       errors: [],
     };
@@ -299,7 +300,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.getByRole('heading', { name: 'Warnings' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText('9 things')).toBeInTheDocument();
+    expect(screen.getByText('10 things')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -362,6 +363,24 @@ describe('ReleaseStatusChecklist', () => {
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/prerelease-access#preReleaseAccess-publicList',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'The content has unresolved comments',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/content',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data#api-data-sets',
     );
   });
 
