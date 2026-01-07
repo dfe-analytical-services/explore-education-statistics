@@ -13,7 +13,8 @@ public class PublicationRoleUtilsTests
     [InlineData(PublicationRole.Approver, PublicationRole.Approver)]
     public void ConvertToNewPermissionsSystemPublicationRole(
         PublicationRole publicationRoleToConvert,
-        PublicationRole expectedPublicationRole)
+        PublicationRole expectedPublicationRole
+    )
     {
         var convertedPublicationRole = publicationRoleToConvert.ConvertToNewPermissionsSystemPublicationRole();
 
@@ -27,9 +28,12 @@ public class PublicationRoleUtilsTests
     public void TryConvertToNewPermissionsSystemPublicationRole(
         ReleaseRole releaseRoleToConvert,
         PublicationRole? expectedPublicationRole,
-        bool expectedConversionSuccessful)
+        bool expectedConversionSuccessful
+    )
     {
-        var conversionSuccessful = releaseRoleToConvert.TryConvertToNewPermissionsSystemPublicationRole(out var convertedPublicationRole);
+        var conversionSuccessful = releaseRoleToConvert.TryConvertToNewPermissionsSystemPublicationRole(
+            out var convertedPublicationRole
+        );
 
         Assert.Equal(expectedConversionSuccessful, conversionSuccessful);
         Assert.Equal(expectedPublicationRole, convertedPublicationRole);
@@ -40,9 +44,7 @@ public class PublicationRoleUtilsTests
     [InlineData(PublicationRole.Allower, false)]
     [InlineData(PublicationRole.Drafter, true)]
     [InlineData(PublicationRole.Approver, true)]
-    public void IsNewPermissionsSystemPublicationRole(
-        PublicationRole publicationRole,
-        bool expectedResult)
+    public void IsNewPermissionsSystemPublicationRole(PublicationRole publicationRole, bool expectedResult)
     {
         var isNewPermissionsSystemPublicationRole = publicationRole.IsNewPermissionsSystemPublicationRole();
 
