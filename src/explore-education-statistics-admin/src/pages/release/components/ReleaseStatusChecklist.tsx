@@ -55,18 +55,18 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
     [releaseVersion.id, releaseVersion.publicationId],
   );
 
+  const apiDataSetsTabRoute = user?.permissions.isBauUser
+    ? `${generatePath<ReleaseRouteParams>(
+        releaseDataRoute.path,
+        releaseRouteParams,
+      )}#${releaseDataPageTabs.apiDataSets.id}`
+    : undefined;
+
   const errorDetails = useMemo<ChecklistMessage[]>(() => {
     const dataUploadsTabRoute = `${generatePath<ReleaseRouteParams>(
       releaseDataRoute.path,
       releaseRouteParams,
     )}#${releaseDataPageTabs.dataUploads.id}`;
-
-    const apiDataSetsTabRoute = user?.permissions.isBauUser
-      ? `${generatePath<ReleaseRouteParams>(
-          releaseDataRoute.path,
-          releaseRouteParams,
-        )}#${releaseDataPageTabs.apiDataSets.id}`
-      : undefined;
 
     return errors.map(error => {
       switch (error.code) {
@@ -246,6 +246,12 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
               releaseContentRoute.path,
               releaseRouteParams,
             ),
+          };
+        case 'MissingUpdatedApiDataSet':
+          return {
+            message:
+              'Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
+            link: apiDataSetsTabRoute,
           };
         default:
           // Show warning code, even if there is no mapping,

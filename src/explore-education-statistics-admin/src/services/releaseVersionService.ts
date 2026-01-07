@@ -170,7 +170,8 @@ export type ReleaseVersionChecklistWarning =
         | 'NoDataFiles'
         | 'NoFeaturedTables'
         | 'NoPublicPreReleaseAccessList'
-        | 'UnresolvedComments';
+        | 'UnresolvedComments'
+        | 'MissingUpdatedApiDataSet';
     }
   | {
       code: 'NoFootnotesOnSubjects';
