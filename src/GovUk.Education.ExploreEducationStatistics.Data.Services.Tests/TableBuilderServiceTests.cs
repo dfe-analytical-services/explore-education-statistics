@@ -136,6 +136,7 @@ public class TableBuilderServiceTests
                     EndYear = 2020,
                     EndCode = AcademicYear,
                 },
+                EnableCropping = true,
             };
 
             var tableBuilderQueryOptimiser = new Mock<ITableBuilderQueryOptimiser>(Strict);
