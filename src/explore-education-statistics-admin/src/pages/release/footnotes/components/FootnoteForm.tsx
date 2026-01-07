@@ -156,13 +156,9 @@ export default function FootnoteForm({
                 ? '1 accessibility error.'
                 : `${invalidContent.length} accessibility errors.`;
 
-            const errorMessage = invalidContent.length
-              ? `Content errors have been found: ${invalidContentMessage}`
-              : '';
-
             return createError({
               path,
-              message: errorMessage,
+              message: `Footnote content errors have been found: ${invalidContentMessage}`,
             });
           }
           setInvalidContentErrors([]);
@@ -180,9 +176,7 @@ export default function FootnoteForm({
           <WarningMessage className="govuk-!-margin-bottom-1">
             The following problems must be resolved before saving:
           </WarningMessage>
-          {!!invalidContentErrors.length && (
-            <InvalidContentDetails errors={invalidContentErrors} />
-          )}
+          <InvalidContentDetails errors={invalidContentErrors} />
         </>
       );
     }
