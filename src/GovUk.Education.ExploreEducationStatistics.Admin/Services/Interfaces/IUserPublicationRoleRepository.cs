@@ -21,9 +21,10 @@ public interface IUserPublicationRoleRepository
     );
 
     Task<UserPublicationRole?> GetById(
-        Guid userPublicationRoleId, 
+        Guid userPublicationRoleId,
         bool includeNewPermissionsSystemRoles = false,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     Task<UserPublicationRole?> GetByCompositeKey(
         Guid userId,

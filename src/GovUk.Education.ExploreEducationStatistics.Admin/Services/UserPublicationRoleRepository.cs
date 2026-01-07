@@ -1,9 +1,9 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
@@ -11,7 +11,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class UserPublicationRoleRepository(ContentDbContext contentDbContext, INewPermissionsSystemHelper newPermissionsSystemHelper) : IUserPublicationRoleRepository
+public class UserPublicationRoleRepository(
+    ContentDbContext contentDbContext,
+    INewPermissionsSystemHelper newPermissionsSystemHelper
+) : IUserPublicationRoleRepository
 {
     // This method will remain but be amended slightly in EES-6196, when we no longer have to cater for
     // the old roles.
@@ -25,12 +28,13 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext, IN
     )
     {
         createdDate ??= createdDate?.ToUniversalTime() ?? DateTime.UtcNow;
-        
+
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
             await newPermissionsSystemHelper.DetermineNewPermissionsSystemChanges(
-                publicationRoleToCreate: role, 
-                userId: userId, 
-                publicationId: publicationId);
+                publicationRoleToCreate: role,
+                userId: userId,
+                publicationId: publicationId
+            );
 
         if (newSystemPublicationRoleToRemove.HasValue)
         {
@@ -39,7 +43,8 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext, IN
                 publicationId: publicationId,
                 role: newSystemPublicationRoleToRemove.Value,
                 includeNewPermissionsSystemRoles: true,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
 
             await Remove(userPublicationRole!, cancellationToken);
         }
@@ -50,11 +55,12 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext, IN
         {
             createdNewPermissionsSystemPublicationRole = await Create(
                 userId: userId,
-                publicationId: publicationId, 
+                publicationId: publicationId,
                 role: newSystemPublicationRoleToCreate.Value,
                 createdById: createdById,
                 createdDate: createdDate,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
         }
 
         return role.IsNewPermissionsSystemPublicationRole()
@@ -65,7 +71,8 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext, IN
                 role: role,
                 createdById: createdById,
                 createdDate: createdDate,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
     }
 
     public async Task<List<UserPublicationRole>> CreateManyIfNotExists(
@@ -156,13 +163,14 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext, IN
     public async Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default)
     {
         await RemoveRole(userPublicationRole, cancellationToken);
-        
+
         if (userPublicationRole.Role.IsNewPermissionsSystemPublicationRole())
         {
             return;
         }
-        
-        var newSystemPublicationRoleToRemove = await newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToDelete(userPublicationRole);
+
+        var newSystemPublicationRoleToRemove =
+            await newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToDelete(userPublicationRole);
 
         if (newSystemPublicationRoleToRemove is null)
         {
@@ -247,7 +255,7 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext, IN
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
-    
+
     private async Task<UserPublicationRole> Create(
         Guid userId,
         Guid publicationId,

@@ -1,7 +1,7 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 
@@ -20,12 +20,14 @@ public static class PublicationRoleUtils
         {
             PublicationRole.Owner => PublicationRole.Drafter,
             PublicationRole.Allower => PublicationRole.Approver,
-            _ => throw new ArgumentOutOfRangeException(
-                $"Unexpected publication role: '{publicationRole}'"),
+            _ => throw new ArgumentOutOfRangeException($"Unexpected publication role: '{publicationRole}'"),
         };
     }
 
-    public static bool TryConvertToNewPermissionsSystemPublicationRole(this ReleaseRole oldSystemReleaseRole, [NotNullWhen(true)] out PublicationRole? newSystemPublicationRole)
+    public static bool TryConvertToNewPermissionsSystemPublicationRole(
+        this ReleaseRole oldSystemReleaseRole,
+        [NotNullWhen(true)] out PublicationRole? newSystemPublicationRole
+    )
     {
         switch (oldSystemReleaseRole)
         {
@@ -47,8 +49,7 @@ public static class PublicationRoleUtils
         {
             PublicationRole.Drafter or PublicationRole.Approver => true,
             PublicationRole.Owner or PublicationRole.Allower => false,
-            _ => throw new ArgumentOutOfRangeException(
-                $"Unexpected publication role: '{publicationRole}'"),
+            _ => throw new ArgumentOutOfRangeException($"Unexpected publication role: '{publicationRole}'"),
         };
     }
 }
