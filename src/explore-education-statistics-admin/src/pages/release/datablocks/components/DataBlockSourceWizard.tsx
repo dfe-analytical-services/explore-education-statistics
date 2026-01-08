@@ -83,6 +83,7 @@ const DataBlockSourceWizardFinalStep = ({
           captionTitle={captionTitle}
           query={query}
           tableHeadersConfig={tableHeaders}
+          isAdmin
         />
       </div>
 
