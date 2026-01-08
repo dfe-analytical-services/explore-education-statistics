@@ -16,6 +16,9 @@ using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInf
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
+/// <summary>
+/// TODO EES-6432 EES-6433: This service is due to be removed by EES-6432/EES-6433 once the release page redesign is live.
+/// </summary>
 public class ReleaseService : IReleaseService
 {
     private readonly ContentDbContext _contentDbContext;
@@ -97,12 +100,47 @@ public class ReleaseService : IReleaseService
 
         // If the view model has no mapped published date because it's not published, set a date
         // based on what we expect it to be when publishing completes
-        releaseViewModel.Published ??= await _releaseVersionRepository.GetPublishedDate(
-            releaseVersion.Id,
-            expectedPublishDate ?? DateTimeOffset.UtcNow
-        );
+        if (releaseViewModel.Published == null)
+        {
+            if (expectedPublishDate == null)
+            {
+                throw new ArgumentException(
+                    $"Expected publish date must be provided for unpublished release version '{releaseVersionId}'.",
+                    nameof(expectedPublishDate)
+                );
+            }
+
+            releaseViewModel.Published = await CalculatePublishedDisplayDate(releaseVersion, expectedPublishDate.Value);
+        }
 
         return releaseViewModel;
+    }
+
+    // This is a duplicate of Publisher.Services.ReleaseService.CalculatePublishedDisplayDate
+    private async Task<DateTimeOffset> CalculatePublishedDisplayDate(
+        ReleaseVersion releaseVersion,
+        DateTimeOffset actualPublishedDate
+    )
+    {
+        // For the first version of a release or if an update to the published date has been requested
+        // return the actual published date
+        if (releaseVersion.Version == 0 || releaseVersion.UpdatePublishedDate)
+        {
+            return actualPublishedDate;
+        }
+
+        // Otherwise, return the published date from the previous version
+        await _contentDbContext.Entry(releaseVersion).Reference(rv => rv.PreviousVersion).LoadAsync();
+        var previousVersion = releaseVersion.PreviousVersion!;
+
+        if (!previousVersion.Published.HasValue)
+        {
+            throw new ArgumentException(
+                $"Expected previous release version '{releaseVersion.PreviousVersionId}' to be published."
+            );
+        }
+
+        return previousVersion.Published.Value;
     }
 
     public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> List(string publicationSlug)

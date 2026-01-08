@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Microsoft.EntityFrameworkCore;
@@ -613,6 +612,6 @@ public class ReleaseServiceTests
     {
         contentDbContext ??= InMemoryContentDbContext();
 
-        return new(contentDbContext, releaseVersionRepository: new ReleaseVersionRepository(contentDbContext));
+        return new ReleaseService(contentDbContext);
     }
 }

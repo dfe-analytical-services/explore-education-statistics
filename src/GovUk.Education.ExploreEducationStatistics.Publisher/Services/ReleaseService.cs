@@ -3,15 +3,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
-public class ReleaseService(ContentDbContext contentDbContext, IReleaseVersionRepository releaseVersionRepository)
-    : IReleaseService
+public class ReleaseService(ContentDbContext contentDbContext) : IReleaseService
 {
     public async Task<ReleaseVersion> Get(Guid releaseVersionId)
     {
@@ -83,9 +81,7 @@ public class ReleaseService(ContentDbContext contentDbContext, IReleaseVersionRe
                 .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
             .SingleAsync(rv => rv.Id == releaseVersionId);
 
-        contentDbContext.ReleaseVersions.Update(releaseVersion);
-
-        var publishedDate = await releaseVersionRepository.GetPublishedDate(releaseVersion.Id, actualPublishedDate);
+        var publishedDate = await CalculatePublishedDisplayDate(releaseVersion, actualPublishedDate);
 
         releaseVersion.Published = publishedDate;
 
@@ -94,6 +90,32 @@ public class ReleaseService(ContentDbContext contentDbContext, IReleaseVersionRe
         await UpdatePublishedDataBlockVersions(releaseVersion);
 
         await contentDbContext.SaveChangesAsync();
+    }
+
+    private async Task<DateTimeOffset> CalculatePublishedDisplayDate(
+        ReleaseVersion releaseVersion,
+        DateTimeOffset actualPublishedDate
+    )
+    {
+        // For the first version of a release or if an update to the published date has been requested
+        // return the actual published date
+        if (releaseVersion.Version == 0 || releaseVersion.UpdatePublishedDate)
+        {
+            return actualPublishedDate;
+        }
+
+        // Otherwise, return the published date from the previous version
+        await contentDbContext.Entry(releaseVersion).Reference(rv => rv.PreviousVersion).LoadAsync();
+        var previousVersion = releaseVersion.PreviousVersion!;
+
+        if (!previousVersion.Published.HasValue)
+        {
+            throw new ArgumentException(
+                $"Expected previous release version '{releaseVersion.PreviousVersionId}' to be published."
+            );
+        }
+
+        return previousVersion.Published.Value;
     }
 
     private async Task UpdateReleaseFilePublishedDate(ReleaseVersion releaseVersion, DateTimeOffset publishedDate)

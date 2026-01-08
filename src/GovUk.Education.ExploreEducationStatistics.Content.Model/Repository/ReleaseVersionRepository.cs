@@ -7,57 +7,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 
-public class ReleaseVersionRepository : IReleaseVersionRepository
+public class ReleaseVersionRepository(ContentDbContext contentDbContext) : IReleaseVersionRepository
 {
-    private readonly ContentDbContext _contentDbContext;
-
-    public ReleaseVersionRepository(ContentDbContext contentDbContext)
-    {
-        _contentDbContext = contentDbContext;
-    }
-
-    public async Task<DateTimeOffset> GetPublishedDate(Guid releaseVersionId, DateTimeOffset actualPublishedDate)
-    {
-        var releaseVersion = await _contentDbContext.ReleaseVersions.SingleAsync(rv => rv.Id == releaseVersionId);
-
-        // If the release version is already published return the published date
-        if (releaseVersion.Published.HasValue)
-        {
-            return releaseVersion.Published.Value;
-        }
-
-        // For the first version of a release or if an update to the published date has been requested
-        // return the actual published date
-        if (releaseVersion.Version == 0 || releaseVersion.UpdatePublishedDate)
-        {
-            return actualPublishedDate;
-        }
-
-        // Otherwise, return the published date from the previous version
-        await _contentDbContext.Entry(releaseVersion).Reference(rv => rv.PreviousVersion).LoadAsync();
-
-        if (!releaseVersion.PreviousVersion!.Published.HasValue)
-        {
-            throw new ArgumentException(
-                $"Expected Release {releaseVersion.PreviousVersionId} to have a Published date as the previous version of Release {releaseVersion.Id}"
-            );
-        }
-
-        return releaseVersion.PreviousVersion.Published.Value;
-    }
-
     public async Task<ReleaseVersion?> GetLatestReleaseVersion(
         Guid publicationId,
         CancellationToken cancellationToken = default
     )
     {
-        var latestReleaseId = await _contentDbContext
+        var latestReleaseId = await contentDbContext
             .Publications.Where(p => p.Id == publicationId)
             .Select(p => p.ReleaseSeries.LatestReleaseId())
             .SingleOrDefaultAsync(cancellationToken: cancellationToken);
 
         return latestReleaseId.HasValue
-            ? await _contentDbContext
+            ? await contentDbContext
                 .ReleaseVersions.LatestReleaseVersion(releaseId: latestReleaseId.Value)
                 .SingleOrDefaultAsync(cancellationToken: cancellationToken)
             : null;
@@ -70,7 +33,7 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
     )
     {
         // There should only ever be one latest published release version with a given slug
-        return await _contentDbContext
+        return await contentDbContext
             .ReleaseVersions.LatestReleaseVersions(publicationId, releaseSlug, publishedOnly: true)
             .SingleOrDefaultAsync(cancellationToken: cancellationToken);
     }
@@ -102,7 +65,7 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
         CancellationToken cancellationToken = default
     )
     {
-        return await _contentDbContext
+        return await contentDbContext
             .ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: publishedOnly)
             .Select(rv => rv.Id)
             .ToListAsync(cancellationToken: cancellationToken);
@@ -114,7 +77,7 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
         CancellationToken cancellationToken = default
     )
     {
-        var publication = await _contentDbContext.Publications.SingleOrDefaultAsync(
+        var publication = await contentDbContext.Publications.SingleOrDefaultAsync(
             p => p.Id == publicationId,
             cancellationToken: cancellationToken
         );
@@ -131,7 +94,7 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
             .ToDictionary(tuple => tuple.releaseId, tuple => tuple.index);
 
         return (
-            await _contentDbContext
+            await contentDbContext
                 .ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: publishedOnly)
                 .ToListAsync(cancellationToken: cancellationToken)
         )
@@ -162,7 +125,7 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
         CancellationToken cancellationToken = default
     )
     {
-        return await _contentDbContext
+        return await contentDbContext
             .ReleaseVersions.Where(rv => rv.ReleaseId == releaseId)
             .Where(rv => !publishedOnly || rv.Published.HasValue)
             .MaxAsync(rv => (int?)rv.Version, cancellationToken: cancellationToken);
@@ -173,7 +136,7 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
         CancellationToken cancellationToken = default
     )
     {
-        return await _contentDbContext
+        return await contentDbContext
             .ReleaseVersions.Where(rv => rv.Id == releaseVersionId)
             .Select(rv => new ReleaseIdVersion(rv.ReleaseId, rv.Version))
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
