@@ -104,6 +104,7 @@ export const testCategoricalMeta: FullTableMeta = {
     }),
   ],
   geoJsonAvailable: true,
+  isCroppedTable: false,
 };
 
 export const testCategoricalData: TableDataResult[] = [

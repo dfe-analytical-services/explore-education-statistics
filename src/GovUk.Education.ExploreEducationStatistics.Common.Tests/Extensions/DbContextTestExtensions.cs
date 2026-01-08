@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
+// TODO EES-6450 - remove when all integration tests are migrated to using the new optimised framework.
 public static class DbContextTestExtensions
 {
     public static async Task ClearTestData<TDbContext>(this TDbContext context)
@@ -31,11 +32,32 @@ public static class DbContextTestExtensions
             }
 #pragma warning restore EF1002
         }
+        else if (context.Database.IsInMemory())
+        {
+            await context.ClearTestDataIfInMemory();
+        }
         else
         {
             throw new NotImplementedException(
                 $"Clearing test data is not supported for type {context.Database.ProviderName}"
             );
+        }
+    }
+
+    public static async Task ClearTestDataIfInMemory<TDbContext>(this TDbContext? context)
+        where TDbContext : DbContext
+    {
+        // If a DbContext's Database property is null, it is most likely a Mock.
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (context == null || context.Database == null)
+        {
+            return;
+        }
+
+        if (context.Database.IsInMemory())
+        {
+            await context.Database.EnsureDeletedAsync();
+            context.ChangeTracker.Clear();
         }
     }
 }

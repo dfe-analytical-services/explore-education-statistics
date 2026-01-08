@@ -18,6 +18,7 @@ export interface InjectedWizardProps {
   isEnabled: boolean;
   isLoading: boolean;
   loadingStep?: number;
+  stepHeadingTag?: 'h2' | 'h3' | 'h4';
   /**
    * Move the wizard to a specific {@param step}.
    *

@@ -68,7 +68,7 @@ public class ReleaseService : IReleaseService
 
     public async Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(
         Guid releaseVersionId,
-        DateTime? expectedPublishDate = null
+        DateTimeOffset? expectedPublishDate = null
     )
     {
         // Note this method is allowed to return a view model for an unpublished release version so that Publisher
@@ -99,7 +99,7 @@ public class ReleaseService : IReleaseService
         // based on what we expect it to be when publishing completes
         releaseViewModel.Published ??= await _releaseVersionRepository.GetPublishedDate(
             releaseVersion.Id,
-            expectedPublishDate ?? DateTime.UtcNow
+            expectedPublishDate ?? DateTimeOffset.UtcNow
         );
 
         return releaseViewModel;

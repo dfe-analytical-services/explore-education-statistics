@@ -44,14 +44,16 @@ describe('ChartBuilder', () => {
 
     expect(screen.getByText('Choose chart type')).toBeInTheDocument();
 
-    expect(screen.getByRole('button', { name: 'Line' })).toBeInTheDocument();
-
     expect(
-      screen.getByRole('button', { name: 'Vertical bar' }),
+      screen.getByRole('button', { name: 'Line chart' }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Horizontal bar' }),
+      screen.getByRole('button', { name: 'Vertical bar chart' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Horizontal bar chart' }),
     ).toBeInTheDocument();
 
     expect(
@@ -80,7 +82,7 @@ describe('ChartBuilder', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Line' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Line chart' }));
 
     expect(
       screen.getByRole('button', { name: 'Chart preview' }),
@@ -126,7 +128,7 @@ describe('ChartBuilder', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await user.click(screen.getByRole('button', { name: 'Line' }));
+      await user.click(screen.getByRole('button', { name: 'Line chart' }));
 
       expect(await screen.findByText('Chart preview')).toBeInTheDocument();
 
@@ -204,7 +206,7 @@ describe('ChartBuilder', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await userEvent.click(screen.getByRole('button', { name: 'Line' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Line chart' }));
 
       await waitFor(() => {
         expect(
@@ -281,7 +283,7 @@ describe('ChartBuilder', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      await user.click(screen.getByRole('button', { name: 'Line' }));
+      await user.click(screen.getByRole('button', { name: 'Line chart' }));
 
       await waitFor(() => {
         expect(

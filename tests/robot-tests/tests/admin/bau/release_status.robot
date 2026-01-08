@@ -120,6 +120,16 @@ Add text block with content to Test section two
     user reloads page
     user scrolls to accordion section    View related dashboard(s)    id:data-accordion
 
+Add comment to Test section one
+    user opens accordion section    Test section one    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    ${block}    user starts editing accordion section text block    Test section one    1
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+
+    user presses keys    CTRL+a
+    user adds comment to selected text    ${block}    Test comment 1
+    user checks list item contains    testid:comments-unresolved    1    Test comment 1    ${block}
+    user saves autosaving text block    ${block}
+
 Add content to text block in Related dashboards section
     user waits until page contains accordion section    View related dashboard(s)
     user opens accordion section    View related dashboard(s)    id:data-accordion
@@ -129,14 +139,22 @@ Validate checklist errors and warnings after adding content to text blocks
     user clicks link    Publishing checklist
 
     user checks checklist warnings contains
-    ...    4 things you may have forgotten, but do not need to resolve to publish this release.
+    ...    5 things you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
     user checks checklist warnings contains link    No next expected release date has been added
     user checks checklist warnings contains link    No data files uploaded
     user checks checklist warnings contains link    A public pre-release access list has not been created
+    user checks checklist warnings contains link    The content has unresolved comments
 
     user waits until page does not contain testid    releaseChecklist-errors
     user waits until page does not contain testid    releaseChecklist-success
+
+Resolve comment
+    user clicks link    Content
+    user opens accordion section    Test section one    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user clicks button    View comments
+    user clicks button    Resolve
+    user clicks button    Save & close
 
 Submit release for Higher Review
     user edits release status
@@ -159,6 +177,7 @@ Verify release checklist has not been updated by status
     user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
     user checks checklist warnings contains link    No data files uploaded
     user checks checklist warnings contains link    A public pre-release access list has not been created
+    user checks checklist warnings does not contain link    The content has unresolved comments
 
     user waits until page does not contain testid    releaseChecklist-errors
     user waits until page does not contain testid    releaseChecklist-success
@@ -346,10 +365,7 @@ Upload the larger data file via data upload
     # TODO https://github.com/dfe-analytical-services/eesyscreener/issues/2
     Skip    Skipping until the "large-data-set.csv" is compatible with screener.
 
-    user uploads subject and waits until importing
-    ...    ${SUBJECT_NAME}-updated
-    ...    large-data-set.csv
-    ...    large-data-set.meta.csv
+    user uploads subject    ${SUBJECT_NAME}-updated    large-data-set.csv    large-data-set.meta.csv    Complete
 
 Validate checklist errors (3rd release)
     # TODO https://github.com/dfe-analytical-services/eesyscreener/issues/2
@@ -373,6 +389,7 @@ Add data guidance to subject
 
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
     user waits until page contains element    id:dataGuidance-dataFiles
 
     user waits until page contains accordion section    ${SUBJECT_NAME}

@@ -23,12 +23,13 @@ import sanitizeHtml, {
 } from '@common/utils/sanitizeHtml';
 import classNames from 'classnames';
 import mapValues from 'lodash/mapValues';
-import React, { useMemo, useRef } from 'react';
+import React, { ReactNode, useMemo, useRef } from 'react';
 
 interface EditableContentBlockProps {
   actionThrottle?: number;
   allowComments?: boolean;
   editable?: boolean;
+  editButtonLabel?: ReactNode | string;
   id: string;
   idleTimeout?: number;
   isEditing?: boolean;
@@ -37,6 +38,7 @@ interface EditableContentBlockProps {
   locked?: string;
   lockedBy?: UserDetails;
   hideLabel?: boolean;
+  removeButtonLabel?: ReactNode | string;
   toolbarConfig?:
     | ReadonlyArray<ToolbarOption | ToolbarGroup>
     | Array<ToolbarOption | ToolbarGroup>;
@@ -60,6 +62,7 @@ const EditableContentBlock = ({
   actionThrottle,
   allowComments = false,
   editable = true,
+  editButtonLabel,
   id,
   idleTimeout,
   isLoading,
@@ -68,6 +71,7 @@ const EditableContentBlock = ({
   locked,
   lockedBy,
   hideLabel = false,
+  removeButtonLabel,
   toolbarConfig,
   transformImageAttributes,
   value,
@@ -156,8 +160,10 @@ const EditableContentBlock = ({
       )}
 
       <EditableBlockWrapper
+        editButtonLabel={editButtonLabel}
         isLoading={isLoading}
         lockedBy={lockedBy}
+        removeButtonLabel={removeButtonLabel}
         onEdit={editable ? onEditing : undefined}
         onDelete={editable ? onDelete : undefined}
       >

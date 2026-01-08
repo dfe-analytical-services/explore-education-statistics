@@ -1,16 +1,25 @@
 using System.Net.Http.Json;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class ReleasePublishingFeedbackControllerTestsFixture : OptimisedContentApiCollectionFixture;
+
+[CollectionDefinition(nameof(ReleasePublishingFeedbackControllerTestsFixture))]
+public class ReleasePublishingFeedbackControllerTestsCollection
+    : ICollectionFixture<ReleasePublishingFeedbackControllerTestsFixture>;
+
+[Collection(nameof(ReleasePublishingFeedbackControllerTestsFixture))]
+public class ReleasePublishingFeedbackControllerTests(ReleasePublishingFeedbackControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private const string BaseUrl = "api/feedback/release-publishing";
 
@@ -28,7 +37,9 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             PublicationTitle = "Publication title",
         };
 
-        await TestApp.AddTestData<ContentDbContext>(context => context.ReleasePublishingFeedback.Add(existingFeedback));
+        await fixture
+            .GetContentDbContext()
+            .AddTestData(context => context.ReleasePublishingFeedback.Add(existingFeedback));
 
         var request = new ReleasePublishingFeedbackUpdateRequest(
             EmailToken: existingFeedback.EmailToken,
@@ -37,15 +48,14 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
         );
 
         // Arrange
-        var client = TestApp.CreateClient();
+        var client = fixture.CreateClient();
 
         // Act
         var response = await client.PutAsync(BaseUrl, JsonContent.Create(request));
         response.AssertNoContent();
 
         // Assert
-        await using var context = TestApp.GetDbContext<ContentDbContext>();
-        var updatedFeedback = await context.ReleasePublishingFeedback.SingleAsync();
+        var updatedFeedback = await fixture.GetContentDbContext().ReleasePublishingFeedback.SingleAsync();
 
         // Assert that the fields that were expecting updates were updated successfully.
         Assert.Equal(request.Response, updatedFeedback.Response);
@@ -75,7 +85,9 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             PublicationTitle = "Publication title",
         };
 
-        await TestApp.AddTestData<ContentDbContext>(context => context.ReleasePublishingFeedback.Add(existingFeedback));
+        await fixture
+            .GetContentDbContext()
+            .AddTestData(context => context.ReleasePublishingFeedback.Add(existingFeedback));
 
         var request = new ReleasePublishingFeedbackUpdateRequest(
             EmailToken: "",
@@ -84,7 +96,7 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
         );
 
         // Arrange
-        var client = TestApp.CreateClient();
+        var client = fixture.CreateClient();
 
         // Act
         var response = await client.PutAsync(BaseUrl, JsonContent.Create(request));
@@ -117,7 +129,9 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
             PublicationTitle = "Publication title",
         };
 
-        await TestApp.AddTestData<ContentDbContext>(context => context.ReleasePublishingFeedback.Add(existingFeedback));
+        await fixture
+            .GetContentDbContext()
+            .AddTestData(context => context.ReleasePublishingFeedback.Add(existingFeedback));
 
         var request = new ReleasePublishingFeedbackUpdateRequest(
             EmailToken: Guid.NewGuid().ToString(),
@@ -125,7 +139,7 @@ public class ReleasePublishingFeedbackControllerTests(TestApplicationFactory tes
         );
 
         // Arrange
-        var client = TestApp.CreateClient();
+        var client = fixture.CreateClient();
 
         // Act
         var response = await client.PutAsync(BaseUrl, JsonContent.Create(request));

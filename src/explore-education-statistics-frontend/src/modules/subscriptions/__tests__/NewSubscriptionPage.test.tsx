@@ -29,7 +29,7 @@ describe('NewSubscriptionPage', () => {
       <NewSubscriptionPage
         publicationSlug="test-publication-slug"
         publicationTitle={testPublicationTitle.title}
-        publicationId={testPublicationTitle.id}
+        publicationId={testPublicationTitle.publicationId}
       />,
     );
 
@@ -47,7 +47,7 @@ describe('NewSubscriptionPage', () => {
       <NewSubscriptionPage
         publicationSlug="test-publication-slug"
         publicationTitle={testPublicationTitle.title}
-        publicationId={testPublicationTitle.id}
+        publicationId={testPublicationTitle.publicationId}
       />,
     );
 
@@ -65,7 +65,7 @@ describe('NewSubscriptionPage', () => {
         email: 'test@test.com',
         slug: 'test-publication-slug',
         title: testPublicationTitle.title,
-        id: testPublicationTitle.id,
+        id: testPublicationTitle.publicationId,
       });
     });
   });
@@ -79,7 +79,7 @@ describe('NewSubscriptionPage', () => {
       <NewSubscriptionPage
         publicationSlug="test-publication-slug"
         publicationTitle={testPublicationTitle.title}
-        publicationId={testPublicationTitle.id}
+        publicationId={testPublicationTitle.publicationId}
       />,
     );
 
@@ -104,7 +104,7 @@ describe('NewSubscriptionPage', () => {
         <NewSubscriptionPage
           publicationSlug="test-publication-slug"
           publicationTitle={testPublicationTitle.title}
-          publicationId={testPublicationTitle.id}
+          publicationId={testPublicationTitle.publicationId}
         />,
       );
 
@@ -133,7 +133,7 @@ describe('NewSubscriptionPage', () => {
       <NewSubscriptionPage
         publicationSlug="test-publication-slug"
         publicationTitle={testPublicationTitle.title}
-        publicationId={testPublicationTitle.id}
+        publicationId={testPublicationTitle.publicationId}
       />,
     );
 
@@ -160,7 +160,7 @@ describe('NewSubscriptionPage', () => {
         email: 'test@test.com',
         slug: 'test-publication-slug',
         title: testPublicationTitle.title,
-        id: testPublicationTitle.id,
+        id: testPublicationTitle.publicationId,
       });
     });
   });
@@ -174,7 +174,7 @@ describe('NewSubscriptionPage', () => {
       <NewSubscriptionPage
         publicationSlug="test-publication-slug"
         publicationTitle={testPublicationTitle.title}
-        publicationId={testPublicationTitle.id}
+        publicationId={testPublicationTitle.publicationId}
       />,
     );
 
@@ -192,7 +192,7 @@ describe('NewSubscriptionPage', () => {
         email: 'test@test.com',
         slug: 'test-publication-slug',
         title: testPublicationTitle.title,
-        id: testPublicationTitle.id,
+        id: testPublicationTitle.publicationId,
       });
     });
 

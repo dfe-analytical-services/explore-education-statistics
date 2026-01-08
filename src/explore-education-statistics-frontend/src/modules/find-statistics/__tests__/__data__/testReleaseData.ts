@@ -248,6 +248,7 @@ export const testReleaseVersionSummary: ReleaseVersionSummary = {
   published: '2025-08-10T09:30:00+01:00',
   lastUpdated: '2025-08-11T14:30:00+01:00',
   isLatestRelease: true,
+  preReleaseAccessList: '<p>Pre-release access list content</p>',
   updateCount: 5,
 };
 
@@ -494,8 +495,7 @@ export const testReleaseDataContent: ReleaseVersionDataContent = {
   releaseId: 'test-release-id',
   releaseVersionId: 'test-release-version-id',
   dataDashboards: '<h3>Data dashboard text</h3>',
-  dataGuidance:
-    '<h3>Description</h3><p>---</p><h3>Coverage</h3><p>---</p><h3>File formats and conventions</h3><p>---</p>',
+  dataGuidance: 'Test data guidance',
   dataSets: [
     {
       dataSetFileId: 'test-dataset-1-datasetfileid',

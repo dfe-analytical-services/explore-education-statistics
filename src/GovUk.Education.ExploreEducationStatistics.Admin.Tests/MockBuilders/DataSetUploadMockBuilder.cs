@@ -11,7 +11,26 @@ public class DataSetUploadMockBuilder
     private string? _screenerResult;
     private List<DataScreenerTestResult>? _testResults;
 
-    public DataSetUpload BuildEntity()
+    public DataSetUpload BuildInitialEntity()
+    {
+        return new DataSetUpload
+        {
+            ReleaseVersionId = _releaseVersionId ?? Guid.NewGuid(),
+            DataSetTitle = "Test Data Set",
+            DataFileId = Guid.NewGuid(),
+            DataFileName = "data.csv",
+            DataFileSizeInBytes = 434,
+            MetaFileId = Guid.NewGuid(),
+            MetaFileName = "meta.data.csv",
+            MetaFileSizeInBytes = 157,
+            Status = DataSetUploadStatus.SCREENING,
+            UploadedBy = "test@test.com",
+            Created = DateTime.UtcNow,
+            ReplacingFileId = null,
+        };
+    }
+
+    public DataSetUpload BuildScreenedEntity()
     {
         return new DataSetUpload
         {

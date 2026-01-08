@@ -8,7 +8,7 @@ public class ReleaseVersionTests
     [Fact]
     public void Live_True()
     {
-        var releaseVersion = new ReleaseVersion { Published = DateTime.Now.AddDays(-1) };
+        var releaseVersion = new ReleaseVersion { Published = DateTimeOffset.UtcNow.AddDays(-1) };
 
         Assert.True(releaseVersion.Live);
     }
@@ -25,7 +25,7 @@ public class ReleaseVersionTests
     public void Live_False_PublishedInFuture()
     {
         // Note that this should not happen, but we test the edge case.
-        var releaseVersion = new ReleaseVersion() { Published = DateTime.Now.AddDays(1) };
+        var releaseVersion = new ReleaseVersion { Published = DateTimeOffset.UtcNow.AddDays(1) };
 
         Assert.False(releaseVersion.Live);
     }

@@ -3,34 +3,67 @@ using System.Net.Http.Json;
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.TheoryData;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class PreviewTokenControllerTestsFixture()
+    : OptimisedAdminCollectionFixture(
+        capabilities: [AdminIntegrationTestCapability.UserAuth, AdminIntegrationTestCapability.Postgres]
+    )
+{
+    public ClaimsPrincipal BauPrincipal = null!;
+
+    public User BauUser = null!;
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+
+        var dataFixture = new DataFixture();
+
+        BauPrincipal = dataFixture.BauUser();
+
+        BauUser = dataFixture.DefaultUser().WithId(BauPrincipal.GetUserId()).WithEmail(BauPrincipal.GetEmail());
+    }
+
+    public override async Task BeforeEachTest()
+    {
+        await base.BeforeEachTest();
+
+        await GetContentDbContext().AddTestData(context => context.Users.Add(BauUser));
+    }
+}
+
+[CollectionDefinition(nameof(PreviewTokenControllerTestsFixture))]
+public class PreviewTokenControllerTestsCollection : ICollectionFixture<PreviewTokenControllerTestsFixture>;
+
+[Collection(nameof(PreviewTokenControllerTestsFixture))]
+public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private const string BaseUrl = "api/public-data/preview-tokens";
+    private static readonly DataFixture DataFixture = new();
 
-    private static readonly ClaimsPrincipal BauUser = new DataFixture().BauUser();
-
-    private static readonly User CreatedByBauUser = new DataFixture().DefaultUser().WithId(BauUser.GetUserId());
-
-    public class CreatePreviewTokenTests(TestApplicationFactory testApp) : PreviewTokenControllerTests(testApp)
+    public class CreatePreviewTokenTests(PreviewTokenControllerTestsFixture fixture)
+        : PreviewTokenControllerTests(fixture)
     {
         private record CreatePreviewTokenValidationError(string Message, string Path);
 
@@ -39,8 +72,13 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         {
             var sevenDaysFromNow = DateTimeOffset.UtcNow.AddDays(7);
             var dataSetVersion = await SetUpDataSetVersionTestData();
+
             var label = new string('A', count: 100);
-            var response = await CreatePreviewToken(dataSetVersionId: dataSetVersion.Id, label: label);
+            var response = await CreatePreviewToken(
+                dataSetVersionId: dataSetVersion.Id,
+                label: label,
+                user: fixture.BauPrincipal
+            );
 
             var (viewModel, createdEntityId) = response.AssertCreated<PreviewTokenViewModel>(
                 expectedLocationPrefix: "http://localhost/api/public-data/preview-tokens/"
@@ -51,22 +89,25 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 () => Assert.Equal(previewTokenId, viewModel.Id),
                 () => Assert.Equal(label, viewModel.Label),
                 () => Assert.Equal(PreviewTokenStatus.Active, viewModel.Status),
-                () => Assert.Equal(CreatedByBauUser.Email, viewModel.CreatedByEmail),
+                () => Assert.Equal(fixture.BauUser.Email, viewModel.CreatedByEmail),
                 () => viewModel.Created.AssertUtcNow(),
                 () => viewModel.Activates.AssertUtcNow(),
                 () => viewModel.Expires.AssertEqual(sevenDaysFromNow),
                 () => Assert.Null(viewModel.Updated)
             );
 
-            await using var publicDataDbContext = TestApp.GetDbContext<PublicDataDbContext>();
+            var previewTokens = await fixture
+                .GetPublicDataDbContext()
+                .PreviewTokens.Where(pt => pt.DataSetVersionId == dataSetVersion.Id)
+                .ToListAsync();
 
-            var actualPreviewToken = Assert.Single(await publicDataDbContext.PreviewTokens.ToListAsync());
+            var actualPreviewToken = Assert.Single(previewTokens);
 
             Assert.Multiple(
                 () => Assert.Equal(previewTokenId, actualPreviewToken.Id),
                 () => Assert.Equal(label, actualPreviewToken.Label),
                 () => Assert.Equal(dataSetVersion.Id, actualPreviewToken.DataSetVersionId),
-                () => Assert.Equal(CreatedByBauUser.Id, actualPreviewToken.CreatedByUserId),
+                () => Assert.Equal(fixture.BauUser.Id, actualPreviewToken.CreatedByUserId),
                 () => actualPreviewToken.Created.AssertUtcNow(),
                 () => actualPreviewToken.Activates.AssertUtcNow(),
                 () => actualPreviewToken.Expires.AssertEqual(sevenDaysFromNow),
@@ -97,7 +138,8 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 dataSetVersionId: dataSetVersion.Id,
                 label: label,
                 activates: suppliedActivates,
-                expires: suppliedExpires
+                expires: suppliedExpires,
+                user: fixture.BauPrincipal
             );
 
             var (viewModel, createdEntityId) = response.AssertCreated<PreviewTokenViewModel>(
@@ -119,22 +161,25 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                         activatesProvided ? PreviewTokenStatus.Pending : PreviewTokenStatus.Active,
                         viewModel.Status
                     ),
-                () => Assert.Equal(CreatedByBauUser.Email, viewModel.CreatedByEmail),
+                () => Assert.Equal(fixture.BauUser.Email, viewModel.CreatedByEmail),
                 () => viewModel.Created.AssertUtcNow(),
                 () => viewModel.Activates.AssertEqual(expectedActivates),
                 () => viewModel.Expires.AssertEqual(expectedExpiry),
                 () => Assert.Null(viewModel.Updated)
             );
 
-            await using var publicDataDbContext = TestApp.GetDbContext<PublicDataDbContext>();
+            var previewTokens = await fixture
+                .GetPublicDataDbContext()
+                .PreviewTokens.Where(pt => pt.DataSetVersionId == dataSetVersion.Id)
+                .ToListAsync();
 
-            var actualPreviewToken = Assert.Single(await publicDataDbContext.PreviewTokens.ToListAsync());
+            var actualPreviewToken = Assert.Single(previewTokens);
 
             Assert.Multiple(
                 () => Assert.Equal(previewTokenId, actualPreviewToken.Id),
                 () => Assert.Equal(label, actualPreviewToken.Label),
                 () => Assert.Equal(dataSetVersion.Id, actualPreviewToken.DataSetVersionId),
-                () => Assert.Equal(CreatedByBauUser.Id, actualPreviewToken.CreatedByUserId),
+                () => Assert.Equal(fixture.BauUser.Id, actualPreviewToken.CreatedByUserId),
                 () => actualPreviewToken.Created.AssertUtcNow(),
                 () => actualPreviewToken.Activates.AssertEqual(expectedActivates),
                 () => actualPreviewToken.Expires.AssertEqual(expectedExpiry),
@@ -152,26 +197,27 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 Message: "Expires date must be no more than 7 days from today."
             );
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
             var response = await CreatePreviewToken(
                 dataSetVersion.Id,
                 new string('A', count: 100),
                 activates: null,
-                expires: expiresDate
+                expires: expiresDate,
+                user: fixture.BauPrincipal
             );
 
             var validationProblem = response.AssertValidationProblem();
@@ -188,7 +234,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
@@ -196,13 +242,15 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 .WithStatus(status)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            var response = await CreatePreviewToken(dataSetVersion.Id, "Label");
+            var response = await CreatePreviewToken(dataSetVersion.Id, "Label", user: fixture.BauPrincipal);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -216,7 +264,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         [Fact]
         public async Task DataSetVersionIdIsEmpty_ReturnsValidationProblem()
         {
-            var response = await CreatePreviewToken(dataSetVersionId: Guid.Empty, "Label");
+            var response = await CreatePreviewToken(dataSetVersionId: Guid.Empty, "Label", user: fixture.BauPrincipal);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -227,7 +275,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         [Fact]
         public async Task LabelIsEmpty_ReturnsValidationProblem()
         {
-            var response = await CreatePreviewToken(Guid.NewGuid(), label: string.Empty);
+            var response = await CreatePreviewToken(Guid.NewGuid(), label: string.Empty, user: fixture.BauPrincipal);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -238,7 +286,11 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         [Fact]
         public async Task LabelAboveMaximumLength_ReturnsValidationProblem()
         {
-            var response = await CreatePreviewToken(Guid.NewGuid(), label: new string('A', count: 101));
+            var response = await CreatePreviewToken(
+                Guid.NewGuid(),
+                label: new string('A', count: 101),
+                user: fixture.BauPrincipal
+            );
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -252,7 +304,11 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         [Fact]
         public async Task NoDataSetVersion_ReturnsNotFound()
         {
-            var response = await CreatePreviewToken(dataSetVersionId: Guid.NewGuid(), "Label");
+            var response = await CreatePreviewToken(
+                dataSetVersionId: Guid.NewGuid(),
+                "Label",
+                user: fixture.BauPrincipal
+            );
             response.AssertNotFound();
         }
 
@@ -261,22 +317,22 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
-
-            var response = await CreatePreviewToken(dataSetVersion.Id, "Label", client);
+            var response = await CreatePreviewToken(dataSetVersion.Id, "Label", user: OptimisedTestUsers.Authenticated);
 
             response.AssertForbidden();
         }
@@ -284,12 +340,12 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         private async Task<HttpResponseMessage> CreatePreviewToken(
             Guid dataSetVersionId,
             string label,
-            HttpClient? client = null,
+            ClaimsPrincipal user,
             DateTimeOffset? activates = null,
             DateTimeOffset? expires = null
         )
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user);
 
             var request = new PreviewTokenCreateRequest
             {
@@ -306,52 +362,53 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
             return dataSetVersion;
         }
     }
 
-    public class GetPreviewTokenTests(TestApplicationFactory testApp) : PreviewTokenControllerTests(testApp)
+    public class GetPreviewTokenTests(PreviewTokenControllerTestsFixture fixture) : PreviewTokenControllerTests(fixture)
     {
         [Fact]
         public async Task Success()
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
                 .WithPreviewTokens(() =>
-                    DataFixture.DefaultPreviewToken().WithCreatedByUserId(CreatedByBauUser.Id).Generate(2)
+                    DataFixture.DefaultPreviewToken().WithCreatedByUserId(fixture.BauUser.Id).Generate(2)
                 )
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
             var previewToken = dataSetVersion.PreviewTokens[0];
 
-            var response = await GetPreviewToken(previewToken.Id);
+            var response = await GetPreviewToken(previewToken.Id, user: fixture.BauPrincipal);
 
             var expectedResult = new PreviewTokenViewModel
             {
@@ -360,7 +417,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 Status = PreviewTokenStatus.Active,
                 Activates = previewToken.Activates,
                 Created = previewToken.Created,
-                CreatedByEmail = CreatedByBauUser.Email,
+                CreatedByEmail = fixture.BauUser.Email,
                 Expires = previewToken.Expires,
                 Updated = previewToken.Updated,
             };
@@ -373,27 +430,27 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
                 .WithPreviewTokens(() =>
-                    [DataFixture.DefaultPreviewToken(expired: true).WithCreatedByUserId(CreatedByBauUser.Id)]
+                    [DataFixture.DefaultPreviewToken(expired: true).WithCreatedByUserId(fixture.BauUser.Id)]
                 )
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
             var previewToken = dataSetVersion.PreviewTokens[0];
 
-            var response = await GetPreviewToken(previewToken.Id);
+            var response = await GetPreviewToken(previewToken.Id, user: fixture.BauPrincipal);
 
             var viewModel = response.AssertOk<PreviewTokenViewModel>();
             Assert.Equal(PreviewTokenStatus.Expired, viewModel.Status);
@@ -402,7 +459,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         [Fact]
         public async Task NoPreviewToken_ReturnsNotFound()
         {
-            var response = await GetPreviewToken(previewTokenId: Guid.NewGuid());
+            var response = await GetPreviewToken(previewTokenId: Guid.NewGuid(), user: fixture.BauPrincipal);
             response.AssertNotFound();
         }
 
@@ -411,7 +468,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
@@ -419,22 +476,25 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
-
-            var response = await GetPreviewToken(dataSetVersion.PreviewTokens[0].Id, client);
+            var response = await GetPreviewToken(
+                dataSetVersion.PreviewTokens[0].Id,
+                user: OptimisedTestUsers.Authenticated
+            );
 
             response.AssertForbidden();
         }
 
-        private async Task<HttpResponseMessage> GetPreviewToken(Guid previewTokenId, HttpClient? client = null)
+        private async Task<HttpResponseMessage> GetPreviewToken(Guid previewTokenId, ClaimsPrincipal user)
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user);
 
             var uri = new Uri($"{BaseUrl}/{previewTokenId}", UriKind.Relative);
 
@@ -442,14 +502,15 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         }
     }
 
-    public class ListPreviewTokensTests(TestApplicationFactory testApp) : PreviewTokenControllerTests(testApp)
+    public class ListPreviewTokensTests(PreviewTokenControllerTestsFixture fixture)
+        : PreviewTokenControllerTests(fixture)
     {
         [Fact]
         public async Task Success()
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
@@ -458,20 +519,20 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                     DataFixture
                         .DefaultPreviewToken()
                         .ForIndex(1, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddSeconds(-1)))
-                        .WithCreatedByUserId(CreatedByBauUser.Id)
+                        .WithCreatedByUserId(fixture.BauUser.Id)
                         .Generate(2)
                 )
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
-
-            var response = await ListPreviewTokens(dataSetVersion.Id);
+            var response = await ListPreviewTokens(dataSetVersion.Id, user: fixture.BauPrincipal);
 
             var expectedViewModels = dataSetVersion
                 .PreviewTokens.Select(pt => new PreviewTokenViewModel
@@ -481,7 +542,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                     Status = pt.Status,
                     Activates = pt.Activates,
                     Created = pt.Created,
-                    CreatedByEmail = CreatedByBauUser.Email,
+                    CreatedByEmail = fixture.BauUser.Email,
                     Expires = pt.Expires,
                     Updated = pt.Updated,
                 })
@@ -495,23 +556,23 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             var (dataSetVersion1, dataSetVersion2) = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
-                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken().WithCreatedByUserId(CreatedByBauUser.Id)])
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken().WithCreatedByUserId(fixture.BauUser.Id)])
                 .GenerateTuple2();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.AddRange(dataSetVersion1, dataSetVersion2);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSetVersion1, dataSetVersion2);
+                    context.DataSets.Update(dataSet);
+                });
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
-
-            var response = await ListPreviewTokens(dataSetVersion1.Id);
+            var response = await ListPreviewTokens(dataSetVersion1.Id, user: fixture.BauPrincipal);
 
             var viewModels = response.AssertOk<List<PreviewTokenViewModel>>();
 
@@ -524,7 +585,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
@@ -536,20 +597,20 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                         .ForIndex(1, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddDays(-1)))
                         .ForIndex(2, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddSeconds(-1)))
                         .ForIndex(3, pt => pt.SetExpiry(DateTimeOffset.UtcNow.AddDays(1)))
-                        .WithCreatedByUserId(CreatedByBauUser.Id)
+                        .WithCreatedByUserId(fixture.BauUser.Id)
                         .Generate(4)
                 )
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
-
-            var response = await ListPreviewTokens(dataSetVersion.Id);
+            var response = await ListPreviewTokens(dataSetVersion.Id, user: fixture.BauPrincipal);
 
             var viewModels = response.AssertOk<List<PreviewTokenViewModel>>();
 
@@ -569,20 +630,22 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            var response = await ListPreviewTokens(dataSetVersion.Id);
+            var response = await ListPreviewTokens(dataSetVersion.Id, user: fixture.BauPrincipal);
 
             var result = response.AssertOk<List<PreviewTokenViewModel>>();
 
@@ -592,7 +655,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         [Fact]
         public async Task NoDataSetVersion_ReturnsNotFound()
         {
-            var response = await ListPreviewTokens(dataSetVersionId: Guid.NewGuid());
+            var response = await ListPreviewTokens(dataSetVersionId: Guid.NewGuid(), user: fixture.BauPrincipal);
             response.AssertNotFound();
         }
 
@@ -601,29 +664,29 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
-
-            var response = await ListPreviewTokens(dataSetVersion.Id, client);
+            var response = await ListPreviewTokens(dataSetVersion.Id, user: OptimisedTestUsers.Authenticated);
 
             response.AssertForbidden();
         }
 
-        private async Task<HttpResponseMessage> ListPreviewTokens(Guid dataSetVersionId, HttpClient? client = null)
+        private async Task<HttpResponseMessage> ListPreviewTokens(Guid dataSetVersionId, ClaimsPrincipal user)
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user);
 
             var queryParams = new Dictionary<string, string?> { { "dataSetVersionId", dataSetVersionId.ToString() } };
 
@@ -633,32 +696,33 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         }
     }
 
-    public class RevokePreviewTokenTests(TestApplicationFactory testApp) : PreviewTokenControllerTests(testApp)
+    public class RevokePreviewTokenTests(PreviewTokenControllerTestsFixture fixture)
+        : PreviewTokenControllerTests(fixture)
     {
         [Fact]
         public async Task Success()
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
                 .WithDataSet(dataSet)
-                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken().WithCreatedByUserId(CreatedByBauUser.Id)])
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken().WithCreatedByUserId(fixture.BauUser.Id)])
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
-
-            await TestApp.AddTestData<ContentDbContext>(context => context.Users.Add(CreatedByBauUser));
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
             var previewToken = dataSetVersion.PreviewTokens[0];
 
-            var response = await RevokePreviewToken(previewToken.Id);
+            var response = await RevokePreviewToken(previewToken.Id, user: fixture.BauPrincipal);
 
             var viewModel = response.AssertOk<PreviewTokenViewModel>();
 
@@ -666,17 +730,15 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 () => Assert.Equal(previewToken.Id, viewModel.Id),
                 () => Assert.Equal(previewToken.Label, viewModel.Label),
                 () => Assert.Equal(PreviewTokenStatus.Expired, viewModel.Status),
-                () => Assert.Equal(CreatedByBauUser.Email, viewModel.CreatedByEmail),
+                () => Assert.Equal(fixture.BauUser.Email, viewModel.CreatedByEmail),
                 () => Assert.Equal(previewToken.Created.TruncateNanoseconds(), viewModel.Created),
                 () => viewModel.Expires.AssertUtcNow(),
                 () => viewModel.Updated.AssertUtcNow()
             );
 
-            await using var publicDataDbContext = TestApp.GetDbContext<PublicDataDbContext>();
-
-            var actualPreviewToken = await publicDataDbContext.PreviewTokens.SingleAsync(pt =>
-                pt.Id == dataSetVersion.PreviewTokens[0].Id
-            );
+            var actualPreviewToken = await fixture
+                .GetPublicDataDbContext()
+                .PreviewTokens.SingleAsync(pt => pt.Id == dataSetVersion.PreviewTokens[0].Id);
 
             Assert.Multiple(
                 () => Assert.Equal(PreviewTokenStatus.Expired, actualPreviewToken.Status),
@@ -690,7 +752,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
@@ -698,13 +760,15 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken(expired: true)])
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            var response = await RevokePreviewToken(dataSetVersion.PreviewTokens[0].Id);
+            var response = await RevokePreviewToken(dataSetVersion.PreviewTokens[0].Id, user: fixture.BauPrincipal);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -714,11 +778,9 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 expectedMessage: ValidationMessages.PreviewTokenExpired.Message
             );
 
-            await using var publicDataDbContext = TestApp.GetDbContext<PublicDataDbContext>();
-
-            var actualPreviewToken = await publicDataDbContext.PreviewTokens.SingleAsync(pt =>
-                pt.Id == dataSetVersion.PreviewTokens[0].Id
-            );
+            var actualPreviewToken = await fixture
+                .GetPublicDataDbContext()
+                .PreviewTokens.SingleAsync(pt => pt.Id == dataSetVersion.PreviewTokens[0].Id);
 
             Assert.Multiple(
                 () => Assert.Equal(PreviewTokenStatus.Expired, actualPreviewToken.Status),
@@ -729,7 +791,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         [Fact]
         public async Task NoPreviewToken_ReturnsNotFound()
         {
-            var response = await RevokePreviewToken(previewTokenId: Guid.NewGuid());
+            var response = await RevokePreviewToken(previewTokenId: Guid.NewGuid(), user: fixture.BauPrincipal);
             response.AssertNotFound();
         }
 
@@ -738,7 +800,7 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
@@ -746,31 +808,29 @@ public abstract class PreviewTokenControllerTests(TestApplicationFactory testApp
                 .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersions.Add(dataSetVersion);
-                context.DataSets.Update(dataSet);
-            });
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
 
-            var client = BuildApp(DataFixture.AuthenticatedUser()).CreateClient();
-
-            var response = await RevokePreviewToken(dataSetVersion.PreviewTokens[0].Id, client);
+            var response = await RevokePreviewToken(
+                dataSetVersion.PreviewTokens[0].Id,
+                user: OptimisedTestUsers.Authenticated
+            );
 
             response.AssertForbidden();
         }
 
-        private async Task<HttpResponseMessage> RevokePreviewToken(Guid previewTokenId, HttpClient? client = null)
+        private async Task<HttpResponseMessage> RevokePreviewToken(Guid previewTokenId, ClaimsPrincipal user)
         {
-            client ??= BuildApp().CreateClient();
+            var client = fixture.CreateClient(user: user);
 
             var uri = new Uri($"{BaseUrl}/{previewTokenId}/revoke", UriKind.Relative);
 
             return await client.PostAsync(uri, content: null);
         }
-    }
-
-    private WebApplicationFactory<TestStartup> BuildApp(ClaimsPrincipal? user = null)
-    {
-        return TestApp.SetUser(user ?? BauUser);
     }
 }

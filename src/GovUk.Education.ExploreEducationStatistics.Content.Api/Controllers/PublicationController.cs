@@ -1,7 +1,6 @@
 #nullable enable
 using System.Net.Mime;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
@@ -45,15 +44,6 @@ public class PublicationController : ControllerBase
     public async Task<ActionResult<PublishedPublicationSummaryViewModel>> GetPublicationSummary(Guid publicationId)
     {
         return await _publicationService.GetSummary(publicationId).HandleFailuresOrOk();
-    }
-
-    [HttpGet("publications/{slug}/title")]
-    public async Task<ActionResult<PublicationTitleViewModel>> GetPublicationTitle(string slug)
-    {
-        return await _publicationCacheService
-            .GetPublication(slug)
-            .OnSuccess(p => new PublicationTitleViewModel { Id = p.Id, Title = p.Title })
-            .HandleFailuresOrOk();
     }
 
     [HttpGet("publicationInfos")]

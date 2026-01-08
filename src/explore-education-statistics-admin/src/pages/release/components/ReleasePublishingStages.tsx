@@ -2,6 +2,7 @@ import StatusBlock from '@admin/components/StatusBlock';
 import getStatusDetail from '@admin/pages/release/utils/getStatusDetail';
 import { ReleaseVersionStageStatus } from '@admin/services/releaseVersionService';
 import Details from '@common/components/Details';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import React from 'react';
 
 const notStartedStatuses = ['Validating', 'Invalid'];
@@ -9,12 +10,14 @@ const notStartedStatuses = ['Validating', 'Invalid'];
 interface Props {
   checklistStyle?: boolean;
   currentStatus?: ReleaseVersionStageStatus;
+  hiddenLabel?: string;
   includeScheduled?: boolean;
 }
 
 export default function ReleasePublishingStages({
   checklistStyle = false,
   currentStatus,
+  hiddenLabel,
   includeScheduled = false,
 }: Props) {
   if (
@@ -31,6 +34,11 @@ export default function ReleasePublishingStages({
     <Details
       className="govuk-!-margin-bottom-0 govuk-!-margin-top-1"
       summary="View stages"
+      summaryAfter={
+        hiddenLabel ? (
+          <VisuallyHidden> {hiddenLabel}</VisuallyHidden>
+        ) : undefined
+      }
     >
       {checklistStyle &&
         ![...notStartedStatuses, 'Scheduled'].includes(

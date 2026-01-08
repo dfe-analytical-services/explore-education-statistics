@@ -122,6 +122,7 @@ export type DataSetUploadStatus =
   | 'UPLOADING'
   | 'SCREENING'
   | 'FAILED_SCREENING'
+  | 'SCREENER_ERROR'
   | 'PENDING_REVIEW'
   | 'PENDING_IMPORT';
 

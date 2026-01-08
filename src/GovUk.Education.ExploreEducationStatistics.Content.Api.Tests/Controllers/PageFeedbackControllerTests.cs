@@ -1,16 +1,24 @@
 using System.Net.Http.Json;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public class PageFeedbackControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class PageFeedbackControllerTestsFixture : OptimisedContentApiCollectionFixture;
+
+[CollectionDefinition(nameof(PageFeedbackControllerTestsFixture))]
+public class PageFeedbackControllerTestsCollection : ICollectionFixture<PageFeedbackControllerTestsFixture>;
+
+[Collection(nameof(PageFeedbackControllerTestsFixture))]
+public class PageFeedbackControllerTests(PageFeedbackControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private const string BaseUrl = "api/feedback/page";
 
@@ -18,7 +26,7 @@ public class PageFeedbackControllerTests(TestApplicationFactory testApp) : Integ
     public async Task CreateFeedback_Success()
     {
         // Arrange
-        var client = TestApp.CreateClient();
+        var client = fixture.CreateClient();
 
         var request = new PageFeedbackCreateRequest
         {
@@ -35,8 +43,7 @@ public class PageFeedbackControllerTests(TestApplicationFactory testApp) : Integ
         await client.PostAsync(BaseUrl, JsonContent.Create(request));
 
         // Assert
-        await using var context = TestApp.GetDbContext<ContentDbContext>();
-        var saved = await context.PageFeedback.FirstAsync();
+        var saved = await fixture.GetContentDbContext().PageFeedback.OrderByDescending(f => f.Created).FirstAsync();
 
         Assert.Equivalent(request, saved);
     }
@@ -45,7 +52,7 @@ public class PageFeedbackControllerTests(TestApplicationFactory testApp) : Integ
     public async Task CreateFeedback_ValidationFailure_ReturnsBadRequest()
     {
         // Arrange
-        var client = TestApp.CreateClient();
+        var client = fixture.CreateClient();
 
         var request = new PageFeedbackCreateRequest
         {

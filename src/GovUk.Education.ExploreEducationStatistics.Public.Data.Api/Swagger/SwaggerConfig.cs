@@ -43,9 +43,8 @@ public class SwaggerConfig(IApiVersionDescriptionProvider provider, IOptions<App
             var actionDescriptor = apiDesc.ActionDescriptor;
 
             return actionDescriptor.AttributeRouteInfo?.Name
-                ?? actionDescriptor.EndpointMetadata.OfType<IEndpointNameMetadata>().LastOrDefault()?.EndpointName ?? (
-                    apiDesc.TryGetMethodInfo(out var methodInfo) ? methodInfo.Name : null
-                );
+                ?? actionDescriptor.EndpointMetadata.OfType<IEndpointNameMetadata>().LastOrDefault()?.EndpointName
+                ?? (apiDesc.TryGetMethodInfo(out var methodInfo) ? methodInfo.Name : null);
         });
 
         options.CustomSchemaIds(SchemaIdSelector);

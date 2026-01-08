@@ -25,8 +25,9 @@ export default function FormFieldTextArea<TFormValues extends FieldValues>({
         <FormGroup>
           <FormField {...props} maxLength={maxLength} as={FormTextArea} />
           <FormCharacterCount
-            id={props.id ?? ''}
+            id={props.id}
             maxLength={maxLength}
+            name={props.name}
             value={watchedValue}
           />
         </FormGroup>

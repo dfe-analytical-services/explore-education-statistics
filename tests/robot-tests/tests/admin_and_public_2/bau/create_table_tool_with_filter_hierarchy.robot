@@ -35,6 +35,7 @@ Upload subject to release
 Add data guidance to subject
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME}
@@ -142,14 +143,14 @@ Save datablock
     user enters text into element    id:dataBlockDetailsForm-heading    UI Test datablock_title
     user clicks button    Save data block
 
-    user waits until h2 is visible    UI Test datablock_name
+    user waits until h3 is visible    UI Test datablock_name
 
 Reload created datablock
     user reloads page
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
     user clicks link containing text    Edit block
-    user waits until h2 is visible    Data source
+    user waits until h3 is visible    Data source
 
 Validate step 5 options
     user checks previous table tool step contains    4    Indicators    Number of achievers

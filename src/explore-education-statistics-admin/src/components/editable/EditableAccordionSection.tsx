@@ -7,6 +7,7 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { FormTextInput } from '@common/components/form';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tooltip from '@common/components/Tooltip';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 
@@ -59,7 +60,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
         <FormTextInput
           id={`${id}-editHeading`}
           name="heading"
-          label="Edit Heading"
+          label="Section title"
           autoFocus
           value={newHeading}
           onChange={e => {
@@ -114,6 +115,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
                         onClick={toggleEditingHeading}
                       >
                         Edit section title
+                        <VisuallyHidden>{` for ${heading}`}</VisuallyHidden>
                       </Button>
                     )}
                   </Tooltip>
@@ -136,6 +138,7 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
                             variant="warning"
                           >
                             Remove this section
+                            <VisuallyHidden>{`: ${heading}`}</VisuallyHidden>
                           </Button>
                         }
                         onConfirm={onRemoveSection}

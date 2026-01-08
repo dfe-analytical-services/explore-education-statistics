@@ -8,6 +8,7 @@ import FormGroup from '@common/components/form/FormGroup';
 import { OmitStrict } from '@common/types';
 import useRegister from '@common/components/form/hooks/useRegister';
 import getErrorMessage from '@common/components/form/util/getErrorMessage';
+import Details from '@common/components/Details';
 import React, { ReactNode, useRef } from 'react';
 import {
   FieldValues,
@@ -102,6 +103,17 @@ export default function FormFieldEditor<TFormValues extends FieldValues>({
         }}
         error={errorMessage}
       />
+      <Details summary="Help using the editor with a keyboard">
+        <p>
+          To access the toolbar press Alt + F10 (⌥ F10 on Mac), use the arrow
+          keys to navigate between toolbar buttons and Space or Enter to select
+          an option.
+        </p>
+        <p>
+          For a full list of available keyboard shortcuts press Alt + 0 (⌥ 0 on
+          Mac).
+        </p>
+      </Details>
     </FormGroup>
   );
 }

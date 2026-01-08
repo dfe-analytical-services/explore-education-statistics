@@ -75,7 +75,7 @@ public abstract class DataSetFilesControllerCachingTests
                     },
                     LatestData = true,
                     IsSuperseded = false,
-                    Published = DateTime.UtcNow,
+                    Published = DateTimeOffset.UtcNow,
                 },
             ],
             totalResults: 1,

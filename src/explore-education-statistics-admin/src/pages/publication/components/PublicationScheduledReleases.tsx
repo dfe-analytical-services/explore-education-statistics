@@ -6,6 +6,7 @@ import {
 } from '@admin/pages/publication/components/PublicationGuidance';
 import { ReleaseVersionSummaryWithPermissions } from '@admin/services/releaseVersionService';
 import InsetText from '@common/components/InsetText';
+import ButtonGroup from '@common/components/ButtonGroup';
 import React from 'react';
 
 interface Props {
@@ -19,30 +20,36 @@ const PublicationScheduledReleases = ({ publicationId, releases }: Props) => {
   }
 
   return (
-    <table data-testid="publication-scheduled-releases">
-      <thead>
-        <tr>
-          <th className="govuk-!-width-one-third">Release period</th>
-          <th className={`${styles.statusColumn} dfe-white-space--nowrap`}>
-            Status <ScheduledStatusGuidanceModal />
-          </th>
-          <th className="govuk-!-width-one-quarter dfe-white-space--nowrap">
-            Stages checklist <ScheduledStagesGuidanceModal />
-          </th>
-          <th>Publish date</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {releases.map(release => (
-          <ScheduledReleaseRow
-            key={release.id}
-            publicationId={publicationId}
-            release={release}
-          />
-        ))}
-      </tbody>
-    </table>
+    <>
+      <table data-testid="publication-scheduled-releases">
+        <thead>
+          <tr>
+            <th className="govuk-!-width-one-third">Release period</th>
+            <th className={`${styles.statusColumn} dfe-white-space--nowrap`}>
+              Status
+            </th>
+            <th className="govuk-!-width-one-quarter dfe-white-space--nowrap">
+              Stages checklist
+            </th>
+            <th>Publish date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {releases.map(release => (
+            <ScheduledReleaseRow
+              key={release.id}
+              publicationId={publicationId}
+              release={release}
+            />
+          ))}
+        </tbody>
+      </table>
+      <ButtonGroup>
+        <ScheduledStatusGuidanceModal />
+        <ScheduledStagesGuidanceModal />
+      </ButtonGroup>
+    </>
   );
 };
 

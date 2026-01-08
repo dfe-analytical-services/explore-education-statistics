@@ -98,9 +98,6 @@
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
       "value": true
     },
-    "enableReplacementOfPublicApiDataSets" : {
-      "value": true
-    },
     "publicAppCompressionDisable": {
       "value": true
     }

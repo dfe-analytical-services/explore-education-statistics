@@ -360,10 +360,12 @@ public class FootnoteController : ControllerBase
                                                         ?? new List<string>(),
                                                     Selected = selectedFilterGroups.Contains(filterGroupId),
                                                 }
-                                            ) ?? new Dictionary<Guid, FootnoteFilterGroupViewModel>(),
+                                            )
+                                        ?? new Dictionary<Guid, FootnoteFilterGroupViewModel>(),
                                     Selected = selectedFilters.Contains(filterId),
                                 }
-                            ) ?? new Dictionary<Guid, FootnoteFilterViewModel>(),
+                            )
+                        ?? new Dictionary<Guid, FootnoteFilterViewModel>(),
                     IndicatorGroups =
                         indicatorGroupsBySubject
                             .GetValueOrDefault(subjectId)
@@ -374,9 +376,11 @@ public class FootnoteController : ControllerBase
                                     Indicators =
                                         indicatorsByIndicatorGroup
                                             .GetValueOrDefault(indicatorGroupId)
-                                            ?.Select(indicatorId => indicatorId.ToString()) ?? new List<string>(),
+                                            ?.Select(indicatorId => indicatorId.ToString())
+                                        ?? new List<string>(),
                                 }
-                            ) ?? new Dictionary<Guid, FootnoteIndicatorGroupViewModel>(),
+                            )
+                        ?? new Dictionary<Guid, FootnoteIndicatorGroupViewModel>(),
                     Selected = selectedSubjects.Contains(subjectId),
                 }
             ),

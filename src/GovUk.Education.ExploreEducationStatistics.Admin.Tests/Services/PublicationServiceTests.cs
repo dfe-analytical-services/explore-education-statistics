@@ -2429,7 +2429,7 @@ public class PublicationServiceTests
             Assert.Equal(releaseVersion.Release.Label, summaryViewModel.Label);
             Assert.Equal(releaseVersion.Published, summaryViewModel.Published);
             Assert.Equal(releaseVersion.Live, summaryViewModel.Live);
-            Assert.Equal(releaseVersion.PublishScheduled?.ConvertUtcToUkTimeZone(), summaryViewModel.PublishScheduled);
+            Assert.Equal(releaseVersion.PublishScheduled?.ToUkDateOnly(), summaryViewModel.PublishScheduled);
             Assert.Equal(releaseVersion.NextReleaseDate, summaryViewModel.NextReleaseDate);
             Assert.Equal(releaseVersion.ApprovalStatus, summaryViewModel.ApprovalStatus);
             Assert.Equal(releaseVersion.Amendment, summaryViewModel.Amendment);

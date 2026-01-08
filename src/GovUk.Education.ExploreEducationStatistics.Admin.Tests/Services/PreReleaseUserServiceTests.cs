@@ -26,11 +26,7 @@ public abstract class PreReleaseUserServiceTests
 
     private static readonly Guid _userId = Guid.NewGuid();
 
-    private static readonly DateTime PublishedScheduledStartOfDay = new DateTime(
-        2020,
-        09,
-        09
-    ).AsStartOfDayUtcForTimeZone();
+    private static readonly DateTimeOffset PublishedScheduledStartOfDay = new DateOnly(2020, 9, 9).GetUkStartOfDayUtc();
 
     public class GetPreReleaseUsersTests : PreReleaseUserServiceTests
     {

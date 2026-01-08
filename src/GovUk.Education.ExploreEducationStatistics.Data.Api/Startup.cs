@@ -153,6 +153,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IBlobCacheService, PublicBlobCacheService>();
         services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
         services.AddTransient<ITableBuilderService, TableBuilderService>();
+        services.AddTransient<ITableBuilderQueryOptimiser, TableBuilderQueryOptimiser>();
         services.AddTransient<IDataBlockService, DataBlockService>();
         services.AddTransient<IReleaseService, ReleaseService>();
         services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
@@ -263,7 +264,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             // CORS config for dev/test/etc. environments set in IaC config
             app.UseCors(options => options.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
         }
-        else
+
+        if (env.IsProduction())
         {
             app.UseHttpsRedirection();
             app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());

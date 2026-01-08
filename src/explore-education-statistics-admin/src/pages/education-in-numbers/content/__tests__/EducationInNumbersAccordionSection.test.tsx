@@ -27,10 +27,10 @@ describe('EducationInNumbersAccordionSection', () => {
       expect(screen.getByText('Test content')).toBeInTheDocument();
 
       expect(
-        screen.queryByRole('button', { name: 'Edit section title' }),
+        screen.queryByRole('button', { name: /Edit section title/ }),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole('button', { name: 'Remove this section' }),
+        screen.queryByRole('button', { name: /Remove this section/ }),
       ).not.toBeInTheDocument();
     });
 
@@ -68,10 +68,10 @@ describe('EducationInNumbersAccordionSection', () => {
       expect(screen.getByText('Test content')).toBeInTheDocument();
 
       expect(
-        screen.getByRole('button', { name: 'Edit section title' }),
+        screen.getByRole('button', { name: /Edit section title/ }),
       ).not.toBeAriaDisabled();
       expect(
-        screen.getByRole('button', { name: 'Remove this section' }),
+        screen.getByRole('button', { name: /Remove this section/ }),
       ).not.toBeAriaDisabled();
     });
 
@@ -86,7 +86,7 @@ describe('EducationInNumbersAccordionSection', () => {
       );
 
       await userEvent.click(
-        screen.getByRole('button', { name: 'Remove this section' }),
+        screen.getByRole('button', { name: /Remove this section/ }),
       );
 
       await waitFor(() => {
@@ -125,7 +125,7 @@ describe('EducationInNumbersAccordionSection', () => {
       );
 
       await userEvent.click(
-        screen.getByRole('button', { name: 'Remove this section' }),
+        screen.getByRole('button', { name: /Remove this section/ }),
       );
 
       await waitFor(() => {

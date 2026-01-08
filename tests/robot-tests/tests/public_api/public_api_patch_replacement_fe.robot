@@ -41,6 +41,7 @@ Add data guidance to subjects
 
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_1_NAME}
@@ -89,6 +90,7 @@ Upload patch replacement data
     ...    ${PUBLIC_API_FILES_DIR}
 
     user waits until page contains element    testid:Data file replacements table
+    user confirms replacement upload    ${SUBJECT_1_NAME}    Error
     user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains element    testid:Replacement Title
@@ -203,6 +205,7 @@ Upload second patch replacement data
     ...    absence_school_patch_manual.csv    absence_school_patch_manual.meta.csv
     ...    ${PUBLIC_API_FILES_DIR}
     user waits until page contains element    testid:Data file replacements table
+    user confirms replacement upload    ${SUBJECT_1_NAME}    Error
     user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains element    testid:Replacement Title

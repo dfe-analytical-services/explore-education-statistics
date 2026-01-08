@@ -24,6 +24,7 @@ import React, {
   useState,
 } from 'react';
 import { ObjectSchema } from 'yup';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 
 interface FormValues {
   emails: string;
@@ -224,7 +225,9 @@ export default function PreReleaseUserAccessForm({
             <thead>
               <tr>
                 <th>User email</th>
-                {!isReleaseLive && <th />}
+                {!isReleaseLive && (
+                  <th className="govuk-!-text-align-right">Actions</th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -250,7 +253,7 @@ export default function PreReleaseUserAccessForm({
                           toggleRemoving.off();
                         }}
                       >
-                        Remove
+                        Remove<VisuallyHidden> {user.email}</VisuallyHidden>
                       </ButtonText>
                     </td>
                   )}

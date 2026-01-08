@@ -6,11 +6,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 public record ReleasePublishedUpdateRequest
 {
     [Range(
-        typeof(DateTime),
-        minimum: "1/1/2000",
-        maximum: "1/1/2100",
+        typeof(DateTimeOffset),
+        minimum: "2000-01-01T00:00:00Z",
+        maximum: "2100-01-01T00:00:00Z",
         ErrorMessage = "Value for {0} must be between {1} and {2}"
     )]
     [Required]
-    public DateTime? Published { get; init; }
+    public DateTimeOffset? Published { get; init; }
 }

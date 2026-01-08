@@ -5,6 +5,7 @@ import releaseDataFileService, {
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
 import { useQuery } from '@tanstack/react-query';
@@ -50,6 +51,7 @@ export default function DeleteDataFileModal({
       triggerButton={
         <ButtonText variant="warning" onClick={toggleOpen.on}>
           Delete files
+          <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
         </ButtonText>
       }
       onConfirm={handleDeleteConfirm}

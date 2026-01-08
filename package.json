@@ -7,9 +7,15 @@
     "node": "22.20.0",
     "pnpm": ">=8.8.0"
   },
+  "pnpm": {
+    "overrides": {
+      "@tanstack/query-core": "4.36.1",
+      "@tanstack/react-query": "4.36.1"
+    }
+  },
   "devDependencies": {
     "@commander-js/extra-typings": "^11.0.0",
-    "@next/eslint-plugin-next": "^12.3.4",
+    "@next/eslint-plugin-next": "15.5.9",
     "@types/jest": "^29.5.3",
     "@types/lodash": "^4.14.195",
     "@types/node": "^18.17.5",
@@ -24,7 +30,7 @@
     "cross-process-lock": "^2.1.1",
     "eslint": "^8.57.0",
     "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-next": "^12.3.4",
+    "eslint-config-next": "15.5.9",
     "eslint-config-prettier": "^8.8.0",
     "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-import": "^2.27.5",
@@ -70,7 +76,7 @@
     "test:coverage": "pnpm -r --no-bail test:coverage",
     "tsc": "pnpm -r --aggregate-output --reporter=append-only --no-bail tsc",
     "api-docs:build": "docker rm -f ees-api-docs-builder-container && cd src/explore-education-statistics-api-docs && docker build -f docker/Dockerfile -t ees-api-docs-builder . && docker run --rm -v .:/home/ubuntu/docs --name ees-api-docs-builder-container ees-api-docs-builder ./docker/build-docs.sh",
-    "api-docs:run": "docker rm -f ees-api-docs-builder-container && cd src/explore-education-statistics-api-docs && docker build -f docker/Dockerfile -t ees-api-docs-builder . && docker run --rm -v .:/home/ubuntu/docs -p4567:4567 -p35729:35729 --name ees-api-docs-builder-container ees-api-docs-builder ./docker/run-docs.sh" 
+    "api-docs:run": "docker rm -f ees-api-docs-builder-container && cd src/explore-education-statistics-api-docs && docker build -f docker/Dockerfile -t ees-api-docs-builder . && docker run --rm -v .:/home/ubuntu/docs -p4567:4567 -p35729:35729 --name ees-api-docs-builder-container ees-api-docs-builder ./docker/run-docs.sh"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [

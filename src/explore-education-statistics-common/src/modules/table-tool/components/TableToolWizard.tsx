@@ -89,6 +89,7 @@ export interface TableToolWizardProps {
   renderRelatedInfo?: ReactNode;
   scrollOnMount?: boolean;
   showTableQueryErrorDownload?: boolean;
+  stepHeadingTag?: 'h2' | 'h3' | 'h4';
   themeMeta?: Theme[];
   onPublicationFormSubmit?: (publication: PublicationTreeSummary) => void;
   onPublicationStepBack?: () => void;
@@ -124,6 +125,7 @@ export default function TableToolWizard({
   renderRelatedInfo,
   scrollOnMount,
   showTableQueryErrorDownload = true,
+  stepHeadingTag = 'h2',
   themeMeta = [],
   onPublicationFormSubmit,
   onPublicationStepBack,
@@ -544,6 +546,7 @@ export default function TableToolWizard({
                       publicationId: state.query.publicationId ?? '',
                       themeId: '',
                     }}
+                    stepHeadingTag={stepHeadingTag}
                     stepTitle={stepTitles.publication}
                     themes={themeMeta}
                     renderSummaryAfter={
@@ -573,6 +576,7 @@ export default function TableToolWizard({
                   loadingFastTrack={loadingFastTrack}
                   renderFeaturedTableLink={renderFeaturedTableLink}
                   releaseVersion={state.selectedPublication?.selectedRelease}
+                  stepHeadingTag={stepHeadingTag}
                   stepTitle={stepTitles.dataSet}
                   subjects={state.subjects}
                   subjectId={state.query.subjectId}
@@ -586,6 +590,7 @@ export default function TableToolWizard({
                   {...stepProps}
                   initialValues={state.query.locationIds}
                   options={state.subjectMeta.locations}
+                  stepHeadingTag={stepHeadingTag}
                   stepTitle={stepTitles.location}
                   onSubmit={handleLocationFiltersFormSubmit}
                 />
@@ -597,6 +602,7 @@ export default function TableToolWizard({
                   {...stepProps}
                   initialValues={state.query.timePeriod}
                   options={state.subjectMeta.timePeriod.options}
+                  stepHeadingTag={stepHeadingTag}
                   stepTitle={stepTitles.timePeriod}
                   onSubmit={handleTimePeriodFormSubmit}
                 />
@@ -612,6 +618,7 @@ export default function TableToolWizard({
                     filterHierarchies: state.query.filterHierarchiesOptions,
                   }}
                   selectedPublication={state.selectedPublication}
+                  stepHeadingTag={stepHeadingTag}
                   stepTitle={stepTitles.filter}
                   subject={
                     state.subjects.filter(

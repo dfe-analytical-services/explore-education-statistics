@@ -101,7 +101,7 @@ export interface Contact {
 }
 
 export interface PublicationTitle {
-  id: string;
+  publicationId: string;
   title: string;
 }
 
@@ -214,6 +214,7 @@ export interface ReleaseVersionSummary {
   title: string;
   type: ReleaseType;
   updateCount: number;
+  preReleaseAccessList: string;
   yearTitle: string;
 }
 

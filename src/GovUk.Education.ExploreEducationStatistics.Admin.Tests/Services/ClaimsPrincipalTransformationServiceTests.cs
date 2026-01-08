@@ -1,9 +1,10 @@
 #nullable enable
 using System.Security.Claims;
-using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -14,8 +15,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public class ClaimsPrincipalTransformationServiceTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class ClaimsPrincipalTransformationServiceTestsFixture()
+    : OptimisedAdminCollectionFixture(capabilities: [AdminIntegrationTestCapability.UserAuth])
 {
+    protected override void ConfigureServicesAndConfiguration(OptimisedServiceAndConfigModifications modifications)
+    {
+        base.ConfigureServicesAndConfiguration(modifications);
+        modifications.AddController(typeof(TestController));
+    }
+}
+
+[CollectionDefinition(nameof(ClaimsPrincipalTransformationServiceTestsFixture))]
+public class ClaimsPrincipalTransformationServiceTestsCollection
+    : ICollectionFixture<ClaimsPrincipalTransformationServiceTestsFixture>;
+
+[Collection(nameof(ClaimsPrincipalTransformationServiceTestsFixture))]
+public class ClaimsPrincipalTransformationServiceTests(ClaimsPrincipalTransformationServiceTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
+{
+    private static readonly DataFixture DataFixture = new();
+
     [Theory]
     [InlineData("unknown-scope-claim", "access-admin-api", false)]
     [InlineData("scp", "access-admin-api", true)]
@@ -31,14 +51,12 @@ public class ClaimsPrincipalTransformationServiceTests(TestApplicationFactory te
     {
         var claimsPrincipal = DataFixture
             .DefaultClaimsPrincipal()
+            .WithId(Guid.NewGuid())
             .WithEmail("user@example.com")
             .WithClaim(scopeClaimName, scopeClaimValue);
 
         // Set up scenario and test data.
-        var client = TestApp
-            .WithWebHostBuilder(builder => builder.WithAdditionalControllers(typeof(TestController)))
-            .SetUser(claimsPrincipal)
-            .CreateClient();
+        var client = fixture.CreateClient(user: claimsPrincipal);
 
         var response = await client.GetAsync("/test/scope-access");
 
@@ -67,54 +85,53 @@ public class ClaimsPrincipalTransformationServiceTests(TestApplicationFactory te
         var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
         claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
 
-        await TestApp.AddTestData<UsersAndRolesDbContext>(context =>
-        {
-            var globalRoles = GetGlobalRoles();
-            context.Roles.AddRange(globalRoles);
+        await fixture
+            .GetUsersAndRolesDbContext()
+            .AddTestData(context =>
+            {
+                var globalRoles = GetGlobalRoles();
+                context.Roles.AddRange(globalRoles);
 
-            var globalRoleClaims = GetGlobalRoleClaims();
-            context.RoleClaims.AddRange(globalRoleClaims);
+                var globalRoleClaims = GetGlobalRoleClaims();
+                context.RoleClaims.AddRange(globalRoleClaims);
 
-            // Add an Identity user for an unrelated user.
-            context.Users.Add(
-                new ApplicationUser
-                {
-                    Id = unrelatedUserId.ToString(),
-                    Email = unrelatedUserEmail.ToLower(),
-                    NormalizedEmail = unrelatedUserEmail.ToUpper(),
-                    FirstName = "AnotherFirstName",
-                    LastName = "AnotherLastName",
-                }
-            );
+                // Add an Identity user for an unrelated user.
+                context.Users.Add(
+                    new ApplicationUser
+                    {
+                        Id = unrelatedUserId.ToString(),
+                        Email = unrelatedUserEmail.ToLower(),
+                        NormalizedEmail = unrelatedUserEmail.ToUpper(),
+                        FirstName = "AnotherFirstName",
+                        LastName = "AnotherLastName",
+                    }
+                );
 
-            // Add a global role assignment for the unrelated user.
-            context.UserRoles.Add(
-                new IdentityUserRole<string> { UserId = unrelatedUserId.ToString(), RoleId = globalRoles[0].Id }
-            );
+                // Add a global role assignment for the unrelated user.
+                context.UserRoles.Add(
+                    new IdentityUserRole<string> { UserId = unrelatedUserId.ToString(), RoleId = globalRoles[0].Id }
+                );
 
-            // Add an Identity user for the user.
-            context.Users.Add(
-                new ApplicationUser
-                {
-                    Id = userId.ToString(),
-                    Email = email,
-                    NormalizedEmail = email.ToUpper(),
-                    FirstName = "FirstName",
-                    LastName = "LastName",
-                }
-            );
+                // Add an Identity user for the user.
+                context.Users.Add(
+                    new ApplicationUser
+                    {
+                        Id = userId.ToString(),
+                        Email = email,
+                        NormalizedEmail = email.ToUpper(),
+                        FirstName = "FirstName",
+                        LastName = "LastName",
+                    }
+                );
 
-            // Add a global role assignment for the user.
-            context.UserRoles.Add(
-                new IdentityUserRole<string> { UserId = userId.ToString(), RoleId = globalRoles[1].Id }
-            );
-        });
+                // Add a global role assignment for the user.
+                context.UserRoles.Add(
+                    new IdentityUserRole<string> { UserId = userId.ToString(), RoleId = globalRoles[1].Id }
+                );
+            });
 
         // Set up scenario and test data.
-        var client = TestApp
-            .WithWebHostBuilder(builder => builder.WithAdditionalControllers(typeof(TestController)))
-            .SetUser(claimsPrincipal)
-            .CreateClient();
+        var client = fixture.CreateClient(user: claimsPrincipal);
 
         var response = await client.GetAsync("/test/role-claims");
 
@@ -191,37 +208,37 @@ public class ClaimsPrincipalTransformationServiceTests(TestApplicationFactory te
         };
     }
 
-    private class TestController : ControllerBase
+    public record ClaimViewModel(string Type, string Value);
+}
+
+public class TestController(IUserService userService) : ControllerBase
+{
+    [HttpGet("/test/scope-access")]
+    [AllowAnonymous]
+    public async Task<ActionResult> ScopeAccess()
     {
-        private readonly IUserService _userService;
-
-        public TestController(IUserService userService)
+        var authorizedByIdP = await userService.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider);
+        if (!authorizedByIdP)
         {
-            _userService = userService;
+            return new ForbidResult();
         }
 
-        [HttpGet("/test/scope-access")]
-        [AllowAnonymous]
-        public async Task<ActionResult> ScopeAccess()
-        {
-            var authorizedByIdP = await _userService.MatchesPolicy(SecurityPolicies.AuthenticatedByIdentityProvider);
-            if (!authorizedByIdP)
-            {
-                return new ForbidResult();
-            }
-
-            return new OkResult();
-        }
-
-        [HttpGet("/test/role-claims")]
-        [AllowAnonymous]
-        public async Task<ActionResult<List<string>>> RoleClaims()
-        {
-            return await Task.FromResult(
-                new OkObjectResult(HttpContext.User.Claims.Select(c => new ClaimViewModel(c.Type, c.Value)).ToList())
-            );
-        }
+        return new OkResult();
     }
 
-    public record ClaimViewModel(string Type, string Value);
+    [HttpGet("/test/role-claims")]
+    [AllowAnonymous]
+    public async Task<ActionResult<List<string>>> RoleClaims()
+    {
+        return await Task.FromResult(
+            new OkObjectResult(
+                HttpContext
+                    .User.Claims.Select(c => new ClaimsPrincipalTransformationServiceTests.ClaimViewModel(
+                        c.Type,
+                        c.Value
+                    ))
+                    .ToList()
+            )
+        );
+    }
 }

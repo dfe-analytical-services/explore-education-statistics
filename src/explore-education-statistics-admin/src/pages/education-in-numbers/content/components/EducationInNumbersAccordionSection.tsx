@@ -7,6 +7,7 @@ import useEducationInNumbersPageContentActions from '@admin/pages/education-in-n
 import { EinEditableContentSection } from '@admin/services/educationInNumbersContentService';
 import focusAddedSectionBlockButton from '@admin/utils/focus/focusAddedSectionBlockButton';
 import Button from '@common/components/Button';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import EinContentBlockRenderer from '@common/modules/education-in-numbers/components/EinContentBlockRenderer';
 import {
   EinBlockType,
@@ -123,6 +124,53 @@ const EducationInNumbersAccordionSection = ({
     [educationInNumbersPageId, sectionId, updateContentSectionHeading],
   );
 
+  const htmlBlocks = blocks.filter(block => block.type === 'HtmlBlock');
+  const groupBlocks = blocks.filter(block => block.type === 'TileGroupBlock');
+
+  const getBlockButtonLabels = (block: EinContentBlock) => {
+    if (block.type === 'HtmlBlock') {
+      const htmlBlockIndex = htmlBlocks.findIndex(
+        htmlBlock => htmlBlock.id === block.id,
+      );
+      const sectionContext =
+        htmlBlocks.length > 1
+          ? `${htmlBlockIndex + 1} in ${heading}`
+          : `in ${heading}`;
+      return {
+        editLabel: (
+          <>
+            Edit<VisuallyHidden> text</VisuallyHidden> block
+            <VisuallyHidden> {sectionContext}</VisuallyHidden>
+          </>
+        ),
+        removeLabel: (
+          <>
+            Remove<VisuallyHidden> text</VisuallyHidden> block
+            <VisuallyHidden> {sectionContext}</VisuallyHidden>
+          </>
+        ),
+      };
+    }
+
+    const groupBlockIndex = groupBlocks.findIndex(
+      groupBlock => groupBlock.id === block.id,
+    );
+    const sectionContext =
+      groupBlocks.length > 1
+        ? `group block ${groupBlockIndex + 1} in ${heading}`
+        : `group block in ${heading}`;
+
+    return {
+      groupButtonsLabel: block.title ?? sectionContext,
+      removeLabel: (
+        <>
+          Remove<VisuallyHidden> group</VisuallyHidden> block
+          <VisuallyHidden> {block.title ?? sectionContext}</VisuallyHidden>
+        </>
+      ),
+    };
+  };
+
   return (
     <EditableAccordionSection
       {...props}
@@ -145,7 +193,14 @@ const EducationInNumbersAccordionSection = ({
             }
           }}
         >
-          {isReordering ? 'Save section order' : 'Reorder this section'}
+          {isReordering ? (
+            'Save section order'
+          ) : (
+            <>
+              Reorder this section
+              <VisuallyHidden>{`: ${heading}`}</VisuallyHidden>
+            </>
+          )}
         </Button>
       }
       onHeadingChange={handleHeadingChange}
@@ -156,15 +211,27 @@ const EducationInNumbersAccordionSection = ({
         isReordering={isReordering}
         onBlocksChange={setBlocks}
         renderBlock={block => <EinContentBlockRenderer block={block} />}
-        renderEditableBlock={block => (
-          <EducationInNumbersEditableBlock
-            sectionId={sectionId}
-            block={block}
-            editable={!isReordering}
-            onSave={updateBlockInAccordionSection}
-            onDelete={removeBlockFromAccordionSection}
-          />
-        )}
+        renderEditableBlock={(block, contentBlockNumber) => {
+          const { editLabel, groupButtonsLabel, removeLabel } =
+            getBlockButtonLabels(block);
+          return (
+            <EducationInNumbersEditableBlock
+              label={
+                !heading
+                  ? 'Content block'
+                  : `Content block ${contentBlockNumber} for the "${heading}" section`
+              }
+              sectionId={sectionId}
+              block={block}
+              editable={!isReordering}
+              editButtonLabel={editLabel}
+              groupButtonsLabel={groupButtonsLabel}
+              removeButtonLabel={removeLabel}
+              onSave={updateBlockInAccordionSection}
+              onDelete={removeBlockFromAccordionSection}
+            />
+          );
+        }}
       />
       {editingMode === 'edit' && !isReordering && (
         <div className="govuk-!-margin-bottom-8 dfe-flex dfe-gap-3 dfe-justify-content--center">
@@ -173,7 +240,7 @@ const EducationInNumbersAccordionSection = ({
             onClick={() => addBlockToAccordionSection('HtmlBlock')}
             ref={addTextBlockButton}
           >
-            Add text block
+            Add text block<VisuallyHidden>{` to ${heading}`}</VisuallyHidden>
           </Button>
           <Button
             variant="secondary"

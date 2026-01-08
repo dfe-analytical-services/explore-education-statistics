@@ -352,5 +352,107 @@ public abstract class PublicationsServiceTests
         }
     }
 
+    public class GetPublicationTitleTests : PublicationsServiceTests
+    {
+        [Fact]
+        public async Task WhenPublicationExists_ReturnsExpectedPublicationTitle()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationTitle(publication.Slug);
+
+                // Assert
+                var result = outcome.AssertRight();
+                Assert.Multiple(() =>
+                {
+                    Assert.Equal(publication.Id, result.PublicationId);
+                    Assert.Equal(publication.Title, result.Title);
+                });
+            }
+        }
+
+        [Fact]
+        public async Task WhenPublicationDoesNotExist_ReturnsNotFound()
+        {
+            // Arrange
+            const string publicationSlug = "publication-that-does-not-exist";
+            await using var context = InMemoryContentDbContext();
+            var sut = BuildService(context);
+
+            // Act
+            var outcome = await sut.GetPublicationTitle(publicationSlug);
+
+            // Assert
+            outcome.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task WhenPublicationHasNoReleases_ReturnsNotFound()
+        {
+            // Arrange
+            Publication publication = _dataFixture.DefaultPublication();
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationTitle(publication.Slug);
+
+                // Assert
+                outcome.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task WhenPublicationHasNoPublishedRelease_ReturnsNotFound()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationTitle(publication.Slug);
+
+                // Assert
+                outcome.AssertNotFound();
+            }
+        }
+    }
+
     private static PublicationsService BuildService(ContentDbContext contentDbContext) => new(contentDbContext);
 }

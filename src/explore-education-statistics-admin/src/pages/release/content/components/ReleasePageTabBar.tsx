@@ -40,12 +40,12 @@ const ReleasePageTabBar = ({ activeTab, onChangeTab }: Props) => {
           const isActive = key === activeTab;
 
           return (
-            <li key={sectionId} role="presentation">
+            <li key={sectionId} role="presentation" className={styles.navItem}>
               <a
                 aria-controls={sectionId}
                 aria-selected={isActive}
                 role="tab"
-                className={styles.navItem}
+                className={styles.navItemLink}
                 href={`#${sectionId}`}
                 id={`${sectionId}-tab`}
                 tabIndex={!isActive ? -1 : undefined}
@@ -54,7 +54,8 @@ const ReleasePageTabBar = ({ activeTab, onChangeTab }: Props) => {
                 }}
                 onKeyDown={event => {
                   switch (event.key) {
-                    case 'ArrowLeft': {
+                    case 'ArrowLeft':
+                    case 'ArrowUp': {
                       event.preventDefault();
                       const nextTabIndex = index - 1;
 
@@ -65,7 +66,8 @@ const ReleasePageTabBar = ({ activeTab, onChangeTab }: Props) => {
 
                       break;
                     }
-                    case 'ArrowRight': {
+                    case 'ArrowRight':
+                    case 'ArrowDown': {
                       event.preventDefault();
                       const nextTabIndex = index + 1;
 

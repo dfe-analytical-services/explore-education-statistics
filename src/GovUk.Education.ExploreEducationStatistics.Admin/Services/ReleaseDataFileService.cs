@@ -1,5 +1,6 @@
 #nullable enable
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -384,8 +385,44 @@ public class ReleaseDataFileService(
             .ToAsyncEnumerable()
             .SelectAwait(async dataSetUpload =>
             {
+                var dataFileToken = await privateBlobStorageService.GetBlobDownloadToken(
+                    PrivateReleaseTempFiles,
+                    dataSetUpload.DataFileName,
+                    dataSetUpload.DataFilePath,
+                    cancellationToken
+                );
+                var metaFileToken = await privateBlobStorageService.GetBlobDownloadToken(
+                    PrivateReleaseTempFiles,
+                    dataSetUpload.MetaFileName,
+                    dataSetUpload.MetaFilePath,
+                    cancellationToken
+                );
+
+                if (dataFileToken.IsLeft || metaFileToken.IsLeft)
+                {
+                    throw new DataScreenerException("Failed to get SAS tokens for data set screener request");
+                }
+
                 var request = mapper.Map<DataSetScreenerRequest>(dataSetUpload);
-                var result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
+                request.DataFileSasToken = dataFileToken.Right!.Token;
+                request.MetaFileSasToken = metaFileToken.Right!.Token;
+
+                DataSetScreenerResponse result;
+
+                try
+                {
+                    result = await dataSetScreenerClient.ScreenDataSet(request, cancellationToken);
+                }
+                catch (DataScreenerException)
+                {
+                    await dataSetFileStorage.UpdateDataSetUpload(
+                        dataSetUpload.Id,
+                        screenerResult: null,
+                        cancellationToken
+                    );
+
+                    return mapper.Map<DataSetUploadViewModel>(dataSetUpload);
+                }
 
                 // TODO (EES-6693): Remove this automatic warning once the external screener is no longer required.
                 result.TestResults.Add(
@@ -399,7 +436,7 @@ public class ReleaseDataFileService(
                     }
                 );
 
-                await dataSetFileStorage.AddScreenerResultToUpload(dataSetUpload.Id, result, cancellationToken);
+                await dataSetFileStorage.UpdateDataSetUpload(dataSetUpload.Id, result, cancellationToken);
 
                 var hasWarnings = result.TestResults.Any(test => test.Result == TestResult.WARNING);
                 var hasFailures = result.TestResults.Any(test => test.Result == TestResult.FAIL);

@@ -16,7 +16,7 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
         _contentDbContext = contentDbContext;
     }
 
-    public async Task<DateTime> GetPublishedDate(Guid releaseVersionId, DateTime actualPublishedDate)
+    public async Task<DateTimeOffset> GetPublishedDate(Guid releaseVersionId, DateTimeOffset actualPublishedDate)
     {
         var releaseVersion = await _contentDbContext.ReleaseVersions.SingleAsync(rv => rv.Id == releaseVersionId);
 

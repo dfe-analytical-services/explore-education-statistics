@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -10,18 +11,15 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Moq;
 using Xunit;
@@ -32,9 +30,47 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers;
 
-public class TableBuilderControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class TableBuilderControllerTestsFixture : OptimisedDataApiCollectionFixture
 {
-    private readonly DataFixture _dataFixture = new();
+    public Mock<IPublicBlobCacheService> PublicBlobCacheServiceMock = null!;
+    public Mock<IDataBlockService> DataBlockServiceMock = null!;
+    public Mock<ITableBuilderService> TableBuilderServiceMock = null!;
+
+    protected override void ConfigureServicesAndConfiguration(
+        OptimisedServiceAndConfigModifications serviceModifications
+    )
+    {
+        base.ConfigureServicesAndConfiguration(serviceModifications);
+
+        PublicBlobCacheServiceMock = new Mock<IPublicBlobCacheService>(Strict);
+        serviceModifications.ReplaceService(PublicBlobCacheServiceMock.Object);
+
+        DataBlockServiceMock = new Mock<IDataBlockService>(Strict);
+        serviceModifications.ReplaceService(DataBlockServiceMock.Object);
+
+        TableBuilderServiceMock = new Mock<ITableBuilderService>(Strict);
+        serviceModifications.ReplaceService(TableBuilderServiceMock.Object);
+    }
+
+    public override async Task BeforeEachTest()
+    {
+        await base.BeforeEachTest();
+
+        PublicBlobCacheServiceMock.Reset();
+        DataBlockServiceMock.Reset();
+        TableBuilderServiceMock.Reset();
+    }
+}
+
+[CollectionDefinition(nameof(TableBuilderControllerTestsFixture))]
+public class TableBuilderControllerTestsCollection : ICollectionFixture<TableBuilderControllerTestsFixture>;
+
+[Collection(nameof(TableBuilderControllerTestsFixture))]
+public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
+{
+    private static readonly DataFixture DataFixture = new();
 
     private static readonly List<IChart> Charts =
     [
@@ -101,6 +137,8 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
         },
     };
 
+    private static readonly FullTableQuery CroppedTableQuery = FullTableQuery with { EnableCropping = true };
+
     private static readonly TableBuilderConfiguration TableConfiguration = new()
     {
         TableHeaders = new TableHeaders { Rows = [new TableHeader("table header 1", TableHeaderType.Filter)] },
@@ -126,17 +164,17 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     [Fact]
     public async Task Query()
     {
-        var tableBuilderService = new Mock<ITableBuilderService>(Strict);
-
-        tableBuilderService
-            .Setup(s => s.Query(ItIs.DeepEqualTo(FullTableQuery), It.IsAny<CancellationToken>()))
+        fixture
+            .TableBuilderServiceMock.Setup(s =>
+                s.Query(ItIs.DeepEqualTo(CroppedTableQuery), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(tableBuilderService: tableBuilderService.Object).CreateClient();
+        var response = await fixture
+            .CreateClient()
+            .PostAsync("/api/tablebuilder", new JsonNetContent(ToRequest(CroppedTableQuery)));
 
-        var response = await client.PostAsync("/api/tablebuilder", new JsonNetContent(ToRequest(FullTableQuery)));
-
-        VerifyAllMocks(tableBuilderService);
+        VerifyAllMocks(fixture.TableBuilderServiceMock);
 
         response.AssertOk(_tableBuilderResults);
     }
@@ -144,24 +182,22 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     [Fact]
     public async Task Query_Csv()
     {
-        var tableBuilderService = new Mock<ITableBuilderService>(Strict);
-
-        tableBuilderService
-            .Setup(s =>
+        fixture
+            .TableBuilderServiceMock.Setup(s =>
                 s.QueryToCsvStream(ItIs.DeepEqualTo(FullTableQuery), It.IsAny<Stream>(), It.IsAny<CancellationToken>())
             )
             .ReturnsAsync(Unit.Instance)
             .Callback<FullTableQuery, Stream, CancellationToken>((_, stream, _) => stream.WriteText("Test csv"));
 
-        var client = SetupApp(tableBuilderService: tableBuilderService.Object).CreateClient();
+        var response = await fixture
+            .CreateClient()
+            .PostAsync(
+                "/api/tablebuilder",
+                content: new JsonNetContent(ToRequest(FullTableQuery)),
+                headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
+            );
 
-        var response = await client.PostAsync(
-            "/api/tablebuilder",
-            content: new JsonNetContent(ToRequest(FullTableQuery)),
-            headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
-        );
-
-        VerifyAllMocks(tableBuilderService);
+        VerifyAllMocks(fixture.TableBuilderServiceMock);
 
         response.AssertOk("Test csv");
     }
@@ -169,28 +205,28 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     [Fact]
     public async Task Query_ReleaseVersionId()
     {
-        Publication publication = _dataFixture
+        Publication publication = DataFixture
             .DefaultPublication()
-            .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
 
-        await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+        await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
-        var tableBuilderService = new Mock<ITableBuilderService>(Strict);
-
-        tableBuilderService
-            .Setup(s => s.Query(releaseVersion.Id, ItIs.DeepEqualTo(FullTableQuery), It.IsAny<CancellationToken>()))
+        fixture
+            .TableBuilderServiceMock.Setup(s =>
+                s.Query(releaseVersion.Id, ItIs.DeepEqualTo(CroppedTableQuery), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(tableBuilderService: tableBuilderService.Object).CreateClient();
+        var response = await fixture
+            .CreateClient()
+            .PostAsync(
+                $"/api/tablebuilder/release/{releaseVersion.Id}",
+                new JsonNetContent(ToRequest(CroppedTableQuery))
+            );
 
-        var response = await client.PostAsync(
-            $"/api/tablebuilder/release/{releaseVersion.Id}",
-            new JsonNetContent(ToRequest(FullTableQuery))
-        );
-
-        VerifyAllMocks(tableBuilderService);
+        VerifyAllMocks(fixture.TableBuilderServiceMock);
 
         response.AssertOk(_tableBuilderResults);
     }
@@ -198,19 +234,17 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     [Fact]
     public async Task Query_ReleaseVersionId_Csv()
     {
-        Publication publication = _dataFixture
+        Publication publication = DataFixture
             .DefaultPublication()
-            .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var release = publication.Releases.Single();
         var releaseVersion = release.Versions.Single();
 
-        await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+        await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
-        var tableBuilderService = new Mock<ITableBuilderService>(Strict);
-
-        tableBuilderService
-            .Setup(s =>
+        fixture
+            .TableBuilderServiceMock.Setup(s =>
                 s.QueryToCsvStream(
                     releaseVersion.Id,
                     ItIs.DeepEqualTo(FullTableQuery),
@@ -223,15 +257,15 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
                 (_, _, stream, _) => stream.WriteText("Test csv")
             );
 
-        var client = SetupApp(tableBuilderService: tableBuilderService.Object).CreateClient();
+        var response = await fixture
+            .CreateClient()
+            .PostAsync(
+                $"/api/tablebuilder/release/{releaseVersion.Id}",
+                content: new JsonNetContent(ToRequest(FullTableQuery)),
+                headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
+            );
 
-        var response = await client.PostAsync(
-            $"/api/tablebuilder/release/{releaseVersion.Id}",
-            content: new JsonNetContent(ToRequest(FullTableQuery)),
-            headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
-        );
-
-        VerifyAllMocks(tableBuilderService);
+        VerifyAllMocks(fixture.TableBuilderServiceMock);
 
         response.AssertOk("Test csv");
     }
@@ -239,17 +273,17 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     [Fact]
     public async Task QueryForTableBuilderResult()
     {
-        Publication publication = _dataFixture
+        Publication publication = DataFixture
             .DefaultPublication()
-            .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var release = publication.Releases.Single();
         var releaseVersion = release.Versions.Single();
 
-        DataBlockParent dataBlockParent = _dataFixture
+        DataBlockParent dataBlockParent = DataFixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(
-                _dataFixture
+                DataFixture
                     .DefaultDataBlockVersion()
                     .WithReleaseVersion(releaseVersion)
                     .WithDates(published: DateTime.UtcNow.AddDays(-1))
@@ -260,11 +294,13 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
 
         var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
 
-        await TestApp.AddTestData<ContentDbContext>(context =>
-        {
-            context.Publications.Add(publication);
-            context.DataBlockParents.Add(dataBlockParent);
-        });
+        await fixture
+            .GetContentDbContext()
+            .AddTestData(context =>
+            {
+                context.Publications.Add(publication);
+                context.DataBlockParents.Add(dataBlockParent);
+            });
 
         var cacheKey = new DataBlockTableResultCacheKey(
             publicationSlug: publication.Slug,
@@ -272,30 +308,23 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        var dataBlockService = new Mock<IDataBlockService>();
-
-        dataBlockService
-            .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
+        fixture
+            .DataBlockServiceMock.Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var app = SetupApp(dataBlockService: dataBlockService.Object);
-        var client = app.CreateClient();
-
-        var publicBlobCacheService = Mock.Get(app.Services.GetRequiredService<IPublicBlobCacheService>());
-
-        publicBlobCacheService
-            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+        fixture
+            .PublicBlobCacheServiceMock.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
             .ReturnsAsync(null!);
 
-        publicBlobCacheService
-            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+        fixture
+            .PublicBlobCacheServiceMock.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
             .Returns(Task.CompletedTask);
 
-        var response = await client.GetAsync(
-            $"http://localhost/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}"
-        );
+        var response = await fixture
+            .CreateClient()
+            .GetAsync($"http://localhost/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}");
 
-        VerifyAllMocks(publicBlobCacheService, dataBlockService);
+        VerifyAllMocks(fixture.PublicBlobCacheServiceMock, fixture.DataBlockServiceMock);
 
         response.AssertOk(_tableBuilderResults);
     }
@@ -303,20 +332,18 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     [Fact]
     public async Task QueryForTableBuilderResult_NotFound()
     {
-        Publication publication = _dataFixture
+        Publication publication = DataFixture
             .DefaultPublication()
-            .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var release = publication.Releases.Single();
         var releaseVersion = release.Versions.Single();
 
-        await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+        await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
-        var client = SetupApp().CreateClient();
-
-        var response = await client.GetAsync(
-            $"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{Guid.NewGuid()}"
-        );
+        var response = await fixture
+            .CreateClient()
+            .GetAsync($"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{Guid.NewGuid()}");
 
         response.AssertNotFound();
     }
@@ -324,17 +351,17 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     [Fact]
     public async Task QueryForTableBuilderResult_NotModified()
     {
-        Publication publication = _dataFixture
+        Publication publication = DataFixture
             .DefaultPublication()
-            .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var release = publication.Releases.Single();
         var releaseVersion = release.Versions.Single();
 
-        DataBlockParent dataBlockParent = _dataFixture
+        DataBlockParent dataBlockParent = DataFixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(
-                _dataFixture
+                DataFixture
                     .DefaultDataBlockVersion()
                     .WithReleaseVersion(releaseVersion)
                     .WithDates(published: DateTime.UtcNow.AddDays(-1))
@@ -343,14 +370,13 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
                     .WithCharts(Charts)
             );
 
-        await TestApp.AddTestData<ContentDbContext>(context =>
-        {
-            context.Publications.Add(publication);
-            context.DataBlockParents.Add(dataBlockParent);
-        });
-
-        var app = SetupApp();
-        var client = app.CreateClient();
+        await fixture
+            .GetContentDbContext()
+            .AddTestData(context =>
+            {
+                context.Publications.Add(publication);
+                context.DataBlockParents.Add(dataBlockParent);
+            });
 
         var publishedDate = dataBlockParent.LatestPublishedVersion!.Published!.Value;
 
@@ -358,18 +384,18 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
         // far, this will be considered Not Modified still.
         var ifModifiedSinceDate = publishedDate.AddSeconds(1);
 
-        var response = await client.GetAsync(
-            $"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}",
-            new Dictionary<string, string>
-            {
-                { HeaderNames.IfModifiedSince, ifModifiedSinceDate.ToUniversalTime().ToString("R") },
-                { HeaderNames.IfNoneMatch, $"W/\"{TableBuilderController.ApiVersion}\"" },
-            }
-        );
+        var response = await fixture
+            .CreateClient()
+            .GetAsync(
+                $"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}",
+                new Dictionary<string, string>
+                {
+                    { HeaderNames.IfModifiedSince, ifModifiedSinceDate.ToUniversalTime().ToString("R") },
+                    { HeaderNames.IfNoneMatch, $"W/\"{TableBuilderController.ApiVersion}\"" },
+                }
+            );
 
-        var publicBlobCacheService = Mock.Get(app.Services.GetRequiredService<IPublicBlobCacheService>());
-
-        VerifyAllMocks(publicBlobCacheService);
+        VerifyAllMocks(fixture.PublicBlobCacheServiceMock);
 
         response.AssertNotModified();
     }
@@ -377,17 +403,17 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     [Fact]
     public async Task QueryForTableBuilderResult_ETagChanged()
     {
-        Publication publication = _dataFixture
+        Publication publication = DataFixture
             .DefaultPublication()
-            .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var release = publication.Releases.Single();
         var releaseVersion = release.Versions.Single();
 
-        DataBlockParent dataBlockParent = _dataFixture
+        DataBlockParent dataBlockParent = DataFixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(
-                _dataFixture
+                DataFixture
                     .DefaultDataBlockVersion()
                     .WithReleaseVersion(releaseVersion)
                     .WithDates(published: DateTime.UtcNow.AddDays(-1))
@@ -398,11 +424,13 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
 
         var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
 
-        await TestApp.AddTestData<ContentDbContext>(context =>
-        {
-            context.Publications.Add(publication);
-            context.DataBlockParents.Add(dataBlockParent);
-        });
+        await fixture
+            .GetContentDbContext()
+            .AddTestData(context =>
+            {
+                context.Publications.Add(publication);
+                context.DataBlockParents.Add(dataBlockParent);
+            });
 
         var cacheKey = new DataBlockTableResultCacheKey(
             publicationSlug: publication.Slug,
@@ -410,23 +438,16 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        var dataBlockService = new Mock<IDataBlockService>(Strict);
-
-        dataBlockService
-            .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
+        fixture
+            .DataBlockServiceMock.Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var app = SetupApp(dataBlockService: dataBlockService.Object);
-        var client = app.CreateClient();
-
-        var publicBlobCacheService = Mock.Get(app.Services.GetRequiredService<IPublicBlobCacheService>());
-
-        publicBlobCacheService
-            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+        fixture
+            .PublicBlobCacheServiceMock.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
             .ReturnsAsync(null!);
 
-        publicBlobCacheService
-            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+        fixture
+            .PublicBlobCacheServiceMock.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
             .Returns(Task.CompletedTask);
 
         var publishedDate = dataBlockParent.LatestPublishedVersion!.Published!.Value;
@@ -436,16 +457,18 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
         // The eTag has changed however.
         var ifModifiedSinceDate = publishedDate.AddSeconds(1);
 
-        var response = await client.GetAsync(
-            $"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}",
-            new Dictionary<string, string>
-            {
-                { HeaderNames.IfModifiedSince, ifModifiedSinceDate.ToUniversalTime().ToString("R") },
-                { HeaderNames.IfNoneMatch, "\"not the same etag\"" },
-            }
-        );
+        var response = await fixture
+            .CreateClient()
+            .GetAsync(
+                $"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}",
+                new Dictionary<string, string>
+                {
+                    { HeaderNames.IfModifiedSince, ifModifiedSinceDate.ToUniversalTime().ToString("R") },
+                    { HeaderNames.IfNoneMatch, "\"not the same etag\"" },
+                }
+            );
 
-        VerifyAllMocks(publicBlobCacheService, dataBlockService);
+        VerifyAllMocks(fixture.PublicBlobCacheServiceMock, fixture.DataBlockServiceMock);
 
         response.AssertOk(_tableBuilderResults);
     }
@@ -453,17 +476,17 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     [Fact]
     public async Task QueryForTableBuilderResult_LastModifiedChanged()
     {
-        Publication publication = _dataFixture
+        Publication publication = DataFixture
             .DefaultPublication()
-            .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var release = publication.Releases.Single();
         var releaseVersion = release.Versions.Single();
 
-        DataBlockParent dataBlockParent = _dataFixture
+        DataBlockParent dataBlockParent = DataFixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(
-                _dataFixture
+                DataFixture
                     .DefaultDataBlockVersion()
                     .WithReleaseVersion(releaseVersion)
                     .WithDates(published: DateTime.UtcNow.AddDays(-1))
@@ -474,11 +497,13 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
 
         var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
 
-        await TestApp.AddTestData<ContentDbContext>(context =>
-        {
-            context.Publications.Add(publication);
-            context.DataBlockParents.Add(dataBlockParent);
-        });
+        await fixture
+            .GetContentDbContext()
+            .AddTestData(context =>
+            {
+                context.Publications.Add(publication);
+                context.DataBlockParents.Add(dataBlockParent);
+            });
 
         var cacheKey = new DataBlockTableResultCacheKey(
             publicationSlug: publication.Slug,
@@ -486,39 +511,34 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        var dataBlockService = new Mock<IDataBlockService>(Strict);
-
-        dataBlockService
-            .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
+        fixture
+            .DataBlockServiceMock.Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var app = SetupApp(dataBlockService: dataBlockService.Object);
-        var client = app.CreateClient();
-
-        var publicBlobCacheService = Mock.Get(app.Services.GetRequiredService<IPublicBlobCacheService>());
-
-        publicBlobCacheService
-            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+        fixture
+            .PublicBlobCacheServiceMock.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
             .ReturnsAsync(null!);
 
-        publicBlobCacheService
-            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+        fixture
+            .PublicBlobCacheServiceMock.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
             .Returns(Task.CompletedTask);
 
         // The latest published DataBlockVersion has been published since the caller last requested it, so we
         // consider this "Modified" by the published date alone.
         var yearBeforePublishedDate = dataBlockParent.LatestPublishedVersion!.Published!.Value.AddYears(-1);
 
-        var response = await client.GetAsync(
-            $"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}",
-            new Dictionary<string, string>
-            {
-                { HeaderNames.IfModifiedSince, yearBeforePublishedDate.ToUniversalTime().ToString("R") },
-                { HeaderNames.IfNoneMatch, $"W/\"{TableBuilderController.ApiVersion}\"" },
-            }
-        );
+        var response = await fixture
+            .CreateClient()
+            .GetAsync(
+                $"/api/tablebuilder/release/{releaseVersion.Id}/data-block/{dataBlockParent.Id}",
+                new Dictionary<string, string>
+                {
+                    { HeaderNames.IfModifiedSince, yearBeforePublishedDate.ToUniversalTime().ToString("R") },
+                    { HeaderNames.IfNoneMatch, $"W/\"{TableBuilderController.ApiVersion}\"" },
+                }
+            );
 
-        VerifyAllMocks(publicBlobCacheService, dataBlockService);
+        VerifyAllMocks(fixture.PublicBlobCacheServiceMock, fixture.DataBlockServiceMock);
 
         response.AssertOk(_tableBuilderResults);
     }
@@ -526,20 +546,20 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     [Fact]
     public async Task QueryForFastTrack()
     {
-        Publication publication = _dataFixture
+        Publication publication = DataFixture
             .DefaultPublication()
             .WithReleases([
-                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
+                DataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                DataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
             ]);
 
         var release = publication.Releases.Single(r => r.Year == 2021);
         var releaseVersion = release.Versions.Single();
 
-        DataBlockParent dataBlockParent = _dataFixture
+        DataBlockParent dataBlockParent = DataFixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(
-                _dataFixture
+                DataFixture
                     .DefaultDataBlockVersion()
                     .WithReleaseVersion(releaseVersion)
                     .WithDates(published: DateTime.UtcNow.AddDays(-1))
@@ -550,11 +570,13 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
 
         var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
 
-        await TestApp.AddTestData<ContentDbContext>(context =>
-        {
-            context.Publications.Add(publication);
-            context.DataBlockParents.Add(dataBlockParent);
-        });
+        await fixture
+            .GetContentDbContext()
+            .AddTestData(context =>
+            {
+                context.Publications.Add(publication);
+                context.DataBlockParents.Add(dataBlockParent);
+            });
 
         var cacheKey = new DataBlockTableResultCacheKey(
             publicationSlug: publication.Slug,
@@ -562,28 +584,21 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        var dataBlockService = new Mock<IDataBlockService>(Strict);
-
-        dataBlockService
-            .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
+        fixture
+            .DataBlockServiceMock.Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var app = SetupApp(dataBlockService: dataBlockService.Object);
-        var client = app.CreateClient();
-
-        var publicBlobCacheService = Mock.Get(app.Services.GetRequiredService<IPublicBlobCacheService>());
-
-        publicBlobCacheService
-            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+        fixture
+            .PublicBlobCacheServiceMock.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
             .ReturnsAsync(null!);
 
-        publicBlobCacheService
-            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+        fixture
+            .PublicBlobCacheServiceMock.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
             .Returns(Task.CompletedTask);
 
-        var response = await client.GetAsync($"/api/tablebuilder/fast-track/{dataBlockParent.Id}");
+        var response = await fixture.CreateClient().GetAsync($"/api/tablebuilder/fast-track/{dataBlockParent.Id}");
 
-        VerifyAllMocks(publicBlobCacheService, dataBlockService);
+        VerifyAllMocks(fixture.PublicBlobCacheServiceMock, fixture.DataBlockServiceMock);
 
         var viewModel = response.AssertOk<FastTrackViewModel>();
         Assert.Equal(dataBlockParent.Id, viewModel.DataBlockParentId);
@@ -613,33 +628,30 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     [Fact]
     public async Task QueryForFastTrack_DataBlockNotYetPublished()
     {
-        Publication publication = _dataFixture
+        Publication publication = DataFixture
             .DefaultPublication()
-            .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)]);
 
         var release = publication.Releases.Single();
         var releaseVersion = release.Versions.Single();
 
-        DataBlockParent dataBlockParentWithNoPublishedVersion = _dataFixture
+        DataBlockParent dataBlockParentWithNoPublishedVersion = DataFixture
             .DefaultDataBlockParent()
-            .WithLatestDraftVersion(_dataFixture.DefaultDataBlockVersion().WithReleaseVersion(releaseVersion));
+            .WithLatestDraftVersion(DataFixture.DefaultDataBlockVersion().WithReleaseVersion(releaseVersion));
 
-        await TestApp.AddTestData<ContentDbContext>(context =>
-        {
-            context.Publications.Add(publication);
-            context.DataBlockParents.Add(dataBlockParentWithNoPublishedVersion);
-        });
+        await fixture
+            .GetContentDbContext()
+            .AddTestData(context =>
+            {
+                context.Publications.Add(publication);
+                context.DataBlockParents.Add(dataBlockParentWithNoPublishedVersion);
+            });
 
-        var app = SetupApp();
-        var client = app.CreateClient();
+        var response = await fixture
+            .CreateClient()
+            .GetAsync($"/api/tablebuilder/fast-track/{dataBlockParentWithNoPublishedVersion.Id}");
 
-        var response = await client.GetAsync(
-            $"/api/tablebuilder/fast-track/{dataBlockParentWithNoPublishedVersion.Id}"
-        );
-
-        var publicBlobCacheService = Mock.Get(app.Services.GetRequiredService<IPublicBlobCacheService>());
-
-        VerifyAllMocks(publicBlobCacheService);
+        VerifyAllMocks(fixture.PublicBlobCacheServiceMock);
 
         response.AssertNotFound();
     }
@@ -647,11 +659,11 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
     [Fact]
     public async Task QueryForFastTrack_NotLatestRelease()
     {
-        Publication publication = _dataFixture
+        Publication publication = DataFixture
             .DefaultPublication()
             .WithReleases([
-                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
-                _dataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
+                DataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                DataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
             ]);
 
         var release2020 = publication.Releases.Single(r => r.Year == 2020);
@@ -660,10 +672,10 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
         // Release version is from the 2020 release which is not the latest release for the publication
         var releaseVersion = release2020.Versions.Single();
 
-        DataBlockParent dataBlockParent = _dataFixture
+        DataBlockParent dataBlockParent = DataFixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(
-                _dataFixture
+                DataFixture
                     .DefaultDataBlockVersion()
                     .WithReleaseVersion(releaseVersion)
                     .WithDates(published: DateTime.UtcNow.AddDays(-1))
@@ -674,11 +686,13 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
 
         var dataBlockId = dataBlockParent.LatestPublishedVersion!.Id;
 
-        await TestApp.AddTestData<ContentDbContext>(context =>
-        {
-            context.Publications.Add(publication);
-            context.DataBlockParents.Add(dataBlockParent);
-        });
+        await fixture
+            .GetContentDbContext()
+            .AddTestData(context =>
+            {
+                context.Publications.Add(publication);
+                context.DataBlockParents.Add(dataBlockParent);
+            });
 
         var cacheKey = new DataBlockTableResultCacheKey(
             publicationSlug: publication.Slug,
@@ -686,28 +700,21 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
             dataBlockParent.Id
         );
 
-        var dataBlockService = new Mock<IDataBlockService>(Strict);
-
-        dataBlockService
-            .Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
+        fixture
+            .DataBlockServiceMock.Setup(s => s.GetDataBlockTableResult(releaseVersion.Id, dataBlockId))
             .ReturnsAsync(_tableBuilderResults);
 
-        var app = SetupApp(dataBlockService: dataBlockService.Object);
-        var client = app.CreateClient();
-
-        var publicBlobCacheService = Mock.Get(app.Services.GetRequiredService<IPublicBlobCacheService>());
-
-        publicBlobCacheService
-            .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
+        fixture
+            .PublicBlobCacheServiceMock.Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
             .ReturnsAsync(null!);
 
-        publicBlobCacheService
-            .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
+        fixture
+            .PublicBlobCacheServiceMock.Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
             .Returns(Task.CompletedTask);
 
-        var response = await client.GetAsync($"/api/tablebuilder/fast-track/{dataBlockParent.Id}");
+        var response = await fixture.CreateClient().GetAsync($"/api/tablebuilder/fast-track/{dataBlockParent.Id}");
 
-        VerifyAllMocks(publicBlobCacheService, dataBlockService);
+        VerifyAllMocks(fixture.PublicBlobCacheServiceMock, fixture.DataBlockServiceMock);
 
         var viewModel = response.AssertOk<FastTrackViewModel>();
         Assert.Equal(dataBlockParent.Id, viewModel.DataBlockParentId);
@@ -717,18 +724,6 @@ public class TableBuilderControllerTests(TestApplicationFactory testApp) : Integ
         Assert.False(viewModel.LatestData);
         Assert.Equal(release2021.Title, viewModel.LatestReleaseTitle);
         Assert.Equal(release2021.Slug, viewModel.LatestReleaseSlug);
-    }
-
-    private WebApplicationFactory<Startup> SetupApp(
-        IDataBlockService? dataBlockService = null,
-        ITableBuilderService? tableBuilderService = null
-    )
-    {
-        return TestApp.ConfigureServices(services =>
-        {
-            services.AddTransient(_ => dataBlockService ?? Mock.Of<IDataBlockService>(Strict));
-            services.AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict));
-        });
     }
 
     private FullTableQueryRequest ToRequest(FullTableQuery query)

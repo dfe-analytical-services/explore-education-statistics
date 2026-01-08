@@ -118,7 +118,7 @@ const ReleaseDataBlockEditPage = ({
 
         {dataBlock && (
           <>
-            <h2 className="govuk-heading-m">{dataBlock.name}</h2>
+            <h3 className="govuk-heading-m">{dataBlock.name}</h3>
 
             <section>
               <SummaryList smallKey noBorder>

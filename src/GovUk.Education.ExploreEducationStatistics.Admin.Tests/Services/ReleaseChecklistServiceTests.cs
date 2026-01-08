@@ -365,6 +365,29 @@ public class ReleaseChecklistServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
             .WithNextReleaseDate(null)
+            .WithContent(
+                _dataFixture
+                    .DefaultContentSection()
+                    .ForIndex(
+                        0,
+                        s =>
+                            s.SetContentBlocks([
+                                _dataFixture
+                                    .DefaultHtmlBlock()
+                                    .WithBody("<div></div>")
+                                    .WithComments([
+                                        new()
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            Content = "Comment 1 Text",
+                                            Resolved = DateTime.UtcNow,
+                                        },
+                                        new() { Id = Guid.NewGuid(), Content = "Comment 2 Text" },
+                                    ]),
+                            ])
+                    )
+                    .GenerateList()
+            )
             .WithPreReleaseAccessList(string.Empty);
 
         var methodologyVersion = new MethodologyVersion { Status = Draft };
@@ -424,7 +447,7 @@ public class ReleaseChecklistServiceTests
 
             Assert.False(checklist.Valid);
 
-            Assert.Equal(4, checklist.Warnings.Count);
+            Assert.Equal(5, checklist.Warnings.Count);
 
             var methodologyMustBeApprovedError = Assert.IsType<MethodologyNotApprovedWarning>(checklist.Warnings[0]);
             Assert.Equal(MethodologyNotApproved, methodologyMustBeApprovedError.Code);
@@ -433,6 +456,7 @@ public class ReleaseChecklistServiceTests
             Assert.Equal(NoNextReleaseDate, checklist.Warnings[1].Code);
             Assert.Equal(NoDataFiles, checklist.Warnings[2].Code);
             Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[3].Code);
+            Assert.Equal(UnresolvedComments, checklist.Warnings[4].Code);
         }
     }
 

@@ -39,14 +39,14 @@ Upload another subject (for deletion later)
 Add data guidance to subject
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance    %{WAIT_MEDIUM}
-    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
+    user adds main data guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}
     ...    data guidance content
 
 Add data guidance to second Subject
     user waits until h2 is visible    Public data guidance
-    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
+    user adds main data guidance content
     user waits until page contains accordion section    ${SECOND_SUBJECT}    15
     user enters text into data guidance data file content editor    ${SECOND_SUBJECT}
     ...    data guidance content
@@ -253,7 +253,7 @@ Create release amendment
 Replace subject data
     user uploads subject replacement    ${SUBJECT_NAME}    dates.csv    dates.meta.csv
     user waits until page contains element    testid:Data file replacements table
-    user confirms replacement upload    ${SUBJECT_NAME}
+    user confirms replacement upload    ${SUBJECT_NAME}    Error
     user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains    Footnotes: ERROR    %{WAIT_MEDIUM}
@@ -474,11 +474,10 @@ Select the date category
 Attempt to generate a table that is too large
     user clicks element    id:filtersForm-submit
     user waits until page contains
-    ...    Could not create table as the filters chosen may exceed the maximum allowed table size.
-    user waits until page contains    Select different filters or download the subject data.
-    user waits until page contains button    Download Seven filters (csv, 17 Kb)    %{WAIT_MEDIUM}
+    ...    The selected options return too many rows to be displayed here and so the table shows only a subset of the data provided by your selections.
 
 Reduce the number of selected Dates and generate a smaller table
+    user clicks button    Edit filters
     user clicks unselect all for category    Date
     user clicks category checkbox    Date    23/03/2020
     user clicks category checkbox    Date    24/03/2020

@@ -109,12 +109,12 @@ const DataBlockDetailsForm = ({
       {({ formState, getValues }) => {
         return (
           <Form id={formId} submitId={formId} onSubmit={handleSubmit}>
-            <h2>Data block details</h2>
+            <h3>Data block details</h3>
 
             <FormGroup>
               <FormFieldTextInput<FormValues>
                 name="name"
-                label="Name"
+                label="Data block name"
                 hint="Name of the data block. This will not be visible to users."
                 className="govuk-!-width-one-half"
               />
@@ -133,7 +133,7 @@ const DataBlockDetailsForm = ({
 
               <FormFieldTextInput<FormValues>
                 name="source"
-                label="Source"
+                label="Data source"
                 hint="The data source used to create this data."
                 className="govuk-!-width-two-thirds"
               />

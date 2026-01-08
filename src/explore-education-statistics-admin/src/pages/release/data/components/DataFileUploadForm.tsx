@@ -62,7 +62,6 @@ const fileErrorMappings = {
   FileNameNotUnique: 'FileNameNotUnique',
   FileSizeMustNotBeZero: 'FileSizeMustNotBeZero',
   MustBeCsvFile: 'MustBeCsvFile',
-  CannotReplaceDataSetWithApiDataSet: 'CannotReplaceDataSetWithApiDataSet',
   CannotReplaceDraftApiDataSet: 'CannotReplaceDraftApiDataSet',
   InvalidFileTypeForReplacement: 'InvalidFileTypeForReplacement',
   DataSetIsNotInAnImportableState: 'DataSetIsNotInAnImportableState',
@@ -283,7 +282,7 @@ export default function DataFileUploadForm({
                 <>
                   <FormFieldTextInput<DataFileUploadFormValues>
                     name="title"
-                    label="Title"
+                    label="Data file title"
                     className="govuk-!-width-two-thirds"
                     maxLength={titleMaxLength}
                     onBlur={() => {

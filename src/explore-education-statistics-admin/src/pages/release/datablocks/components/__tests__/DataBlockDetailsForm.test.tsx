@@ -21,9 +21,9 @@ describe('DataBlockDetailsForm', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Name')).toHaveValue('Test name');
+    expect(screen.getByLabelText('Data block name')).toHaveValue('Test name');
     expect(screen.getByLabelText('Table title')).toHaveValue('Test heading');
-    expect(screen.getByLabelText('Source')).toHaveValue('Test source');
+    expect(screen.getByLabelText('Data source')).toHaveValue('Test source');
     expect(screen.getByLabelText('Featured table name')).toHaveValue(
       'Test highlight name',
     );
@@ -182,9 +182,9 @@ describe('DataBlockDetailsForm', () => {
 
     const { user } = render(<DataBlockDetailsForm onSubmit={handleSubmit} />);
 
-    await user.type(screen.getByLabelText('Name'), 'Test name');
+    await user.type(screen.getByLabelText('Data block name'), 'Test name');
     await user.type(screen.getByLabelText('Table title'), 'Test title');
-    await user.type(screen.getByLabelText('Source'), 'Test source');
+    await user.type(screen.getByLabelText('Data source'), 'Test source');
 
     await user.click(
       screen.getByLabelText('Set as a featured table for this publication'),
@@ -221,9 +221,9 @@ describe('DataBlockDetailsForm', () => {
 
     const { user } = render(<DataBlockDetailsForm onSubmit={handleSubmit} />);
 
-    await user.type(screen.getByLabelText('Name'), 'Test name');
+    await user.type(screen.getByLabelText('Data block name'), 'Test name');
     await user.type(screen.getByLabelText('Table title'), 'Test title');
-    await user.type(screen.getByLabelText('Source'), 'Test source');
+    await user.type(screen.getByLabelText('Data source'), 'Test source');
 
     await user.click(
       screen.getByLabelText('Set as a featured table for this publication'),

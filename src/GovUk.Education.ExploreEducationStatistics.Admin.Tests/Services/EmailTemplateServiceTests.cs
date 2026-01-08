@@ -1,5 +1,4 @@
 #nullable enable
-using System.Globalization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -125,6 +124,105 @@ public class EmailTemplateServiceTests
         result.AssertRight();
     }
 
+    [Fact]
+    public async Task SendContributorInviteEmail()
+    {
+        var email = "test@test.com";
+
+        Publication publication = _dataFixture.DefaultPublication();
+
+        // Purposefully creating some releases out of order to ensure sorting is working as expected when generating the release titles for the email.
+        var releases = _dataFixture
+            .DefaultRelease(3)
+            .WithPublication(publication)
+            .ForIndex(0, s => s.SetYear(2021).SetTimePeriodCoverage(TimeIdentifier.AcademicYearQ2))
+            .ForIndex(1, s => s.SetYear(2020).SetTimePeriodCoverage(TimeIdentifier.AcademicYearQ1))
+            .ForIndex(2, s => s.SetYear(2022).SetTimePeriodCoverage(TimeIdentifier.AcademicYearQ2))
+            .ForIndex(3, s => s.SetYear(2020).SetTimePeriodCoverage(TimeIdentifier.AcademicYearQ2))
+            .ForIndex(4, s => s.SetYear(2022).SetTimePeriodCoverage(TimeIdentifier.AcademicYearQ1))
+            .ForIndex(5, s => s.SetYear(2021).SetTimePeriodCoverage(TimeIdentifier.AcademicYearQ1))
+            .ForIndex(6, s => s.SetYear(2023).SetTimePeriodCoverage(TimeIdentifier.AcademicYearQ1))
+            .GenerateList(7);
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.Releases.AddRange(releases);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        // Grab some release version Ids from some (but not all) releases
+        var releaseVersionIdsForEmail = new HashSet<Guid>
+        {
+            // Grab a couple from the first release in the list (shouldn't matter how many or which ones)
+            releases[0].Versions[0].Id,
+            releases[0].Versions[1].Id,
+            // Grab just 1 from the remaining releases in the list EXCEPT the last one
+            releases[1].Versions[1].Id,
+            releases[2].Versions[2].Id,
+            releases[3].Versions[0].Id,
+            releases[4].Versions[2].Id,
+            releases[5].Versions[1].Id,
+        };
+
+        // These should be ordered by release year and then time period coverage
+        var expectedReleaseList = """
+            * Academic year Q1 2020/21
+            * Academic year Q2 2020/21
+            * Academic year Q1 2021/22
+            * Academic year Q2 2021/22
+            * Academic year Q1 2022/23
+            * Academic year Q2 2022/23
+            """;
+
+        const string expectedTemplateId = "contributor-template-id";
+
+        var expectedValues = new Dictionary<string, dynamic>
+        {
+            { "url", "https://admin-uri" },
+            { "publication name", publication.Title },
+            { "release list", expectedReleaseList },
+        };
+
+        var emailService = new Mock<IEmailService>(Strict);
+
+        emailService.Setup(mock => mock.SendEmail(email, expectedTemplateId, expectedValues)).Returns(Unit.Instance);
+
+        await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupEmailTemplateService(
+                contentDbContext: contentDbContext,
+                emailService: emailService.Object
+            );
+
+            var result = await service.SendContributorInviteEmail(
+                email: email,
+                publicationTitle: publication.Title,
+                releaseVersionIds: releaseVersionIdsForEmail
+            );
+
+            result.AssertRight();
+        }
+
+        emailService.Verify(s => s.SendEmail(email, expectedTemplateId, expectedValues), Times.Once);
+
+        VerifyAllMocks(emailService);
+    }
+
+    [Fact]
+    public async Task SendContributorInviteEmail_EmptyReleaseVersionIds_Throws()
+    {
+        var service = SetupEmailTemplateService();
+
+        await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await service.SendContributorInviteEmail(
+                email: "test@test.com",
+                publicationTitle: "publication-title",
+                releaseVersionIds: []
+            )
+        );
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
@@ -133,10 +231,7 @@ public class EmailTemplateServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
 
         // UK time 00:00 on 9th Sept 2020
-        var publishedScheduledStartOfDay = DateTime.Parse(
-            "2020-09-08T23:00:00.00Z",
-            styles: DateTimeStyles.AdjustToUniversal
-        );
+        var publishedScheduledStartOfDay = new DateOnly(2020, 9, 9).GetUkStartOfDayUtc();
 
         ReleaseVersion releaseVersion = _dataFixture
             .DefaultReleaseVersion()
@@ -155,7 +250,7 @@ public class EmailTemplateServiceTests
             .Returns(
                 new PreReleaseWindow
                 {
-                    Start = DateTime.Parse("2020-09-08T07:30:00.00Z", styles: DateTimeStyles.AdjustToUniversal), // UK time 08:30 on 8th Sept 2020
+                    Start = new DateTimeOffset(2020, 9, 8, 7, 30, 0, TimeSpan.Zero), // UK time 08:30 on 8th Sept 2020
                     ScheduledPublishDate = publishedScheduledStartOfDay,
                 }
             );
@@ -292,6 +387,7 @@ public class EmailTemplateServiceTests
             ReleaseHigherReviewersTemplateId = "notify-release-higher-reviewers-template-id",
             MethodologyHigherReviewersTemplateId = "notify-methodology-higher-reviewers-template-id",
             PreReleaseTemplateId = "prerelease-template-id",
+            ContributorTemplateId = "contributor-template-id",
         }.ToOptionsWrapper();
     }
 

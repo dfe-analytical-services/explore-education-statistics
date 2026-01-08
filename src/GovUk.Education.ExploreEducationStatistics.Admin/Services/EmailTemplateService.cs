@@ -111,6 +111,40 @@ public class EmailTemplateService(
         return emailService.SendEmail(email, template, emailValues);
     }
 
+    public async Task<Either<ActionResult, Unit>> SendContributorInviteEmail(
+        string email,
+        string publicationTitle,
+        HashSet<Guid> releaseVersionIds
+    )
+    {
+        if (releaseVersionIds.IsNullOrEmpty())
+        {
+            throw new ArgumentException("List of release versions cannot be empty");
+        }
+
+        var url = appOptions.Value.Url;
+        var template = notifyOptions.Value.ContributorTemplateId;
+
+        var releases = await contentDbContext
+            .Releases.Where(r => r.Versions.Any(rv => releaseVersionIds.Contains(rv.Id)))
+            .ToListAsync();
+
+        var releaseTitles = releases
+            .OrderBy(r => r.Year)
+            .ThenBy(r => r.TimePeriodCoverage)
+            .Select(r => $"* {r.Title}")
+            .JoinToString('\n');
+
+        var emailValues = new Dictionary<string, dynamic>
+        {
+            { "url", url },
+            { "publication name", publicationTitle },
+            { "release list", releaseTitles },
+        };
+
+        return emailService.SendEmail(email, template, emailValues);
+    }
+
     public async Task<Either<ActionResult, Unit>> SendPreReleaseInviteEmail(
         string email,
         Guid releaseVersionId,
@@ -130,8 +164,8 @@ public class EmailTemplateService(
                     $"{url}/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/prerelease/content";
 
                 var preReleaseWindow = preReleaseService.GetPreReleaseWindow(releaseVersion);
-                var preReleaseWindowStart = preReleaseWindow.Start.ConvertUtcToUkTimeZone();
-                var publishScheduled = releaseVersion.PublishScheduled!.Value.ConvertUtcToUkTimeZone();
+                var preReleaseWindowStart = preReleaseWindow.Start.ConvertToUkTimeZone();
+                var publishScheduled = releaseVersion.PublishScheduled!.Value.ConvertToUkTimeZone();
 
                 // TODO EES-828 This time should depend on the Publisher schedule
                 var publishScheduledTime = new TimeSpan(9, 30, 0);
@@ -203,7 +237,7 @@ public class EmailTemplateService(
         };
     }
 
-    private static string FormatTimeForEmail(DateTime dateTime)
+    private static string FormatTimeForEmail(DateTimeOffset dateTime)
     {
         return dateTime.ToString("HH:mm");
     }
@@ -213,7 +247,7 @@ public class EmailTemplateService(
         return timeSpan.ToString(@"hh\:mm");
     }
 
-    private static string FormatDayForEmail(DateTime dateTime)
+    private static string FormatDayForEmail(DateTimeOffset dateTime)
     {
         return dateTime.ToString("dddd dd MMMM yyyy");
     }

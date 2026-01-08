@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Thinktecture.EntityFrameworkCore.TempTables;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
@@ -272,29 +271,16 @@ public class FilterItemRepositoryTests
 
         var filterCharacteristic = new Filter
         {
-            FilterGroups = new List<FilterGroup>
-            {
-                new() { FilterItems = new List<FilterItem> { filterItemCharacteristicSchoolYear1 } },
-                new()
-                {
-                    FilterItems = new List<FilterItem>
-                    {
-                        filterItemCharacteristicFsmEligible,
-                        filterItemCharacteristicFsmNotEligible,
-                    },
-                },
-            },
+            FilterGroups =
+            [
+                new() { FilterItems = [filterItemCharacteristicSchoolYear1] },
+                new() { FilterItems = [filterItemCharacteristicFsmEligible, filterItemCharacteristicFsmNotEligible] },
+            ],
         };
 
         var filterSchoolType = new Filter
         {
-            FilterGroups = new List<FilterGroup>
-            {
-                new()
-                {
-                    FilterItems = new List<FilterItem> { filterItemSchoolTypePrimary, filterItemSchoolTypeSecondary },
-                },
-            },
+            FilterGroups = [new() { FilterItems = [filterItemSchoolTypePrimary, filterItemSchoolTypeSecondary] }],
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -332,10 +318,7 @@ public class FilterItemRepositoryTests
     [Fact]
     public async Task CountFilterItemsByFilter_EmptyFilterItemsIsEmpty()
     {
-        var filter = new Filter
-        {
-            FilterGroups = new List<FilterGroup> { new() { FilterItems = new List<FilterItem> { new() } } },
-        };
+        var filter = new Filter { FilterGroups = [new() { FilterItems = [new()] }] };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -357,10 +340,7 @@ public class FilterItemRepositoryTests
     public async Task CountFilterItemsByFilter_FilterItemsNotFoundThrowsException()
     {
         var filterItem = new FilterItem();
-        var filter = new Filter
-        {
-            FilterGroups = new List<FilterGroup> { new() { FilterItems = new List<FilterItem> { filterItem } } },
-        };
+        var filter = new Filter { FilterGroups = [new() { FilterItems = [filterItem] }] };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -379,9 +359,7 @@ public class FilterItemRepositoryTests
 
             var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
             {
-                await repository.CountFilterItemsByFilter(
-                    ListOf(filterItem.Id, filterItemNotFound1, filterItemNotFound2)
-                );
+                await repository.CountFilterItemsByFilter([filterItem.Id, filterItemNotFound1, filterItemNotFound2]);
             });
 
             Assert.Equal(

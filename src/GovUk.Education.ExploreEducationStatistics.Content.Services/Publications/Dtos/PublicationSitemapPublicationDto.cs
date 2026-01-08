@@ -26,7 +26,7 @@ public record PublicationSitemapReleaseDto
 {
     public required string Slug { get; init; }
 
-    public required DateTime LastModified { get; init; }
+    public required DateTimeOffset LastModified { get; init; }
 
     public static PublicationSitemapReleaseDto FromReleaseVersion(ReleaseVersion releaseVersion) =>
         new()

@@ -317,7 +317,7 @@ public class PermalinkService : IPermalinkService
                 rf.File.SubjectId == subjectId
                 && rf.File.Type == FileType.Data
                 && rf.ReleaseVersion.Published.HasValue
-                && DateTime.UtcNow >= rf.ReleaseVersion.Published.Value
+                && DateTimeOffset.UtcNow >= rf.ReleaseVersion.Published.Value
             )
             .Select(rf => rf.ReleaseVersion)
             .ToListAsync();

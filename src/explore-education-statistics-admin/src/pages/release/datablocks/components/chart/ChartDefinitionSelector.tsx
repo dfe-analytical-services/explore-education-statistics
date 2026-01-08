@@ -1,5 +1,6 @@
 import styles from '@admin/pages/release/datablocks/components/chart/ChartDefinitionSelector.module.scss';
 import ButtonText from '@common/components/ButtonText';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import { infographicBlockDefinition } from '@common/modules/charts/components/InfographicBlock';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
 import React from 'react';
@@ -41,6 +42,7 @@ const ChartDefinitionSelector = ({
               }}
             >
               {definition.name}
+              <VisuallyHidden> chart</VisuallyHidden>
               <span
                 className={styles.image}
                 style={{

@@ -1,6 +1,7 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
@@ -9,16 +10,39 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Net.Http.Headers;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics;
 
-public class TableBuilderControllerIntegrationTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class TableBuilderControllerIntegrationTestsFixture()
+    : OptimisedAdminCollectionFixture(capabilities: [AdminIntegrationTestCapability.UserAuth])
+{
+    public Mock<ITableBuilderService> TableBuilderServiceMock = null!;
+
+    protected override void ConfigureServicesAndConfiguration(OptimisedServiceAndConfigModifications modifications)
+    {
+        base.ConfigureServicesAndConfiguration(modifications);
+        modifications.ReplaceServiceWithMock<ITableBuilderService>();
+    }
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+        TableBuilderServiceMock = lookups.GetMockService<ITableBuilderService>();
+    }
+}
+
+[CollectionDefinition(nameof(TableBuilderControllerIntegrationTestsFixture))]
+public class TableBuilderControllerIntegrationTestsCollection
+    : ICollectionFixture<TableBuilderControllerIntegrationTestsFixture>;
+
+[Collection(nameof(TableBuilderControllerIntegrationTestsFixture))]
+public class TableBuilderControllerIntegrationTests(TableBuilderControllerIntegrationTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private static readonly Guid ReleaseVersionId = Guid.NewGuid();
     private static readonly Guid SubjectId = Guid.NewGuid();
@@ -61,21 +85,20 @@ public class TableBuilderControllerIntegrationTests(TestApplicationFactory testA
     [Fact]
     public async Task Query()
     {
-        var tableBuilderService = new Mock<ITableBuilderService>(Strict);
-        tableBuilderService
-            .Setup(s => s.Query(ReleaseVersionId, ItIs.DeepEqualTo(FullTableQuery), It.IsAny<CancellationToken>()))
+        fixture
+            .TableBuilderServiceMock.Setup(s =>
+                s.Query(ReleaseVersionId, ItIs.DeepEqualTo(FullTableQuery), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync(_tableBuilderResults);
 
-        var client = SetupApp(tableBuilderService: tableBuilderService.Object)
-            .SetUser(DataFixture.AuthenticatedUser())
-            .CreateClient();
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Authenticated);
 
         var response = await client.PostAsync(
             $"/api/data/tablebuilder/release/{ReleaseVersionId}",
             new JsonNetContent(FullTableQueryRequest)
         );
 
-        VerifyAllMocks(tableBuilderService);
+        VerifyAllMocks(fixture.TableBuilderServiceMock);
 
         response.AssertOk(_tableBuilderResults);
     }
@@ -83,9 +106,8 @@ public class TableBuilderControllerIntegrationTests(TestApplicationFactory testA
     [Fact]
     public async Task Query_Csv()
     {
-        var tableBuilderService = new Mock<ITableBuilderService>(Strict);
-        tableBuilderService
-            .Setup(s =>
+        fixture
+            .TableBuilderServiceMock.Setup(s =>
                 s.QueryToCsvStream(
                     ReleaseVersionId,
                     ItIs.DeepEqualTo(FullTableQuery),
@@ -101,9 +123,7 @@ public class TableBuilderControllerIntegrationTests(TestApplicationFactory testA
                 }
             );
 
-        var client = SetupApp(tableBuilderService: tableBuilderService.Object)
-            .SetUser(DataFixture.AuthenticatedUser())
-            .CreateClient();
+        var client = fixture.CreateClient(user: OptimisedTestUsers.Authenticated);
 
         var response = await client.PostAsync(
             $"/api/data/tablebuilder/release/{ReleaseVersionId}",
@@ -111,15 +131,8 @@ public class TableBuilderControllerIntegrationTests(TestApplicationFactory testA
             headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
         );
 
-        VerifyAllMocks(tableBuilderService);
+        VerifyAllMocks(fixture.TableBuilderServiceMock);
 
         response.AssertOk("Test csv");
-    }
-
-    private WebApplicationFactory<TestStartup> SetupApp(ITableBuilderService? tableBuilderService = null)
-    {
-        return TestApp.ConfigureServices(services =>
-            services.ReplaceService(tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict))
-        );
     }
 }

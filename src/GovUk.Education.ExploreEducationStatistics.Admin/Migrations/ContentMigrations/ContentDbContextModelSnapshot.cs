@@ -1371,11 +1371,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("PublishScheduled")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("PublishScheduled")
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTime?>("Published")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("Published")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("RelatedInformation")
                         .IsRequired()

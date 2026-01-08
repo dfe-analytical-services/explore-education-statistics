@@ -219,7 +219,7 @@ const program = new Command()
 This script will also run prerequisite tasks to ensure that services will be able to startup:
 
 - Starting Docker services that are required for any services to start correctly (e.g. the database)
-- Run a .NET clean and build will be executed for any .NET services (e.g. admin)
+- Run a .NET build will be executed for any .NET services (e.g. admin)
 `,
   )
   .addHelpText(
@@ -245,9 +245,6 @@ Start public data API:
 Start admin and its dependencies:
   $ start admin processor publisher publicProcessor
 
-Start .NET services without a clean step:
-  $ start data content --skip-clean
-
 Start services without first starting any Docker services:
   $ start data content --skip-docker
 
@@ -265,7 +262,6 @@ Restart Docker services:
   )
   .addOption(new Option('--restart-docker', 'Restart any Docker containers'))
   .addOption(new Option('--rebuild-docker', 'Rebuild any Docker containers'))
-  .addOption(new Option('--skip-clean', 'Skip clean steps where possible'))
   .addOption(new Option('--skip-build', 'Skip build steps where possible'))
   .addOption(
     new Option(
@@ -366,22 +362,6 @@ async function startDockerServices() {
   }
 }
 
-async function runDotnetClean(service: ServiceName) {
-  const schema = serviceSchemas[service];
-
-  if (schema.type !== 'dotnet' && schema.type !== 'func') {
-    return;
-  }
-
-  if (!programOpts.skipClean) {
-    logService(service, logColours.info('Running clean...'));
-
-    await $({
-      cwd: path.join(projectRoot, schema.root),
-    })`dotnet clean`;
-  }
-}
-
 async function startService(service: ServiceName): Promise<void> {
   const schema = serviceSchemas[service];
 
@@ -404,7 +384,6 @@ async function startService(service: ServiceName): Promise<void> {
       env.MSBUILDDISABLENODEREUSE = '1';
 
       lockUntilReady = true;
-      beforeTask = () => runDotnetClean(service);
       checkReady = line => line.startsWith('Server listening on address:');
 
       break;
@@ -417,7 +396,6 @@ async function startService(service: ServiceName): Promise<void> {
       env.MSBUILDDISABLENODEREUSE = '1';
 
       lockUntilReady = true;
-      beforeTask = () => runDotnetClean(service);
       checkReady = line => line.startsWith('Function Runtime Version:');
 
       break;

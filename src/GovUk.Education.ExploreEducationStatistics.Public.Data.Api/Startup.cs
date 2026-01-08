@@ -267,14 +267,17 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        UpdateDatabase(app, env);
+        if (!env.IsIntegrationTest())
+        {
+            UpdateDatabase(app, env);
+        }
 
         if (_miniProfilerOptions.Enabled)
         {
             app.UseMiniProfiler();
         }
 
-        if (env.IsDevelopment() || env.IsIntegrationTest())
+        if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
 

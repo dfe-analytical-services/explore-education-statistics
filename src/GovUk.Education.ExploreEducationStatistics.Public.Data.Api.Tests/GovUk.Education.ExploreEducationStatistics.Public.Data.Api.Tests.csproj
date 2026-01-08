@@ -24,6 +24,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Api\GovUk.Education.ExploreEducationStatistics.Public.Data.Api.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.csproj" />
@@ -37,9 +40,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="appsettings.IntegrationTest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="appsettings.AnalyticsEnabled.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

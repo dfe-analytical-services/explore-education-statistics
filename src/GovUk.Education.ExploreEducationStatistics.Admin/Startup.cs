@@ -21,7 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.KeyStatisticsMigration;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
@@ -34,7 +33,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -378,7 +376,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.Configure<OpenIdConnectSpaClientOptions>(
             configuration.GetSection(OpenIdConnectSpaClientOptions.Section)
         );
-        services.Configure<FeatureFlagsOptions>(configuration.GetSection(FeatureFlagsOptions.Section));
         services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
         services.Configure<DataScreenerClientOptions>(
             configuration.GetRequiredSection(DataScreenerClientOptions.Section)
@@ -417,7 +414,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
         services.AddTransient<IMethodologyRepository, MethodologyRepository>();
 
-        services.AddTransient<IKeyStatisticsMigrationService, KeyStatisticsMigrationService>();
         services.AddTransient<IReleaseDataContentService, ReleaseDataContentService>();
         services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
         services.AddTransient<IDataSetFileStorage, DataSetFileStorage>();
@@ -591,6 +587,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
         services.AddTransient<IEmailTemplateService, EmailTemplateService>();
         services.AddTransient<ITableBuilderService, TableBuilderService>();
+        services.AddTransient<ITableBuilderQueryOptimiser, TableBuilderQueryOptimiser>();
         services.AddTransient<IFilterRepository, FilterRepository>();
         services.AddTransient<IFilterItemRepository, FilterItemRepository>();
         services.AddTransient<
@@ -752,7 +749,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         {
             app.UseDeveloperExceptionPage();
         }
-        else
+
+        if (env.IsProduction())
         {
             app.UseExceptionHandler("/Error");
             app.UseHsts(opts =>
@@ -800,7 +798,11 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 .ScriptSources(s => s.UnsafeInline())
         );
 
-        app.UseHttpsRedirection();
+        if (env.IsProduction())
+        {
+            app.UseHttpsRedirection();
+        }
+
         app.UseStaticFiles();
         app.UseSpaStaticFiles();
         app.UseCookiePolicy();

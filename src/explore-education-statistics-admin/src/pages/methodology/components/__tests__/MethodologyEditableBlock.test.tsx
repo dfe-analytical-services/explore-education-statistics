@@ -17,6 +17,7 @@ describe('MethodologyEditableBlock', () => {
   test('renders HTML block', () => {
     render(
       <MethodologyEditableBlock
+        label="Test block"
         methodologyId="methodology-1"
         block={testHtmlBlock}
         onSave={noop}
@@ -46,6 +47,7 @@ describe('MethodologyEditableBlock', () => {
 
     render(
       <MethodologyEditableBlock
+        label="Test block"
         methodologyId="methodology-1"
         block={{
           ...testHtmlBlock,

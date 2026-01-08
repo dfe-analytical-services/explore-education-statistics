@@ -9,11 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 
 public static class ClaimsPrincipalGeneratorExtensions
 {
-    public static Generator<ClaimsPrincipal> VerifiedButNotAuthorizedByIdentityProviderUser(this DataFixture fixture)
-    {
-        return fixture.Generator<ClaimsPrincipal>().WithId(Guid.NewGuid()).WithScope("some-other-scope");
-    }
-
     public static Generator<ClaimsPrincipal> VerifiedByIdentityProviderUser(this DataFixture fixture)
     {
         return fixture
@@ -28,7 +23,7 @@ public static class ClaimsPrincipalGeneratorExtensions
             .Generator<ClaimsPrincipal>()
             .WithId(userId != Guid.Empty ? userId : Guid.NewGuid())
             .WithScope(SecurityScopes.AccessAdminApiScope)
-            .WithClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString());
+            .WithClaim(nameof(SecurityClaimTypes.ApplicationAccessGranted));
     }
 
     public static Generator<ClaimsPrincipal> BauUser(this DataFixture fixture)
@@ -48,10 +43,10 @@ public static class ClaimsPrincipalGeneratorExtensions
             .WithId(Guid.NewGuid())
             .WithRole(GlobalRoles.RoleNames.Analyst)
             .WithScope(SecurityScopes.AccessAdminApiScope)
-            .WithClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString())
-            .WithClaim(SecurityClaimTypes.AnalystPagesAccessGranted.ToString())
-            .WithClaim(SecurityClaimTypes.PrereleasePagesAccessGranted.ToString())
-            .WithClaim(SecurityClaimTypes.CanViewPrereleaseContacts.ToString());
+            .WithClaim(nameof(SecurityClaimTypes.ApplicationAccessGranted))
+            .WithClaim(nameof(SecurityClaimTypes.AnalystPagesAccessGranted))
+            .WithClaim(nameof(SecurityClaimTypes.PrereleasePagesAccessGranted))
+            .WithClaim(nameof(SecurityClaimTypes.CanViewPrereleaseContacts));
     }
 
     public static Generator<ClaimsPrincipal> PreReleaseUser(this DataFixture fixture)
@@ -61,8 +56,8 @@ public static class ClaimsPrincipalGeneratorExtensions
             .WithId(Guid.NewGuid())
             .WithRole(GlobalRoles.RoleNames.PrereleaseUser)
             .WithScope(SecurityScopes.AccessAdminApiScope)
-            .WithClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString())
-            .WithClaim(SecurityClaimTypes.PrereleasePagesAccessGranted.ToString());
+            .WithClaim(nameof(SecurityClaimTypes.ApplicationAccessGranted))
+            .WithClaim(nameof(SecurityClaimTypes.PrereleasePagesAccessGranted));
     }
 
     public static Generator<ClaimsPrincipal> WithId(this Generator<ClaimsPrincipal> generator, Guid userId) =>

@@ -1,54 +1,81 @@
 @import '~govuk-frontend/dist/govuk/base';
 
 .nav {
-  position: sticky;
-  top: 0;
-  z-index: 1001; // Above chart tooltip z-index of 1000
-  background-color: govuk-colour('white');
+  @include govuk-media-query($from: tablet) {
+    position: sticky;
+    top: 0;
+    z-index: 1001; // Above chart tooltip z-index of 1000
+    background-color: govuk-colour('white');
+  }
 }
 
 .navList {
-  display: flex;
-  align-items: flex-end;
-  gap: govuk-spacing(2);
-  border-bottom: 1px solid $govuk-border-colour;
-  min-width: 100%;
-  overflow-y: hidden;
-  overflow-x: auto;
   list-style: none;
-  padding: 0;
-  margin: 0;
-  scrollbar-width: none;
+  border-bottom: 1px solid $govuk-border-colour;
+  padding: govuk-spacing(2) 0;
+  margin: 0 0 govuk-spacing(2);
 
   ::-webkit-scrollbar {
     display: none;
   }
 
   @include govuk-media-query($from: tablet) {
-    gap: govuk-spacing(4);
-  }
-
-  > li {
+    padding: 0;
     margin: 0;
-    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;
+    min-width: 100%;
+    overflow-y: hidden;
+    overflow-x: auto;
+    scrollbar-width: none;
+    gap: govuk-spacing(4);
   }
 }
 
 .navItem {
-  display: inline-flex;
-  margin: 0;
-  padding: govuk-spacing(3) govuk-spacing(1) govuk-spacing(2);
+  flex-shrink: 0;
+  display: flex;
+  border-left: 5px solid transparent;
+  margin: 0 0 govuk-spacing(3);
+  border-left-width: 5px;
+  text-decoration: none;
   color: $govuk-link-colour;
-  border-bottom: 5px solid transparent;
+
+  @include govuk-media-query($from: tablet) {
+    margin: 0;
+    border-left: unset;
+    border-bottom: 5px solid transparent;
+  }
+
+  &:has([aria-current='page']) {
+    border-color: currentColor;
+
+    @include govuk-media-query($until: tablet) {
+      font-weight: bold;
+      margin-left: -15px;
+      padding-left: 10px;
+    }
+  }
+}
+
+.navItemLink {
+  display: inline-flex;
   text-decoration: none;
 
-  &:hover {
+  @include govuk-media-query($from: tablet) {
+    padding: govuk-spacing(3) govuk-spacing(1) govuk-spacing(2);
+  }
+
+  &:hover:not(:focus) {
     text-decoration: underline;
     color: $govuk-link-hover-colour;
   }
 
-  &:focus,
-  &[aria-current='page'] {
-    border-color: currentColor;
+  &:visited:not(:focus) {
+    color: $govuk-link-colour;
+  }
+
+  &:focus {
+    color: $govuk-focus-text-colour;
   }
 }

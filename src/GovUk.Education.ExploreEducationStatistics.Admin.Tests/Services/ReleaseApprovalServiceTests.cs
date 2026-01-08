@@ -1,5 +1,4 @@
 #nullable enable
-using System.Globalization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -71,7 +70,7 @@ public class ReleaseApprovalServiceTests
                 new ReleaseStatusCreateRequest
                 {
                     PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2051-06-30",
+                    PublishScheduled = new DateOnly(2051, 6, 30),
                     NextReleaseDate = nextReleaseDateEdited,
                     ApprovalStatus = ReleaseApprovalStatus.Draft,
                     InternalReleaseNote = "Test note",
@@ -88,7 +87,7 @@ public class ReleaseApprovalServiceTests
                 .SingleAsync(rv => rv.Id == releaseVersion.Id);
 
             Assert.Equal(ReleaseApprovalStatus.Draft, saved.ApprovalStatus);
-            Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc), saved.PublishScheduled);
+            Assert.Equal(new DateTimeOffset(2051, 6, 29, 23, 0, 0, TimeSpan.Zero), saved.PublishScheduled);
             Assert.Equal(nextReleaseDateEdited, saved.NextReleaseDate);
             // NotifySubscribers should default to true for first release versions
             Assert.True(saved.NotifySubscribers);
@@ -149,7 +148,7 @@ public class ReleaseApprovalServiceTests
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
                     InternalReleaseNote = "Test note",
                     PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2051-06-30",
+                    PublishScheduled = new DateOnly(2051, 6, 30),
                     NextReleaseDate = new PartialDate { Month = "12", Year = "2000" },
                 }
             );
@@ -196,41 +195,6 @@ public class ReleaseApprovalServiceTests
     }
 
     [Fact]
-    public async Task CreateReleaseStatus_Approved_FailsEmptyPublishDate()
-    {
-        ReleaseVersion releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            context.ReleaseVersions.Add(releaseVersion);
-            await context.SaveChangesAsync();
-        }
-
-        await using (var context = InMemoryApplicationDbContext(contextId))
-        {
-            var releaseService = BuildService(context);
-
-            var result = await releaseService.CreateReleaseStatus(
-                releaseVersion.Id,
-                new ReleaseStatusCreateRequest
-                {
-                    ApprovalStatus = ReleaseApprovalStatus.Approved,
-                    InternalReleaseNote = "Test note",
-                    PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "",
-                    NextReleaseDate = new PartialDate { Month = "12", Year = "2000" },
-                }
-            );
-
-            result.AssertBadRequest(PublishDateCannotBeEmpty);
-        }
-    }
-
-    [Fact]
     public async Task CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_PreviousDay()
     {
         ReleaseVersion releaseVersion = _fixture
@@ -246,9 +210,7 @@ public class ReleaseApprovalServiceTests
         }
 
         // Set up the current time in UTC
-        var timeProvider = new FakeTimeProvider(
-            DateTime.Parse("2023-01-01T00:00:00Z", styles: DateTimeStyles.RoundtripKind)
-        );
+        var timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2023-01-01T00:00:00Z"));
 
         // Set up the cron schedules for publishing
         var options = new ReleaseApprovalOptions
@@ -269,7 +231,7 @@ public class ReleaseApprovalServiceTests
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
                     InternalReleaseNote = "Test note",
                     PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2022-12-31",
+                    PublishScheduled = new DateOnly(2022, 12, 31),
                     NextReleaseDate = new PartialDate { Month = "12", Year = "2000" },
                 }
             );
@@ -298,9 +260,7 @@ public class ReleaseApprovalServiceTests
         // Set up a current time in UTC which crosses a day boundary in British Summer Time.
         // Date is 6th June UTC but 7th June in British Summer Time which is the timezone we expect the user to be
         // located in and the Publisher functions to be running in.
-        var timeProvider = new FakeTimeProvider(
-            DateTime.Parse("2023-06-06T23:00:00Z", styles: DateTimeStyles.RoundtripKind)
-        );
+        var timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2023-06-06T23:00:00Z"));
 
         // Set up the cron schedules for publishing
         var options = new ReleaseApprovalOptions
@@ -321,7 +281,7 @@ public class ReleaseApprovalServiceTests
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
                     InternalReleaseNote = "Test note",
                     PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2023-06-06",
+                    PublishScheduled = new DateOnly(2023, 6, 6),
                     NextReleaseDate = new PartialDate { Month = "12", Year = "2000" },
                 }
             );
@@ -348,9 +308,7 @@ public class ReleaseApprovalServiceTests
         }
 
         // Set up a current time in UTC after the first publishing function has run
-        var timeProvider = new FakeTimeProvider(
-            DateTime.Parse("2023-01-01T01:00:00Z", styles: DateTimeStyles.RoundtripKind)
-        );
+        var timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2023-01-01T01:00:00Z"));
 
         // Set up the cron schedules for publishing
         var options = new ReleaseApprovalOptions
@@ -371,7 +329,7 @@ public class ReleaseApprovalServiceTests
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
                     InternalReleaseNote = "Test note",
                     PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2023-01-01",
+                    PublishScheduled = new DateOnly(2023, 1, 1),
                     NextReleaseDate = new PartialDate { Month = "12", Year = "2000" },
                 }
             );
@@ -400,9 +358,7 @@ public class ReleaseApprovalServiceTests
         // Set up a current time in UTC after the first publishing function has run.
         // Based on a time now of 2023-06-06T23:30:00Z the cron schedule in the UK timezone will have had an
         // occurrence at 2023-06-06T23:30:00Z and the next occurrence will not be until 2023-06-07T23:00:00Z.
-        var timeProvider = new FakeTimeProvider(
-            DateTime.Parse("2023-06-06T23:30:00Z", styles: DateTimeStyles.RoundtripKind)
-        );
+        var timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2023-06-06T23:30:00Z"));
 
         // Set up the cron schedules for publishing
         var options = new ReleaseApprovalOptions
@@ -423,7 +379,7 @@ public class ReleaseApprovalServiceTests
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
                     InternalReleaseNote = "Test note",
                     PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2023-06-07",
+                    PublishScheduled = new DateOnly(2023, 6, 7),
                     NextReleaseDate = new PartialDate { Month = "12", Year = "2000" },
                 }
             );
@@ -450,9 +406,7 @@ public class ReleaseApprovalServiceTests
         }
 
         // Set up the current time in UTC
-        var timeProvider = new FakeTimeProvider(
-            DateTime.Parse("2023-01-01T12:00:00Z", styles: DateTimeStyles.RoundtripKind)
-        );
+        var timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2023-01-01T12:00:00Z"));
 
         // Set up the cron schedules for publishing
         var options = new ReleaseApprovalOptions
@@ -473,7 +427,7 @@ public class ReleaseApprovalServiceTests
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
                     InternalReleaseNote = "Test note",
                     PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2023-01-08", // Sunday
+                    PublishScheduled = new DateOnly(2023, 1, 8), // Sunday
                     NextReleaseDate = new PartialDate { Month = "12", Year = "2000" },
                 }
             );
@@ -500,9 +454,7 @@ public class ReleaseApprovalServiceTests
         }
 
         // Set up the current time in UTC
-        var timeProvider = new FakeTimeProvider(
-            DateTime.Parse("2023-01-01T23:20:00Z", styles: DateTimeStyles.RoundtripKind)
-        );
+        var timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2023-01-01T23:20:00Z"));
 
         // Set up cron schedules for publishing hourly on specific minutes in a way that the first function
         // will have an occurrence on the day, but not the second
@@ -523,7 +475,7 @@ public class ReleaseApprovalServiceTests
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
                     InternalReleaseNote = "Test note",
                     PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2023-01-01",
+                    PublishScheduled = new DateOnly(2023, 1, 1),
                     NextReleaseDate = new PartialDate { Month = "12", Year = "2000" },
                 }
             );
@@ -542,7 +494,7 @@ public class ReleaseApprovalServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
             .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-            .WithPublished(DateTime.UtcNow);
+            .WithPublished(DateTimeOffset.UtcNow);
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -723,7 +675,7 @@ public class ReleaseApprovalServiceTests
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
                     InternalReleaseNote = "Test note",
                     PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2051-06-30",
+                    PublishScheduled = new DateOnly(2051, 6, 30),
                     NextReleaseDate = nextReleaseDateEdited,
                 }
             );
@@ -748,7 +700,7 @@ public class ReleaseApprovalServiceTests
             Assert.Equal(ReleaseApprovalStatus.Approved, saved.ApprovalStatus);
 
             // PublishScheduled should have been set to the scheduled date specified in the request.
-            Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc), saved.PublishScheduled);
+            Assert.Equal(new DateTimeOffset(2051, 6, 29, 23, 0, 0, TimeSpan.Zero), saved.PublishScheduled);
             nextReleaseDateEdited.AssertDeepEqualTo(saved.NextReleaseDate);
 
             // NotifySubscribers should default to true for original releases
@@ -1040,7 +992,7 @@ public class ReleaseApprovalServiceTests
                 releaseVersion.Id,
                 new ReleaseStatusCreateRequest
                 {
-                    PublishScheduled = "2051-06-30",
+                    PublishScheduled = new DateOnly(2051, 6, 30),
                     ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                     InternalReleaseNote = "Internal note",
                 }
@@ -1123,7 +1075,7 @@ public class ReleaseApprovalServiceTests
                 releaseVersion.Id,
                 new ReleaseStatusCreateRequest
                 {
-                    PublishScheduled = "2051-06-30",
+                    PublishScheduled = new DateOnly(2051, 6, 30),
                     ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                     InternalReleaseNote = "Test internal note",
                 }
@@ -1206,7 +1158,7 @@ public class ReleaseApprovalServiceTests
                         ApprovalStatus = ReleaseApprovalStatus.Approved,
                         InternalReleaseNote = "Test note",
                         PublishMethod = PublishMethod.Scheduled,
-                        PublishScheduled = "2051-06-30",
+                        PublishScheduled = new DateOnly(2051, 6, 30),
                     }
                 )
             );
@@ -1306,7 +1258,7 @@ public class ReleaseApprovalServiceTests
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
                     InternalReleaseNote = "Test note",
                     PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2051-06-30",
+                    PublishScheduled = new DateOnly(2051, 6, 30),
                 }
             );
 
@@ -1382,7 +1334,7 @@ public class ReleaseApprovalServiceTests
                 new ReleaseStatusCreateRequest
                 {
                     PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2051-06-30",
+                    PublishScheduled = new DateOnly(2051, 6, 30),
                     ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                     InternalReleaseNote = "Test internal note",
                 }
@@ -1486,7 +1438,7 @@ public class ReleaseApprovalServiceTests
                 new ReleaseStatusCreateRequest
                 {
                     PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2051-06-30",
+                    PublishScheduled = new DateOnly(2051, 6, 30),
                     ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                     InternalReleaseNote = "Test internal note",
                 }
@@ -1574,7 +1526,7 @@ public class ReleaseApprovalServiceTests
                 new ReleaseStatusCreateRequest
                 {
                     PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2051-06-30",
+                    PublishScheduled = new DateOnly(2051, 6, 30),
                     ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                     InternalReleaseNote = "Test internal note",
                 }
@@ -1678,7 +1630,7 @@ public class ReleaseApprovalServiceTests
                 new ReleaseStatusCreateRequest
                 {
                     PublishMethod = PublishMethod.Scheduled,
-                    PublishScheduled = "2051-06-30",
+                    PublishScheduled = new DateOnly(2051, 6, 30),
                     ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
                     InternalReleaseNote = "Test internal note",
                 }
@@ -1915,7 +1867,7 @@ public class ReleaseApprovalServiceTests
 
         return new ReleaseApprovalService(
             contentDbContext,
-            timeProvider ?? new FakeTimeProvider(DateTime.UtcNow),
+            timeProvider ?? new FakeTimeProvider(DateTimeOffset.UtcNow),
             userService.Object,
             publishingService ?? Mock.Of<IPublishingService>(MockBehavior.Strict),
             releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(MockBehavior.Strict),

@@ -41,6 +41,7 @@ Add data guidance to archive-publication subject
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance    %{WAIT_SMALL}
 
+    user adds main data guidance content
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME_ARCHIVE}
     user enters text into data guidance data file content editor
@@ -197,6 +198,7 @@ Import superseding-publication subject to release
 Add data guidance to superseding-publication subject
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance    %{WAIT_SMALL}
+    user adds main data guidance content
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME_SUPERSEDE}

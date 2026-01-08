@@ -53,10 +53,7 @@ export type FilterFormSubmitHandler = (
   values: Omit<FiltersFormValues, 'filterHierachies'>,
 ) => void;
 
-const TableQueryErrorCodes = [
-  'QueryExceedsMaxAllowableTableSize',
-  'RequestCancelled',
-] as const;
+const TableQueryErrorCodes = ['RequestCancelled'] as const;
 
 export type TableQueryErrorCode = (typeof TableQueryErrorCodes)[number];
 

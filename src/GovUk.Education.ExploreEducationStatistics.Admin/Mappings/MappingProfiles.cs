@@ -60,9 +60,7 @@ public class MappingProfiles : CommonMappingProfile
                 dest => dest.PublishScheduled,
                 m =>
                     m.MapFrom(rv =>
-                        rv.PublishScheduled.HasValue
-                            ? rv.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?)null
+                        rv.PublishScheduled.HasValue ? rv.PublishScheduled.Value.ToUkDateOnly() : (DateOnly?)null
                     )
             )
             .ForMember(
@@ -82,9 +80,7 @@ public class MappingProfiles : CommonMappingProfile
                 dest => dest.PublishScheduled,
                 m =>
                     m.MapFrom(model =>
-                        model.PublishScheduled.HasValue
-                            ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?)null
+                        model.PublishScheduled.HasValue ? model.PublishScheduled.Value.ToUkDateOnly() : (DateOnly?)null
                     )
             );
 
@@ -107,9 +103,9 @@ public class MappingProfiles : CommonMappingProfile
 
         CreateContentBlockMap();
         CreateMap<DataBlockCreateRequest, DataBlock>()
-            .ForMember(dest => dest.Query, m => m.MapFrom(c => c.Query.AsFullTableQuery()));
+            .ForMember(dest => dest.Query, m => m.MapFrom(c => c.Query.AsFullTableQuery(default)));
         CreateMap<DataBlockUpdateRequest, DataBlock>()
-            .ForMember(dest => dest.Query, m => m.MapFrom(c => c.Query.AsFullTableQuery()));
+            .ForMember(dest => dest.Query, m => m.MapFrom(c => c.Query.AsFullTableQuery(default)));
 
         CreateMap<KeyStatisticDataBlock, KeyStatisticDataBlockViewModel>();
         CreateMap<KeyStatisticText, KeyStatisticTextViewModel>();
@@ -153,9 +149,7 @@ public class MappingProfiles : CommonMappingProfile
                 model => model.PublishScheduled,
                 m =>
                     m.MapFrom(rv =>
-                        rv.PublishScheduled.HasValue
-                            ? rv.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?)null
+                        rv.PublishScheduled.HasValue ? rv.PublishScheduled.Value.ToUkDateOnly() : (DateOnly?)null
                     )
             )
             .ForMember(
@@ -248,14 +242,19 @@ public class MappingProfiles : CommonMappingProfile
 
     private static string GetDataSetUploadStatus(DataSetScreenerResponse screenerResult)
     {
+        if (screenerResult is null)
+        {
+            return nameof(DataSetUploadStatus.SCREENER_ERROR);
+        }
+
         if (screenerResult.Passed && screenerResult.TestResults.Any(test => test.Result == TestResult.WARNING))
         {
-            return DataSetUploadStatus.PENDING_REVIEW.ToString();
+            return nameof(DataSetUploadStatus.PENDING_REVIEW);
         }
 
         return !screenerResult.Passed
-            ? DataSetUploadStatus.FAILED_SCREENING.ToString()
-            : DataSetUploadStatus.PENDING_IMPORT.ToString();
+            ? nameof(DataSetUploadStatus.FAILED_SCREENING)
+            : nameof(DataSetUploadStatus.PENDING_IMPORT);
     }
 
     private void CreateContentBlockMap()

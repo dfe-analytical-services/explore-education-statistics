@@ -8,8 +8,6 @@ import {
 } from '@admin/types/ckeditor';
 
 export const toolbarConfigFull: ReadonlyArray<ToolbarOption | ToolbarGroup> = [
-  'accessibilityHelp',
-  '|',
   'heading',
   '|',
   'bold',
@@ -56,8 +54,6 @@ export const methodologyToolbarConfigFull: ReadonlyArray<
 export const educationInNumbersToolbarConfig: ReadonlyArray<
   ToolbarOption | ToolbarGroup
 > = [
-  'accessibilityHelp',
-  '|',
   'heading',
   '|',
   'bold',
@@ -76,8 +72,6 @@ export const educationInNumbersToolbarConfig: ReadonlyArray<
 ];
 
 export const toolbarConfigSimple: ReadonlyArray<ToolbarOption> = [
-  'accessibilityHelp',
-  '|',
   'bold',
   'link',
   '|',
@@ -88,11 +82,7 @@ export const toolbarConfigSimple: ReadonlyArray<ToolbarOption> = [
   'undo',
 ];
 
-export const toolbarConfigLinkOnly: ReadonlyArray<ToolbarOption> = [
-  'accessibilityHelp',
-  '|',
-  'link',
-];
+export const toolbarConfigLinkOnly: ReadonlyArray<ToolbarOption> = ['link'];
 
 export const corePlugins: ReadonlySet<PluginName> = new Set<PluginName>([
   'Essentials',

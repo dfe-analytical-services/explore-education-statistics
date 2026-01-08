@@ -1,9 +1,9 @@
+import { FileRepository } from 'ckeditor5';
 import { Editor, PluginName, PluginClass } from '@admin/types/ckeditor';
 import CustomUploadAdapter, {
   ImageUploadCancelHandler,
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
-import { FileRepository } from '@ckeditor/ckeditor5-upload';
 
 export default function customUploadAdapterPlugin(
   onUpload: ImageUploadHandler,

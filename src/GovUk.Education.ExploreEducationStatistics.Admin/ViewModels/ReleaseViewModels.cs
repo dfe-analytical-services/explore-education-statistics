@@ -52,12 +52,11 @@ public record ReleaseVersionViewModel
 
     public PartialDate? NextReleaseDate { get; set; }
 
-    [JsonConverter(typeof(DateTimeToDateJsonConverter))]
-    public DateTime? PublishScheduled { get; set; }
+    public DateOnly? PublishScheduled { get; set; }
 
     public List<OrganisationViewModel> PublishingOrganisations { get; set; } = [];
 
-    public DateTime? Published { get; set; }
+    public DateTimeOffset? Published { get; set; }
 
     public bool Live => Published != null;
 
@@ -126,12 +125,11 @@ public record ReleaseVersionSummaryViewModel
     [JsonConverter(typeof(StringEnumConverter))]
     public ReleaseApprovalStatus ApprovalStatus { get; init; }
 
-    public DateTime? Published { get; init; }
+    public DateTimeOffset? Published { get; init; }
 
     public bool Live => Published != null;
 
-    [JsonConverter(typeof(DateTimeToDateJsonConverter))]
-    public DateTime? PublishScheduled { get; init; }
+    public DateOnly? PublishScheduled { get; init; }
 
     public PartialDate? NextReleaseDate { get; init; }
 

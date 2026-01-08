@@ -43,6 +43,7 @@ Add data guidance to subjects
 
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
+    user adds main data guidance content
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME_1}
@@ -232,8 +233,8 @@ User creates another preview token through 'Generate preview token' modal window
 User verifies created preview token details for custom dates
     user checks page contains    Reference: ${PREVIEW_TOKEN_NAME}
 
-    ${date_tomorrow}=    get local browser date and time    offset_days=1    format_string=%d %B %Y
-    ${date_after_tomorrow}=    get local browser date and time    offset_days=2    format_string=%d %B %Y
+    ${date_tomorrow}=    get local browser date and time    offset_days=1    format_string=%-d %B %Y
+    ${date_after_tomorrow}=    get local browser date and time    offset_days=2    format_string=%-d %B %Y
     user checks page contains
     ...    The token is active from: ${date_tomorrow} (UK time) and expires: ${date_after_tomorrow} (UK time)
 

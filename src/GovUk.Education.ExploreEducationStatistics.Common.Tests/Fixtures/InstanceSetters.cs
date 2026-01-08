@@ -70,14 +70,17 @@ public class InstanceSetters<T>
 
     public InstanceSetters<T> SetDefault(Expression<Func<T, string?>> property)
     {
+        return Set(property, (faker, _, context) => GenerateDefaultString(property, context, faker));
+    }
+
+    /// <summary>
+    /// The same behaviour as SetDefault, but with the addition of a unique suffix.
+    /// </summary>
+    public InstanceSetters<T> SetDefaultUnique(Expression<Func<T, string?>> property)
+    {
         return Set(
             property,
-            (faker, _, context) =>
-            {
-                var index = GetDisplayIndex(context, faker);
-
-                return $"{typeof(T).Name} {index} :: {PropertyName.For(property)}";
-            }
+            (faker, _, context) => $"{GenerateDefaultString(property, context, faker)} :: {Guid.NewGuid()}"
         );
     }
 
@@ -120,6 +123,13 @@ public class InstanceSetters<T>
 
     public int GetDisplayIndex(SetterContext context, Faker faker) =>
         context.FixtureTypeIndex > 0 ? context.FixtureTypeIndex : faker.IndexFaker;
+
+    private string GenerateDefaultString(Expression<Func<T, string?>> property, SetterContext context, Faker faker)
+    {
+        var index = GetDisplayIndex(context, faker);
+
+        return $"{typeof(T).Name} {index} :: {PropertyName.For(property)}";
+    }
 }
 
 /// <summary>

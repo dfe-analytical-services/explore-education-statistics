@@ -91,7 +91,7 @@ public class AuthorizationHandlerServiceTests
 
         var preReleaseServiceMock = new Mock<IPreReleaseService>();
         preReleaseServiceMock
-            .Setup(rvr => rvr.GetPreReleaseWindowStatus(It.IsAny<ReleaseVersion>(), It.IsAny<DateTime>()))
+            .Setup(rvr => rvr.GetPreReleaseWindowStatus(It.IsAny<ReleaseVersion>(), It.IsAny<DateTimeOffset>()))
             .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.NoneSet });
 
         return new AuthorizationHandlerService(

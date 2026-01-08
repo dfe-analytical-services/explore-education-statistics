@@ -91,7 +91,7 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
     return {
       props: {
         publicationSlug: publicationSlug as string,
-        publicationId: publication.id,
+        publicationId: publication.publicationId,
         publicationTitle: publication.title,
         token,
       },

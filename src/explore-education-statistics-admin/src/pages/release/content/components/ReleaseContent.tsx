@@ -251,10 +251,21 @@ const ReleaseContent = ({
                     <ReleaseEditableBlock
                       allowComments
                       block={block}
+                      editButtonLabel={
+                        <>
+                          Edit<VisuallyHidden> summary</VisuallyHidden> block
+                        </>
+                      }
                       publicationId={release.publication.id}
                       releaseVersionId={release.id}
+                      removeButtonLabel={
+                        <>
+                          Remove<VisuallyHidden> summary</VisuallyHidden> block
+                        </>
+                      }
                       sectionId={release.summarySection.id}
                       sectionKey="summarySection"
+                      label="Summary block"
                       onAfterDeleteBlock={onAfterDeleteSummaryBlock}
                     />
                   )}
@@ -327,7 +338,7 @@ const ReleaseContent = ({
               </ul>
             </nav>
 
-            <h2 className="govuk-heading-s">Related information</h2>
+            <h3 className="govuk-heading-s">Related information</h3>
             <ul className="govuk-list" data-testid="related-information">
               <li>
                 <Link
@@ -377,9 +388,9 @@ const ReleaseContent = ({
 
             {!!releaseSeries.length && (
               <>
-                <h2 className="govuk-heading-s" id="past-releases">
+                <h3 className="govuk-heading-s" id="past-releases">
                   Releases in this series
-                </h2>
+                </h3>
 
                 <Details
                   className="govuk-!-margin-bottom-4"
@@ -423,12 +434,12 @@ const ReleaseContent = ({
 
             {allMethodologies.length > 0 && (
               <>
-                <h2
+                <h3
                   className="govuk-heading-s govuk-!-padding-top-0"
                   id="methodologies"
                 >
                   Methodologies
-                </h2>
+                </h3>
                 <ul className="govuk-list" data-testid="methodologies-list">
                   {allMethodologies.map(methodology => (
                     <li key={methodology.key}>
@@ -463,6 +474,7 @@ const ReleaseContent = ({
         <ReleaseDataAndFiles
           downloadFiles={release.downloadFiles}
           hasDataGuidance={release.hasDataGuidance}
+          headingClassName="govuk-heading-l"
           renderAllFilesLink={
             <ButtonText
               preventDoubleClick
@@ -525,6 +537,7 @@ const ReleaseContent = ({
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     sectionId={release.relatedDashboardsSection!.id}
                     sectionKey="relatedDashboardsSection"
+                    label="Related Dashboards block"
                   />
                 )}
               />

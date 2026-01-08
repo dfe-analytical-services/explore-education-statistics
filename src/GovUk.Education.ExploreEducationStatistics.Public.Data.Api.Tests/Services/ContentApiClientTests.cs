@@ -103,7 +103,7 @@ public abstract class ContentApiClientTests
                 Title = "Test title",
                 Slug = "test-slug",
                 Summary = "Test summary",
-                Published = DateTime.UtcNow,
+                Published = DateTimeOffset.UtcNow,
             };
 
             _mockHttp

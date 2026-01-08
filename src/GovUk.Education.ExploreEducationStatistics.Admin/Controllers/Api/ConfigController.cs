@@ -2,7 +2,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Options;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -14,8 +13,7 @@ public class ConfigController(
     IOptions<OpenIdConnectSpaClientOptions> oidcOptions,
     IOptions<AppInsightsOptions> appInsightsOptions,
     IOptions<PublicAppOptions> publicAppOptions,
-    IOptions<PublicDataApiOptions> publicDataApiOptions,
-    IOptions<FeatureFlagsOptions> featureFlags
+    IOptions<PublicDataApiOptions> publicDataApiOptions
 ) : ControllerBase
 {
     [AllowAnonymous]
@@ -30,7 +28,6 @@ public class ConfigController(
             PublicApiDocsUrl = publicDataApiOptions.Value.DocsUrl,
             PermittedEmbedUrlDomains = EmbedBlockService.PermittedDomains,
             Oidc = oidcOptions.Value,
-            EnableReplacementOfPublicApiDataSets = featureFlags.Value.EnableReplacementOfPublicApiDataSets,
         };
     }
 }

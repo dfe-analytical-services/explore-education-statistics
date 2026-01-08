@@ -35,13 +35,13 @@ public static class ReleaseGeneratorExtensions
                                     p => p.Published,
                                     (f, releaseVersion) =>
                                         releaseVersion.Version == 0
-                                            ? f.Date.Past()
-                                            : f.Date.Between(previousVersion!.Published!.Value, DateTime.UtcNow)
+                                            ? f.Date.PastOffset()
+                                            : f.Date.BetweenOffset(
+                                                previousVersion!.Published!.Value,
+                                                DateTimeOffset.UtcNow
+                                            )
                                 )
-                                .Set(
-                                    rv => rv.PublishScheduled,
-                                    (_, rv) => rv.Published!.Value.AsStartOfDayUtcForTimeZone()
-                                )
+                                .Set(rv => rv.PublishScheduled, (_, rv) => rv.Published!.Value.GetUkStartOfDayUtc())
                     )
                     .ForRange(1.., s => s.SetPreviousVersion(previousVersion))
                     .FinishWith(releaseVersion => previousVersion = releaseVersion)

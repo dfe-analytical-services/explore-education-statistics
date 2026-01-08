@@ -272,6 +272,7 @@ describe('ReleaseStatusChecklist', () => {
         { code: 'NoFeaturedTables' },
         { code: 'NoDataFiles' },
         { code: 'NoPublicPreReleaseAccessList' },
+        { code: 'UnresolvedComments' },
       ],
       errors: [],
     };
@@ -298,7 +299,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.getByRole('heading', { name: 'Warnings' }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText('8 things')).toBeInTheDocument();
+    expect(screen.getByText('9 things')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
