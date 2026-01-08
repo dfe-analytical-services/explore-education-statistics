@@ -55,6 +55,8 @@ describe('ReleaseUserTable', () => {
       />,
     );
 
+    expect(screen.queryByRole('caption')).not.toBeInTheDocument();
+
     const rows = screen.getAllByRole('row');
     expect(rows.length).toBe(6);
 
@@ -213,5 +215,43 @@ describe('ReleaseUserTable', () => {
       expect(onUserInvitesRemove).toHaveBeenCalledWith('user4@test.com');
       expect(onUserRemove).not.toBeCalled();
     });
+  });
+
+  test('renders captions correctly for contributors', async () => {
+    const onUserRemove = jest.fn();
+    const onUserInvitesRemove = jest.fn();
+
+    render(
+      <ReleaseUserTable
+        users={testReleaseContributors}
+        invites={testInvites}
+        onUserRemove={onUserRemove}
+        onUserInvitesRemove={onUserInvitesRemove}
+        data-testid="releaseContributors"
+      />,
+    );
+    const caption = screen.getByRole('caption');
+    expect(caption).toHaveTextContent(
+      'Table showing the contributors or pending contributors invites for this release.',
+    );
+  });
+
+  test('renders captions correctly for approvers', async () => {
+    const onUserRemove = jest.fn();
+    const onUserInvitesRemove = jest.fn();
+
+    render(
+      <ReleaseUserTable
+        users={testReleaseContributors}
+        invites={testInvites}
+        onUserRemove={onUserRemove}
+        onUserInvitesRemove={onUserInvitesRemove}
+        data-testid="releaseApprovers"
+      />,
+    );
+    const caption = screen.getByRole('caption');
+    expect(caption).toHaveTextContent(
+      'Table showing the approvers or pending approvers invites for this release.',
+    );
   });
 });

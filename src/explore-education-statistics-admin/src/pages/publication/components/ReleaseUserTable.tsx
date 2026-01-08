@@ -24,8 +24,21 @@ const ReleaseUserTable = ({
   onUserRemove,
   onUserInvitesRemove,
 }: Props) => {
+  const displaysApproversOrContributors =
+    testId === 'releaseApprovers' || testId === 'releaseContributors';
+  const caption =
+    displaysApproversOrContributors &&
+    `Table showing the${
+      testId === 'releaseApprovers'
+        ? ' approvers or pending approvers '
+        : ' contributors or pending contributors '
+    }invites for this release.`;
+
   return (
     <table data-testid={testId}>
+      {displaysApproversOrContributors && (
+        <caption className="govuk-visually-hidden">{caption}</caption>
+      )}
       <thead>
         <tr>
           <th scope="col">Name</th>

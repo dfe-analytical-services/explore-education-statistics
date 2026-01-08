@@ -112,6 +112,12 @@ describe('ReleaseSeriesTable', () => {
           </TestConfigContextProvider>
         </Router>,
       );
+
+      const caption = screen.getByRole('caption');
+      expect(caption).toHaveTextContent(
+        'Table showing the ordered releases for this publication.',
+      );
+
       await user.click(
         screen.getByRole('button', { name: 'Edit Legacy link 1' }),
       );
