@@ -240,6 +240,7 @@ const useCKEditorConfig = ({
     setSelectedComment,
     toolbar,
     unresolveComment,
+    label,
   ]);
 
   return config;
