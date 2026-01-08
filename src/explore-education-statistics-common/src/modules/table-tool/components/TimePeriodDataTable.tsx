@@ -23,6 +23,7 @@ interface Props {
   source?: string;
   tableHeadersConfig: TableHeadersConfig;
   tableHeadersForm?: ReactNode;
+  isAdmin?: boolean;
   onError?: (message: string) => void;
 }
 
@@ -39,6 +40,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       source,
       tableHeadersConfig,
       tableHeadersForm,
+      isAdmin = false,
       onError,
     }: Props,
     dataTableRef,
@@ -78,8 +80,9 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
             <WarningMessage testId="missing-data-warning">
               The selected options return too many rows to be displayed here and
               so the table shows only a subset of the data provided by your
-              selections. To get the full set of relevant data, use the download
-              options below to download in ODT or CSV format.
+              selections.{' '}
+              {!isAdmin &&
+                'To get the full set of relevant data, use the download options below to download in ODT or CSV format.'}
             </WarningMessage>
           )}
           {dataBlockId && query && (
