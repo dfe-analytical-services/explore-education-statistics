@@ -1,6 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.ViewModels;
 
 /// <summary>
 /// A filterable characteristic (excluding geography or time) of a data set.

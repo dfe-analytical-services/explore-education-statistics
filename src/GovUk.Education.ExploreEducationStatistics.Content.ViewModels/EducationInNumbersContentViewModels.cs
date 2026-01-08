@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -99,6 +100,7 @@ public class EducationInNumbersContentViewModels
             return tile switch
             {
                 EinFreeTextStatTile statTile => EinFreeTextStatTileViewModel.FromModel(statTile),
+                EinApiQueryStatTile statTile => EinApiQueryStatTileViewModel.FromModel(statTile),
                 _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found"),
             };
         }
@@ -124,6 +126,37 @@ public class EducationInNumbersContentViewModels
                 Trend = statTile.Trend,
                 LinkUrl = statTile.LinkUrl,
                 LinkText = statTile.LinkText,
+            };
+        }
+    }
+
+    // @MarkFix just copied from Admin, so probably needs loads of changes
+    public class EinApiQueryStatTileViewModel : EinTileViewModel
+    {
+        public string Title { get; init; } = string.Empty;
+        public Guid? DataSetId { get; init; }
+        public string Version { get; init; } = string.Empty;
+        public bool IsLatestVersion { get; init; }
+        public string Query { get; init; } = string.Empty;
+        public IndicatorUnit? IndicatorUnit { get; init; } // @MarkFix needs a converter?
+        public int? DecimalPlaces { get; set; }
+        public string QueryResult { get; set; } = string.Empty;
+
+        public static EinApiQueryStatTileViewModel FromModel(EinApiQueryStatTile statTile)
+        {
+            return new EinApiQueryStatTileViewModel
+            {
+                Id = statTile.Id,
+                Order = statTile.Order,
+                Type = EinTileType.ApiQueryStatTile,
+                Title = statTile.Title,
+                DataSetId = statTile.DataSetId,
+                Version = statTile.Version,
+                IsLatestVersion = statTile.IsLatestVersion,
+                Query = statTile.Query,
+                IndicatorUnit = statTile.IndicatorUnit,
+                DecimalPlaces = statTile.DecimalPlaces,
+                QueryResult = statTile.QueryResult,
             };
         }
     }

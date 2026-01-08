@@ -1,6 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.ViewModels;
 
 /// <summary>
 /// A filterable option that can be used to filter a data set.

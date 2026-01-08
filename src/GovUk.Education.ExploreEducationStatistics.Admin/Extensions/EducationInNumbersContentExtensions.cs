@@ -56,6 +56,21 @@ public static class EducationInNumbersContentExtensions
                 LinkUrl = statTile.LinkUrl,
                 LinkText = statTile.LinkText,
             },
+            EinApiQueryStatTile statTile => new EinApiQueryStatTile
+            {
+                Id = Guid.NewGuid(),
+                Order = statTile.Order,
+                EinParentBlockId = groupBlockId,
+                Title = statTile.Title,
+                DataSetId = statTile.DataSetId,
+                Version = statTile.Version,
+                IsLatestVersion = statTile.IsLatestVersion,
+                Query = statTile.Query,
+                IndicatorUnit = statTile.IndicatorUnit,
+                DecimalPlaces = statTile.DecimalPlaces,
+                QueryResult = statTile.QueryResult,
+                MetaResult = statTile.MetaResult,
+            },
             _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found"),
         };
     }

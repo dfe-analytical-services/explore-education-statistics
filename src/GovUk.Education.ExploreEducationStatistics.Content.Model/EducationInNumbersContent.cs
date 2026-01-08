@@ -93,4 +93,4 @@ public class EinApiQueryStatTile : EinTile
 
 // @MarkFix filters results by NAT and latest TimeIdentifier/TimePeriod and then should have one result
 // @MarkFix link to release that the api data set is from (like free stat text tile)
-// @MarkFix on a new release being published, check for api data sets - if it is in an EinTile, update isLatestVersion
+// @MarkFix on a new release being published, check for api data sets - if it is in an EinTile, update isLatestVersion AND any previous version of the tile in case of amendments!

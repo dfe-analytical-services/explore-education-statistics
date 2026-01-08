@@ -1,5 +1,4 @@
 #nullable enable
-using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -475,6 +474,9 @@ public class EducationInNumbersContentService(
                 tileToUpdate.Query = request.Query;
                 tileToUpdate.QueryResult = queryResults.Results.ToJson();
                 tileToUpdate.IsLatestVersion = isLatestVersion;
+                //tileToUpdate.MetaResult = ; // @MarkFix from /meta endpoint
+                //tileToUpdate.DecimalPlaces = ;
+                //tileToUpdate.IndicatorUnit = ;
 
                 contentDbContext.EinTiles.Update(tileToUpdate);
                 await contentDbContext.SaveChangesAsync();

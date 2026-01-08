@@ -1,3 +1,5 @@
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.ViewModels;
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
 /// <summary>
