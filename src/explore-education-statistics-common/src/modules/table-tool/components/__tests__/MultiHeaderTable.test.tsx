@@ -57,7 +57,7 @@ describe('MultiHeaderTable', () => {
     const caption = container.querySelectorAll('caption');
     expect(caption).toHaveLength(1);
     expect(caption[0]).toHaveTextContent(
-      'Multi header table the following data: Test table',
+      'Multi header table with the following data: Test table',
     );
 
     // 3x2 table

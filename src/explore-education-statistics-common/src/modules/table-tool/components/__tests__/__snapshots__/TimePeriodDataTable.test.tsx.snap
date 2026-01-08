@@ -9,7 +9,7 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     Authorised absence rate for 'Absence in prus' in Barnet, Barnsley and England for 2014/15
   </caption>
   <thead
@@ -82,7 +82,7 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     Authorised absence rate for 'Absence in prus' in Barnet, Barnsley and England for 2014/15
   </caption>
   <thead
@@ -164,7 +164,7 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     Authorised absence rate for 'Absence in prus' in Barnet, Barnsley and England for 2014/15
   </caption>
   <thead
@@ -243,7 +243,7 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     Authorised absence rate for 'Absence in prus' in Barnet, Barnsley and England for 2014/15
   </caption>
   <thead
@@ -330,7 +330,7 @@ exports[`TimePeriodDataTable renders table with completely empty columns removed
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     'Absence by characteristic' for First language Known or believed to be other than English, First language Unclassified and Special in Coventry and Croydon between 2013/14 and 2015/16
   </caption>
   <thead
@@ -562,7 +562,7 @@ exports[`TimePeriodDataTable renders table with completely empty rows removed 1`
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     'Absence by characteristic' for First language Known or believed to be other than English, First language Unclassified and Special in Coventry and Croydon between 2013/14 and 2015/16
   </caption>
   <thead
@@ -825,7 +825,7 @@ exports[`TimePeriodDataTable renders table with location hierarchies 1`] = `
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     Authorised absence rate for 'Absence in prus' in Barnet, Barnsley and England for 2014/15
   </caption>
   <thead
@@ -920,7 +920,7 @@ exports[`TimePeriodDataTable renders table with no filters 1`] = `
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     'Absence in prus' in England between 2014/15 and 2016/17
   </caption>
   <thead
@@ -1051,7 +1051,7 @@ exports[`TimePeriodDataTable renders table with only one of each option 1`] = `
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     Authorised absence rate for 'Absence in prus' for Ethnicity Major Asian Total in England for 2014/15
   </caption>
   <thead
@@ -1109,7 +1109,7 @@ exports[`TimePeriodDataTable renders table with only one of each option and no f
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     Authorised absence rate for 'Absence in prus' in England for 2014/15
   </caption>
   <thead
@@ -1158,7 +1158,7 @@ exports[`TimePeriodDataTable renders table with only one of each option and no f
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     Authorised absence rate for 'Absence in prus' in England for 2014/15
   </caption>
   <thead
@@ -1207,7 +1207,7 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     'Absence by characteristic' for Ethnicity Major Asian Total, Ethnicity Major Black Total, State-funded primary and State-funded secondary in Barnet and Barnsley between 2013/14 and 2014/15
   </caption>
   <thead
@@ -1575,7 +1575,7 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     Authorised absence rate for 'Absence by characteristic' for Ethnicity Major Asian Total, Ethnicity Major Black Total, State-funded primary and State-funded secondary in Barnet and Barnsley between 2013/14 and 2014/15
   </caption>
   <thead
@@ -1791,7 +1791,7 @@ exports[`TimePeriodDataTable renders table without time period when there is onl
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     Authorised absence rate for 'Absence by characteristic' for Ethnicity Major Asian Total, Ethnicity Major Black Total, State-funded primary and State-funded secondary in Barnet and Barnsley for 2014/15
   </caption>
   <thead

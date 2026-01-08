@@ -9,7 +9,7 @@ exports[`TableToolFinalStep renders the final step successfully 1`] = `
   <caption
     class="govuk-visually-hidden"
   >
-    Multi header table the following data: 
+    Multi header table with the following data: 
     'dates' for 02/04/2021 and 02/06/2020 in England between 2020 Week 23 and 2020 Week 26
   </caption>
   <thead

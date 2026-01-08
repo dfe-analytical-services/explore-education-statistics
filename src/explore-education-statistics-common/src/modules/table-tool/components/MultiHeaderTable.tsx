@@ -21,7 +21,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
       >
         {captionTitle && (
           <caption className="govuk-visually-hidden">
-            Multi header table the following data: {captionTitle}
+            Multi header table with the following data: {captionTitle}
           </caption>
         )}
         <thead className={styles.tableHead}>
