@@ -36,11 +36,11 @@ export default function useReleasePublishingStatus({
     text: '',
   });
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   const cancelTimer = useCallback(() => {
     if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current); // Use clearTimeout for setTimeout
+      clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
   }, []);

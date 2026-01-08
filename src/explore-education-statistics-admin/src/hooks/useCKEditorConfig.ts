@@ -21,7 +21,7 @@ import {
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
 import customUploadAdapterPlugin from '@admin/utils/ckeditor/customUploadAdapterPlugin';
-import { MutableRefObject, useMemo } from 'react';
+import { RefObject, useMemo } from 'react';
 
 const useCKEditorConfig = ({
   allowComments,
@@ -40,7 +40,7 @@ const useCKEditorConfig = ({
 }: {
   allowComments?: boolean;
   allowedHeadings?: string[];
-  editorInstance?: MutableRefObject<EditorType | undefined>;
+  editorInstance?: RefObject<EditorType | null>;
   glossaryItems?: {
     title: string;
     slug: string;

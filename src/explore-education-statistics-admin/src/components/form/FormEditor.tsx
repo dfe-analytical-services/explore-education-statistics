@@ -30,8 +30,8 @@ import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
 import Editor from 'explore-education-statistics-ckeditor';
 import React, {
-  MutableRefObject,
   ReactNode,
+  RefObject,
   useCallback,
   useEffect,
   useMemo,
@@ -90,11 +90,11 @@ const FormEditor = ({
   onImageUpload,
   onImageUploadCancel,
 }: FormEditorProps) => {
-  const editorInstance = useRef<EditorType>(undefined);
-  const commentsPlugin = useRef<CommentsPlugin>(undefined);
-  const featuredTablesPlugin = useRef<FeaturedTablesPlugin>(undefined);
-  const glossaryPlugin = useRef<GlossaryPlugin>(undefined);
-  const editorRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
+  const editorInstance = useRef<EditorType>(null);
+  const commentsPlugin = useRef<CommentsPlugin>(null);
+  const featuredTablesPlugin = useRef<FeaturedTablesPlugin>(null);
+  const glossaryPlugin = useRef<GlossaryPlugin>(null);
+  const editorRef: RefObject<HTMLDivElement | null> = useRef(null);
   const { currentInteraction, selectedComment, setMarkersOrder } =
     useCommentsContext();
   const [showFeaturedTablesModal, toggleFeaturedTablesModal] = useToggle(false);

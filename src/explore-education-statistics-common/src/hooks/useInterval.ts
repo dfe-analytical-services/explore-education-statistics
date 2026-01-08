@@ -13,7 +13,7 @@ export default function useInterval(
   const savedCallback = useRef<() => void>(callback);
   savedCallback.current = callback;
 
-  const interval = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const interval = useRef<ReturnType<typeof setTimeout>>(null);
 
   const cancelInterval = useCallback(() => {
     if (interval.current) {
