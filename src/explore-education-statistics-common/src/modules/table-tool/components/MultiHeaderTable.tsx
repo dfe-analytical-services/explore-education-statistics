@@ -6,11 +6,12 @@ import styles from './MultiHeaderTable.module.scss';
 export interface MultiHeaderTableProps {
   ariaLabelledBy?: string;
   className?: string;
+  captionTitle?: string;
   tableJson: TableJson;
 }
 
 const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
-  ({ ariaLabelledBy, className, tableJson }, ref) => {
+  ({ ariaLabelledBy, className, tableJson, captionTitle }, ref) => {
     return (
       <table
         data-testid={ariaLabelledBy && `${ariaLabelledBy}-table`}
@@ -18,6 +19,11 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
         className={classNames('govuk-table', styles.table, className)}
         ref={ref}
       >
+        {captionTitle && (
+          <caption className="govuk-visually-hidden">
+            Multi header table the following data: {captionTitle}
+          </caption>
+        )}
         <thead className={styles.tableHead}>
           {tableJson.thead.map((headerRow, rowIndex) => (
             // eslint-disable-next-line react/no-array-index-key

@@ -6,6 +6,12 @@ exports[`TableToolPage renders the page correctly with pre-built table when a fa
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    'data 1' for MBA and PGCE in Great Britain for 2018-19
+  </caption>
   <thead
     class="tableHead"
   >

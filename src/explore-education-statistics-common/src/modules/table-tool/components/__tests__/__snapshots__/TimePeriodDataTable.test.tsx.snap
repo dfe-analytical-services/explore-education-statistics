@@ -6,6 +6,12 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    Authorised absence rate for 'Absence in prus' in Barnet, Barnsley and England for 2014/15
+  </caption>
   <thead
     class="tableHead"
   >
@@ -73,6 +79,12 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    Authorised absence rate for 'Absence in prus' in Barnet, Barnsley and England for 2014/15
+  </caption>
   <thead
     class="tableHead"
   >
@@ -149,6 +161,12 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    Authorised absence rate for 'Absence in prus' in Barnet, Barnsley and England for 2014/15
+  </caption>
   <thead
     class="tableHead"
   >
@@ -222,6 +240,12 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    Authorised absence rate for 'Absence in prus' in Barnet, Barnsley and England for 2014/15
+  </caption>
   <thead
     class="tableHead"
   >
@@ -303,6 +327,12 @@ exports[`TimePeriodDataTable renders table with completely empty columns removed
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    'Absence by characteristic' for First language Known or believed to be other than English, First language Unclassified and Special in Coventry and Croydon between 2013/14 and 2015/16
+  </caption>
   <thead
     class="tableHead"
   >
@@ -529,6 +559,12 @@ exports[`TimePeriodDataTable renders table with completely empty rows removed 1`
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    'Absence by characteristic' for First language Known or believed to be other than English, First language Unclassified and Special in Coventry and Croydon between 2013/14 and 2015/16
+  </caption>
   <thead
     class="tableHead"
   >
@@ -786,6 +822,12 @@ exports[`TimePeriodDataTable renders table with location hierarchies 1`] = `
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    Authorised absence rate for 'Absence in prus' in Barnet, Barnsley and England for 2014/15
+  </caption>
   <thead
     class="tableHead"
   >
@@ -875,6 +917,12 @@ exports[`TimePeriodDataTable renders table with no filters 1`] = `
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    'Absence in prus' in England between 2014/15 and 2016/17
+  </caption>
   <thead
     class="tableHead"
   >
@@ -1000,6 +1048,12 @@ exports[`TimePeriodDataTable renders table with only one of each option 1`] = `
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    Authorised absence rate for 'Absence in prus' for Ethnicity Major Asian Total in England for 2014/15
+  </caption>
   <thead
     class="tableHead"
   >
@@ -1052,6 +1106,12 @@ exports[`TimePeriodDataTable renders table with only one of each option and no f
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    Authorised absence rate for 'Absence in prus' in England for 2014/15
+  </caption>
   <thead
     class="tableHead"
   >
@@ -1095,6 +1155,12 @@ exports[`TimePeriodDataTable renders table with only one of each option and no f
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    Authorised absence rate for 'Absence in prus' in England for 2014/15
+  </caption>
   <thead
     class="tableHead"
   >
@@ -1138,6 +1204,12 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    'Absence by characteristic' for Ethnicity Major Asian Total, Ethnicity Major Black Total, State-funded primary and State-funded secondary in Barnet and Barnsley between 2013/14 and 2014/15
+  </caption>
   <thead
     class="tableHead"
   >
@@ -1500,6 +1572,12 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    Authorised absence rate for 'Absence by characteristic' for Ethnicity Major Asian Total, Ethnicity Major Black Total, State-funded primary and State-funded secondary in Barnet and Barnsley between 2013/14 and 2014/15
+  </caption>
   <thead
     class="tableHead"
   >
@@ -1710,6 +1788,12 @@ exports[`TimePeriodDataTable renders table without time period when there is onl
   class="govuk-table table"
   data-testid="dataTableCaption-table"
 >
+  <caption
+    class="govuk-visually-hidden"
+  >
+    Multi header table the following data: 
+    Authorised absence rate for 'Absence by characteristic' for Ethnicity Major Asian Total, Ethnicity Major Black Total, State-funded primary and State-funded secondary in Barnet and Barnsley for 2014/15
+  </caption>
   <thead
     class="tableHead"
   >

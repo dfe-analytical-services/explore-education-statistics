@@ -234,6 +234,9 @@ exports[`MultiHeaderTable can render a complicated table with nesting 2`] = `
 
 exports[`MultiHeaderTable can render basic table 1`] = `
 <table class="govuk-table table">
+  <caption class="govuk-visually-hidden">
+    Multi header table the following data: Test table
+  </caption>
   <thead class="tableHead">
     <tr>
       <td colspan="1"
@@ -276,6 +279,9 @@ exports[`MultiHeaderTable can render basic table 1`] = `
 
 exports[`MultiHeaderTable can render basic table 2`] = `
 <table class="govuk-table table">
+  <caption class="govuk-visually-hidden">
+    Multi header table the following data: Test table
+  </caption>
   <thead class="tableHead">
     <tr>
       <td colspan="1"
