@@ -313,7 +313,7 @@ public class ReleaseServiceTests
 
             Assert.Equal(Release1V1.Id, viewModel.Id);
             Assert.Equal(Release1V1.Release.Title, viewModel.Title);
-            Assert.Equal(Release1V1.Published, viewModel.Published);
+            Assert.Equal(Release1V1.PublishedDisplayDate, viewModel.Published);
             Assert.Equal(Release1.Id, viewModel.ReleaseId);
 
             Assert.Equal(2, viewModel.KeyStatistics.Count);
@@ -587,8 +587,8 @@ public class ReleaseServiceTests
             var viewModel = result.AssertRight();
 
             Assert.Equal(releaseVersion.Id, viewModel.Id);
-            // Published date in the view model should match the published date of the previous version
-            Assert.Equal(previousReleaseVersion.Published, viewModel.Published);
+            // Published date in the view model should match the published display date of the previous version
+            Assert.Equal(previousReleaseVersion.PublishedDisplayDate, viewModel.Published);
         }
     }
 

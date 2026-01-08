@@ -61,8 +61,7 @@ public abstract class ReleaseVersionsServiceTests
                     Assert.True(result.IsLatestRelease);
                     Assert.Equal(release.Label, result.Label);
                     Assert.Equal(releaseVersion.Published, result.LastUpdated);
-                    // TODO EES-6414 'Published' should be the published display date
-                    Assert.Equal(releaseVersion.Published, result.Published);
+                    Assert.Equal(releaseVersion.PublishedDisplayDate, result.Published);
                     Assert.Empty(result.PublishingOrganisations);
                     Assert.Equal(release.Slug, result.Slug);
                     Assert.Equal(release.Title, result.Title);

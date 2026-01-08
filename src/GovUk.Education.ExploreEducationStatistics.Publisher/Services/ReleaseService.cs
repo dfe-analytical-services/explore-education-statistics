@@ -81,11 +81,17 @@ public class ReleaseService(ContentDbContext contentDbContext) : IReleaseService
                 .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
             .SingleAsync(rv => rv.Id == releaseVersionId);
 
-        var publishedDate = await CalculatePublishedDisplayDate(releaseVersion, actualPublishedDate);
+        var publishedDisplayDate = await CalculatePublishedDisplayDate(releaseVersion, actualPublishedDate);
+        releaseVersion.PublishedDisplayDate = publishedDisplayDate;
 
-        releaseVersion.Published = publishedDate;
+        // In a future change we can alter this to set Published to the actual published date,
+        // maintaining a record of when the release version was actually published.
+        // Up until now it can have been inherited from the previous release version.
+        // Provided that the values for all existing release versions are also corrected,
+        // Published can also become the public facing 'last updated' date of the release.
+        releaseVersion.Published = publishedDisplayDate;
 
-        await UpdateReleaseFilePublishedDate(releaseVersion, publishedDate);
+        await UpdateReleaseFilePublishedDate(releaseVersion, publishedDisplayDate);
 
         await UpdatePublishedDataBlockVersions(releaseVersion);
 
@@ -97,25 +103,25 @@ public class ReleaseService(ContentDbContext contentDbContext) : IReleaseService
         DateTimeOffset actualPublishedDate
     )
     {
-        // For the first version of a release or if an update to the published date has been requested
+        // For the first version of a release or if an update to the published display date has been requested
         // return the actual published date
         if (releaseVersion.Version == 0 || releaseVersion.UpdatePublishedDate)
         {
             return actualPublishedDate;
         }
 
-        // Otherwise, return the published date from the previous version
+        // Otherwise, return the published display date from the previous version
         await contentDbContext.Entry(releaseVersion).Reference(rv => rv.PreviousVersion).LoadAsync();
         var previousVersion = releaseVersion.PreviousVersion!;
 
-        if (!previousVersion.Published.HasValue)
+        if (!previousVersion.PublishedDisplayDate.HasValue)
         {
             throw new ArgumentException(
                 $"Expected previous release version '{releaseVersion.PreviousVersionId}' to be published."
             );
         }
 
-        return previousVersion.Published.Value;
+        return previousVersion.PublishedDisplayDate.Value;
     }
 
     private async Task UpdateReleaseFilePublishedDate(ReleaseVersion releaseVersion, DateTimeOffset publishedDate)

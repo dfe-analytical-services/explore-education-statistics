@@ -102,8 +102,7 @@ public abstract class PublicationReleasesServiceTests
                     Assert.True(releaseEntry.IsLatestRelease);
                     Assert.Equal(release.Label, releaseEntry.Label);
                     Assert.Equal(release.Versions[0].Published, releaseEntry.LastUpdated);
-                    // TODO EES-6414 'Published' should be the published display date
-                    Assert.Equal(release.Versions[0].Published, releaseEntry.Published);
+                    Assert.Equal(release.Versions[0].PublishedDisplayDate, releaseEntry.Published);
                     Assert.Equal(release.Slug, releaseEntry.Slug);
                     Assert.Equal(release.Title, releaseEntry.Title);
                     Assert.Equal(release.TimePeriodCoverage.GetEnumLabel(), releaseEntry.CoverageTitle);
@@ -330,8 +329,7 @@ public abstract class PublicationReleasesServiceTests
                 Assert.Multiple(() =>
                 {
                     Assert.Equal(new DateTimeOffset(expectedReleaseVersion.Updates[0].On), releaseEntry.LastUpdated);
-                    // TODO EES-6414 'Published' should be the published display date
-                    Assert.Equal(expectedReleaseVersion.Published, releaseEntry.Published);
+                    Assert.Equal(expectedReleaseVersion.PublishedDisplayDate, releaseEntry.Published);
                 });
             }
         }

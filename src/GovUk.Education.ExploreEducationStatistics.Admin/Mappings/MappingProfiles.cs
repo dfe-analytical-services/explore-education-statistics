@@ -133,6 +133,7 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(dest => dest.Slug, m => m.MapFrom(rv => rv.Release.Slug))
             .ForMember(dest => dest.Title, m => m.MapFrom(rv => rv.Release.Title))
             .ForMember(dest => dest.YearTitle, m => m.MapFrom(rv => rv.Release.YearTitle))
+            .ForMember(dest => dest.Published, m => m.MapFrom(releaseVersion => releaseVersion.PublishedDisplayDate))
             .ForMember(dest => dest.Content, m => m.MapFrom(rv => rv.GenericContent.OrderBy(s => s.Order)))
             .ForMember(dest => dest.KeyStatistics, m => m.MapFrom(rv => rv.KeyStatistics.OrderBy(ks => ks.Order)))
             .ForMember(dest => dest.Updates, m => m.MapFrom(rv => rv.Updates.OrderByDescending(update => update.On)))

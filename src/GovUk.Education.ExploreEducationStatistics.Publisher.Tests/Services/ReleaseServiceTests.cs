@@ -338,8 +338,9 @@ public class ReleaseServiceTests
         {
             var actualRelease = await contentDbContext.ReleaseVersions.SingleAsync(rv => rv.Id == releaseVersion.Id);
 
-            // Expect the published date to have been updated with the actual published date
+            // Expect the published and published display dates to have been updated with the actual published date
             Assert.Equal(actualPublishedDate, actualRelease.Published);
+            Assert.Equal(actualPublishedDate, actualRelease.PublishedDisplayDate);
 
             var actualDataBlockParents = await contentDbContext
                 .DataBlockParents.Include(dataBlockParent => dataBlockParent.LatestDraftVersion)

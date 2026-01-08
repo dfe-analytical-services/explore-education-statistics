@@ -137,8 +137,7 @@ public class PublicationReleasesService(ContentDbContext contentDbContext) : IPu
                         releaseVersionsByReleaseId[releaseEntry.ReleaseId].Release,
                         isLatestRelease: releaseEntry == latestReleaseEntry,
                         lastUpdated: lastUpdatedDatesByReleaseId[releaseEntry.ReleaseId],
-                        // TODO EES-6414 'Published' should be the published display date
-                        published: releaseVersionsByReleaseId[releaseEntry.ReleaseId].Published!.Value
+                        published: releaseVersionsByReleaseId[releaseEntry.ReleaseId].PublishedDisplayDate!.Value
                     ),
 
                     _ => throw new ArgumentOutOfRangeException(nameof(e)),

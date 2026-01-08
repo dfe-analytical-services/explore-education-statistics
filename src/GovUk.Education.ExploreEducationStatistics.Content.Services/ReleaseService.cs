@@ -98,8 +98,8 @@ public class ReleaseService : IReleaseService
 
         releaseViewModel.DownloadFiles = await GetDownloadFiles(releaseVersion);
 
-        // If the view model has no mapped published date because it's not published, set a date
-        // based on what we expect it to be when publishing completes
+        // If the view model has no Published value (mapped from PublishedDisplayDate) because the release version is
+        // unpublished, set a date based on what we expect it to be when publishing completes.
         if (releaseViewModel.Published == null)
         {
             if (expectedPublishDate == null)
@@ -122,25 +122,25 @@ public class ReleaseService : IReleaseService
         DateTimeOffset actualPublishedDate
     )
     {
-        // For the first version of a release or if an update to the published date has been requested
+        // For the first version of a release or if an update to the published display date has been requested
         // return the actual published date
         if (releaseVersion.Version == 0 || releaseVersion.UpdatePublishedDate)
         {
             return actualPublishedDate;
         }
 
-        // Otherwise, return the published date from the previous version
+        // Otherwise, return the published display date of the previous version
         await _contentDbContext.Entry(releaseVersion).Reference(rv => rv.PreviousVersion).LoadAsync();
         var previousVersion = releaseVersion.PreviousVersion!;
 
-        if (!previousVersion.Published.HasValue)
+        if (!previousVersion.PublishedDisplayDate.HasValue)
         {
             throw new ArgumentException(
                 $"Expected previous release version '{releaseVersion.PreviousVersionId}' to be published."
             );
         }
 
-        return previousVersion.Published.Value;
+        return previousVersion.PublishedDisplayDate.Value;
     }
 
     public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> List(string publicationSlug)
