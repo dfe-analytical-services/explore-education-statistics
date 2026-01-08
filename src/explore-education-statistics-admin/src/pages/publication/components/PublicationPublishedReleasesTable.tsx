@@ -53,6 +53,9 @@ export default function PublicationPublishedReleasesTable({
         className="dfe-hide-empty-cells"
         data-testid="publication-published-releases"
       >
+        <caption className="govuk-visually-hidden">
+          Table showing the published releases for this publication.
+        </caption>
         <thead>
           <tr>
             <th className="govuk-!-width-one-third">Release period</th>

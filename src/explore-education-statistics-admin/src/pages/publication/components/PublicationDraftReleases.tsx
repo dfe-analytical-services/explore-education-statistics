@@ -30,6 +30,9 @@ const PublicationDraftReleases = ({
         className="dfe-hide-empty-cells"
         data-testid="publication-draft-releases"
       >
+        <caption className="govuk-visually-hidden">
+          Table showing the draft releases for this publication.
+        </caption>
         <thead>
           <tr>
             <th className="govuk-!-width-one-third">Release period</th>

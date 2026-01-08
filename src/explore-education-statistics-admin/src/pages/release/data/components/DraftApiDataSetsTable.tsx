@@ -52,6 +52,9 @@ export default function DraftApiDataSetsTable({
       className={`${styles.table} dfe-table--row-highlights`}
       data-testid="draft-api-data-sets"
     >
+      <caption className="govuk-visually-hidden">
+        Table showing draft API data sets for this publication.
+      </caption>
       <thead>
         <tr>
           <th

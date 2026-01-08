@@ -38,9 +38,7 @@ describe('PublicationReleasesPage', () => {
 
     renderPage(testPublication);
 
-    await waitFor(() => {
-      expect(screen.getByText('Manage releases')).toBeInTheDocument();
-    });
+    await assertHeadingsArePresent();
 
     expect(
       screen.getByRole('link', { name: 'Create new release' }),
@@ -59,15 +57,28 @@ describe('PublicationReleasesPage', () => {
 
     renderPage(publication);
 
-    await waitFor(() => {
-      expect(screen.getByText('Manage releases')).toBeInTheDocument();
-    });
+    await assertHeadingsArePresent();
 
     expect(
       screen.queryByRole('link', { name: 'Create new release' }),
     ).not.toBeInTheDocument();
   });
 });
+
+async function assertHeadingsArePresent() {
+  await waitFor(() => {
+    expect(screen.getByText('Manage releases')).toBeInTheDocument();
+  });
+  expect(
+    screen.getByRole('heading', { name: 'Scheduled releases' }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole('heading', { name: 'Draft releases' }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole('heading', { name: 'Published releases' }),
+  ).toBeInTheDocument();
+}
 
 function renderPage(publication: PublicationWithPermissions) {
   render(

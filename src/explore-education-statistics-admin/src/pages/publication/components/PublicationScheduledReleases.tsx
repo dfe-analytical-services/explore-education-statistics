@@ -22,6 +22,9 @@ const PublicationScheduledReleases = ({ publicationId, releases }: Props) => {
   return (
     <>
       <table data-testid="publication-scheduled-releases">
+        <caption className="govuk-visually-hidden">
+          Table showing the scheduled releases for this publication.
+        </caption>
         <thead>
           <tr>
             <th className="govuk-!-width-one-third">Release period</th>
