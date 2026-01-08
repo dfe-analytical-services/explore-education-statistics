@@ -74,8 +74,6 @@ public class TableBuilderService : ITableBuilderService
         CancellationToken cancellationToken = default
     )
     {
-        query.EnableCropping = true;
-
         return await FindLatestPublishedReleaseVersionId(query.SubjectId)
             .OnSuccess(releaseVersionId => Query(releaseVersionId, query, cancellationToken));
     }
