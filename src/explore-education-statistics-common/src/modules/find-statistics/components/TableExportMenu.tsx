@@ -11,7 +11,7 @@ interface Props {
   fileName?: string | undefined;
   footnotes?: Footnote[];
   fullTable?: FullTable;
-  tableRef: RefObject<HTMLElement>;
+  tableRef: RefObject<HTMLElement | null>;
   title?: string | undefined;
   onCsvDownload: () => Blob | Promise<Blob>;
 }

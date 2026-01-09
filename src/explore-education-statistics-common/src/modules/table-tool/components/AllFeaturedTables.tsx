@@ -6,11 +6,13 @@ import useToggle from '@common/hooks/useToggle';
 import FormSearchBar from '@common/components/form/FormSearchBar';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
-import React, { ReactNode, useState } from 'react';
+import React, { HTMLAttributes, ReactElement, useState } from 'react';
 
 interface Props {
   featuredTables?: FeaturedTable[];
-  renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
+  renderFeaturedTableLink?: (
+    featuredTable: FeaturedTable,
+  ) => ReactElement<HTMLAttributes<HTMLElement>>;
 }
 
 export default function AllFeaturedTables({

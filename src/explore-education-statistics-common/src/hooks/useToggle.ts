@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 export type Toggle = ((nextValue?: boolean | unknown) => void) & {
   off: () => void;
@@ -12,21 +12,23 @@ export type Toggle = ((nextValue?: boolean | unknown) => void) & {
 export default function useToggle(initialValue: boolean): [boolean, Toggle] {
   const [value, setValue] = useState<boolean>(initialValue);
 
-  const toggleFunc = useCallback(
-    (nextValue?: unknown) => {
-      if (typeof nextValue === 'boolean') {
-        setValue(nextValue);
-      } else {
-        setValue(currentValue => !currentValue);
-      }
-    },
-    [setValue],
-  );
+  const toggleFunc = useCallback((nextValue?: unknown) => {
+    if (typeof nextValue === 'boolean') {
+      setValue(nextValue);
+    } else {
+      setValue(currentValue => !currentValue);
+    }
+  }, []);
 
-  const toggle = toggleFunc as Toggle;
+  const on = useCallback(() => setValue(true), []);
+  const off = useCallback(() => setValue(false), []);
 
-  toggle.off = useCallback(() => setValue(false), [setValue]);
-  toggle.on = useCallback(() => setValue(true), [setValue]);
+  const toggle = useMemo(() => {
+    const func = toggleFunc as Toggle;
+    func.on = on;
+    func.off = off;
+    return func;
+  }, [toggleFunc, on, off]);
 
   return [value, toggle];
 }

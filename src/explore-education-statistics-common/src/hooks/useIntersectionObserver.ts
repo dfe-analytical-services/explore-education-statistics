@@ -6,7 +6,7 @@ import { RefObject, useEffect, useState } from 'react';
  * Useful for detecting visibility changes to the element.
  */
 export default function useIntersectionObserver(
-  ref: RefObject<HTMLElement>,
+  ref: RefObject<HTMLElement | null>,
   options: IntersectionObserverInit,
 ): IntersectionObserverEntry[] {
   const [entries, setEntries] = useState<IntersectionObserverEntry[]>([]);
@@ -21,7 +21,6 @@ export default function useIntersectionObserver(
     }
 
     return () => {
-      setEntries([]);
       observer.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

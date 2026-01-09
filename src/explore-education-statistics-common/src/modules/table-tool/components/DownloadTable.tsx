@@ -26,7 +26,7 @@ interface Props {
   fullTable?: FullTable;
   headingTag?: 'h2' | 'h3' | 'h4';
   headingSize?: 's' | 'm' | 'l';
-  tableRef: RefObject<HTMLElement>;
+  tableRef: RefObject<HTMLElement | null>;
   tableTitle?: string;
   onCsvDownload: () => Blob | Promise<Blob>;
   onSubmit?: (type: FileFormat) => void;
