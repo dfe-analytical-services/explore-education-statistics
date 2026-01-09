@@ -17,7 +17,7 @@ interface FormValues {
 
 interface Props {
   baseId: string;
-  containerRef: RefObject<HTMLDivElement>;
+  containerRef: RefObject<HTMLDivElement | null>;
   onCancel: () => void;
   onSave: () => void;
 }
@@ -37,7 +37,7 @@ export default function CommentAddForm({
 
   useEffect(() => {
     if (focus) {
-      textAreaRef?.current?.focus();
+      textAreaRef.current?.focus();
     }
   }, [focus]);
 

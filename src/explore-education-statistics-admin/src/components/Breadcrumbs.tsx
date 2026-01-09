@@ -1,5 +1,5 @@
 import { dashboardRoute } from '@admin/routes/routes';
-import React, { ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 import Link from './Link';
 
 export interface BreadcrumbsProps {
@@ -13,7 +13,7 @@ export interface BreadcrumbsProps {
 const Breadcrumbs = ({
   breadcrumbs = [],
   homePath = dashboardRoute.path,
-}: BreadcrumbsProps): ReactElement => {
+}: BreadcrumbsProps): ReactNode => {
   const currentBreadcrumbIndex = breadcrumbs.length - 1;
 
   return (

@@ -1,7 +1,7 @@
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
-import React, { ReactElement, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import styles from './WizardStepSummary.module.scss';
 
 interface Props extends InjectedWizardProps {
@@ -17,7 +17,7 @@ const WizardStepSummary = ({
   loadingStep,
   setCurrentStep,
   stepNumber,
-}: Props): ReactElement => {
+}: Props): ReactNode => {
   return (
     <div className={styles.container}>
       <div className={styles.content}>{children}</div>
