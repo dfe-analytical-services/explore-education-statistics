@@ -76,9 +76,8 @@ public enum ValidationErrorMessages
     PublishDateCannotBeEmpty,
     PublishDateCannotBeScheduled,
 
-    // Release update
-    ReleasePublishedCannotBeFutureDate,
-    ReleaseNotPublished,
+    // Release version update
+    ReleaseVersionNotPublished,
     UpdateRequestForPublishedReleaseVersionInvalid,
     ReleaseUndergoingPublishing,
 

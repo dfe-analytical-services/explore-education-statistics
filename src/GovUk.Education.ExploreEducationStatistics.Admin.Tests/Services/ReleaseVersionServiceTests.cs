@@ -2360,10 +2360,10 @@ public abstract class ReleaseVersionServiceTests
         }
     }
 
-    public class UpdateReleasePublishedTests : ReleaseVersionServiceTests
+    public class UpdatePublishedDisplayDateTests : ReleaseVersionServiceTests
     {
         [Fact]
-        public async Task Success_NotLatestReleaseInPublication()
+        public async Task WhenReleaseVersionNotLatestPublished_UpdatesPublishedDisplayDateAndClearsExpectedCacheEntry()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -2380,7 +2380,10 @@ public abstract class ReleaseVersionServiceTests
             // Check the publication's latest published release version in the generated test data setup
             Assert.Equal(release2025.Versions[0].Id, publication.LatestPublishedReleaseVersionId);
 
-            var request = new ReleasePublishedUpdateRequest { Published = DateTimeOffset.UtcNow.AddDays(-1) };
+            var request = new ReleaseVersionPublishedDisplayDateUpdateRequest
+            {
+                PublishedDisplayDate = DateTimeOffset.UtcNow.AddDays(-1),
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -2400,7 +2403,7 @@ public abstract class ReleaseVersionServiceTests
             {
                 var service = BuildService(contentDbContext: context, releaseCacheService: releaseCacheService.Object);
 
-                var result = await service.UpdateReleasePublished(release2024.Versions[0].Id, request);
+                var result = await service.UpdatePublishedDisplayDate(release2024.Versions[0].Id, request);
 
                 VerifyAllMocks(releaseCacheService);
 
@@ -2411,18 +2414,21 @@ public abstract class ReleaseVersionServiceTests
             {
                 var saved = await context.ReleaseVersions.SingleAsync(rv => rv.Id == release2024.Versions[0].Id);
 
-                Assert.Equal(request.Published, saved.Published);
+                Assert.Equal(request.PublishedDisplayDate, saved.PublishedDisplayDate);
             }
         }
 
         [Fact]
-        public async Task Success_LatestReleaseInPublication()
+        public async Task WhenReleaseVersionIsLatestPublished_UpdatesPublishedDisplayDateAndClearsExpectedCacheEntries()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
-            var request = new ReleasePublishedUpdateRequest { Published = DateTimeOffset.UtcNow.AddDays(-1) };
+            var request = new ReleaseVersionPublishedDisplayDateUpdateRequest
+            {
+                PublishedDisplayDate = DateTimeOffset.UtcNow.AddDays(-1),
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -2454,7 +2460,7 @@ public abstract class ReleaseVersionServiceTests
             {
                 var service = BuildService(contentDbContext: context, releaseCacheService: releaseCacheService.Object);
 
-                var result = await service.UpdateReleasePublished(publication.Releases[0].Versions[0].Id, request);
+                var result = await service.UpdatePublishedDisplayDate(publication.Releases[0].Versions[0].Id, request);
 
                 VerifyAllMocks(releaseCacheService);
 
@@ -2467,18 +2473,21 @@ public abstract class ReleaseVersionServiceTests
                     rv.Id == publication.Releases[0].Versions[0].Id
                 );
 
-                Assert.Equal(request.Published, saved.Published);
+                Assert.Equal(request.PublishedDisplayDate, saved.PublishedDisplayDate);
             }
         }
 
         [Fact]
-        public async Task ReleaseNotPublished()
+        public async Task WhenReleaseVersionIsNotPublished_ReturnsBadRequest()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
 
-            var request = new ReleasePublishedUpdateRequest { Published = DateTime.UtcNow.AddDays(-1) };
+            var request = new ReleaseVersionPublishedDisplayDateUpdateRequest
+            {
+                PublishedDisplayDate = DateTimeOffset.UtcNow.AddDays(-1),
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -2492,49 +2501,22 @@ public abstract class ReleaseVersionServiceTests
             {
                 var service = BuildService(context);
 
-                var result = await service.UpdateReleasePublished(publication.Releases[0].Versions[0].Id, request);
+                var result = await service.UpdatePublishedDisplayDate(publication.Releases[0].Versions[0].Id, request);
 
-                result.AssertBadRequest(ValidationErrorMessages.ReleaseNotPublished);
+                result.AssertBadRequest(ValidationErrorMessages.ReleaseVersionNotPublished);
             }
         }
 
         [Fact]
-        public async Task FutureDate()
+        public async Task WhenPublishedDisplayDateHasLocalOffset_ConvertsPublishedDisplayDateToUtc()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
-            var request = new ReleasePublishedUpdateRequest { Published = DateTime.UtcNow.AddDays(1) };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
+            var request = new ReleaseVersionPublishedDisplayDateUpdateRequest
             {
-                await context.Publications.AddAsync(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var service = BuildService(context);
-
-                var result = await service.UpdateReleasePublished(publication.Releases[0].Versions[0].Id, request);
-
-                result.AssertBadRequest(ValidationErrorMessages.ReleasePublishedCannotBeFutureDate);
-            }
-        }
-
-        [Fact]
-        public async Task ConvertsPublishedFromLocalToUniversalTimezone()
-        {
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
-
-            var request = new ReleasePublishedUpdateRequest
-            {
-                Published = DateTimeOffset.Parse("2022-08-08T09:30:00.0000000+01:00"),
+                PublishedDisplayDate = DateTimeOffset.Parse("2022-08-08T09:30:00.0000000+01:00"),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -2565,7 +2547,7 @@ public abstract class ReleaseVersionServiceTests
             {
                 var service = BuildService(contentDbContext: context, releaseCacheService: releaseCacheService.Object);
 
-                var result = await service.UpdateReleasePublished(publication.Releases[0].Versions[0].Id, request);
+                var result = await service.UpdatePublishedDisplayDate(publication.Releases[0].Versions[0].Id, request);
 
                 VerifyAllMocks(releaseCacheService);
 
@@ -2578,9 +2560,9 @@ public abstract class ReleaseVersionServiceTests
                     rv.Id == publication.Releases[0].Versions[0].Id
                 );
 
-                // Make sure the request date was converted to UTC before it was updated on the release
-                Assert.Equal(TimeSpan.Zero, saved.Published?.Offset);
-                Assert.Equal(request.Published, saved.Published);
+                // Make sure the request date was converted to UTC before it was updated on the release version
+                Assert.Equal(TimeSpan.Zero, saved.PublishedDisplayDate?.Offset);
+                Assert.Equal(request.PublishedDisplayDate, saved.PublishedDisplayDate);
             }
         }
     }

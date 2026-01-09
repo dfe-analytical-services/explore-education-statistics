@@ -395,9 +395,9 @@ public class ReleaseVersionService(
             .OnSuccess(async () => await GetRelease(releaseVersionId));
     }
 
-    public async Task<Either<ActionResult, Unit>> UpdateReleasePublished(
+    public async Task<Either<ActionResult, Unit>> UpdatePublishedDisplayDate(
         Guid releaseVersionId,
-        ReleasePublishedUpdateRequest request
+        ReleaseVersionPublishedDisplayDateUpdateRequest request
     )
     {
         return await context
@@ -409,19 +409,12 @@ public class ReleaseVersionService(
             {
                 if (releaseVersion.Published == null)
                 {
-                    return ValidationActionResult(ValidationErrorMessages.ReleaseNotPublished);
-                }
-
-                var newPublishedDate = request.Published?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
-
-                // Prevent assigning a future date since it would have the effect of un-publishing the release
-                if (newPublishedDate > DateTimeOffset.UtcNow)
-                {
-                    return ValidationActionResult(ValidationErrorMessages.ReleasePublishedCannotBeFutureDate);
+                    return ValidationActionResult(ValidationErrorMessages.ReleaseVersionNotPublished);
                 }
 
                 context.ReleaseVersions.Update(releaseVersion);
-                releaseVersion.Published = newPublishedDate;
+                releaseVersion.PublishedDisplayDate =
+                    request.PublishedDisplayDate?.ToUniversalTime() ?? DateTimeOffset.UtcNow;
                 await context.SaveChangesAsync();
 
                 // Update the cached release version

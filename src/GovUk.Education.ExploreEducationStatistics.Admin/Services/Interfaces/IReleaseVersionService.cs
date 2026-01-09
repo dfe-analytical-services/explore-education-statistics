@@ -34,9 +34,9 @@ public interface IReleaseVersionService
         ReleaseVersionUpdateRequest request
     );
 
-    Task<Either<ActionResult, Unit>> UpdateReleasePublished(
+    Task<Either<ActionResult, Unit>> UpdatePublishedDisplayDate(
         Guid releaseVersionId,
-        ReleasePublishedUpdateRequest request
+        ReleaseVersionPublishedDisplayDateUpdateRequest request
     );
 
     Task<Either<ActionResult, IdTitleViewModel>> GetLatestPublishedRelease(Guid publicationId);

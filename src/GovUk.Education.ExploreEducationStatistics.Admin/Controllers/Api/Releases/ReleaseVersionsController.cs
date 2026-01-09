@@ -337,12 +337,14 @@ public class ReleaseVersionsController : ControllerBase
         return await _releaseChecklistService.GetChecklist(releaseVersionId).HandleFailuresOrOk();
     }
 
-    // We intend to change this route, to make these endpoints more consistent, as per EES-5895
-    [HttpPatch("releases/{releaseVersionId:guid}/published")]
-    public async Task<ActionResult> UpdateReleasePublished(Guid releaseVersionId, ReleasePublishedUpdateRequest request)
+    [HttpPatch("releaseVersions/{releaseVersionId:guid}/published-display-date")]
+    public async Task<ActionResult> UpdatePublishedDisplayDate(
+        Guid releaseVersionId,
+        ReleaseVersionPublishedDisplayDateUpdateRequest request
+    )
     {
         return await _releaseVersionService
-            .UpdateReleasePublished(releaseVersionId, request)
+            .UpdatePublishedDisplayDate(releaseVersionId, request)
             .HandleFailuresOrNoContent();
     }
 }

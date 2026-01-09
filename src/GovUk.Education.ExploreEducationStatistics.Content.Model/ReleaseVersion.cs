@@ -11,12 +11,21 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     public Guid Id { get; set; }
 
     /// <summary>
-    /// The last date the release version was published - this should be set when the PublishScheduled date is reached and the release is published.
+    /// The date when the release version was published.
+    /// For the latest published version, this denotes the effective public facing 'last updated' date of the release.
     /// </summary>
     public DateTimeOffset? Published { get; set; }
 
     /// <summary>
-    /// The date that the release version is scheduled to be published - when this time is reached then the release should be published and the Published date set.
+    /// The date displayed as the published date for the release version.
+    /// For the initial version, this always equals <c>Published</c>.
+    /// For subsequent versions, when publishing completes it inherits the previous version's <c>PublishedDisplayDate</c>,
+    /// unless <c>UpdatePublishedDate</c> is set to true, in which case it is set to <c>Published</c>.
+    /// </summary>
+    public DateTimeOffset? PublishedDisplayDate { get; set; }
+
+    /// <summary>
+    /// The date that the release version is scheduled to be published.
     /// </summary>
     public DateTimeOffset? PublishScheduled { get; set; }
 
@@ -63,6 +72,10 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
 
     public List<Organisation> PublishingOrganisations { get; set; } = [];
 
+    /// <summary>
+    /// When publishing the release version, if this property is true, <c>PublishedDisplayDate</c> is set to the current date,
+    /// otherwise it inherits the previous version's <c>PublishedDisplayDate</c>.
+    /// </summary>
     public bool UpdatePublishedDate { get; set; }
 
     public ReleaseVersion? PreviousVersion { get; set; }
