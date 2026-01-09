@@ -312,7 +312,7 @@ const ReleaseContentAccordionSection = ({
                   label={
                     !heading
                       ? 'Content block'
-                      : `Content block ${contentBlockNumber} for the "${section.heading}" section`
+                      : `Content block ${contentBlockNumber} for the "${sectionHeading}" section`
                   }
                 />
               );
