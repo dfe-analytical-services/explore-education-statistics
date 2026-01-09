@@ -152,6 +152,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEduc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth", "GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth.csproj", "{98C0F430-B571-4F22-870D-E62C8E661F1D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels", "GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels\GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels.csproj", "{8863470B-6A83-402A-A0AD-F20CB178E25B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -810,6 +812,18 @@ Global
 		{98C0F430-B571-4F22-870D-E62C8E661F1D}.Release|x64.Build.0 = Release|Any CPU
 		{98C0F430-B571-4F22-870D-E62C8E661F1D}.Release|x86.ActiveCfg = Release|Any CPU
 		{98C0F430-B571-4F22-870D-E62C8E661F1D}.Release|x86.Build.0 = Release|Any CPU
+		{8863470B-6A83-402A-A0AD-F20CB178E25B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8863470B-6A83-402A-A0AD-F20CB178E25B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8863470B-6A83-402A-A0AD-F20CB178E25B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8863470B-6A83-402A-A0AD-F20CB178E25B}.Debug|x64.Build.0 = Debug|Any CPU
+		{8863470B-6A83-402A-A0AD-F20CB178E25B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8863470B-6A83-402A-A0AD-F20CB178E25B}.Debug|x86.Build.0 = Debug|Any CPU
+		{8863470B-6A83-402A-A0AD-F20CB178E25B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8863470B-6A83-402A-A0AD-F20CB178E25B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8863470B-6A83-402A-A0AD-F20CB178E25B}.Release|x64.ActiveCfg = Release|Any CPU
+		{8863470B-6A83-402A-A0AD-F20CB178E25B}.Release|x64.Build.0 = Release|Any CPU
+		{8863470B-6A83-402A-A0AD-F20CB178E25B}.Release|x86.ActiveCfg = Release|Any CPU
+		{8863470B-6A83-402A-A0AD-F20CB178E25B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -880,5 +894,6 @@ Global
 		{F4400664-90D1-4A27-9FDE-93D8431FEF1E} = {A58A13A6-EA97-4CE1-A134-83045CC08C85}
 		{CD64CF0B-0B3A-4C2F-A149-8EFE0AE6CA58} = {A58A13A6-EA97-4CE1-A134-83045CC08C85}
 		{98C0F430-B571-4F22-870D-E62C8E661F1D} = {A58A13A6-EA97-4CE1-A134-83045CC08C85}
+		{8863470B-6A83-402A-A0AD-F20CB178E25B} = {4C3EAB1C-11ED-43A7-A9FD-16B6CE336539}
 	EndGlobalSection
 EndGlobal
