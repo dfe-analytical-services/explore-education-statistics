@@ -21,7 +21,7 @@ public class ReleasePublishingStatus : ITableEntity
 
     public DateTime Created { get; set; }
     public string PublicationSlug { get; set; }
-    public DateTime? Publish { get; set; }
+    public DateTimeOffset? Publish { get; set; }
     public string ReleaseSlug { get; set; }
     public string ContentStage { get; set; }
     public string FilesStage { get; set; }
@@ -41,7 +41,7 @@ public class ReleasePublishingStatus : ITableEntity
         Guid releaseVersionId,
         Guid releaseStatusId,
         string publicationSlug,
-        DateTime? publish,
+        DateTimeOffset? publish,
         string releaseSlug,
         ReleasePublishingStatusState state,
         bool immediate,

@@ -81,7 +81,7 @@ public abstract class ReleaseUpdatesServiceTests
             releaseVersion.Updates = _dataFixture
                 .DefaultUpdate()
                 .WithReleaseVersionId(releaseVersion.Id)
-                .WithOn(releaseVersion.Published!.Value.AddDays(1))
+                .WithOn(releaseVersion.Published!.Value.AddDays(1).UtcDateTime)
                 .GenerateList(1);
 
             var contextId = Guid.NewGuid().ToString();
@@ -140,7 +140,7 @@ public abstract class ReleaseUpdatesServiceTests
                         _dataFixture
                             .DefaultUpdate()
                             .WithReleaseVersionId(releaseVersion.Id)
-                            .WithOn(releaseVersion.Published!.Value.AddDays(i + 1))
+                            .WithOn(releaseVersion.Published!.Value.AddDays(i + 1).UtcDateTime)
                             .Generate()
                     )
                     .ToArray()
@@ -201,8 +201,8 @@ public abstract class ReleaseUpdatesServiceTests
             var (updateBeforeFirstPublished, updateAfterFirstPublished) = _dataFixture
                 .DefaultUpdate()
                 .WithReleaseVersionId(releaseVersion.Id)
-                .ForIndex(0, setters => setters.SetOn(releaseVersion.Published!.Value.AddDays(-1)))
-                .ForIndex(1, setters => setters.SetOn(releaseVersion.Published!.Value.AddDays(1)))
+                .ForIndex(0, setters => setters.SetOn(releaseVersion.Published!.Value.AddDays(-1).UtcDateTime))
+                .ForIndex(1, setters => setters.SetOn(releaseVersion.Published!.Value.AddDays(1).UtcDateTime))
                 .GenerateTuple2();
             releaseVersion.Updates = [updateBeforeFirstPublished, updateAfterFirstPublished];
 

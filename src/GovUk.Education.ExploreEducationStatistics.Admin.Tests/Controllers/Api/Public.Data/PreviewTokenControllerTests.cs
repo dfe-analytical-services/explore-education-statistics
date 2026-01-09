@@ -19,6 +19,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -40,6 +42,11 @@ public class PreviewTokenControllerTestsFixture()
         BauPrincipal = dataFixture.BauUser();
 
         BauUser = dataFixture.DefaultUser().WithId(BauPrincipal.GetUserId()).WithEmail(BauPrincipal.GetEmail());
+    }
+
+    public override async Task BeforeEachTest()
+    {
+        await base.BeforeEachTest();
 
         await GetContentDbContext().AddTestData(context => context.Users.Add(BauUser));
     }
@@ -49,12 +56,14 @@ public class PreviewTokenControllerTestsFixture()
 public class PreviewTokenControllerTestsCollection : ICollectionFixture<PreviewTokenControllerTestsFixture>;
 
 [Collection(nameof(PreviewTokenControllerTestsFixture))]
-public abstract class PreviewTokenControllerTests
+public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private const string BaseUrl = "api/public-data/preview-tokens";
     private static readonly DataFixture DataFixture = new();
 
-    public class CreatePreviewTokenTests(PreviewTokenControllerTestsFixture fixture) : PreviewTokenControllerTests
+    public class CreatePreviewTokenTests(PreviewTokenControllerTestsFixture fixture)
+        : PreviewTokenControllerTests(fixture)
     {
         private record CreatePreviewTokenValidationError(string Message, string Path);
 
@@ -372,7 +381,7 @@ public abstract class PreviewTokenControllerTests
         }
     }
 
-    public class GetPreviewTokenTests(PreviewTokenControllerTestsFixture fixture) : PreviewTokenControllerTests
+    public class GetPreviewTokenTests(PreviewTokenControllerTestsFixture fixture) : PreviewTokenControllerTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -493,7 +502,8 @@ public abstract class PreviewTokenControllerTests
         }
     }
 
-    public class ListPreviewTokensTests(PreviewTokenControllerTestsFixture fixture) : PreviewTokenControllerTests
+    public class ListPreviewTokensTests(PreviewTokenControllerTestsFixture fixture)
+        : PreviewTokenControllerTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -686,7 +696,8 @@ public abstract class PreviewTokenControllerTests
         }
     }
 
-    public class RevokePreviewTokenTests(PreviewTokenControllerTestsFixture fixture) : PreviewTokenControllerTests
+    public class RevokePreviewTokenTests(PreviewTokenControllerTestsFixture fixture)
+        : PreviewTokenControllerTests(fixture)
     {
         [Fact]
         public async Task Success()

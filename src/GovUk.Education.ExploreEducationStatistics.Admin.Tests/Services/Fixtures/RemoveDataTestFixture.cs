@@ -203,7 +203,7 @@ public class RemoveDataSetTestFixture
 
         if (isPublished)
         {
-            ReleaseVersion.Published = DateTime.Now.AddDays(-1);
+            ReleaseVersion.Published = DateTimeOffset.UtcNow.AddDays(-1);
         }
 
         Subject = dataFixture.DefaultSubject().Generate();

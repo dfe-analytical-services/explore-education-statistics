@@ -1,34 +1,55 @@
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public abstract class RedirectsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class RedirectsControllerTestsFixture()
+    : OptimisedContentApiCollectionFixture(capabilities: [ContentApiIntegrationTestCapability.Azurite])
 {
-    public abstract class ListTests(TestApplicationFactory testApp) : RedirectsControllerTests(testApp)
-    {
-        public override async Task InitializeAsync() => await StartAzurite();
+    public IBlobCacheService BlobCacheService = null!;
 
-        public class GeneralTests(TestApplicationFactory testApp) : ListTests(testApp)
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+
+        BlobCacheService = lookups.GetService<IBlobCacheService>();
+    }
+
+    public override async Task BeforeEachTest()
+    {
+        await base.BeforeEachTest();
+
+        await GetAzuriteWrapper().ClearTestData();
+    }
+}
+
+[CollectionDefinition(nameof(RedirectsControllerTestsFixture))]
+public class RedirectsControllerTestsCollection : ICollectionFixture<RedirectsControllerTestsFixture>;
+
+[Collection(nameof(RedirectsControllerTestsFixture))]
+public abstract class RedirectsControllerTests(RedirectsControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
+{
+    private static readonly DataFixture DataFixture = new();
+
+    public abstract class ListTests(RedirectsControllerTestsFixture fixture) : RedirectsControllerTests(fixture)
+    {
+        public class GeneralTests(RedirectsControllerTestsFixture fixture) : ListTests(fixture)
         {
             [Fact]
             public async Task RedirectsExistInCache_Returns200WithRedirects()
             {
-                var app = BuildApp(enableAzurite: true);
-                var client = app.CreateClient();
-
-                var blobCacheService = app.Services.GetRequiredService<IBlobCacheService>();
-
                 List<RedirectViewModel> cachedMethodologyRedirects =
                 [
                     new(FromSlug: "original-methodology-slug-1", ToSlug: "updated-methodology-slug-1"),
@@ -45,7 +66,7 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                 {
                     {
                         "updated-publication-slug-1",
-                        new List<RedirectViewModel>()
+                        new List<RedirectViewModel>
                         {
                             new(FromSlug: "original-release-slug-1", ToSlug: "updated-release-slug-1"),
                             new(FromSlug: "original-release-slug-2", ToSlug: "updated-release-slug-2"),
@@ -59,9 +80,9 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                     MethodologyRedirects: cachedMethodologyRedirects
                 );
 
-                await blobCacheService.SetItemAsync(new RedirectsCacheKey(), cachedViewModel);
+                await fixture.BlobCacheService.SetItemAsync(new RedirectsCacheKey(), cachedViewModel);
 
-                var response = await ListRedirects(client);
+                var response = await ListRedirects();
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
@@ -104,8 +125,7 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
             [Fact]
             public async Task NoRedirectsExist_Returns200WithNoRedirects()
             {
-                var client = BuildApp(enableAzurite: true).CreateClient();
-                var response = await ListRedirects(client);
+                var response = await ListRedirects();
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
@@ -115,7 +135,7 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
             }
         }
 
-        public class MethodologyRedirectsTests(TestApplicationFactory testApp) : ListTests(testApp)
+        public class MethodologyRedirectsTests(RedirectsControllerTestsFixture fixture) : ListTests(fixture)
         {
             [Fact]
             public async Task RedirectsExist_Returns200WithRedirects()
@@ -136,10 +156,9 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                             .GenerateList(2)
                     );
 
-                await TestApp.AddTestData<ContentDbContext>(context => context.Methodologies.Add(methodology));
+                await fixture.GetContentDbContext().AddTestData(context => context.Methodologies.Add(methodology));
 
-                var client = BuildApp(enableAzurite: true).CreateClient();
-                var response = await ListRedirects(client);
+                var response = await ListRedirects();
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
@@ -177,16 +196,11 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                             .GenerateList(2)
                     );
 
-                await TestApp.AddTestData<ContentDbContext>(context => context.Methodologies.Add(methodology));
+                await fixture.GetContentDbContext().AddTestData(context => context.Methodologies.Add(methodology));
 
-                var app = BuildApp(enableAzurite: true);
-                var client = app.CreateClient();
+                await ListRedirects();
 
-                await ListRedirects(client);
-
-                var blobCacheService = app.Services.GetRequiredService<IBlobCacheService>();
-
-                var cachedValue = await blobCacheService.GetItemAsync(
+                var cachedValue = await fixture.BlobCacheService.GetItemAsync(
                     new RedirectsCacheKey(),
                     typeof(RedirectsViewModel)
                 );
@@ -211,7 +225,7 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
             }
         }
 
-        public class PublicationRedirectsTests(TestApplicationFactory testApp) : ListTests(testApp)
+        public class PublicationRedirectsTests(RedirectsControllerTestsFixture fixture) : ListTests(fixture)
         {
             [Fact]
             public async Task RedirectsExist_Returns200WithRedirects()
@@ -221,12 +235,11 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                     .WithPublication(DataFixture.DefaultPublication())
                     .GenerateList(2);
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                    context.PublicationRedirects.AddRange(publicationRedirects)
-                );
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context => context.PublicationRedirects.AddRange(publicationRedirects));
 
-                var client = BuildApp(enableAzurite: true).CreateClient();
-                var response = await ListRedirects(client);
+                var response = await ListRedirects();
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
@@ -249,20 +262,13 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                     .WithPublication(DataFixture.DefaultPublication())
                     .GenerateList(2);
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                    context.PublicationRedirects.AddRange(publicationRedirects)
-                );
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context => context.PublicationRedirects.AddRange(publicationRedirects));
 
-                await StartAzurite();
+                await ListRedirects();
 
-                var app = BuildApp(enableAzurite: true);
-                var client = app.CreateClient();
-
-                await ListRedirects(client);
-
-                var blobCacheService = app.Services.GetRequiredService<IBlobCacheService>();
-
-                var cachedValue = await blobCacheService.GetItemAsync(
+                var cachedValue = await fixture.BlobCacheService.GetItemAsync(
                     new RedirectsCacheKey(),
                     typeof(RedirectsViewModel)
                 );
@@ -283,7 +289,7 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
             }
         }
 
-        public class ReleaseRedirectsTests(TestApplicationFactory testApp) : ListTests(testApp)
+        public class ReleaseRedirectsTests(RedirectsControllerTestsFixture fixture) : ListTests(fixture)
         {
             [Fact]
             public async Task ReleaseRedirectDoesNotExistForPublicationWithRedirect_Returns200WithRedirects()
@@ -292,12 +298,11 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                     .DefaultPublicationRedirect()
                     .WithPublication(DataFixture.DefaultPublication());
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                    context.PublicationRedirects.Add(publicationRedirect)
-                );
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context => context.PublicationRedirects.Add(publicationRedirect));
 
-                var client = BuildApp(enableAzurite: true).CreateClient();
-                var response = await ListRedirects(client);
+                var response = await ListRedirects();
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
@@ -328,10 +333,9 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                     .WithSlug("updated-publication-slug-1")
                     .WithRedirects([DataFixture.DefaultPublicationRedirect().WithSlug("original-publication-slug-1")]);
 
-                await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+                await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
-                var client = BuildApp(enableAzurite: true).CreateClient();
-                var response = await ListRedirects(client);
+                var response = await ListRedirects();
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
@@ -372,10 +376,9 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                     ])
                     .WithSlug("original-publication-slug-1");
 
-                await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+                await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
-                var client = BuildApp(enableAzurite: true).CreateClient();
-                var response = await ListRedirects(client);
+                var response = await ListRedirects();
 
                 var viewModel = response.AssertOk<RedirectsViewModel>();
 
@@ -414,16 +417,11 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
                     ])
                     .WithSlug("original-publication-slug-1");
 
-                await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+                await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
 
-                var app = BuildApp(enableAzurite: true);
-                var client = app.CreateClient();
+                await ListRedirects();
 
-                await ListRedirects(client);
-
-                var blobCacheService = app.Services.GetRequiredService<IBlobCacheService>();
-
-                var cachedValue = await blobCacheService.GetItemAsync(
+                var cachedValue = await fixture.BlobCacheService.GetItemAsync(
                     new RedirectsCacheKey(),
                     typeof(RedirectsViewModel)
                 );
@@ -449,17 +447,9 @@ public abstract class RedirectsControllerTests(TestApplicationFactory testApp) :
             }
         }
 
-        private async Task<HttpResponseMessage> ListRedirects(HttpClient? client = null)
+        private async Task<HttpResponseMessage> ListRedirects()
         {
-            client ??= BuildApp().CreateClient();
-
-            return await client.GetAsync("/api/redirects");
+            return await fixture.CreateClient().GetAsync("/api/redirects");
         }
-    }
-
-    private WebApplicationFactory<Startup> BuildApp(bool enableAzurite = false)
-    {
-        List<Action<IWebHostBuilder>> configFuncs = enableAzurite ? [WithAzurite()] : [];
-        return BuildWebApplicationFactory(configFuncs);
     }
 }

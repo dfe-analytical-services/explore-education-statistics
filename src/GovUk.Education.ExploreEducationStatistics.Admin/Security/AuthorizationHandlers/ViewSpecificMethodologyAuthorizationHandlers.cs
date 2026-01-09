@@ -91,7 +91,7 @@ public class ViewSpecificMethodologyAuthorizationHandler(
                 )
                 {
                     if (
-                        preReleaseService.GetPreReleaseWindowStatus(latestReleaseVersion, DateTime.UtcNow).Access
+                        preReleaseService.GetPreReleaseWindowStatus(latestReleaseVersion, DateTimeOffset.UtcNow).Access
                         == PreReleaseAccess.Within
                     )
                     {

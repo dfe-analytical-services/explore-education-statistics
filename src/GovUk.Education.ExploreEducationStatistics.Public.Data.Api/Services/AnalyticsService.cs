@@ -170,7 +170,7 @@ public class AnalyticsService(
                     ResultsCount: results.Results.Count,
                     TotalRowsCount: results.Paging.TotalResults,
                     StartTime: startTime,
-                    EndTime: DateTime.UtcNow
+                    EndTime: dateTimeProvider.UtcNow
                 ),
             cancellationToken: cancellationToken
         );

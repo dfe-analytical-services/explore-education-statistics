@@ -5,6 +5,7 @@ import {
   IssuesGuidanceModal,
 } from '@admin/pages/publication/components/PublicationGuidance';
 import { DashboardReleaseVersionSummary } from '@admin/services/releaseVersionService';
+import ButtonGroup from '@common/components/ButtonGroup';
 import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo } from 'react';
@@ -76,42 +77,46 @@ const DraftReleasesTable = ({
         <>
           {releasesByPublication &&
             Object.keys(releasesByPublication).length > 0 && (
-              <table>
-                <thead>
-                  <tr>
-                    <th
-                      className={
-                        isBauUser ? 'govuk-!-width-one-half' : undefined
-                      }
-                    >
-                      Publication / Release period
-                    </th>
-                    <th className="dfe-white-space--nowrap">
-                      Status <DraftStatusGuidanceModal />
-                    </th>
-                    {/* Don't render the issues for BAU users to prevent performance problems. */}
-                    {!isBauUser && (
+              <>
+                <table>
+                  <thead>
+                    <tr>
                       <th
-                        className={`${styles.issuesColumn} dfe-white-space--nowrap`}
+                        className={
+                          isBauUser ? 'govuk-!-width-one-half' : undefined
+                        }
                       >
-                        Issues <IssuesGuidanceModal />
+                        Publication / Release period
                       </th>
+                      <th className="dfe-white-space--nowrap">Status</th>
+                      {/* Don't render the issues for BAU users to prevent performance problems. */}
+                      {!isBauUser && (
+                        <th
+                          className={`${styles.issuesColumn} dfe-white-space--nowrap`}
+                        >
+                          Issues
+                        </th>
+                      )}
+                      <th>Actions</th>
+                    </tr>
+                    {orderBy(Object.keys(releasesByPublication)).map(
+                      publication => (
+                        <PublicationRow
+                          key={publication}
+                          isBauUser={isBauUser}
+                          publication={publication}
+                          releases={releasesByPublication[publication]}
+                          onChangeRelease={onChangeRelease}
+                        />
+                      ),
                     )}
-                    <th>Actions</th>
-                  </tr>
-                  {orderBy(Object.keys(releasesByPublication)).map(
-                    publication => (
-                      <PublicationRow
-                        key={publication}
-                        isBauUser={isBauUser}
-                        publication={publication}
-                        releases={releasesByPublication[publication]}
-                        onChangeRelease={onChangeRelease}
-                      />
-                    ),
-                  )}
-                </thead>
-              </table>
+                  </thead>
+                </table>
+                <ButtonGroup>
+                  {!isBauUser && <IssuesGuidanceModal />}
+                  <DraftStatusGuidanceModal />
+                </ButtonGroup>
+              </>
             )}
         </>
       )}

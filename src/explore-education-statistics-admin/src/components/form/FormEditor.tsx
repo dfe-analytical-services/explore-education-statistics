@@ -100,6 +100,7 @@ const FormEditor = ({
   const [showFeaturedTablesModal, toggleFeaturedTablesModal] = useToggle(false);
   const [showGlossaryModal, toggleGlossaryModal] = useToggle(false);
   const config = useCKEditorConfig({
+    label,
     allowComments,
     allowedHeadings,
     editorInstance,
@@ -344,6 +345,7 @@ const FormEditor = ({
           {process.env.NODE_ENV !== 'test' ? (
             <>
               <CKEditor
+                key={label}
                 editor={Editor}
                 config={config}
                 data={value}

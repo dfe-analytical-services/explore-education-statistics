@@ -1005,7 +1005,7 @@ public class MethodologyVersionRepositoryTests
     [Fact]
     public async Task IsToBePublished_ApprovedAndScheduledWithLiveRelease()
     {
-        var liveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Published = DateTime.UtcNow };
+        var liveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Published = DateTimeOffset.UtcNow };
 
         var methodologyVersion = new MethodologyVersion
         {
@@ -1069,7 +1069,7 @@ public class MethodologyVersionRepositoryTests
     [Fact]
     public async Task IsToBePublished_ScheduledWithLiveReleaseButNotApprovedIsNotAccessible()
     {
-        var liveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Published = DateTime.UtcNow };
+        var liveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Published = DateTimeOffset.UtcNow };
 
         var methodologyVersion = new MethodologyVersion
         {
@@ -1267,7 +1267,7 @@ public class MethodologyVersionRepositoryTests
     [Fact]
     public async Task IsToBePublished_ApprovedAndScheduledWithLiveReleaseIsAccessibleIfNextVersionIsDraft()
     {
-        var liveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Published = DateTime.UtcNow };
+        var liveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Published = DateTimeOffset.UtcNow };
 
         var previousVersion = new MethodologyVersion
         {
@@ -1334,7 +1334,7 @@ public class MethodologyVersionRepositoryTests
     [Fact]
     public async Task IsToBePublished_ApprovedAndScheduledWithLiveReleaseIsAccessibleIfNextVersionIsScheduledWithNonLiveRelease()
     {
-        var liveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Published = DateTime.UtcNow };
+        var liveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), Published = DateTimeOffset.UtcNow };
 
         var nonLiveReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 

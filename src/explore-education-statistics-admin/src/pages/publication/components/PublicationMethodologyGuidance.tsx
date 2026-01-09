@@ -14,7 +14,7 @@ export function MethodologyStatusGuidanceModal() {
       title="Methodology status guidance"
       triggerButton={
         <ButtonText>
-          <InfoIcon description="Guidance on methodology statuses" />
+          Methodology status guidance <InfoIcon />
         </ButtonText>
       }
     >
@@ -54,7 +54,7 @@ export function MethodologyTypeGuidanceModal() {
       title="Methodology type guidance"
       triggerButton={
         <ButtonText>
-          <InfoIcon description="Guidance on methodology types" />
+          Methodology type guidance <InfoIcon />
         </ButtonText>
       }
     >

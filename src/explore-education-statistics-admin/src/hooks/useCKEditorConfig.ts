@@ -28,6 +28,7 @@ const useCKEditorConfig = ({
   allowedHeadings,
   editorInstance,
   includePlugins,
+  label,
   toolbarConfig = toolbarConfigFull,
   onAutoSave,
   onCancelComment,
@@ -46,6 +47,7 @@ const useCKEditorConfig = ({
     body: string;
   }[];
   includePlugins?: ReadonlySet<PluginName> | Set<PluginName>;
+  label: string;
   toolbarConfig?:
     | ReadonlyArray<ToolbarOption | ToolbarGroup>
     | Array<ToolbarOption | ToolbarGroup>;
@@ -137,6 +139,8 @@ const useCKEditorConfig = ({
         },
         defaultProtocol: 'https://',
       },
+      label,
+      licenseKey: 'GPL',
       extraPlugins:
         hasImageUpload && onImageUpload
           ? [customUploadAdapterPlugin(onImageUpload, onImageUploadCancel)]
@@ -222,6 +226,7 @@ const useCKEditorConfig = ({
     editorInstance,
     hasImageUpload,
     includePlugins,
+    label,
     onAutoSave,
     onCancelComment,
     onClickAddComment,

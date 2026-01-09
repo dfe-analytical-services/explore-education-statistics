@@ -1,11 +1,12 @@
-﻿using Xunit;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using Xunit;
 using static System.TimeZoneInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 
 public class CronExpressionUtilTestsTheoryData
 {
-    private static readonly TimeZoneInfo UkTimeZone = FindSystemTimeZoneById("Europe/London");
+    private static readonly TimeZoneInfo UkTimeZone = TimeZoneUtils.GetUkTimeZone();
 
     /// <summary>
     /// Test data to verify calculating the next occurrence of a Cron expression in the UTC time zone.
@@ -135,8 +136,5 @@ public class CronExpressionUtilTestsTheoryData
             // csharpier-ignore-end
         };
 
-    private static DateTimeOffset Dt(string input)
-    {
-        return DateTimeOffset.Parse(input);
-    }
+    private static DateTimeOffset Dt(string input) => DateTimeOffset.Parse(input);
 }

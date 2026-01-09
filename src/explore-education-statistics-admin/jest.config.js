@@ -37,8 +37,6 @@ const config = {
     '^explore-education-statistics-ckeditor$': '<rootDir>/test/stub.js',
     // Stub out MSAL React library.
     '@azure/msal-react': '<rootDir>/test/stub.js',
-    'react-markdown':
-      '<rootDir>/node_modules/react-markdown/react-markdown.min.js',
   },
   moduleFileExtensions: [
     'web.js',

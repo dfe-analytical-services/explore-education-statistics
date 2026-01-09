@@ -63,6 +63,7 @@ describe('ReleaseEditableBlock', () => {
   test('renders HTML block', () => {
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -93,6 +94,7 @@ describe('ReleaseEditableBlock', () => {
 
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -134,6 +136,7 @@ describe('ReleaseEditableBlock', () => {
 
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -188,6 +191,7 @@ describe('ReleaseEditableBlock', () => {
 
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -237,6 +241,7 @@ describe('ReleaseEditableBlock', () => {
 
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -280,6 +285,7 @@ describe('ReleaseEditableBlock', () => {
 
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -334,6 +340,7 @@ describe('ReleaseEditableBlock', () => {
 
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -371,6 +378,7 @@ describe('ReleaseEditableBlock', () => {
 
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -406,6 +414,7 @@ describe('ReleaseEditableBlock', () => {
 
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -470,6 +479,7 @@ describe('ReleaseEditableBlock', () => {
 
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -551,6 +561,7 @@ describe('ReleaseEditableBlock', () => {
 
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -646,6 +657,7 @@ describe('ReleaseEditableBlock', () => {
 
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -721,6 +733,7 @@ describe('ReleaseEditableBlock', () => {
 
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -771,6 +784,7 @@ describe('ReleaseEditableBlock', () => {
   test('clicking `Remove block` button shows confirmation modal', async () => {
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -791,6 +805,7 @@ describe('ReleaseEditableBlock', () => {
   test('confirming removal of block calls service to delete block', async () => {
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -822,6 +837,7 @@ describe('ReleaseEditableBlock', () => {
   test('renders Embed block', () => {
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -839,6 +855,7 @@ describe('ReleaseEditableBlock', () => {
   test('renders data block', () => {
     render(
       <ReleaseEditableBlock
+        label="Test block"
         publicationId="publication-1"
         releaseVersionId="release-1"
         sectionId="section-1"
@@ -854,6 +871,7 @@ describe('ReleaseEditableBlock', () => {
     test('renders comments correctly', () => {
       render(
         <ReleaseEditableBlock
+          label="Test block"
           publicationId="publication-1"
           releaseVersionId="release-1"
           sectionId="section-1"
@@ -887,6 +905,7 @@ describe('ReleaseEditableBlock', () => {
     test('calls `deleteContentSectionComment` when a comment delete button is clicked', async () => {
       render(
         <ReleaseEditableBlock
+          label="Test block"
           publicationId="publication-1"
           releaseVersionId="release-1"
           sectionId="section-1"
@@ -922,6 +941,7 @@ describe('ReleaseEditableBlock', () => {
     test('calls `updateContentSectionComment` when a comment is edited', async () => {
       render(
         <ReleaseEditableBlock
+          label="Test block"
           publicationId="publication-1"
           releaseVersionId="release-1"
           sectionId="section-1"
@@ -965,6 +985,7 @@ describe('ReleaseEditableBlock', () => {
     test('calls `updateContentSectionComment` when a comment is resolved', async () => {
       render(
         <ReleaseEditableBlock
+          label="Test block"
           publicationId="publication-1"
           releaseVersionId="release-1"
           sectionId="section-1"
@@ -1001,6 +1022,7 @@ describe('ReleaseEditableBlock', () => {
     test('calls `updateContentSectionComment` when a comment is unresolved', async () => {
       render(
         <ReleaseEditableBlock
+          label="Test block"
           publicationId="publication-1"
           releaseVersionId="release-1"
           sectionId="section-1"
@@ -1039,6 +1061,7 @@ describe('ReleaseEditableBlock', () => {
     test('calls `addContentSectionComment` when a comment is added', async () => {
       render(
         <ReleaseEditableBlock
+          label="Test block"
           publicationId="publication-1"
           releaseVersionId="release-1"
           sectionId="section-1"
@@ -1085,6 +1108,7 @@ describe('ReleaseEditableBlock', () => {
     test('renders comments correctly', () => {
       render(
         <ReleaseEditableBlock
+          label="Test block"
           publicationId="publication-1"
           releaseVersionId="release-1"
           sectionId="section-1"
@@ -1118,6 +1142,7 @@ describe('ReleaseEditableBlock', () => {
     test('calls `deleteContentSectionComment` when a comment delete button is clicked', async () => {
       render(
         <ReleaseEditableBlock
+          label="Test block"
           publicationId="publication-1"
           releaseVersionId="release-1"
           sectionId="section-1"
@@ -1153,6 +1178,7 @@ describe('ReleaseEditableBlock', () => {
     test('calls `updateContentSectionComment` when a comment is edited', async () => {
       render(
         <ReleaseEditableBlock
+          label="Test block"
           publicationId="publication-1"
           releaseVersionId="release-1"
           sectionId="section-1"
@@ -1196,6 +1222,7 @@ describe('ReleaseEditableBlock', () => {
     test('calls `updateContentSectionComment` when a comment is resolved', async () => {
       render(
         <ReleaseEditableBlock
+          label="Test block"
           publicationId="publication-1"
           releaseVersionId="release-1"
           sectionId="section-1"
@@ -1232,6 +1259,7 @@ describe('ReleaseEditableBlock', () => {
     test('calls `updateContentSectionComment` when a comment is unresolved', async () => {
       render(
         <ReleaseEditableBlock
+          label="Test block"
           publicationId="publication-1"
           releaseVersionId="release-1"
           sectionId="section-1"
@@ -1270,6 +1298,7 @@ describe('ReleaseEditableBlock', () => {
     test('calls `addContentSectionComment` when a comment is added', async () => {
       render(
         <ReleaseEditableBlock
+          label="Test block"
           publicationId="publication-1"
           releaseVersionId="release-1"
           sectionId="section-1"

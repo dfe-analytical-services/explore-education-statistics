@@ -76,7 +76,7 @@ public class ReleaseService(ContentDbContext contentDbContext, IReleaseVersionRe
             .ToListAsync();
     }
 
-    public async Task CompletePublishing(Guid releaseVersionId, DateTime actualPublishedDate)
+    public async Task CompletePublishing(Guid releaseVersionId, DateTimeOffset actualPublishedDate)
     {
         var releaseVersion = await contentDbContext
             .ReleaseVersions.Include(rv => rv.DataBlockVersions)
@@ -96,7 +96,7 @@ public class ReleaseService(ContentDbContext contentDbContext, IReleaseVersionRe
         await contentDbContext.SaveChangesAsync();
     }
 
-    private async Task UpdateReleaseFilePublishedDate(ReleaseVersion releaseVersion, DateTime publishedDate)
+    private async Task UpdateReleaseFilePublishedDate(ReleaseVersion releaseVersion, DateTimeOffset publishedDate)
     {
         var dataReleaseFiles = contentDbContext
             .ReleaseFiles.Where(releaseFile => releaseFile.ReleaseVersionId == releaseVersion.Id)
@@ -104,7 +104,7 @@ public class ReleaseService(ContentDbContext contentDbContext, IReleaseVersionRe
 
         if (releaseVersion.PreviousVersion is null)
         {
-            await dataReleaseFiles.ForEachAsync(releaseFile => releaseFile.Published = publishedDate);
+            await dataReleaseFiles.ForEachAsync(releaseFile => releaseFile.Published = publishedDate.UtcDateTime);
         }
         else
         {

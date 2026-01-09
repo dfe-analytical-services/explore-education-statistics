@@ -70,7 +70,7 @@ public class ReleaseServiceTests
             },
         },
         ApprovalStatus = Approved,
-        Published = new DateTime(2019, 2, 1),
+        Published = new DateTimeOffset(2019, 2, 1, 9, 30, 0, TimeSpan.Zero),
         Updates = new List<Update>
         {
             new()
@@ -400,8 +400,8 @@ public class ReleaseServiceTests
         Publication publication = _dataFixture
             .DefaultPublication()
             .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
-
-        var releaseVersion = publication.ReleaseVersions[0];
+        var release = publication.Releases[0];
+        var releaseVersion = release.Versions.Single(rv => rv is { Published: null });
 
         var originalContent = @"
                 <p>
@@ -491,8 +491,10 @@ public class ReleaseServiceTests
         Publication publication = _dataFixture
             .DefaultPublication()
             .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
+        var release = publication.Releases[0];
+        var releaseVersion = release.Versions.Single(rv => rv is { Published: null });
 
-        var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null });
+        var expectedPublishDate = new DateTimeOffset(2025, 1, 1, 9, 30, 0, TimeSpan.Zero);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -507,12 +509,11 @@ public class ReleaseServiceTests
 
             // Test scenario of the publisher getting an unpublished release to cache it in advance of publishing it
             // on a scheduled date
-            var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
             var result = await service.GetRelease(releaseVersion.Id, expectedPublishDate);
 
             var viewModel = result.AssertRight();
 
-            // Published date in the view model should match the expected publish date
+            // Published date in the view model should match the expected date
             Assert.Equal(expectedPublishDate, viewModel.Published);
         }
     }
@@ -523,8 +524,8 @@ public class ReleaseServiceTests
         Publication publication = _dataFixture
             .DefaultPublication()
             .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
-
-        var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null });
+        var release = publication.Releases[0];
+        var releaseVersion = release.Versions.Single(rv => rv is { Published: null });
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -554,9 +555,12 @@ public class ReleaseServiceTests
         Publication publication = _dataFixture
             .DefaultPublication()
             .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true).Generate(1));
+        var release = publication.Releases[0];
+        var (previousReleaseVersion, releaseVersion) = release.Versions.ToTuple2();
 
-        var (previousReleaseVersion, releaseVersion) = publication.ReleaseVersions.ToTuple2();
         releaseVersion.UpdatePublishedDate = false;
+
+        var expectedPublishDate = new DateTimeOffset(2025, 1, 1, 9, 30, 0, TimeSpan.Zero);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -572,7 +576,6 @@ public class ReleaseServiceTests
             // Test scenario of the publisher getting an unpublished amended release to cache it in advance of
             // publishing it.
             // An update to the published date *has not* been requested.
-            var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
             var result = await service.GetRelease(releaseVersion.Id, expectedPublishDate);
 
             var viewModel = result.AssertRight();
@@ -589,9 +592,12 @@ public class ReleaseServiceTests
         Publication publication = _dataFixture
             .DefaultPublication()
             .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true).Generate(1));
+        var release = publication.Releases[0];
+        var releaseVersion = release.Versions.Single(rv => rv is { Published: null });
 
-        var releaseVersion = publication.ReleaseVersions[1];
         releaseVersion.UpdatePublishedDate = true;
+
+        var expectedPublishDate = new DateTimeOffset(2025, 1, 1, 9, 30, 0, TimeSpan.Zero);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -607,13 +613,12 @@ public class ReleaseServiceTests
             // Test scenario of the publisher getting an unpublished amended release to cache it in advance of
             // publishing it.
             // An update to the published date *has* been requested.
-            var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
             var result = await service.GetRelease(releaseVersion.Id, expectedPublishDate);
 
             var viewModel = result.AssertRight();
 
             Assert.Equal(releaseVersion.Id, viewModel.Id);
-            // Published date in the view model should match the expected publish date
+            // Published date in the view model should match the expected date
             Assert.Equal(expectedPublishDate, viewModel.Published);
         }
     }
@@ -633,7 +638,7 @@ public class ReleaseServiceTests
         {
             var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-            var result = await service.GetRelease(Release1V3NotPublished.Id, DateTime.UtcNow);
+            var result = await service.GetRelease(Release1V3NotPublished.Id, DateTimeOffset.UtcNow);
             var viewModel = result.AssertRight();
 
             Assert.Equal(Release1V3NotPublished.Id, viewModel.Id);

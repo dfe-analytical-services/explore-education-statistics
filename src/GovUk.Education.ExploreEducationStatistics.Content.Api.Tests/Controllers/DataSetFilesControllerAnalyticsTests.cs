@@ -1,70 +1,96 @@
 using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Strategies;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using Snapshooter.Xunit;
 using Xunit;
 using File = System.IO.File;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public abstract class DataSetFilesControllerAnalyticsTests : IntegrationTestFixture
+// ReSharper disable once ClassNeverInstantiated.Global
+public class DataSetFilesControllerAnalyticsTestsFixture()
+    : OptimisedContentApiCollectionFixture(capabilities: [ContentApiIntegrationTestCapability.Azurite])
 {
-    private readonly DataFixture _fixture = new();
+    public IAnalyticsPathResolver AnalyticsPathResolver = null!;
+    public IPublicBlobStorageService PublicBlobStorageService = null!;
 
-    private DataSetFilesControllerAnalyticsTests(TestApplicationFactory testApp)
-        : base(testApp) { }
-
-    public class DownloadDataSetFileAnalyticsTests(TestApplicationFactory testApp)
-        : DataSetFilesControllerAnalyticsTests(testApp)
+    protected override void ConfigureServicesAndConfiguration(
+        OptimisedServiceAndConfigModifications serviceModifications
+    )
     {
-        public override async Task InitializeAsync() => await StartAzurite();
+        base.ConfigureServicesAndConfiguration(serviceModifications);
 
+        var analyticsBasePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+        serviceModifications.AddInMemoryCollection([
+            new KeyValuePair<string, string?>("Analytics:BasePath", analyticsBasePath),
+            new KeyValuePair<string, string?>("Analytics:Enabled", "true"),
+        ]);
+    }
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+
+        AnalyticsPathResolver = lookups.GetService<IAnalyticsPathResolver>();
+        PublicBlobStorageService = lookups.GetService<IPublicBlobStorageService>();
+    }
+}
+
+[CollectionDefinition(nameof(DataSetFilesControllerAnalyticsTestsFixture))]
+public class DataSetFilesControllerAnalyticsTestsCollection
+    : ICollectionFixture<DataSetFilesControllerAnalyticsTestsFixture>;
+
+[Collection(nameof(DataSetFilesControllerAnalyticsTestsFixture))]
+public abstract class DataSetFilesControllerAnalyticsTests(DataSetFilesControllerAnalyticsTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
+{
+    private static readonly DataFixture DataFixture = new();
+
+    public class DownloadDataSetFileAnalyticsTests(DataSetFilesControllerAnalyticsTestsFixture fixture)
+        : DataSetFilesControllerAnalyticsTests(fixture)
+    {
         [Fact]
         public async Task DownloadDataSetFile_RecordAnalytics()
         {
-            Publication publication = _fixture
+            Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                .WithTheme(_fixture.DefaultTheme());
+                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                .WithTheme(DataFixture.DefaultTheme());
 
-            ReleaseFile releaseFile = _fixture
+            ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
-                .WithFile(_fixture.DefaultFile(FileType.Data));
-
-            var testApp = BuildApp(enableAzurite: true, enableAnalytics: true);
-            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
-            var analyticsPathResolver = testApp.Services.GetRequiredService<IAnalyticsPathResolver>();
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             var formFile = CreateDataCsvFormFile("test file contents 2");
 
-            await publicBlobStorageService.UploadFile(
+            await fixture.PublicBlobStorageService.UploadFile(
                 containerName: BlobContainers.PublicReleaseFiles,
                 releaseFile.PublicPath(),
                 formFile
             );
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
-            var client = testApp.CreateClient();
+            var client = fixture.CreateClient();
 
             var response = await client.GetAsync($"/api/data-set-files/{releaseFile.File.DataSetFileId}/download");
 
@@ -72,7 +98,9 @@ public abstract class DataSetFilesControllerAnalyticsTests : IntegrationTestFixt
 
             var analyticsRequestFiles = Directory
                 .GetFiles(
-                    analyticsPathResolver.BuildOutputDirectory(AnalyticsWritePublicCsvDownloadStrategy.OutputSubPaths)
+                    fixture.AnalyticsPathResolver.BuildOutputDirectory(
+                        AnalyticsWritePublicCsvDownloadStrategy.OutputSubPaths
+                    )
                 )
                 .ToList();
 
@@ -83,40 +111,6 @@ public abstract class DataSetFilesControllerAnalyticsTests : IntegrationTestFixt
                 snapshotName: $"{nameof(DownloadDataSetFileAnalyticsTests)}.{nameof(DownloadDataSetFile_RecordAnalytics)}.snap"
             );
         }
-    }
-
-    private WebApplicationFactory<Startup> BuildApp(
-        ContentDbContext? contentDbContext = null,
-        StatisticsDbContext? statisticsDbContext = null,
-        bool enableAzurite = false,
-        bool enableAnalytics = false
-    )
-    {
-        List<Action<IWebHostBuilder>> configFuncs = [];
-
-        if (enableAzurite)
-        {
-            configFuncs.Add(WithAzurite());
-        }
-
-        if (enableAnalytics)
-        {
-            configFuncs.Add(WithAnalytics());
-        }
-
-        return BuildWebApplicationFactory(configFuncs)
-            .ConfigureServices(services =>
-            {
-                if (contentDbContext is not null)
-                {
-                    services.ReplaceService(contentDbContext);
-                }
-
-                if (statisticsDbContext is not null)
-                {
-                    services.ReplaceService(statisticsDbContext);
-                }
-            });
     }
 
     private static IFormFile CreateDataCsvFormFile(string content)

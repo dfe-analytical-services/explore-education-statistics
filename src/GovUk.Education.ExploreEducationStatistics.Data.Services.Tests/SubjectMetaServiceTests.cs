@@ -520,7 +520,7 @@ public class SubjectMetaServiceTests
         var releaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow.AddDays(-1),
+            Published = DateTimeOffset.UtcNow.AddDays(-1),
         };
 
         var releaseSubject = new ReleaseSubject
@@ -728,7 +728,7 @@ public class SubjectMetaServiceTests
             ReleaseVersion = new Content.Model.ReleaseVersion
             {
                 Id = releaseSubject.ReleaseVersion.Id,
-                Published = DateTime.UtcNow,
+                Published = DateTimeOffset.UtcNow,
             },
             File = new File
             {

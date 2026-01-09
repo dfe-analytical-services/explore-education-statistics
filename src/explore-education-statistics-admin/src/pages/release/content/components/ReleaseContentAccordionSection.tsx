@@ -16,6 +16,7 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Modal from '@common/components/Modal';
 import Tooltip from '@common/components/Tooltip';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
@@ -42,7 +43,11 @@ const ReleaseContentAccordionSection = ({
   transformFeaturedTableLinks,
   ...props
 }: ReleaseContentAccordionSectionProps) => {
-  const { id: sectionId, content: sectionContent = [] } = section;
+  const {
+    id: sectionId,
+    content: sectionContent = [],
+    heading: sectionHeading,
+  } = section;
 
   const { editingMode, unsavedCommentDeletions, unsavedBlocks } =
     useEditingContext();
@@ -158,6 +163,79 @@ const ReleaseContentAccordionSection = ({
     block => block.lockedUntil && isFuture(new Date(block.lockedUntil)),
   );
 
+  const htmlBlocks = blocks.filter(block => block.type === 'HtmlBlock');
+  const dataBlocks = blocks.filter(block => block.type === 'DataBlock');
+  const embedBlocks = blocks.filter(block => block.type === 'EmbedBlockLink');
+
+  const getBlockButtonLabels = (block: EditableBlock) => {
+    if (block.type === 'HtmlBlock') {
+      const htmlBlockIndex = htmlBlocks.findIndex(
+        htmlBlock => htmlBlock.id === block.id,
+      );
+      const sectionContext =
+        htmlBlocks.length > 1
+          ? `${htmlBlockIndex + 1} in ${sectionHeading}`
+          : `in ${sectionHeading}`;
+      return {
+        editLabel: (
+          <>
+            Edit<VisuallyHidden> text</VisuallyHidden> block
+            <VisuallyHidden> {sectionContext}</VisuallyHidden>
+          </>
+        ),
+        removeLabel: (
+          <>
+            Remove<VisuallyHidden> text</VisuallyHidden> block
+            <VisuallyHidden> {sectionContext}</VisuallyHidden>
+          </>
+        ),
+      };
+    }
+    if (block.type === 'DataBlock') {
+      const dataBlockIndex = dataBlocks.findIndex(
+        dataBlock => dataBlock.id === block.id,
+      );
+      const sectionContext =
+        dataBlocks.length > 1
+          ? `${dataBlockIndex + 1} in ${sectionHeading}`
+          : `in ${sectionHeading}`;
+
+      return {
+        editLabel: (
+          <>
+            Edit data block<VisuallyHidden> {sectionContext}</VisuallyHidden>
+          </>
+        ),
+        removeLabel: (
+          <>
+            Remove<VisuallyHidden> data</VisuallyHidden> block
+            <VisuallyHidden> {sectionContext}</VisuallyHidden>
+          </>
+        ),
+      };
+    }
+    const embedBlockIndex = embedBlocks.findIndex(
+      embedBlock => embedBlock.id === block.id,
+    );
+    const sectionContext =
+      embedBlocks.length > 1
+        ? `${embedBlockIndex + 1} in ${sectionHeading}`
+        : `in ${sectionHeading}`;
+    return {
+      editLabel: (
+        <>
+          Edit embedded URL<VisuallyHidden> {sectionContext}</VisuallyHidden>
+        </>
+      ),
+      removeLabel: (
+        <>
+          Remove<VisuallyHidden> embedded URL</VisuallyHidden> block
+          <VisuallyHidden> {sectionContext}</VisuallyHidden>
+        </>
+      ),
+    };
+  };
+
   return (
     <EditableAccordionSection
       {...props}
@@ -188,7 +266,14 @@ const ReleaseContentAccordionSection = ({
                 }
               }}
             >
-              {isReordering ? 'Save section order' : 'Reorder this section'}
+              {isReordering ? (
+                'Save section order'
+              ) : (
+                <>
+                  Reorder this section
+                  <VisuallyHidden>{`: ${heading}`}</VisuallyHidden>
+                </>
+              )}
             </Button>
           )}
         </Tooltip>
@@ -208,20 +293,30 @@ const ReleaseContentAccordionSection = ({
                 visible={open}
               />
             )}
-            renderEditableBlock={block => (
-              <ReleaseEditableBlock
-                allowComments
-                allowImages
-                block={block}
-                sectionId={sectionId}
-                sectionKey="content"
-                editable={!isReordering}
-                publicationId={release.publication.id}
-                releaseVersionId={release.id}
-                visible={open}
-                onAfterDeleteBlock={onAfterDeleteBlock}
-              />
-            )}
+            renderEditableBlock={(block, contentBlockNumber) => {
+              const { editLabel, removeLabel } = getBlockButtonLabels(block);
+              return (
+                <ReleaseEditableBlock
+                  allowComments
+                  allowImages
+                  block={block}
+                  editButtonLabel={editLabel}
+                  removeButtonLabel={removeLabel}
+                  sectionId={sectionId}
+                  sectionKey="content"
+                  editable={!isReordering}
+                  publicationId={release.publication.id}
+                  releaseVersionId={release.id}
+                  visible={open}
+                  onAfterDeleteBlock={onAfterDeleteBlock}
+                  label={
+                    !heading
+                      ? 'Content block'
+                      : `Content block ${contentBlockNumber} for the "${sectionHeading}" section`
+                  }
+                />
+              );
+            }}
           />
 
           {editingMode === 'edit' && !isReordering && (
@@ -245,10 +340,12 @@ const ReleaseContentAccordionSection = ({
                   ref={addTextBlockButton}
                 >
                   Add text block
+                  <VisuallyHidden>{` to ${heading}`}</VisuallyHidden>
                 </Button>
                 {!showDataBlockForm && (
                   <Button variant="secondary" onClick={toggleDataBlockForm.on}>
                     Add data block
+                    <VisuallyHidden>{` to ${heading}`}</VisuallyHidden>
                   </Button>
                 )}
                 {user?.permissions.isBauUser && (
@@ -262,6 +359,7 @@ const ReleaseContentAccordionSection = ({
                         onClick={toggleEmbedDashboardForm.on}
                       >
                         Embed a URL
+                        <VisuallyHidden>{` in ${heading}`}</VisuallyHidden>
                       </Button>
                     }
                   >

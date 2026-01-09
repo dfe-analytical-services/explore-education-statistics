@@ -1,10 +1,5 @@
 using DotNet.Testcontainers.Containers;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
@@ -92,13 +87,39 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimal
         await AfterFactoryConstructed(lookups);
     }
 
+    /// <summary>
+    /// A method that can be overridden by subclasses of this fixture to register any test containers that they require.
+    ///
+    /// Containers registered here will be started prior to any tests in a collection running and stopped after all
+    /// tests in the collection have finished.
+    /// </summary>
     protected virtual void RegisterTestContainers(TestContainerRegistrations registrations) { }
 
+    /// <summary>
+    /// A method that can be overridden by subclasses of this fixture to provide any specific alteration of services
+    /// and configuration prior to building the WebApplicationFactory e.g. replacing services with mocks, adding
+    /// in-memory DbContexts etc.
+    /// </summary>
     protected virtual void ConfigureServicesAndConfiguration(
         OptimisedServiceAndConfigModifications serviceModifications
     ) { }
 
+    /// <summary>
+    /// A method that can be overridden by subclasses of this fixture to perform any actions after the
+    /// WebApplicationFactory has been constructed e.g. looking up any special services that the fixture may have
+    /// registered via the <see cref="ConfigureServicesAndConfiguration"/> method.
+    /// </summary>
     protected virtual Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<TStartup> lookups)
+    {
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// A method that can be overridden by subclasses of this fixture to perform actions before each test
+    /// in a collection runs e.g. resetting any shared Mocks that were dirtied in previous tests in the
+    /// collection, unsettings users from handling requests etc.
+    /// </summary>
+    public virtual Task BeforeEachTest()
     {
         return Task.CompletedTask;
     }
@@ -142,144 +163,5 @@ public class TestContainerRegistrations
     {
         var stopTasks = _testContainers.Select(container => container.StopAsync());
         await Task.WhenAll(stopTasks);
-    }
-}
-
-/// <summary>
-///
-/// A helper class to control access to WebApplicationFactory modifications for tests.
-///
-/// By exposing only safe methods of reconfiguring the factory, we can better control the types of changes that we
-/// are able to perform, and it also makes it more visible when classes need particular additional support through
-/// reconfiguration.
-///
-/// By using this helper class, we also prevent direct access to the factory from test classes.
-///
-/// </summary>
-public class OptimisedServiceAndConfigModifications
-{
-    internal readonly List<Action<IServiceCollection>> ServiceModifications = new();
-    internal readonly List<Action<IConfigurationBuilder>> ConfigModifications = new();
-
-    public OptimisedServiceAndConfigModifications AddController(Type controllerType)
-    {
-        ServiceModifications.Add(services =>
-            services.AddControllers().AddApplicationPart(controllerType.Assembly).AddControllersAsServices()
-        );
-        return this;
-    }
-
-    public OptimisedServiceAndConfigModifications AddControllers<TStartup>()
-        where TStartup : class
-    {
-        ServiceModifications.Add(services => services.RegisterControllers<TStartup>());
-        return this;
-    }
-
-    public OptimisedServiceAndConfigModifications AddInMemoryDbContext<TDbContext>(string databaseName)
-        where TDbContext : DbContext
-    {
-        ServiceModifications.Add(services => services.UseInMemoryDbContext<TDbContext>(databaseName));
-        return this;
-    }
-
-    public OptimisedServiceAndConfigModifications AddDbContext<TDbContext>(Action<DbContextOptionsBuilder> options)
-        where TDbContext : DbContext
-    {
-        ServiceModifications.Add(services => services.AddDbContext<TDbContext>(options));
-        return this;
-    }
-
-    public OptimisedServiceAndConfigModifications AddSingleton<TService>()
-        where TService : class
-    {
-        ServiceModifications.Add(services => services.AddSingleton<TService>());
-        return this;
-    }
-
-    public OptimisedServiceAndConfigModifications AddSingleton<TService>(TService service)
-        where TService : class
-    {
-        ServiceModifications.Add(services => services.AddSingleton(service));
-        return this;
-    }
-
-    public OptimisedServiceAndConfigModifications AddAuthentication<
-        TAuthenticationHandler,
-        TAuthenticationHandlerOptions
-    >(string schemeName)
-        where TAuthenticationHandler : AuthenticationHandler<TAuthenticationHandlerOptions>
-        where TAuthenticationHandlerOptions : AuthenticationSchemeOptions, new()
-    {
-        ServiceModifications.Add(services =>
-            services
-                .AddAuthentication(schemeName)
-                .AddScheme<TAuthenticationHandlerOptions, TAuthenticationHandler>(schemeName, null)
-        );
-        return this;
-    }
-
-    public OptimisedServiceAndConfigModifications ReplaceService<T>(T service, bool optional = false)
-        where T : class
-    {
-        ServiceModifications.Add(services => services.ReplaceService(service, optional: optional));
-        return this;
-    }
-
-    public OptimisedServiceAndConfigModifications ReplaceServiceWithMock<T>(
-        MockBehavior mockBehavior = MockBehavior.Strict
-    )
-        where T : class
-    {
-        ServiceModifications.Add(services => services.MockService<T>(mockBehavior));
-        return this;
-    }
-
-    public OptimisedServiceAndConfigModifications AddMock<T>(T service, bool optional = false)
-        where T : class
-    {
-        ServiceModifications.Add(services => services.MockService<T>());
-        return this;
-    }
-
-    public OptimisedServiceAndConfigModifications AddInMemoryCollection(
-        IEnumerable<KeyValuePair<string, string?>> appsettings
-    )
-    {
-        ConfigModifications.Add(config => config.AddInMemoryCollection(appsettings));
-        return this;
-    }
-}
-
-/// <summary>
-///
-/// A helper class to allow tests to look up services and mocks after the factory has been configured.
-/// Through using this helper class to perform service lookups, we prevent direct access to the factory from tests.
-///
-/// </summary>
-public class OptimisedServiceCollectionLookups<TStartup>(WebApplicationFactory<TStartup> factory)
-    where TStartup : class
-{
-    /// <summary>
-    ///
-    /// Look up a service from the factory.  If it's required to look up a mocked service, use the
-    /// <see cref="GetMockService{TService}" /> method instead.
-    ///
-    /// </summary>
-    public TService GetService<TService>()
-        where TService : class
-    {
-        return factory.Services.GetRequiredService<TService>();
-    }
-
-    /// <summary>
-    ///
-    /// Look up a mocked service from the factory.
-    ///
-    /// </summary>
-    public Mock<TService> GetMockService<TService>()
-        where TService : class
-    {
-        return Mock.Get(factory.Services.GetRequiredService<TService>());
     }
 }

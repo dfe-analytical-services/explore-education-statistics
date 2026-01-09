@@ -1,5 +1,4 @@
 #nullable enable
-using System.Globalization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -1329,8 +1328,8 @@ public abstract class ReleaseVersionServiceTests
                                     _dataFixture
                                         .DefaultReleaseVersion()
                                         .WithApprovalStatus(ReleaseApprovalStatus.Approved)
-                                        .WithPublished(DateTime.UtcNow)
-                                        .WithPublishScheduled(DateTime.UtcNow)
+                                        .WithPublished(DateTimeOffset.UtcNow)
+                                        .WithPublishScheduled(DateTimeOffset.UtcNow)
                                         .WithPublishingOrganisations(_dataFixture.DefaultOrganisation().Generate(2))
                                         .WithReleaseStatuses(_dataFixture.DefaultReleaseStatus().Generate(2)),
                                 ]
@@ -1382,7 +1381,7 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(releaseVersion.Release.Publication.Slug, viewModel.PublicationSlug);
                 Assert.Equal(releaseVersion.ApprovalStatus, viewModel.ApprovalStatus);
                 Assert.Equal(releaseVersion.LatestInternalReleaseNote, viewModel.LatestInternalReleaseNote);
-                Assert.Equal(releaseVersion.PublishScheduled?.ConvertUtcToUkTimeZone(), viewModel.PublishScheduled);
+                Assert.Equal(releaseVersion.PublishScheduled?.ToUkDateOnly(), viewModel.PublishScheduled);
                 Assert.Equal(releaseVersion.Published, viewModel.Published);
                 Assert.Equal(releaseVersion.PreReleaseAccessList, viewModel.PreReleaseAccessList);
                 Assert.Equal(releaseVersion.NextReleaseDate, viewModel.NextReleaseDate);
@@ -2382,7 +2381,7 @@ public abstract class ReleaseVersionServiceTests
             // Check the publication's latest published release version in the generated test data setup
             Assert.Equal(release2025.Versions[0].Id, publication.LatestPublishedReleaseVersionId);
 
-            var request = new ReleasePublishedUpdateRequest { Published = DateTime.UtcNow.AddDays(-1) };
+            var request = new ReleasePublishedUpdateRequest { Published = DateTimeOffset.UtcNow.AddDays(-1) };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -2424,7 +2423,7 @@ public abstract class ReleaseVersionServiceTests
                 .DefaultPublication()
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
 
-            var request = new ReleasePublishedUpdateRequest { Published = DateTime.UtcNow.AddDays(-1) };
+            var request = new ReleasePublishedUpdateRequest { Published = DateTimeOffset.UtcNow.AddDays(-1) };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -2536,7 +2535,7 @@ public abstract class ReleaseVersionServiceTests
 
             var request = new ReleasePublishedUpdateRequest
             {
-                Published = DateTime.Parse("2022-08-08T09:30:00.0000000+01:00"), // DateTimeKind: Local
+                Published = DateTimeOffset.Parse("2022-08-08T09:30:00.0000000+01:00"),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -2580,15 +2579,9 @@ public abstract class ReleaseVersionServiceTests
                     rv.Id == publication.Releases[0].Versions[0].Id
                 );
 
-                // The published date retrieved from the database should always be represented in UTC
-                // because of the conversion setup in the database context config.
-                Assert.Equal(DateTimeKind.Utc, saved.Published!.Value.Kind);
-
                 // Make sure the request date was converted to UTC before it was updated on the release
-                Assert.Equal(
-                    DateTime.Parse("2022-08-08T08:30:00Z", styles: DateTimeStyles.AdjustToUniversal),
-                    saved.Published
-                );
+                Assert.Equal(TimeSpan.Zero, saved.Published?.Offset);
+                Assert.Equal(request.Published, saved.Published);
             }
         }
     }

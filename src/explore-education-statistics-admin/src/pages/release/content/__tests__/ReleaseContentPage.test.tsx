@@ -477,7 +477,7 @@ describe('ReleaseContentPage', () => {
     const section1Button = await within(contentAccordionSections[0]).findByRole(
       'button',
       {
-        name: /Section 1/,
+        name: /Section 1, show/,
       },
     );
 
@@ -554,7 +554,7 @@ describe('ReleaseContentPage', () => {
 
       expect(
         within(contentAccordionSections[0]).getByRole('button', {
-          name: /Section 1/,
+          name: /Section 1, show/,
         }),
       ).toBeInTheDocument();
       expect(
@@ -562,27 +562,27 @@ describe('ReleaseContentPage', () => {
       ).toBeInTheDocument();
       expect(
         within(contentAccordionSections[0]).getByRole('button', {
-          name: 'Edit section title',
+          name: /Edit section title/,
         }),
       ).toBeInTheDocument();
       expect(
         within(contentAccordionSections[0]).getByRole('button', {
-          name: 'Reorder this section',
+          name: /Reorder this section/,
         }),
       ).toBeInTheDocument();
       expect(
         within(contentAccordionSections[0]).getByRole('button', {
-          name: 'Remove this section',
+          name: /Remove this section/,
         }),
       ).toBeInTheDocument();
       expect(
         within(contentAccordionSections[0]).getByRole('button', {
-          name: 'Edit block',
+          name: /Edit text block/,
         }),
       ).toBeInTheDocument();
       expect(
         within(contentAccordionSections[0]).getByRole('button', {
-          name: 'Remove block',
+          name: /Remove text block/,
         }),
       ).toBeInTheDocument();
 
@@ -652,27 +652,27 @@ describe('ReleaseContentPage', () => {
       ).toBeInTheDocument();
       expect(
         within(contentAccordionSections[0]).queryByRole('button', {
-          name: 'Edit section title',
+          name: /Edit section title/,
         }),
       ).not.toBeInTheDocument();
       expect(
         within(contentAccordionSections[0]).queryByRole('button', {
-          name: 'Reorder this section',
+          name: /Reorder this section/,
         }),
       ).not.toBeInTheDocument();
       expect(
         within(contentAccordionSections[0]).queryByRole('button', {
-          name: 'Remove this section',
+          name: /Remove this section/,
         }),
       ).not.toBeInTheDocument();
       expect(
         within(contentAccordionSections[0]).queryByRole('button', {
-          name: 'Edit block',
+          name: /Edit text block/,
         }),
       ).not.toBeInTheDocument();
       expect(
         within(contentAccordionSections[0]).queryByRole('button', {
-          name: 'Remove block',
+          name: /Remove text block/,
         }),
       ).not.toBeInTheDocument();
 

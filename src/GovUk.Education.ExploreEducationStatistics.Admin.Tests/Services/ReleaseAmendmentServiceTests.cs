@@ -57,7 +57,7 @@ public class ReleaseAmendmentServiceTests
                     .WithPublication(_fixture.DefaultPublication())
             )
             .WithCreated(created: DateTime.UtcNow.AddDays(-2), createdById: originalCreatedBy.Id)
-            .WithPublishScheduled(DateTime.Now.AddDays(1))
+            .WithPublishScheduled(DateTimeOffset.UtcNow.AddDays(1))
             .WithNextReleaseDate(
                 new PartialDate
                 {
@@ -66,7 +66,7 @@ public class ReleaseAmendmentServiceTests
                     Year = "2040",
                 }
             )
-            .WithPublished(DateTime.UtcNow.AddDays(-1))
+            .WithPublished(DateTimeOffset.UtcNow.AddDays(-1))
             .WithApprovalStatus(ReleaseApprovalStatus.Approved)
             .WithPreviousVersionId(Guid.NewGuid())
             .WithType(ReleaseType.OfficialStatistics)

@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static System.DateTime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Security;
 
@@ -113,7 +112,9 @@ public class PermissionsController(
         return await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanViewPreReleaseSummary)
-            .OnSuccess(releaseVersion => preReleaseService.GetPreReleaseWindowStatus(releaseVersion, UtcNow))
+            .OnSuccess(releaseVersion =>
+                preReleaseService.GetPreReleaseWindowStatus(releaseVersion, DateTimeOffset.UtcNow)
+            )
             .HandleFailuresOrOk();
     }
 

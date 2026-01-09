@@ -6,23 +6,31 @@ import {
   EinContentBlock,
 } from '@common/services/types/einBlocks';
 import isBrowser from '@common/utils/isBrowser';
-import React, { useCallback } from 'react';
+import React, { ReactNode, useCallback } from 'react';
 import EditableTileGroupBlock from './EditableTileGroupBlock';
 
 interface Props {
   block: EinContentBlock;
   editable?: boolean;
+  editButtonLabel?: ReactNode | string;
+  groupButtonsLabel?: ReactNode | string;
+  removeButtonLabel?: ReactNode | string;
   sectionId: string;
   onSave: (blockId: string, content: string, blockType: EinBlockType) => void;
   onDelete: (blockId: string) => void;
+  label: string;
 }
 
 const EducationInNumbersEditableBlock = ({
   block,
   editable = true,
+  editButtonLabel,
+  groupButtonsLabel,
+  removeButtonLabel,
   sectionId,
   onSave,
   onDelete,
+  label,
 }: Props) => {
   const blockId = `block-${block.id}`;
 
@@ -47,9 +55,11 @@ const EducationInNumbersEditableBlock = ({
       return (
         <EditableContentBlock
           editable={editable && !isBrowser('IE')}
+          editButtonLabel={editButtonLabel}
+          removeButtonLabel={removeButtonLabel}
           id={blockId}
           isEditing={isEditing}
-          label="Content block"
+          label={label}
           hideLabel
           value={block.body}
           toolbarConfig={educationInNumbersToolbarConfig}
@@ -64,6 +74,8 @@ const EducationInNumbersEditableBlock = ({
         <EditableTileGroupBlock
           block={block}
           editable={editable && !isBrowser('IE')}
+          groupButtonsLabel={groupButtonsLabel}
+          removeButtonLabel={removeButtonLabel}
           sectionId={sectionId}
           onDelete={handleDelete}
           onSave={handleSave}

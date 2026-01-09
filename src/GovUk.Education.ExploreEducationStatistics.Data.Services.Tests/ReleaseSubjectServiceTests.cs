@@ -48,21 +48,21 @@ public class ReleaseSubjectServiceTests
         var previousReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow.AddDays(-2),
+            Published = DateTimeOffset.UtcNow.AddDays(-2),
             Version = 0,
         };
 
         var latestReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow.AddDays(-1),
+            Published = DateTimeOffset.UtcNow.AddDays(-1),
             Version = 1,
         };
 
         var futureReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow.AddDays(1),
+            Published = DateTimeOffset.UtcNow.AddDays(1),
             Version = 2,
         };
 
@@ -129,21 +129,21 @@ public class ReleaseSubjectServiceTests
         var previousReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow.AddDays(-2),
+            Published = DateTimeOffset.UtcNow.AddDays(-2),
             Version = 0,
         };
 
         var latestReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow.AddDays(-1),
+            Published = DateTimeOffset.UtcNow.AddDays(-1),
             Version = 1,
         };
 
         var futureReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow.AddDays(1),
+            Published = DateTimeOffset.UtcNow.AddDays(1),
             Version = 2,
         };
 
@@ -229,7 +229,7 @@ public class ReleaseSubjectServiceTests
         var futureReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow.AddDays(1),
+            Published = DateTimeOffset.UtcNow.AddDays(1),
         };
 
         // Link the Subject to a Release with a future Published date/time that should not be considered Live

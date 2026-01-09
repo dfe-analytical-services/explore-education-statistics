@@ -62,7 +62,7 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
 
         var firstPublishedUpdate = new ReleaseUpdateDto
         {
-            Date = await GetReleaseFirstPublishedDate(releaseVersion),
+            Date = (await GetReleaseFirstPublishedDate(releaseVersion)).UtcDateTime,
             Summary = "First published",
         };
 
@@ -72,7 +72,7 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
         return PaginatedListViewModel<ReleaseUpdateDto>.Paginate(allUpdates, page, pageSize);
     }
 
-    private async Task<DateTime> GetReleaseFirstPublishedDate(ReleaseVersion releaseVersion)
+    private async Task<DateTimeOffset> GetReleaseFirstPublishedDate(ReleaseVersion releaseVersion)
     {
         var published =
             releaseVersion.Version == 0

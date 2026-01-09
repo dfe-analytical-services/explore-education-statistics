@@ -1,9 +1,9 @@
 #nullable enable
-using System.Globalization;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -231,10 +231,7 @@ public class EmailTemplateServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
 
         // UK time 00:00 on 9th Sept 2020
-        var publishedScheduledStartOfDay = DateTime.Parse(
-            "2020-09-08T23:00:00.00Z",
-            styles: DateTimeStyles.AdjustToUniversal
-        );
+        var publishedScheduledStartOfDay = new DateOnly(2020, 9, 9).GetUkStartOfDayUtc();
 
         ReleaseVersion releaseVersion = _dataFixture
             .DefaultReleaseVersion()
@@ -253,7 +250,7 @@ public class EmailTemplateServiceTests
             .Returns(
                 new PreReleaseWindow
                 {
-                    Start = DateTime.Parse("2020-09-08T07:30:00.00Z", styles: DateTimeStyles.AdjustToUniversal), // UK time 08:30 on 8th Sept 2020
+                    Start = new DateTimeOffset(2020, 9, 8, 7, 30, 0, TimeSpan.Zero), // UK time 08:30 on 8th Sept 2020
                     ScheduledPublishDate = publishedScheduledStartOfDay,
                 }
             );

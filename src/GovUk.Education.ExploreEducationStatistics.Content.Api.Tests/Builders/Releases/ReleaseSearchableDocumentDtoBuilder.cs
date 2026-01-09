@@ -13,7 +13,7 @@ public class ReleaseSearchableDocumentDtoBuilder
     private string _publicationSlug = "Publication slug";
     private string _publicationSummary = "Publication summary";
     private string _publicationTitle = "Publication title";
-    private DateTimeOffset _published = new DateTime(2025, 09, 01, 08, 30, 00, DateTimeKind.Utc);
+    private DateTimeOffset _published = new(2025, 09, 01, 08, 30, 00, TimeSpan.Zero);
     private Guid _themeId = Guid.NewGuid();
     private string _themeTitle = "Theme title";
     private ReleaseType _type = ReleaseType.OfficialStatistics;

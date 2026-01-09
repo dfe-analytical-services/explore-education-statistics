@@ -111,7 +111,7 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
             var preReleaseService = new Mock<IPreReleaseService>(Strict);
 
             preReleaseService
-                .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTime>()))
+                .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTimeOffset>()))
                 .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
 
             // Assert that a User who specifically has the Pre Release role will cause this handler to succeed
@@ -156,7 +156,7 @@ public class ViewSpecificReleaseAuthorizationHandlersTests
                     var preReleaseService = new Mock<IPreReleaseService>(Strict);
 
                     preReleaseService
-                        .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTime>()))
+                        .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTimeOffset>()))
                         .Returns(new PreReleaseWindowStatus { Access = access });
 
                     // Assert that a User who specifically has the Pre Release role will cause this handler to fail

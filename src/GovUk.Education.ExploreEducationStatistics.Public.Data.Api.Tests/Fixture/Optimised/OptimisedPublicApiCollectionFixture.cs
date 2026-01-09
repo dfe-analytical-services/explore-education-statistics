@@ -2,12 +2,14 @@ using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.UserAuth;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces.Search;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Tests;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.Optimised;
@@ -42,17 +44,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixtu
 ///
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTestCapability[] capabilities)
+public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegrationTestCapability[] capabilities)
     : OptimisedIntegrationTestFixtureBase<Startup>(minimalApi: true)
 {
-    private OptimisedTestUserHolder _userHolder = null!;
+    private OptimisedTestUserHolder? _userHolder;
 
     private Func<string> _psqlConnectionString = null!;
 
-    private PublicDataDbContext _publicDataDbContext = null!;
-    private Mock<IContentApiClient> _contentApiClientMock = null!;
-    private Mock<ISearchService> _searchServiceMock = null!;
-    private Mock<IAnalyticsService> _analyticsServiceMock = null!;
+    private PublicDataDbContext? _publicDataDbContext;
+    private IContentApiClient _contentApiClient = null!;
+    private ISearchService _searchService = null!;
+    private IAnalyticsService _analyticsService = null!;
+
+    private readonly TestDataSetVersionPathResolver _testDataSetVersionPathResolver = new()
+    {
+        Directory = "AbsenceSchool",
+    };
+
+    private FakeTimeProvider _timeProvider = null!;
+    private DateTimeProvider _dateTimeProvider = null!;
 
     protected override void RegisterTestContainers(TestContainerRegistrations registrations)
     {
@@ -72,6 +82,14 @@ public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTe
             .ReplaceServiceWithMock<IContentApiClient>()
             .ReplaceServiceWithMock<ISearchService>()
             .ReplaceServiceWithMock<IAnalyticsService>(mockBehavior: MockBehavior.Loose);
+
+        serviceModifications.ReplaceService<IDataSetVersionPathResolver>(_testDataSetVersionPathResolver);
+
+        _timeProvider = new FakeTimeProvider(DateTimeOffset.UtcNow);
+        _dateTimeProvider = new DateTimeProvider(_timeProvider.GetUtcNow().UtcDateTime);
+
+        serviceModifications.ReplaceService<TimeProvider>(_timeProvider);
+        serviceModifications.ReplaceService(_dateTimeProvider);
 
         if (capabilities.Contains(PublicApiIntegrationTestCapability.Postgres))
         {
@@ -101,12 +119,13 @@ public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTe
         // calling "DisposeAsync" on this fixture.
         _publicDataDbContext = lookups.GetService<PublicDataDbContext>();
 
-        // Look up the Mocks surrounding mocked-out dependencies once per test class using this fixture.
-        // Test classes can then use the Mocks for setups and verifications, as the Mocks will be the same ones
-        // as used in the tested code itself.
-        _contentApiClientMock = lookups.GetMockService<IContentApiClient>();
-        _searchServiceMock = lookups.GetMockService<ISearchService>();
-        _analyticsServiceMock = lookups.GetMockService<IAnalyticsService>();
+        // Look up commonly mocked-out dependencies once per test class using this fixture. If the test collection
+        // needs these as mocks, they can access them using the respective "GetXMock" method in this fixture e.g.
+        // "GetContentApiClientMock()". We look up just the plain services here because an individual test collection
+        // fixture may have chosen to inject a real service here rather than the standard mock.
+        _contentApiClient = lookups.GetService<IContentApiClient>();
+        _searchService = lookups.GetService<ISearchService>();
+        _analyticsService = lookups.GetService<IAnalyticsService>();
 
         if (capabilities.Contains(PublicApiIntegrationTestCapability.Postgres))
         {
@@ -130,7 +149,10 @@ public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTe
     protected override async Task DisposeResources()
     {
         // Dispose of any DbContexts when the test class that was using this fixture has completed.
-        await _publicDataDbContext.DisposeAsync();
+        if (_publicDataDbContext != null)
+        {
+            await _publicDataDbContext.DisposeAsync();
+        }
     }
 
     /// <summary>
@@ -139,53 +161,56 @@ public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTe
     public HttpClient CreateClient(ClaimsPrincipal user)
     {
         SetUser(user);
-        return CreateClient();
+        return base.CreateClient();
+    }
+
+    public DateTimeOffset GetUtcNow()
+    {
+        return _timeProvider.GetUtcNow();
     }
 
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public PublicDataDbContext GetPublicDataDbContext() => _publicDataDbContext;
-
-    /// <summary>
-    ///
-    /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
-    /// within the tested code itself.
-    /// </summary>
-    ///
-    /// <param name="resetMock">
-    /// Controls whether this mock is firstly reset upon being requested via this method.
-    /// See <see cref="MockExtensions.WithOptionalReset" /> for more details.
-    ///
-    /// </param>
-    public Mock<IContentApiClient> GetContentApiClientMock(bool resetMock = true) =>
-        _contentApiClientMock.WithOptionalReset(resetMock);
+    public PublicDataDbContext GetPublicDataDbContext() => _publicDataDbContext!;
 
     /// <summary>
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
-    ///
-    /// <param name="resetMock">
-    /// Controls whether this mock is firstly reset upon being requested via this method.
-    /// See <see cref="MockExtensions.WithOptionalReset" /> for more details.
-    /// </param>
-    public Mock<ISearchService> GetSearchServiceMock(bool resetMock = true) =>
-        _searchServiceMock.WithOptionalReset(resetMock);
+    public Mock<IContentApiClient> GetContentApiClientMock() => Mock.Get(_contentApiClient);
 
     /// <summary>
-    ///
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
     /// within the tested code itself.
     /// </summary>
-    ///
-    /// <param name="resetMock">
-    /// Controls whether this mock is firstly reset upon being requested via this method.
-    /// See <see cref="MockExtensions.WithOptionalReset" /> for more details.
-    ///
-    /// </param>
-    public Mock<IAnalyticsService> GetAnalyticsServiceMock(bool resetMock = true) =>
-        _analyticsServiceMock.WithOptionalReset(resetMock);
+    public Mock<ISearchService> GetSearchServiceMock() => Mock.Get(_searchService);
+
+    /// <summary>
+    /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used
+    /// within the tested code itself.
+    /// </summary>
+    public Mock<IAnalyticsService> GetAnalyticsServiceMock() => Mock.Get(_analyticsService);
+
+    public TestDataSetVersionPathResolver GetTestDataSetVersionPathResolver() => _testDataSetVersionPathResolver;
+
+    /// <summary>
+    /// This method is run prior to each individual test in a collection. Here we reset any commonly-used mocks and
+    /// ensure no users are set to handle HttpClient requests by default.
+    /// </summary>
+    public override Task BeforeEachTest()
+    {
+        ResetIfMock(_contentApiClient);
+        ResetIfMock(_searchService);
+        ResetIfMock(_analyticsService);
+
+        if (capabilities.Contains(PublicApiIntegrationTestCapability.UserAuth))
+        {
+            _userHolder!.SetUser(null);
+        }
+
+        return Task.CompletedTask;
+    }
 
     /// <summary>
     /// Adds a user to the test user pool so that they can be used for HttpClient calls and looked up successfully.
@@ -197,7 +222,27 @@ public abstract class OptimisedPublicApiCollectionFixture(PublicApiIntegrationTe
             throw new Exception("""Cannot register test users if "useTestUserAuthentication" is false.""");
         }
 
-        _userHolder.SetUser(user);
+        _userHolder!.SetUser(user);
+    }
+
+    /// <summary>
+    /// Resets a mock for a given service if the service has been mocked.
+    ///
+    /// We support this not necessarily being a mock because a fixture subclass may have chosen to inject a real
+    /// service in place of a service that is generally mocked out.
+    /// </summary>
+    private void ResetIfMock<TService>(TService service)
+        where TService : class
+    {
+        try
+        {
+            var mock = Mock.Get(service);
+            mock.Reset();
+        }
+        catch
+        {
+            // "service" is not a Mock. This is fine.
+        }
     }
 }
 
@@ -205,42 +250,5 @@ public enum PublicApiIntegrationTestCapability
 {
     Postgres,
     UserAuth,
-}
-
-public static class OptimisedTestUsers
-{
-    public static readonly ClaimsPrincipal AdminAppUser = new DataFixture()
-        .Generator<ClaimsPrincipal>()
-        .WithRole(SecurityConstants.AdminAccessAppRole);
-
-    public static readonly ClaimsPrincipal UnsupportedRoleUser = new DataFixture()
-        .Generator<ClaimsPrincipal>()
-        .WithRole("Unsupported Role");
-}
-
-public static class MockExtensions
-{
-    /// <summary>
-    /// Allows mocks to be reset if requested.
-    ///
-    /// The reason that we support this and enable it by default when using a "GetXMock()" method is because this
-    /// fixture is reused by all tests within a collection, and therefore each new test using a Mock will ideally
-    /// want to use a Mock that has no pre-existing unverified setups on it. It is possible that prior tests might
-    /// have left the Mock in an unclean state.
-    ///
-    /// A test class should therefore use Mocks from this fixture firstly by calling "GetXMock()" and assigning the
-    /// Mock to a variable, then adding its setups to that variable. After the method under test has been performed,
-    /// that same variable should be used for verifications.
-    ///
-    /// </summary>
-    public static Mock<TMockType> WithOptionalReset<TMockType>(this Mock<TMockType> mock, bool resetMock)
-        where TMockType : class
-    {
-        if (resetMock)
-        {
-            mock.Reset();
-        }
-
-        return mock;
-    }
+    AnalyticsService,
 }

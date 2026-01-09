@@ -31,10 +31,10 @@ describe('EditableAccordionSection', () => {
       expect(screen.getByText('Test content')).toBeInTheDocument();
 
       expect(
-        screen.queryByRole('button', { name: 'Edit section title' }),
+        screen.queryByRole('button', { name: /Edit section title/ }),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole('button', { name: 'Remove this section' }),
+        screen.queryByRole('button', { name: /Remove this section/ }),
       ).not.toBeInTheDocument();
     });
 
@@ -72,10 +72,10 @@ describe('EditableAccordionSection', () => {
       expect(screen.getByText('Test content')).toBeInTheDocument();
 
       expect(
-        screen.getByRole('button', { name: 'Edit section title' }),
+        screen.getByRole('button', { name: /Edit section title/ }),
       ).not.toBeAriaDisabled();
       expect(
-        screen.getByRole('button', { name: 'Remove this section' }),
+        screen.getByRole('button', { name: /Remove this section/ }),
       ).not.toBeAriaDisabled();
     });
 
@@ -111,7 +111,7 @@ describe('EditableAccordionSection', () => {
       );
 
       expect(
-        screen.getByRole('button', { name: 'Remove this section' }),
+        screen.getByRole('button', { name: /Remove this section/ }),
       ).toBeAriaDisabled();
     });
 
@@ -127,7 +127,7 @@ describe('EditableAccordionSection', () => {
       );
 
       expect(
-        screen.getByRole('button', { name: 'Edit section title' }),
+        screen.getByRole('button', { name: /Edit section title/ }),
       ).toBeAriaDisabled();
     });
 
@@ -142,7 +142,7 @@ describe('EditableAccordionSection', () => {
       );
 
       await userEvent.click(
-        screen.getByRole('button', { name: 'Remove this section' }),
+        screen.getByRole('button', { name: /Remove this section/ }),
       );
 
       await waitFor(() => {
@@ -181,7 +181,7 @@ describe('EditableAccordionSection', () => {
       );
 
       await userEvent.click(
-        screen.getByRole('button', { name: 'Remove this section' }),
+        screen.getByRole('button', { name: /Remove this section/ }),
       );
 
       await waitFor(() => {

@@ -14,6 +14,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -24,11 +26,12 @@ public class PublicationControllerTestsFixture()
 public class PublicationControllerTestsCollection : ICollectionFixture<PublicationControllerTestsFixture>;
 
 [Collection(nameof(PublicationControllerTestsFixture))]
-public class PublicationControllerTests
+public class PublicationControllerTests(PublicationControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     private static readonly DataFixture DataFixture = new();
 
-    public class CreatePublicationTests(PublicationControllerTestsFixture fixture) : PublicationControllerTests
+    public class CreatePublicationTests(PublicationControllerTestsFixture fixture) : PublicationControllerTests(fixture)
     {
         [Fact]
         public async Task Success()
@@ -238,7 +241,7 @@ public class PublicationControllerTests
         }
     }
 
-    public class UpdatePublicationTests(PublicationControllerTestsFixture fixture) : PublicationControllerTests
+    public class UpdatePublicationTests(PublicationControllerTestsFixture fixture) : PublicationControllerTests(fixture)
     {
         [Fact]
         public async Task RequiredFieldsAreEmpty_ReturnsValidationError()

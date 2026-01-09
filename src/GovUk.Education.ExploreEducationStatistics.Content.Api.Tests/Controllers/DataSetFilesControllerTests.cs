@@ -1,6 +1,7 @@
 using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -8,51 +9,68 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Fixtures.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.DependencyInjection;
-using MockQueryable.Moq;
-using Moq;
 using Xunit;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public abstract class DataSetFilesControllerTests : IntegrationTestFixture
+// ReSharper disable once ClassNeverInstantiated.Global
+public class DataSetFilesControllerTestsFixture()
+    : OptimisedContentApiCollectionFixture(capabilities: [ContentApiIntegrationTestCapability.Azurite])
 {
-    private readonly DataFixture _fixture = new();
+    public IPublicBlobStorageService PublicBlobStorageService = null!;
 
-    private DataSetFilesControllerTests(TestApplicationFactory testApp)
-        : base(testApp) { }
-
-    public class ListDataSetFilesTests : DataSetFilesControllerTests
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
     {
-        private ListDataSetFilesTests(TestApplicationFactory testApp)
-            : base(testApp) { }
+        await base.AfterFactoryConstructed(lookups);
 
-        public class FilterTests(TestApplicationFactory testApp) : ListDataSetFilesTests(testApp)
+        PublicBlobStorageService = lookups.GetService<IPublicBlobStorageService>();
+    }
+
+    public override async Task BeforeEachTest()
+    {
+        await base.BeforeEachTest();
+
+        await GetContentDbContext().ClearTestData();
+    }
+}
+
+[CollectionDefinition(nameof(DataSetFilesControllerTestsFixture))]
+public class DataSetFilesControllerTestsCollection : ICollectionFixture<DataSetFilesControllerTestsFixture>;
+
+[Collection(nameof(DataSetFilesControllerTestsFixture))]
+public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
+{
+    private static readonly DataFixture DataFixture = new();
+
+    public class ListDataSetFilesTests(DataSetFilesControllerTestsFixture fixture)
+        : DataSetFilesControllerTests(fixture)
+    {
+        public class FilterTests(DataSetFilesControllerTestsFixture fixture) : ListDataSetFilesTests(fixture)
         {
             [Fact]
             public async Task FilterByReleaseId_Success()
             {
-                var (publication1, publication2) = _fixture
+                var (publication1, publication2) = DataFixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme())
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme())
                     .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
@@ -62,11 +80,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     publication2.Releases[0].Versions[0]
                 );
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest(ReleaseId: publication1.Releases[0].Versions[0].Id);
                 var response = await ListDataSetFiles(query);
@@ -82,18 +102,18 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task FilterByGeographicLevel_Success()
             {
-                var (publication1, publication2) = _fixture
+                var (publication1, publication2) = DataFixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme())
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme())
                     .GenerateTuple2();
 
-                ReleaseFile publication1Release1Version1File = _fixture
+                ReleaseFile publication1Release1Version1File = DataFixture
                     .DefaultReleaseFile()
                     .WithReleaseVersion(publication1.Releases[0].Versions[0])
                     .WithFile(
-                        _fixture
+                        DataFixture
                             .DefaultFile(FileType.Data)
                             .WithDataSetFileVersionGeographicLevels([
                                 GeographicLevel.Country,
@@ -106,11 +126,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     publication2.Releases[0].Versions[0]
                 );
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.Add(publication1Release1Version1File);
-                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.Add(publication1Release1Version1File);
+                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest(GeographicLevel: GeographicLevel.Institution.GetEnumValue());
                 var response = await ListDataSetFiles(query);
@@ -124,11 +146,11 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task FilterByPublicationId_Success()
             {
-                var (publication1, publication2) = _fixture
+                var (publication1, publication2) = DataFixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme())
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme())
                     .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
@@ -138,11 +160,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     publication2.Releases[0].Versions[0]
                 );
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest(PublicationId: publication1.Id);
                 var response = await ListDataSetFiles(query);
@@ -158,12 +182,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task FilterByThemeId_Success()
             {
-                var (publication1, publication2) = _fixture
+                var (publication1, publication2) = DataFixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
                     // Publications have different themes
-                    .WithThemes(_fixture.DefaultTheme().Generate(2))
+                    .WithThemes(DataFixture.DefaultTheme().Generate(2))
                     .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
@@ -173,11 +197,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     publication2.Releases[0].Versions[0]
                 );
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest(ThemeId: publication1.ThemeId);
                 var response = await ListDataSetFiles(query);
@@ -197,24 +223,26 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             {
                 // Set up a publication with 2 releases each with a published version.
                 // The 2021/22 Academic year will be the latest release in reverse chronological order.
-                Publication publication = _fixture
+                Publication publication = DataFixture
                     .DefaultPublication()
                     .WithReleases(_ =>
                         [
-                            _fixture.DefaultRelease(publishedVersions: 1, year: 2021),
-                            _fixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                            DataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
+                            DataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
                         ]
                     )
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithTheme(DataFixture.DefaultTheme());
 
                 var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[0]);
                 var release2Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[1].Versions[0]);
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(release1Version1Files);
-                    context.ReleaseFiles.AddRange(release2Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(release1Version1Files);
+                        context.ReleaseFiles.AddRange(release2Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest
                 {
@@ -236,24 +264,26 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             {
                 // Set up a publication with 2 releases each with a published version.
                 // The 2021/22 Academic year will be the latest release in reverse chronological order.
-                Publication publication = _fixture
+                Publication publication = DataFixture
                     .DefaultPublication()
                     .WithReleases(_ =>
                         [
-                            _fixture.DefaultRelease(publishedVersions: 1, year: 2021),
-                            _fixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                            DataFixture.DefaultRelease(publishedVersions: 1, year: 2021),
+                            DataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
                         ]
                     )
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithTheme(DataFixture.DefaultTheme());
 
                 var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[0]);
                 var release2Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[1].Versions[0]);
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(release1Version1Files);
-                    context.ReleaseFiles.AddRange(release2Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(release1Version1Files);
+                        context.ReleaseFiles.AddRange(release2Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest
                 {
@@ -274,16 +304,16 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [InlineData(null)]
             public async Task FilterByReleaseIdWhereReleaseIsUnpublished_ReturnsEmpty(bool? latestOnly)
             {
-                var (publication1, publication2) = _fixture
+                var (publication1, publication2) = DataFixture
                     .DefaultPublication()
                     // Index 0 has a published and unpublished release version
                     // Index 1 has a published release version
                     .ForIndex(
                         0,
-                        p => p.SetReleases([_fixture.DefaultRelease(publishedVersions: 1, draftVersion: true)])
+                        p => p.SetReleases([DataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true)])
                     )
-                    .ForIndex(1, p => p.SetReleases([_fixture.DefaultRelease(publishedVersions: 1)]))
-                    .WithTheme(_fixture.DefaultTheme())
+                    .ForIndex(1, p => p.SetReleases([DataFixture.DefaultRelease(publishedVersions: 1)]))
+                    .WithTheme(DataFixture.DefaultTheme())
                     .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
@@ -296,12 +326,14 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     publication2.Releases[0].Versions[0]
                 );
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                    context.ReleaseFiles.AddRange(publication1Release1Version2Files);
-                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                        context.ReleaseFiles.AddRange(publication1Release1Version2Files);
+                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest
                 {
@@ -323,19 +355,21 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             public async Task FilterByReleaseIdWhereReleaseIsNotLatestVersion_ReturnsEmpty(bool? latestOnly)
             {
                 // Set up a publication with a release that has 2 published versions
-                Publication publication = _fixture
+                Publication publication = DataFixture
                     .DefaultPublication()
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 2)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 2)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
                 var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[0]);
                 var release1Version2Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[1]);
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(release1Version1Files);
-                    context.ReleaseFiles.AddRange(release1Version2Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(release1Version1Files);
+                        context.ReleaseFiles.AddRange(release1Version2Files);
+                    });
 
                 var query = new DataSetFileListRequest
                 {
@@ -354,16 +388,16 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task FilterByPublicationIdWherePublicationIsUnpublished_ReturnsEmpty()
             {
-                var (publication1, publication2) = _fixture
+                var (publication1, publication2) = DataFixture
                     .DefaultPublication()
                     // Index 0 has an unpublished release version
                     // Index 1 has a published release version
                     .ForIndex(
                         0,
-                        p => p.SetReleases([_fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
+                        p => p.SetReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
                     )
-                    .ForIndex(1, p => p.SetReleases([_fixture.DefaultRelease(publishedVersions: 1)]))
-                    .WithTheme(_fixture.DefaultTheme())
+                    .ForIndex(1, p => p.SetReleases([DataFixture.DefaultRelease(publishedVersions: 1)]))
+                    .WithTheme(DataFixture.DefaultTheme())
                     .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
@@ -373,11 +407,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     publication2.Releases[0].Versions[0]
                 );
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest(PublicationId: publication1.Id);
                 var response = await ListDataSetFiles(query);
@@ -390,17 +426,17 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task FilterByThemeIdWhereThemeIsUnpublished_ReturnsEmpty()
             {
-                var (publication1, publication2) = _fixture
+                var (publication1, publication2) = DataFixture
                     .DefaultPublication()
                     // Index 0 has an unpublished release version
                     // Index 1 has a published release version
                     .ForIndex(
                         0,
-                        p => p.SetReleases([_fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
+                        p => p.SetReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
                     )
-                    .ForIndex(1, p => p.SetReleases([_fixture.DefaultRelease(publishedVersions: 1)]))
+                    .ForIndex(1, p => p.SetReleases([DataFixture.DefaultRelease(publishedVersions: 1)]))
                     // Publications have different themes
-                    .WithThemes(_fixture.DefaultTheme().Generate(2))
+                    .WithThemes(DataFixture.DefaultTheme().Generate(2))
                     .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
@@ -410,74 +446,16 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     publication2.Releases[0].Versions[0]
                 );
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest(ThemeId: publication1.ThemeId);
                 var response = await ListDataSetFiles(query);
-
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                pagedResult.AssertHasPagingConsistentWithEmptyResults();
-            }
-
-            [Fact]
-            public async Task FilterBySearchTerm_Success()
-            {
-                Publication publication = _fixture
-                    .DefaultPublication()
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
-
-                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[0]);
-
-                var freeTextRanks = new List<FreeTextRank>
-                {
-                    new(release1Version1Files[0].Id, 1),
-                    new(release1Version1Files[1].Id, 2),
-                };
-
-                var contentDbContext = ContentDbContextMock(
-                    publication.Releases.SelectMany(r => r.Versions),
-                    release1Version1Files,
-                    freeTextRanks
-                );
-
-                var client = BuildApp(contentDbContext.Object).CreateClient();
-
-                var query = new DataSetFileListRequest(SearchTerm: "aaa");
-                var response = await ListDataSetFiles(query, client);
-
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var expectedReleaseFiles = new List<ReleaseFile> { release1Version1Files[1], release1Version1Files[0] };
-
-                pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
-                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
-            }
-
-            [Fact]
-            public async Task FilterBySearchTermWhereTermIsNotFound_ReturnsEmpty()
-            {
-                Publication publication = _fixture
-                    .DefaultPublication()
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
-
-                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[0]);
-
-                var contentDbContext = ContentDbContextMock(
-                    publication.Releases.SelectMany(r => r.Versions),
-                    release1Version1Files
-                );
-
-                var client = BuildApp(contentDbContext.Object).CreateClient();
-
-                var query = new DataSetFileListRequest(SearchTerm: "aaa");
-                var response = await ListDataSetFiles(query, client);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
@@ -494,16 +472,16 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 // Set up 2 publications where both have multiple releases each with a mix of published and
                 // unpublished versions. The 2021/22 Academic year will be the latest release in
                 // reverse chronological order with a published release version for both publications.
-                var (publication1, publication2) = _fixture
+                var (publication1, publication2) = DataFixture
                     .DefaultPublication()
                     .WithReleases(_ =>
                         [
-                            _fixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
-                            _fixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021),
-                            _fixture.DefaultRelease(publishedVersions: 1, year: 2020),
+                            DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
+                            DataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021),
+                            DataFixture.DefaultRelease(publishedVersions: 1, year: 2020),
                         ]
                     )
-                    .WithTheme(_fixture.DefaultTheme())
+                    .WithTheme(DataFixture.DefaultTheme())
                     .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
@@ -552,11 +530,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     .Concat(publication2Release3Version1Files)
                     .ToList();
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(publication1ReleaseFiles);
-                    context.ReleaseFiles.AddRange(publication2ReleaseFiles);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(publication1ReleaseFiles);
+                        context.ReleaseFiles.AddRange(publication2ReleaseFiles);
+                    });
 
                 var query = new DataSetFileListRequest(LatestOnly: latestOnly);
                 var response = await ListDataSetFiles(query);
@@ -579,16 +559,16 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             {
                 // Set up 2 publications where both have multiple releases each with a mix of published and
                 // unpublished versions
-                var (publication1, publication2) = _fixture
+                var (publication1, publication2) = DataFixture
                     .DefaultPublication()
                     .WithReleases(_ =>
                         [
-                            _fixture.DefaultRelease(publishedVersions: 0, draftVersion: true),
-                            _fixture.DefaultRelease(publishedVersions: 2, draftVersion: true),
-                            _fixture.DefaultRelease(publishedVersions: 1),
+                            DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true),
+                            DataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true),
+                            DataFixture.DefaultRelease(publishedVersions: 1),
                         ]
                     )
-                    .WithTheme(_fixture.DefaultTheme())
+                    .WithTheme(DataFixture.DefaultTheme())
                     .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
@@ -637,11 +617,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     .Concat(publication2Release3Version1Files)
                     .ToList();
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(publication1ReleaseFiles);
-                    context.ReleaseFiles.AddRange(publication2ReleaseFiles);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(publication1ReleaseFiles);
+                        context.ReleaseFiles.AddRange(publication2ReleaseFiles);
+                    });
 
                 var query = new DataSetFileListRequest(LatestOnly: false);
                 var response = await ListDataSetFiles(query);
@@ -664,15 +646,15 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task FilterByDataSetType_Api_ReturnsOnlyDataSetsWithAssociatedApiDataSets()
             {
-                Publication publication = _fixture
+                Publication publication = DataFixture
                     .DefaultPublication()
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
-                var releaseVersionFiles = _fixture
+                var releaseVersionFiles = DataFixture
                     .DefaultReleaseFile()
                     .WithReleaseVersion(publication.Releases[0].Versions[0])
-                    .WithFile(() => _fixture.DefaultFile(FileType.Data))
+                    .WithFile(() => DataFixture.DefaultFile(FileType.Data))
                     .ForIndex(
                         0,
                         s => s.SetPublicApiDataSetId(Guid.NewGuid()).SetPublicApiDataSetVersion(major: 1, minor: 0)
@@ -683,10 +665,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     )
                     .GenerateList(5);
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(releaseVersionFiles);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(releaseVersionFiles);
+                    });
 
                 var query = new DataSetFileListRequest { DataSetType = DataSetType.Api };
 
@@ -708,15 +692,15 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [InlineData(null)]
             public async Task FilterByDataSetType_AllOrUnset_ReturnsAllDataSets(DataSetType? dataSetType)
             {
-                Publication publication = _fixture
+                Publication publication = DataFixture
                     .DefaultPublication()
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
-                var releaseVersionFiles = _fixture
+                var releaseVersionFiles = DataFixture
                     .DefaultReleaseFile()
                     .WithReleaseVersion(publication.Releases[0].Versions[0])
-                    .WithFile(() => _fixture.DefaultFile(FileType.Data))
+                    .WithFile(() => DataFixture.DefaultFile(FileType.Data))
                     .ForIndex(
                         0,
                         s => s.SetPublicApiDataSetId(Guid.NewGuid()).SetPublicApiDataSetVersion(major: 1, minor: 1)
@@ -727,10 +711,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     )
                     .GenerateList();
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(releaseVersionFiles);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(releaseVersionFiles);
+                    });
 
                 var query = new DataSetFileListRequest { DataSetType = dataSetType };
 
@@ -745,11 +731,11 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task NoFilter_ReturnsAllResultsOrderedByTitleAscending()
             {
-                var (publication1, publication2) = _fixture
+                var (publication1, publication2) = DataFixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme())
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme())
                     .GenerateTuple2();
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
@@ -759,11 +745,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     publication2.Releases[0].Versions[0]
                 );
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest();
                 var response = await ListDataSetFiles(query);
@@ -780,7 +768,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             }
         }
 
-        public class SortByTests(TestApplicationFactory testApp) : ListDataSetFilesTests(testApp)
+        public class SortByTests(DataSetFilesControllerTestsFixture fixture) : ListDataSetFilesTests(fixture)
         {
             [Theory]
             [InlineData(SortDirection.Asc)]
@@ -789,10 +777,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 SortDirection? sortDirection
             )
             {
-                Publication publication = _fixture
+                Publication publication = DataFixture
                     .DefaultPublication()
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
                 var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[0]);
 
@@ -800,10 +788,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 release1Version1Files[0].Name = "b";
                 release1Version1Files[1].Name = "a";
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest
                 {
@@ -827,10 +817,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task SortByTitleDescending_SortsByTitleInDescendingOrder()
             {
-                Publication publication = _fixture
+                Publication publication = DataFixture
                     .DefaultPublication()
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
                 var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[0]);
 
@@ -838,10 +828,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 release1Version1Files[0].Name = "a";
                 release1Version1Files[1].Name = "b";
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest
                 {
@@ -869,10 +861,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 SortDirection? sortDirection
             )
             {
-                Publication publication = _fixture
+                Publication publication = DataFixture
                     .DefaultPublication()
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
                 var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[0]);
 
@@ -880,10 +872,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 release1Version1Files[0].Order = 1;
                 release1Version1Files[1].Order = 0;
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest
                 {
@@ -909,10 +903,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task SortByNaturalDescending_SortsByNaturalInDescendingOrder()
             {
-                Publication publication = _fixture
+                Publication publication = DataFixture
                     .DefaultPublication()
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
                 var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[0]);
 
@@ -920,10 +914,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 release1Version1Files[0].Order = 0;
                 release1Version1Files[1].Order = 1;
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest
                 {
@@ -949,19 +945,19 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task SortByPublishedAscending_SortsByPublishedInAscendingOrder()
             {
-                var (publication1, publication2) = _fixture
+                var (publication1, publication2) = DataFixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme())
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme())
                     .GenerateTuple2();
 
                 var publication1Release1Version1 = publication1.Releases[0].Versions[0];
                 var publication2Release1Version1 = publication2.Releases[0].Versions[0];
 
                 // Apply a descending sequence of published dates to the releases
-                publication1Release1Version1.Published = DateTime.UtcNow.AddDays(-1);
-                publication2Release1Version1.Published = DateTime.UtcNow.AddDays(-2);
+                publication1Release1Version1.Published = DateTimeOffset.UtcNow.AddDays(-1);
+                publication2Release1Version1.Published = DateTimeOffset.UtcNow.AddDays(-2);
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
                     publication1Release1Version1
@@ -970,11 +966,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     publication2Release1Version1
                 );
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest
                 {
@@ -1005,19 +1003,19 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 SortDirection? sortDirection
             )
             {
-                var (publication1, publication2) = _fixture
+                var (publication1, publication2) = DataFixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme())
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme())
                     .GenerateTuple2();
 
                 var publication1Release1Version1 = publication1.Releases[0].Versions[0];
                 var publication2Release1Version1 = publication2.Releases[0].Versions[0];
 
                 // Apply an ascending sequence of published dates to the releases
-                publication1Release1Version1.Published = DateTime.UtcNow.AddDays(-2);
-                publication2Release1Version1.Published = DateTime.UtcNow.AddDays(-1);
+                publication1Release1Version1.Published = DateTimeOffset.UtcNow.AddDays(-2);
+                publication2Release1Version1.Published = DateTimeOffset.UtcNow.AddDays(-1);
 
                 var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(
                     publication1Release1Version1
@@ -1026,11 +1024,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     publication2Release1Version1
                 );
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(publication1Release1Version1Files);
-                    context.ReleaseFiles.AddRange(publication2Release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(publication1Release1Version1Files);
+                        context.ReleaseFiles.AddRange(publication2Release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest
                 {
@@ -1053,125 +1053,24 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
                 AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
             }
-
-            [Fact]
-            public async Task SortByRelevanceAscending_SortsByRelevanceInAscendingOrder()
-            {
-                Publication publication = _fixture
-                    .DefaultPublication()
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
-
-                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(
-                    publication.Releases[0].Versions[0],
-                    numberOfDataSets: 3
-                );
-
-                var freeTextRanks = new List<FreeTextRank>
-                {
-                    new(release1Version1Files[0].Id, 2),
-                    new(release1Version1Files[1].Id, 3),
-                    new(release1Version1Files[2].Id, 1),
-                };
-
-                var contentDbContext = ContentDbContextMock(
-                    publication.Releases.SelectMany(r => r.Versions),
-                    release1Version1Files,
-                    freeTextRanks
-                );
-
-                var client = BuildApp(contentDbContext.Object).CreateClient();
-
-                var query = new DataSetFileListRequest
-                {
-                    SearchTerm = "aaa",
-                    Sort = DataSetsListRequestSortBy.Relevance,
-                    SortDirection = SortDirection.Asc,
-                };
-                var response = await ListDataSetFiles(query, client);
-
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var expectedReleaseFiles = new List<ReleaseFile>
-                {
-                    release1Version1Files[2], // Has rank 1
-                    release1Version1Files[0], // Has rank 2
-                    release1Version1Files[1], //  Has rank 3
-                };
-
-                pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
-                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
-            }
-
-            [Theory]
-            [InlineData(SortDirection.Desc)]
-            [InlineData(null)]
-            public async Task SortByRelevance_SortsByRelevanceInDescendingOrderAndIsDescendingByDefault(
-                SortDirection? sortDirection
-            )
-            {
-                Publication publication = _fixture
-                    .DefaultPublication()
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
-
-                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(
-                    publication.Releases[0].Versions[0],
-                    numberOfDataSets: 3
-                );
-
-                var freeTextRanks = new List<FreeTextRank>
-                {
-                    new(release1Version1Files[0].Id, 2),
-                    new(release1Version1Files[1].Id, 3),
-                    new(release1Version1Files[2].Id, 1),
-                };
-
-                var contentDbContext = ContentDbContextMock(
-                    publication.Releases.SelectMany(r => r.Versions),
-                    release1Version1Files,
-                    freeTextRanks
-                );
-
-                var client = BuildApp(contentDbContext.Object).CreateClient();
-
-                var query = new DataSetFileListRequest
-                {
-                    SearchTerm = "aaa",
-                    Sort = DataSetsListRequestSortBy.Relevance,
-                    SortDirection = sortDirection,
-                };
-                var response = await ListDataSetFiles(query, client);
-
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                var expectedReleaseFiles = new List<ReleaseFile>
-                {
-                    release1Version1Files[1], // Has rank 3
-                    release1Version1Files[0], // Has rank 2
-                    release1Version1Files[2], // Has rank 1
-                };
-
-                pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
-                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
-            }
         }
 
-        public class SupersededPublicationTests(TestApplicationFactory testApp) : ListDataSetFilesTests(testApp)
+        public class SupersededPublicationTests(DataSetFilesControllerTestsFixture fixture)
+            : ListDataSetFilesTests(fixture)
         {
             [Fact]
             public async Task PublicationIsSuperseded_DataSetsOfSupersededPublicationsAreExcluded()
             {
-                Publication supersedingPublication = _fixture
+                Publication supersedingPublication = DataFixture
                     .DefaultPublication()
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
-                Publication supersededPublication = _fixture
+                Publication supersededPublication = DataFixture
                     .DefaultPublication()
                     .WithSupersededBy(supersedingPublication)
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
                 var supersedingPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(
                     supersedingPublication.Releases[0].Versions[0]
@@ -1180,11 +1079,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     supersededPublication.Releases[0].Versions[0]
                 );
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(supersedingPublicationReleaseFiles);
-                    context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(supersedingPublicationReleaseFiles);
+                        context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
+                    });
 
                 var query = new DataSetFileListRequest();
                 var response = await ListDataSetFiles(query);
@@ -1203,16 +1104,16 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task FilterBySupersededPublicationId_SupersededStatusIsIgnored()
             {
-                Publication supersedingPublication = _fixture
+                Publication supersedingPublication = DataFixture
                     .DefaultPublication()
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
-                Publication supersededPublication = _fixture
+                Publication supersededPublication = DataFixture
                     .DefaultPublication()
                     .WithSupersededBy(supersedingPublication)
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
                 var supersedingPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(
                     supersedingPublication.Releases[0].Versions[0]
@@ -1221,11 +1122,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     supersededPublication.Releases[0].Versions[0]
                 );
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(supersedingPublicationReleaseFiles);
-                    context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(supersedingPublicationReleaseFiles);
+                        context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
+                    });
 
                 var query = new DataSetFileListRequest(PublicationId: supersededPublication.Id);
                 var response = await ListDataSetFiles(query);
@@ -1244,16 +1147,16 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             [Fact]
             public async Task SupersedingPublicationHasNoPublishedReleases_SupersededStatusIsIgnored()
             {
-                Publication supersedingPublication = _fixture
+                Publication supersedingPublication = DataFixture
                     .DefaultPublication()
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
-                Publication supersededPublication = _fixture
+                Publication supersededPublication = DataFixture
                     .DefaultPublication()
                     .WithSupersededBy(supersedingPublication)
-                    .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
                 var supersedingPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(
                     supersedingPublication.Releases[0].Versions[0]
@@ -1262,11 +1165,13 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     supersededPublication.Releases[0].Versions[0]
                 );
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(supersedingPublicationReleaseFiles);
-                    context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(supersedingPublicationReleaseFiles);
+                        context.ReleaseFiles.AddRange(supersededPublicationReleaseFiles);
+                    });
 
                 var query = new DataSetFileListRequest();
                 var response = await ListDataSetFiles(query);
@@ -1283,7 +1188,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             }
         }
 
-        public class ValidationTests(TestApplicationFactory testApp) : ListDataSetFilesTests(testApp)
+        public class ValidationTests(DataSetFilesControllerTestsFixture fixture) : ListDataSetFilesTests(fixture)
         {
             [Theory]
             [InlineData(0)]
@@ -1358,21 +1263,6 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 validationProblem.AssertHasMinimumLengthError("searchTerm", minLength: 3);
             }
 
-            [Theory]
-            [InlineData("aaa")]
-            [InlineData("aaaa")]
-            public async Task SearchTermAboveMinimumLength_Success(string searchTerm)
-            {
-                var contentDbContext = ContentDbContextMock();
-
-                var client = BuildApp(contentDbContext.Object).CreateClient();
-
-                var query = new DataSetFileListRequest(SearchTerm: searchTerm);
-                var response = await ListDataSetFiles(query, client);
-
-                response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-            }
-
             [Fact]
             public async Task SortByNaturalWithoutReleaseId_ReturnsValidationError()
             {
@@ -1410,36 +1300,23 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
                 validationProblem.AssertHasNotEmptyError("searchTerm");
             }
-
-            [Fact]
-            public async Task SortByRelevanceWithSearchTerm_Success()
-            {
-                var contentDbContext = ContentDbContextMock();
-
-                var client = BuildApp(contentDbContext.Object).CreateClient();
-
-                var query = new DataSetFileListRequest(SearchTerm: "aaa", Sort: DataSetsListRequestSortBy.Relevance);
-                var response = await ListDataSetFiles(query, client);
-
-                response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-            }
         }
 
-        public class MiscellaneousTests(TestApplicationFactory testApp) : ListDataSetFilesTests(testApp)
+        public class MiscellaneousTests(DataSetFilesControllerTestsFixture fixture) : ListDataSetFilesTests(fixture)
         {
             [Fact]
             public async Task DataSetFileMetaCorrectlyReturned_Success()
             {
-                Publication publication = _fixture
+                Publication publication = DataFixture
                     .DefaultPublication()
-                    .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
-                ReleaseFile releaseFile = _fixture
+                ReleaseFile releaseFile = DataFixture
                     .DefaultReleaseFile()
                     .WithReleaseVersion(publication.Releases[0].Versions[0])
                     .WithFile(
-                        _fixture
+                        DataFixture
                             .DefaultFile(FileType.Data)
                             .WithType(FileType.Data)
                             .WithDataSetFileVersionGeographicLevels([
@@ -1447,10 +1324,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                                 GeographicLevel.LocalAuthority,
                             ])
                             .WithDataSetFileMeta(
-                                _fixture
+                                DataFixture
                                     .DefaultDataSetFileMeta()
                                     .WithTimePeriodRange(
-                                        _fixture
+                                        DataFixture
                                             .DefaultTimePeriodRangeMeta()
                                             .WithStart("2000", TimeIdentifier.AcademicYear)
                                             .WithEnd("2002", TimeIdentifier.AcademicYear)
@@ -1498,10 +1375,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                             )
                     );
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.Add(releaseFile);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.Add(releaseFile);
+                    });
 
                 var query = new DataSetFileListRequest();
                 var response = await ListDataSetFiles(query);
@@ -1556,10 +1435,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             // TODO Remove this once we do further work to remove all HTML from summaries at source
             public async Task ReleaseFileSummariesContainHtml_HtmlTagsAreStripped()
             {
-                Publication publication = _fixture
+                Publication publication = DataFixture
                     .DefaultPublication()
-                    .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(_fixture.DefaultTheme());
+                    .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
 
                 var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[0]);
 
@@ -1568,10 +1447,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     releaseFile.Summary = $"<p>{releaseFile.Summary}</p>";
                 });
 
-                await TestApp.AddTestData<ContentDbContext>(context =>
-                {
-                    context.ReleaseFiles.AddRange(release1Version1Files);
-                });
+                await fixture
+                    .GetContentDbContext()
+                    .AddTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(release1Version1Files);
+                    });
 
                 var query = new DataSetFileListRequest();
                 var response = await ListDataSetFiles(query);
@@ -1590,10 +1471,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             }
         }
 
-        private async Task<HttpResponseMessage> ListDataSetFiles(
-            DataSetFileListRequest request,
-            HttpClient? client = null
-        )
+        private async Task<HttpResponseMessage> ListDataSetFiles(DataSetFileListRequest request)
         {
             var queryParams = new Dictionary<string, string?>
             {
@@ -1610,11 +1488,9 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 { "dataSetType", request.DataSetType?.ToString() },
             };
 
-            client ??= BuildApp().CreateClient();
-
             var uri = QueryHelpers.AddQueryString("/api/data-set-files", queryParams);
 
-            return await client.GetAsync(uri);
+            return await fixture.CreateClient().GetAsync(uri);
         }
 
         private static void AssertResultsForExpectedReleaseFiles(
@@ -1624,10 +1500,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         {
             Assert.Equal(releaseFiles.Count, viewModels.Count);
             Assert.All(
-                releaseFiles.Zip(viewModels),
-                tuple =>
+                releaseFiles,
+                releaseFile =>
                 {
-                    var (releaseFile, viewModel) = tuple;
+                    var viewModel = viewModels.Single(vm => vm.FileId == releaseFile.FileId);
 
                     var releaseVersion = releaseFile.ReleaseVersion;
                     var release = releaseVersion.Release;
@@ -1673,61 +1549,37 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             int numberOfDataSets = 2
         )
         {
-            return _fixture
+            return DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
                 .WithFiles(
-                    _fixture
+                    DataFixture
                         .DefaultFile(FileType.Data)
-                        .WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta())
+                        .WithDataSetFileMeta(DataFixture.DefaultDataSetFileMeta())
                         .WithDataSetFileVersionGeographicLevels([GeographicLevel.Country])
                         .GenerateList(numberOfDataSets)
                 )
                 .GenerateList();
         }
-
-        private static Mock<ContentDbContext> ContentDbContextMock(
-            IEnumerable<ReleaseVersion>? releaseVersions = null,
-            IEnumerable<ReleaseFile>? releaseFiles = null,
-            IEnumerable<FreeTextRank>? freeTextRanks = null
-        )
-        {
-            var releaseFilesArray = releaseFiles?.ToArray() ?? [];
-
-            var contentDbContext = new Mock<ContentDbContext>();
-            contentDbContext
-                .Setup(context => context.ReleaseVersions)
-                .Returns((releaseVersions ?? []).ToArray().BuildMockDbSet().Object);
-            contentDbContext.Setup(context => context.ReleaseFiles).Returns(releaseFilesArray.BuildMockDbSet().Object);
-            contentDbContext
-                .Setup(context => context.Files)
-                .Returns(releaseFilesArray.Select(rf => rf.File).ToArray().BuildMockDbSet().Object);
-            contentDbContext
-                .Setup(context => context.ReleaseFilesFreeTextTable(It.IsAny<string>()))
-                .Returns((freeTextRanks ?? []).ToArray().BuildMockDbSet().Object);
-            return contentDbContext;
-        }
     }
 
-    public class DownloadDataSetFileTests(TestApplicationFactory testApp) : DataSetFilesControllerTests(testApp)
+    public class DownloadDataSetFileTests(DataSetFilesControllerTestsFixture fixture)
+        : DataSetFilesControllerTests(fixture)
     {
-        public override async Task InitializeAsync() => await StartAzurite();
-
         [Fact]
         public async Task DownloadDataSetFile()
         {
-            Publication publication = _fixture
+            Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                .WithTheme(_fixture.DefaultTheme());
+                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                .WithTheme(DataFixture.DefaultTheme());
 
-            ReleaseFile releaseFile = _fixture
+            ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
-                .WithFile(_fixture.DefaultFile(FileType.Data));
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
 
-            var testApp = BuildApp(enableAzurite: true);
-            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
+            var publicBlobStorageService = fixture.PublicBlobStorageService;
 
             var formFile = CreateDataCsvFormFile("test file contents");
 
@@ -1737,14 +1589,16 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 formFile
             );
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
-            var client = testApp.CreateClient();
-
-            var response = await client.GetAsync($"/api/data-set-files/{releaseFile.File.DataSetFileId}/download");
+            var response = await fixture
+                .CreateClient()
+                .GetAsync($"/api/data-set-files/{releaseFile.File.DataSetFileId}/download");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -1764,11 +1618,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         [Fact]
         public async Task DownloadDataSetFile_ReleaseFileDoesNotExist()
         {
-            var testApp = BuildApp();
-
-            var client = testApp.CreateClient();
-
-            var response = await client.GetAsync($"/api/data-set-files/{Guid.NewGuid()}/download");
+            var response = await fixture.CreateClient().GetAsync($"/api/data-set-files/{Guid.NewGuid()}/download");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -1776,20 +1626,17 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         [Fact]
         public async Task DownloadDataSetFile_NotPublished()
         {
-            Publication publication = _fixture
+            Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
-                .WithTheme(_fixture.DefaultTheme());
+                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
+                .WithTheme(DataFixture.DefaultTheme());
 
-            ReleaseFile releaseFile = _fixture
+            ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
-                .WithFile(_fixture.DefaultFile(FileType.Data));
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
 
-            await StartAzurite();
-
-            var testApp = BuildApp(enableAzurite: true);
-            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
+            var publicBlobStorageService = fixture.PublicBlobStorageService;
 
             var formFile = CreateDataCsvFormFile("test file contents");
 
@@ -1799,51 +1646,45 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 formFile
             );
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
-            var client = testApp.CreateClient();
-
-            var response = await client.GetAsync($"/api/data-set-files/{releaseFile.File.DataSetFileId}/download");
+            var response = await fixture
+                .CreateClient()
+                .GetAsync($"/api/data-set-files/{releaseFile.File.DataSetFileId}/download");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
     }
 
-    public class ListSitemapItemsTests(TestApplicationFactory testApp) : DataSetFilesControllerTests(testApp)
+    public class ListSitemapItemsTests(DataSetFilesControllerTestsFixture fixture)
+        : DataSetFilesControllerTests(fixture)
     {
-        public override async Task InitializeAsync() => await StartAzurite();
-
-        private async Task<HttpResponseMessage> InvokeListSitemapItems(WebApplicationFactory<Startup>? app = null)
-        {
-            var client = (app ?? BuildApp()).CreateClient();
-
-            return await client.GetAsync("/api/data-set-files/sitemap-items");
-        }
-
         [Fact]
         public async Task ListSitemapItems()
         {
-            Publication publication = _fixture
+            Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                .WithTheme(_fixture.DefaultTheme());
+                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                .WithTheme(DataFixture.DefaultTheme());
 
-            ReleaseFile releaseFile = _fixture
+            ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
                 .WithPublicApiDataSetId(Guid.NewGuid())
                 .WithPublicApiDataSetVersion(major: 1, minor: 0)
                 .WithFile(
-                    _fixture
+                    DataFixture
                         .DefaultFile(FileType.Data)
                         .WithDataSetFileMeta(
-                            _fixture
+                            DataFixture
                                 .DefaultDataSetFileMeta()
                                 .WithTimePeriodRange(
-                                    _fixture
+                                    DataFixture
                                         .DefaultTimePeriodRangeMeta()
                                         .WithStart("2000", TimeIdentifier.CalendarYear)
                                         .WithEnd("2001", TimeIdentifier.CalendarYear)
@@ -1851,10 +1692,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         )
                 );
 
-            await StartAzurite();
-
-            var testApp = BuildApp(enableAzurite: true);
-            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
+            var publicBlobStorageService = fixture.PublicBlobStorageService;
 
             var formFile = CreateDataCsvFormFile(
                 """"
@@ -1874,10 +1712,12 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 formFile
             );
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             var response = await InvokeListSitemapItems();
 
@@ -1887,36 +1727,36 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             Assert.Equal(releaseFile.File.DataSetFileId!.Value.ToString(), item.Id);
             Assert.Equal(releaseFile.Published, item.LastModified);
         }
+
+        private async Task<HttpResponseMessage> InvokeListSitemapItems()
+        {
+            return await fixture.CreateClient().GetAsync("/api/data-set-files/sitemap-items");
+        }
     }
 
-    public class GetDataSetFileTests(TestApplicationFactory testApp) : DataSetFilesControllerTests(testApp)
+    public class GetDataSetFileTests(DataSetFilesControllerTestsFixture fixture) : DataSetFilesControllerTests(fixture)
     {
-        public override async Task InitializeAsync()
-        {
-            await StartAzurite();
-        }
-
         [Fact]
         public async Task FetchDataSetDetails_Success()
         {
-            Publication publication = _fixture
+            Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                .WithTheme(_fixture.DefaultTheme());
+                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                .WithTheme(DataFixture.DefaultTheme());
 
-            ReleaseFile releaseFile = _fixture
+            ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
                 .WithPublicApiDataSetId(Guid.NewGuid())
                 .WithPublicApiDataSetVersion(major: 1, minor: 0)
                 .WithFile(
-                    _fixture
+                    DataFixture
                         .DefaultFile(FileType.Data)
                         .WithDataSetFileMeta(
-                            _fixture
+                            DataFixture
                                 .DefaultDataSetFileMeta()
                                 .WithTimePeriodRange(
-                                    _fixture
+                                    DataFixture
                                         .DefaultTimePeriodRangeMeta()
                                         .WithStart("2000", TimeIdentifier.CalendarYear)
                                         .WithEnd("2001", TimeIdentifier.CalendarYear)
@@ -1924,16 +1764,14 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         )
                 );
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
-            await StartAzurite();
-
-            var testApp = BuildApp(enableAzurite: true);
-
-            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
+            var publicBlobStorageService = fixture.PublicBlobStorageService;
 
             var formFile = CreateDataCsvFormFile(
                 """"
@@ -1953,7 +1791,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 formFile
             );
 
-            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value, testApp);
+            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             Assert.Equal(releaseFile.Name, viewModel.Title);
@@ -1997,7 +1835,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
 
             var dataSetFileMeta = file.DataSetFileMeta!;
 
-            Assert.Equal(0, viewModel.File.Meta.NumDataFileRows);
+            Assert.Equal(releaseFile.File.DataSetFileMeta!.NumDataFileRows, viewModel.File.Meta.NumDataFileRows);
 
             Assert.Equal(
                 new DataSetFileTimePeriodRangeViewModel
@@ -2036,26 +1874,26 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         [Fact]
         public async Task FetchCsvWithSingleDataRow_Success()
         {
-            Publication publication = _fixture
+            Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                .WithTheme(_fixture.DefaultTheme());
+                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                .WithTheme(DataFixture.DefaultTheme());
 
-            ReleaseFile releaseFile = _fixture
+            ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
-                .WithFile(_fixture.DefaultFile(FileType.Data).WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta()));
+                .WithFile(
+                    DataFixture.DefaultFile(FileType.Data).WithDataSetFileMeta(DataFixture.DefaultDataSetFileMeta())
+                );
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
-            await StartAzurite();
-
-            var testApp = BuildApp(enableAzurite: true);
-
-            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
+            var publicBlobStorageService = fixture.PublicBlobStorageService;
 
             var formFile = CreateDataCsvFormFile(
                 """
@@ -2070,7 +1908,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 formFile
             );
 
-            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value, testApp);
+            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             Assert.Equal(releaseFile.Name, viewModel.Title);
@@ -2087,16 +1925,16 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         [Fact]
         public async Task FetchDataSetFiltersOrdered_Success()
         {
-            Publication publication = _fixture
+            Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                .WithTheme(_fixture.DefaultTheme());
+                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                .WithTheme(DataFixture.DefaultTheme());
 
             var filter1Id = Guid.NewGuid();
             var filter2Id = Guid.NewGuid();
             var filter3Id = Guid.NewGuid();
 
-            ReleaseFile releaseFile = _fixture
+            ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
                 .WithFilterSequence([
@@ -2105,10 +1943,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     new FilterSequenceEntry(filter3Id, []),
                 ])
                 .WithFile(
-                    _fixture
+                    DataFixture
                         .DefaultFile(FileType.Data)
                         .WithDataSetFileMeta(
-                            _fixture
+                            DataFixture
                                 .DefaultDataSetFileMeta()
                                 .WithFilters([
                                     new FilterMeta
@@ -2133,16 +1971,14 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         )
                 );
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
-            await StartAzurite();
-
-            var testApp = BuildApp(enableAzurite: true);
-
-            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
+            var publicBlobStorageService = fixture.PublicBlobStorageService;
 
             var formFile = CreateDataCsvFormFile(
                 """
@@ -2157,7 +1993,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 formFile
             );
 
-            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value, testApp);
+            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             Assert.Equal(3, viewModel.File.Meta.Filters.Count);
@@ -2169,17 +2005,17 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         [Fact]
         public async Task FetchDataSetIndicatorsOrdered_Success()
         {
-            Publication publication = _fixture
+            Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                .WithTheme(_fixture.DefaultTheme());
+                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                .WithTheme(DataFixture.DefaultTheme());
 
             var indicator1Id = Guid.NewGuid();
             var indicator2Id = Guid.NewGuid();
             var indicator3Id = Guid.NewGuid();
             var indicator4Id = Guid.NewGuid();
 
-            ReleaseFile releaseFile = _fixture
+            ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
                 .WithIndicatorSequence([
@@ -2188,10 +2024,10 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                     new IndicatorGroupSequenceEntry(Guid.NewGuid(), [indicator3Id, indicator4Id]),
                 ])
                 .WithFile(
-                    _fixture
+                    DataFixture
                         .DefaultFile(FileType.Data)
                         .WithDataSetFileMeta(
-                            _fixture
+                            DataFixture
                                 .DefaultDataSetFileMeta()
                                 .WithIndicators([
                                     new IndicatorMeta
@@ -2222,16 +2058,14 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         )
                 );
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
-            await StartAzurite();
-
-            var testApp = BuildApp(enableAzurite: true);
-
-            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
+            var publicBlobStorageService = fixture.PublicBlobStorageService;
 
             var formFile = CreateDataCsvFormFile(
                 """
@@ -2246,7 +2080,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 formFile
             );
 
-            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value, testApp);
+            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             Assert.Equal(4, viewModel.File.Meta.Indicators.Count);
@@ -2259,19 +2093,19 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         [Fact]
         public async Task FetchVariables_Success()
         {
-            Publication publication = _fixture
+            Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                .WithTheme(_fixture.DefaultTheme());
+                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                .WithTheme(DataFixture.DefaultTheme());
 
-            ReleaseFile releaseFile = _fixture
+            ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
                 .WithFile(
-                    _fixture
+                    DataFixture
                         .DefaultFile(FileType.Data)
                         .WithDataSetFileMeta(
-                            _fixture
+                            DataFixture
                                 .DefaultDataSetFileMeta()
                                 .WithFilters([
                                     new FilterMeta
@@ -2324,16 +2158,14 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                         )
                 );
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
-            await StartAzurite();
-
-            var testApp = BuildApp(enableAzurite: true);
-
-            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
+            var publicBlobStorageService = fixture.PublicBlobStorageService;
 
             var formFile = CreateDataCsvFormFile(
                 """
@@ -2348,7 +2180,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 formFile
             );
 
-            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value, testApp);
+            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             Assert.Equal(7, viewModel.File.Variables.Count);
@@ -2371,46 +2203,46 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         [Fact]
         public async Task FetchDataSetFootnotes_Success()
         {
-            Publication publication = _fixture
+            Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                .WithTheme(_fixture.DefaultTheme());
+                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                .WithTheme(DataFixture.DefaultTheme());
 
-            Subject subject = _fixture.DefaultSubject();
+            Subject subject = DataFixture.DefaultSubject();
 
-            ReleaseFile releaseFile = _fixture
+            ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
-                .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
+                .WithFile(DataFixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
             var statsReleaseVersion = new Data.Model.ReleaseVersion { Id = releaseFile.ReleaseVersionId };
 
-            ReleaseFootnote releaseFootnote1 = _fixture
+            ReleaseFootnote releaseFootnote1 = DataFixture
                 .DefaultReleaseFootnote()
                 .WithReleaseVersion(statsReleaseVersion)
-                .WithFootnote(_fixture.DefaultFootnote().WithSubjects(new List<Subject> { subject }));
+                .WithFootnote(DataFixture.DefaultFootnote().WithSubjects(new List<Subject> { subject }));
 
-            var filter = _fixture.DefaultFilter().WithSubject(subject);
+            var filter = DataFixture.DefaultFilter().WithSubject(subject);
 
-            ReleaseFootnote releaseFootnote2 = _fixture
+            ReleaseFootnote releaseFootnote2 = DataFixture
                 .DefaultReleaseFootnote()
                 .WithReleaseVersion(statsReleaseVersion)
-                .WithFootnote(_fixture.DefaultFootnote().WithFilters(new List<Filter> { filter }));
+                .WithFootnote(DataFixture.DefaultFootnote().WithFilters(new List<Filter> { filter }));
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
-            await TestApp.AddTestData<StatisticsDbContext>(context =>
-            {
-                context.ReleaseFootnote.AddRange(releaseFootnote1, releaseFootnote2);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
+            await fixture
+                .GetStatisticsDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFootnote.AddRange(releaseFootnote1, releaseFootnote2);
+                });
 
-            await StartAzurite();
-
-            var testApp = BuildApp(enableAzurite: true);
-
-            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
+            var publicBlobStorageService = fixture.PublicBlobStorageService;
 
             var formFile = CreateDataCsvFormFile(
                 """
@@ -2425,7 +2257,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 formFile
             );
 
-            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value, testApp);
+            var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             var footnotes = viewModel.Footnotes;
@@ -2438,20 +2270,22 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         [Fact]
         public async Task NoDataSetFile_ReturnsNotFound()
         {
-            Publication publication = _fixture
+            Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 1)])
-                .WithTheme(_fixture.DefaultTheme());
+                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                .WithTheme(DataFixture.DefaultTheme());
 
-            ReleaseFile releaseFile = _fixture
+            ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
-                .WithFile(_fixture.DefaultFile(FileType.Data));
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             var response = await GetDataSetFile(Guid.NewGuid());
 
@@ -2461,20 +2295,22 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         [Fact]
         public async Task ReleaseNotPublished_ReturnsNotFound()
         {
-            Publication publication = _fixture
+            Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
-                .WithTheme(_fixture.DefaultTheme());
+                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)])
+                .WithTheme(DataFixture.DefaultTheme());
 
-            ReleaseFile releaseFile = _fixture
+            ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
-                .WithFile(_fixture.DefaultFile(FileType.Data));
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
 
             var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value);
 
@@ -2484,38 +2320,38 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         [Fact]
         public async Task AmendmentNotPublished_ReturnsOk()
         {
-            Publication publication = _fixture
+            Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 2, draftVersion: true)])
-                .WithTheme(_fixture.DefaultTheme());
+                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true)])
+                .WithTheme(DataFixture.DefaultTheme());
 
-            File file = _fixture.DefaultFile(FileType.Data).WithDataSetFileMeta(_fixture.DefaultDataSetFileMeta());
+            File file = DataFixture
+                .DefaultFile(FileType.Data)
+                .WithDataSetFileMeta(DataFixture.DefaultDataSetFileMeta());
 
-            ReleaseFile releaseFile0 = _fixture
+            ReleaseFile releaseFile0 = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[0]) // the previous published version
                 .WithFile(file);
 
-            ReleaseFile releaseFile1 = _fixture
+            ReleaseFile releaseFile1 = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[1]) // the latest published version
                 .WithFile(file);
 
-            ReleaseFile releaseFile2 = _fixture
+            ReleaseFile releaseFile2 = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(publication.Releases[0].Versions[2]) // the draft version
                 .WithFile(file);
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.AddRange(releaseFile0, releaseFile1, releaseFile2);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.AddRange(releaseFile0, releaseFile1, releaseFile2);
+                });
 
-            await StartAzurite();
-
-            var testApp = BuildApp(enableAzurite: true);
-
-            var publicBlobStorageService = testApp.Services.GetRequiredService<IPublicBlobStorageService>();
+            var publicBlobStorageService = fixture.PublicBlobStorageService;
 
             var formFile = CreateDataCsvFormFile(
                 """
@@ -2530,7 +2366,7 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
                 formFile
             );
 
-            var response = await GetDataSetFile(releaseFile2.File.DataSetFileId!.Value, testApp);
+            var response = await GetDataSetFile(releaseFile2.File.DataSetFileId!.Value);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             // Fetches latest published version, not amendment
@@ -2540,26 +2376,28 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
         [Fact]
         public async Task DataSetFileRemovedOnAmendment_ReturnsNotFound()
         {
-            Publication publication = _fixture
+            Publication publication = DataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_fixture.DefaultRelease(publishedVersions: 2, draftVersion: false)])
-                .WithTheme(_fixture.DefaultTheme());
+                .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 2, draftVersion: false)])
+                .WithTheme(DataFixture.DefaultTheme());
 
             var release = publication.Releases[0];
 
-            File file = _fixture.DefaultFile(FileType.Data);
+            File file = DataFixture.DefaultFile(FileType.Data);
 
-            ReleaseFile releaseFile0 = _fixture
+            ReleaseFile releaseFile0 = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(release.Versions[0]) // the previous published version
                 .WithFile(file);
 
             // NOTE: No ReleaseFile for release.Versions[1]
 
-            await TestApp.AddTestData<ContentDbContext>(context =>
-            {
-                context.ReleaseFiles.Add(releaseFile0);
-            });
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile0);
+                });
 
             var response = await GetDataSetFile(releaseFile0.File.DataSetFileId!.Value);
 
@@ -2571,35 +2409,11 @@ public abstract class DataSetFilesControllerTests : IntegrationTestFixture
             WebApplicationFactory<Startup>? app = null
         )
         {
-            var client = (app ?? BuildApp()).CreateClient();
-
-            return await client.GetAsync($"/api/data-set-files/{dataSetFileId}");
+            return await fixture.CreateClient().GetAsync($"/api/data-set-files/{dataSetFileId}");
         }
     }
 
-    private WebApplicationFactory<Startup> BuildApp(
-        ContentDbContext? contentDbContext = null,
-        StatisticsDbContext? statisticsDbContext = null,
-        bool enableAzurite = false
-    )
-    {
-        List<Action<IWebHostBuilder>> configFuncs = enableAzurite ? [WithAzurite()] : [];
-        return BuildWebApplicationFactory(configFuncs)
-            .ConfigureServices(services =>
-            {
-                if (contentDbContext is not null)
-                {
-                    services.ReplaceService(contentDbContext);
-                }
-
-                if (statisticsDbContext is not null)
-                {
-                    services.ReplaceService(statisticsDbContext);
-                }
-            });
-    }
-
-    private static IFormFile CreateDataCsvFormFile(string content)
+    private static FormFile CreateDataCsvFormFile(string content)
     {
         var memoryStream = new MemoryStream();
         var writer = new StreamWriter(memoryStream);

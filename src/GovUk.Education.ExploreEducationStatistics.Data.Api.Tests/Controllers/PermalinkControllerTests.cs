@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
@@ -8,18 +9,44 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Moq;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers;
 
-public class PermalinkControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class PermalinkControllerTestsFixture : OptimisedDataApiCollectionFixture
+{
+    public Mock<IPermalinkService> PermalinkServiceMock = null!;
+
+    protected override void ConfigureServicesAndConfiguration(
+        OptimisedServiceAndConfigModifications serviceModifications
+    )
+    {
+        base.ConfigureServicesAndConfiguration(serviceModifications);
+
+        PermalinkServiceMock = new Mock<IPermalinkService>(MockBehavior.Strict);
+        serviceModifications.ReplaceService(PermalinkServiceMock.Object);
+    }
+
+    public override async Task BeforeEachTest()
+    {
+        await base.BeforeEachTest();
+
+        PermalinkServiceMock.Reset();
+    }
+}
+
+[CollectionDefinition(nameof(PermalinkControllerTestsFixture))]
+public class PermalinkControllerTestsCollection : ICollectionFixture<PermalinkControllerTestsFixture>;
+
+[Collection(nameof(PermalinkControllerTestsFixture))]
+public class PermalinkControllerTests(PermalinkControllerTestsFixture fixture)
+    : OptimisedIntegrationTestBase<Startup>(fixture)
 {
     [Fact]
     public async Task CreatePermalink()
@@ -39,12 +66,11 @@ public class PermalinkControllerTests(TestApplicationFactory testApp) : Integrat
                 Indicators = new List<Guid> { Guid.NewGuid() },
             },
         };
+
         var expectedResult = new PermalinkViewModel { Id = Guid.NewGuid() };
 
-        var permalinkService = new Mock<IPermalinkService>(MockBehavior.Strict);
-
-        permalinkService
-            .Setup(s =>
+        fixture
+            .PermalinkServiceMock.Setup(s =>
                 s.CreatePermalink(
                     It.Is<PermalinkCreateRequest>(r => r.IsDeepEqualTo(createRequest, null)),
                     It.IsAny<CancellationToken>()
@@ -52,11 +78,11 @@ public class PermalinkControllerTests(TestApplicationFactory testApp) : Integrat
             )
             .ReturnsAsync(expectedResult);
 
-        var client = SetupApp(permalinkService: permalinkService.Object).CreateClient();
+        var response = await fixture
+            .CreateClient()
+            .PostAsync(requestUri: "/api/permalink", content: new JsonNetContent(createRequest));
 
-        var response = await client.PostAsync(requestUri: "/api/permalink", content: new JsonNetContent(createRequest));
-
-        MockUtils.VerifyAllMocks(permalinkService);
+        MockUtils.VerifyAllMocks(fixture.PermalinkServiceMock);
 
         response.AssertCreated(expectedResult, $"http://localhost/api/permalink/{expectedResult.Id}");
     }
@@ -67,18 +93,18 @@ public class PermalinkControllerTests(TestApplicationFactory testApp) : Integrat
         var permalinkId = Guid.NewGuid();
         var permalink = new PermalinkViewModel { Id = permalinkId };
 
-        var permalinkService = new Mock<IPermalinkService>(MockBehavior.Strict);
+        fixture
+            .PermalinkServiceMock.Setup(s => s.GetPermalink(permalinkId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(permalink);
 
-        permalinkService.Setup(s => s.GetPermalink(permalinkId, It.IsAny<CancellationToken>())).ReturnsAsync(permalink);
+        var response = await fixture
+            .CreateClient()
+            .GetAsync(
+                uri: $"/api/permalink/{permalinkId}",
+                headers: new Dictionary<string, string> { { HeaderNames.Accept, "application/json" } }
+            );
 
-        var client = SetupApp(permalinkService: permalinkService.Object).CreateClient();
-
-        var response = await client.GetAsync(
-            uri: $"/api/permalink/{permalinkId}",
-            headers: new Dictionary<string, string> { { HeaderNames.Accept, "application/json" } }
-        );
-
-        MockUtils.VerifyAllMocks(permalinkService);
+        MockUtils.VerifyAllMocks(fixture.PermalinkServiceMock);
 
         response.AssertOk(permalink);
     }
@@ -88,20 +114,18 @@ public class PermalinkControllerTests(TestApplicationFactory testApp) : Integrat
     {
         var permalinkId = Guid.NewGuid();
 
-        var permalinkService = new Mock<IPermalinkService>(MockBehavior.Strict);
-
-        permalinkService
-            .Setup(s => s.GetPermalink(permalinkId, It.IsAny<CancellationToken>()))
+        fixture
+            .PermalinkServiceMock.Setup(s => s.GetPermalink(permalinkId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new NotFoundResult());
 
-        var client = SetupApp(permalinkService: permalinkService.Object).CreateClient();
+        var response = await fixture
+            .CreateClient()
+            .GetAsync(
+                uri: $"/api/permalink/{permalinkId}",
+                headers: new Dictionary<string, string> { { HeaderNames.Accept, "application/json" } }
+            );
 
-        var response = await client.GetAsync(
-            uri: $"/api/permalink/{permalinkId}",
-            headers: new Dictionary<string, string> { { HeaderNames.Accept, "application/json" } }
-        );
-
-        MockUtils.VerifyAllMocks(permalinkService);
+        MockUtils.VerifyAllMocks(fixture.PermalinkServiceMock);
 
         response.AssertNotFound();
     }
@@ -110,20 +134,19 @@ public class PermalinkControllerTests(TestApplicationFactory testApp) : Integrat
     public async Task GetPermalink_Csv()
     {
         var permalinkId = Guid.NewGuid();
-        var permalinkService = new Mock<IPermalinkService>(MockBehavior.Strict);
 
-        permalinkService
-            .Setup(s => s.GetCsvDownloadStream(permalinkId, It.IsAny<CancellationToken>()))
+        fixture
+            .PermalinkServiceMock.Setup(s => s.GetCsvDownloadStream(permalinkId, It.IsAny<CancellationToken>()))
             .ReturnsAsync("Test csv".ToStream());
 
-        var client = SetupApp(permalinkService: permalinkService.Object).CreateClient();
+        var response = await fixture
+            .CreateClient()
+            .GetAsync(
+                uri: $"/api/permalink/{permalinkId}",
+                headers: new Dictionary<string, string> { { HeaderNames.Accept, "text/csv, application/json" } }
+            );
 
-        var response = await client.GetAsync(
-            uri: $"/api/permalink/{permalinkId}",
-            headers: new Dictionary<string, string> { { HeaderNames.Accept, "text/csv, application/json" } }
-        );
-
-        MockUtils.VerifyAllMocks(permalinkService);
+        MockUtils.VerifyAllMocks(fixture.PermalinkServiceMock);
 
         response.AssertOk("Test csv");
     }
@@ -133,20 +156,18 @@ public class PermalinkControllerTests(TestApplicationFactory testApp) : Integrat
     {
         var permalinkId = Guid.NewGuid();
 
-        var permalinkService = new Mock<IPermalinkService>(MockBehavior.Strict);
-
-        permalinkService
-            .Setup(s => s.GetCsvDownloadStream(permalinkId, It.IsAny<CancellationToken>()))
+        fixture
+            .PermalinkServiceMock.Setup(s => s.GetCsvDownloadStream(permalinkId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new NotFoundResult());
 
-        var client = SetupApp(permalinkService: permalinkService.Object).CreateClient();
+        var response = await fixture
+            .CreateClient()
+            .GetAsync(
+                uri: $"/api/permalink/{permalinkId}",
+                headers: new Dictionary<string, string> { { HeaderNames.Accept, "text/csv, application/json" } }
+            );
 
-        var response = await client.GetAsync(
-            uri: $"/api/permalink/{permalinkId}",
-            headers: new Dictionary<string, string> { { HeaderNames.Accept, "text/csv, application/json" } }
-        );
-
-        MockUtils.VerifyAllMocks(permalinkService);
+        MockUtils.VerifyAllMocks(fixture.PermalinkServiceMock);
 
         response.AssertNotFound();
     }
@@ -154,18 +175,8 @@ public class PermalinkControllerTests(TestApplicationFactory testApp) : Integrat
     [Fact]
     public async Task GetPermalink_InvalidIdReturnsNotFound()
     {
-        var client = SetupApp().CreateClient();
-
-        var response = await client.GetAsync("/api/permalink/not-a-guid");
+        var response = await fixture.CreateClient().GetAsync("/api/permalink/not-a-guid");
 
         response.AssertNotFound();
-    }
-
-    private WebApplicationFactory<Startup> SetupApp(IPermalinkService? permalinkService = null)
-    {
-        return TestApp.ConfigureServices(services =>
-        {
-            services.AddTransient(_ => permalinkService ?? Mock.Of<IPermalinkService>(MockBehavior.Strict));
-        });
     }
 }

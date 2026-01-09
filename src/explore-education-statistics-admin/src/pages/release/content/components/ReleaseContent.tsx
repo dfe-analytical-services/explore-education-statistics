@@ -251,10 +251,21 @@ const ReleaseContent = ({
                     <ReleaseEditableBlock
                       allowComments
                       block={block}
+                      editButtonLabel={
+                        <>
+                          Edit<VisuallyHidden> summary</VisuallyHidden> block
+                        </>
+                      }
                       publicationId={release.publication.id}
                       releaseVersionId={release.id}
+                      removeButtonLabel={
+                        <>
+                          Remove<VisuallyHidden> summary</VisuallyHidden> block
+                        </>
+                      }
                       sectionId={release.summarySection.id}
                       sectionKey="summarySection"
+                      label="Summary block"
                       onAfterDeleteBlock={onAfterDeleteSummaryBlock}
                     />
                   )}
@@ -526,6 +537,7 @@ const ReleaseContent = ({
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     sectionId={release.relatedDashboardsSection!.id}
                     sectionKey="relatedDashboardsSection"
+                    label="Related Dashboards block"
                   />
                 )}
               />

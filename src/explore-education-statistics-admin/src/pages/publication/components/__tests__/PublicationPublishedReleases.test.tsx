@@ -203,7 +203,9 @@ describe('PublicationPublishedReleases', () => {
       '/publication/publication-1/release/release-1-version-1/summary',
     );
     expect(
-      within(row1Cells[3]).getByRole('button', { name: 'Edit details' }),
+      within(row1Cells[3]).getByRole('button', {
+        name: 'Edit release label for Release 1',
+      }),
     ).toBeInTheDocument();
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
@@ -222,7 +224,9 @@ describe('PublicationPublishedReleases', () => {
       '/publication/publication-1/release/release-2-version-1/summary',
     );
     expect(
-      within(row2Cells[3]).getByRole('button', { name: 'Edit details' }),
+      within(row2Cells[3]).getByRole('button', {
+        name: 'Edit release label for Release 2',
+      }),
     ).toBeInTheDocument();
 
     const row3Cells = within(rows[3]).getAllByRole('cell');
@@ -241,7 +245,9 @@ describe('PublicationPublishedReleases', () => {
       '/publication/publication-1/release/release-3-version-1/summary',
     );
     expect(
-      within(row3Cells[3]).getByRole('button', { name: 'Edit details' }),
+      within(row3Cells[3]).getByRole('button', {
+        name: 'Edit release label for Release 3',
+      }),
     ).toBeInTheDocument();
 
     const row4Cells = within(rows[4]).getAllByRole('cell');
@@ -260,7 +266,9 @@ describe('PublicationPublishedReleases', () => {
       '/publication/publication-1/release/release-4-version-1/summary',
     );
     expect(
-      within(row4Cells[3]).getByRole('button', { name: 'Edit details' }),
+      within(row4Cells[3]).getByRole('button', {
+        name: 'Edit release label for Release 4',
+      }),
     ).toBeInTheDocument();
 
     const row5Cells = within(rows[5]).getAllByRole('cell');
@@ -279,12 +287,14 @@ describe('PublicationPublishedReleases', () => {
       '/publication/publication-1/release/release-5-version-1/summary',
     );
     expect(
-      within(row5Cells[3]).getByRole('button', { name: 'Edit details' }),
+      within(row5Cells[3]).getByRole('button', {
+        name: 'Edit release label for Release 5',
+      }),
     ).toBeInTheDocument();
   });
 
   test.each([true, false])(
-    '"Edit details" button only appears if the user has permission to update the release',
+    '"Edit release label" button only appears if the user has permission to update the release',
     async (canUpdateRelease: boolean) => {
       publicationService.listReleaseVersions.mockResolvedValue(
         produce(
@@ -325,11 +335,15 @@ describe('PublicationPublishedReleases', () => {
 
       if (canUpdateRelease) {
         expect(
-          within(rowCells[3]).getByRole('button', { name: 'Edit details' }),
+          within(rowCells[3]).getByRole('button', {
+            name: 'Edit release label for Release 1',
+          }),
         ).toBeInTheDocument();
       } else {
         expect(
-          within(rowCells[3]).queryByRole('button', { name: 'Edit details' }),
+          within(rowCells[3]).queryByRole('button', {
+            name: 'Edit release label for Release 1',
+          }),
         ).not.toBeInTheDocument();
       }
     },

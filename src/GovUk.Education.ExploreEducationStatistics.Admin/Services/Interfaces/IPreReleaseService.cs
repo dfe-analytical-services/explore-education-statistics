@@ -8,5 +8,5 @@ public interface IPreReleaseService
 {
     PreReleaseWindow GetPreReleaseWindow(ReleaseVersion releaseVersion);
 
-    PreReleaseWindowStatus GetPreReleaseWindowStatus(ReleaseVersion releaseVersion, DateTime referenceTime);
+    PreReleaseWindowStatus GetPreReleaseWindowStatus(ReleaseVersion releaseVersion, DateTimeOffset referenceTime);
 }

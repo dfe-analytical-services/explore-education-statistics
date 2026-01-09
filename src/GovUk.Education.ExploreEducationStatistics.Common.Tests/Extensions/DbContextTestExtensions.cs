@@ -32,11 +32,32 @@ public static class DbContextTestExtensions
             }
 #pragma warning restore EF1002
         }
+        else if (context.Database.IsInMemory())
+        {
+            await context.ClearTestDataIfInMemory();
+        }
         else
         {
             throw new NotImplementedException(
                 $"Clearing test data is not supported for type {context.Database.ProviderName}"
             );
+        }
+    }
+
+    public static async Task ClearTestDataIfInMemory<TDbContext>(this TDbContext? context)
+        where TDbContext : DbContext
+    {
+        // If a DbContext's Database property is null, it is most likely a Mock.
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (context == null || context.Database == null)
+        {
+            return;
+        }
+
+        if (context.Database.IsInMemory())
+        {
+            await context.Database.EnsureDeletedAsync();
+            context.ChangeTracker.Clear();
         }
     }
 }

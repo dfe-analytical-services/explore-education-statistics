@@ -151,9 +151,11 @@ describe('DataFilesTableUploadsRow', () => {
       expect(cells[2]).toHaveTextContent('Pending import');
 
       const detailsButton = screen.getByRole('button', {
-        name: 'View details',
+        name: 'View details for pass',
       });
-      const deleteButton = screen.getByRole('button', { name: 'Delete files' });
+      const deleteButton = screen.getByRole('button', {
+        name: 'Delete files for pass',
+      });
       expect(detailsButton).toBeInTheDocument();
       expect(deleteButton).toBeInTheDocument();
 
@@ -223,9 +225,11 @@ describe('DataFilesTableUploadsRow', () => {
       expect(cells[2]).toHaveTextContent('Pending import');
 
       const detailsButton = screen.getByRole('button', {
-        name: 'View details',
+        name: 'View details for pass',
       });
-      const deleteButton = screen.getByRole('button', { name: 'Delete files' });
+      const deleteButton = screen.getByRole('button', {
+        name: 'Delete files for pass',
+      });
       expect(detailsButton).toBeInTheDocument();
       expect(deleteButton).toBeInTheDocument();
 
@@ -326,9 +330,11 @@ describe('DataFilesTableUploadsRow', () => {
       expect(cells[2]).toHaveTextContent('Failed screening');
 
       const detailsButton = screen.getByRole('button', {
-        name: 'View details',
+        name: 'View details for fail',
       });
-      const deleteButton = screen.getByRole('button', { name: 'Delete files' });
+      const deleteButton = screen.getByRole('button', {
+        name: 'Delete files for fail',
+      });
       expect(detailsButton).toBeInTheDocument();
       expect(deleteButton).toBeInTheDocument();
 

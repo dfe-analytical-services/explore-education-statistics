@@ -189,9 +189,9 @@ Validate table rows
     user checks table cell in offset row contains    ${row}    4    1    5,669
 
 Save data block
-    user enters text into element    label:Name    ${DATABLOCK_NAME}
+    user enters text into element    label:Data block name    ${DATABLOCK_NAME}
     user enters text into element    label:Table title    UI test table title
-    user enters text into element    label:Source    UI test source
+    user enters text into element    label:Data source    UI test source
 
     user clicks button    Save data block
     user waits until page contains    Delete this data block
@@ -249,9 +249,9 @@ Create table again
     ...    Admission Numbers for 'UI test subject' in Bolton 001 between 2009 and 2017
 
 Save data block again
-    user enters text into element    label:Name    UI test featured table
+    user enters text into element    label:Data block name    UI test featured table
     user enters text into element    label:Table title    UI test featured table title
-    user enters text into element    label:Source    UI test featured table source
+    user enters text into element    label:Data source    UI test featured table source
 
     user clicks checkbox    Set as a featured table for this publication
     user waits until page contains element    label:Featured table name
@@ -958,9 +958,9 @@ Create data block with categorical and numerical data
 
     user waits until results table appears    %{WAIT_LONG}
 
-    user enters text into element    label:Name    ${DATABLOCK_2_NAME}
+    user enters text into element    label:Data block name    ${DATABLOCK_2_NAME}
     user enters text into element    label:Table title    UI test table title
-    user enters text into element    label:Source    UI test source
+    user enters text into element    label:Data source    UI test source
 
     user clicks button    Save data block
     user waits until page contains    Delete this data block
@@ -1066,7 +1066,7 @@ Save and validate infographic chart embeds correctly
     user checks infographic chart contains alt    ${datablock}    Test chart alt
 
 Delete embedded data block
-    user clicks button    Remove block
+    user clicks element    testid:remove-block
     user clicks button    Confirm
 
 Delete chart from data block

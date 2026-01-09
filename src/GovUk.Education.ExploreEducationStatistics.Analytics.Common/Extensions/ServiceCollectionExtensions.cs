@@ -2,10 +2,8 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Strategies;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Analytics.Common.Extensions;
 
@@ -47,7 +45,6 @@ public static class ServiceCollectionExtensions
                         typeof(ICommonAnalyticsWriteStrategyWorkflow<>),
                         typeof(CommonAnalyticsWriteStrategyWorkflow<>)
                     )
-                    .TryAddSingletonInline<DateTimeProvider>()
                 : services.AddSingleton<IAnalyticsManager, NoOpAnalyticsManager>(),
             isAnalyticsEnabled
         );
@@ -89,12 +86,5 @@ public static class ServiceCollectionExtensions
 
         public IServiceCollection Services => services;
         public AnalyticsDisabledRegistrar WhenDisabled => new(services, isAnalyticsEnabled);
-    }
-
-    private static IServiceCollection TryAddSingletonInline<TService>(this IServiceCollection services)
-        where TService : class
-    {
-        services.TryAddSingleton<TService>();
-        return services;
     }
 }

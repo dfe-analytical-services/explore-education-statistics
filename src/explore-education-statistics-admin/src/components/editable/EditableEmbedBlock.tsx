@@ -4,7 +4,7 @@ import EditableEmbedForm, {
 } from '@admin/components/editable/EditableEmbedForm';
 import Gate from '@common/components/Gate';
 import EmbedBlock from '@common/modules/find-statistics/components/EmbedBlock';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { EmbedBlock as EmbedBlockType } from '@common/services/types/blocks';
 import Modal from '@common/components/Modal';
 import useToggle from '@common/hooks/useToggle';
@@ -12,6 +12,8 @@ import useToggle from '@common/hooks/useToggle';
 interface Props {
   block: EmbedBlockType;
   editable: boolean;
+  editButtonLabel?: ReactNode | string;
+  removeButtonLabel?: ReactNode | string;
   visible?: boolean;
   onDelete: () => void;
   onSubmit: (values: EditableEmbedFormValues) => void;
@@ -20,6 +22,8 @@ interface Props {
 const EditableEmbedBlock = ({
   block,
   editable,
+  editButtonLabel,
+  removeButtonLabel,
   visible = true,
   onDelete,
   onSubmit,
@@ -29,6 +33,8 @@ const EditableEmbedBlock = ({
   return (
     <>
       <EditableBlockWrapper
+        editButtonLabel={editButtonLabel}
+        removeButtonLabel={removeButtonLabel}
         onEmbedBlockEdit={editable ? toggleEmbedDashboardForm.on : undefined}
         onDelete={editable ? onDelete : undefined}
       >
