@@ -1,5 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.ViewModels;
 

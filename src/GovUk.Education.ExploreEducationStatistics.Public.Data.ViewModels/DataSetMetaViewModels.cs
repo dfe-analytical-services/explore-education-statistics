@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 
 /// <summary>
 /// All the metadata associated with a data set.

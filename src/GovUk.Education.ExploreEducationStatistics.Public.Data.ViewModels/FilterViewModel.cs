@@ -1,6 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 
 /// <summary>
 /// A filterable characteristic (excluding geography or time) of a data set.
@@ -30,15 +28,4 @@ public record FilterViewModel
     /// </summary>
     /// <example>Additional detail about the filter.</example>
     public string Hint { get; init; } = string.Empty;
-
-    public static FilterViewModel Create(FilterMeta meta)
-    {
-        return new FilterViewModel
-        {
-            Id = meta.PublicId,
-            Column = meta.Column,
-            Label = meta.Label,
-            Hint = meta.Hint,
-        };
-    }
 }

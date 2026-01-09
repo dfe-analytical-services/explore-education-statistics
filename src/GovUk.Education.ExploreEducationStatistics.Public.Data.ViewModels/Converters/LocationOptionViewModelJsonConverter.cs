@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels.Converters;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels.Converters;
 
 public class LocationOptionViewModelJsonConverter : JsonConverter<LocationOptionViewModel>
 {
