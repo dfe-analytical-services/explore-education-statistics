@@ -86,6 +86,10 @@ const ReleaseDataReorderSection = ({
                 !reorderingFilters &&
                 !reorderingIndicators && (
                   <table className={styles.table}>
+                    <caption className="govuk-visually-hidden">
+                      Table showing data files in this release and buttons for
+                      reordering data file filters and indicators.
+                    </caption>
                     <thead>
                       <tr>
                         <th>Data file</th>

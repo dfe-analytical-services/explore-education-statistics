@@ -73,6 +73,9 @@ export default function ReleaseSeriesTable({
 
   return (
     <table data-testid="release-series">
+      <caption className="govuk-visually-hidden">
+        Table showing the ordered releases for this publication.
+      </caption>
       <thead>
         <tr>
           <th>Description</th>

@@ -15,6 +15,7 @@ interface Props {
   users: UserReleaseRole[];
   onUserRemove?: (userId: string) => void;
   onUserInvitesRemove?: (email: string) => void;
+  caption?: string;
 }
 
 const ReleaseUserTable = ({
@@ -23,9 +24,13 @@ const ReleaseUserTable = ({
   users,
   onUserRemove,
   onUserInvitesRemove,
+  caption,
 }: Props) => {
   return (
     <table data-testid={testId}>
+      {caption && (
+        <caption className="govuk-visually-hidden">{caption}</caption>
+      )}
       <thead>
         <tr>
           <th scope="col">Name</th>

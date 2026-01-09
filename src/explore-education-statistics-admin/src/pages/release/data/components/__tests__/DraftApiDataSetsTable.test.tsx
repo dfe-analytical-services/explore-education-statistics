@@ -189,6 +189,11 @@ describe('DraftApiDataSetsTable', () => {
     const baseDataSetUrl =
       '/publication/publication-1/release/release-1/api-data-sets';
 
+    const caption = screen.getByRole('caption');
+    expect(caption).toHaveTextContent(
+      'Table showing draft API data sets for this publication.',
+    );
+
     const rows = within(screen.getByRole('table')).getAllByRole('row');
 
     expect(rows).toHaveLength(7);

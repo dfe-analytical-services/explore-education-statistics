@@ -178,6 +178,10 @@ describe('PublicationPublishedReleases', () => {
         screen.queryByText('Loading published releases'),
       ).not.toBeInTheDocument();
     });
+    const caption = screen.getByRole('caption');
+    expect(caption).toHaveTextContent(
+      'Table showing the published releases for this publication.',
+    );
 
     expect(screen.getByText('Published releases (5 of 7)')).toBeInTheDocument();
     expect(

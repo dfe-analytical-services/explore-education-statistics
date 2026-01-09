@@ -96,6 +96,11 @@ describe('PublicationDraftReleases', () => {
       />,
     );
 
+    const caption = screen.getByRole('caption');
+    expect(caption).toHaveTextContent(
+      'Table showing the draft releases for this publication.',
+    );
+
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(4);
 

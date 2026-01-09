@@ -80,6 +80,10 @@ describe('PublicationScheduledReleases', () => {
 
     await waitFor(() => {
       expect(within(row1Cells[1]).getByText('Scheduled')).toBeInTheDocument();
+      const caption = screen.getByRole('caption');
+      expect(caption).toHaveTextContent(
+        'Table showing the scheduled releases for this publication.',
+      );
     });
 
     expect(
