@@ -5,7 +5,7 @@ import baseRender from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React, { ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 
 describe('EducationInNumbersAccordionSection', () => {
   describe('preview mode', () => {
@@ -34,7 +34,7 @@ describe('EducationInNumbersAccordionSection', () => {
       ).not.toBeInTheDocument();
     });
 
-    function render(element: ReactElement) {
+    function render(element: ReactNode) {
       baseRender(
         <EditingContextProvider editingMode="preview">
           <EditableAccordion
@@ -139,7 +139,7 @@ describe('EducationInNumbersAccordionSection', () => {
       expect(handleRemoveSection).toHaveBeenCalledTimes(1);
     });
 
-    function render(element: ReactElement) {
+    function render(element: ReactNode) {
       baseRender(
         <EditingContextProvider editingMode="edit">
           <EditableAccordion

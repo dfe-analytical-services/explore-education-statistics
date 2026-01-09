@@ -6,12 +6,12 @@ import { getDescribedBy } from '@common-test/queries';
 import { render as baseRender, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React, { ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 
 describe('EditableContentBlock', () => {
   const testOrphanedCommentHtml = `
 <p>
-  Test <comment-start name="comment-1"></comment-start>unresolved<comment-end name="comment-1"></comment-end> and 
+  Test <comment-start name="comment-1"></comment-start>unresolved<comment-end name="comment-1"></comment-end> and
   <resolvedcomment-start name="comment-2"></resolvedcomment-start>resolved<resolvedcomment-end name="comment-2"></resolvedcomment-end>
 </p>`;
 
@@ -60,7 +60,7 @@ describe('EditableContentBlock', () => {
     // Markup should not contain comment elements
     expect(paragraph.innerHTML).toMatchInlineSnapshot(`
       "
-        Test unresolved and 
+        Test unresolved and
         resolved
       "
     `);
@@ -113,7 +113,7 @@ describe('EditableContentBlock', () => {
     // Markup should not contain comment elements
     expect(paragraph.innerHTML).toMatchInlineSnapshot(`
       "
-        Test unresolved and 
+        Test unresolved and
         resolved
       "
     `);
@@ -307,7 +307,7 @@ describe('EditableContentBlock', () => {
     });
   });
 
-  function render(element: ReactElement) {
+  function render(element: ReactNode) {
     baseRender(
       <TestConfigContextProvider>{element}</TestConfigContextProvider>,
     );

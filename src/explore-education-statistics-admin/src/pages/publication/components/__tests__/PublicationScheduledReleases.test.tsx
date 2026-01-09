@@ -8,7 +8,7 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
-import React, { ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('@admin/services/releaseVersionService');
@@ -164,6 +164,6 @@ describe('PublicationScheduledReleases', () => {
   });
 });
 
-function render(element: ReactElement) {
+function render(element: ReactNode) {
   baseRender(<MemoryRouter>{element}</MemoryRouter>);
 }
