@@ -15,6 +15,7 @@ interface Props {
   users: UserReleaseRole[];
   onUserRemove?: (userId: string) => void;
   onUserInvitesRemove?: (email: string) => void;
+  caption?: string;
 }
 
 const ReleaseUserTable = ({
@@ -23,20 +24,11 @@ const ReleaseUserTable = ({
   users,
   onUserRemove,
   onUserInvitesRemove,
+  caption,
 }: Props) => {
-  const displaysApproversOrContributors =
-    testId === 'releaseApprovers' || testId === 'releaseContributors';
-  const caption =
-    displaysApproversOrContributors &&
-    `Table showing the${
-      testId === 'releaseApprovers'
-        ? ' approvers or pending approvers '
-        : ' contributors or pending contributors '
-    }invites for this release.`;
-
   return (
     <table data-testid={testId}>
-      {displaysApproversOrContributors && (
+      {caption && (
         <caption className="govuk-visually-hidden">{caption}</caption>
       )}
       <thead>

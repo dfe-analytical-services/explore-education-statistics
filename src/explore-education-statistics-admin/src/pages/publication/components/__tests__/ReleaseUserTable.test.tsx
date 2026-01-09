@@ -217,41 +217,21 @@ describe('ReleaseUserTable', () => {
     });
   });
 
-  test('renders captions correctly for contributors', async () => {
+  test('renders captions correctly', async () => {
     const onUserRemove = jest.fn();
     const onUserInvitesRemove = jest.fn();
-
+    const captionText = 'test caption';
     render(
       <ReleaseUserTable
         users={testReleaseContributors}
         invites={testInvites}
         onUserRemove={onUserRemove}
         onUserInvitesRemove={onUserInvitesRemove}
-        data-testid="releaseContributors"
+        caption={captionText}
       />,
     );
-    const caption = screen.getByRole('caption');
-    expect(caption).toHaveTextContent(
-      'Table showing the contributors or pending contributors invites for this release.',
-    );
-  });
 
-  test('renders captions correctly for approvers', async () => {
-    const onUserRemove = jest.fn();
-    const onUserInvitesRemove = jest.fn();
-
-    render(
-      <ReleaseUserTable
-        users={testReleaseContributors}
-        invites={testInvites}
-        onUserRemove={onUserRemove}
-        onUserInvitesRemove={onUserInvitesRemove}
-        data-testid="releaseApprovers"
-      />,
-    );
     const caption = screen.getByRole('caption');
-    expect(caption).toHaveTextContent(
-      'Table showing the approvers or pending approvers invites for this release.',
-    );
+    expect(caption).toHaveTextContent(captionText);
   });
 });
