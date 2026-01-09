@@ -3099,7 +3099,9 @@ public class PublicationServiceTests
 
             var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
             releaseCacheService
-                .Setup(mock => mock.UpdateRelease(expectedLatestPublishedReleaseVersionId, publication.Slug, null))
+                .Setup(mock =>
+                    mock.UpdateRelease(expectedLatestPublishedReleaseVersionId, publication.Slug, null, null)
+                )
                 .ReturnsAsync(new ReleaseCacheViewModel(expectedLatestPublishedReleaseVersionId));
 
             var publicationService = BuildPublicationService(
@@ -3222,7 +3224,9 @@ public class PublicationServiceTests
 
             var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
             releaseCacheService
-                .Setup(mock => mock.UpdateRelease(expectedLatestPublishedReleaseVersionId, publication.Slug, null))
+                .Setup(mock =>
+                    mock.UpdateRelease(expectedLatestPublishedReleaseVersionId, publication.Slug, null, null)
+                )
                 .ReturnsAsync(new ReleaseCacheViewModel(expectedLatestPublishedReleaseVersionId));
 
             var publicationService = BuildPublicationService(

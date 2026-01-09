@@ -2396,7 +2396,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
 
             releaseCacheService
-                .Setup(s => s.UpdateRelease(release2024.Versions[0].Id, publication.Slug, release2024.Slug))
+                .Setup(s => s.UpdateRelease(release2024.Versions[0].Id, publication.Slug, release2024.Slug, null))
                 .ReturnsAsync(new ReleaseCacheViewModel(release2024.Versions[0].Id));
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -2445,7 +2445,8 @@ public abstract class ReleaseVersionServiceTests
                     s.UpdateRelease(
                         publication.Releases[0].Versions[0].Id,
                         publication.Slug,
-                        publication.Releases[0].Slug
+                        publication.Releases[0].Slug,
+                        null
                     )
                 )
                 .ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
@@ -2453,7 +2454,7 @@ public abstract class ReleaseVersionServiceTests
             // As the release is the latest for the publication the separate cache entry for the publication's latest
             // release should also be updated
             releaseCacheService
-                .Setup(s => s.UpdateRelease(publication.Releases[0].Versions[0].Id, publication.Slug, null))
+                .Setup(s => s.UpdateRelease(publication.Releases[0].Versions[0].Id, publication.Slug, null, null))
                 .ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -2534,13 +2535,14 @@ public abstract class ReleaseVersionServiceTests
                     s.UpdateRelease(
                         publication.Releases[0].Versions[0].Id,
                         publication.Slug,
-                        publication.Releases[0].Slug
+                        publication.Releases[0].Slug,
+                        null
                     )
                 )
                 .ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
 
             releaseCacheService
-                .Setup(s => s.UpdateRelease(publication.Releases[0].Versions[0].Id, publication.Slug, null))
+                .Setup(s => s.UpdateRelease(publication.Releases[0].Versions[0].Id, publication.Slug, null, null))
                 .ReturnsAsync(new ReleaseCacheViewModel(publication.Releases[0].Versions[0].Id));
 
             await using (var context = InMemoryApplicationDbContext(contextId))
