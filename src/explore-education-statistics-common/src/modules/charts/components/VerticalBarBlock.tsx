@@ -26,14 +26,7 @@ import parseNumber from '@common/utils/number/parseNumber';
 import getUnit from '@common/modules/charts/util/getUnit';
 import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
 import { otherAxisPositionTypes } from '@common/modules/charts/types/referenceLinePosition';
-import React, {
-  memo,
-  RefObject,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
   Bar,
   BarChart,

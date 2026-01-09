@@ -160,7 +160,7 @@ export function appendFootnotes(
 export default function downloadTableOdsFile(
   fileName: string,
   footnotes: Footnote[],
-  tableRef: RefObject<HTMLElement>,
+  tableRef: RefObject<HTMLElement | null>,
   title: string,
 ): void {
   let tableEl: HTMLTableElement | null = null;

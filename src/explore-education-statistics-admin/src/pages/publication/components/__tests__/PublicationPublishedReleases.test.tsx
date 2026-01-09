@@ -11,7 +11,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
 import { produce } from 'immer';
-import React, { ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 
@@ -546,6 +546,6 @@ describe('PublicationPublishedReleases', () => {
   });
 });
 
-function render(element: ReactElement) {
+function render(element: ReactNode) {
   baseRender(<MemoryRouter>{element}</MemoryRouter>);
 }

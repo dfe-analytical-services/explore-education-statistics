@@ -19,7 +19,7 @@ import _releasePermissionService, {
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { generatePath, MemoryRouter, Route } from 'react-router';
-import React, { ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 import { Router } from 'react-router-dom';
 import noop from 'lodash/noop';
 import { createMemoryHistory, MemoryHistory } from 'history';
@@ -681,6 +681,6 @@ async function renderPage({
   );
 }
 
-function render(element: ReactElement) {
+function render(element: ReactNode) {
   return baseRender(<MemoryRouter>{element}</MemoryRouter>);
 }

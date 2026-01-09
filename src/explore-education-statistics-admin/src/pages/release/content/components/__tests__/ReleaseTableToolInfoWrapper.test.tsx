@@ -6,7 +6,7 @@ import {
   testContact,
   testPublication,
 } from '@admin/pages/publication/__data__/testPublication';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import React from 'react';
 
 jest.mock('@admin/services/publicationService');

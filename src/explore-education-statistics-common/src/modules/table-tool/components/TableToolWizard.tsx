@@ -43,7 +43,13 @@ import { Dictionary } from '@common/types';
 import locationLevelsMap, {
   LocationLevelKey,
 } from '@common/utils/locationLevelsMap';
-import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
+import React, {
+  HTMLAttributes,
+  ReactElement,
+  ReactNode,
+  useMemo,
+  useState,
+} from 'react';
 import { useImmer } from 'use-immer';
 import { convertHierarchiesFormToQuery } from './utils/filterHierarchiesConversion';
 
@@ -81,11 +87,13 @@ export interface FinalStepRenderProps {
 
 export interface TableToolWizardProps {
   currentStep?: number;
-  finalStep?: (props: FinalStepRenderProps) => ReactElement;
+  finalStep?: (props: FinalStepRenderProps) => ReactNode;
   hidePublicationStep?: boolean;
   initialState?: Partial<InitialTableToolState>;
   loadingFastTrack?: boolean;
-  renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
+  renderFeaturedTableLink?: (
+    featuredTable: FeaturedTable,
+  ) => ReactElement<HTMLAttributes<HTMLElement>>;
   renderRelatedInfo?: ReactNode;
   scrollOnMount?: boolean;
   showTableQueryErrorDownload?: boolean;
