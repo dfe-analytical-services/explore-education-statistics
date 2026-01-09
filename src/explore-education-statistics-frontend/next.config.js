@@ -82,6 +82,28 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source:
+          '/find-statistics/:publication/:page(data-guidance|prerelease-access-list)',
+        destination: '/find-statistics/:publication',
+        permanent: true,
+      },
+      {
+        source: '/find-statistics/:publication/:release/data-guidance',
+        destination:
+          '/find-statistics/:publication/:release/explore#data-guidance-section',
+        permanent: true,
+      },
+      {
+        source: '/find-statistics/:publication/:release/prerelease-access-list',
+        destination:
+          '/find-statistics/:publication/:release/help#pre-release-access-list-section',
+        permanent: true,
+      },
+    ];
+  },
   webpack(config, options) {
     const { dev, isServer } = options;
 
