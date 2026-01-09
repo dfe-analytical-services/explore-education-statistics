@@ -18,7 +18,7 @@ public record FullTableQueryRequest
 
     public IDictionary<Guid, List<FilterHierarchyOption>>? FilterHierarchiesOptions { get; set; } = null;
 
-    public FullTableQuery AsFullTableQuery(bool enableCropping = false)
+    public FullTableQuery AsFullTableQuery()
     {
         return new FullTableQuery
         {
@@ -28,7 +28,6 @@ public record FullTableQueryRequest
             Filters = this.Filters,
             Indicators = this.Indicators,
             FilterHierarchiesOptions = CreateFilterHierarchiesOptionsFromDictionary(this.FilterHierarchiesOptions),
-            EnableCropping = enableCropping,
         };
     }
 
