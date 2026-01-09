@@ -6,11 +6,11 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import tableBuilderService, {
   ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
+import DataTableCaption from '@common/modules/table-tool/components/DataTableCaption';
 import FixedMultiHeaderDataTable from '@common/modules/table-tool/components/FixedMultiHeaderDataTable';
 import mapTableToJson from '@common/modules/table-tool/utils/mapTableToJson';
 import TableExportMenu from '@common/modules/find-statistics/components/TableExportMenu';
-import React, { forwardRef, useMemo, memo, ReactNode, RefObject } from 'react';
-import generateTableTitle from '@common/modules/table-tool/utils/generateTableTitle';
+import React, { forwardRef, memo, ReactNode, RefObject } from 'react';
 
 interface Props {
   captionTitle?: string;
@@ -45,14 +45,9 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
     }: Props,
     dataTableRef,
   ) {
-    const { subjectMeta, results } = fullTable;
-    const generatedTitle = useMemo<string>(
-      () =>
-        !captionTitle && subjectMeta ? generateTableTitle(subjectMeta) : '',
-      [subjectMeta, captionTitle],
-    );
-
     try {
+      const { subjectMeta, results } = fullTable;
+
       if (results.length === 0) {
         return (
           <WarningMessage>
@@ -103,12 +98,14 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
           )}
           <FixedMultiHeaderDataTable
             caption={
-              <strong id={captionId} data-testid="dataTableCaption">
-                {captionTitle || generatedTitle}
-              </strong>
+              <DataTableCaption
+                title={captionTitle}
+                meta={subjectMeta}
+                id={captionId}
+              />
             }
             captionId={captionId}
-            captionTitle={captionTitle || generatedTitle}
+            captionTitle={captionTitle}
             tableJson={tableJson}
             footnotesClassName={footnotesClassName}
             footnotesId={
