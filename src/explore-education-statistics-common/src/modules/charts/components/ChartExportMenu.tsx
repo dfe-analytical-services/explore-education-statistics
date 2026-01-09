@@ -7,7 +7,7 @@ import ExportMenu from '@common/components/ExportMenu';
 import useToggle from '@common/hooks/useToggle';
 
 interface Props {
-  chartRef: RefObject<HTMLElement>;
+  chartRef: RefObject<HTMLElement | null>;
   chartTitle?: string | undefined;
 }
 

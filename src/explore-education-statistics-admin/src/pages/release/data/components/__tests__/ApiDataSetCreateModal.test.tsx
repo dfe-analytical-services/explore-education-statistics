@@ -6,7 +6,7 @@ import _apiDataSetService from '@admin/services/apiDataSetService';
 import baseRender from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import { createMemoryHistory, History } from 'history';
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 import { Router } from 'react-router-dom';
 
 jest.mock('@admin/services/apiDataSetService');
@@ -146,7 +146,7 @@ describe('ApiDataSetCreateModal', () => {
   });
 
   function render(
-    ui: ReactElement,
+    ui: ReactNode,
     options?: {
       history: History;
     },

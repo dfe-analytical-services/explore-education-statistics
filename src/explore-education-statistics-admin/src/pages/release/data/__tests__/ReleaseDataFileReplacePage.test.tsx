@@ -681,7 +681,7 @@ describe('ReleaseDataFileReplacePage', () => {
     });
   };
 
-  const renderWithTestConfig = (ui: React.ReactElement) => {
+  const renderWithTestConfig = (ui: React.ReactNode) => {
     const defaultTestConfig = {
       appInsightsKey: '',
       publicAppUrl: 'http://localhost',

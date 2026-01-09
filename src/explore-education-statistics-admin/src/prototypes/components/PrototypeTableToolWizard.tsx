@@ -31,7 +31,7 @@ import {
   SubjectMeta,
 } from '@common/services/tableBuilderService';
 import { Theme } from '@common/services/publicationService';
-import React, { ReactElement, ReactNode } from 'react';
+import React, { HTMLAttributes, ReactElement, ReactNode } from 'react';
 import { useImmer } from 'use-immer';
 import {
   filtersAndIndicatorsSubjectMeta,
@@ -75,9 +75,11 @@ export interface PrototypeTableToolWizardProps {
   themeMeta?: Theme[];
   initialState?: Partial<InitialTableToolState>;
   hidePublicationStep?: boolean;
-  finalStep?: (props: FinalStepRenderProps) => ReactElement;
+  finalStep?: (props: FinalStepRenderProps) => ReactNode;
   loadingFastTrack?: boolean;
-  renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
+  renderFeaturedTableLink?: (
+    featuredTable: FeaturedTable,
+  ) => ReactElement<HTMLAttributes<HTMLElement>>;
   scrollOnMount?: boolean;
   onTableQueryError?: (
     errorCode: TableQueryErrorCode,

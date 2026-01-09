@@ -6,13 +6,15 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import { SelectedRelease } from '@common/modules/table-tool/types/selectedPublication';
 import ButtonText from '@common/components/ButtonText';
 import { FeaturedTable, Subject } from '@common/services/tableBuilderService';
-import React, { ReactNode } from 'react';
+import React, { HTMLAttributes, ReactElement } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 interface Props extends InjectedWizardProps {
   featuredTables?: FeaturedTable[];
   isSubmitting: boolean;
-  renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
+  renderFeaturedTableLink?: (
+    featuredTable: FeaturedTable,
+  ) => ReactElement<HTMLAttributes<HTMLElement>>;
   releaseVersion?: SelectedRelease;
   subjects: Subject[];
 }

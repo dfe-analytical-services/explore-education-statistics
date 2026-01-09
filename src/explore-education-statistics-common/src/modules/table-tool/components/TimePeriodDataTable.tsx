@@ -86,7 +86,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
               fileName={captionTitle}
               fullTable={fullTable}
               title={captionTitle}
-              tableRef={dataTableRef as RefObject<HTMLElement>}
+              tableRef={dataTableRef as RefObject<HTMLElement | null>}
               onCsvDownload={() =>
                 tableBuilderService.getTableCsv({ releaseVersionId, ...query })
               }
