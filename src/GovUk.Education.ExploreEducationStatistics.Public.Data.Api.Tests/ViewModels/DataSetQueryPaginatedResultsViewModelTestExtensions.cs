@@ -1,7 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.ViewModels;
 

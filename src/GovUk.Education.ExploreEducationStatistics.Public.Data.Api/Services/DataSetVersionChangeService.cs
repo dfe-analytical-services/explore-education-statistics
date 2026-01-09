@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
@@ -8,6 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -156,8 +159,26 @@ public class DataSetVersionChangeService(
             ? changes
                 .Select(c => new IndicatorChangeViewModel
                 {
-                    CurrentState = c.CurrentState is not null ? IndicatorViewModel.Create(c.CurrentState) : null,
-                    PreviousState = c.PreviousState is not null ? IndicatorViewModel.Create(c.PreviousState) : null,
+                    CurrentState = c.CurrentState is not null
+                        ? new IndicatorViewModel
+                        {
+                            Id = c.CurrentState.PublicId,
+                            Column = c.CurrentState.Column,
+                            Label = c.CurrentState.Label,
+                            Unit = c.CurrentState.Unit,
+                            DecimalPlaces = c.CurrentState.DecimalPlaces,
+                        }
+                        : null,
+                    PreviousState = c.PreviousState is not null
+                        ? new IndicatorViewModel
+                        {
+                            Id = c.PreviousState.PublicId,
+                            Column = c.PreviousState.Column,
+                            Label = c.PreviousState.Label,
+                            Unit = c.PreviousState.Unit,
+                            DecimalPlaces = c.PreviousState.DecimalPlaces,
+                        }
+                        : null,
                 })
                 .GroupBy(c => c.IsMajor() ? ChangeType.Major : ChangeType.Minor)
                 .ToDictionary(g => g.Key, g => g.ToList())
@@ -170,8 +191,24 @@ public class DataSetVersionChangeService(
             ? changes
                 .Select(c => new FilterChangeViewModel
                 {
-                    CurrentState = c.CurrentState is not null ? FilterViewModel.Create(c.CurrentState) : null,
-                    PreviousState = c.PreviousState is not null ? FilterViewModel.Create(c.PreviousState) : null,
+                    CurrentState = c.CurrentState is not null
+                        ? new FilterViewModel
+                        {
+                            Id = c.CurrentState.PublicId,
+                            Column = c.CurrentState.Column,
+                            Label = c.CurrentState.Label,
+                            Hint = c.CurrentState.Hint,
+                        }
+                        : null,
+                    PreviousState = c.PreviousState is not null
+                        ? new FilterViewModel
+                        {
+                            Id = c.PreviousState.PublicId,
+                            Column = c.PreviousState.Column,
+                            Label = c.PreviousState.Label,
+                            Hint = c.PreviousState.Hint,
+                        }
+                        : null,
                 })
                 .GroupBy(c => c.IsMajor() ? ChangeType.Major : ChangeType.Minor)
                 .ToDictionary(g => g.Key, g => g.ToList())
@@ -190,10 +227,18 @@ public class DataSetVersionChangeService(
                         Option: new FilterOptionChangeViewModel
                         {
                             CurrentState = c.CurrentState is not null
-                                ? FilterOptionViewModel.Create(c.CurrentState)
+                                ? new FilterOptionViewModel
+                                {
+                                    Id = c.CurrentState.PublicId,
+                                    Label = c.CurrentState.Option.Label,
+                                }
                                 : null,
                             PreviousState = c.PreviousState is not null
-                                ? FilterOptionViewModel.Create(c.PreviousState)
+                                ? new FilterOptionViewModel
+                                {
+                                    Id = c.PreviousState.PublicId,
+                                    Label = c.PreviousState.Option.Label,
+                                }
                                 : null,
                         }
                     )
@@ -267,8 +312,12 @@ public class DataSetVersionChangeService(
             ? changes
                 .Select(c => new LocationGroupChangeViewModel
                 {
-                    CurrentState = c.CurrentState is not null ? LocationGroupViewModel.Create(c.CurrentState) : null,
-                    PreviousState = c.PreviousState is not null ? LocationGroupViewModel.Create(c.PreviousState) : null,
+                    CurrentState = c.CurrentState is not null
+                        ? new LocationGroupViewModel { Level = GeographicLevelViewModel.Create(c.CurrentState.Level) }
+                        : null,
+                    PreviousState = c.PreviousState is not null
+                        ? new LocationGroupViewModel { Level = GeographicLevelViewModel.Create(c.PreviousState.Level) }
+                        : null,
                 })
                 .GroupBy(c => c.IsMajor() ? ChangeType.Major : ChangeType.Minor)
                 .ToDictionary(g => g.Key, g => g.ToList())
@@ -286,12 +335,8 @@ public class DataSetVersionChangeService(
                         Meta: (c.CurrentState?.Meta ?? c.PreviousState?.Meta)!,
                         Option: new LocationOptionChangeViewModel
                         {
-                            CurrentState = c.CurrentState is not null
-                                ? LocationOptionViewModel.Create(c.CurrentState.Option, c.CurrentState.PublicId)
-                                : null,
-                            PreviousState = c.PreviousState is not null
-                                ? LocationOptionViewModel.Create(c.PreviousState.Option, c.PreviousState.PublicId)
-                                : null,
+                            CurrentState = c.CurrentState?.Option.ToViewModel(c.CurrentState.PublicId),
+                            PreviousState = c.PreviousState?.Option.ToViewModel(c.PreviousState.PublicId),
                         }
                     )
                 )
@@ -319,9 +364,21 @@ public class DataSetVersionChangeService(
             ? changes
                 .Select(c => new TimePeriodOptionChangeViewModel
                 {
-                    CurrentState = c.CurrentState is not null ? TimePeriodOptionViewModel.Create(c.CurrentState) : null,
+                    CurrentState = c.CurrentState is not null
+                        ? new TimePeriodOptionViewModel
+                        {
+                            Code = c.CurrentState.Code,
+                            Period = c.CurrentState.Period,
+                            Label = TimePeriodFormatter.FormatLabel(c.CurrentState.Period, c.CurrentState.Code),
+                        }
+                        : null,
                     PreviousState = c.PreviousState is not null
-                        ? TimePeriodOptionViewModel.Create(c.PreviousState)
+                        ? new TimePeriodOptionViewModel
+                        {
+                            Code = c.PreviousState.Code,
+                            Period = c.PreviousState.Period,
+                            Label = TimePeriodFormatter.FormatLabel(c.PreviousState.Period, c.PreviousState.Code),
+                        }
                         : null,
                 })
                 .GroupBy(c => c.IsMajor() ? ChangeType.Major : ChangeType.Minor)
