@@ -3,7 +3,6 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
-using static System.DateTime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -22,7 +21,7 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     public DateTimeOffset? PublishScheduled { get; set; }
 
     [NotMapped]
-    public bool Live => Published.HasValue && UtcNow >= Published.Value;
+    public bool Live => Published.HasValue && DateTimeOffset.UtcNow >= Published.Value;
 
     [NotMapped]
     public bool Amendment => Version > 0 && !Live;
