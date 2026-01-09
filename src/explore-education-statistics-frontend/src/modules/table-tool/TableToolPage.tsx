@@ -294,6 +294,14 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         }}
         onTableQueryError={(errorCode, publicationTitle, subjectName) => {
           switch (errorCode) {
+            case 'QueryExceedsMaxAllowableTableSize': {
+              logEvent({
+                category: 'Table tool size error',
+                action: 'Table exceeded maximum size',
+                label: `${publicationTitle}/${subjectName}`,
+              });
+              break;
+            }
             case 'RequestCancelled': {
               logEvent({
                 category: 'Table tool query timeout error',

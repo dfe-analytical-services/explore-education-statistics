@@ -151,7 +151,6 @@ describe('permalink api route', () => {
               },
             ],
             geoJsonAvailable: true,
-            isCroppedTable: false,
           },
           results: [
             {

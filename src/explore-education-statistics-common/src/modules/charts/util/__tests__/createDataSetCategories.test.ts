@@ -87,7 +87,6 @@ describe('createDataSetCategories', () => {
         { code: 'AY', label: '2015/16', year: 2015 },
       ],
       geoJsonAvailable: true,
-      isCroppedTable: false,
     },
     results: [
       {
@@ -1342,7 +1341,6 @@ describe('createDataSetCategories', () => {
         subjectName: 'Absence by geographic level',
         timePeriodRange: [{ code: 'AY', label: '2015/16', year: 2015 }],
         geoJsonAvailable: true,
-        isCroppedTable: false,
       },
       results: [
         {

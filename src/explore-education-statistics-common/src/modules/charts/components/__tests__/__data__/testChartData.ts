@@ -178,7 +178,6 @@ export const testChartTableData: TableDataResponse = {
       { code: 'AY', label: '2016/17', year: 2016 },
     ],
     geoJsonAvailable: true,
-    isCroppedTable: false,
   },
   results: [
     {
@@ -325,7 +324,6 @@ export const testEmptyChartTableData: TableDataResponse = {
       { code: 'AY', label: '2021/22', year: 2021 },
     ],
     geoJsonAvailable: true,
-    isCroppedTable: false,
   },
   results: [
     {

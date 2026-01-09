@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Utils.TableBuilderUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils;
@@ -77,7 +78,7 @@ public class TableBuilderUtilsTests
                 countOfIndicators: 2,
                 countOfLocations: 2,
                 countOfTimePeriods: 3,
-                countsOfFilterItemsByFilter: [1]
+                countsOfFilterItemsByFilter: ListOf(1)
             )
         );
     }
@@ -99,7 +100,7 @@ public class TableBuilderUtilsTests
                 countOfIndicators: 2,
                 countOfLocations: 2,
                 countOfTimePeriods: 3,
-                countsOfFilterItemsByFilter: [1, 1]
+                countsOfFilterItemsByFilter: ListOf(1, 1)
             )
         );
     }
@@ -133,7 +134,7 @@ public class TableBuilderUtilsTests
                 countOfIndicators: 2,
                 countOfLocations: 2,
                 countOfTimePeriods: 3,
-                countsOfFilterItemsByFilter: [3]
+                countsOfFilterItemsByFilter: ListOf(3)
             )
         );
     }
@@ -185,7 +186,7 @@ public class TableBuilderUtilsTests
                 countOfIndicators: 2,
                 countOfLocations: 2,
                 countOfTimePeriods: 3,
-                countsOfFilterItemsByFilter: [3, 2]
+                countsOfFilterItemsByFilter: ListOf(3, 2)
             )
         );
     }

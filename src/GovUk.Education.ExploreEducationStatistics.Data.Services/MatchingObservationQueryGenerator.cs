@@ -236,7 +236,7 @@ public class MatchingObservationsQueryGenerator(ITemporaryTableCreator tempTable
     private async Task<string> GetLocationsClause(
         StatisticsDbContext context,
         IList<Guid> locationIds,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken
     )
     {
         var locationsTempTable = await tempTableCreator.CreateAndPopulateTemporaryTable(
@@ -254,7 +254,6 @@ public class MatchingObservationsQueryGenerator(ITemporaryTableCreator tempTable
         var timePeriodClauses = timePeriods.Select(timePeriod =>
             $"(o.TimeIdentifier = '{timePeriod.TimeIdentifier.GetEnumValue()}' AND o.Year = {timePeriod.Year})"
         );
-
         return timePeriodClauses.JoinToString(" OR ");
     }
 

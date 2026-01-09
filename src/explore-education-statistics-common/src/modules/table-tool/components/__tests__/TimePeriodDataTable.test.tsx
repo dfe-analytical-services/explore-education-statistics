@@ -266,7 +266,6 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
-        isCroppedTable: true,
       },
       results: [
         {
@@ -315,12 +314,6 @@ describe('TimePeriodDataTable', () => {
         tableHeadersConfig={tableHeadersConfig}
       />,
     );
-
-    expect(
-      screen.getByText(
-        'The selected options return too many rows to be displayed here and so the table shows only a subset of the data provided by your selections. To get the full set of relevant data, use the download options below to download in ODT or CSV format.',
-      ),
-    ).toBeInTheDocument();
 
     const table = screen.getByRole('table');
 
@@ -377,7 +370,6 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
-        isCroppedTable: false,
       },
       results: [
         {
@@ -474,7 +466,6 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
-        isCroppedTable: false,
       },
       results: [
         {
@@ -599,7 +590,6 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
-        isCroppedTable: false,
       },
       results: [
         {
@@ -785,7 +775,6 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
-        isCroppedTable: false,
       },
       results: [
         {
@@ -962,7 +951,6 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
-        isCroppedTable: false,
       },
       results: [
         {
@@ -1146,7 +1134,6 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
-        isCroppedTable: false,
       },
       results: [
         {
@@ -1290,7 +1277,6 @@ describe('TimePeriodDataTable', () => {
         subjectName: 'Absence in prus',
         timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
         geoJsonAvailable: false,
-        isCroppedTable: false,
       },
       results: [
         {

@@ -12,7 +12,6 @@ import DataTableCaption from '../DataTableCaption';
 describe('DataTableCaption', () => {
   const testMeta: FullTableMeta = {
     geoJsonAvailable: false,
-    isCroppedTable: false,
     publicationName: 'Pupil absence in schools in England',
     subjectName: 'Absence by characteristic',
     footnotes: [],
