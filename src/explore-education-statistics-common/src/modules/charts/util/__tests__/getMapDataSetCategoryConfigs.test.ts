@@ -66,7 +66,6 @@ describe('getMapDataSetCategoryConfigs', () => {
     },
     footnotes: [],
     geoJsonAvailable: false,
-    isCroppedTable: false,
     indicators: [testIndicator],
     locations: [testLocation1],
     publicationName: 'Publication 1',

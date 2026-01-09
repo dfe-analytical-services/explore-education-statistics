@@ -587,7 +587,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
         services.AddTransient<IEmailTemplateService, EmailTemplateService>();
         services.AddTransient<ITableBuilderService, TableBuilderService>();
-        services.AddTransient<ITableBuilderQueryOptimiser, TableBuilderQueryOptimiser>();
         services.AddTransient<IFilterRepository, FilterRepository>();
         services.AddTransient<IFilterItemRepository, FilterItemRepository>();
         services.AddTransient<

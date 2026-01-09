@@ -392,6 +392,54 @@ describe('FiltersForm', () => {
     expect(container.querySelector('dl')).toMatchSnapshot();
   });
 
+  test('shows table size error when the correct error response is returned from the API', async () => {
+    const errorResponse = createServerValidationErrorMock<TableQueryErrorCode>([
+      { code: 'QueryExceedsMaxAllowableTableSize', message: '' },
+    ]);
+    const onSubmit = jest.fn(() => Promise.reject(errorResponse));
+
+    const { user } = render(
+      <FiltersForm
+        {...testWizardStepProps}
+        stepTitle="Choose your filters"
+        subject={testSubject}
+        subjectMeta={{
+          ...testSubjectMeta,
+          filters: {
+            ...testSubjectMeta.filters,
+            Characteristic: {
+              ...testSubjectMeta.filters.Characteristic,
+              autoSelectFilterItemId: 'total',
+            },
+          },
+        }}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await user.click(screen.getByLabelText('State-funded secondary'));
+    await user.click(screen.getByLabelText('Number of excluded sessions'));
+    await user.click(screen.getByLabelText('Total'));
+
+    await user.click(screen.getByRole('button', { name: 'Create table' }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Could not create table/)).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByText(/exceed the maximum allowed table size/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Select different filters or download the subject data/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Download Subject 1/)).toBeInTheDocument();
+    expect(screen.getByText(/csv, 100mb/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/available when the release is published/),
+    ).toBeInTheDocument();
+  });
+
   test('shows table timeout error when the correct error response is returned from the API', async () => {
     const errorResponse = createServerValidationErrorMock<TableQueryErrorCode>([
       { code: 'RequestCancelled', message: '' },

@@ -1264,7 +1264,6 @@ export const tableData: TableDataResponse = {
       },
     ],
     geoJsonAvailable: true,
-    isCroppedTable: false,
   },
   results: [
     {

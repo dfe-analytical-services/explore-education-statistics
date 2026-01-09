@@ -103,9 +103,9 @@ public class MappingProfiles : CommonMappingProfile
 
         CreateContentBlockMap();
         CreateMap<DataBlockCreateRequest, DataBlock>()
-            .ForMember(dest => dest.Query, m => m.MapFrom(c => c.Query.AsFullTableQuery(default)));
+            .ForMember(dest => dest.Query, m => m.MapFrom(c => c.Query.AsFullTableQuery()));
         CreateMap<DataBlockUpdateRequest, DataBlock>()
-            .ForMember(dest => dest.Query, m => m.MapFrom(c => c.Query.AsFullTableQuery(default)));
+            .ForMember(dest => dest.Query, m => m.MapFrom(c => c.Query.AsFullTableQuery()));
 
         CreateMap<KeyStatisticDataBlock, KeyStatisticDataBlockViewModel>();
         CreateMap<KeyStatisticText, KeyStatisticTextViewModel>();

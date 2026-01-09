@@ -136,39 +136,32 @@ public class TableBuilderServiceTests
                     EndYear = 2020,
                     EndCode = AcademicYear,
                 },
-                EnableCropping = true,
             };
 
-            var tableBuilderQueryOptimiser = new Mock<ITableBuilderQueryOptimiser>(Strict);
             var observationService = new Mock<IObservationService>(Strict);
-            var matchedObservationsTable = Mock.Of<ITempTableReference>(Strict);
-            var subjectResultMetaService = new Mock<ISubjectResultMetaService>(Strict);
 
-            tableBuilderQueryOptimiser
-                .Setup(mock => mock.IsCroppingRequired(It.IsAny<FullTableQuery>()))
-                .ReturnsAsync(false);
+            var matchedObservationsTable = Mock.Of<ITempTableReference>();
 
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
                 .ReturnsAsync(matchedObservationsTable);
 
+            var subjectResultMetaService = new Mock<ISubjectResultMetaService>(Strict);
+
             subjectResultMetaService
-                .Setup(s =>
-                    s.GetSubjectMeta(releaseVersion.Id, query, It.IsAny<IList<Observation>>(), It.IsAny<bool>())
-                )
+                .Setup(s => s.GetSubjectMeta(releaseVersion.Id, query, It.IsAny<IList<Observation>>()))
                 .ReturnsAsync(subjectMeta);
 
             var service = BuildTableBuilderService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
                 observationService: observationService.Object,
-                subjectResultMetaService: subjectResultMetaService.Object,
-                tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
+                subjectResultMetaService: subjectResultMetaService.Object
             );
 
             var result = await service.Query(query);
 
-            VerifyAllMocks(observationService, subjectResultMetaService, tableBuilderQueryOptimiser);
+            VerifyAllMocks(observationService, subjectResultMetaService);
 
             var observationResults = result.AssertRight().Results.ToList();
 
@@ -309,6 +302,89 @@ public class TableBuilderServiceTests
     }
 
     [Fact]
+    public async Task Query_LatestRelease_PredictedTableTooBig()
+    {
+        Publication publication = _fixture
+            .DefaultPublication()
+            .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
+
+        var releaseVersion = publication.Releases.Single().Versions.Single();
+
+        ReleaseSubject releaseSubject = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(
+                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
+            );
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            contentDbContext.Publications.Add(publication);
+            await contentDbContext.SaveChangesAsync();
+
+            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var query = new FullTableQuery
+            {
+                SubjectId = releaseSubject.SubjectId,
+                Filters = new[] { Guid.NewGuid(), Guid.NewGuid() },
+                Indicators = new[] { Guid.NewGuid(), Guid.NewGuid() },
+                LocationIds = ListOf(Guid.NewGuid()),
+                TimePeriod = new TimePeriodQuery
+                {
+                    StartYear = 2019,
+                    StartCode = AcademicYear,
+                    EndYear = 2020,
+                    EndCode = AcademicYear,
+                },
+            };
+
+            var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
+
+            filterItemRepository
+                .Setup(s => s.CountFilterItemsByFilter(query.GetFilterItemIds()))
+                .ReturnsAsync(
+                    new Dictionary<Guid, int>
+                    {
+                        {
+                            // For the purpose of calculating the potential table size,
+                            // treat all the Filter Items as belonging to the same Filter
+                            Guid.NewGuid(),
+                            query.GetFilterItemIds().Count()
+                        },
+                    }
+                );
+
+            var options = new TableBuilderOptions
+            {
+                // 2 Filter items (from 1 Filter), 1 Location, and 2 Time periods provide 4 different combinations,
+                // assuming that all the data is provided. For 2 Indicators this would be 8 table cells rendered.
+                // Configure a maximum table size limit lower than 8.
+                MaxTableCellsAllowed = 7,
+            };
+
+            var service = BuildTableBuilderService(
+                statisticsDbContext: statisticsDbContext,
+                contentDbContext: contentDbContext,
+                filterItemRepository: filterItemRepository.Object,
+                tableBuilderOptions: options.ToOptionsWrapper()
+            );
+
+            var result = await service.Query(query);
+
+            VerifyAllMocks(filterItemRepository);
+
+            result.AssertBadRequest(ValidationErrorMessages.QueryExceedsMaxAllowableTableSize);
+        }
+    }
+
+    [Fact]
     public async Task Query_ReleaseId()
     {
         Publication publication = _fixture
@@ -408,37 +484,29 @@ public class TableBuilderServiceTests
                 },
             };
 
-            var tableBuilderQueryOptimiser = new Mock<ITableBuilderQueryOptimiser>(Strict);
             var observationService = new Mock<IObservationService>(Strict);
-            var matchedObservationsTable = Mock.Of<ITempTableReference>(Strict);
-            var subjectResultMetaService = new Mock<ISubjectResultMetaService>(Strict);
+
+            var matchedObservationsTable = Mock.Of<ITempTableReference>();
 
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
                 .ReturnsAsync(matchedObservationsTable);
 
+            var subjectResultMetaService = new Mock<ISubjectResultMetaService>(Strict);
+
             subjectResultMetaService
-                .Setup(s =>
-                    s.GetSubjectMeta(
-                        releaseSubject.ReleaseVersionId,
-                        query,
-                        It.IsAny<IList<Observation>>(),
-                        It.IsAny<bool>()
-                    )
-                )
+                .Setup(s => s.GetSubjectMeta(releaseSubject.ReleaseVersionId, query, It.IsAny<IList<Observation>>()))
                 .ReturnsAsync(subjectMeta);
 
             var service = BuildTableBuilderService(
                 statisticsDbContext: statisticsDbContext,
                 observationService: observationService.Object,
-                subjectResultMetaService: subjectResultMetaService.Object,
-                tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
+                subjectResultMetaService: subjectResultMetaService.Object
             );
 
             var result = await service.Query(releaseSubject.ReleaseVersionId, query);
 
             VerifyAllMocks(observationService, subjectResultMetaService);
-            tableBuilderQueryOptimiser.Verify(mock => mock.IsCroppingRequired(It.IsAny<FullTableQuery>()), Times.Never);
 
             var observationResults = result.AssertRight().Results.ToList();
 
@@ -543,6 +611,87 @@ public class TableBuilderServiceTests
             var result = await service.Query(releaseVersionId: releaseVersion.Id, query);
 
             result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task Query_ReleaseVersionId_PredictedTableTooBig()
+    {
+        Publication publication = _fixture
+            .DefaultPublication()
+            .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
+
+        var releaseVersion = publication.Releases.Single().Versions.Single();
+
+        ReleaseSubject releaseSubject = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(
+                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
+            );
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            contentDbContext.Publications.Add(publication);
+            await contentDbContext.SaveChangesAsync();
+
+            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var query = new FullTableQuery
+            {
+                SubjectId = releaseSubject.SubjectId,
+                Filters = new[] { Guid.NewGuid(), Guid.NewGuid() },
+                Indicators = new[] { Guid.NewGuid(), Guid.NewGuid() },
+                LocationIds = ListOf(Guid.NewGuid()),
+                TimePeriod = new TimePeriodQuery
+                {
+                    StartYear = 2019,
+                    StartCode = AcademicYear,
+                    EndYear = 2020,
+                    EndCode = AcademicYear,
+                },
+            };
+
+            var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
+
+            filterItemRepository
+                .Setup(s => s.CountFilterItemsByFilter(query.GetFilterItemIds()))
+                .ReturnsAsync(
+                    new Dictionary<Guid, int>
+                    {
+                        {
+                            // For the purpose of calculating the potential table size,
+                            // treat all the Filter Items as belonging to the same Filter
+                            Guid.NewGuid(),
+                            query.GetFilterItemIds().Count()
+                        },
+                    }
+                );
+
+            var options = new TableBuilderOptions
+            {
+                // 2 Filter items (from 1 Filter), 1 Location, and 2 Time periods provide 4 different combinations,
+                // assuming that all the data is provided. For 2 Indicators this would be 8 table cells rendered.
+                // Configure a maximum table size limit lower than 8.
+                MaxTableCellsAllowed = 7,
+            };
+
+            var service = BuildTableBuilderService(
+                statisticsDbContext: statisticsDbContext,
+                filterItemRepository: filterItemRepository.Object,
+                tableBuilderOptions: options.ToOptionsWrapper()
+            );
+
+            var result = await service.Query(releaseVersionId: releaseSubject.ReleaseVersionId, query);
+
+            VerifyAllMocks(filterItemRepository);
+
+            result.AssertBadRequest(ValidationErrorMessages.QueryExceedsMaxAllowableTableSize);
         }
     }
 
@@ -694,10 +843,9 @@ public class TableBuilderServiceTests
                 },
             };
 
-            var tableBuilderQueryOptimiser = new Mock<ITableBuilderQueryOptimiser>(Strict);
             var observationService = new Mock<IObservationService>(Strict);
-            var matchedObservationsTable = Mock.Of<ITempTableReference>(Strict);
-            var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
+
+            var matchedObservationsTable = Mock.Of<ITempTableReference>();
 
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
@@ -710,8 +858,8 @@ public class TableBuilderServiceTests
                 ),
                 Indicators = indicators.Select(i => new IndicatorCsvMetaViewModel(i)).ToDictionary(i => i.Name),
                 Locations = locations.ToDictionary(l => l.Id, l => l.GetCsvValues()),
-                Headers =
-                [
+                Headers = new List<string>
+                {
                     "time_period",
                     "time_identifier",
                     "geographic_level",
@@ -730,8 +878,10 @@ public class TableBuilderServiceTests
                     indicators[0].Name,
                     indicators[1].Name,
                     indicators[2].Name,
-                ],
+                },
             };
+
+            var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
 
             subjectCsvMetaService
                 .Setup(s =>
@@ -751,20 +901,19 @@ public class TableBuilderServiceTests
                 statisticsDbContext,
                 contentDbContext,
                 observationService: observationService.Object,
-                subjectCsvMetaService: subjectCsvMetaService.Object,
-                tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
+                subjectCsvMetaService: subjectCsvMetaService.Object
             );
 
             using var stream = new MemoryStream();
 
             var result = await service.QueryToCsvStream(query, stream);
 
-            VerifyAllMocks(observationService, subjectCsvMetaService, tableBuilderQueryOptimiser);
-            tableBuilderQueryOptimiser.Verify(mock => mock.IsCroppingRequired(It.IsAny<FullTableQuery>()), Times.Never);
+            VerifyAllMocks(observationService, subjectCsvMetaService);
 
             result.AssertRight();
 
             stream.SeekToBeginning();
+
             Snapshot.Match(stream.ReadToEnd());
         }
     }
@@ -842,6 +991,91 @@ public class TableBuilderServiceTests
             var result = await service.QueryToCsvStream(query, stream);
 
             result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task QueryToCsvStream_LatestRelease_PredictedTableTooBig()
+    {
+        Publication publication = _fixture
+            .DefaultPublication()
+            .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
+
+        var releaseVersion = publication.Releases.Single().Versions.Single();
+
+        ReleaseSubject releaseSubject = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(
+                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
+            );
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            contentDbContext.Publications.Add(publication);
+            await contentDbContext.SaveChangesAsync();
+
+            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var query = new FullTableQuery
+            {
+                SubjectId = releaseSubject.SubjectId,
+                Filters = new[] { Guid.NewGuid(), Guid.NewGuid() },
+                Indicators = new[] { Guid.NewGuid(), Guid.NewGuid() },
+                LocationIds = ListOf(Guid.NewGuid()),
+                TimePeriod = new TimePeriodQuery
+                {
+                    StartYear = 2019,
+                    StartCode = AcademicYear,
+                    EndYear = 2020,
+                    EndCode = AcademicYear,
+                },
+            };
+
+            var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
+
+            filterItemRepository
+                .Setup(s => s.CountFilterItemsByFilter(query.GetFilterItemIds()))
+                .ReturnsAsync(
+                    new Dictionary<Guid, int>
+                    {
+                        {
+                            // For the purpose of calculating the potential table size,
+                            // treat all the Filter Items as belonging to the same Filter
+                            Guid.NewGuid(),
+                            query.GetFilterItemIds().Count()
+                        },
+                    }
+                );
+
+            var options = new TableBuilderOptions
+            {
+                // 2 Filter items (from 1 Filter), 1 Location, and 2 Time periods provide 4 different combinations,
+                // assuming that all the data is provided. For 2 Indicators this would be 8 table cells rendered.
+                // Configure a maximum table size limit lower than 8.
+                MaxTableCellsAllowed = 7,
+            };
+
+            var service = BuildTableBuilderService(
+                statisticsDbContext: statisticsDbContext,
+                contentDbContext: contentDbContext,
+                filterItemRepository: filterItemRepository.Object,
+                tableBuilderOptions: options.ToOptionsWrapper()
+            );
+
+            using var stream = new MemoryStream();
+
+            var result = await service.QueryToCsvStream(query, stream);
+
+            VerifyAllMocks(filterItemRepository);
+
+            result.AssertBadRequest(ValidationErrorMessages.QueryExceedsMaxAllowableTableSize);
         }
     }
 
@@ -975,10 +1209,9 @@ public class TableBuilderServiceTests
                 },
             };
 
-            var tableBuilderQueryOptimiser = new Mock<ITableBuilderQueryOptimiser>(Strict);
             var observationService = new Mock<IObservationService>(Strict);
-            var matchedObservationsTable = Mock.Of<ITempTableReference>(Strict);
-            var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
+
+            var matchedObservationsTable = Mock.Of<ITempTableReference>();
 
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
@@ -1011,6 +1244,8 @@ public class TableBuilderServiceTests
                 },
             };
 
+            var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
+
             subjectCsvMetaService
                 .Setup(s =>
                     s.GetSubjectCsvMeta(
@@ -1029,16 +1264,14 @@ public class TableBuilderServiceTests
                 statisticsDbContext,
                 contentDbContext,
                 observationService: observationService.Object,
-                subjectCsvMetaService: subjectCsvMetaService.Object,
-                tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
+                subjectCsvMetaService: subjectCsvMetaService.Object
             );
 
             using var stream = new MemoryStream();
 
             var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
 
-            VerifyAllMocks(observationService, subjectCsvMetaService, tableBuilderQueryOptimiser);
-            tableBuilderQueryOptimiser.Verify(mock => mock.IsCroppingRequired(It.IsAny<FullTableQuery>()), Times.Never);
+            VerifyAllMocks(observationService, subjectCsvMetaService);
 
             result.AssertRight();
 
@@ -1115,10 +1348,9 @@ public class TableBuilderServiceTests
                 },
             };
 
-            var tableBuilderQueryOptimiser = new Mock<ITableBuilderQueryOptimiser>(Strict);
             var observationService = new Mock<IObservationService>(Strict);
-            var matchedObservationsTable = Mock.Of<ITempTableReference>(Strict);
-            var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
+
+            var matchedObservationsTable = Mock.Of<ITempTableReference>();
 
             observationService
                 .Setup(s => s.GetMatchedObservations(query, default))
@@ -1142,6 +1374,8 @@ public class TableBuilderServiceTests
                 },
             };
 
+            var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
+
             subjectCsvMetaService
                 .Setup(s =>
                     s.GetSubjectCsvMeta(
@@ -1160,16 +1394,14 @@ public class TableBuilderServiceTests
                 statisticsDbContext,
                 contentDbContext,
                 observationService: observationService.Object,
-                subjectCsvMetaService: subjectCsvMetaService.Object,
-                tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
+                subjectCsvMetaService: subjectCsvMetaService.Object
             );
 
             using var stream = new MemoryStream();
 
             var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
 
-            VerifyAllMocks(observationService, subjectCsvMetaService, tableBuilderQueryOptimiser);
-            tableBuilderQueryOptimiser.Verify(mock => mock.IsCroppingRequired(It.IsAny<FullTableQuery>()), Times.Never);
+            VerifyAllMocks(observationService, subjectCsvMetaService);
 
             result.AssertRight();
 
@@ -1263,9 +1495,92 @@ public class TableBuilderServiceTests
         }
     }
 
+    [Fact]
+    public async Task QueryToCsvStream_ReleaseVersionId_PredictedTableTooBig()
+    {
+        Publication publication = _fixture
+            .DefaultPublication()
+            .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
+
+        var releaseVersion = publication.Releases.Single().Versions.Single();
+
+        ReleaseSubject releaseSubject = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(
+                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
+            );
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            contentDbContext.Publications.Add(publication);
+            await contentDbContext.SaveChangesAsync();
+
+            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var query = new FullTableQuery
+            {
+                SubjectId = releaseSubject.SubjectId,
+                Filters = new[] { Guid.NewGuid(), Guid.NewGuid() },
+                Indicators = new[] { Guid.NewGuid(), Guid.NewGuid() },
+                LocationIds = ListOf(Guid.NewGuid()),
+                TimePeriod = new TimePeriodQuery
+                {
+                    StartYear = 2019,
+                    StartCode = AcademicYear,
+                    EndYear = 2020,
+                    EndCode = AcademicYear,
+                },
+            };
+
+            var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
+
+            filterItemRepository
+                .Setup(s => s.CountFilterItemsByFilter(query.GetFilterItemIds()))
+                .ReturnsAsync(
+                    new Dictionary<Guid, int>
+                    {
+                        {
+                            // For the purpose of calculating the potential table size,
+                            // treat all the Filter Items as belonging to the same Filter
+                            Guid.NewGuid(),
+                            query.GetFilterItemIds().Count()
+                        },
+                    }
+                );
+
+            var options = new TableBuilderOptions
+            {
+                // 2 Filter items (from 1 Filter), 1 Location, and 2 Time periods provide 4 different combinations,
+                // assuming that all the data is provided. For 2 Indicators this would be 8 table cells rendered.
+                // Configure a maximum table size limit lower than 8.
+                MaxTableCellsAllowed = 7,
+            }.ToOptionsWrapper();
+
+            var service = BuildTableBuilderService(
+                statisticsDbContext: statisticsDbContext,
+                filterItemRepository: filterItemRepository.Object,
+                tableBuilderOptions: options
+            );
+
+            using var stream = new MemoryStream();
+
+            var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
+
+            VerifyAllMocks(filterItemRepository);
+
+            result.AssertBadRequest(ValidationErrorMessages.QueryExceedsMaxAllowableTableSize);
+        }
+    }
+
     private static IOptions<TableBuilderOptions> DefaultTableBuilderOptions()
     {
-        return new TableBuilderOptions { MaxTableCellsAllowed = 25000, CroppedTableMaxRows = 1000 }.ToOptionsWrapper();
+        return new TableBuilderOptions { MaxTableCellsAllowed = 25000 }.ToOptionsWrapper();
     }
 
     private static IOptions<LocationsOptions> DefaultLocationOptions()
@@ -1284,13 +1599,13 @@ public class TableBuilderServiceTests
     private static TableBuilderService BuildTableBuilderService(
         StatisticsDbContext statisticsDbContext,
         ContentDbContext? contentDbContext = null,
+        IFilterItemRepository? filterItemRepository = null,
         ILocationService? locationService = null,
         IObservationService? observationService = null,
         IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
         ISubjectResultMetaService? subjectResultMetaService = null,
         ISubjectCsvMetaService? subjectCsvMetaService = null,
         ISubjectRepository? subjectRepository = null,
-        ITableBuilderQueryOptimiser? tableBuilderQueryOptimiser = null,
         IUserService? userService = null,
         IOptions<TableBuilderOptions>? tableBuilderOptions = null,
         IOptions<LocationsOptions>? locationsOptions = null
@@ -1299,13 +1614,13 @@ public class TableBuilderServiceTests
         return new(
             statisticsDbContext,
             contentDbContext ?? InMemoryContentDbContext(),
+            filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
             locationService ?? Mock.Of<ILocationService>(Strict),
             observationService ?? Mock.Of<IObservationService>(Strict),
             statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
             subjectResultMetaService ?? Mock.Of<ISubjectResultMetaService>(Strict),
             subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(Strict),
             subjectRepository ?? new SubjectRepository(statisticsDbContext),
-            tableBuilderQueryOptimiser ?? Mock.Of<ITableBuilderQueryOptimiser>(Strict),
             userService ?? AlwaysTrueUserService().Object,
             tableBuilderOptions ?? DefaultTableBuilderOptions(),
             locationsOptions ?? DefaultLocationOptions()

@@ -27,7 +27,6 @@ describe('ChartDataSetsConfiguration', () => {
     publicationName: '',
     subjectName: '',
     geoJsonAvailable: false,
-    isCroppedTable: false,
     footnotes: [],
     boundaryLevels: [],
     locations: {

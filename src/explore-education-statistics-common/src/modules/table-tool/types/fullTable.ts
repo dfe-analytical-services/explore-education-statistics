@@ -28,7 +28,6 @@ export interface FullTableMeta {
     label: string;
   }[];
   geoJsonAvailable: boolean;
-  isCroppedTable: boolean;
 }
 
 export interface FullTable {

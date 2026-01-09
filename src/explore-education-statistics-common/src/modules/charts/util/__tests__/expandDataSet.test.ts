@@ -108,7 +108,6 @@ describe('expandDataSet', () => {
         { code: 'AY', label: '2015/16', year: 2015 },
       ],
       geoJsonAvailable: true,
-      isCroppedTable: false,
     },
     results: [],
   };

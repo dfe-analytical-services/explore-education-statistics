@@ -65,8 +65,6 @@ public class TableBuilderControllerIntegrationTests(TableBuilderControllerIntegr
 
     private static readonly FullTableQuery FullTableQuery = FullTableQueryRequest.AsFullTableQuery();
 
-    private static readonly FullTableQuery CroppedTableQuery = FullTableQuery with { EnableCropping = true };
-
     private readonly TableBuilderResultViewModel _tableBuilderResults = new()
     {
         SubjectMeta = new SubjectResultMetaViewModel
@@ -89,7 +87,7 @@ public class TableBuilderControllerIntegrationTests(TableBuilderControllerIntegr
     {
         fixture
             .TableBuilderServiceMock.Setup(s =>
-                s.Query(ReleaseVersionId, ItIs.DeepEqualTo(CroppedTableQuery), It.IsAny<CancellationToken>())
+                s.Query(ReleaseVersionId, ItIs.DeepEqualTo(FullTableQuery), It.IsAny<CancellationToken>())
             )
             .ReturnsAsync(_tableBuilderResults);
 

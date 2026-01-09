@@ -61,7 +61,6 @@ describe('getDefaultTableHeadersConfig', () => {
       },
       footnotes: [],
       geoJsonAvailable: false,
-      isCroppedTable: false,
       indicators: [
         {
           value: 'overall-absence-sessions',

@@ -474,10 +474,11 @@ Select the date category
 Attempt to generate a table that is too large
     user clicks element    id:filtersForm-submit
     user waits until page contains
-    ...    The selected options return too many rows to be displayed here and so the table shows only a subset of the data provided by your selections.
+    ...    Could not create table as the filters chosen may exceed the maximum allowed table size.
+    user waits until page contains    Select different filters or download the subject data.
+    user waits until page contains button    Download Seven filters (csv, 17 Kb)    %{WAIT_MEDIUM}
 
 Reduce the number of selected Dates and generate a smaller table
-    user clicks button    Edit filters
     user clicks unselect all for category    Date
     user clicks category checkbox    Date    23/03/2020
     user clicks category checkbox    Date    24/03/2020

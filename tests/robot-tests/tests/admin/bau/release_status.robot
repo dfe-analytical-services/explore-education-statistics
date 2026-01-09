@@ -365,7 +365,10 @@ Upload the larger data file via data upload
     # TODO https://github.com/dfe-analytical-services/eesyscreener/issues/2
     Skip    Skipping until the "large-data-set.csv" is compatible with screener.
 
-    user uploads subject    ${SUBJECT_NAME}-updated    large-data-set.csv    large-data-set.meta.csv    Complete
+    user uploads subject and waits until importing
+    ...    ${SUBJECT_NAME}-updated
+    ...    large-data-set.csv
+    ...    large-data-set.meta.csv
 
 Validate checklist errors (3rd release)
     # TODO https://github.com/dfe-analytical-services/eesyscreener/issues/2

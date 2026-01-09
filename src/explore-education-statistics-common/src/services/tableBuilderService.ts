@@ -193,7 +193,6 @@ export interface TableDataSubjectMeta {
     id: string;
     label: string;
   }[];
-  isCroppedTable: boolean;
 }
 
 export interface TableDataResult {

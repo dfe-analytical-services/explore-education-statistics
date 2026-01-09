@@ -74,8 +74,7 @@ public class SubjectResultMetaService : ISubjectResultMetaService
     public async Task<Either<ActionResult, SubjectResultMetaViewModel>> GetSubjectMeta(
         Guid releaseVersionId,
         FullTableQuery query,
-        IList<Observation> observations,
-        bool isCroppedTable
+        IList<Observation> observations
     )
     {
         return await CheckReleaseSubjectExists(releaseVersionId: releaseVersionId, subjectId: query.SubjectId)
@@ -144,7 +143,6 @@ public class SubjectResultMetaService : ISubjectResultMetaService
                     PublicationName = publicationTitle,
                     SubjectName = releaseFile.Name!,
                     TimePeriodRange = timePeriodViewModels,
-                    IsCroppedTable = isCroppedTable,
                 };
             });
     }

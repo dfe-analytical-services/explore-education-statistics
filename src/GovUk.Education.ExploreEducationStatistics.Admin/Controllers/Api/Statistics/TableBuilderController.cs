@@ -52,7 +52,7 @@ public class TableBuilderController(
         }
 
         return await tableBuilderService
-            .Query(releaseVersionId, request.AsFullTableQuery(enableCropping: true), cancellationTokenWithTimeout.Token)
+            .Query(releaseVersionId, request.AsFullTableQuery(), cancellationTokenWithTimeout.Token)
             .HandleFailuresOr(Ok);
     }
 

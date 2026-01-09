@@ -137,8 +137,6 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
         },
     };
 
-    private static readonly FullTableQuery CroppedTableQuery = FullTableQuery with { EnableCropping = true };
-
     private static readonly TableBuilderConfiguration TableConfiguration = new()
     {
         TableHeaders = new TableHeaders { Rows = [new TableHeader("table header 1", TableHeaderType.Filter)] },
@@ -166,13 +164,13 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
     {
         fixture
             .TableBuilderServiceMock.Setup(s =>
-                s.Query(ItIs.DeepEqualTo(CroppedTableQuery), It.IsAny<CancellationToken>())
+                s.Query(ItIs.DeepEqualTo(FullTableQuery), It.IsAny<CancellationToken>())
             )
             .ReturnsAsync(_tableBuilderResults);
 
         var response = await fixture
             .CreateClient()
-            .PostAsync("/api/tablebuilder", new JsonNetContent(ToRequest(CroppedTableQuery)));
+            .PostAsync("/api/tablebuilder", new JsonNetContent(ToRequest(FullTableQuery)));
 
         VerifyAllMocks(fixture.TableBuilderServiceMock);
 
@@ -215,16 +213,13 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
 
         fixture
             .TableBuilderServiceMock.Setup(s =>
-                s.Query(releaseVersion.Id, ItIs.DeepEqualTo(CroppedTableQuery), It.IsAny<CancellationToken>())
+                s.Query(releaseVersion.Id, ItIs.DeepEqualTo(FullTableQuery), It.IsAny<CancellationToken>())
             )
             .ReturnsAsync(_tableBuilderResults);
 
         var response = await fixture
             .CreateClient()
-            .PostAsync(
-                $"/api/tablebuilder/release/{releaseVersion.Id}",
-                new JsonNetContent(ToRequest(CroppedTableQuery))
-            );
+            .PostAsync($"/api/tablebuilder/release/{releaseVersion.Id}", new JsonNetContent(ToRequest(FullTableQuery)));
 
         VerifyAllMocks(fixture.TableBuilderServiceMock);
 
