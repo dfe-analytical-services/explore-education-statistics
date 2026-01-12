@@ -29,25 +29,30 @@ describe('getContentErrors', () => {
     mockGetInvalidImages.mockReturnValue([]);
   });
 
-  test('returns correct error message when multiple errors', () => {
+  test('runs all validators when content, links and images checks are enabled', () => {
     mockGetInvalidContent.mockReturnValue([
-      {
-        type: 'repeatedLinkText',
-        details: 'dummy details',
-      },
+      { type: 'boldAsHeading', details: 'content error' },
+    ]);
+    mockGetInvalidLinks.mockReturnValue([
+      { text: 'Broken link', url: 'http://invalid' },
     ]);
     mockGetInvalidImages.mockReturnValue([{ name: 'image.png' }]);
-    mockGetInvalidLinks.mockReturnValue([
-      { text: 'Example link', url: 'http://invalid-url' },
-    ]);
+
     const result = getContentErrors(elements, {
       checkContent: true,
       checkLinks: true,
       checkImages: true,
     });
+
+    expect(mockGetInvalidContent).toHaveBeenCalledWith(elements);
+    expect(mockGetInvalidLinks).toHaveBeenCalledWith(elements);
+    expect(mockGetInvalidImages).toHaveBeenCalledWith(elements);
+
+    expect(result).toBeDefined();
     expect(result?.errorMessage).toContain(
       'Content errors have been found: 1 image does not have alternative text.  1 link has an invalid URL. 1 accessibility error.',
     );
+    expect(result?.contentErrorDetails).toBeTruthy();
   });
 
   describe('content validation', () => {
