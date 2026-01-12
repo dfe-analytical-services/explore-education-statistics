@@ -1,21 +1,8 @@
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
-import InvalidContentDetails from '@admin/components/editable/InvalidContentDetails';
 import CommentsWrapper from '@admin/components/comments/CommentsWrapper';
 import styles from '@admin/components/editable/EditableContentForm.module.scss';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
-import getInvalidContent, {
-  InvalidContentError,
-} from '@admin/components/editable/utils/getInvalidContent';
-import getInvalidImages from '@admin/components/editable/utils/getInvalidImages';
-import getInvalidLinks, {
-  InvalidUrl,
-} from '@admin/components/editable/utils/getInvalidLinks';
-import {
-  Element,
-  JsonElement,
-  ToolbarGroup,
-  ToolbarOption,
-} from '@admin/types/ckeditor';
+import { Element, ToolbarGroup, ToolbarOption } from '@admin/types/ckeditor';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -24,7 +11,6 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import FormProvider from '@common/components/form/FormProvider';
 import Form from '@common/components/form/Form';
-import WarningMessage from '@common/components/WarningMessage';
 import useAsyncCallback from '@common/hooks/useAsyncCallback';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
@@ -37,8 +23,15 @@ import sanitizeHtml, {
   commentTags,
   defaultSanitizeOptions,
 } from '@common/utils/sanitizeHtml';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, {
+  ReactNode,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useIdleTimer } from 'react-idle-timer';
+import getContentErrors from '@admin/components/editable/utils/getContentErrors';
 
 interface FormValues {
   content: string;
@@ -87,13 +80,7 @@ const EditableContentForm = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
   const [elements, setElements] = useState<Element[] | undefined>();
-  const [invalidImageErrors, setInvalidImageErrors] = useState<JsonElement[]>(
-    [],
-  );
-  const [invalidContentErrors, setInvalidContentErrors] = useState<
-    InvalidContentError[]
-  >([]);
-  const [invalidLinkErrors, setInvalidLinkErrors] = useState<InvalidUrl[]>([]);
+  const [invalidContentErrors, setInvalidContentErrors] = useState<ReactNode>();
   const [submitError, setSubmitError] = useState<string>();
 
   useIdleTimer({
@@ -106,32 +93,6 @@ const EditableContentForm = ({
     onAction,
     onIdle,
   });
-
-  const contentErrorDetails = useMemo(() => {
-    if (
-      invalidImageErrors.length ||
-      invalidLinkErrors.length ||
-      invalidContentErrors.length
-    ) {
-      return (
-        <>
-          <WarningMessage className="govuk-!-margin-bottom-1">
-            The following problems must be resolved before saving:
-          </WarningMessage>
-          {!!invalidImageErrors.length && (
-            <InvalidImagesDetails errors={invalidImageErrors} />
-          )}
-          {!!invalidLinkErrors.length && (
-            <InvalidLinksDetails errors={invalidLinkErrors} />
-          )}
-          {!!invalidContentErrors.length && (
-            <InvalidContentDetails errors={invalidContentErrors} />
-          )}
-        </>
-      );
-    }
-    return null;
-  }, [invalidContentErrors, invalidImageErrors, invalidLinkErrors]);
 
   const sanitizeOptions: SanitizeHtmlOptions = useMemo(() => {
     return {
@@ -201,63 +162,18 @@ const EditableContentForm = ({
                 if (!elements?.length) {
                   return true;
                 }
+                const contentErrors = getContentErrors(elements);
 
-                // Convert to json to make it easier to process and test.
-                // Have to convert from Record<string | unknown> to unknown then to our
-                // JsonElement type to be able to access object properties
-                const elementsJson = elements.map(
-                  element => element.toJSON() as unknown,
-                );
-
-                const invalidImages = getInvalidImages(
-                  elementsJson as JsonElement[],
-                );
-                const invalidLinks = getInvalidLinks(
-                  elementsJson as JsonElement[],
-                );
-                const invalidContent = getInvalidContent(
-                  elementsJson as JsonElement[],
-                );
-
-                if (
-                  invalidImages.length ||
-                  invalidLinks.length ||
-                  invalidContent.length
-                ) {
-                  setInvalidImageErrors(invalidImages);
-                  setInvalidContentErrors(invalidContent);
-                  setInvalidLinkErrors(invalidLinks);
-
-                  const invalidImagesMessage =
-                    invalidImages.length === 1
-                      ? '1 image does not have alternative text.'
-                      : `${invalidImages.length} images do not have alternative text.`;
-
-                  const invalidLinksMessage =
-                    invalidLinks.length === 1
-                      ? '1 link has an invalid URL.'
-                      : `${invalidLinks.length} links have invalid URLs.`;
-
-                  const invalidContentMessage =
-                    invalidContent.length === 1
-                      ? '1 accessibility error.'
-                      : `${invalidContent.length} accessibility errors.`;
-
-                  const errorMessage = `Content errors have been found: ${
-                    invalidImages.length ? invalidImagesMessage : ''
-                  }  ${invalidLinks.length ? invalidLinksMessage : ''} ${
-                    invalidContent.length ? invalidContentMessage : ''
-                  }`;
+                if (contentErrors) {
+                  const { errorMessage, contentErrorDetails } = contentErrors;
+                  setInvalidContentErrors(contentErrorDetails);
 
                   return createError({
                     path,
                     message: errorMessage,
                   });
                 }
-
-                setInvalidImageErrors([]);
-                setInvalidContentErrors([]);
-                setInvalidLinkErrors([]);
+                setInvalidContentErrors(undefined);
 
                 return true;
               }),
@@ -273,7 +189,7 @@ const EditableContentForm = ({
               >
                 <FormFieldEditor<FormValues>
                   allowComments={allowComments}
-                  contentErrorDetails={contentErrorDetails}
+                  contentErrorDetails={invalidContentErrors}
                   error={
                     autoSaveError || submitError
                       ? 'Could not save content'
@@ -321,44 +237,3 @@ const EditableContentForm = ({
   );
 };
 export default EditableContentForm;
-
-function InvalidImagesDetails({ errors }: { errors: JsonElement[] }) {
-  return (
-    <>
-      <p>
-        {errors.length === 1
-          ? '1 image does not have alternative text.'
-          : `${errors.length} images do not have alternative text.`}
-      </p>
-      <ul>
-        <li>
-          Alternative text must be added for all images, for guidance see{' '}
-          <a
-            href="https://www.w3.org/WAI/tutorials/images/tips/"
-            rel="noopener noreferrer nofollow"
-            target="_blank"
-          >
-            W3C tips on writing alternative text (opens in new tab)
-          </a>
-          .
-        </li>
-        <li>Images without alternative text are outlined in red.</li>
-      </ul>
-    </>
-  );
-}
-
-function InvalidLinksDetails({ errors }: { errors: InvalidUrl[] }) {
-  return (
-    <>
-      <p>The following links have invalid URLs:</p>
-      <ul>
-        {errors.map(error => (
-          <li key={error?.text}>
-            {error?.text} ({error?.url})
-          </li>
-        ))}
-      </ul>
-    </>
-  );
-}
