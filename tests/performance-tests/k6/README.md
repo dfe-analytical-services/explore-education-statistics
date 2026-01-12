@@ -10,7 +10,7 @@ The performance test suite is built using [k6](https://k6.io/) and visualised us
 3. If running in Ubuntu, refer to the [Ubuntu firewall steps](#ubuntu-firewall-steps).
 4. Run:
     ```bash
-    cd tests/performance-tests
+    cd tests/performance-tests/k6
    
     # Install Node dependencies.
     pnpm i
@@ -60,7 +60,7 @@ You will need the following dependencies to run the tests successfully:
 
 ## Running the tests
 
-NOTE: All commands in this README are issued from the `tests/performance-tests` folder.
+NOTE: All commands in this README are issued from the `tests/performance-tests/k6` folder.
 
 ### Install dependencies with NPM
 
@@ -114,12 +114,12 @@ pnpm webpack watch
 This step is only required if running performance tests that require access to the Admin API.
 These files will store environment-specific user credentials for accessing Admin.
 
-As a one-off, we will need to copy `tests/performance-tests/.env.example.json` to
-`tests/performance-tests/.env.<environment>.json`, and supply the file with the correct
+As a one-off, we will need to copy `tests/performance-tests/k6/.env.example.json` to
+`tests/performance-tests/k6/.env.<environment>.json`, and supply the file with the correct
 environment-specific credentials for the users that we'll be using. The `<environment>` can
 be any value that we can load test against. As an example, if doing load testing or test script
 development against a local environment, we would create a file called
-`tests/performance-tests/.env.local.json` and supply the local user credentials within the file.
+`tests/performance-tests/k6/.env.local.json` and supply the local user credentials within the file.
 
 <a id="ubuntu-firewall-steps"></a>
 #### Allow access to host ports from containers
