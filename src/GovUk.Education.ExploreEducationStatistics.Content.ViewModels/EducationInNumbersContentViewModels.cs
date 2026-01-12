@@ -90,6 +90,8 @@ public class EducationInNumbersContentViewModels
     {
         public Guid Id { get; set; }
 
+        public string Title { get; init; } = string.Empty;
+
         public int Order { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -108,7 +110,6 @@ public class EducationInNumbersContentViewModels
 
     public class EinFreeTextStatTileViewModel : EinTileViewModel
     {
-        public string Title { get; set; } = string.Empty;
         public string Statistic { get; set; } = string.Empty;
         public string Trend { get; set; } = string.Empty;
         public string? LinkUrl { get; set; }
@@ -130,17 +131,15 @@ public class EducationInNumbersContentViewModels
         }
     }
 
-    // @MarkFix just copied from Admin, so probably needs loads of changes
     public class EinApiQueryStatTileViewModel : EinTileViewModel
     {
-        public string Title { get; init; } = string.Empty;
         public Guid? DataSetId { get; init; }
-        public string Version { get; init; } = string.Empty;
-        public bool IsLatestVersion { get; init; }
-        public string Query { get; init; } = string.Empty;
-        public IndicatorUnit? IndicatorUnit { get; init; } // @MarkFix needs a converter?
+        public string Statistic { get; init; } = string.Empty;
+        public IndicatorUnit? IndicatorUnit { get; init; }
         public int? DecimalPlaces { get; set; }
-        public string QueryResult { get; set; } = string.Empty;
+        public string Version { get; init; } = string.Empty;
+        public string LatestPublishedVersion { get; init; } = string.Empty;
+        public string Query { get; init; } = string.Empty;
 
         public static EinApiQueryStatTileViewModel FromModel(EinApiQueryStatTile statTile)
         {
@@ -151,12 +150,12 @@ public class EducationInNumbersContentViewModels
                 Type = EinTileType.ApiQueryStatTile,
                 Title = statTile.Title,
                 DataSetId = statTile.DataSetId,
-                Version = statTile.Version,
-                IsLatestVersion = statTile.IsLatestVersion,
-                Query = statTile.Query,
+                Statistic = statTile.Statistic,
                 IndicatorUnit = statTile.IndicatorUnit,
                 DecimalPlaces = statTile.DecimalPlaces,
-                QueryResult = statTile.QueryResult,
+                Version = statTile.Version,
+                LatestPublishedVersion = statTile.LatestPublishedVersion,
+                Query = statTile.Query,
             };
         }
     }

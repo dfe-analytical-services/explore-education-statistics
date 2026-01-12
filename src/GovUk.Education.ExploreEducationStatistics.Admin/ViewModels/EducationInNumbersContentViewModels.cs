@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
@@ -159,11 +160,16 @@ public record EinApiQueryStatTileViewModel : EinTileViewModel
     public string Title { get; init; } = string.Empty;
     public Guid? DataSetId { get; init; }
     public string Version { get; init; } = string.Empty;
-    public bool IsLatestVersion { get; init; }
+    public string LatestPublishedVersion { get; init; } = string.Empty;
+    public string Stat { get; init; }
     public string Query { get; init; } = string.Empty;
-    public IndicatorUnit? IndicatorUnit { get; init; } // @MarkFix needs a converter?
+
+    [JsonConverter(typeof(EnumToEnumValueJsonConverter<IndicatorUnit>))]
+    public IndicatorUnit? IndicatorUnit { get; init; }
+
     public int? DecimalPlaces { get; set; }
-    public string QueryResult { get; set; } = string.Empty;
+    public string QueryResult { get; set; } = string.Empty; // @MarkFix temp?
+    public string MetaResult { get; set; } = string.Empty; // @MarkFix temp?
 
     public static EinApiQueryStatTileViewModel FromModel(EinApiQueryStatTile statTile)
     {
@@ -175,11 +181,13 @@ public record EinApiQueryStatTileViewModel : EinTileViewModel
             Title = statTile.Title,
             DataSetId = statTile.DataSetId,
             Version = statTile.Version,
-            IsLatestVersion = statTile.IsLatestVersion,
+            LatestPublishedVersion = statTile.LatestPublishedVersion,
+            Stat = statTile.Statistic,
             Query = statTile.Query,
             IndicatorUnit = statTile.IndicatorUnit,
             DecimalPlaces = statTile.DecimalPlaces,
             QueryResult = statTile.QueryResult,
+            MetaResult = statTile.MetaResult,
         };
     }
 }

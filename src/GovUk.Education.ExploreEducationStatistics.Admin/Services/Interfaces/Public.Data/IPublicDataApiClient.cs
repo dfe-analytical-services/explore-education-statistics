@@ -19,4 +19,11 @@ public interface IPublicDataApiClient
         string queryBody,
         CancellationToken cancellationToken = default
     );
+
+    Task<Either<ActionResult, DataSetMetaViewModel>> GetMeta(
+        Guid dataSetId,
+        string dataSetVersion,
+        string[]? types,
+        CancellationToken cancellationToken = default
+    );
 }

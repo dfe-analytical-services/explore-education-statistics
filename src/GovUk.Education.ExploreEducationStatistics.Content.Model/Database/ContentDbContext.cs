@@ -914,6 +914,11 @@ public class ContentDbContext : DbContext
             .HasDiscriminator<string>("Type")
             .HasValue<EinFreeTextStatTile>("FreeTextStatTile")
             .HasValue<EinApiQueryStatTile>("ApiQueryStatTile");
+
+        modelBuilder
+            .Entity<EinApiQueryStatTile>()
+            .Property(e => e.IndicatorUnit)
+            .HasConversion(new EnumToStringConverter<IndicatorUnit>());
     }
 }
 

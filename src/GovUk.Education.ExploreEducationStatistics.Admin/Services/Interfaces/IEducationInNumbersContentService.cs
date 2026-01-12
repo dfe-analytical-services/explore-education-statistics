@@ -63,7 +63,7 @@ public interface IEducationInNumbersContentService
         EinFreeTextStatTileUpdateRequest request
     );
 
-    Task<Either<ActionResult?, EinTileViewModel>> UpdateApiQueryStatTile(
+    Task<Either<ActionResult, EinTileViewModel>> UpdateApiQueryStatTile(
         Guid pageId,
         Guid tileId,
         EinApiQueryStatTileUpdateRequest request

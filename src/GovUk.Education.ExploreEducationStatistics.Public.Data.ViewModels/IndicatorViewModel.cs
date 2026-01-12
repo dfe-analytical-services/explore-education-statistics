@@ -32,7 +32,7 @@ public record IndicatorViewModel
     /// </summary>
     /// <example>%</example>
     [JsonConverter(typeof(EnumToEnumLabelJsonConverter<IndicatorUnit>))]
-    public required IndicatorUnit? Unit { get; init; }
+    public IndicatorUnit? Unit { get; init; }
 
     /// <summary>
     /// The recommended number of decimal places to use when formatting the indicator.

@@ -25,7 +25,7 @@ public record DataSetMetaViewModel
     /// <summary>
     /// All the locations associated with the data set, grouped by geographic level.
     /// </summary>
-    public required IReadOnlyList<LocationGroupOptionsViewModel> Locations { get; init; } // @MarkFix THIS IS THE PROBLEM
+    public required IReadOnlyList<LocationGroupOptionsViewModel> Locations { get; init; }
 
     /// <summary>
     /// All the time periods associated with the data set.

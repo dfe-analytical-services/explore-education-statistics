@@ -31,7 +31,7 @@ resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' = {
     name: 'Standard_AzureFrontDoor'
   }
   properties: {
-    originResponseTimeoutSeconds: 60 // @MarkFix maybe want longer - for table tool exclusively?
+    originResponseTimeoutSeconds: 60
   }
 }
 

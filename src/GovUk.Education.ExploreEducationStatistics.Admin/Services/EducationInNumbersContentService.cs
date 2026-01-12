@@ -1,4 +1,5 @@
 #nullable enable
+using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -6,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -318,7 +320,7 @@ public class EducationInNumbersContentService(
         return Unit.Instance;
     }
 
-    public async Task<Either<ActionResult, EinTileViewModel>> AddTile(
+    public async Task<Either<ActionResult, EinTileViewModel>> AddTile( // @MarkFix add tests
         Guid pageId,
         Guid parentBlockId,
         EinTileType type,
@@ -355,7 +357,7 @@ public class EducationInNumbersContentService(
                 Query = "",
                 DecimalPlaces = null,
                 IndicatorUnit = null,
-                IsLatestVersion = false,
+                LatestPublishedVersion = "",
                 QueryResult = "",
                 Version = "",
             },
@@ -402,81 +404,132 @@ public class EducationInNumbersContentService(
         return EinTileViewModel.FromModel(tileToUpdate);
     }
 
-    public async Task<Either<ActionResult?, EinTileViewModel>> UpdateApiQueryStatTile(
+    public async Task<Either<ActionResult, EinTileViewModel>> UpdateApiQueryStatTile( // @MarkFix add tests
         Guid pageId,
         Guid tileId,
         EinApiQueryStatTileUpdateRequest request
     )
     {
-        var tileToUpdate = contentDbContext
-            .EinTiles.OfType<EinApiQueryStatTile>()
-            .SingleOrDefault(tile =>
-                tile.Id == tileId && tile.EinParentBlock.EinContentSection.EducationInNumbersPageId == pageId
-            );
-
-        if (tileToUpdate == null)
+        var indicatorPublicId = FetchSingleIndicator(request.Query);
+        if (indicatorPublicId == null)
         {
-            return new NotFoundResult();
+            return new Either<ActionResult, EinTileViewModel>(
+                new BadRequestObjectResult("request query must contain exactly one indicator")
+            );
         }
 
-        // @MarkFix fetch api query results, validate it's correct, then update tile
+        // Get data from publicDataDbContext where possible
+        var apiDataSet = publicDataDbContext
+            .DataSets.Include(ds => ds.LatestLiveVersion)
+            .Single(ds => ds.Id == request.DataSetId);
+        if (apiDataSet.LatestLiveVersion == null)
+        {
+            return new Either<ActionResult, EinTileViewModel>(
+                new BadRequestObjectResult("API data set has no live version")
+            );
+        }
+        var apiDataSetLatest = apiDataSet.LatestLiveVersion;
+        //var releaseSlug = apiDataSetLatest.Release.Slug; // @MarkFix use this
+        var latestVersion =
+            $"{apiDataSetLatest.VersionMajor}.{apiDataSetLatest.VersionMinor}.{apiDataSetLatest.VersionPatch}";
+
+        if (latestVersion != request.Version)
+        {
+            return new Either<ActionResult, EinTileViewModel>(
+                new BadRequestObjectResult(
+                    $"Version provided isn't the latest version. Latest: {latestVersion} Provided: {request.Version}"
+                )
+            );
+        }
+
+        var indicatorMeta = publicDataDbContext.IndicatorMetas.SingleOrDefault(im =>
+            im.DataSetVersionId == apiDataSetLatest.Id && im.PublicId == indicatorPublicId
+        );
+        if (indicatorMeta == null)
+        {
+            return new Either<ActionResult, EinTileViewModel>(
+                new BadRequestObjectResult($"Could not find indicator meta for {indicatorPublicId}")
+            );
+        }
+        var indicatorUnit = indicatorMeta.Unit;
+        var indicatorDecimalPlaces = indicatorMeta.DecimalPlaces;
+
         return await publicDataApiClient
             .RunQuery(request.DataSetId, request.Version, request.Query)
             .OnSuccess(async queryResults =>
             {
-                int majorVersion;
-                int minorVersion;
-                int patchVersion;
-                if (Version.TryParse(request.Version, out Version? version))
-                {
-                    majorVersion = version.Major;
-                    minorVersion = version.Minor;
-                    patchVersion = version.Build;
-                }
-                else
-                {
-                    // @MarkFix Could return a validation error?
-                    return new Either<ActionResult?, EinTileViewModel>(
-                        new BadRequestObjectResult("Unable to parse version")
-                    );
-                }
-
                 var latestLiveDataSetVersion = publicDataDbContext
                     .DataSets.Where(ds => ds.Id == request.DataSetId)
                     .Select(ds => ds.LatestLiveVersion)
                     .Single();
                 if (latestLiveDataSetVersion == null)
                 {
-                    return new BadRequestObjectResult("Data set has no latest live version");
+                    return new Either<ActionResult, EinTileViewModel>(
+                        new BadRequestObjectResult("Data set has no latest live version")
+                    );
                 }
-                var isLatestVersion =
-                    latestLiveDataSetVersion.VersionMajor == majorVersion
-                    && latestLiveDataSetVersion.VersionMinor == minorVersion
-                    && latestLiveDataSetVersion.VersionPatch == patchVersion;
 
-                if (queryResults == null || queryResults.Warnings.Count > 0)
+                // @MarkFix Get the latest version via PAPI /versions endpoint?
+
+                if (queryResults.Warnings.Count > 0)
                 {
                     return new BadRequestObjectResult("Warnings returned, {queryResults.Warnings}");
                 }
 
-                if (queryResults.Paging.TotalResults > queryResults.Paging.PageSize)
+                if (queryResults.Paging.TotalPages > 1)
                 {
-                    // @MarkFix could collate results from multiple pages into a single array
                     return new BadRequestObjectResult("Results need to all fit on the first page");
                 }
 
-                // @MarkFix check one result for NAT and latest year
-                // @MarkFix fetch meta data
+                // filter query results to National and latest year, for THE ONE result we intend to display
+                var natResults = queryResults.Results.Where(result =>
+                    result.GeographicLevel == GeographicLevel.Country
+                );
+
+                var latestTimePeriod2 = queryResults
+                    .Results.OrderBy(result => result.TimePeriod.Period[..4])
+                    .ThenBy(result => result.TimePeriod.Code)
+                    .ToList();
+
+                var latestTimePeriod = latestTimePeriod2.Select(result => result.TimePeriod).Last();
+
+                var latestResults = natResults
+                    .Where(result =>
+                        result.TimePeriod.Period == latestTimePeriod.Period
+                        && result.TimePeriod.Code == latestTimePeriod.Code
+                    )
+                    .ToList();
+
+                if (latestResults.Count != 1)
+                {
+                    return new BadRequestObjectResult(
+                        $"Should only be one result with NAT and latest year. Found {latestResults.Count} results"
+                    );
+                }
+                var theStat = latestResults[0].Values[indicatorPublicId];
+
+                // Get tile to update
+                var tileToUpdate = contentDbContext
+                    .EinTiles.OfType<EinApiQueryStatTile>()
+                    .SingleOrDefault(tile =>
+                        tile.Id == tileId && tile.EinParentBlock.EinContentSection.EducationInNumbersPageId == pageId
+                    );
+
+                if (tileToUpdate == null)
+                {
+                    return new NotFoundResult();
+                }
 
                 tileToUpdate.Title = request.Title;
                 tileToUpdate.DataSetId = request.DataSetId;
                 tileToUpdate.Version = request.Version;
+                tileToUpdate.LatestPublishedVersion = latestVersion;
                 tileToUpdate.Query = request.Query;
+                tileToUpdate.Statistic = theStat;
+                tileToUpdate.IndicatorUnit = indicatorUnit;
+                tileToUpdate.DecimalPlaces = indicatorDecimalPlaces;
                 tileToUpdate.QueryResult = queryResults.Results.ToJson();
-                tileToUpdate.IsLatestVersion = isLatestVersion;
-                //tileToUpdate.MetaResult = ; // @MarkFix from /meta endpoint
-                //tileToUpdate.DecimalPlaces = ;
-                //tileToUpdate.IndicatorUnit = ;
+                tileToUpdate.MetaResult = "{}"; // @MarkFix remove
 
                 contentDbContext.EinTiles.Update(tileToUpdate);
                 await contentDbContext.SaveChangesAsync();
@@ -558,5 +611,21 @@ public class EducationInNumbersContentService(
         await contentDbContext.SaveChangesAsync();
 
         return Unit.Instance;
+    }
+
+    private string? FetchSingleIndicator(string queryString)
+    {
+        using JsonDocument doc = JsonDocument.Parse(queryString);
+
+        if (
+            !doc.RootElement.TryGetProperty("indicators", out var indicators)
+            || indicators.ValueKind != JsonValueKind.Array
+            || indicators.GetArrayLength() != 1
+            || indicators[0].ValueKind != JsonValueKind.String
+        )
+        {
+            return null;
+        }
+        return indicators[0].ToString();
     }
 }

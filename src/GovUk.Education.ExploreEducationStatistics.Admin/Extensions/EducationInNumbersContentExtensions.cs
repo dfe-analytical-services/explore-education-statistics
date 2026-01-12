@@ -64,7 +64,7 @@ public static class EducationInNumbersContentExtensions
                 Title = statTile.Title,
                 DataSetId = statTile.DataSetId,
                 Version = statTile.Version,
-                IsLatestVersion = statTile.IsLatestVersion,
+                LatestPublishedVersion = statTile.LatestPublishedVersion,
                 Query = statTile.Query,
                 IndicatorUnit = statTile.IndicatorUnit,
                 DecimalPlaces = statTile.DecimalPlaces,

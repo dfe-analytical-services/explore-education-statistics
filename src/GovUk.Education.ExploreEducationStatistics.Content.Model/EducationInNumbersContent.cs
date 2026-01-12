@@ -1,8 +1,6 @@
 ﻿#nullable enable
 using System.ComponentModel.DataAnnotations;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -48,8 +46,12 @@ public class EinTileGroupBlock : EinContentBlock
 public class EinTile
 {
     public Guid Id { get; set; }
+
+    [MaxLength(2048)]
     public string Title { get; set; } = string.Empty;
+
     public int Order { get; set; }
+
     public Guid EinParentBlockId { get; set; }
     public EinTileGroupBlock EinParentBlock { get; set; } = null!;
 }
@@ -73,22 +75,23 @@ public class EinApiQueryStatTile : EinTile
 {
     public Guid? DataSetId { get; set; }
 
-    public string Version { get; set; } = string.Empty; // @MarkFix can the user provide a version without a patch version?
+    public string Version { get; set; } = string.Empty;
 
-    public bool IsLatestVersion { get; set; } // @MarkFix change to string latestPublishedVersion
+    public string LatestPublishedVersion { get; set; } = string.Empty;
 
     public string Query { get; set; } = string.Empty;
 
-    [JsonConverter(typeof(EnumToEnumValueJsonConverter<IndicatorUnit>))]
+    public string Statistic { get; set; } = string.Empty;
+
     public IndicatorUnit? IndicatorUnit { get; set; } = null;
 
     public int? DecimalPlaces { get; set; }
 
+    // @MarkFix should be a DataSetQueryPaginatedResultsViewModel? (And similar for MetaResult?)
     public string QueryResult { get; set; } = string.Empty;
 
-    public string MetaResult { get; set; } = string.Empty; // @MarkFix update migration to add
+    public string MetaResult { get; set; } = string.Empty;
 }
 
-// @MarkFix filters results by NAT and latest TimeIdentifier/TimePeriod and then should have one result
 // @MarkFix link to release that the api data set is from (like free stat text tile)
 // @MarkFix on a new release being published, check for api data sets - if it is in an EinTile, update isLatestVersion AND any previous version of the tile in case of amendments!
