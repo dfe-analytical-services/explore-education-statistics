@@ -1,4 +1,5 @@
-﻿import getContentErrors from '@admin/components/editable/utils/getContentErrors';
+﻿import { render } from '@testing-library/react';
+import getContentErrors from '@admin/components/editable/utils/getContentErrors';
 import getInvalidContent from '@admin/components/editable/utils/getInvalidContent';
 import getInvalidLinks from '@admin/components/editable/utils/getInvalidLinks';
 import getInvalidImages from '@admin/components/editable/utils/getInvalidImages';
@@ -17,154 +18,218 @@ const mockGetInvalidLinks = getInvalidLinks as jest.MockedFunction<
 const mockGetInvalidImages = getInvalidImages as jest.MockedFunction<
   typeof getInvalidImages
 >;
-describe('getContentErrors', () => {
-  const mockElements = [] as Element[];
 
-  describe('getInvalidContent', () => {
-    beforeEach(() => {
-      jest.clearAllMocks();
-      mockGetInvalidContent.mockReturnValue([]);
+describe('getContentErrors', () => {
+  const elements = [] as Element[];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockGetInvalidContent.mockReturnValue([]);
+    mockGetInvalidLinks.mockReturnValue([]);
+    mockGetInvalidImages.mockReturnValue([]);
+  });
+
+  test('returns correct error message when multiple errors', () => {
+    mockGetInvalidContent.mockReturnValue([
+      {
+        type: 'repeatedLinkText',
+        details: 'dummy details',
+      },
+    ]);
+    mockGetInvalidImages.mockReturnValue([{ name: 'image.png' }]);
+    mockGetInvalidLinks.mockReturnValue([
+      { text: 'Example link', url: 'http://invalid-url' },
+    ]);
+    const result = getContentErrors(elements, {
+      checkContent: true,
+      checkLinks: true,
+      checkImages: true,
     });
+    expect(result?.errorMessage).toContain(
+      'Content errors have been found: 1 image does not have alternative text.  1 link has an invalid URL. 1 accessibility error.',
+    );
+  });
+
+  describe('content validation', () => {
     test('returns undefined when no invalid content', () => {
-      mockGetInvalidContent.mockReturnValue([]);
-      const result = getContentErrors(mockElements, { checkContent: true });
+      const result = getContentErrors(elements, {
+        checkContent: true,
+        checkLinks: false,
+        checkImages: false,
+      });
       expect(result).toBeUndefined();
     });
 
-    test('does not check content when checkContent is false', () => {
-      const result = getContentErrors(mockElements, { checkContent: false });
+    test('does not run when checkContent is false', () => {
+      const result = getContentErrors(elements, {
+        checkContent: false,
+        checkLinks: false,
+        checkImages: false,
+      });
       expect(mockGetInvalidContent).not.toHaveBeenCalled();
       expect(result).toBeUndefined();
     });
 
-    test('returns error message for single invalid content', () => {
-      mockGetInvalidContent.mockReturnValue([
-        {
-          type: 'repeatedLinkText',
-          details: 'dummy details',
-        },
-      ]);
-      const result = getContentErrors(mockElements, { checkContent: true });
-      expect(result?.errorMessage).toContain('1 accessibility error.');
-    });
+    test.each([
+      [1, '1 accessibility error.'],
+      [2, '2 accessibility errors.'],
+    ])(
+      'returns correct error message for %i invalid content items',
+      (count, expectedMessage) => {
+        mockGetInvalidContent.mockReturnValue(
+          Array.from({ length: count }, () => ({
+            type: 'repeatedLinkText',
+            details: 'dummy',
+          })),
+        );
 
-    test('returns error message for multiple invalid content', () => {
-      mockGetInvalidContent.mockReturnValue([
-        {
-          type: 'repeatedLinkText',
-          details: 'dummy details',
-        },
-        {
-          type: 'boldAsHeading',
-          details: 'dummy details',
-        },
-      ]);
-      const result = getContentErrors(mockElements, { checkContent: true });
-      expect(result?.errorMessage).toContain('2 accessibility errors.');
-    });
+        const result = getContentErrors(elements, {
+          checkContent: true,
+          checkLinks: false,
+          checkImages: false,
+        });
 
-    test('renders InvalidContentDetails component when invalid content exists', () => {
+        expect(result?.errorMessage).toContain(expectedMessage);
+        expect(result?.contentErrorDetails).toBeTruthy();
+      },
+    );
+
+    test('matches snapshot for content error details', () => {
       mockGetInvalidContent.mockReturnValue([
         {
           type: 'repeatedLinkText',
           details: 'dummy details',
         },
       ]);
-      const result = getContentErrors(mockElements, { checkContent: true });
+
+      const result = getContentErrors(elements, {
+        checkContent: true,
+        checkLinks: false,
+        checkImages: false,
+      });
+
       expect(result?.contentErrorDetails).toBeTruthy();
+
+      const { container } = render(result!.contentErrorDetails);
+
+      expect(container).toMatchSnapshot();
     });
   });
 
-  describe('getInvalidLinks', () => {
-    beforeEach(() => {
-      jest.clearAllMocks();
-      mockGetInvalidLinks.mockReturnValue([]);
-    });
-    test('returns undefined when no invalid content', () => {
-      mockGetInvalidLinks.mockReturnValue([]);
-      const result = getContentErrors(mockElements, { checkLinks: true });
+  describe('link validation', () => {
+    test('returns undefined when no invalid links', () => {
+      const result = getContentErrors(elements, {
+        checkLinks: true,
+        checkImages: false,
+        checkContent: false,
+      });
       expect(result).toBeUndefined();
     });
 
-    test('does not check content when checkLinks is false', () => {
-      const result = getContentErrors(mockElements, { checkLinks: false });
+    test('does not run when checkLinks is false', () => {
+      const result = getContentErrors(elements, {
+        checkLinks: false,
+        checkImages: false,
+        checkContent: false,
+      });
       expect(mockGetInvalidLinks).not.toHaveBeenCalled();
       expect(result).toBeUndefined();
     });
 
-    test('returns error message for single invalid content', () => {
-      mockGetInvalidLinks.mockReturnValue([
-        {
-          text: 'string',
-          url: 'http://localhost/url',
-        },
-      ]);
-      const result = getContentErrors(mockElements, { checkLinks: true });
-      expect(result?.errorMessage).toContain('1 link has an invalid URL.');
-      expect(result?.contentErrorDetails).toBeTruthy();
-    });
+    test.each([
+      [1, '1 link has an invalid URL.'],
+      [2, '2 links have invalid URLs.'],
+    ])(
+      'returns correct error message for %i invalid links',
+      (count, expectedMessage) => {
+        mockGetInvalidLinks.mockReturnValue(
+          Array.from({ length: count }, () => ({
+            text: 'text',
+            url: 'http://invalid',
+          })),
+        );
 
-    test('returns error message for multiple invalid content', () => {
+        const result = getContentErrors(elements, {
+          checkLinks: true,
+          checkImages: false,
+          checkContent: false,
+        });
+
+        expect(result?.errorMessage).toContain(expectedMessage);
+        expect(result?.contentErrorDetails).toBeTruthy();
+      },
+    );
+
+    test('matches snapshot for link error details', () => {
       mockGetInvalidLinks.mockReturnValue([
-        {
-          text: 'string',
-          url: 'http://localhost/url',
-        },
-        {
-          text: 'string',
-          url: 'http://www.google.com',
-        },
+        { text: 'Example link', url: 'http://invalid-url' },
       ]);
-      const result = getContentErrors(mockElements, { checkLinks: true });
-      expect(result?.errorMessage).toContain('2 links have invalid URLs.');
-      expect(result?.contentErrorDetails).toBeTruthy();
+
+      const result = getContentErrors(elements, {
+        checkLinks: true,
+        checkImages: false,
+        checkContent: false,
+      });
+
+      const { container } = render(result!.contentErrorDetails);
+
+      expect(container).toMatchSnapshot();
     });
   });
 
-  describe('getInvalidImages', () => {
-    beforeEach(() => {
-      jest.clearAllMocks();
-      mockGetInvalidImages.mockReturnValue([]);
-    });
-    test('returns undefined when no invalid content', () => {
-      mockGetInvalidImages.mockReturnValue([]);
-      const result = getContentErrors(mockElements, { checkImages: true });
+  describe('image validation', () => {
+    test('returns undefined when no invalid images', () => {
+      const result = getContentErrors(elements, {
+        checkImages: true,
+        checkContent: false,
+        checkLinks: false,
+      });
       expect(result).toBeUndefined();
     });
 
-    test('does not check content when checkImages is false', () => {
-      const result = getContentErrors(mockElements, { checkImages: false });
+    test('does not run when checkImages is false', () => {
+      const result = getContentErrors(elements, {
+        checkImages: false,
+        checkContent: false,
+        checkLinks: false,
+      });
       expect(mockGetInvalidImages).not.toHaveBeenCalled();
       expect(result).toBeUndefined();
     });
 
-    test('returns error message for single invalid content', () => {
-      mockGetInvalidImages.mockReturnValue([
-        {
-          name: 'string',
-        },
-      ]);
-      const result = getContentErrors(mockElements, { checkImages: true });
-      expect(result?.errorMessage).toContain(
-        '1 image does not have alternative text.',
-      );
-      expect(result?.contentErrorDetails).toBeTruthy();
-    });
+    test.each([
+      [1, '1 image does not have alternative text.'],
+      [2, '2 images do not have alternative text.'],
+    ])(
+      'returns correct error message for %i invalid images',
+      (count, expectedMessage) => {
+        mockGetInvalidImages.mockReturnValue(
+          Array.from({ length: count }, () => ({ name: 'image' })),
+        );
 
-    test('returns error message for multiple invalid content', () => {
-      mockGetInvalidImages.mockReturnValue([
-        {
-          name: 'string',
-        },
-        {
-          name: 'string',
-        },
-      ]);
-      const result = getContentErrors(mockElements, { checkImages: true });
-      expect(result?.errorMessage).toContain(
-        '2 images do not have alternative text.',
-      );
-      expect(result?.contentErrorDetails).toBeTruthy();
+        const result = getContentErrors(elements, {
+          checkImages: true,
+          checkContent: false,
+          checkLinks: false,
+        });
+
+        expect(result?.errorMessage).toContain(expectedMessage);
+        expect(result?.contentErrorDetails).toBeTruthy();
+      },
+    );
+
+    test('matches snapshot for image error details', () => {
+      mockGetInvalidImages.mockReturnValue([{ name: 'image.png' }]);
+
+      const result = getContentErrors(elements, {
+        checkImages: true,
+        checkContent: false,
+        checkLinks: false,
+      });
+
+      const { container } = render(result!.contentErrorDetails);
+
+      expect(container).toMatchSnapshot();
     });
   });
 });
