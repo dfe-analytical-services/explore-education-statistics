@@ -1,0 +1,200 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getContentErrors content validation matches snapshot for content error details 1`] = `
+<div>
+  <div
+    class="govuk-warning-text warning govuk-!-margin-bottom-1"
+  >
+    <span
+      aria-hidden="true"
+      class="govuk-warning-text__icon icon"
+    >
+      !
+    </span>
+    <strong
+      class="govuk-warning-text__text text"
+    >
+      <span
+        class="govuk-visually-hidden"
+      >
+        Warning
+      </span>
+      The following problems must be resolved before saving:
+    </strong>
+  </div>
+  <p>
+    The following accessibility problems have been found:
+  </p>
+  <ul>
+    <li>
+      <button
+        aria-disabled="false"
+        class="button"
+        type="button"
+      >
+        1 links have the same text with different URLs
+         
+        <span
+          aria-hidden="true"
+          class="infoIcon"
+        >
+          ?
+        </span>
+        <span
+          class="govuk-visually-hidden"
+        >
+          Show information about this error
+        </span>
+      </button>
+      <ul
+        class="govuk-!-margin-bottom-1 govuk-!-margin-top-1"
+      >
+        <li>
+          : 
+          dummy details
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+`;
+
+exports[`getContentErrors image validation matches snapshot for image error details 1`] = `
+<div>
+  <div
+    class="govuk-warning-text warning govuk-!-margin-bottom-1"
+  >
+    <span
+      aria-hidden="true"
+      class="govuk-warning-text__icon icon"
+    >
+      !
+    </span>
+    <strong
+      class="govuk-warning-text__text text"
+    >
+      <span
+        class="govuk-visually-hidden"
+      >
+        Warning
+      </span>
+      The following problems must be resolved before saving:
+    </strong>
+  </div>
+  <p>
+    1 image does not have alternative text.
+  </p>
+  <ul>
+    <li>
+      Alternative text must be added for all images, for guidance see
+       
+      <a
+        href="https://www.w3.org/WAI/tutorials/images/tips/"
+        rel="noopener noreferrer nofollow"
+        target="_blank"
+      >
+        W3C tips on writing alternative text (opens in new tab)
+      </a>
+      .
+    </li>
+    <li>
+      Images without alternative text are outlined in red.
+    </li>
+  </ul>
+</div>
+`;
+
+exports[`getContentErrors link validation matches snapshot for link error details 1`] = `
+<div>
+  <div
+    class="govuk-warning-text warning govuk-!-margin-bottom-1"
+  >
+    <span
+      aria-hidden="true"
+      class="govuk-warning-text__icon icon"
+    >
+      !
+    </span>
+    <strong
+      class="govuk-warning-text__text text"
+    >
+      <span
+        class="govuk-visually-hidden"
+      >
+        Warning
+      </span>
+      The following problems must be resolved before saving:
+    </strong>
+  </div>
+  <p>
+    The following links have invalid URLs:
+  </p>
+  <ul>
+    <li>
+      Example link
+       (
+      http://invalid-url
+      )
+    </li>
+  </ul>
+</div>
+`;
+
+exports[`getContentErrors matches snapshot for content error details 1`] = `
+<div>
+  <div
+    class="govuk-warning-text warning govuk-!-margin-bottom-1"
+  >
+    <span
+      aria-hidden="true"
+      class="govuk-warning-text__icon icon"
+    >
+      !
+    </span>
+    <strong
+      class="govuk-warning-text__text text"
+    >
+      <span
+        class="govuk-visually-hidden"
+      >
+        Warning
+      </span>
+      The following problems must be resolved before saving:
+    </strong>
+  </div>
+  <p>
+    The following accessibility problems have been found:
+  </p>
+  <ul>
+    <li>
+      <button
+        aria-disabled="false"
+        class="button"
+        type="button"
+      >
+        1 links have the same text with different URLs
+         
+        <span
+          aria-hidden="true"
+          class="infoIcon"
+        >
+          ?
+        </span>
+        <span
+          class="govuk-visually-hidden"
+        >
+          Show information about this error
+        </span>
+      </button>
+      <ul
+        class="govuk-!-margin-bottom-1 govuk-!-margin-top-1"
+      >
+        <li>
+          : 
+          dummy details
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+`;
