@@ -333,11 +333,12 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
     };
 
     if (dataSetFile.api) {
-      await queryClient.prefetchQuery(
-        apiDataSetQueries.listDataSetVersions(dataSetFile.api.id, {
+      await queryClient.prefetchQuery({
+        ...apiDataSetQueries.listDataSetVersions(dataSetFile.api.id, {
           page: versionPage ? Number(versionPage) : 1,
         }),
-      );
+        staleTime: Infinity,
+      });
 
       const [apiDataSet, apiDataSetVersion, apiDataSetVersionChanges] =
         await Promise.all([

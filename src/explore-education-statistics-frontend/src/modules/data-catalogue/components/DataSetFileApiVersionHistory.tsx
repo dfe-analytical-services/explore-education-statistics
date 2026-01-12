@@ -31,6 +31,7 @@ export default function DataSetFileApiVersionHistory({
       page: router.query.versionPage ? Number(router.query.versionPage) : 1,
       pageSize: 10,
     }),
+    staleTime: Infinity,
   });
 
   const { page = 1, totalPages = 1 } = data?.paging ?? {};
