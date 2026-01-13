@@ -170,8 +170,8 @@ public abstract class PublicationReleasesServiceTests
                 .WithReleases(_ =>
                     [
                         _dataFixture.DefaultRelease(publishedVersions: 1, year: 2025),
-                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2024),
-                        _dataFixture.DefaultRelease(publishedVersions: 3, year: 2023),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2024),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2023),
                     ]
                 )
                 .FinishWith(p =>
@@ -240,8 +240,8 @@ public abstract class PublicationReleasesServiceTests
                 .WithReleases(_ =>
                     [
                         _dataFixture.DefaultRelease(publishedVersions: 1, year: 2025),
-                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2024),
-                        _dataFixture.DefaultRelease(publishedVersions: 3, year: 2023),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2024),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, year: 2023),
                     ]
                 );
 
@@ -283,14 +283,24 @@ public abstract class PublicationReleasesServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 2, draftVersion: true)]);
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 3, draftVersion: true)]);
             var release = publication.Releases[0];
 
             // Ensure the generated release versions have different published dates
             Assert.True(
                 release.Versions[0].Published < release.Versions[1].Published,
-                "The first version should have an earlier published date than the second version"
+                "Version 0 should be published before version 1"
             );
+
+            Assert.True(
+                release.Versions[1].Published < release.Versions[2].Published,
+                "Version 1 should be published before version 2"
+            );
+
+            release.Versions[2].Updates = _dataFixture
+                .DefaultUpdate()
+                .WithReleaseVersionId(release.Versions[2].Id)
+                .GenerateList(1);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -316,13 +326,76 @@ public abstract class PublicationReleasesServiceTests
                 );
 
                 var releaseEntry = Assert.IsType<PublicationReleaseEntryDto>(pagedResult.Results.Single());
-                var expectedReleaseVersion = release.Versions[1];
+                var expectedReleaseVersion = release.Versions[2];
                 Assert.Multiple(() =>
                 {
-                    Assert.Equal(expectedReleaseVersion.Published, releaseEntry.LastUpdated);
+                    Assert.Equal(new DateTimeOffset(expectedReleaseVersion.Updates[0].On), releaseEntry.LastUpdated);
                     // TODO EES-6414 'Published' should be the published display date
                     Assert.Equal(expectedReleaseVersion.Published, releaseEntry.Published);
                 });
+            }
+        }
+
+        [Fact]
+        public async Task WhenReleaseHasMultiplePublishedVersions_ReturnsLastUpdatedFromLatestReleaseUpdate()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 3)]);
+            var release = publication.Releases[0];
+
+            // Ensure the generated release versions have different published dates
+            Assert.True(
+                release.Versions[0].Published < release.Versions[1].Published,
+                "Version 0 should be published before version 1"
+            );
+
+            Assert.True(
+                release.Versions[1].Published < release.Versions[2].Published,
+                "Version 1 should be published before version 2"
+            );
+
+            release.Versions[1].Updates = _dataFixture
+                .DefaultUpdate()
+                .WithReleaseVersionId(release.Versions[1].Id)
+                .GenerateList(1);
+
+            release.Versions[2].Updates = _dataFixture
+                .DefaultUpdate()
+                .WithReleaseVersionId(release.Versions[2].Id)
+                .ForIndex(0, s => s.SetOn(DateTime.Parse("2026-01-01T00:00:00Z")))
+                .ForIndex(1, s => s.SetOn(DateTime.Parse("2026-02-01T00:00:00Z")))
+                .GenerateList(2);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetPublicationReleases(publication.Slug);
+
+                // Assert
+                var pagedResult = outcome.AssertRight();
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(
+                    expectedTotalResults: 1,
+                    expectedPage: 1,
+                    expectedPageSize: 10
+                );
+
+                var releaseEntry = Assert.IsType<PublicationReleaseEntryDto>(pagedResult.Results.Single());
+
+                // Expect last updated to be mapped from the latest release update on the latest published release version
+                Assert.Equal(new DateTimeOffset(release.Versions[2].Updates[1].On), releaseEntry.LastUpdated);
+                Assert.Equal(TimeSpan.Zero, releaseEntry.LastUpdated.Offset);
             }
         }
 

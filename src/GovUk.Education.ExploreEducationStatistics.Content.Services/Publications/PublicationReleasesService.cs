@@ -1,5 +1,6 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -22,16 +23,20 @@ public class PublicationReleasesService(ContentDbContext contentDbContext) : IPu
         await GetPublicationBySlug(publicationSlug, cancellationToken)
             .OnSuccess(async publication =>
             {
-                var publishedReleaseVersions = await GetPublishedReleaseVersions(publication, cancellationToken);
+                var releaseVersionsByReleaseId = await GetPublishedReleaseVersions(publication, cancellationToken);
 
-                var releaseEntries = GetPublishedOrLegacyReleaseEntries(publication, publishedReleaseVersions);
+                var lastUpdatedDatesByReleaseId = GetReleaseLastUpdatedDates(releaseVersionsByReleaseId);
+
+                // Release entries provide the order of releases in a publication and also include any legacy releases
+                var releaseEntries = GetPublishedOrLegacyReleaseEntries(publication, releaseVersionsByReleaseId);
 
                 var latestReleaseEntry = releaseEntries.OfType<PublicationReleaseEntry>().FirstOrDefault();
 
                 // Map to DTO's in the same order as the publication's release entries, before paginating in-memory
                 var entryDtos = MapToPublicationReleaseEntryDtos(
                     releaseEntries,
-                    publishedReleaseVersions,
+                    releaseVersionsByReleaseId,
+                    lastUpdatedDatesByReleaseId,
                     latestReleaseEntry
                 );
 
@@ -54,6 +59,8 @@ public class PublicationReleasesService(ContentDbContext contentDbContext) : IPu
         await contentDbContext
             .ReleaseVersions.AsNoTracking()
             .Include(rv => rv.Release)
+            // Include all release updates here until EES-6414, as they are needed to determine 'last updated' for non-first versions
+            .Include(rv => rv.Updates)
             .LatestReleaseVersions(publicationId: publication.Id, publishedOnly: true)
             // There should only be one version per release since only the latest published versions are selected
             .ToDictionaryAsync(rv => rv.ReleaseId, rv => rv, cancellationToken);
@@ -72,9 +79,51 @@ public class PublicationReleasesService(ContentDbContext contentDbContext) : IPu
             )
             .ToList();
 
+    private Dictionary<Guid, DateTimeOffset> GetReleaseLastUpdatedDates(
+        Dictionary<Guid, ReleaseVersion> releaseVersionsByReleaseId
+    ) =>
+        releaseVersionsByReleaseId.ToDictionary(
+            kvp => kvp.Key,
+            r =>
+            {
+                var releaseVersion = r.Value;
+                return releaseVersion.Version == 0
+                    ? releaseVersion.Published!.Value
+                    : GetLastUpdatedFromReleaseUpdates(releaseVersion);
+            }
+        );
+
+    /// <summary>
+    /// Until a change in EES-6414 makes <see cref="ReleaseVersion.Published"/> the effective public facing 'last updated'
+    /// date of the release, use the date from the latest release update, in the same way the frontend did for the old
+    /// release page design.
+    /// </summary>
+    /// <param name="releaseVersion"></param>
+    /// <returns>The date of the latest update for the release version.</returns>
+    private DateTimeOffset GetLastUpdatedFromReleaseUpdates(ReleaseVersion releaseVersion)
+    {
+        var lastUpdated = releaseVersion.Updates.OrderByDescending(u => u.On).Select(u => u.On).FirstOrDefault();
+
+        if (lastUpdated == default)
+        {
+            throw new InvalidOperationException(
+                $"Expected release version '{releaseVersion.Id}' to have Updates to determine last updated date from."
+            );
+        }
+
+        // EES-6490 has been created to convert Update.On from DateTime to DateTimeOffset but until then, convert it here.
+        // Values of Update.On are created by ReleaseNoteService in local time using DateTime.Now,
+        // even though it's standard elsewhere across the service to store and return dates as UTC.
+        // Interpret the value as UK local time, create a DateTimeOffset with the correct UTC offset for the UK time zone,
+        // then convert it to UTC so it is consistent with other dates.
+        var ukZoneOffset = TimeZoneUtils.GetUkTimeZone().GetUtcOffset(lastUpdated);
+        return new DateTimeOffset(lastUpdated, ukZoneOffset).ToUniversalTime();
+    }
+
     private static List<IPublicationReleaseEntryDto> MapToPublicationReleaseEntryDtos(
         List<IPublicationReleaseEntry> releaseEntries,
         Dictionary<Guid, ReleaseVersion> releaseVersionsByReleaseId,
+        Dictionary<Guid, DateTimeOffset> lastUpdatedDatesByReleaseId,
         PublicationReleaseEntry? latestReleaseEntry
     ) =>
         releaseEntries
@@ -87,7 +136,7 @@ public class PublicationReleasesService(ContentDbContext contentDbContext) : IPu
                     PublicationReleaseEntry releaseEntry => PublicationReleaseEntryDto.FromRelease(
                         releaseVersionsByReleaseId[releaseEntry.ReleaseId].Release,
                         isLatestRelease: releaseEntry == latestReleaseEntry,
-                        lastUpdated: releaseVersionsByReleaseId[releaseEntry.ReleaseId].Published!.Value,
+                        lastUpdated: lastUpdatedDatesByReleaseId[releaseEntry.ReleaseId],
                         // TODO EES-6414 'Published' should be the published display date
                         published: releaseVersionsByReleaseId[releaseEntry.ReleaseId].Published!.Value
                     ),
