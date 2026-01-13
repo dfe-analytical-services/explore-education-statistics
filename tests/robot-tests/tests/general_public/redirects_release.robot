@@ -20,13 +20,11 @@ Verify that deprecated publication data guidance and prerelease access pages red
     user checks url equals    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
 
 Verify that deprecated release data guidance page redirects to explore page
-    environment variable should be set    PUBLIC_URL
     user navigates to    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}/data-guidance
     user waits until page contains    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks url equals    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}/explore#data-guidance-section
 
 Verify that deprecated release prerelease access page redirects to help page
-    environment variable should be set    PUBLIC_URL
     user navigates to    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}/prerelease-access-list
     user waits until page contains    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks url equals
