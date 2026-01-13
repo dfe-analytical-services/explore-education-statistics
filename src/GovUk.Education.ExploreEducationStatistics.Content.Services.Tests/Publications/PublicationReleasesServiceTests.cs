@@ -11,11 +11,11 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Util
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Publications;
 
-public abstract class PublicationReleaseServiceTests
+public abstract class PublicationReleasesServiceTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    public class GetPublicationReleasesTests : PublicationReleaseServiceTests
+    public class GetPublicationReleasesTests : PublicationReleasesServiceTests
     {
         [Theory]
         [InlineData(1, 1, 10)]
