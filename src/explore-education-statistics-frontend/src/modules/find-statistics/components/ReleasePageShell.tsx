@@ -14,6 +14,7 @@ import {
   releasePageTabRouteItems,
   ReleasePageTabRouteKey,
 } from '@frontend/modules/find-statistics/PublicationReleasePage';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { NextPage } from 'next';
 import React, { ReactNode } from 'react';
 
@@ -59,7 +60,16 @@ const ReleasePageShell: NextPage<Props> = ({
         releaseUrlBase={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}`}
         tabNavItems={tabNavItems}
       />
-      <ReleasePageLayout navItems={inPageNavItems}>
+      <ReleasePageLayout
+        navItems={inPageNavItems}
+        onClickNavItem={(title: string) => {
+          logEvent({
+            category: `${publicationSummary.title} release page - ${activePage}`,
+            action: `In page nav item clicked`,
+            label: `${title}`,
+          });
+        }}
+      >
         {children}
       </ReleasePageLayout>
     </Page>

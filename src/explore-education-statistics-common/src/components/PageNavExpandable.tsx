@@ -7,11 +7,13 @@ import useToggle from '@common/hooks/useToggle';
 interface Props {
   heading?: string;
   items: NavItem[];
+  onClickNavItem?: (title: string) => void;
 }
 
 export default function PageNavExpandable({
   heading = 'On this page',
   items,
+  onClickNavItem,
 }: Props) {
   const [activeSection, setActiveSection] = useState(items[0].id);
   const [isScrollHandlingBlocked, toggleScrollHandlingBlocked] =
@@ -118,7 +120,10 @@ export default function PageNavExpandable({
               isActive={activeSection === item.id}
               text={item.text}
               subNavItems={item.subNavItems}
-              onClick={() => handleNavItemClick(item.id)}
+              onClick={(id, title) => {
+                handleNavItemClick(id);
+                onClickNavItem?.(title);
+              }}
             />
           ))}
           <NavItem
@@ -139,7 +144,7 @@ export interface NavItem {
   isActive?: boolean;
   subNavItems?: NavItem[];
   text: string;
-  onClick?: (id: string) => void;
+  onClick?: (id: string, title: string) => void;
 }
 
 function NavItem({
@@ -167,7 +172,7 @@ function NavItem({
           },
         )}
         href={`#${id}`}
-        onClick={() => onClick?.(id)}
+        onClick={() => onClick?.(id, text)}
         aria-current={isActive ? 'true' : undefined}
       >
         {text}
@@ -179,7 +184,7 @@ function NavItem({
               <a
                 className={`${styles.subNavLink} govuk-link--no-visited-state govuk-link--no-underline`}
                 href={`#${item.id}`}
-                onClick={() => onClick?.(id)}
+                onClick={() => onClick?.(id, `${text} - ${item.text}`)}
               >
                 {item.text}
               </a>
