@@ -666,7 +666,8 @@ public class ContentDbContext : DbContext
         modelBuilder
             .Entity<UserPublicationRole>()
             .Property(upr => upr.Role)
-            .HasConversion(new EnumToStringConverter<PublicationRole>());
+            .HasConversion(new EnumToStringConverter<PublicationRole>())
+            .HasMaxLength(20);
 
         // This will be changed when we start introducing the use of the NEW publication roles in the
         // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
@@ -696,7 +697,8 @@ public class ContentDbContext : DbContext
         modelBuilder
             .Entity<UserReleaseRole>()
             .Property(r => r.Role)
-            .HasConversion(new EnumToStringConverter<ReleaseRole>());
+            .HasConversion(new EnumToStringConverter<ReleaseRole>())
+            .HasMaxLength(20);
     }
 
     private static void ConfigureUserReleaseInvite(ModelBuilder modelBuilder)

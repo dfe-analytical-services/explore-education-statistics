@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20251219122952_Ees6511MigratingUserResourceInvitesToRoles")]
+    [Migration("20260113152512_Ees6511MigratingUserResourceInvitesToRoles")]
     partial class Ees6511MigratingUserResourceInvitesToRoles
     {
         /// <inheritdoc />
@@ -1374,11 +1374,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("PublishScheduled")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("PublishScheduled")
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTime?>("Published")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("Published")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("RelatedInformation")
                         .IsRequired()
@@ -1569,7 +1569,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -1645,7 +1646,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");

@@ -1,5 +1,4 @@
-﻿using System;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -9,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
     /// <inheritdoc />
     public partial class Ees6511MigratingUserResourceInvitesToRoles : Migration
     {
-        private const string MigrationId = "20251219122952";
+        private const string MigrationId = "20260113152512";
 
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,7 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             migrationBuilder.AlterColumn<string>(
                 name: "Role",
                 table: "UserReleaseRoles",
-                type: "nvarchar(450)",
+                type: "nvarchar(20)",
+                maxLength: 20,
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)"
@@ -41,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             migrationBuilder.AlterColumn<string>(
                 name: "Role",
                 table: "UserPublicationRoles",
-                type: "nvarchar(450)",
+                type: "nvarchar(20)",
+                maxLength: 20,
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)"
@@ -98,7 +99,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(450)"
+                oldType: "nvarchar(20)",
+                oldMaxLength: 20
             );
 
             migrationBuilder.AlterColumn<DateTime>(
@@ -116,7 +118,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(450)"
+                oldType: "nvarchar(20)",
+                oldMaxLength: 20
             );
 
             migrationBuilder.AlterColumn<DateTime>(
