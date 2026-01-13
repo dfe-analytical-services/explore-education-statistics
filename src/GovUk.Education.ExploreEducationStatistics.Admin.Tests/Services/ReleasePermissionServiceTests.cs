@@ -189,7 +189,10 @@ public class ReleasePermissionServiceTests
             );
 
             var result = await service.ListReleaseRoles(releaseVersion.Id);
+
             var viewModel = result.AssertRight();
+
+            Assert.Empty(viewModel);
         }
 
         MockUtils.VerifyAllMocks(userReleaseRoleRepository);

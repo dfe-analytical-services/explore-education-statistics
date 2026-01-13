@@ -5,9 +5,9 @@ using MockQueryable;
 using Moq;
 using Moq.Language.Flow;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 
-internal static class UserReleaseRoleRepositoryMockUtils
+internal static class UserReleaseRoleRepositoryMockExtensions
 {
     public static IReturnsResult<IUserReleaseRoleRepository> SetupQuery(
         this Mock<IUserReleaseRoleRepository> mock,
