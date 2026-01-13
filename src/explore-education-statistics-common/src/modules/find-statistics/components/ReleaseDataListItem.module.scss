@@ -4,13 +4,6 @@
 .listItem {
   padding: govuk-spacing(3) 0;
   margin: 0;
-
-  @include govuk-media-query($from: 1024px) {
-    display: flex;
-    justify-content: space-between;
-    gap: govuk-spacing(3);
-    align-items: flex-start;
-  }
 }
 
 .content {
