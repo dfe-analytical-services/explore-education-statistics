@@ -289,7 +289,7 @@ public abstract class ReleaseUpdatesServiceTests
             // Ensure the generated release versions have different published dates
             Assert.True(
                 release.Versions[0].Published < release.Versions[1].Published,
-                "The first version should have an earlier published date than the second version"
+                "Version 0 should be published before version 1"
             );
 
             var contextId = Guid.NewGuid().ToString();
