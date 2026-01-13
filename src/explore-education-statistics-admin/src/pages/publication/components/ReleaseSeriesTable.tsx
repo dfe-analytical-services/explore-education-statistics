@@ -100,7 +100,7 @@ export default function ReleaseSeriesTable({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {seriesItem.legacyLinkUrl}
+                  {seriesItem.legacyLinkUrl} (opens in new tab)
                 </a>
               )}
 
@@ -111,7 +111,8 @@ export default function ReleaseSeriesTable({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {`${config.publicAppUrl}/find-statistics/${publicationSlug}/${seriesItem.releaseSlug}`}
+                  {`${config.publicAppUrl}/find-statistics/${publicationSlug}/${seriesItem.releaseSlug}`}{' '}
+                  (opens in new tab)
                 </Link>
               )}
               {!seriesItem.isLegacyLink &&

@@ -50,7 +50,7 @@ describe('ReleaseSeriesTable', () => {
     expect(row2Cells[0]).toHaveTextContent('EES release 2');
     expect(
       within(row2Cells[1]).getByRole('link', {
-        name: 'http://localhost/find-statistics/publication-1-slug/2',
+        name: 'http://localhost/find-statistics/publication-1-slug/2 (opens in new tab)',
       }),
     ).toHaveAttribute(
       'href',
@@ -63,7 +63,7 @@ describe('ReleaseSeriesTable', () => {
     expect(row3Cells[0]).toHaveTextContent('EES release 1');
     expect(
       within(row3Cells[1]).getByRole('link', {
-        name: 'http://localhost/find-statistics/publication-1-slug/1',
+        name: 'http://localhost/find-statistics/publication-1-slug/1 (opens in new tab)',
       }),
     ).toHaveAttribute(
       'href',
@@ -76,7 +76,7 @@ describe('ReleaseSeriesTable', () => {
     expect(row4Cells[0]).toHaveTextContent('Legacy link 1');
     expect(
       within(row4Cells[1]).getByRole('link', {
-        name: 'http://gov.uk/1',
+        name: 'http://gov.uk/1 (opens in new tab)',
       }),
     ).toHaveAttribute('href', 'http://gov.uk/1');
     expect(row4Cells[2]).toHaveTextContent('Legacy release');
@@ -198,7 +198,7 @@ describe('ReleaseSeriesTable', () => {
     expect(row4Cells[0]).toHaveTextContent('Legacy link 1');
     expect(
       within(row4Cells[1]).getByRole('link', {
-        name: 'http://gov.uk/1',
+        name: 'http://gov.uk/1 (opens in new tab)',
       }),
     ).toHaveAttribute('href', 'http://gov.uk/1');
     expect(row4Cells[2]).toHaveTextContent('Legacy release');
