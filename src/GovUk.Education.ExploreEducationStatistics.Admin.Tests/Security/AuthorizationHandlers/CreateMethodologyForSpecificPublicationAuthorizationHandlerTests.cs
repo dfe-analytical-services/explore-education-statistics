@@ -90,8 +90,8 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
                 if (!expectedToPassByClaimAlone)
                 {
                     userPublicationRoleRepository
-                        .Setup(rvr =>
-                            rvr.UserHasAnyRoleOnPublication(
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
                                 UserId,
                                 publication.Id,
                                 ResourceRoleFilter.ActiveOnly,
@@ -167,8 +167,8 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
             var authContext = CreateAuthContext(user, Publication);
 
             userPublicationRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         Publication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -204,8 +204,8 @@ public class CreateMethodologyForSpecificPublicationAuthorizationHandlerTests
             var authContext = CreateAuthContext(user, publication);
 
             userPublicationRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         publication.Id,
                         ResourceRoleFilter.ActiveOnly,

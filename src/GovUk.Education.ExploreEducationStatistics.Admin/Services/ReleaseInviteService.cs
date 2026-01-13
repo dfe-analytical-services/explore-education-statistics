@@ -43,7 +43,7 @@ public class ReleaseInviteService(
             .OnSuccessVoid(async publication =>
                 await InviteContributor(
                     email: email,
-                    publicationTitle: publication!.Title,
+                    publicationTitle: publication.Title,
                     releaseVersionIds: releaseVersionIds
                 )
             );
@@ -58,17 +58,13 @@ public class ReleaseInviteService(
         return await contentPersistenceHelper
             .CheckEntityExists<Publication>(publicationId, query => query.Include(p => p.ReleaseVersions))
             .OnSuccessCombineWith(_ => GetPendingUserInvite(email))
-            .OnSuccess(tuple =>
-            {
-                var (publication, user) = tuple;
-                return (publication, user);
-            })
-            .OnSuccessDo(tuple => userService.CheckCanUpdateReleaseRole(tuple.publication, releaseRole))
+            .OnSuccess(tuple => (Publication: tuple.Item1, User: tuple.Item2))
+            .OnSuccessDo(tuple => userService.CheckCanUpdateReleaseRole(tuple.Publication, releaseRole))
             .OnSuccess(async tuple =>
             {
                 var releaseRolesToRemove = await userReleaseRoleRepository
                     .Query(ResourceRoleFilter.PendingOnly)
-                    .WhereForUser(tuple.user.Id)
+                    .WhereForUser(tuple.User.Id)
                     .WhereForPublication(publicationId)
                     .WhereRolesIn(releaseRole)
                     .ToListAsync();

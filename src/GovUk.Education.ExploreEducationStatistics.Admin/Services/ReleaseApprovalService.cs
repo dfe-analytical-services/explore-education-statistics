@@ -166,32 +166,27 @@ public class ReleaseApprovalService(
         ReleaseVersion releaseVersion
     )
     {
-        var userReleaseRoles = await userReleaseRoleService.ListLatestActiveUserReleaseRolesByPublication(
-            publicationId: releaseVersion.Release.PublicationId,
-            rolesToInclude: ReleaseRole.Approver
-        );
+        var userReleaseRoleEmails = (
+            await userReleaseRoleService.ListLatestActiveUserReleaseRolesByPublication(
+                publicationId: releaseVersion.Release.PublicationId,
+                rolesToInclude: ReleaseRole.Approver
+            )
+        )
+            .Select(urr => urr.User.Email)
+            .ToList();
 
-        var userPublicationRoles = await userPublicationRoleRepository
+        var userPublicationRoleEmails = await userPublicationRoleRepository
             .Query()
-            .AsNoTracking()
             .WhereForPublication(releaseVersion.Release.PublicationId)
             .WhereRolesIn(PublicationRole.Allower)
-            .Include(upr => upr.User)
+            .Select(upr => upr.User.Email)
             .ToListAsync();
 
-        var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();
-
-        if (notifyHigherReviewers)
-        {
-            return userReleaseRoles
-                .Select(urr => urr.User.Email)
-                .Concat(userPublicationRoles.Select(upr => upr.User.Email))
-                .Distinct()
-                .Select(email => emailTemplateService.SendReleaseHigherReviewEmail(email, releaseVersion))
-                .OnSuccessAllReturnVoid();
-        }
-
-        return Unit.Instance;
+        return userReleaseRoleEmails
+            .Concat(userPublicationRoleEmails)
+            .Distinct()
+            .Select(email => emailTemplateService.SendReleaseHigherReviewEmail(email, releaseVersion))
+            .OnSuccessAllReturnVoid();
     }
 
     private async Task SendPreReleaseUserInviteEmails(ReleaseVersion releaseVersion)

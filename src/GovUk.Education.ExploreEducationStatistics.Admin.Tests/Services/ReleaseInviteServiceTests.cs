@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -12,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using MockQueryable;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -60,16 +60,15 @@ public abstract class ReleaseInviteServiceTests
                     mock.CreateManyIfNotExists(
                         It.Is<List<UserReleaseRole>>(l =>
                             l.Count == 2
-                            && l[0].UserId == userToCreate.Id
+                            && l.All(r =>
+                                r.UserId == userToCreate.Id
+                                && r.Role == ReleaseRole.Contributor
+                                && r.CreatedById == CreatedById
+                            )
                             && l[0].ReleaseVersionId == releaseVersionIds.ElementAt(0)
-                            && l[0].Role == ReleaseRole.Contributor
-                            && l[0].CreatedById == CreatedById
                             && Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
                                 <= AssertExtensions.TimeWithinMillis
-                            && l[1].UserId == userToCreate.Id
                             && l[1].ReleaseVersionId == releaseVersionIds.ElementAt(1)
-                            && l[1].Role == ReleaseRole.Contributor
-                            && l[1].CreatedById == CreatedById
                             && Math.Abs((l[1].Created - DateTime.UtcNow).Milliseconds)
                                 <= AssertExtensions.TimeWithinMillis
                         ),
@@ -180,16 +179,13 @@ public abstract class ReleaseInviteServiceTests
                     mock.CreateManyIfNotExists(
                         It.Is<List<UserReleaseRole>>(l =>
                             l.Count == 2
-                            && l[0].UserId == user.Id
+                            && l.All(r =>
+                                r.UserId == user.Id && r.Role == ReleaseRole.Contributor && r.CreatedById == CreatedById
+                            )
                             && l[0].ReleaseVersionId == newReleaseVersionIds.ElementAt(0)
-                            && l[0].Role == ReleaseRole.Contributor
-                            && l[0].CreatedById == CreatedById
                             && Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
                                 <= AssertExtensions.TimeWithinMillis
-                            && l[1].UserId == user.Id
                             && l[1].ReleaseVersionId == newReleaseVersionIds.ElementAt(1)
-                            && l[1].Role == ReleaseRole.Contributor
-                            && l[1].CreatedById == CreatedById
                             && Math.Abs((l[1].Created - DateTime.UtcNow).Milliseconds)
                                 <= AssertExtensions.TimeWithinMillis
                         ),
@@ -533,9 +529,7 @@ public abstract class ReleaseInviteServiceTests
                 .ReturnsAsync(userWithPendingInvite);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
-                .Setup(mock => mock.Query(ResourceRoleFilter.PendingOnly))
-                .Returns(userReleaseRoles.BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
             userReleaseRoleRepository
                 .Setup(mock =>
                     mock.RemoveMany(

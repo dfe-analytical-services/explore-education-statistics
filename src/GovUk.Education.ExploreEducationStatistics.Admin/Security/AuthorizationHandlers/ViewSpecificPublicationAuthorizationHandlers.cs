@@ -52,9 +52,9 @@ public class ViewSpecificPublicationAuthorizationHandler(
         if (
             await userReleaseRoleRepository
                 .Query()
-                .AsNoTracking()
                 .WhereForUser(context.User.GetUserId())
-                .AnyAsync(r => r.ReleaseVersion.Release.PublicationId == publication.Id)
+                .WhereForPublication(publication.Id)
+                .AnyAsync()
         )
         {
             context.Succeed(requirement);

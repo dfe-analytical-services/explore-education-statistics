@@ -78,8 +78,8 @@ public class DropMethodologyLinkAuthorizationHandlerTests
                 if (!expectedToPassByClaimAlone)
                 {
                     userPublicationRoleRepository
-                        .Setup(rvr =>
-                            rvr.UserHasAnyRoleOnPublication(
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
                                 UserId,
                                 NonOwningLink.PublicationId,
                                 ResourceRoleFilter.ActiveOnly,
@@ -144,8 +144,8 @@ public class DropMethodologyLinkAuthorizationHandlerTests
                 var handler = SetupHandler(userPublicationRoleRepository.Object);
 
                 userPublicationRoleRepository
-                    .Setup(rvr =>
-                        rvr.UserHasAnyRoleOnPublication(
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
                             UserId,
                             NonOwningLink.PublicationId,
                             ResourceRoleFilter.ActiveOnly,
@@ -177,8 +177,8 @@ public class DropMethodologyLinkAuthorizationHandlerTests
             var handler = SetupHandler(userPublicationRoleRepository.Object);
 
             userPublicationRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         NonOwningLink.PublicationId,
                         ResourceRoleFilter.ActiveOnly,

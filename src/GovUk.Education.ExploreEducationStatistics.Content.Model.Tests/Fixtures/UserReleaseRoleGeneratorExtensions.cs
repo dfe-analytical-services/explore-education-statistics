@@ -73,7 +73,7 @@ public static class UserReleaseRoleGeneratorExtensions
             .SetDefault(urr => urr.Id)
             .SetDefault(urr => urr.ReleaseVersionId)
             .SetDefault(urr => urr.UserId)
-            .SetDefault(upr => upr.Created);
+            .SetDefault(urr => urr.Created);
 
     public static InstanceSetters<UserReleaseRole> SetReleaseVersion(
         this InstanceSetters<UserReleaseRole> setters,
@@ -101,20 +101,20 @@ public static class UserReleaseRoleGeneratorExtensions
     public static InstanceSetters<UserReleaseRole> SetCreated(
         this InstanceSetters<UserReleaseRole> setters,
         DateTime created
-    ) => setters.Set(upr => upr.Created, created);
+    ) => setters.Set(urr => urr.Created, created);
 
     public static InstanceSetters<UserReleaseRole> SetCreatedBy(
         this InstanceSetters<UserReleaseRole> setters,
         User createdBy
-    ) => setters.Set(upr => upr.CreatedBy, createdBy).SetCreatedById(createdBy.Id);
+    ) => setters.Set(urr => urr.CreatedBy, createdBy).SetCreatedById(createdBy.Id);
 
     public static InstanceSetters<UserReleaseRole> SetCreatedById(
         this InstanceSetters<UserReleaseRole> setters,
         Guid createdById
-    ) => setters.Set(upr => upr.CreatedById, createdById);
+    ) => setters.Set(urr => urr.CreatedById, createdById);
 
     public static InstanceSetters<UserReleaseRole> SetEmailSent(
         this InstanceSetters<UserReleaseRole> setters,
         DateTimeOffset emailSent
-    ) => setters.Set(upr => upr.EmailSent, emailSent);
+    ) => setters.Set(urr => urr.EmailSent, emailSent);
 }

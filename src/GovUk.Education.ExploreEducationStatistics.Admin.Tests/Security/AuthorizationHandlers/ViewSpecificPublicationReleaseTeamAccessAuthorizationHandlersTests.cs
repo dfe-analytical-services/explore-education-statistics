@@ -38,8 +38,8 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
             if (!expectedToPassByClaimAlone)
             {
                 userPublicationRoleRepository
-                    .Setup(rvr =>
-                        rvr.UserHasAnyRoleOnPublication(
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
                             UserId,
                             Publication.Id,
                             ResourceRoleFilter.ActiveOnly,
@@ -76,8 +76,8 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         Publication.Id,
                         ResourceRoleFilter.ActiveOnly,

@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -16,7 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using MockQueryable;
 using Moq;
 using Semver;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -342,9 +342,7 @@ public class ReleaseAmendmentServiceTests
         }
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(userReleaseRoles.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
         Guid? amendmentId;
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -776,9 +774,7 @@ public class ReleaseAmendmentServiceTests
         }
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         Guid? amendmentId;
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -846,9 +842,7 @@ public class ReleaseAmendmentServiceTests
         }
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         Guid? amendmentId;
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -895,9 +889,7 @@ public class ReleaseAmendmentServiceTests
         }
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         Guid? amendmentId;
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -998,9 +990,7 @@ public class ReleaseAmendmentServiceTests
         }
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         Guid? amendmentId;
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))

@@ -44,8 +44,8 @@ public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
                 if (!expectedToPassByClaimAlone)
                 {
                     userPublicationRoleRepository
-                        .Setup(rvr =>
-                            rvr.UserHasAnyRoleOnPublication(
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
                                 UserId,
                                 Publication.Id,
                                 ResourceRoleFilter.ActiveOnly,
@@ -80,8 +80,8 @@ public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
             var authContext = CreateAuthContext(user, Publication);
 
             userPublicationRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         Publication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -108,8 +108,8 @@ public class ManageExternalMethodologyForSpecificPublicationAuthorizationHandler
             var authContext = CreateAuthContext(user, Publication);
 
             userPublicationRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         Publication.Id,
                         ResourceRoleFilter.ActiveOnly,

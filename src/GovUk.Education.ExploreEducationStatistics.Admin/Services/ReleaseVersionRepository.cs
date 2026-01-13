@@ -34,7 +34,6 @@ public class ReleaseVersionRepository(
     {
         var releaseRoleReleaseVersionIds = await userReleaseRoleRepository
             .Query()
-            .AsNoTracking()
             .WhereForUser(userId)
             .WhereRolesNotIn(ReleaseRole.PrereleaseViewer)
             .Select(urr => urr.ReleaseVersionId)
@@ -42,14 +41,12 @@ public class ReleaseVersionRepository(
 
         var publicationRolePublicationIds = await userPublicationRoleRepository
             .Query()
-            .AsNoTracking()
             .WhereForUser(userId)
             .Select(upr => upr.PublicationId)
             .ToListAsync();
 
         var publicationRoleReleaseVersionIds = await contentDbContext
-            .ReleaseVersions.AsNoTracking()
-            .Where(rv => publicationRolePublicationIds.Contains(rv.Release.PublicationId))
+            .ReleaseVersions.Where(rv => publicationRolePublicationIds.Contains(rv.Release.PublicationId))
             .Select(rv => rv.Id)
             .ToListAsync();
 

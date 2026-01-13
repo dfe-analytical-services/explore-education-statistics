@@ -210,26 +210,23 @@ public class UserRoleService(
     {
         var releaseRoles = await userReleaseRoleRepository
             .Query()
-            .AsNoTracking()
             .WhereForUser(Guid.Parse(user.Id))
-            .Select(upr => upr.Role)
+            .Select(urr => urr.Role)
             .Distinct()
             .ToListAsync();
 
         var publicationRoles = await userPublicationRoleRepository
             .Query()
-            .AsNoTracking()
             .WhereForUser(Guid.Parse(user.Id))
             .Select(upr => upr.Role)
             .Distinct()
             .ToListAsync();
 
-        var requiredGlobalRoleNames = releaseRoles
+        return releaseRoles
             .Select(GetAssociatedGlobalRoleNameForReleaseRole)
             .Concat(publicationRoles.Select(GetAssociatedGlobalRoleNameForPublicationRole))
             .Distinct()
             .ToList();
-        return requiredGlobalRoleNames;
     }
 
     public string GetAssociatedGlobalRoleNameForReleaseRole(ReleaseRole role)
@@ -351,7 +348,6 @@ public class UserRoleService(
             .OnSuccess(async () =>
                 await userPublicationRoleRepository
                     .Query()
-                    .AsNoTracking()
                     .WhereForUser(userId)
                     .Include(upr => upr.User)
                     .Include(upr => upr.Publication)
@@ -378,7 +374,6 @@ public class UserRoleService(
             .OnSuccess(async () =>
                 await userPublicationRoleRepository
                     .Query()
-                    .AsNoTracking()
                     .WhereForPublication(publicationId)
                     .Include(upr => upr.User)
                     .Include(upr => upr.Publication)

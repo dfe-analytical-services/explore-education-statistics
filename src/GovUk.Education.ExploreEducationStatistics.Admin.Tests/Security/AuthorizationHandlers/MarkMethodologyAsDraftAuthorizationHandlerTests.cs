@@ -96,8 +96,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(rvr =>
-                            rvr.UserHasAnyRoleOnPublication(
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
                                 UserId,
                                 OwningPublication.Id,
                                 ResourceRoleFilter.ActiveOnly,
@@ -108,8 +108,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                         .ReturnsAsync(false);
 
                     userReleaseRoleRepository
-                        .Setup(rvr =>
-                            rvr.UserHasAnyRoleOnPublication(
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
                                 UserId,
                                 OwningPublication.Id,
                                 ResourceRoleFilter.ActiveOnly,
@@ -166,8 +166,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(rvr =>
-                        rvr.UserHasAnyRoleOnPublication(
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
                             UserId,
                             OwningPublication.Id,
                             ResourceRoleFilter.ActiveOnly,
@@ -180,8 +180,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                 if (!isApproverOrOwner)
                 {
                     userReleaseRoleRepository
-                        .Setup(rvr =>
-                            rvr.UserHasAnyRoleOnPublication(
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
                                 UserId,
                                 OwningPublication.Id,
                                 ResourceRoleFilter.ActiveOnly,
@@ -236,8 +236,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(rvr =>
-                        rvr.UserHasAnyRoleOnPublication(
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
                             UserId,
                             OwningPublication.Id,
                             ResourceRoleFilter.ActiveOnly,
@@ -250,8 +250,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                 if (!isApprover)
                 {
                     userReleaseRoleRepository
-                        .Setup(rvr =>
-                            rvr.UserHasAnyRoleOnPublication(
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
                                 UserId,
                                 OwningPublication.Id,
                                 ResourceRoleFilter.ActiveOnly,
@@ -309,8 +309,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(rvr =>
-                        rvr.UserHasAnyRoleOnPublication(
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
                             UserId,
                             OwningPublication.Id,
                             ResourceRoleFilter.ActiveOnly,
@@ -321,8 +321,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     .ReturnsAsync(false);
 
                 userReleaseRoleRepository
-                    .Setup(rvr =>
-                        rvr.UserHasAnyRoleOnPublication(
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
                             UserId,
                             OwningPublication.Id,
                             ResourceRoleFilter.ActiveOnly,
@@ -376,8 +376,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(rvr =>
-                        rvr.UserHasAnyRoleOnPublication(
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
                             UserId,
                             OwningPublication.Id,
                             ResourceRoleFilter.ActiveOnly,
@@ -388,8 +388,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                     .ReturnsAsync(false);
 
                 userReleaseRoleRepository
-                    .Setup(rvr =>
-                        rvr.UserHasAnyRoleOnPublication(
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
                             UserId,
                             OwningPublication.Id,
                             ResourceRoleFilter.ActiveOnly,
@@ -439,8 +439,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -451,8 +451,8 @@ public class MarkMethodologyAsDraftAuthorizationHandlerTests
                 .ReturnsAsync(false);
 
             userReleaseRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,

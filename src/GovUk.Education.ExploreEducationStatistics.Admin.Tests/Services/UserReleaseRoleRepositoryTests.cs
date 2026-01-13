@@ -200,7 +200,7 @@ public abstract class UserReleaseRoleRepositoryTests
                 )
                 .WithCreated(DateTime.UtcNow.AddDays(-2))
                 .WithCreatedById(createdBy.Id)
-                .WithEmailSent(DateTime.UtcNow.AddDays(-1));
+                .WithEmailSent(DateTimeOffset.UtcNow.AddDays(-1));
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -258,7 +258,7 @@ public abstract class UserReleaseRoleRepositoryTests
                 )
                 .WithCreated(DateTime.UtcNow.AddDays(-2))
                 .WithCreatedById(createdBy.Id)
-                .WithEmailSent(DateTime.UtcNow.AddDays(-1));
+                .WithEmailSent(DateTimeOffset.UtcNow.AddDays(-1));
 
             var contentDbContextId = Guid.NewGuid().ToString();
 

@@ -37,12 +37,11 @@ public class PreReleaseUserService(
             .OnSuccess(async _ =>
                 await userReleaseRoleRepository
                     .Query(ResourceRoleFilter.All)
-                    .AsNoTracking()
                     .WhereForReleaseVersion(releaseVersionId)
                     .WhereRolesIn(ReleaseRole.PrereleaseViewer)
-                    .Select(r => new PreReleaseUserViewModel(r.User.Email.ToLower()))
+                    .Select(urr => new PreReleaseUserViewModel(urr.User.Email.ToLower()))
                     .Distinct()
-                    .OrderBy(a => a.Email)
+                    .OrderBy(vm => vm.Email)
                     .ToListAsync()
             );
     }

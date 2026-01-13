@@ -47,10 +47,11 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUse
                 !await UserHasRoleOnReleaseVersion(
                     userId: userReleaseRole.UserId,
                     releaseVersionId: userReleaseRole.ReleaseVersionId,
-                    role: userReleaseRole.Role
+                    role: userReleaseRole.Role,
+                    cancellationToken: cancellationToken
                 )
             )
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         contentDbContext.UserReleaseRoles.AddRange(newUserReleaseRoles);
         await contentDbContext.SaveChangesAsync(cancellationToken);
@@ -59,8 +60,7 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUse
     public async Task<UserReleaseRole?> GetById(Guid userReleaseRoleId, CancellationToken cancellationToken = default)
     {
         return await Query(ResourceRoleFilter.All)
-            .Where(urr => urr.Id == userReleaseRoleId)
-            .SingleOrDefaultAsync(cancellationToken);
+            .SingleOrDefaultAsync(urr => urr.Id == userReleaseRoleId, cancellationToken);
     }
 
     public async Task<UserReleaseRole?> GetByCompositeKey(

@@ -317,6 +317,19 @@ public static class EnumerableExtensions
         return new Tuple<T, T, T>(list[0], list[1], list[2]);
     }
 
+    public static Tuple<T, T, T, T> ToTuple4<T>(this IEnumerable<T> collection)
+        where T : class
+    {
+        var list = collection.ToList();
+
+        if (list.Count != 4)
+        {
+            throw new ArgumentException($"Expected 4 list items when constructing a 4-tuple, but found {list.Count}");
+        }
+
+        return new Tuple<T, T, T, T>(list[0], list[1], list[2], list[3]);
+    }
+
     public static bool ContainsAll<T>(this IEnumerable<T> source, IEnumerable<T> values)
     {
         return values.All(id => source.Contains(id));

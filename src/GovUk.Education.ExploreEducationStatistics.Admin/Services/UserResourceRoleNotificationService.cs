@@ -53,24 +53,28 @@ public class UserResourceRoleNotificationService(
 
             await userReleaseRoles
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async userReleaseRole =>
-                    await userReleaseRoleRepository.MarkEmailAsSent(
-                        userId: userId,
-                        releaseVersionId: userReleaseRole.ReleaseVersionId,
-                        role: userReleaseRole.Role,
-                        cancellationToken: cancellationToken
-                    )
+                .ForEachAwaitAsync(
+                    async userReleaseRole =>
+                        await userReleaseRoleRepository.MarkEmailAsSent(
+                            userId: userId,
+                            releaseVersionId: userReleaseRole.ReleaseVersionId,
+                            role: userReleaseRole.Role,
+                            cancellationToken: cancellationToken
+                        ),
+                    cancellationToken
                 );
 
             await userPublicationRoles
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async userPublicationRole =>
-                    await userPublicationRoleRepository.MarkEmailAsSent(
-                        userId: userId,
-                        publicationId: userPublicationRole.PublicationId,
-                        role: userPublicationRole.Role,
-                        cancellationToken: cancellationToken
-                    )
+                .ForEachAwaitAsync(
+                    async userPublicationRole =>
+                        await userPublicationRoleRepository.MarkEmailAsSent(
+                            userId: userId,
+                            publicationId: userPublicationRole.PublicationId,
+                            role: userPublicationRole.Role,
+                            cancellationToken: cancellationToken
+                        ),
+                    cancellationToken
                 );
 
             await emailTemplateService
@@ -107,7 +111,7 @@ public class UserResourceRoleNotificationService(
             );
 
             emailTemplateService
-                .SendPublicationRoleEmail(email: user.Email, publication: publication, role: role)
+                .SendPublicationRoleEmail(email: user.Email, publicationTitle: publication.Title, role: role)
                 .OrThrow(_ =>
                     throw new EmailSendFailedException($"Failed to send publication role email to {user.Email}.")
                 );
@@ -163,13 +167,15 @@ public class UserResourceRoleNotificationService(
             // We could do something more 'proper' using a queueing mechanism, but this is sufficient for now.
             await releaseVersionIds
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async releaseVersionId =>
-                    await userReleaseRoleRepository.MarkEmailAsSent(
-                        userId: userId,
-                        releaseVersionId: releaseVersionId,
-                        role: ReleaseRole.Contributor,
-                        cancellationToken: cancellationToken
-                    )
+                .ForEachAwaitAsync(
+                    async releaseVersionId =>
+                        await userReleaseRoleRepository.MarkEmailAsSent(
+                            userId: userId,
+                            releaseVersionId: releaseVersionId,
+                            role: ReleaseRole.Contributor,
+                            cancellationToken: cancellationToken
+                        ),
+                    cancellationToken
                 );
 
             await emailTemplateService

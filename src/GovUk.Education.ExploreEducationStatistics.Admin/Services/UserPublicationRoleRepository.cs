@@ -47,7 +47,8 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
                 !await UserHasRoleOnPublication(
                     userId: userPublicationRole.UserId,
                     publicationId: userPublicationRole.PublicationId,
-                    role: userPublicationRole.Role
+                    role: userPublicationRole.Role,
+                    cancellationToken: cancellationToken
                 )
             )
             .ToListAsync(cancellationToken);
@@ -62,8 +63,7 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
     )
     {
         return await Query(ResourceRoleFilter.All)
-            .Where(upr => upr.Id == userPublicationRoleId)
-            .SingleOrDefaultAsync(cancellationToken);
+            .SingleOrDefaultAsync(upr => upr.Id == userPublicationRoleId, cancellationToken);
     }
 
     public async Task<UserPublicationRole?> GetByCompositeKey(
@@ -117,7 +117,7 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
     public async Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default)
     {
         var userPublicationRoles = await Query(ResourceRoleFilter.All)
-            .Where(urr => urr.UserId == userId)
+            .Where(upr => upr.UserId == userId)
             .ToListAsync(cancellationToken);
 
         await RemoveMany(userPublicationRoles, cancellationToken);

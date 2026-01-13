@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -17,7 +18,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MockQueryable;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -25,7 +25,6 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -375,9 +374,7 @@ public class MethodologyApprovalServiceTests
             .Setup(mock => mock.ListLatestActiveUserReleaseRolesByPublication(publication.Id, ReleaseRole.Approver))
             .ReturnsAsync([]);
 
-        userPublicationRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(Array.Empty<UserPublicationRole>().BuildMock());
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         await using (var context = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -1253,9 +1250,7 @@ public class MethodologyApprovalServiceTests
                     .Generate(),
             ]);
 
-        userPublicationRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(userPublicationRoles.ToArray().BuildMock());
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userPublicationRoles]);
 
         emailTemplateService
             .Setup(mock =>

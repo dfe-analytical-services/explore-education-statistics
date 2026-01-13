@@ -162,6 +162,40 @@ public class ReleasePermissionServiceTests
     }
 
     [Fact]
+    public async Task ListReleaseRoles_NoRolesForReleaseVersion()
+    {
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
+        userReleaseRoleRepository
+            .Setup(m => m.Query(ResourceRoleFilter.ActiveOnly))
+            .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleasePermissionService(
+                contentDbContext: contentDbContext,
+                userReleaseRoleRepository: userReleaseRoleRepository.Object
+            );
+
+            var result = await service.ListReleaseRoles(releaseVersion.Id);
+            var viewModel = result.AssertRight();
+        }
+
+        MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+    }
+
+    [Fact]
     public async Task ListReleaseInvites()
     {
         ReleaseVersion releaseVersion = _dataFixture

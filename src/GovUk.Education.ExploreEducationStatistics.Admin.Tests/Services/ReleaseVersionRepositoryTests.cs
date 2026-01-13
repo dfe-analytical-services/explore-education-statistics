@@ -32,30 +32,18 @@ public class ReleaseVersionRepositoryTests
         public async Task ListReleasesForUser_Success(ReleaseApprovalStatus releaseApprovalStatus)
         {
             User user = _fixture.DefaultUser();
-            ReleaseVersion releaseVersion1 = _fixture
+            var (releaseVersion1, releaseVersion2, releaseVersion3, releaseVersion4) = _fixture
                 .DefaultReleaseVersion()
                 .WithApprovalStatus(releaseApprovalStatus)
-                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-            ReleaseVersion releaseVersion2 = _fixture
-                .DefaultReleaseVersion()
-                .WithApprovalStatus(releaseApprovalStatus)
-                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-            ReleaseVersion releaseVersion3 = _fixture
-                .DefaultReleaseVersion()
-                .WithApprovalStatus(releaseApprovalStatus)
-                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-            ReleaseVersion releaseVersion4 = _fixture
-                .DefaultReleaseVersion()
-                .WithApprovalStatus(releaseApprovalStatus)
-                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
+                .GenerateTuple4();
 
             var userReleaseRoles = _fixture
                 .DefaultUserReleaseRole()
                 .WithUser(user)
-                .WithReleaseVersion(releaseVersion1)
                 .ForIndex(0, s => s.SetReleaseVersion(releaseVersion1).SetRole(ReleaseRole.Contributor))
                 .ForIndex(1, s => s.SetReleaseVersion(releaseVersion1).SetRole(ReleaseRole.Approver))
-                // This release version is double-counted to test distinctness
+                // This release version is double-counted across different resource roles (see publication roles below) to test distinctness
                 .ForIndex(2, s => s.SetReleaseVersion(releaseVersion2).SetRole(ReleaseRole.Approver))
                 // This one should be filtered out
                 .ForIndex(3, s => s.SetReleaseVersion(releaseVersion3).SetRole(ReleaseRole.PrereleaseViewer))
@@ -69,7 +57,7 @@ public class ReleaseVersionRepositoryTests
                     1,
                     s => s.SetPublication(releaseVersion4.Release.Publication).SetRole(PublicationRole.Allower)
                 )
-                // This release version is double-counted to test distinctness
+                // This release version is double-counted across different resource roles (see release roles above) to test distinctness
                 .ForIndex(
                     2,
                     s => s.SetPublication(releaseVersion2.Release.Publication).SetRole(PublicationRole.Allower)
@@ -79,12 +67,12 @@ public class ReleaseVersionRepositoryTests
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.ReleaseVersions.AddRange([
+                contentDbContext.ReleaseVersions.AddRange(
                     releaseVersion1,
                     releaseVersion2,
                     releaseVersion3,
-                    releaseVersion4,
-                ]);
+                    releaseVersion4
+                );
                 await contentDbContext.SaveChangesAsync();
             }
 

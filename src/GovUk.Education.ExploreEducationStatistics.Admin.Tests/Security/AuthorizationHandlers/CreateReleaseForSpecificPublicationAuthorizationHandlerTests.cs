@@ -50,8 +50,8 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
                 if (!expectedToPassByClaimAlone)
                 {
                     userPublicationRoleRepository
-                        .Setup(rvr =>
-                            rvr.UserHasAnyRoleOnPublication(
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
                                 UserId,
                                 Publication.Id,
                                 ResourceRoleFilter.ActiveOnly,
@@ -105,8 +105,8 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
                 var isOwnerRole = publicationRole == PublicationRole.Owner;
 
                 userPublicationRoleRepository
-                    .Setup(rvr =>
-                        rvr.UserHasAnyRoleOnPublication(
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
                             UserId,
                             Publication.Id,
                             ResourceRoleFilter.ActiveOnly,

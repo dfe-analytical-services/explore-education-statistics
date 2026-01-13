@@ -524,7 +524,6 @@ public class MethodologyService(
 
         var directPublicationsWithApprovalRole = await userPublicationRoleRepository
             .Query()
-            .AsNoTracking()
             .WhereForUser(userId)
             .WhereRolesIn(PublicationRole.Allower)
             .Select(role => role.PublicationId)
@@ -532,7 +531,6 @@ public class MethodologyService(
 
         var indirectPublicationsWithApprovalRole = await userReleaseRoleRepository
             .Query()
-            .AsNoTracking()
             .WhereForUser(userId)
             .WhereRolesIn(ReleaseRole.Approver)
             .Select(role => role.ReleaseVersion.Release.PublicationId)

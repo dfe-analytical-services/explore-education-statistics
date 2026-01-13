@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -20,7 +21,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
-using MockQueryable;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -541,20 +541,17 @@ public class ReleaseApprovalServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
-        User activeUser1 = _fixture.DefaultUser();
-        User activeUser2 = _fixture.DefaultUser();
-        User activeUser3 = _fixture.DefaultUser();
-        User pendingUserInvite1 = _fixture.DefaultUserWithPendingInvite();
-        User pendingUserInvite2 = _fixture.DefaultUserWithPendingInvite();
+        var (activeUser1, activeUser2, activeUser3) = _fixture.DefaultUser().GenerateTuple3();
+        var (pendingUserInvite1, pendingUserInvite2) = _fixture.DefaultUserWithPendingInvite().GenerateTuple2();
 
         var userReleaseRoles = _fixture
             .DefaultUserReleaseRole()
-            // PrerelaseViewer + Email NOT SENT + Active User
+            // PrereleaseViewer + Email NOT SENT + Active User
             .ForIndex(
                 0,
                 s => s.SetUser(activeUser1).SetReleaseVersion(releaseVersion).SetRole(ReleaseRole.PrereleaseViewer)
             )
-            // PrerelaseViewer + Email SENT + Active User
+            // PrereleaseViewer + Email SENT + Active User
             .ForIndex(
                 1,
                 s =>
@@ -563,9 +560,9 @@ public class ReleaseApprovalServiceTests
                         .SetRole(ReleaseRole.PrereleaseViewer)
                         .SetEmailSent(DateTimeOffset.UtcNow)
             )
-            // NOT PrerelaseViewer + Email NOT SENT + Active User
+            // NOT PrereleaseViewer + Email NOT SENT + Active User
             .ForIndex(2, s => s.SetUser(activeUser3).SetReleaseVersion(releaseVersion).SetRole(ReleaseRole.Contributor))
-            // PrerelaseViewer + Email NOT SENT + Pending Invite
+            // PrereleaseViewer + Email NOT SENT + Pending Invite
             .ForIndex(
                 3,
                 s =>
@@ -573,12 +570,12 @@ public class ReleaseApprovalServiceTests
                         .SetReleaseVersion(releaseVersion)
                         .SetRole(ReleaseRole.PrereleaseViewer)
             )
-            // NOT PrerelaseViewer + Email NOT SENT + Pending Invite
+            // NOT PrereleaseViewer + Email NOT SENT + Pending Invite
             .ForIndex(
                 4,
                 s => s.SetUser(pendingUserInvite2).SetReleaseVersion(releaseVersion).SetRole(ReleaseRole.Contributor)
             )
-            // PrerelaseViewer + Email NOT SENT + Pending User + Different ReleaseVersion
+            // PrereleaseViewer + Email NOT SENT + Pending User + Different ReleaseVersion
             .ForIndex(
                 5,
                 s =>
@@ -619,9 +616,7 @@ public class ReleaseApprovalServiceTests
             .Setup(mock => mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        userReleaseRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.AllButExpired))
-            .Returns(userReleaseRoles.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. userReleaseRoles]);
 
         userResourceRoleNotificationService
             .Setup(mock =>
@@ -956,9 +951,7 @@ public class ReleaseApprovalServiceTests
             )
             .ReturnsAsync(ListOf<UserReleaseRole>());
 
-        userPublicationRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(Array.Empty<UserPublicationRole>().BuildMock());
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         contentService
             .Setup(mock => mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
@@ -1062,9 +1055,7 @@ public class ReleaseApprovalServiceTests
             )
             .ReturnsAsync(ListOf<UserReleaseRole>());
 
-        userPublicationRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(Array.Empty<UserPublicationRole>().BuildMock());
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
@@ -1132,9 +1123,7 @@ public class ReleaseApprovalServiceTests
             .Setup(mock => mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
             .ReturnsAsync(new List<HtmlBlock>());
 
-        userReleaseRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.AllButExpired))
-            .Returns(userReleaseRoles.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. userReleaseRoles]);
 
         userResourceRoleNotificationService
             .Setup(mock =>
@@ -1224,9 +1213,7 @@ public class ReleaseApprovalServiceTests
             .Setup(s => s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
             .ReturnsAsync([]);
 
-        userReleaseRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.AllButExpired))
-            .Returns(new[] { userReleaseRole }.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);
 
         userResourceRoleNotificationService
             .Setup(mock =>
@@ -1322,9 +1309,7 @@ public class ReleaseApprovalServiceTests
         var userReleaseRoleService = new Mock<IUserReleaseRoleService>(MockBehavior.Strict);
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
 
-        userPublicationRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(Array.Empty<UserPublicationRole>().BuildMock());
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
@@ -1429,9 +1414,7 @@ public class ReleaseApprovalServiceTests
                 )
                 .ReturnsAsync(ListOf(userReleaseRole1, userReleaseRole2));
 
-            userPublicationRoleRepository
-                .Setup(mock => mock.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(Array.Empty<UserPublicationRole>().BuildMock());
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             emailTemplateService
                 .Setup(mock =>
@@ -1533,9 +1516,7 @@ public class ReleaseApprovalServiceTests
                 )
                 .ReturnsAsync([]);
 
-            userPublicationRoleRepository
-                .Setup(mock => mock.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(new[] { userPublicationApproverRole }.BuildMock());
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, userPublicationApproverRole);
 
             emailTemplateService
                 .Setup(mock =>
@@ -1635,9 +1616,7 @@ public class ReleaseApprovalServiceTests
                 )
                 .ReturnsAsync(ListOf(userReleaseRole1, userReleaseRole2));
 
-            userPublicationRoleRepository
-                .Setup(mock => mock.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(Array.Empty<UserPublicationRole>().BuildMock());
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             emailTemplateService
                 .Setup(mock =>

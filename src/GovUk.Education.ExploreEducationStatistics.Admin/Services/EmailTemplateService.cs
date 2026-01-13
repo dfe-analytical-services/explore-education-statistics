@@ -33,7 +33,7 @@ public class EmailTemplateService(
 
         if (
             userReleaseRoles.Any(urr => urr.User.Email != email)
-            || userPublicationRoles.Any(urr => urr.User.Email != email)
+            || userPublicationRoles.Any(upr => upr.User.Email != email)
         )
         {
             throw new ArgumentException("Not all user role IDs match the provided email address");
@@ -43,11 +43,11 @@ public class EmailTemplateService(
         var template = notifyOptions.Value.InviteWithRolesTemplateId;
 
         var releaseRoleList = userReleaseRoles
-            .OrderBy(invite => invite.ReleaseVersion.Release.Publication.Title)
-            .ThenBy(invite => invite.ReleaseVersion.Release.Title)
-            .ThenBy(invite => invite.Role.ToString())
-            .Select(invite =>
-                $"* {invite.ReleaseVersion.Release.Publication.Title}, {invite.ReleaseVersion.Release.Title} - {invite.Role}"
+            .OrderBy(urr => urr.ReleaseVersion.Release.Publication.Title)
+            .ThenBy(urr => urr.ReleaseVersion.Release.Title)
+            .ThenBy(urr => urr.Role.ToString())
+            .Select(urr =>
+                $"* {urr.ReleaseVersion.Release.Publication.Title}, {urr.ReleaseVersion.Release.Title} - {urr.Role}"
             )
             .ToList();
 
@@ -55,9 +55,9 @@ public class EmailTemplateService(
         // temporarily named 'Allower' role, as this is the name used in the UI. This will be removed in the future;
         // likely in STEP 9 (EES-6196) of the permissions rework approach (NO TICKET HAS BEEN CREATED FOR THIS YET).
         var publicationRoleList = userPublicationRoles
-            .OrderBy(invite => invite.Publication.Title)
-            .ThenBy(invite => invite.Role)
-            .Select(invite => $"* {invite.Publication.Title} - {TransformPublicationRole(invite.Role)}")
+            .OrderBy(upr => upr.Publication.Title)
+            .ThenBy(upr => upr.Role)
+            .Select(upr => $"* {upr.Publication.Title} - {TransformPublicationRole(upr.Role)}")
             .ToList();
 
         var emailValues = new Dictionary<string, dynamic>
@@ -82,7 +82,7 @@ public class EmailTemplateService(
 
     public Either<ActionResult, Unit> SendPublicationRoleEmail(
         string email,
-        Publication publication,
+        string publicationTitle,
         PublicationRole role
     )
     {
@@ -98,7 +98,7 @@ public class EmailTemplateService(
         {
             { "url", url },
             { "role", transformedRole },
-            { "publication", publication.Title },
+            { "publication", publicationTitle },
         };
 
         return emailService.SendEmail(email, template, emailValues);
@@ -257,7 +257,7 @@ public class EmailTemplateService(
             .Query(ResourceRoleFilter.PendingOnly)
             .AsNoTracking()
             .Where(upr => userPublicationRoleIds.Contains(upr.Id))
-            .Include(urr => urr.User)
+            .Include(upr => upr.User)
             .Include(upr => upr.Publication)
             .ToListAsync();
     }

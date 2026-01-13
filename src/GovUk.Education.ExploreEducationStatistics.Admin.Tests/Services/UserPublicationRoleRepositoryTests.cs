@@ -193,7 +193,7 @@ public abstract class UserPublicationRoleRepositoryTests
                 .WithPublication(_fixture.DefaultPublication())
                 .WithCreated(DateTime.UtcNow.AddDays(-2))
                 .WithCreatedById(createdBy.Id)
-                .WithEmailSent(DateTime.UtcNow.AddDays(-1));
+                .WithEmailSent(DateTimeOffset.UtcNow.AddDays(-1));
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -246,7 +246,7 @@ public abstract class UserPublicationRoleRepositoryTests
                 .WithPublication(_fixture.DefaultPublication())
                 .WithCreated(DateTime.UtcNow.AddDays(-2))
                 .WithCreatedById(createdBy.Id)
-                .WithEmailSent(DateTime.UtcNow.AddDays(-1))
+                .WithEmailSent(DateTimeOffset.UtcNow.AddDays(-1))
                 .ForIndex(0, s => s.SetRole(PublicationRole.Approver))
                 .ForIndex(1, s => s.SetRole(PublicationRole.Drafter))
                 .GenerateList(2);
@@ -288,7 +288,7 @@ public abstract class UserPublicationRoleRepositoryTests
                 .WithPublication(_fixture.DefaultPublication())
                 .WithCreated(DateTime.UtcNow.AddDays(-2))
                 .WithCreatedById(createdBy.Id)
-                .WithEmailSent(DateTime.UtcNow.AddDays(-1));
+                .WithEmailSent(DateTimeOffset.UtcNow.AddDays(-1));
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -349,7 +349,7 @@ public abstract class UserPublicationRoleRepositoryTests
                 .WithPublication(_fixture.DefaultPublication())
                 .WithCreated(DateTime.UtcNow.AddDays(-2))
                 .WithCreatedById(createdBy.Id)
-                .WithEmailSent(DateTime.UtcNow.AddDays(-1))
+                .WithEmailSent(DateTimeOffset.UtcNow.AddDays(-1))
                 .ForIndex(0, s => s.SetRole(PublicationRole.Approver))
                 .ForIndex(1, s => s.SetRole(PublicationRole.Drafter))
                 .GenerateList(2);
@@ -420,6 +420,7 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
+                // ReSharper disable once RedundantArgumentDefaultValue
                 var resultingQueryableWithExplicitFilter = repository.Query(ResourceRoleFilter.ActiveOnly);
 
                 // Don't apply any further filtering to the queryable, and just execute it to get all results
@@ -658,7 +659,7 @@ public abstract class UserPublicationRoleRepositoryTests
         [InlineData(PublicationRole.Drafter)]
         public async Task Success(PublicationRole publicationRole)
         {
-            var email = "test@test.com";
+            const string email = "test@test.com";
 
             UserPublicationRole userPublicationRole = _fixture
                 .DefaultUserPublicationRole()
@@ -760,8 +761,8 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             User targetUser = _fixture.DefaultUser().WithEmail("test1@test.com");
             User otherUser = _fixture.DefaultUser().WithEmail("test2@test.com");
-            var role1 = PublicationRole.Allower;
-            var role2 = PublicationRole.Owner;
+            const PublicationRole role1 = PublicationRole.Allower;
+            const PublicationRole role2 = PublicationRole.Owner;
             Publication publication1 = _fixture.DefaultPublication();
             Publication publication2 = _fixture.DefaultPublication();
 
@@ -819,8 +820,8 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             User targetUser = _fixture.DefaultUser().WithEmail("test1@test.com");
             User otherUser = _fixture.DefaultUser().WithEmail("test2@test.com");
-            var role1 = PublicationRole.Allower;
-            var role2 = PublicationRole.Owner;
+            const PublicationRole role1 = PublicationRole.Allower;
+            const PublicationRole role2 = PublicationRole.Owner;
             Publication publication1 = _fixture.DefaultPublication();
             Publication publication2 = _fixture.DefaultPublication();
 
@@ -875,7 +876,7 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             User targetActiveUser = _fixture.DefaultUser();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             UserPublicationRole userPublicationRole = _fixture
                 .DefaultUserPublicationRole()
@@ -923,7 +924,7 @@ public abstract class UserPublicationRoleRepositoryTests
             User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
 
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -989,7 +990,7 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             User targetActiveUser = _fixture.DefaultUser();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -1038,7 +1039,7 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             UserPublicationRole userPublicationRole = _fixture
                 .DefaultUserPublicationRole()
@@ -1077,7 +1078,7 @@ public abstract class UserPublicationRoleRepositoryTests
             User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
 
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -1140,7 +1141,7 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -1199,7 +1200,7 @@ public abstract class UserPublicationRoleRepositoryTests
             User targetActiveUser = _fixture.DefaultUser();
             User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -1248,7 +1249,7 @@ public abstract class UserPublicationRoleRepositoryTests
             User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
 
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -1302,7 +1303,7 @@ public abstract class UserPublicationRoleRepositoryTests
             User targetActiveUser = _fixture.DefaultUser();
             User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -1384,7 +1385,7 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             var targetUser = userFactory(_fixture);
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             UserPublicationRole userPublicationRole = _fixture
                 .DefaultUserPublicationRole()
@@ -1423,7 +1424,7 @@ public abstract class UserPublicationRoleRepositoryTests
             User targetUserWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
             User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -1571,7 +1572,7 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             User targetActiveUser = _fixture.DefaultUser();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRolesToInclude = PublicationRole.Owner;
+            const PublicationRole targetRolesToInclude = PublicationRole.Owner;
 
             UserPublicationRole userPublicationRole = _fixture
                 .DefaultUserPublicationRole()
@@ -1661,7 +1662,7 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             User targetActiveUser = _fixture.DefaultUser();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             UserPublicationRole userPublicationRole = _fixture
                 .DefaultUserPublicationRole()
@@ -1709,7 +1710,7 @@ public abstract class UserPublicationRoleRepositoryTests
             User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
 
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -1775,7 +1776,7 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             User targetActiveUser = _fixture.DefaultUser();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -1824,7 +1825,7 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             UserPublicationRole userPublicationRole = _fixture
                 .DefaultUserPublicationRole()
@@ -1863,7 +1864,7 @@ public abstract class UserPublicationRoleRepositoryTests
             User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
 
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -1926,7 +1927,7 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -1985,7 +1986,7 @@ public abstract class UserPublicationRoleRepositoryTests
             User targetActiveUser = _fixture.DefaultUser();
             User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -2034,7 +2035,7 @@ public abstract class UserPublicationRoleRepositoryTests
             User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
 
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -2088,7 +2089,7 @@ public abstract class UserPublicationRoleRepositoryTests
             User targetActiveUser = _fixture.DefaultUser();
             User targetUserWithPendingInvite = _fixture.DefaultUserWithPendingInvite();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()
@@ -2170,7 +2171,7 @@ public abstract class UserPublicationRoleRepositoryTests
         {
             var targetUser = userFactory(_fixture);
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             UserPublicationRole userPublicationRole = _fixture
                 .DefaultUserPublicationRole()
@@ -2209,7 +2210,7 @@ public abstract class UserPublicationRoleRepositoryTests
             User targetUserWithExpiredInvite = _fixture.DefaultUserWithExpiredInvite();
             User targetSoftDeletedUser = _fixture.DefaultSoftDeletedUser();
             Publication targetPublication = _fixture.DefaultPublication();
-            var targetRole = PublicationRole.Owner;
+            const PublicationRole targetRole = PublicationRole.Owner;
 
             var userPublicationRoles = _fixture
                 .DefaultUserPublicationRole()

@@ -186,7 +186,7 @@ public class UserManagementService(
                     .WhereInvitePending()
                     .Select(u => new
                     {
-                        u.Id,
+                        UserId = u.Id,
                         u.Email,
                         u.Role,
                     })
@@ -199,8 +199,7 @@ public class UserManagementService(
                     {
                         var userReleaseRoles = await userReleaseRoleRepository
                             .Query(ResourceRoleFilter.PendingOnly)
-                            .AsNoTracking()
-                            .WhereForUser(pendingUserInvite.Id)
+                            .WhereForUser(pendingUserInvite.UserId)
                             .Select(urr => new UserReleaseRoleViewModel
                             {
                                 Id = urr.Id,
@@ -212,8 +211,7 @@ public class UserManagementService(
 
                         var userPublicationRoles = await userPublicationRoleRepository
                             .Query(ResourceRoleFilter.PendingOnly)
-                            .AsNoTracking()
-                            .WhereForUser(pendingUserInvite.Id)
+                            .WhereForUser(pendingUserInvite.UserId)
                             .Select(upr => new UserPublicationRoleViewModel
                             {
                                 Id = upr.Id,
@@ -350,7 +348,7 @@ public class UserManagementService(
         await usersAndRolesDbContext.Users.SingleOrNotFoundAsync(user => user.Email == email);
 
     private async Task<Either<ActionResult, Unit>> ValidateActiveUserDoesNotExist(string email) =>
-        (await userRepository.FindActiveUserByEmail(email)) is not null
+        await userRepository.FindActiveUserByEmail(email) is not null
             ? ValidationActionResult(UserAlreadyExists)
             : Unit.Instance;
 

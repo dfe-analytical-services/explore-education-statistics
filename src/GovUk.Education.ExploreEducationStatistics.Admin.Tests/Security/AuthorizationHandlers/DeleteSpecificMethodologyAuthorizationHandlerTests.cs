@@ -81,8 +81,8 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(rvr =>
-                            rvr.UserHasAnyRoleOnPublication(
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
                                 UserId,
                                 OwningPublication.Id,
                                 ResourceRoleFilter.ActiveOnly,
@@ -143,8 +143,8 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(rvr =>
-                            rvr.UserHasAnyRoleOnPublication(
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
                                 UserId,
                                 OwningPublication.Id,
                                 ResourceRoleFilter.ActiveOnly,
@@ -207,8 +207,8 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                     var isOwnerRole = role == PublicationRole.Owner;
 
                     userPublicationRoleRepository
-                        .Setup(rvr =>
-                            rvr.UserHasAnyRoleOnPublication(
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
                                 UserId,
                                 OwningPublication.Id,
                                 ResourceRoleFilter.ActiveOnly,
@@ -240,8 +240,8 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -294,8 +294,8 @@ public class DeleteSpecificMethodologyAuthorizationHandlerTests
                     var isOwnerRole = role == PublicationRole.Owner;
 
                     userPublicationRoleRepository
-                        .Setup(rvr =>
-                            rvr.UserHasAnyRoleOnPublication(
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
                                 UserId,
                                 OwningPublication.Id,
                                 ResourceRoleFilter.ActiveOnly,

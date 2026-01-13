@@ -69,8 +69,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync((ReleaseVersion?)null);
 
                     userPublicationRoleRepository
-                        .Setup(rvr =>
-                            rvr.UserHasAnyRoleOnPublication(
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
                                 UserId,
                                 OwningPublication.Id,
                                 ResourceRoleFilter.ActiveOnly,
@@ -81,8 +81,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                         .ReturnsAsync(false);
 
                     userReleaseRoleRepository
-                        .Setup(rvr =>
-                            rvr.UserHasAnyRoleOnPublication(
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
                                 UserId,
                                 OwningPublication.Id,
                                 ResourceRoleFilter.ActiveOnly,
@@ -137,8 +137,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                     .Contains(publicationRole);
 
                 userPublicationRoleRepository
-                    .Setup(rvr =>
-                        rvr.UserHasAnyRoleOnPublication(
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
                             UserId,
                             OwningPublication.Id,
                             ResourceRoleFilter.ActiveOnly,
@@ -149,8 +149,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                     .ReturnsAsync(isOwnerOrApprover);
 
                 userReleaseRoleRepository
-                    .Setup(rvr =>
-                        rvr.UserHasAnyRoleOnPublication(
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
                             UserId,
                             OwningPublication.Id,
                             ResourceRoleFilter.ActiveOnly,
@@ -225,8 +225,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 }
 
                 userPublicationRoleRepository
-                    .Setup(rvr =>
-                        rvr.UserHasAnyRoleOnPublication(
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
                             UserId,
                             OwningPublication.Id,
                             ResourceRoleFilter.ActiveOnly,
@@ -237,8 +237,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                     .ReturnsAsync(false);
 
                 userReleaseRoleRepository
-                    .Setup(rvr =>
-                        rvr.UserHasAnyRoleOnPublication(
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
                             UserId,
                             OwningPublication.Id,
                             ResourceRoleFilter.ActiveOnly,
@@ -296,8 +296,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -308,8 +308,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(false);
 
             userReleaseRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -328,8 +328,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(preReleaseForConnectedPublication);
 
             userReleaseRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasRoleOnReleaseVersion(
+                .Setup(mock =>
+                    mock.UserHasRoleOnReleaseVersion(
                         UserId,
                         preReleaseForConnectedPublication.Id,
                         ReleaseRole.PrereleaseViewer,
@@ -398,8 +398,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -410,8 +410,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(false);
 
             userReleaseRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -430,8 +430,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(preReleaseForConnectedPublication);
 
             userReleaseRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasRoleOnReleaseVersion(
+                .Setup(mock =>
+                    mock.UserHasRoleOnReleaseVersion(
                         UserId,
                         preReleaseForConnectedPublication.Id,
                         ReleaseRole.PrereleaseViewer,
@@ -499,8 +499,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -511,8 +511,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(false);
 
             userReleaseRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -578,8 +578,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -590,8 +590,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(false);
 
             userReleaseRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -648,8 +648,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -660,8 +660,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(false);
 
             userReleaseRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -718,11 +718,11 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
 
             methodologyRepository
                 .Setup(s => s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
-                .ReturnsAsync(new List<Guid> { OwningPublication.Id });
+                .ReturnsAsync([OwningPublication.Id]);
 
             userPublicationRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,
@@ -733,8 +733,8 @@ public class ViewSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(false);
 
             userReleaseRoleRepository
-                .Setup(rvr =>
-                    rvr.UserHasAnyRoleOnPublication(
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
                         UserId,
                         OwningPublication.Id,
                         ResourceRoleFilter.ActiveOnly,

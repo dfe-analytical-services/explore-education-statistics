@@ -13,7 +13,7 @@ public interface IEmailTemplateService
         HashSet<Guid> userPublicationRoleIds
     );
 
-    Either<ActionResult, Unit> SendPublicationRoleEmail(string email, Publication publication, PublicationRole role);
+    Either<ActionResult, Unit> SendPublicationRoleEmail(string email, string publicationTitle, PublicationRole role);
 
     Either<ActionResult, Unit> SendReleaseRoleEmail(string email, ReleaseVersion releaseVersion, ReleaseRole role);
 

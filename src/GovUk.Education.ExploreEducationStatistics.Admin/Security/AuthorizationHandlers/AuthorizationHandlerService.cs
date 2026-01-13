@@ -37,50 +37,34 @@ public class AuthorizationHandlerService(
         Guid releaseVersionId,
         HashSet<PublicationRole> publicationRoles,
         HashSet<ReleaseRole> releaseRoles
-    )
-    {
-        if (
-            await UserHasAnyPublicationRoleOnPublication(
-                userId: userId,
-                publicationId: publicationId,
-                rolesToInclude: [.. publicationRoles]
-            )
+    ) =>
+        await UserHasAnyPublicationRoleOnPublication(
+            userId: userId,
+            publicationId: publicationId,
+            rolesToInclude: [.. publicationRoles]
         )
-        {
-            return true;
-        }
-
-        return await UserHasAnyReleaseRoleOnReleaseVersion(
+        || await UserHasAnyReleaseRoleOnReleaseVersion(
             userId: userId,
             releaseVersionId: releaseVersionId,
             rolesToInclude: [.. releaseRoles]
         );
-    }
 
     public async Task<bool> UserHasAnyRoleOnPublicationOrAnyReleaseVersion(
         Guid userId,
         Guid publicationId,
         HashSet<PublicationRole> publicationRoles,
         HashSet<ReleaseRole> releaseRoles
-    )
-    {
-        if (
-            await UserHasAnyPublicationRoleOnPublication(
-                userId: userId,
-                publicationId: publicationId,
-                rolesToInclude: [.. publicationRoles]
-            )
+    ) =>
+        await UserHasAnyPublicationRoleOnPublication(
+            userId: userId,
+            publicationId: publicationId,
+            rolesToInclude: [.. publicationRoles]
         )
-        {
-            return true;
-        }
-
-        return await UserHasAnyReleaseRoleOnPublication(
+        || await UserHasAnyReleaseRoleOnPublication(
             userId: userId,
             publicationId: publicationId,
             rolesToInclude: [.. releaseRoles]
         );
-    }
 
     public async Task<bool> UserHasAnyPublicationRoleOnPublication(
         Guid userId,

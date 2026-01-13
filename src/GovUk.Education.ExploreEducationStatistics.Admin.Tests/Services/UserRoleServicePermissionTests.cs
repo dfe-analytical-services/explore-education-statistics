@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -193,9 +194,7 @@ public class UserRoleServicePermissionTests
             .WithRole(Contributor);
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
-        userReleaseRoleRepository
-            .Setup(m => m.Query(ResourceRoleFilter.All))
-            .Returns(new[] { userReleaseRole }.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, userReleaseRole);
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(

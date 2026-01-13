@@ -304,6 +304,12 @@ public class PublicationServiceTests
                     .DefaultUserPublicationRole()
                     .WithUser(user)
                     .WithRole(PublicationRole.Owner)
+                    .WithPublication(publication3)
+                    .Generate(),
+                _dataFixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithRole(PublicationRole.Owner)
                     .WithPublication(publication1)
                     .Generate(),
                 _dataFixture
@@ -311,12 +317,6 @@ public class PublicationServiceTests
                     .WithUser(user)
                     .WithRole(PublicationRole.Owner)
                     .WithPublication(publication2)
-                    .Generate(),
-                _dataFixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(user)
-                    .WithRole(PublicationRole.Owner)
-                    .WithPublication(publication3)
                     .Generate()
             );
             await contentDbContext.SaveChangesAsync();

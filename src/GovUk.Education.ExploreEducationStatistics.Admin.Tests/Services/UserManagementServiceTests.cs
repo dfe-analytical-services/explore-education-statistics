@@ -450,16 +450,16 @@ public abstract class UserManagementServiceTests
             userPublicationRoleRepository
                 .Setup(mock =>
                     mock.CreateManyIfNotExists(
-                        It.Is<List<UserPublicationRole>>(upr =>
-                            upr.Count == 1
-                            && upr[0].UserId == userToCreate.Id
-                            && upr[0].PublicationId == publication.Id
-                            && upr[0].Role == publicationRole
+                        It.Is<List<UserPublicationRole>>(l =>
+                            l.Count == 1
+                            && l[0].UserId == userToCreate.Id
+                            && l[0].PublicationId == publication.Id
+                            && l[0].Role == publicationRole
                             && createdDate.HasValue
-                                ? upr[0].Created == createdDate
-                                : Math.Abs((upr[0].Created - DateTime.UtcNow).Milliseconds)
+                                ? l[0].Created == createdDate
+                                : Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
                                     <= AssertExtensions.TimeWithinMillis
-                                    && upr[0].CreatedById == CreatedById
+                                    && l[0].CreatedById == CreatedById
                         ),
                         It.IsAny<CancellationToken>()
                     )
@@ -633,20 +633,17 @@ public abstract class UserManagementServiceTests
             userPublicationRoleRepository
                 .Setup(mock =>
                     mock.CreateManyIfNotExists(
-                        It.Is<List<UserPublicationRole>>(upr =>
-                            upr.Count == 2
-                            && upr[0].UserId == userToCreate.Id
-                            && upr[0].PublicationId == publications[2].Id
-                            && upr[0].Role == publicationRole1
-                            && Math.Abs((upr[0].Created - DateTime.UtcNow).Milliseconds)
+                        It.Is<List<UserPublicationRole>>(l =>
+                            l.Count == 2
+                            && l.All(r => r.UserId == userToCreate.Id && r.CreatedById == CreatedById)
+                            && l[0].PublicationId == publications[2].Id
+                            && l[0].Role == publicationRole1
+                            && Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
                                 <= AssertExtensions.TimeWithinMillis
-                            && upr[0].CreatedById == CreatedById
-                            && upr[1].UserId == userToCreate.Id
-                            && upr[1].PublicationId == publications[3].Id
-                            && upr[1].Role == publicationRole2
-                            && Math.Abs((upr[1].Created - DateTime.UtcNow).Milliseconds)
+                            && l[1].PublicationId == publications[3].Id
+                            && l[1].Role == publicationRole2
+                            && Math.Abs((l[1].Created - DateTime.UtcNow).Milliseconds)
                                 <= AssertExtensions.TimeWithinMillis
-                            && upr[1].CreatedById == CreatedById
                         ),
                         It.IsAny<CancellationToken>()
                     )

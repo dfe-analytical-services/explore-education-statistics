@@ -288,7 +288,7 @@ public abstract class UserResourceRoleNotificationServiceTests
                 .Returns(Task.CompletedTask);
 
             emailTemplateService
-                .Setup(s => s.SendPublicationRoleEmail(activeUser.Email, publication, role))
+                .Setup(s => s.SendPublicationRoleEmail(activeUser.Email, publication.Title, role))
                 .Returns(Unit.Instance);
 
             var service = BuildService(
@@ -346,7 +346,7 @@ public abstract class UserResourceRoleNotificationServiceTests
                 .Returns(Task.CompletedTask);
 
             emailTemplateService
-                .Setup(s => s.SendPublicationRoleEmail(activeUser.Email, publication, role))
+                .Setup(s => s.SendPublicationRoleEmail(activeUser.Email, publication.Title, role))
                 .Returns(new BadRequestResult());
 
             var service = BuildService(

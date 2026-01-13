@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -12,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.Extensions.Options;
-using MockQueryable;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
@@ -30,43 +30,120 @@ public class EmailTemplateServiceTests
 
         User user = _dataFixture.DefaultUser();
 
+        var publications = _dataFixture
+            .DefaultPublication()
+            .ForIndex(0, s => s.SetTitle("Title 1"))
+            .ForIndex(1, s => s.SetTitle("Title 2"))
+            .ForIndex(2, s => s.SetTitle("Title 3"))
+            .GenerateList(3);
+
+        var releaseVersions = _dataFixture
+            .DefaultReleaseVersion()
+            .ForIndex(
+                0,
+                s =>
+                    s.SetRelease(
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithYear(2021)
+                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
+                            .WithPublication(publications[0])
+                    )
+            ) // 2021 Q1 Title 1
+            .ForIndex(
+                1,
+                s =>
+                    s.SetRelease(
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithYear(2022)
+                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
+                            .WithPublication(publications[0])
+                    )
+            ) // 2022 Q1 Title 1
+            .ForIndex(
+                2,
+                s =>
+                    s.SetRelease(
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithYear(2021)
+                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
+                            .WithPublication(publications[1])
+                    )
+            ) // 2021 Q1 Title 2
+            .ForIndex(
+                3,
+                s =>
+                    s.SetRelease(
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithYear(2022)
+                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
+                            .WithPublication(publications[1])
+                    )
+            ) // 2022 Q1 Title 2
+            .ForIndex(
+                4,
+                s =>
+                    s.SetRelease(
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithYear(2021)
+                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
+                            .WithPublication(publications[2])
+                    )
+            ) // 2021 Q1 Title 3
+            .ForIndex(
+                5,
+                s =>
+                    s.SetRelease(
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithYear(2022)
+                            .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
+                            .WithPublication(publications[2])
+                    )
+            ) // 2022 Q1 Title 3
+            .GenerateList(6);
+
         var applicableUserPublicationRoles = _dataFixture
             .DefaultUserPublicationRole()
             .WithUser(user)
             .ForIndex(
                 0,
                 s =>
-                    s.SetPublication(_dataFixture.DefaultPublication().WithTitle("Title 2"))
+                    s.SetPublication(publications[1]) // Title 2
                         .SetRole(PublicationRole.Owner)
             )
             .ForIndex(
                 1,
                 s =>
-                    s.SetPublication(_dataFixture.DefaultPublication().WithTitle("Title 2"))
+                    s.SetPublication(publications[1]) // Title 2
                         .SetRole(PublicationRole.Allower)
             )
             .ForIndex(
                 2,
                 s =>
-                    s.SetPublication(_dataFixture.DefaultPublication().WithTitle("Title 1"))
+                    s.SetPublication(publications[0]) // Title 1
                         .SetRole(PublicationRole.Allower)
             )
             .ForIndex(
                 3,
                 s =>
-                    s.SetPublication(_dataFixture.DefaultPublication().WithTitle("Title 1"))
+                    s.SetPublication(publications[0]) // Title 1
                         .SetRole(PublicationRole.Owner)
             )
             .ForIndex(
                 4,
                 s =>
-                    s.SetPublication(_dataFixture.DefaultPublication().WithTitle("Title 3"))
+                    s.SetPublication(publications[2]) // Title 3
                         .SetRole(PublicationRole.Owner)
             )
             .ForIndex(
                 5,
                 s =>
-                    s.SetPublication(_dataFixture.DefaultPublication().WithTitle("Title 3"))
+                    s.SetPublication(publications[2]) // Title 3
                         .SetRole(PublicationRole.Allower)
             )
             .GenerateList(6);
@@ -77,145 +154,55 @@ public class EmailTemplateServiceTests
             .ForIndex(
                 0,
                 s =>
-                    s.SetReleaseVersion(
-                            _dataFixture
-                                .DefaultReleaseVersion()
-                                .WithRelease(
-                                    _dataFixture
-                                        .DefaultRelease()
-                                        .WithYear(2022)
-                                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
-                                        .WithPublication(_dataFixture.DefaultPublication().WithTitle("Title 3"))
-                                )
-                        )
+                    s.SetReleaseVersion(releaseVersions[5]) // 2022 Q1 Title 3
                         .SetRole(ReleaseRole.Contributor)
             )
             .ForIndex(
                 1,
                 s =>
-                    s.SetReleaseVersion(
-                            _dataFixture
-                                .DefaultReleaseVersion()
-                                .WithRelease(
-                                    _dataFixture
-                                        .DefaultRelease()
-                                        .WithYear(2021)
-                                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
-                                        .WithPublication(_dataFixture.DefaultPublication().WithTitle("Title 3"))
-                                )
-                        )
+                    s.SetReleaseVersion(releaseVersions[4]) // 2021 Q1 Title 3)
                         .SetRole(ReleaseRole.Contributor)
             )
             .ForIndex(
                 2,
                 s =>
-                    s.SetReleaseVersion(
-                            _dataFixture
-                                .DefaultReleaseVersion()
-                                .WithRelease(
-                                    _dataFixture
-                                        .DefaultRelease()
-                                        .WithYear(2022)
-                                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
-                                        .WithPublication(_dataFixture.DefaultPublication().WithTitle("Title 3"))
-                                )
-                        )
+                    s.SetReleaseVersion(releaseVersions[5]) // 2022 Q1 Title 3)
                         .SetRole(ReleaseRole.Approver)
             )
             .ForIndex(
                 3,
                 s =>
-                    s.SetReleaseVersion(
-                            _dataFixture
-                                .DefaultReleaseVersion()
-                                .WithRelease(
-                                    _dataFixture
-                                        .DefaultRelease()
-                                        .WithYear(2022)
-                                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
-                                        .WithPublication(_dataFixture.DefaultPublication().WithTitle("Title 1"))
-                                )
-                        )
+                    s.SetReleaseVersion(releaseVersions[1]) // 2022 Q1 Title 1)
                         .SetRole(ReleaseRole.Approver)
             )
             .ForIndex(
                 4,
                 s =>
-                    s.SetReleaseVersion(
-                            _dataFixture
-                                .DefaultReleaseVersion()
-                                .WithRelease(
-                                    _dataFixture
-                                        .DefaultRelease()
-                                        .WithYear(2021)
-                                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
-                                        .WithPublication(_dataFixture.DefaultPublication().WithTitle("Title 1"))
-                                )
-                        )
+                    s.SetReleaseVersion(releaseVersions[0]) // 2021 Q1 Title 1))
                         .SetRole(ReleaseRole.Approver)
             )
             .ForIndex(
                 5,
                 s =>
-                    s.SetReleaseVersion(
-                            _dataFixture
-                                .DefaultReleaseVersion()
-                                .WithRelease(
-                                    _dataFixture
-                                        .DefaultRelease()
-                                        .WithYear(2022)
-                                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
-                                        .WithPublication(_dataFixture.DefaultPublication().WithTitle("Title 1"))
-                                )
-                        )
+                    s.SetReleaseVersion(releaseVersions[1]) // 2022 Q1 Title 1))
                         .SetRole(ReleaseRole.Contributor)
             )
             .ForIndex(
                 6,
                 s =>
-                    s.SetReleaseVersion(
-                            _dataFixture
-                                .DefaultReleaseVersion()
-                                .WithRelease(
-                                    _dataFixture
-                                        .DefaultRelease()
-                                        .WithYear(2022)
-                                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
-                                        .WithPublication(_dataFixture.DefaultPublication().WithTitle("Title 2"))
-                                )
-                        )
+                    s.SetReleaseVersion(releaseVersions[3]) // 2022 Q1 Title 2))
                         .SetRole(ReleaseRole.Contributor)
             )
             .ForIndex(
                 7,
                 s =>
-                    s.SetReleaseVersion(
-                            _dataFixture
-                                .DefaultReleaseVersion()
-                                .WithRelease(
-                                    _dataFixture
-                                        .DefaultRelease()
-                                        .WithYear(2021)
-                                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
-                                        .WithPublication(_dataFixture.DefaultPublication().WithTitle("Title 2"))
-                                )
-                        )
+                    s.SetReleaseVersion(releaseVersions[2]) // 2021 Q1 Title 2)))
                         .SetRole(ReleaseRole.Contributor)
             )
             .ForIndex(
                 8,
                 s =>
-                    s.SetReleaseVersion(
-                            _dataFixture
-                                .DefaultReleaseVersion()
-                                .WithRelease(
-                                    _dataFixture
-                                        .DefaultRelease()
-                                        .WithYear(2022)
-                                        .WithTimePeriodCoverage(TimeIdentifier.AcademicYearQ1)
-                                        .WithPublication(_dataFixture.DefaultPublication().WithTitle("Title 2"))
-                                )
-                        )
+                    s.SetReleaseVersion(releaseVersions[3]) // 2022 Q1 Title 2)))
                         .SetRole(ReleaseRole.Approver)
             )
             .GenerateList(9);
@@ -261,14 +248,10 @@ public class EmailTemplateServiceTests
         };
 
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-        userPublicationRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.PendingOnly))
-            .Returns(allUserPublicationRoles.BuildMock());
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, allUserPublicationRoles);
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-        userReleaseRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.PendingOnly))
-            .Returns(allUserReleaseRoles.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, allUserReleaseRoles);
 
         var emailService = new Mock<IEmailService>(Strict);
         emailService
@@ -305,7 +288,7 @@ public class EmailTemplateServiceTests
             // This role is for the correct user email
             .ForIndex(0, s => s.SetUser(user))
             // This role is for a different user email
-            .ForIndex(0, s => s.SetUser(_dataFixture.DefaultUser()))
+            .ForIndex(1, s => s.SetUser(_dataFixture.DefaultUser()))
             .GenerateList(2);
 
         var userReleaseRoles = _dataFixture
@@ -318,7 +301,7 @@ public class EmailTemplateServiceTests
             // This role is for the correct user email
             .ForIndex(0, s => s.SetUser(user))
             // This role is for a different user email
-            .ForIndex(0, s => s.SetUser(_dataFixture.DefaultUser()))
+            .ForIndex(1, s => s.SetUser(_dataFixture.DefaultUser()))
             .GenerateList(2);
 
         // Try sending an invite email for all roles, even those that don't match the user's email
@@ -326,14 +309,10 @@ public class EmailTemplateServiceTests
         var userReleaseRoleIds = userReleaseRoles.Select(r => r.Id).ToHashSet();
 
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-        userPublicationRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.PendingOnly))
-            .Returns(userPublicationRoles.BuildMock());
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userPublicationRoles]);
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-        userReleaseRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.PendingOnly))
-            .Returns(userReleaseRoles.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
 
         var service = SetupEmailTemplateService(
             userPublicationRoleRepository: userPublicationRoleRepository.Object,
@@ -365,14 +344,10 @@ public class EmailTemplateServiceTests
         };
 
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-        userPublicationRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.PendingOnly))
-            .Returns(new List<UserPublicationRole>().BuildMock());
+        userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, []);
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-        userReleaseRoleRepository
-            .Setup(mock => mock.Query(ResourceRoleFilter.PendingOnly))
-            .Returns(new List<UserReleaseRole>().BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, []);
 
         var emailService = new Mock<IEmailService>(Strict);
         emailService.Setup(mock => mock.SendEmail(email, expectedTemplateId, expectedValues)).Returns(Unit.Instance);
@@ -395,7 +370,7 @@ public class EmailTemplateServiceTests
     [Fact]
     public void SendPublicationRoleEmail()
     {
-        Publication publication = _dataFixture.DefaultPublication();
+        string publicationTitle = "Publication Title";
 
         const string expectedTemplateId = "publication-role-template-id";
 
@@ -403,7 +378,7 @@ public class EmailTemplateServiceTests
         {
             { "url", "https://admin-uri" },
             { "role", PublicationRole.Owner.ToString() },
-            { "publication", publication.Title },
+            { "publication", publicationTitle },
         };
 
         var emailService = new Mock<IEmailService>(Strict);
@@ -414,7 +389,7 @@ public class EmailTemplateServiceTests
 
         var service = SetupEmailTemplateService(emailService: emailService.Object);
 
-        var result = service.SendPublicationRoleEmail("test@test.com", publication, PublicationRole.Owner);
+        var result = service.SendPublicationRoleEmail("test@test.com", publicationTitle, PublicationRole.Owner);
 
         emailService.Verify(s => s.SendEmail("test@test.com", expectedTemplateId, expectedValues), Times.Once);
 

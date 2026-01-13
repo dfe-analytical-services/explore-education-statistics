@@ -66,7 +66,6 @@ public class ReleasePermissionService(
             .OnSuccess(async _ =>
                 await userReleaseRoleRepository
                     .Query(ResourceRoleFilter.PendingOnly)
-                    .AsNoTracking()
                     .WhereForReleaseVersion(releaseVersionId)
                     .WhereRolesIn(rolesToCheck)
                     .Where(urr => rolesToCheck.Contains(urr.Role))

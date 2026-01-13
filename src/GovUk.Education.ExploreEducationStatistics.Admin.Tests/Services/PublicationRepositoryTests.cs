@@ -23,7 +23,7 @@ public class PublicationRepositoryTests
     {
         User user = _dataFixture.DefaultUser();
 
-        Theme theme = _dataFixture.DefaultTheme();
+        var (theme1, theme2) = _dataFixture.DefaultTheme().GenerateTuple2();
 
         var userPublicationRoles = _dataFixture
             .DefaultUserPublicationRole()
@@ -31,14 +31,21 @@ public class PublicationRepositoryTests
             .ForIndex(
                 0,
                 s =>
-                    s.SetPublication(_dataFixture.DefaultPublication().WithTheme(theme))
+                    s.SetPublication(_dataFixture.DefaultPublication().WithTheme(theme1))
                         .SetRole(PublicationRole.Allower)
             )
             .ForIndex(
                 1,
-                s => s.SetPublication(_dataFixture.DefaultPublication().WithTheme(theme)).SetRole(PublicationRole.Owner)
+                s =>
+                    s.SetPublication(_dataFixture.DefaultPublication().WithTheme(theme1)).SetRole(PublicationRole.Owner)
             )
-            .GenerateList(2);
+            // This one should be excluded from the results due to being for a different theme
+            .ForIndex(
+                2,
+                s =>
+                    s.SetPublication(_dataFixture.DefaultPublication().WithTheme(theme2)).SetRole(PublicationRole.Owner)
+            )
+            .GenerateList(3);
 
         var userReleaseRoles = _dataFixture
             .DefaultUserReleaseRole()
@@ -52,7 +59,7 @@ public class PublicationRepositoryTests
                                 .WithRelease(
                                     _dataFixture
                                         .DefaultRelease()
-                                        .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme))
+                                        .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme1))
                                 )
                         )
                         .SetRole(ReleaseRole.Contributor)
@@ -66,12 +73,12 @@ public class PublicationRepositoryTests
                                 .WithRelease(
                                     _dataFixture
                                         .DefaultRelease()
-                                        .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme))
+                                        .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme1))
                                 )
                         )
                         .SetRole(ReleaseRole.Approver)
             )
-            // This one should be excluded from results
+            // This one should be excluded from results due to it being for a PrereleaseViewer role
             .ForIndex(
                 2,
                 s =>
@@ -81,12 +88,27 @@ public class PublicationRepositoryTests
                                 .WithRelease(
                                     _dataFixture
                                         .DefaultRelease()
-                                        .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme))
+                                        .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme1))
                                 )
                         )
                         .SetRole(ReleaseRole.PrereleaseViewer)
             )
-            .GenerateList(3);
+            .ForIndex(
+                3,
+                s =>
+                    s.SetReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(
+                                    _dataFixture
+                                        .DefaultRelease()
+                                        .WithPublication(_dataFixture.DefaultPublication().WithTheme(theme2))
+                                )
+                        )
+                        .SetRole(ReleaseRole.Contributor)
+            )
+            // This one should be excluded from the results due to being for a different theme
+            .GenerateList(4);
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -115,10 +137,10 @@ public class PublicationRepositoryTests
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
-            var result = await service.ListPublicationsForUser(userId: user.Id, themeId: theme.Id);
+            var result = await service.ListPublicationsForUser(userId: user.Id, themeId: theme1.Id);
 
             // Result should contain all publications except the one associated with the
-            // Release.PrereleaseViewer role
+            // Release.PrereleaseViewer role, and the ones for theme2
             Assert.Equal(4, result.Count);
 
             Assert.Equal(userPublicationRoles[0].PublicationId, result[0].Id);

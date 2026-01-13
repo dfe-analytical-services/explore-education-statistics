@@ -39,8 +39,7 @@ public abstract class PreReleaseUserServiceTests
                 .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
             var userReleaseRoles = _dataFixture
-                // These should be returned, regardless of whether or not the user
-                // is active, pending or expired
+                // These should be returned, regardless of whether the user is active, pending or expired
                 .DefaultUserReleaseRole()
                 .ForIndex(
                     0,
@@ -396,7 +395,7 @@ public abstract class PreReleaseUserServiceTests
                 var service = SetupPreReleaseUserService(context);
                 var result = await service.InvitePreReleaseUsers(
                     releaseVersion.Id,
-                    ListOf("test1@test.com", "not an email", "test2@test.com")
+                    ["test1@test.com", "not an email", "test2@test.com"]
                 );
 
                 result.AssertBadRequest(InvalidEmailAddress);
@@ -408,7 +407,7 @@ public abstract class PreReleaseUserServiceTests
         {
             await using var context = InMemoryApplicationDbContext();
             var service = SetupPreReleaseUserService(context);
-            var result = await service.InvitePreReleaseUsers(Guid.NewGuid(), ListOf("test@test.com"));
+            var result = await service.InvitePreReleaseUsers(Guid.NewGuid(), ["test@test.com"]);
 
             result.AssertNotFound();
         }
@@ -472,7 +471,7 @@ public abstract class PreReleaseUserServiceTests
 
                 var result = await service.InvitePreReleaseUsers(
                     releaseVersion.Id,
-                    ListOf([activeUser.Email, userWithPendingInvite.Email])
+                    [activeUser.Email, userWithPendingInvite.Email]
                 );
 
                 result.AssertBadRequest(NoInvitableEmails);
@@ -495,6 +494,8 @@ public abstract class PreReleaseUserServiceTests
                 .GenerateList(2)
                 .ToDictionary(u => u.Email);
 
+            // Although this looks similar to 'activeUsersWithNoRolesOrInvitesByEmail' below, they each have
+            // unique setups when mocking the dependencies and behaviour below.
             var usersWithExistingRoleByEmail = _dataFixture.DefaultUser().GenerateList(2).ToDictionary(u => u.Email);
 
             var activeUsersWithNoRolesOrInvitesByEmail = _dataFixture
