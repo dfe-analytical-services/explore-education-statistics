@@ -1,4 +1,6 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 
 public static class UserReleaseRoleQueries
 {
@@ -18,12 +20,28 @@ public static class UserReleaseRoleQueries
     public static IQueryable<UserReleaseRole> WhereRolesIn(
         this IQueryable<UserReleaseRole> query,
         params ReleaseRole[] roles
-    ) => query.Where(urr => roles.Contains(urr.Role));
+    )
+    {
+        if (roles.IsNullOrEmpty())
+        {
+            throw new ArgumentException($"{nameof(roles)} should not be empty or NULL.");
+        }
+
+        return query.Where(urr => roles.Contains(urr.Role));
+    }
 
     public static IQueryable<UserReleaseRole> WhereRolesNotIn(
         this IQueryable<UserReleaseRole> query,
         params ReleaseRole[] roles
-    ) => query.Where(urr => !roles.Contains(urr.Role));
+    )
+    {
+        if (roles.IsNullOrEmpty())
+        {
+            throw new ArgumentException($"{nameof(roles)} should not be empty or NULL.");
+        }
+
+        return query.Where(urr => !roles.Contains(urr.Role));
+    }
 
     public static IQueryable<UserReleaseRole> WhereEmailNotSent(this IQueryable<UserReleaseRole> query) =>
         query.Where(urr => urr.EmailSent == null);
