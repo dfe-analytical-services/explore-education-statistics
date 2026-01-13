@@ -90,6 +90,12 @@ const PublicationReleasePage = ({
             renderSubscribeLink={
               <Link
                 to={`/subscriptions/new-subscription/${publicationSummary.slug}`}
+                onClick={() => {
+                  logEvent({
+                    category: 'Subscribe',
+                    action: 'Email subscription',
+                  });
+                }}
                 unvisited
               >
                 Get email alerts

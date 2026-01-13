@@ -341,6 +341,13 @@ const ReleaseExploreDataPage = ({
               <ContentHtml
                 html={dataDashboards}
                 testId="dataDashboards-content"
+                trackGlossaryLinks={glossaryEntrySlug =>
+                  logEvent({
+                    category: `Publication Release Related Dashboards Glossary Link`,
+                    action: `Glossary link clicked`,
+                    label: glossaryEntrySlug,
+                  })
+                }
               />
             </AccordionSection>
           )}
@@ -396,6 +403,13 @@ const ReleaseExploreDataPage = ({
               <ContentHtml
                 html={dataDashboards}
                 testId="dataDashboards-content"
+                trackGlossaryLinks={glossaryEntrySlug =>
+                  logEvent({
+                    category: `Publication Release Related Dashboards Glossary Link`,
+                    action: `Glossary link clicked`,
+                    label: glossaryEntrySlug,
+                  })
+                }
               />
             </ReleasePageContentSection>
           )}
