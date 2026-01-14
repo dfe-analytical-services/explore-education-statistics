@@ -62,7 +62,7 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
 
         var firstPublishedUpdate = new ReleaseUpdateDto
         {
-            Date = (await GetReleaseFirstPublishedDate(releaseVersion)).UtcDateTime,
+            Date = (await GetReleaseFirstPublishedDisplayDate(releaseVersion)).UtcDateTime,
             Summary = "First published",
         };
 
@@ -72,14 +72,14 @@ public class ReleaseUpdatesService(ContentDbContext contentDbContext) : IRelease
         return PaginatedListViewModel<ReleaseUpdateDto>.Paginate(allUpdates, page, pageSize);
     }
 
-    private async Task<DateTimeOffset> GetReleaseFirstPublishedDate(ReleaseVersion releaseVersion)
+    private async Task<DateTimeOffset> GetReleaseFirstPublishedDisplayDate(ReleaseVersion releaseVersion)
     {
         var published =
             releaseVersion.Version == 0
-                ? releaseVersion.Published
+                ? releaseVersion.PublishedDisplayDate
                 : await contentDbContext
                     .ReleaseVersions.Where(rv => rv.ReleaseId == releaseVersion.ReleaseId && rv.Version == 0)
-                    .Select(rv => rv.Published)
+                    .Select(rv => rv.PublishedDisplayDate)
                     .SingleAsync();
         return published!.Value;
     }
