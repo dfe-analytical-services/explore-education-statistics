@@ -4,7 +4,6 @@ import { Options } from 'k6/options';
 import http from 'k6/http';
 import exec from 'k6/execution';
 import { check, fail } from 'k6';
-import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
 import loggingUtils from '../../utils/loggingUtils';
 import steadyRequestRateProfile from '../../configuration/steadyRequestRateProfile';
@@ -20,9 +19,29 @@ const profile = (__ENV.PROFILE ?? 'sequential') as
   | 'stress'
   | 'sequential';
 
+const releasePageUrl =
+  __ENV.URL ?? '/find-statistics/pupil-absence-in-schools-in-england/2016-17';
+const expectedPublicationTitle =
+  __ENV.PUBLICATION_TITLE ?? 'Pupil absence in schools in England';
+const expectedContentSnippet =
+  __ENV.CONTENT_SNIPPET ?? 'pupils missed on average 8.2 school days';
+
+const urlSlugs = /\/find-statistics\/(.*)\/(.*)/g.exec(releasePageUrl)!;
+const publicationSlug = urlSlugs[1];
+const releaseSlug = urlSlugs[2];
+
+const dataUrls = [
+  `/find-statistics/${publicationSlug}/releases.json?redesign=true&publication=${publicationSlug}`,
+  `${releasePageUrl}.json?redesign=true&publication=${publicationSlug}&release=${releaseSlug}`,
+  `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,
+  `${releasePageUrl}/methodology.json?publication=${publicationSlug}&release=${releaseSlug}&tab=methodology`,
+  `${releasePageUrl}/help.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
+  `/find-statistics.json`,
+];
+
 export const options = getOptions();
 
-const name = 'getReleasePageOld.ts';
+const name = 'getReleasePage.ts';
 
 function getOptions(): Options {
   switch (profile) {
@@ -68,6 +87,17 @@ export const getReleaseRequestDuration = new Trend(
   true,
 );
 
+export const getReleaseDataRequestDuration = new Trend(
+  'ees_get_release_data_duration',
+  true,
+);
+export const getReleaseDataSuccessCount = new Counter(
+  'ees_get_release_data_success',
+);
+export const getReleaseDataFailureCount = new Counter(
+  'ees_get_release_data_failure',
+);
+
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT,
 );
@@ -95,10 +125,10 @@ const performTest = () => {
   console.log('Requesting');
 
   const startTime = Date.now();
-  let response;
+  let mainResponse;
   try {
-    response = http.get(
-      `${environmentAndUsers.environment.publicUrl}/find-statistics/pupil-absence-in-schools-in-england/2016-17`,
+    mainResponse = http.get(
+      `${environmentAndUsers.environment.publicUrl}${releasePageUrl}?redesign=true`,
       {
         timeout: '120s',
       },
@@ -110,29 +140,79 @@ const performTest = () => {
   }
 
   if (
-    check(response, {
+    check(mainResponse, {
       'response code was 200': ({ status }) => status === 200,
       'response should have contained body': ({ body }) => body != null,
       'response contains expected title': res =>
-        res.html().text().includes('Pupil absence in schools in England'),
+        res.html().text().includes(expectedPublicationTitle),
       'response contains expected content': res =>
-        res.html().text().includes('pupils missed on average 8.2 school days'),
+        res.html().text().includes(expectedContentSnippet),
     })
   ) {
-    console.log('SUCCESS!');
+    // console.log('SUCCESS!');
     getReleaseSuccessCount.add(1);
     getReleaseRequestDuration.add(Date.now() - startTime);
   } else {
-    console.log(`FAILURE! Got ${response.status} response code`);
+    console.log(`FAILURE! Got ${mainResponse.status} response code`);
     getReleaseFailureCount.add(1);
     getReleaseRequestDuration.add(Date.now() - startTime);
     errorRate.add(1);
     fail('Failure to Get Release page');
   }
+
+  const regexp = /"buildId":"([-0-9a-zA-Z]*)"/g;
+  const buildId = regexp.exec(mainResponse.body as string)![1];
+
+  dataUrls.forEach(dataUrl => {
+    const fullDataUrl = `${environmentAndUsers.environment.publicUrl}/_next/data/${buildId}${dataUrl}`;
+    // console.log(`Calling data URL ${fullDataUrl}`);
+
+    let dataResponse;
+    try {
+      dataResponse = http.get(
+        `${environmentAndUsers.environment.publicUrl}${releasePageUrl}?redesign=true`,
+        {
+          timeout: '120s',
+          headers: {
+            'x-nextjs-data': '1',
+            'x-middleware-prefetch': '1',
+            purpose: 'prefetch',
+          },
+        },
+      );
+    } catch (e) {
+      getReleaseDataFailureCount.add(1);
+      errorRate.add(1);
+      fail(
+        `Failure to get Release data response for URL ${fullDataUrl} - ${JSON.stringify(
+          e,
+        )}`,
+      );
+    }
+
+    if (
+      check(dataResponse, {
+        'response code was 200': ({ status }) => status === 200,
+      })
+    ) {
+      // console.log(`Data call success for URL ${fullDataUrl}`);
+      getReleaseDataSuccessCount.add(1);
+      getReleaseDataRequestDuration.add(Date.now() - startTime);
+    } else {
+      console.log(
+        `Data call failure! Got ${mainResponse.status} response code for URL ${fullDataUrl}`,
+      );
+      getReleaseDataFailureCount.add(1);
+      getReleaseDataRequestDuration.add(Date.now() - startTime);
+      errorRate.add(1);
+      fail(`Failure to get Release data response for URL ${fullDataUrl}`);
+    }
+  });
 };
-export function handleSummary(data: unknown) {
-  return {
-    'getReleasePageOld.html': htmlReport(data),
-  };
-}
+// export function handleSummary(data: unknown) {
+//   // return {
+//   //   'getReleasePage.html': htmlReport(data),
+//   // };
+//   return null;
+// }
 export default performTest;
