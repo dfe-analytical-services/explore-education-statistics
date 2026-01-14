@@ -1328,6 +1328,7 @@ public abstract class ReleaseVersionServiceTests
                                         .DefaultReleaseVersion()
                                         .WithApprovalStatus(ReleaseApprovalStatus.Approved)
                                         .WithPublished(DateTimeOffset.UtcNow)
+                                        .WithPublishedDisplayDate(DateTimeOffset.UtcNow)
                                         .WithPublishScheduled(DateTimeOffset.UtcNow)
                                         .WithPublishingOrganisations(_dataFixture.DefaultOrganisation().Generate(2))
                                         .WithReleaseStatuses(_dataFixture.DefaultReleaseStatus().Generate(2)),
@@ -1381,7 +1382,7 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(releaseVersion.ApprovalStatus, viewModel.ApprovalStatus);
                 Assert.Equal(releaseVersion.LatestInternalReleaseNote, viewModel.LatestInternalReleaseNote);
                 Assert.Equal(releaseVersion.PublishScheduled?.ToUkDateOnly(), viewModel.PublishScheduled);
-                Assert.Equal(releaseVersion.Published, viewModel.Published);
+                Assert.Equal(releaseVersion.PublishedDisplayDate, viewModel.Published);
                 Assert.Equal(releaseVersion.PreReleaseAccessList, viewModel.PreReleaseAccessList);
                 Assert.Equal(releaseVersion.NextReleaseDate, viewModel.NextReleaseDate);
                 Assert.Equal(releaseVersion.Type, viewModel.Type);

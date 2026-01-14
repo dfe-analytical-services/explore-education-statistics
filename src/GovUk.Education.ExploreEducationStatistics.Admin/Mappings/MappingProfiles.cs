@@ -49,6 +49,7 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(dest => dest.Title, m => m.MapFrom(rv => rv.Release.Title))
             .ForMember(dest => dest.Year, m => m.MapFrom(rv => rv.Release.Year))
             .ForMember(dest => dest.YearTitle, m => m.MapFrom(rv => rv.Release.YearTitle))
+            .ForMember(dest => dest.Published, m => m.MapFrom(releaseVersion => releaseVersion.PublishedDisplayDate))
             .ForMember(
                 dest => dest.LatestRelease,
                 m => m.MapFrom(rv => rv.Release.Publication.LatestPublishedReleaseVersionId == rv.Id)
@@ -76,6 +77,7 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(dest => dest.Title, m => m.MapFrom(rv => rv.Release.Title))
             .ForMember(dest => dest.Year, m => m.MapFrom(rv => rv.Release.Year))
             .ForMember(dest => dest.YearTitle, m => m.MapFrom(rv => rv.Release.YearTitle))
+            .ForMember(dest => dest.Published, m => m.MapFrom(releaseVersion => releaseVersion.PublishedDisplayDate))
             .ForMember(
                 dest => dest.PublishScheduled,
                 m =>
