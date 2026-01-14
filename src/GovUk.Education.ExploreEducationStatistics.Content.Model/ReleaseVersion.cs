@@ -75,6 +75,7 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     /// <summary>
     /// When publishing the release version, if this property is true, <c>PublishedDisplayDate</c> is set to the current date,
     /// otherwise it inherits the previous version's <c>PublishedDisplayDate</c>.
+    /// TODO EES-6832 rename this to UpdatePublishedDisplayDate.
     /// </summary>
     public bool UpdatePublishedDate { get; set; }
 

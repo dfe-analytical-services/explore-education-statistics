@@ -84,11 +84,11 @@ public class ReleaseService(ContentDbContext contentDbContext) : IReleaseService
         var publishedDisplayDate = await CalculatePublishedDisplayDate(releaseVersion, actualPublishedDate);
         releaseVersion.PublishedDisplayDate = publishedDisplayDate;
 
-        // In a future change we can alter this to set Published to the actual published date,
+        // TODO EES-6831 Alter this to set Published to the actual published date,
         // maintaining a record of when the release version was actually published.
         // Up until now it can have been inherited from the previous release version.
-        // Provided that the values for all existing release versions are also corrected,
-        // Published can also become the public facing 'last updated' date of the release.
+        // Provided that the values for all existing release versions are also corrected by EES-6830 in a one-off migration,
+        // Published can also become the public facing 'last updated' date of the release in EES-6833.
         releaseVersion.Published = publishedDisplayDate;
 
         await UpdateReleaseFilePublishedDate(releaseVersion, publishedDisplayDate);
