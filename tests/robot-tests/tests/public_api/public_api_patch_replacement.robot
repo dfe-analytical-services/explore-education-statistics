@@ -132,7 +132,7 @@ Upload replacement data
     user uploads subject replacement    ${SUBJECT_1_NAME}    absence_school_minor_manual.csv
     ...    absence_school_minor_manual.meta.csv    ${PUBLIC_API_FILES_DIR}
     user waits until page contains element    testid:Data file replacements table
-    user confirms replacement upload    ${SUBJECT_1_NAME}    Error
+    user confirms replacement upload    ${SUBJECT_1_NAME}    Error    True
     user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
     user waits until page contains element    testid:Replacement Title
