@@ -105,6 +105,11 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
             <ReleaseSummaryBlockMobile
               lastUpdated={updates[0]?.on}
               publishingOrganisations={publishingOrganisations}
+              releaseDate={
+                updates.length === 0
+                  ? release.published ?? release.publishScheduled
+                  : undefined
+              }
               releaseType={type}
               renderProducerLink={
                 publishingOrganisations?.length ? (

@@ -99,7 +99,9 @@ const ReleasePageIntro = ({
 
       {!isMobileMedia && (
         <ReleaseSummaryBlock
-          lastUpdated={lastUpdated}
+          lastUpdated={
+            updateCountExcludingFirstPublished > 0 ? lastUpdated : undefined
+          }
           publishingOrganisations={publishingOrganisations}
           releaseDate={published}
           releaseType={type}

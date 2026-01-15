@@ -54,9 +54,18 @@ const PublicationReleasePage = ({
           <p className="govuk-body-l">{publicationSummary.summary}</p>
 
           <ReleaseSummaryBlockMobile
-            lastUpdated={releaseVersionSummary.lastUpdated}
+            lastUpdated={
+              updateCountExcludingFirstPublished > 0
+                ? releaseVersionSummary.lastUpdated
+                : undefined
+            }
             publishingOrganisations={
               releaseVersionSummary.publishingOrganisations
+            }
+            releaseDate={
+              updateCountExcludingFirstPublished === 0
+                ? releaseVersionSummary.published
+                : undefined
             }
             releaseType={releaseVersionSummary.type}
             renderProducerLink={
