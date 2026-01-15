@@ -2,6 +2,7 @@ import { useMobileMedia } from '@common/hooks/useMedia';
 import { PublicationSummaryRedesign } from '@common/services/publicationService';
 import SubscribeLink from '@frontend/components/SubscribeLink';
 import styles from '@frontend/modules/find-statistics/components/ReleasePageTitle.module.scss';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
 
 interface Props {
@@ -34,6 +35,12 @@ const ReleasePageTitle = ({ publicationSummary, releaseTitle }: Props) => {
         <div className="govuk-!-margin-bottom-4 dfe-flex-shrink--0">
           <SubscribeLink
             url={`/subscriptions/new-subscription/${publicationSummary.slug}`}
+            onClick={() => {
+              logEvent({
+                category: 'Subscribe',
+                action: 'Email subscription',
+              });
+            }}
           />
         </div>
       )}
