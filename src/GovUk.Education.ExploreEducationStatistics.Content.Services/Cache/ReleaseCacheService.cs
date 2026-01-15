@@ -33,12 +33,13 @@ public class ReleaseCacheService(
     public Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateRelease(
         Guid releaseVersionId,
         string publicationSlug,
-        string? releaseSlug = null
+        string? releaseSlug = null,
+        DateTimeOffset? expectedPublishDate = null
     )
     {
         return publicBlobCacheService.Update(
             cacheKey: new ReleaseCacheKey(publicationSlug: publicationSlug, releaseSlug: releaseSlug),
-            createFn: () => releaseService.GetRelease(releaseVersionId),
+            createFn: () => releaseService.GetRelease(releaseVersionId, expectedPublishDate),
             logger: logger
         );
     }

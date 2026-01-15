@@ -81,7 +81,7 @@ public abstract class ReleaseUpdatesServiceTests
             releaseVersion.Updates = _dataFixture
                 .DefaultUpdate()
                 .WithReleaseVersionId(releaseVersion.Id)
-                .WithOn(releaseVersion.Published!.Value.AddDays(1).UtcDateTime)
+                .WithOn(releaseVersion.PublishedDisplayDate!.Value.AddDays(1).UtcDateTime)
                 .GenerateList(1);
 
             var contextId = Guid.NewGuid().ToString();
@@ -116,7 +116,7 @@ public abstract class ReleaseUpdatesServiceTests
                 Assert.Equal(releaseVersion.Updates[0].Reason, results[0].Summary);
 
                 // Check that the last item is the 'First published' entry
-                Assert.Equal(releaseVersion.Published, results[^1].Date);
+                Assert.Equal(releaseVersion.PublishedDisplayDate, results[^1].Date);
                 Assert.Equal("First published", results[^1].Summary);
             }
         }
@@ -131,7 +131,7 @@ public abstract class ReleaseUpdatesServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            // Set a shuffled list of updates dated after the release version published date
+            // Set a shuffled list of updates dated after the release version published display date
             releaseVersion.Updates =
             [
                 .. Enumerable
@@ -140,7 +140,7 @@ public abstract class ReleaseUpdatesServiceTests
                         _dataFixture
                             .DefaultUpdate()
                             .WithReleaseVersionId(releaseVersion.Id)
-                            .WithOn(releaseVersion.Published!.Value.AddDays(i + 1).UtcDateTime)
+                            .WithOn(releaseVersion.PublishedDisplayDate!.Value.AddDays(i + 1).UtcDateTime)
                             .Generate()
                     )
                     .ToArray()
@@ -181,7 +181,7 @@ public abstract class ReleaseUpdatesServiceTests
                 }
 
                 // Check that the last item is the 'First published' entry
-                Assert.Equal(releaseVersion.Published, results[^1].Date);
+                Assert.Equal(releaseVersion.PublishedDisplayDate, results[^1].Date);
                 Assert.Equal("First published", results[^1].Summary);
             }
         }
@@ -201,8 +201,14 @@ public abstract class ReleaseUpdatesServiceTests
             var (updateBeforeFirstPublished, updateAfterFirstPublished) = _dataFixture
                 .DefaultUpdate()
                 .WithReleaseVersionId(releaseVersion.Id)
-                .ForIndex(0, setters => setters.SetOn(releaseVersion.Published!.Value.AddDays(-1).UtcDateTime))
-                .ForIndex(1, setters => setters.SetOn(releaseVersion.Published!.Value.AddDays(1).UtcDateTime))
+                .ForIndex(
+                    0,
+                    setters => setters.SetOn(releaseVersion.PublishedDisplayDate!.Value.AddDays(-1).UtcDateTime)
+                )
+                .ForIndex(
+                    1,
+                    setters => setters.SetOn(releaseVersion.PublishedDisplayDate!.Value.AddDays(1).UtcDateTime)
+                )
                 .GenerateTuple2();
             releaseVersion.Updates = [updateBeforeFirstPublished, updateAfterFirstPublished];
 
@@ -233,7 +239,7 @@ public abstract class ReleaseUpdatesServiceTests
 
                 Assert.Equal(updateAfterFirstPublished.On, results[0].Date);
                 Assert.Equal(updateAfterFirstPublished.Reason, results[0].Summary);
-                Assert.Equal(releaseVersion.Published!.Value, results[1].Date);
+                Assert.Equal(releaseVersion.PublishedDisplayDate!.Value, results[1].Date);
                 Assert.Equal("First published", results[1].Summary);
                 Assert.Equal(updateBeforeFirstPublished.On, results[2].Date);
                 Assert.Equal(updateBeforeFirstPublished.Reason, results[2].Summary);
@@ -272,7 +278,7 @@ public abstract class ReleaseUpdatesServiceTests
                     expectedPageSize: 10
                 );
 
-                Assert.Equal(release.Versions[0].Published, pagedResult.Results[0].Date);
+                Assert.Equal(release.Versions[0].PublishedDisplayDate, pagedResult.Results[0].Date);
                 Assert.Equal("First published", pagedResult.Results[0].Summary);
             }
         }
@@ -283,14 +289,32 @@ public abstract class ReleaseUpdatesServiceTests
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 2)]);
+                .WithReleases(_ =>
+                    [
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                _dataFixture
+                                    .DefaultReleaseVersion()
+                                    .ForIndex(
+                                        0,
+                                        s =>
+                                            s.SetPublished(DateTimeOffset.UtcNow.AddDays(-2))
+                                                .SetPublishedDisplayDate(DateTimeOffset.UtcNow.AddDays(-2))
+                                                .SetVersion(0)
+                                    )
+                                    .ForIndex(
+                                        1,
+                                        s =>
+                                            s.SetPublished(DateTimeOffset.UtcNow.AddDays(-1))
+                                                .SetPublishedDisplayDate(DateTimeOffset.UtcNow.AddDays(-1))
+                                                .SetVersion(1)
+                                    )
+                                    .Generate(2)
+                            ),
+                    ]
+                );
             var release = publication.Releases[0];
-
-            // Ensure the generated release versions have different published dates
-            Assert.True(
-                release.Versions[0].Published < release.Versions[1].Published,
-                "Version 0 should be published before version 1"
-            );
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -315,7 +339,7 @@ public abstract class ReleaseUpdatesServiceTests
                     expectedPageSize: 10
                 );
 
-                Assert.Equal(release.Versions[0].Published, pagedResult.Results[0].Date);
+                Assert.Equal(release.Versions[0].PublishedDisplayDate, pagedResult.Results[0].Date);
                 Assert.Equal("First published", pagedResult.Results[0].Summary);
             }
         }

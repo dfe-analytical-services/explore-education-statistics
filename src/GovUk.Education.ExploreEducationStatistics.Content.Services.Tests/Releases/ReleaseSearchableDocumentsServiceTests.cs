@@ -44,7 +44,7 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             {
                 ReleaseId = release.Id,
                 Slug = release.Slug,
-                Published = releaseVersion.Published,
+                Published = releaseVersion.PublishedDisplayDate,
                 Title = release.Title,
                 Type = releaseVersion.Type,
                 HeadlinesSection = new ContentSectionViewModelBuilder().AddHtmlContent(
@@ -114,7 +114,7 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                     () => Assert.Equal(publication.Slug, actual.PublicationSlug),
                     () => Assert.Equal(publication.Summary, actual.Summary),
                     () => Assert.Equal(publication.Title, actual.PublicationTitle),
-                    () => Assert.Equal(releaseVersion.Published!.Value, actual.Published),
+                    () => Assert.Equal(releaseVersion.PublishedDisplayDate!.Value, actual.Published),
                     () => Assert.Equal(publication.Theme.Id, actual.ThemeId),
                     () => Assert.Equal(publication.Theme.Title, actual.ThemeTitle),
                     () => Assert.Equal(releaseVersion.Type.ToString(), actual.Type),

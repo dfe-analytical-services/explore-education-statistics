@@ -192,10 +192,12 @@ def user_creates_test_release_via_api(
 
 
 def user_updates_release_published_date_via_api(release_id: str, published: datetime) -> None:
-    response = admin_client.patch(f"/api/releases/{release_id}/published", {"published": published.isoformat()})
+    response = admin_client.patch(
+        f"/api/releaseVersions/{release_id}/published-display-date", {"publishedDisplayDate": published.isoformat()}
+    )
     assert (
         response.status_code < 300
-    ), f"Updating release published date failed with {response.status_code} and {response.text}"
+    ), f"Updating release published display date failed with {response.status_code} and {response.text}"
 
 
 def delete_test_user(email: str):

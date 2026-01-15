@@ -33,13 +33,17 @@ public static class ReleaseGeneratorExtensions
                             s.SetApprovalStatus(ReleaseApprovalStatus.Approved)
                                 .Set(
                                     p => p.Published,
-                                    (f, releaseVersion) =>
-                                        releaseVersion.Version == 0
+                                    (f, rv) =>
+                                        rv.Version == 0
                                             ? f.Date.PastOffset()
                                             : f.Date.BetweenOffset(
                                                 previousVersion!.Published!.Value,
                                                 DateTimeOffset.UtcNow
                                             )
+                                )
+                                .Set(
+                                    p => p.PublishedDisplayDate,
+                                    (_, rv) => rv.Version == 0 ? rv.Published : previousVersion!.PublishedDisplayDate
                                 )
                                 .Set(rv => rv.PublishScheduled, (_, rv) => rv.Published!.Value.GetUkStartOfDayUtc())
                     )

@@ -67,6 +67,7 @@ public class ReleaseAmendmentServiceTests
                 }
             )
             .WithPublished(DateTimeOffset.UtcNow.AddDays(-1))
+            .WithPublishedDisplayDate(DateTimeOffset.UtcNow.AddDays(-1))
             .WithApprovalStatus(ReleaseApprovalStatus.Approved)
             .WithPreviousVersionId(Guid.NewGuid())
             .WithType(ReleaseType.OfficialStatistics)
@@ -367,6 +368,7 @@ public class ReleaseAmendmentServiceTests
                     r => r.PreviousVersionId,
                     r => r.Version,
                     r => r.Published,
+                    r => r.PublishedDisplayDate,
                     r => r.PublishScheduled,
                     r => r.Live,
                     r => r.ApprovalStatus,
@@ -400,6 +402,7 @@ public class ReleaseAmendmentServiceTests
             Assert.Equal(originalReleaseVersion.Id, amendment.PreviousVersionId);
             Assert.Equal(originalReleaseVersion.Version + 1, amendment.Version);
             Assert.Null(amendment.Published);
+            Assert.Null(amendment.PublishedDisplayDate);
             Assert.Null(amendment.PublishScheduled);
             Assert.False(amendment.Live);
             Assert.Equal(ReleaseApprovalStatus.Draft, amendment.ApprovalStatus);

@@ -21,6 +21,9 @@ using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests;
 
+/// <summary>
+/// TODO EES-6432 EES-6433: This service is due to be removed by EES-6432/EES-6433 once the release page redesign is live.
+/// </summary>
 public class ReleaseServiceTests
 {
     private readonly DataFixture _dataFixture = new();
@@ -71,6 +74,7 @@ public class ReleaseServiceTests
         },
         ApprovalStatus = Approved,
         Published = new DateTimeOffset(2019, 2, 1, 9, 30, 0, TimeSpan.Zero),
+        PublishedDisplayDate = new DateTimeOffset(2019, 2, 1, 9, 30, 0, TimeSpan.Zero),
         Updates = new List<Update>
         {
             new()
@@ -309,7 +313,7 @@ public class ReleaseServiceTests
 
             Assert.Equal(Release1V1.Id, viewModel.Id);
             Assert.Equal(Release1V1.Release.Title, viewModel.Title);
-            Assert.Equal(Release1V1.Published, viewModel.Published);
+            Assert.Equal(Release1V1.PublishedDisplayDate, viewModel.Published);
             Assert.Equal(Release1.Id, viewModel.ReleaseId);
 
             Assert.Equal(2, viewModel.KeyStatistics.Count);
@@ -437,6 +441,8 @@ public class ReleaseServiceTests
             },
         };
 
+        var expectedPublishDate = new DateTimeOffset(2025, 1, 1, 9, 30, 0, TimeSpan.Zero);
+
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -448,7 +454,7 @@ public class ReleaseServiceTests
         {
             var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-            var result = await service.GetRelease(releaseVersion.Id);
+            var result = await service.GetRelease(releaseVersion.Id, expectedPublishDate);
             var viewModel = result.AssertRight();
 
             Assert.Equal(releaseVersion.Id, viewModel.Id);
@@ -508,7 +514,7 @@ public class ReleaseServiceTests
             var service = SetupReleaseService(contentDbContext: contentDbContext);
 
             // Test scenario of the publisher getting an unpublished release to cache it in advance of publishing it
-            // on a scheduled date
+            // (scheduled or immediately), supplying the expected publish date.
             var result = await service.GetRelease(releaseVersion.Id, expectedPublishDate);
 
             var viewModel = result.AssertRight();
@@ -519,7 +525,7 @@ public class ReleaseServiceTests
     }
 
     [Fact]
-    public async Task GetRelease_NotPublished_ExpectedPublishDateIsNull()
+    public async Task GetRelease_NotPublishedAndExpectedPublishDateIsNull_ThrowsException()
     {
         Publication publication = _dataFixture
             .DefaultPublication()
@@ -538,14 +544,14 @@ public class ReleaseServiceTests
         {
             var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-            // Test scenario of the publisher getting an unpublished release to cache it in advance of publishing it
-            // immediately.
-            var result = await service.GetRelease(releaseVersion.Id, expectedPublishDate: null);
-
-            var viewModel = result.AssertRight();
-
-            // Published date in the view model should match the date now
-            viewModel.Published.AssertUtcNow();
+            // Test that retrieving an unpublished release without an expected publish date throws an exception
+            var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+                service.GetRelease(releaseVersion.Id, expectedPublishDate: null)
+            );
+            Assert.Equal(
+                $"Expected publish date must be provided for unpublished release version '{releaseVersion.Id}'. (Parameter 'expectedPublishDate')",
+                exception.Message
+            );
         }
     }
 
@@ -581,8 +587,8 @@ public class ReleaseServiceTests
             var viewModel = result.AssertRight();
 
             Assert.Equal(releaseVersion.Id, viewModel.Id);
-            // Published date in the view model should match the published date of the previous version
-            Assert.Equal(previousReleaseVersion.Published, viewModel.Published);
+            // Published date in the view model should match the published display date of the previous version
+            Assert.Equal(previousReleaseVersion.PublishedDisplayDate, viewModel.Published);
         }
     }
 

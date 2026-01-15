@@ -50,8 +50,8 @@ public record ReleaseVersionSummaryDto
             IsLatestRelease = isLatestRelease,
             Label = releaseVersion.Release.Label,
             LastUpdated = lastUpdated,
-            // TODO EES-6414 'Published' should be the published display date
-            Published = releaseVersion.Published.Value,
+            Published =
+                releaseVersion.PublishedDisplayDate ?? throw new ArgumentException("ReleaseVersion must be published"),
             PublishingOrganisations = publishingOrganisations,
             Slug = releaseVersion.Release.Slug,
             Title = releaseVersion.Release.Title,
