@@ -168,7 +168,7 @@ export default function DataFilesTableUploadRow({
             confirmText={confirmText}
             triggerButton={
               <ButtonText
-                testId={`${testId}-view-details`}
+                testId={testId && `${testId}-view-details`}
                 onClick={toggleOpenImportConfirm.on}
               >
                 View details

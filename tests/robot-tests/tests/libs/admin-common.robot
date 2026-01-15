@@ -645,17 +645,11 @@ user confirms replacement upload
     [Arguments]
     ...    ${SUBJECT_NAME}
     ...    ${EXPECTED_STATUS}=Ready
-    ...    ${USE_TESTID}=False
-    ...    ${TESTID_INDEX}=1
-    IF    ${USE_TESTID}
-        user clicks element    testid:data-set-upload-row-${TESTID_INDEX}-view-details
-    ELSE
-        user clicks button in table cell    1    4    View details    testid:Data file replacements table
-    END
+    ...    ${ROW}=1
+    user clicks element    testid:data-set-upload-row-${TESTID_INDEX}-view-details
 
     user waits until modal is visible    Data set details
     ${statusText}=    Get Text    xpath=//tr[td[1][text()[contains(.,'${SUBJECT_NAME}')]]]/td[3]/strong
-
     IF    '${statusText}' == 'Pending review'
         user acknowledges any warnings in modal
         user clicks button    Continue import with warnings
