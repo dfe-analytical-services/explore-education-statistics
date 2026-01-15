@@ -464,7 +464,7 @@ public abstract class UserManagementServiceTests
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync([]); // Don't actually need to return anything here for the test. Just want to check it was called correctly.
 
             var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(Strict);
             userResourceRoleNotificationService
@@ -648,7 +648,7 @@ public abstract class UserManagementServiceTests
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync([]); // Don't actually need to return anything here for the test. Just want to check it was called correctly.
 
             var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(Strict);
             userResourceRoleNotificationService

@@ -36,7 +36,7 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUse
         return newUserReleaseRole;
     }
 
-    public async Task CreateManyIfNotExists(
+    public async Task<List<UserReleaseRole>> CreateManyIfNotExists(
         IReadOnlyList<UserReleaseRole> userReleaseRoles,
         CancellationToken cancellationToken = default
     )
@@ -48,6 +48,7 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUse
                     userId: userReleaseRole.UserId,
                     releaseVersionId: userReleaseRole.ReleaseVersionId,
                     role: userReleaseRole.Role,
+                    resourceRoleFilter: ResourceRoleFilter.All,
                     cancellationToken: cancellationToken
                 )
             )
@@ -55,6 +56,8 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUse
 
         contentDbContext.UserReleaseRoles.AddRange(newUserReleaseRoles);
         await contentDbContext.SaveChangesAsync(cancellationToken);
+
+        return newUserReleaseRoles;
     }
 
     public async Task<UserReleaseRole?> GetById(Guid userReleaseRoleId, CancellationToken cancellationToken = default)

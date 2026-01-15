@@ -33,24 +33,23 @@ public class ReleasePermissionService(
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Publication))
             .OnSuccessDo(releaseVersion => userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
             .OnSuccess(async _ =>
-            {
-                var userReleaseRoles = await userReleaseRoleRepository
-                    .Query()
-                    .AsNoTracking()
-                    .WhereForReleaseVersion(releaseVersionId)
-                    .WhereRolesIn(rolesToCheck)
-                    .ToListAsync();
-
-                return userReleaseRoles
-                    .Select(urr => new UserReleaseRoleSummaryViewModel(
-                        urr.UserId,
-                        urr.User.DisplayName,
-                        urr.User.Email,
-                        urr.Role
-                    ))
+                (
+                    await userReleaseRoleRepository
+                        .Query()
+                        .AsNoTracking()
+                        .WhereForReleaseVersion(releaseVersionId)
+                        .WhereRolesIn(rolesToCheck)
+                        .Select(urr => new UserReleaseRoleSummaryViewModel(
+                            urr.UserId,
+                            urr.User.DisplayName,
+                            urr.User.Email,
+                            urr.Role
+                        ))
+                        .ToListAsync()
+                )
                     .OrderBy(model => model.UserDisplayName)
-                    .ToList();
-            });
+                    .ToList()
+            );
     }
 
     public async Task<Either<ActionResult, List<UserReleaseInviteViewModel>>> ListReleaseInvites(
@@ -64,14 +63,17 @@ public class ReleasePermissionService(
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Publication))
             .OnSuccessDo(releaseVersion => userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
             .OnSuccess(async _ =>
-                await userReleaseRoleRepository
-                    .Query(ResourceRoleFilter.PendingOnly)
-                    .WhereForReleaseVersion(releaseVersionId)
-                    .WhereRolesIn(rolesToCheck)
-                    .Where(urr => rolesToCheck.Contains(urr.Role))
-                    .Select(urr => new UserReleaseInviteViewModel(urr.User.Email, urr.Role))
+                (
+                    await userReleaseRoleRepository
+                        .Query(ResourceRoleFilter.PendingOnly)
+                        .WhereForReleaseVersion(releaseVersionId)
+                        .WhereRolesIn(rolesToCheck)
+                        .Where(urr => rolesToCheck.Contains(urr.Role))
+                        .Select(urr => new UserReleaseInviteViewModel(urr.User.Email, urr.Role))
+                        .ToListAsync()
+                )
                     .OrderBy(viewModel => viewModel.Email)
-                    .ToListAsync()
+                    .ToList()
             );
     }
 

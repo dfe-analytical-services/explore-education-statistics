@@ -366,6 +366,7 @@ public class ReleasePermissionServiceTests
     {
         Release release1 = _dataFixture.DefaultRelease(publishedVersions: 1);
         Release release2 = _dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true);
+        Release release3 = _dataFixture.DefaultRelease(publishedVersions: 1);
         Publication publication = _dataFixture.DefaultPublication().WithReleases(ListOf(release1, release2));
         User user1 = _dataFixture.DefaultUser();
         User user2 = _dataFixture.DefaultUser();
@@ -374,7 +375,9 @@ public class ReleasePermissionServiceTests
             .DefaultUserReleaseRole()
             .ForIndex(0, s => s.SetUser(user1).SetReleaseVersion(release1.Versions[0]).SetRole(Contributor))
             .ForIndex(1, s => s.SetUser(user2).SetReleaseVersion(release2.Versions[1]).SetRole(Contributor))
-            .GenerateList(2);
+            // Duplicate user for different release version - should be ignored in the result
+            .ForIndex(2, s => s.SetUser(user1).SetReleaseVersion(release3.Versions[0]).SetRole(Contributor))
+            .GenerateList(3);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -398,6 +401,7 @@ public class ReleasePermissionServiceTests
             var result = await service.ListPublicationContributors(publication.Id);
             var viewModel = result.AssertRight();
 
+            // Should only be 2, as one of the users is a duplicate
             Assert.Equal(2, viewModel.Count);
 
             Assert.Equal(user1.Id, viewModel[0].UserId);
@@ -536,7 +540,7 @@ public class ReleasePermissionServiceTests
                     It.IsAny<CancellationToken>()
                 )
             )
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync([]); // Don't actually need to return anything here for the test. Just want to check it was called correctly.
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {

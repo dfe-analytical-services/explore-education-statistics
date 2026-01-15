@@ -15,7 +15,7 @@ public interface IUserReleaseRoleRepository
         CancellationToken cancellationToken = default
     );
 
-    Task CreateManyIfNotExists(
+    Task<List<UserReleaseRole>> CreateManyIfNotExists(
         IReadOnlyList<UserReleaseRole> userReleaseRoles,
         CancellationToken cancellationToken = default
     );

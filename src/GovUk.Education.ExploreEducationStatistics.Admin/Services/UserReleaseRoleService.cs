@@ -23,11 +23,13 @@ public class UserReleaseRoleService(
 
         var releaseVersionIds = await releaseVersionRepository.ListLatestReleaseVersionIds(publicationId);
 
-        return await userReleaseRoleRepository
+        var x = await userReleaseRoleRepository
             .Query()
             .Where(urr => releaseVersionIds.Contains(urr.ReleaseVersionId))
             .WhereRolesIn(rolesToCheck)
             .Include(urr => urr.User)
             .ToListAsync();
+
+        return x;
     }
 }

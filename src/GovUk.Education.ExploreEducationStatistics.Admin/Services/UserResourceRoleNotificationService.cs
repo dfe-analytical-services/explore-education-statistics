@@ -31,19 +31,34 @@ public class UserResourceRoleNotificationService(
 
         var userReleaseRoles = await userReleaseRoleRepository
             .Query(ResourceRoleFilter.PendingOnly)
+            .AsNoTracking()
             .WhereForUser(user.Id)
+            .Select(urr => new
+            {
+                urr.Id,
+                PublicationTitle = urr.ReleaseVersion.Release.Publication.Title,
+                ReleaseTitle = urr.ReleaseVersion.Release.Title,
+                urr.Role,
+            })
             .ToListAsync(cancellationToken);
 
         var userPublicationRoles = await userPublicationRoleRepository
             .Query(ResourceRoleFilter.PendingOnly)
+            .AsNoTracking()
             .WhereForUser(user.Id)
+            .Select(upr => new
+            {
+                upr.Id,
+                PublicationTitle = upr.Publication.Title,
+                upr.Role,
+            })
             .ToListAsync(cancellationToken);
 
         var releaseRolesInfo = userReleaseRoles
-            .Select(urr => (urr.ReleaseVersion.Release.Publication.Title, urr.ReleaseVersion.Release.Title, urr.Role))
+            .Select(urr => (urr.PublicationTitle, urr.ReleaseTitle, urr.Role))
             .ToHashSet();
 
-        var publicationRolesInfo = userPublicationRoles.Select(upr => (upr.Publication.Title, upr.Role)).ToHashSet();
+        var publicationRolesInfo = userPublicationRoles.Select(upr => (upr.PublicationTitle, upr.Role)).ToHashSet();
 
         await contentDbContext.RequireTransaction(async () =>
         {
@@ -281,9 +296,9 @@ public class UserResourceRoleNotificationService(
         return await userPublicationRoleRepository
                 .Query(ResourceRoleFilter.AllButExpired)
                 .AsNoTracking()
-                .Include(urr => urr.User)
-                .Include(urr => urr.Publication)
-                .SingleOrDefaultAsync(urr => urr.Id == userPublicationRoleId, cancellationToken)
+                .Include(upr => upr.User)
+                .Include(upr => upr.Publication)
+                .SingleOrDefaultAsync(upr => upr.Id == userPublicationRoleId, cancellationToken)
             ?? throw new KeyNotFoundException(
                 $"A non-expired publication role with ID {userPublicationRoleId} does not exist."
             );
@@ -318,8 +333,10 @@ public class UserResourceRoleNotificationService(
             .Query(ResourceRoleFilter.AllButExpired)
             .AsNoTracking()
             .Where(urr => userReleaseRoleIds.Contains(urr.Id))
+            .Include(urr => urr.User)
             .Include(urr => urr.ReleaseVersion)
                 .ThenInclude(rv => rv.Release)
+                    .ThenInclude(r => r.Publication)
             .ToListAsync(cancellationToken);
 
         var userReleaseRoleIdsFound = userReleaseRoles.Select(urr => urr.Id).ToHashSet();

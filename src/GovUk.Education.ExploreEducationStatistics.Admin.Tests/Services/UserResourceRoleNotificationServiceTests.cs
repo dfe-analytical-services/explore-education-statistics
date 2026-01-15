@@ -452,39 +452,16 @@ public abstract class UserResourceRoleNotificationServiceTests
         {
             User user = _dataFixture.DefaultUser();
             Publication publication = _dataFixture.DefaultPublication();
+            var (release1, release2) = _dataFixture.DefaultRelease().WithPublication(publication).GenerateTuple2();
 
             var userReleaseRoles = _dataFixture
                 .DefaultUserReleaseRole()
                 .WithUser(user)
                 .WithRole(ReleaseRole.Contributor)
-                // Create different release versions for each role, to test that the releases info passed to the email contains all distinct releases
-                .ForIndex(
-                    0,
-                    s =>
-                        s.SetReleaseVersion(
-                            _dataFixture
-                                .DefaultReleaseVersion()
-                                .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
-                        )
-                )
-                .ForIndex(
-                    1,
-                    s =>
-                        s.SetReleaseVersion(
-                            _dataFixture
-                                .DefaultReleaseVersion()
-                                .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
-                        )
-                )
-                .ForIndex(
-                    2,
-                    s =>
-                        s.SetReleaseVersion(
-                            _dataFixture
-                                .DefaultReleaseVersion()
-                                .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
-                        )
-                )
+                .ForIndex(0, s => s.SetReleaseVersion(_dataFixture.DefaultReleaseVersion().WithRelease(release1)))
+                .ForIndex(1, s => s.SetReleaseVersion(_dataFixture.DefaultReleaseVersion().WithRelease(release2)))
+                // Create a duplicate release across two roles, to test that the releases info passed to the email contains all distinct releases
+                .ForIndex(2, s => s.SetReleaseVersion(_dataFixture.DefaultReleaseVersion().WithRelease(release1)))
                 .GenerateList(3);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);

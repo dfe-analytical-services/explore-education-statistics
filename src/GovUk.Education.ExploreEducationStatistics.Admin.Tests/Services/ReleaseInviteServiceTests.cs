@@ -37,14 +37,16 @@ public abstract class ReleaseInviteServiceTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(2));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(3));
 
             User userToCreate = _dataFixture.DefaultUserWithPendingInvite();
 
-            var releaseVersionIds = SetOf(
-                publication.Releases[0].Versions[0].Id,
-                publication.Releases[1].Versions[0].Id
+            var releaseVersions = SetOf(
+                publication.Releases[0].Versions[0],
+                publication.Releases[1].Versions[0],
+                publication.Releases[2].Versions[0]
             );
+            var releaseVersionIds = releaseVersions.Select(rv => rv.Id).ToHashSet();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -54,41 +56,41 @@ public abstract class ReleaseInviteServiceTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var createdUserReleaseRoleIds = new HashSet<Guid>();
+            // Simulate that one release version already had a Contributor role associated with it for this user.
+            // So only 2 new UserReleaseRoles should be created.
+            var createdUserReleaseRoles = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithRole(ReleaseRole.Contributor)
+                .WithCreatedById(CreatedById)
+                .WithUser(userToCreate)
+                .ForIndex(0, s => s.SetReleaseVersion(releaseVersions.ElementAt(0)))
+                .ForIndex(1, s => s.SetReleaseVersion(releaseVersions.ElementAt(1)))
+                .GenerateList(2);
+            var createdUserReleaseRoleIds = createdUserReleaseRoles.Select(urr => urr.Id).ToHashSet();
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository
                 .Setup(mock =>
                     mock.CreateManyIfNotExists(
+                        // Assert that all 3 UserReleaseRoles are attempted to be created
                         It.Is<List<UserReleaseRole>>(l =>
-                            l.Count == 2
+                            l.Count == 3
                             && l.All(r =>
                                 r.UserId == userToCreate.Id
                                 && r.Role == ReleaseRole.Contributor
                                 && r.CreatedById == CreatedById
+                                && Math.Abs((r.Created - DateTime.UtcNow).Milliseconds)
+                                    <= AssertExtensions.TimeWithinMillis
                             )
                             && l[0].ReleaseVersionId == releaseVersionIds.ElementAt(0)
-                            && Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
-                                <= AssertExtensions.TimeWithinMillis
                             && l[1].ReleaseVersionId == releaseVersionIds.ElementAt(1)
-                            && Math.Abs((l[1].Created - DateTime.UtcNow).Milliseconds)
-                                <= AssertExtensions.TimeWithinMillis
+                            && l[2].ReleaseVersionId == releaseVersionIds.ElementAt(2)
                         ),
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .Returns(Task.CompletedTask)
-                .Callback<IReadOnlyList<UserReleaseRole>, CancellationToken>(
-                    (allUserReleaseRoles, _) =>
-                    {
-                        foreach (var userReleaseRole in allUserReleaseRoles)
-                        {
-                            // Simulate EF Core setting the ID on creation
-                            userReleaseRole.Id = Guid.NewGuid();
-                            createdUserReleaseRoleIds.Add(userReleaseRole.Id);
-                        }
-                    }
-                );
+                // But only 2 are actually created (as one already existed)
+                .ReturnsAsync(createdUserReleaseRoles);
 
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
             releaseVersionRepository
@@ -144,14 +146,16 @@ public abstract class ReleaseInviteServiceTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(2));
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(3));
 
             User user = _dataFixture.DefaultUser().WithEmail(Email);
 
-            var newReleaseVersionIds = SetOf(
-                publication.Releases[0].Versions[0].Id,
-                publication.Releases[1].Versions[0].Id
+            var releaseVersions = SetOf(
+                publication.Releases[0].Versions[0],
+                publication.Releases[1].Versions[0],
+                publication.Releases[2].Versions[0]
             );
+            var releaseVersionIds = releaseVersions.Select(rv => rv.Id).ToHashSet();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -161,39 +165,41 @@ public abstract class ReleaseInviteServiceTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var createdUserReleaseRoleIds = new HashSet<Guid>();
+            // Simulate that one release version already had a Contributor role associated with it for this user.
+            // So only 2 new UserReleaseRoles should be created.
+            var createdUserReleaseRoles = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithRole(ReleaseRole.Contributor)
+                .WithCreatedById(CreatedById)
+                .WithUser(user)
+                .ForIndex(0, s => s.SetReleaseVersion(releaseVersions.ElementAt(0)))
+                .ForIndex(1, s => s.SetReleaseVersion(releaseVersions.ElementAt(1)))
+                .GenerateList(2);
+            var createdUserReleaseRoleIds = createdUserReleaseRoles.Select(urr => urr.Id).ToHashSet();
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository
                 .Setup(mock =>
                     mock.CreateManyIfNotExists(
+                        // Assert that all 3 UserReleaseRoles are attempted to be created
                         It.Is<List<UserReleaseRole>>(l =>
-                            l.Count == 2
+                            l.Count == 3
                             && l.All(r =>
-                                r.UserId == user.Id && r.Role == ReleaseRole.Contributor && r.CreatedById == CreatedById
+                                r.UserId == user.Id
+                                && r.Role == ReleaseRole.Contributor
+                                && r.CreatedById == CreatedById
+                                && Math.Abs((r.Created - DateTime.UtcNow).Milliseconds)
+                                    <= AssertExtensions.TimeWithinMillis
                             )
-                            && l[0].ReleaseVersionId == newReleaseVersionIds.ElementAt(0)
-                            && Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
-                                <= AssertExtensions.TimeWithinMillis
-                            && l[1].ReleaseVersionId == newReleaseVersionIds.ElementAt(1)
-                            && Math.Abs((l[1].Created - DateTime.UtcNow).Milliseconds)
-                                <= AssertExtensions.TimeWithinMillis
+                            && l[0].ReleaseVersionId == releaseVersionIds.ElementAt(0)
+                            && l[1].ReleaseVersionId == releaseVersionIds.ElementAt(1)
+                            && l[2].ReleaseVersionId == releaseVersionIds.ElementAt(2)
                         ),
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .Returns(Task.CompletedTask)
-                .Callback<IReadOnlyList<UserReleaseRole>, CancellationToken>(
-                    (allUserReleaseRoles, _) =>
-                    {
-                        foreach (var userReleaseRole in allUserReleaseRoles)
-                        {
-                            // Simulate EF Core setting the ID on creation
-                            userReleaseRole.Id = Guid.NewGuid();
-                            createdUserReleaseRoleIds.Add(userReleaseRole.Id);
-                        }
-                    }
-                );
+                // But only 2 are actually created (as one already existed)
+                .ReturnsAsync(createdUserReleaseRoles);
 
             var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(Strict);
             userResourceRoleNotificationService
@@ -213,7 +219,7 @@ public abstract class ReleaseInviteServiceTests
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
             releaseVersionRepository
                 .Setup(mock => mock.ListLatestReleaseVersionIds(publication.Id, false, It.IsAny<CancellationToken>()))
-                .ReturnsAsync([.. newReleaseVersionIds]);
+                .ReturnsAsync([.. releaseVersionIds]);
 
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository
@@ -234,7 +240,7 @@ public abstract class ReleaseInviteServiceTests
                 var result = await service.InviteContributor(
                     email: Email,
                     publicationId: publication.Id,
-                    releaseVersionIds: newReleaseVersionIds
+                    releaseVersionIds: releaseVersionIds
                 );
 
                 result.AssertRight();
@@ -250,6 +256,79 @@ public abstract class ReleaseInviteServiceTests
         }
 
         [Fact]
+        public async Task UserAlreadyHasAllRoles_DoesNotNotify()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(2));
+
+            User user = _dataFixture.DefaultUser().WithEmail(Email);
+
+            var releaseVersions = SetOf(publication.Releases[0].Versions[0], publication.Releases[1].Versions[0]);
+            var releaseVersionIds = releaseVersions.Select(rv => rv.Id).ToHashSet();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+            userReleaseRoleRepository
+                .Setup(mock =>
+                    mock.CreateManyIfNotExists(
+                        It.Is<List<UserReleaseRole>>(l =>
+                            l.Count == 2
+                            && l.All(r =>
+                                r.UserId == user.Id
+                                && r.Role == ReleaseRole.Contributor
+                                && r.CreatedById == CreatedById
+                                && Math.Abs((r.Created - DateTime.UtcNow).Milliseconds)
+                                    <= AssertExtensions.TimeWithinMillis
+                            )
+                            && l[0].ReleaseVersionId == releaseVersionIds.ElementAt(0)
+                            && l[1].ReleaseVersionId == releaseVersionIds.ElementAt(1)
+                        ),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                // Simulate that no new UserReleaseRoles were created as the user already had all the roles
+                .ReturnsAsync([]);
+
+            var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
+            releaseVersionRepository
+                .Setup(mock => mock.ListLatestReleaseVersionIds(publication.Id, false, It.IsAny<CancellationToken>()))
+                .ReturnsAsync([.. releaseVersionIds]);
+
+            var userRepository = new Mock<IUserRepository>(Strict);
+            userRepository
+                .Setup(mock => mock.FindActiveUserByEmail(Email, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(user);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseInviteService(
+                    contentDbContext: contentDbContext,
+                    userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                    releaseVersionRepository: releaseVersionRepository.Object,
+                    userRepository: userRepository.Object
+                );
+
+                var result = await service.InviteContributor(
+                    email: Email,
+                    publicationId: publication.Id,
+                    releaseVersionIds: releaseVersionIds
+                );
+
+                result.AssertRight();
+            }
+
+            VerifyAllMocks(userReleaseRoleRepository, releaseVersionRepository, userRepository);
+        }
+
+        [Fact]
         public async Task InactiveUser_FailsSendingEmail()
         {
             Publication publication = _dataFixture
@@ -258,7 +337,7 @@ public abstract class ReleaseInviteServiceTests
 
             User userToCreate = _dataFixture.DefaultUserWithPendingInvite();
 
-            var releaseVersionIds = SetOf(publication.Releases[0].Versions[0].Id);
+            var releaseVersion = publication.Releases[0].Versions[0];
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -271,7 +350,7 @@ public abstract class ReleaseInviteServiceTests
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
             releaseVersionRepository
                 .Setup(mock => mock.ListLatestReleaseVersionIds(publication.Id, false, It.IsAny<CancellationToken>()))
-                .ReturnsAsync([.. releaseVersionIds]);
+                .ReturnsAsync([releaseVersion.Id]);
 
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository
@@ -289,7 +368,12 @@ public abstract class ReleaseInviteServiceTests
                 )
                 .ReturnsAsync(userToCreate);
 
-            var createdUserReleaseRoleIds = new HashSet<Guid>();
+            UserReleaseRole createdUserReleaseRole = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithRole(ReleaseRole.Contributor)
+                .WithCreatedById(CreatedById)
+                .WithUser(userToCreate)
+                .WithReleaseVersion(releaseVersion);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository
@@ -298,7 +382,7 @@ public abstract class ReleaseInviteServiceTests
                         It.Is<List<UserReleaseRole>>(l =>
                             l.Count == 1
                             && l[0].UserId == userToCreate.Id
-                            && l[0].ReleaseVersionId == releaseVersionIds.ElementAt(0)
+                            && l[0].ReleaseVersionId == releaseVersion.Id
                             && l[0].Role == ReleaseRole.Contributor
                             && l[0].CreatedById == CreatedById
                             && Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
@@ -307,23 +391,15 @@ public abstract class ReleaseInviteServiceTests
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .Returns(Task.CompletedTask)
-                .Callback<IReadOnlyList<UserReleaseRole>, CancellationToken>(
-                    (allUserReleaseRoles, _) =>
-                    {
-                        foreach (var userReleaseRole in allUserReleaseRoles)
-                        {
-                            // Simulate EF Core setting the ID on creation
-                            userReleaseRole.Id = Guid.NewGuid();
-                            createdUserReleaseRoleIds.Add(userReleaseRole.Id);
-                        }
-                    }
-                );
+                .ReturnsAsync([createdUserReleaseRole]);
 
             var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(Strict);
             userResourceRoleNotificationService
                 .Setup(mock =>
-                    mock.NotifyUserOfNewContributorRoles(createdUserReleaseRoleIds, It.IsAny<CancellationToken>())
+                    mock.NotifyUserOfNewContributorRoles(
+                        SetOf(createdUserReleaseRole.Id),
+                        It.IsAny<CancellationToken>()
+                    )
                 )
                 .ThrowsAsync(new EmailSendFailedException(""));
 
@@ -341,7 +417,7 @@ public abstract class ReleaseInviteServiceTests
                     await service.InviteContributor(
                         email: userToCreate.Email,
                         publicationId: publication.Id,
-                        releaseVersionIds: releaseVersionIds
+                        releaseVersionIds: [releaseVersion.Id]
                     )
                 );
             }
@@ -363,7 +439,7 @@ public abstract class ReleaseInviteServiceTests
                 .DefaultPublication()
                 .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
 
-            var releaseVersionIds = SetOf(publication.Releases[0].Versions[0].Id);
+            var releaseVersion = publication.Releases[0].Versions[0];
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -372,7 +448,12 @@ public abstract class ReleaseInviteServiceTests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var createdUserReleaseRoleIds = new HashSet<Guid>();
+            UserReleaseRole createdUserReleaseRole = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithRole(ReleaseRole.Contributor)
+                .WithCreatedById(CreatedById)
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             userReleaseRoleRepository
@@ -381,7 +462,7 @@ public abstract class ReleaseInviteServiceTests
                         It.Is<List<UserReleaseRole>>(l =>
                             l.Count == 1
                             && l[0].UserId == user.Id
-                            && l[0].ReleaseVersionId == releaseVersionIds.ElementAt(0)
+                            && l[0].ReleaseVersionId == releaseVersion.Id
                             && l[0].Role == ReleaseRole.Contributor
                             && l[0].CreatedById == CreatedById
                             && Math.Abs((l[0].Created - DateTime.UtcNow).Milliseconds)
@@ -390,30 +471,22 @@ public abstract class ReleaseInviteServiceTests
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .Returns(Task.CompletedTask)
-                .Callback<IReadOnlyList<UserReleaseRole>, CancellationToken>(
-                    (allUserReleaseRoles, _) =>
-                    {
-                        foreach (var userReleaseRole in allUserReleaseRoles)
-                        {
-                            // Simulate EF Core setting the ID on creation
-                            userReleaseRole.Id = Guid.NewGuid();
-                            createdUserReleaseRoleIds.Add(userReleaseRole.Id);
-                        }
-                    }
-                );
+                .ReturnsAsync([createdUserReleaseRole]);
 
             var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(Strict);
             userResourceRoleNotificationService
                 .Setup(mock =>
-                    mock.NotifyUserOfNewContributorRoles(createdUserReleaseRoleIds, It.IsAny<CancellationToken>())
+                    mock.NotifyUserOfNewContributorRoles(
+                        SetOf(createdUserReleaseRole.Id),
+                        It.IsAny<CancellationToken>()
+                    )
                 )
                 .ThrowsAsync(new EmailSendFailedException(""));
 
             var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
             releaseVersionRepository
                 .Setup(mock => mock.ListLatestReleaseVersionIds(publication.Id, false, It.IsAny<CancellationToken>()))
-                .ReturnsAsync([.. releaseVersionIds]);
+                .ReturnsAsync([releaseVersion.Id]);
 
             var userRepository = new Mock<IUserRepository>(Strict);
             userRepository
@@ -434,7 +507,7 @@ public abstract class ReleaseInviteServiceTests
                     await service.InviteContributor(
                         email: user.Email,
                         publicationId: publication.Id,
-                        releaseVersionIds: releaseVersionIds
+                        releaseVersionIds: [releaseVersion.Id]
                     )
                 );
 

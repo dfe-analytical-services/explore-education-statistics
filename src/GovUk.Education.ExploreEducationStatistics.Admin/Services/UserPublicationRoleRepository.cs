@@ -36,7 +36,7 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
         return newUserPublicationRole;
     }
 
-    public async Task CreateManyIfNotExists(
+    public async Task<List<UserPublicationRole>> CreateManyIfNotExists(
         IReadOnlyList<UserPublicationRole> userPublicationRoles,
         CancellationToken cancellationToken = default
     )
@@ -48,6 +48,7 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
                     userId: userPublicationRole.UserId,
                     publicationId: userPublicationRole.PublicationId,
                     role: userPublicationRole.Role,
+                    resourceRoleFilter: ResourceRoleFilter.All,
                     cancellationToken: cancellationToken
                 )
             )
@@ -55,6 +56,8 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
 
         contentDbContext.UserPublicationRoles.AddRange(newUserPublicationRoles);
         await contentDbContext.SaveChangesAsync(cancellationToken);
+
+        return newUserPublicationRoles;
     }
 
     public async Task<UserPublicationRole?> GetById(

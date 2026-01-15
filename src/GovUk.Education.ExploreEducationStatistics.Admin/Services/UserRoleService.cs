@@ -76,7 +76,7 @@ public class UserRoleService(
 
                         await contentDbContext.RequireTransaction(async () =>
                         {
-                            var userPublicationRole = await userPublicationRoleRepository.Create(
+                            var createdUserPublicationRole = await userPublicationRoleRepository.Create(
                                 userId: userId,
                                 publicationId: publication.Id,
                                 role: role,
@@ -89,7 +89,7 @@ public class UserRoleService(
                             );
 
                             await userResourceRoleNotificationService.NotifyUserOfNewPublicationRole(
-                                userPublicationRole.Id
+                                createdUserPublicationRole.Id
                             );
                         });
                     });
@@ -365,23 +365,22 @@ public class UserRoleService(
         return await contentPersistenceHelper
             .CheckEntityExists<Publication>(publicationId)
             .OnSuccess(userService.CheckCanViewPublication)
-            .OnSuccess(async () =>
-                await userPublicationRoleRepository
-                    .Query()
-                    .WhereForPublication(publicationId)
-                    .Include(upr => upr.User)
-                    .Include(upr => upr.Publication)
-                    .OrderBy(upr => upr.User.DisplayName)
-                    .Select(upr => new UserPublicationRoleViewModel
-                    {
-                        Id = upr.Id,
-                        Publication = upr.Publication.Title,
-                        Role = upr.Role,
-                        UserName = upr.User.DisplayName,
-                        Email = upr.User.Email,
-                    })
-                    .ToListAsync()
-            );
+            .OnSuccess(async () => (
+                    await userPublicationRoleRepository
+                        .Query()
+                        .WhereForPublication(publicationId)
+                        .Include(upr => upr.User)
+                        .Include(upr => upr.Publication)
+                        .Select(upr => new UserPublicationRoleViewModel
+                        {
+                            Id = upr.Id,
+                            Publication = upr.Publication.Title,
+                            Role = upr.Role,
+                            UserName = upr.User.DisplayName,
+                            Email = upr.User.Email,
+                        })
+                        .ToListAsync()
+                ).OrderBy(upr => upr.UserName).ToList());
     }
 
     public async Task<Either<ActionResult, List<UserReleaseRoleViewModel>>> GetReleaseRoles(Guid userId)

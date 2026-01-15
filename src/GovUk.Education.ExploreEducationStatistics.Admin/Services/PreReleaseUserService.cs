@@ -35,14 +35,18 @@ public class PreReleaseUserService(
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
             .OnSuccess(userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
             .OnSuccess(async _ =>
-                await userReleaseRoleRepository
-                    .Query(ResourceRoleFilter.All)
-                    .WhereForReleaseVersion(releaseVersionId)
-                    .WhereRolesIn(ReleaseRole.PrereleaseViewer)
-                    .Select(urr => new PreReleaseUserViewModel(urr.User.Email.ToLower()))
-                    .Distinct()
-                    .OrderBy(vm => vm.Email)
-                    .ToListAsync()
+                (
+                    await userReleaseRoleRepository
+                        .Query(ResourceRoleFilter.All)
+                        .WhereForReleaseVersion(releaseVersionId)
+                        .WhereRolesIn(ReleaseRole.PrereleaseViewer)
+                        .Select(urr => urr.User.Email)
+                        .Distinct()
+                        .OrderBy(email => email)
+                        .ToListAsync()
+                )
+                    .Select(email => new PreReleaseUserViewModel(email.ToLower()))
+                    .ToList()
             );
     }
 

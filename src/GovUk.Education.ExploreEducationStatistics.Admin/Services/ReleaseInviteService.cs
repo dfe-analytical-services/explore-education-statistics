@@ -99,11 +99,16 @@ public class ReleaseInviteService(
                 })
                 .ToList();
 
-            await userReleaseRoleRepository.CreateManyIfNotExists(userReleaseRoles); // CHECK IDS ARE POPULATED HERE!
+            var createdUserReleaseRoles = await userReleaseRoleRepository.CreateManyIfNotExists(userReleaseRoles);
 
-            var userReleaseRoleIds = userReleaseRoles.Select(urr => urr.Id).ToHashSet();
+            if (!createdUserReleaseRoles.Any())
+            {
+                return;
+            }
 
-            await userResourceRoleNotificationService.NotifyUserOfNewContributorRoles(userReleaseRoleIds);
+            var createdUserReleaseRoleIds = createdUserReleaseRoles.Select(urr => urr.Id).ToHashSet();
+
+            await userResourceRoleNotificationService.NotifyUserOfNewContributorRoles(createdUserReleaseRoleIds);
 
             if (user.Active)
             {

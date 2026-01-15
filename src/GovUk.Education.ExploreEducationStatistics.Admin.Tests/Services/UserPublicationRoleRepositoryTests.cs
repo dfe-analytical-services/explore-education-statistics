@@ -130,7 +130,32 @@ public abstract class UserPublicationRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                await repository.CreateManyIfNotExists(allUserPublicationRoles);
+                var result = await repository.CreateManyIfNotExists(allUserPublicationRoles);
+
+                // Should only have created 2 new roles, as one already existed
+                Assert.Equal(2, result.Count);
+
+                Assert.Contains(
+                    result,
+                    upr =>
+                        upr.UserId == user.Id
+                        && upr.PublicationId == publication1.Id
+                        && upr.Role == PublicationRole.Allower
+                        && upr.Created == newRolesCreatedDate
+                        && upr.CreatedById == createdBy.Id
+                        && upr.EmailSent == null
+                );
+
+                Assert.Contains(
+                    result,
+                    upr =>
+                        upr.UserId == user.Id
+                        && upr.PublicationId == publication2.Id
+                        && upr.Role == PublicationRole.Owner
+                        && upr.Created == newRolesCreatedDate
+                        && upr.CreatedById == createdBy.Id
+                        && upr.EmailSent == null
+                );
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
