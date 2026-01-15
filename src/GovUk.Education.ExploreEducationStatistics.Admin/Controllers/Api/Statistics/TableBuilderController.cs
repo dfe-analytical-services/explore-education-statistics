@@ -44,7 +44,7 @@ public class TableBuilderController(
             return await tableBuilderService
                 .QueryToCsvStream(
                     releaseVersionId: releaseVersionId,
-                    query: request.AsFullTableQuery(),
+                    query: request.AsFullTableQuery(ignoreMaxTableSize: true),
                     stream: Response.BodyWriter.AsStream(),
                     cancellationToken: cancellationTokenWithTimeout.Token
                 )

@@ -85,7 +85,7 @@ public class PermalinkService : IPermalinkService
         ).OnSuccess(releaseVersionId =>
         {
             return _tableBuilderService
-                .Query(releaseVersionId, request.Query.AsFullTableQuery(), cancellationToken)
+                .Query(releaseVersionId, request.Query.AsFullTableQuery(ignoreMaxTableSize: true), cancellationToken)
                 .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
                 {
                     var frontendTableTask = _frontendService.CreateTable(

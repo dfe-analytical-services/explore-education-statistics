@@ -82,9 +82,7 @@ User clicks Create table button
 
 Validate the query could exceed the maximum allowable table size
     user waits until page contains
-    ...    Could not create table as the filters chosen may exceed the maximum allowed table size.
-    user waits until page contains    Select different filters or download the subject data.
-    user waits until page contains button    Download Exclusions by geographic level (csv, 37 Mb)    %{WAIT_MEDIUM}
+    ...    The selected options return too many rows to be displayed here and so the table shows only a subset of the data provided by your selections.
 
 Go back to Locations step
     user clicks button    Edit locations

@@ -138,6 +138,7 @@ describe('MapBlock', () => {
         }),
       ],
       geoJsonAvailable: true,
+      isCroppedTable: false,
     };
 
     const testCategoricalData: TableDataResult[] = [

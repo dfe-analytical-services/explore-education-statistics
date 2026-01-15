@@ -52,6 +52,14 @@ public static class TableBuilderUtils
             foreach (var countOfFilterItems in countsOfFilterItemsByFilter)
             {
                 result *= countOfFilterItems;
+
+                // For occasions where the multipliers result in a number which exceeds the maximum value for int32 (~2b),
+                // this causes `result` to revert to a negative number, which would resolve incorrectly when determining
+                // whether or not a table exceeds the maximum number of rows permitted.
+                if (result < 0)
+                {
+                    return int.MaxValue;
+                }
             }
         }
         return result;

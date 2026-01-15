@@ -66,6 +66,11 @@ public class TableBuilderControllerIntegrationTests(TableBuilderControllerIntegr
 
     private static readonly FullTableQuery FullTableQuery = FullTableQueryRequest.AsFullTableQuery();
 
+    private static readonly FullTableQuery UnrestrictedFullTableQuery = FullTableQuery with
+    {
+        IgnoreMaxTableSize = true,
+    };
+
     private readonly TableBuilderResultViewModel _tableBuilderResults = new()
     {
         SubjectMeta = new SubjectResultMetaViewModel
@@ -111,7 +116,7 @@ public class TableBuilderControllerIntegrationTests(TableBuilderControllerIntegr
             .TableBuilderServiceMock.Setup(s =>
                 s.QueryToCsvStream(
                     ReleaseVersionId,
-                    ItIs.DeepEqualTo(FullTableQuery),
+                    ItIs.DeepEqualTo(UnrestrictedFullTableQuery),
                     It.IsAny<Stream>(),
                     It.IsAny<CancellationToken>()
                 )
@@ -128,7 +133,7 @@ public class TableBuilderControllerIntegrationTests(TableBuilderControllerIntegr
 
         var response = await client.PostAsync(
             $"/api/data/tablebuilder/release/{ReleaseVersionId}",
-            content: new JsonNetContent(FullTableQueryRequest),
+            content: new JsonNetContent(UnrestrictedFullTableQuery),
             headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
         );
 
