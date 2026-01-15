@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -35,7 +36,23 @@ public class ReleaseVersionRepositoryTests
             var (releaseVersion1, releaseVersion2, releaseVersion3, releaseVersion4) = _fixture
                 .DefaultReleaseVersion()
                 .WithApprovalStatus(releaseApprovalStatus)
-                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
+                // All unique publications to avoid them all just being pulled in via one publication role
+                .ForIndex(
+                    0,
+                    s => s.SetRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
+                )
+                .ForIndex(
+                    1,
+                    s => s.SetRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
+                )
+                .ForIndex(
+                    2,
+                    s => s.SetRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
+                )
+                .ForIndex(
+                    3,
+                    s => s.SetRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
+                )
                 .GenerateTuple4();
 
             var userReleaseRoles = _fixture
@@ -77,14 +94,10 @@ public class ReleaseVersionRepositoryTests
             }
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
-            userPublicationRoleRepository
-                .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(userPublicationRoles.BuildMock());
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userPublicationRoles]);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository
-                .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(userReleaseRoles.BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {

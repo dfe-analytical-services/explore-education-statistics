@@ -619,22 +619,10 @@ public class ReleaseApprovalServiceTests
         userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. userReleaseRoles]);
 
         userResourceRoleNotificationService
-            .Setup(mock =>
-                mock.NotifyUserOfNewPreReleaseRole(
-                    userReleaseRoles[0].User.Id,
-                    releaseVersion.Id,
-                    It.IsAny<CancellationToken>()
-                )
-            )
+            .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userReleaseRoles[0].Id, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
         userResourceRoleNotificationService
-            .Setup(mock =>
-                mock.NotifyUserOfNewPreReleaseRole(
-                    userReleaseRoles[3].User.Id,
-                    releaseVersion.Id,
-                    It.IsAny<CancellationToken>()
-                )
-            )
+            .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userReleaseRoles[3].Id, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         var nextReleaseDateEdited = new PartialDate { Month = "12", Year = "2000" };
@@ -1126,13 +1114,7 @@ public class ReleaseApprovalServiceTests
         userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. userReleaseRoles]);
 
         userResourceRoleNotificationService
-            .Setup(mock =>
-                mock.NotifyUserOfNewPreReleaseRole(
-                    userReleaseRoles[0].User.Id,
-                    releaseVersion.Id,
-                    It.IsAny<CancellationToken>()
-                )
-            )
+            .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userReleaseRoles[0].Id, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new EmailSendFailedException(""));
 
         await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1216,13 +1198,7 @@ public class ReleaseApprovalServiceTests
         userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);
 
         userResourceRoleNotificationService
-            .Setup(mock =>
-                mock.NotifyUserOfNewPreReleaseRole(
-                    userReleaseRole.User.Id,
-                    releaseVersion.Id,
-                    It.IsAny<CancellationToken>()
-                )
-            )
+            .Setup(mock => mock.NotifyUserOfNewPreReleaseRole(userReleaseRole.Id, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         publishingService

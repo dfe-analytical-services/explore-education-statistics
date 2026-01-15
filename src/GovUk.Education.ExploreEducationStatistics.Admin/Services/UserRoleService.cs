@@ -76,7 +76,7 @@ public class UserRoleService(
 
                         await contentDbContext.RequireTransaction(async () =>
                         {
-                            await userPublicationRoleRepository.Create(
+                            var userPublicationRole = await userPublicationRoleRepository.Create(
                                 userId: userId,
                                 publicationId: publication.Id,
                                 role: role,
@@ -89,9 +89,7 @@ public class UserRoleService(
                             );
 
                             await userResourceRoleNotificationService.NotifyUserOfNewPublicationRole(
-                                userId: userId,
-                                publication: publication,
-                                role: role
+                                userPublicationRole.Id
                             );
                         });
                     });
@@ -116,7 +114,7 @@ public class UserRoleService(
 
                 await contentDbContext.RequireTransaction(async () =>
                 {
-                    await userReleaseRoleRepository.Create(
+                    var createdUserReleaseRole = await userReleaseRoleRepository.Create(
                         userId: userId,
                         releaseVersionId: releaseVersion!.Id,
                         role,
@@ -126,11 +124,7 @@ public class UserRoleService(
                     var globalRole = GetAssociatedGlobalRoleNameForReleaseRole(role);
                     await UpgradeToGlobalRoleIfRequired(globalRole, user);
 
-                    await userResourceRoleNotificationService.NotifyUserOfNewReleaseRole(
-                        userId: userId,
-                        releaseVersion: releaseVersion,
-                        role: role
-                    );
+                    await userResourceRoleNotificationService.NotifyUserOfNewReleaseRole(createdUserReleaseRole.Id);
                 });
             });
     }

@@ -155,25 +155,16 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
             .AnyAsync(cancellationToken);
     }
 
-    public async Task MarkEmailAsSent(
-        Guid userId,
-        Guid publicationId,
-        PublicationRole role,
-        CancellationToken cancellationToken = default
-    )
+    public async Task MarkEmailAsSent(Guid userPublicationRoleId, CancellationToken cancellationToken = default)
     {
-        var userPublicationRole = await GetByCompositeKey(
-            userId: userId,
-            publicationId: publicationId,
-            role: role,
+        var userPublicationRole = await GetById(
+            userPublicationRoleId: userPublicationRoleId,
             cancellationToken: cancellationToken
         );
 
         if (userPublicationRole is null)
         {
-            throw new InvalidOperationException(
-                $"No User Publication Role found for {nameof(userId)} '{userId}', {nameof(publicationId)} '{publicationId}', {nameof(role)} '{role}'"
-            );
+            throw new InvalidOperationException($"No User Publication Role found with ID {userPublicationRoleId}.");
         }
 
         userPublicationRole.EmailSent = DateTimeOffset.UtcNow;

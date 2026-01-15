@@ -56,10 +56,5 @@ public interface IUserPublicationRoleRepository
         params PublicationRole[] rolesToInclude
     );
 
-    Task MarkEmailAsSent(
-        Guid userId,
-        Guid publicationId,
-        PublicationRole role,
-        CancellationToken cancellationToken = default
-    );
+    Task MarkEmailAsSent(Guid userPublicationRoleId, CancellationToken cancellationToken = default);
 }

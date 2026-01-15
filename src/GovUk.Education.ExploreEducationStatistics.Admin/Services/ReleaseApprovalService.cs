@@ -208,10 +208,7 @@ public class ReleaseApprovalService(
         await unsentUserReleaseRoleInvites
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async invite =>
-                await userResourceRoleNotificationService.NotifyUserOfNewPreReleaseRole(
-                    userId: invite.UserId,
-                    releaseVersionId: releaseVersion.Id
-                )
+                await userResourceRoleNotificationService.NotifyUserOfNewPreReleaseRole(invite.Id)
             );
     }
 

@@ -3596,11 +3596,7 @@ public abstract class UserReleaseRoleRepositoryTests
             {
                 var repository = CreateRepository(contentDbContext);
 
-                await repository.MarkEmailAsSent(
-                    userId: userReleaseRole.UserId,
-                    releaseVersionId: userReleaseRole.ReleaseVersionId,
-                    role: userReleaseRole.Role
-                );
+                await repository.MarkEmailAsSent(userReleaseRole.Id);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -3620,11 +3616,7 @@ public abstract class UserReleaseRoleRepositoryTests
             var repository = CreateRepository(contentDbContext);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await repository.MarkEmailAsSent(
-                    userId: Guid.NewGuid(),
-                    releaseVersionId: Guid.NewGuid(),
-                    role: ReleaseRole.PrereleaseViewer
-                )
+                await repository.MarkEmailAsSent(Guid.NewGuid())
             );
         }
     }

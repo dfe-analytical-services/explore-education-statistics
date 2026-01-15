@@ -1,10 +1,11 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -61,8 +62,15 @@ public abstract class UserResourceRoleNotificationServiceTests
             var allUserPublicationRoles = publicationRolesForTargetUser.Concat(publicationRolesForOtherUser).ToList();
             var allUserReleaseRoles = releaseRolesForTargetUser.Concat(releaseRolesForOtherUser).ToList();
 
-            var userPublicationRoleIdsForTargetUser = publicationRolesForTargetUser.Select(r => r.Id).ToHashSet();
-            var userReleaseRoleIdsForTargetUser = releaseRolesForTargetUser.Select(r => r.Id).ToHashSet();
+            var releaseRolesInfo = releaseRolesForTargetUser
+                .Select(urr =>
+                    (urr.ReleaseVersion.Release.Publication.Title, urr.ReleaseVersion.Release.Title, urr.Role)
+                )
+                .ToHashSet();
+
+            var publicationRolesInfo = publicationRolesForTargetUser
+                .Select(upr => (upr.Publication.Title, upr.Role))
+                .ToHashSet();
 
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
@@ -80,14 +88,7 @@ public abstract class UserResourceRoleNotificationServiceTests
             foreach (var publicationRole in publicationRolesForTargetUser)
             {
                 userPublicationRoleRepository
-                    .Setup(r =>
-                        r.MarkEmailAsSent(
-                            inactiveUser.Id,
-                            publicationRole.PublicationId,
-                            publicationRole.Role,
-                            It.IsAny<CancellationToken>()
-                        )
-                    )
+                    .Setup(r => r.MarkEmailAsSent(publicationRole.Id, It.IsAny<CancellationToken>()))
                     .Returns(Task.CompletedTask);
             }
 
@@ -98,26 +99,13 @@ public abstract class UserResourceRoleNotificationServiceTests
             foreach (var releaseRole in releaseRolesForTargetUser)
             {
                 userReleaseRoleRepository
-                    .Setup(r =>
-                        r.MarkEmailAsSent(
-                            inactiveUser.Id,
-                            releaseRole.ReleaseVersionId,
-                            releaseRole.Role,
-                            It.IsAny<CancellationToken>()
-                        )
-                    )
+                    .Setup(r => r.MarkEmailAsSent(releaseRole.Id, It.IsAny<CancellationToken>()))
                     .Returns(Task.CompletedTask);
             }
 
             emailTemplateService
-                .Setup(s =>
-                    s.SendInviteEmail(
-                        inactiveUser.Email,
-                        userReleaseRoleIdsForTargetUser,
-                        userPublicationRoleIdsForTargetUser
-                    )
-                )
-                .ReturnsAsync(Unit.Instance);
+                .Setup(s => s.SendInviteEmail(inactiveUser.Email, releaseRolesInfo, publicationRolesInfo))
+                .Returns(Unit.Instance);
 
             var service = BuildService(
                 userRepository: userRepository.Object,
@@ -194,8 +182,15 @@ public abstract class UserResourceRoleNotificationServiceTests
                 )
                 .GenerateList(3);
 
-            var userPublicationRoleIds = userPublicationRoles.Select(r => r.Id).ToHashSet();
-            var userReleaseRoleIds = userReleaseRoles.Select(r => r.Id).ToHashSet();
+            var releaseRolesInfo = userReleaseRoles
+                .Select(urr =>
+                    (urr.ReleaseVersion.Release.Publication.Title, urr.ReleaseVersion.Release.Title, urr.Role)
+                )
+                .ToHashSet();
+
+            var publicationRolesInfo = userPublicationRoles
+                .Select(upr => (upr.Publication.Title, upr.Role))
+                .ToHashSet();
 
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
@@ -213,14 +208,7 @@ public abstract class UserResourceRoleNotificationServiceTests
             foreach (var publicationRole in userPublicationRoles)
             {
                 userPublicationRoleRepository
-                    .Setup(r =>
-                        r.MarkEmailAsSent(
-                            inactiveUser.Id,
-                            publicationRole.PublicationId,
-                            publicationRole.Role,
-                            It.IsAny<CancellationToken>()
-                        )
-                    )
+                    .Setup(r => r.MarkEmailAsSent(publicationRole.Id, It.IsAny<CancellationToken>()))
                     .Returns(Task.CompletedTask);
             }
 
@@ -231,20 +219,13 @@ public abstract class UserResourceRoleNotificationServiceTests
             foreach (var releaseRole in userReleaseRoles)
             {
                 userReleaseRoleRepository
-                    .Setup(r =>
-                        r.MarkEmailAsSent(
-                            inactiveUser.Id,
-                            releaseRole.ReleaseVersionId,
-                            releaseRole.Role,
-                            It.IsAny<CancellationToken>()
-                        )
-                    )
+                    .Setup(r => r.MarkEmailAsSent(releaseRole.Id, It.IsAny<CancellationToken>()))
                     .Returns(Task.CompletedTask);
             }
 
             emailTemplateService
-                .Setup(s => s.SendInviteEmail(inactiveUser.Email, userReleaseRoleIds, userPublicationRoleIds))
-                .ReturnsAsync(new BadRequestResult());
+                .Setup(s => s.SendInviteEmail(inactiveUser.Email, releaseRolesInfo, publicationRolesInfo))
+                .Returns(new BadRequestResult());
 
             var service = BuildService(
                 userRepository: userRepository.Object,
@@ -271,99 +252,90 @@ public abstract class UserResourceRoleNotificationServiceTests
         [Fact]
         public async Task Success()
         {
-            User activeUser = _dataFixture.DefaultUser();
-            Publication publication = _dataFixture.DefaultPublication();
-            const PublicationRole role = PublicationRole.Allower;
+            UserPublicationRole userPublicationRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(_dataFixture.DefaultUser())
+                .WithPublication(_dataFixture.DefaultPublication());
 
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
-            userRepository
-                .Setup(r => r.FindActiveUserById(activeUser.Id, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(activeUser);
-
             userPublicationRoleRepository
-                .Setup(r => r.MarkEmailAsSent(activeUser.Id, publication.Id, role, It.IsAny<CancellationToken>()))
+                .Setup(r => r.MarkEmailAsSent(userPublicationRole.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userPublicationRole);
 
             emailTemplateService
-                .Setup(s => s.SendPublicationRoleEmail(activeUser.Email, publication.Title, role))
+                .Setup(s =>
+                    s.SendPublicationRoleEmail(
+                        userPublicationRole.User.Email,
+                        userPublicationRole.Publication.Title,
+                        userPublicationRole.Role
+                    )
+                )
                 .Returns(Unit.Instance);
 
             var service = BuildService(
-                userRepository: userRepository.Object,
                 emailTemplateService: emailTemplateService.Object,
                 userPublicationRoleRepository: userPublicationRoleRepository.Object
             );
 
-            await service.NotifyUserOfNewPublicationRole(userId: activeUser.Id, publication: publication, role: role);
+            await service.NotifyUserOfNewPublicationRole(userPublicationRole.Id);
 
-            MockUtils.VerifyAllMocks(userRepository, userPublicationRoleRepository, emailTemplateService);
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository, emailTemplateService);
         }
 
         [Fact]
-        public async Task ActiveUserDoesNotExist_ThrowsKeyNotFoundException()
+        public async Task RoleDoesNotExist_ThrowsKeyNotFoundException()
         {
-            var userId = Guid.NewGuid();
+            var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
-
-            userRepository
-                .Setup(r => r.FindActiveUserById(userId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((User?)null);
-
-            var service = BuildService(userRepository: userRepository.Object);
+            var service = BuildService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
 
             await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
-                await service.NotifyUserOfNewPublicationRole(
-                    userId: userId,
-                    publication: _dataFixture.DefaultPublication(),
-                    role: PublicationRole.Allower
-                )
+                await service.NotifyUserOfNewPublicationRole(Guid.NewGuid())
             );
 
-            MockUtils.VerifyAllMocks(userRepository);
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository);
         }
 
         [Fact]
         public async Task SendingEmailFails_ThrowsEmailSendFailedException()
         {
-            User activeUser = _dataFixture.DefaultUser();
-            Publication publication = _dataFixture.DefaultPublication();
-            const PublicationRole role = PublicationRole.Allower;
+            UserPublicationRole userPublicationRole = _dataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(_dataFixture.DefaultUser())
+                .WithPublication(_dataFixture.DefaultPublication());
 
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
-            userRepository
-                .Setup(r => r.FindActiveUserById(activeUser.Id, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(activeUser);
-
             userPublicationRoleRepository
-                .Setup(r => r.MarkEmailAsSent(activeUser.Id, publication.Id, role, It.IsAny<CancellationToken>()))
+                .Setup(r => r.MarkEmailAsSent(userPublicationRole.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userPublicationRole);
 
             emailTemplateService
-                .Setup(s => s.SendPublicationRoleEmail(activeUser.Email, publication.Title, role))
+                .Setup(s =>
+                    s.SendPublicationRoleEmail(
+                        userPublicationRole.User.Email,
+                        userPublicationRole.Publication.Title,
+                        userPublicationRole.Role
+                    )
+                )
                 .Returns(new BadRequestResult());
 
             var service = BuildService(
-                userRepository: userRepository.Object,
                 emailTemplateService: emailTemplateService.Object,
                 userPublicationRoleRepository: userPublicationRoleRepository.Object
             );
 
             await Assert.ThrowsAsync<EmailSendFailedException>(async () =>
-                await service.NotifyUserOfNewPublicationRole(
-                    userId: activeUser.Id,
-                    publication: publication,
-                    role: role
-                )
+                await service.NotifyUserOfNewPublicationRole(userPublicationRole.Id)
             );
 
-            MockUtils.VerifyAllMocks(userRepository, userPublicationRoleRepository, emailTemplateService);
+            MockUtils.VerifyAllMocks(userPublicationRoleRepository, emailTemplateService);
         }
     }
 
@@ -372,99 +344,104 @@ public abstract class UserResourceRoleNotificationServiceTests
         [Fact]
         public async Task Success()
         {
-            User activeUser = _dataFixture.DefaultUser();
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
-            const ReleaseRole role = ReleaseRole.Contributor;
+            UserReleaseRole userReleaseRole = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithUser(_dataFixture.DefaultUser())
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+                );
 
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
-            userRepository
-                .Setup(r => r.FindActiveUserById(activeUser.Id, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(activeUser);
-
             userReleaseRoleRepository
-                .Setup(r => r.MarkEmailAsSent(activeUser.Id, releaseVersion.Id, role, It.IsAny<CancellationToken>()))
+                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);
 
             emailTemplateService
-                .Setup(s => s.SendReleaseRoleEmail(activeUser.Email, releaseVersion, role))
+                .Setup(s =>
+                    s.SendReleaseRoleEmail(
+                        userReleaseRole.User.Email,
+                        userReleaseRole.ReleaseVersion.Release.Publication.Title,
+                        userReleaseRole.ReleaseVersion.Release.Title,
+                        userReleaseRole.ReleaseVersion.Release.PublicationId,
+                        userReleaseRole.ReleaseVersionId,
+                        userReleaseRole.Role
+                    )
+                )
                 .Returns(Unit.Instance);
 
             var service = BuildService(
-                userRepository: userRepository.Object,
                 emailTemplateService: emailTemplateService.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
-            await service.NotifyUserOfNewReleaseRole(userId: activeUser.Id, releaseVersion: releaseVersion, role: role);
+            await service.NotifyUserOfNewReleaseRole(userReleaseRole.Id);
 
-            MockUtils.VerifyAllMocks(userRepository, userReleaseRoleRepository, emailTemplateService);
+            MockUtils.VerifyAllMocks(userReleaseRoleRepository, emailTemplateService);
         }
 
         [Fact]
-        public async Task ActiveUserDoesNotExist_ThrowsKeyNotFoundException()
+        public async Task RoleDoesNotExist_ThrowsKeyNotFoundException()
         {
-            var userId = Guid.NewGuid();
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
-
-            userRepository
-                .Setup(r => r.FindActiveUserById(userId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((User?)null);
-
-            var service = BuildService(userRepository: userRepository.Object);
+            var service = BuildService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
-                await service.NotifyUserOfNewReleaseRole(
-                    userId: userId,
-                    releaseVersion: _dataFixture.DefaultReleaseVersion(),
-                    role: ReleaseRole.Contributor
-                )
+                await service.NotifyUserOfNewReleaseRole(Guid.NewGuid())
             );
 
-            MockUtils.VerifyAllMocks(userRepository);
+            MockUtils.VerifyAllMocks(userReleaseRoleRepository);
         }
 
         [Fact]
         public async Task SendingEmailFails_ThrowsEmailSendFailedException()
         {
-            User activeUser = _dataFixture.DefaultUser();
-            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion();
-            const ReleaseRole role = ReleaseRole.Contributor;
+            UserReleaseRole userReleaseRole = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithUser(_dataFixture.DefaultUser())
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+                );
 
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
-            userRepository
-                .Setup(r => r.FindActiveUserById(activeUser.Id, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(activeUser);
-
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);
             userReleaseRoleRepository
-                .Setup(r => r.MarkEmailAsSent(activeUser.Id, releaseVersion.Id, role, It.IsAny<CancellationToken>()))
+                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             emailTemplateService
-                .Setup(s => s.SendReleaseRoleEmail(activeUser.Email, releaseVersion, role))
+                .Setup(s =>
+                    s.SendReleaseRoleEmail(
+                        userReleaseRole.User.Email,
+                        userReleaseRole.ReleaseVersion.Release.Publication.Title,
+                        userReleaseRole.ReleaseVersion.Release.Title,
+                        userReleaseRole.ReleaseVersion.Release.PublicationId,
+                        userReleaseRole.ReleaseVersionId,
+                        userReleaseRole.Role
+                    )
+                )
                 .Returns(new BadRequestResult());
 
             var service = BuildService(
-                userRepository: userRepository.Object,
                 emailTemplateService: emailTemplateService.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
             await Assert.ThrowsAsync<EmailSendFailedException>(async () =>
-                await service.NotifyUserOfNewReleaseRole(
-                    userId: activeUser.Id,
-                    releaseVersion: releaseVersion,
-                    role: role
-                )
+                await service.NotifyUserOfNewReleaseRole(userReleaseRole.Id)
             );
 
-            MockUtils.VerifyAllMocks(userRepository, userReleaseRoleRepository, emailTemplateService);
+            MockUtils.VerifyAllMocks(userReleaseRoleRepository, emailTemplateService);
         }
     }
 
@@ -474,104 +451,283 @@ public abstract class UserResourceRoleNotificationServiceTests
         public async Task Success()
         {
             User user = _dataFixture.DefaultUser();
-            var publicationTitle = "publication-title";
-            var releaseVersionIds = CollectionUtils.SetOf(Guid.NewGuid(), Guid.NewGuid());
-            const ReleaseRole role = ReleaseRole.Contributor;
+            Publication publication = _dataFixture.DefaultPublication();
 
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
+            var userReleaseRoles = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithRole(ReleaseRole.Contributor)
+                // Create different release versions for each role, to test that the releases info passed to the email contains all distinct releases
+                .ForIndex(
+                    0,
+                    s =>
+                        s.SetReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                        )
+                )
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                        )
+                )
+                .ForIndex(
+                    2,
+                    s =>
+                        s.SetReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                        )
+                )
+                .GenerateList(3);
+
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
-            userRepository.Setup(r => r.FindUserById(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. userReleaseRoles]);
 
-            foreach (var releaseVersionId in releaseVersionIds)
+            foreach (var userReleaseRole in userReleaseRoles)
             {
                 userReleaseRoleRepository
-                    .Setup(r => r.MarkEmailAsSent(user.Id, releaseVersionId, role, It.IsAny<CancellationToken>()))
+                    .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, It.IsAny<CancellationToken>()))
                     .Returns(Task.CompletedTask);
             }
 
+            var releasesInfo = userReleaseRoles
+                .Select(urr => urr.ReleaseVersion.Release)
+                .Distinct()
+                .Select(r => (r.Year, r.TimePeriodCoverage, r.Title))
+                .ToHashSet();
+
+            var userReleaseRoleIds = userReleaseRoles.Select(r => r.Id).ToHashSet();
+
             emailTemplateService
-                .Setup(s => s.SendContributorInviteEmail(user.Email, publicationTitle, releaseVersionIds))
-                .ReturnsAsync(Unit.Instance);
+                .Setup(s => s.SendContributorInviteEmail(user.Email, publication.Title, releasesInfo))
+                .Returns(Unit.Instance);
 
             var service = BuildService(
-                userRepository: userRepository.Object,
                 emailTemplateService: emailTemplateService.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
-            await service.NotifyUserOfNewContributorRoles(
-                userId: user.Id,
-                publicationTitle: publicationTitle,
-                releaseVersionIds: releaseVersionIds
-            );
+            await service.NotifyUserOfNewContributorRoles(userReleaseRoleIds);
 
-            MockUtils.VerifyAllMocks(userRepository, userReleaseRoleRepository, emailTemplateService);
+            MockUtils.VerifyAllMocks(userReleaseRoleRepository, emailTemplateService);
         }
 
         [Fact]
-        public async Task UserDoesNotExist_ThrowsKeyNotFoundException()
+        public async Task EmptyRoleIds_ThrowsArgumentException()
         {
-            var userId = Guid.NewGuid();
+            var service = BuildService();
 
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
+            await Assert.ThrowsAsync<ArgumentException>(async () => await service.NotifyUserOfNewContributorRoles([]));
+        }
 
-            userRepository.Setup(r => r.FindUserById(userId, It.IsAny<CancellationToken>())).ReturnsAsync((User?)null);
+        [Fact]
+        public async Task SomeRolesDontExist_ThrowsKeyNotFoundException()
+        {
+            var existingUserReleaseRoles = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithUser(_dataFixture.DefaultUser())
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+                )
+                .WithRole(ReleaseRole.Contributor)
+                .GenerateList(3);
 
-            var service = BuildService(userRepository: userRepository.Object);
+            var userReleaseRoleIds = existingUserReleaseRoles
+                .Select(r => r.Id)
+                .ToHashSet()
+                .Concat([Guid.NewGuid(), Guid.NewGuid()]) // Non-existent role IDs
+                .ToHashSet();
+
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. existingUserReleaseRoles]);
+
+            var service = BuildService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
-                await service.NotifyUserOfNewContributorRoles(
-                    userId: userId,
-                    publicationTitle: "publication-title",
-                    releaseVersionIds: []
-                )
+                await service.NotifyUserOfNewContributorRoles(userReleaseRoleIds)
             );
 
-            MockUtils.VerifyAllMocks(userRepository);
+            MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+        }
+
+        [Fact]
+        public async Task NotAllRolesAreForTheSameUser_ThrowsArgumentException()
+        {
+            var user1 = _dataFixture.DefaultUser();
+            var user2 = _dataFixture.DefaultUser();
+
+            var existingUserReleaseRoles = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+                )
+                .WithRole(ReleaseRole.Contributor)
+                .ForIndex(0, s => s.SetUser(user1))
+                .ForIndex(1, s => s.SetUser(user1))
+                .ForIndex(2, s => s.SetUser(user2))
+                .GenerateList(3);
+
+            var userReleaseRoleIds = existingUserReleaseRoles.Select(r => r.Id).ToHashSet();
+
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. existingUserReleaseRoles]);
+
+            var service = BuildService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
+
+            await Assert.ThrowsAsync<ArgumentException>(async () =>
+                await service.NotifyUserOfNewContributorRoles(userReleaseRoleIds)
+            );
+
+            MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+        }
+
+        [Fact]
+        public async Task NotAllRolesAreForTheSamePublication_ThrowsArgumentException()
+        {
+            Publication publication1 = _dataFixture.DefaultPublication();
+            Publication publication2 = _dataFixture.DefaultPublication();
+
+            var existingUserReleaseRoles = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithUser(_dataFixture.DefaultUser())
+                .WithRole(ReleaseRole.Contributor)
+                .ForIndex(
+                    0,
+                    s =>
+                        s.SetReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication1))
+                        )
+                )
+                .ForIndex(
+                    1,
+                    s =>
+                        s.SetReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication1))
+                        )
+                )
+                .ForIndex(
+                    2,
+                    s =>
+                        s.SetReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication2))
+                        )
+                )
+                .GenerateList(3);
+
+            var userReleaseRoleIds = existingUserReleaseRoles.Select(r => r.Id).ToHashSet();
+
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. existingUserReleaseRoles]);
+
+            var service = BuildService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
+
+            await Assert.ThrowsAsync<ArgumentException>(async () =>
+                await service.NotifyUserOfNewContributorRoles(userReleaseRoleIds)
+            );
+
+            MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+        }
+
+        [Fact]
+        public async Task NotAllRolesAreContributorRoles_ThrowsArgumentException()
+        {
+            var existingUserReleaseRoles = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithUser(_dataFixture.DefaultUser())
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+                )
+                .ForIndex(0, s => s.SetRole(ReleaseRole.Contributor))
+                .ForIndex(1, s => s.SetRole(ReleaseRole.Contributor))
+                .ForIndex(2, s => s.SetRole(ReleaseRole.Approver))
+                .GenerateList(3);
+
+            var userReleaseRoleIds = existingUserReleaseRoles.Select(r => r.Id).ToHashSet();
+
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. existingUserReleaseRoles]);
+
+            var service = BuildService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
+
+            await Assert.ThrowsAsync<ArgumentException>(async () =>
+                await service.NotifyUserOfNewContributorRoles(userReleaseRoleIds)
+            );
+
+            MockUtils.VerifyAllMocks(userReleaseRoleRepository);
         }
 
         [Fact]
         public async Task SendingEmailFails_ThrowsEmailSendFailedException()
         {
             User user = _dataFixture.DefaultUser();
-            var publicationTitle = "publication-title";
-            var releaseVersionIds = CollectionUtils.SetOf(Guid.NewGuid(), Guid.NewGuid());
-            const ReleaseRole role = ReleaseRole.Contributor;
+            Publication publication = _dataFixture.DefaultPublication();
 
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
+            var userReleaseRoles = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(_dataFixture.DefaultRelease().WithPublication(publication))
+                )
+                .WithRole(ReleaseRole.Contributor)
+                .GenerateList(3);
+
+            var releasesInfo = userReleaseRoles
+                .Select(urr => urr.ReleaseVersion.Release)
+                .Distinct()
+                .Select(r => (r.Year, r.TimePeriodCoverage, r.Title))
+                .ToHashSet();
+
+            var userReleaseRoleIds = userReleaseRoles.Select(r => r.Id).ToHashSet();
+
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
-            userRepository.Setup(r => r.FindUserById(user.Id, It.IsAny<CancellationToken>())).ReturnsAsync(user);
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, [.. userReleaseRoles]);
 
-            foreach (var releaseVersionId in releaseVersionIds)
+            foreach (var userReleaseRole in userReleaseRoles)
             {
                 userReleaseRoleRepository
-                    .Setup(r => r.MarkEmailAsSent(user.Id, releaseVersionId, role, It.IsAny<CancellationToken>()))
+                    .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, It.IsAny<CancellationToken>()))
                     .Returns(Task.CompletedTask);
             }
 
             emailTemplateService
-                .Setup(s => s.SendContributorInviteEmail(user.Email, publicationTitle, releaseVersionIds))
-                .ReturnsAsync(new BadRequestResult());
+                .Setup(s => s.SendContributorInviteEmail(user.Email, publication.Title, releasesInfo))
+                .Returns(new BadRequestResult());
 
             var service = BuildService(
-                userRepository: userRepository.Object,
                 emailTemplateService: emailTemplateService.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
             await Assert.ThrowsAsync<EmailSendFailedException>(async () =>
-                await service.NotifyUserOfNewContributorRoles(
-                    userId: user.Id,
-                    publicationTitle: publicationTitle,
-                    releaseVersionIds: releaseVersionIds
-                )
+                await service.NotifyUserOfNewContributorRoles(userReleaseRoleIds)
             );
 
-            MockUtils.VerifyAllMocks(userRepository, userReleaseRoleRepository, emailTemplateService);
+            MockUtils.VerifyAllMocks(userReleaseRoleRepository, emailTemplateService);
         }
     }
 
@@ -580,146 +736,234 @@ public abstract class UserResourceRoleNotificationServiceTests
         [Fact]
         public async Task Success_ActiveUser()
         {
-            User activeUser = _dataFixture.DefaultUser();
-            var releaseVersionId = Guid.NewGuid();
+            var scheduledPublishDate = DateTimeOffset.UtcNow.AddDays(7);
 
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
+            UserReleaseRole userReleaseRole = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithUser(_dataFixture.DefaultUser()) // Active user
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithPublishScheduled(scheduledPublishDate)
+                        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+                )
+                .WithRole(ReleaseRole.PrereleaseViewer);
+
+            var preReleaseWindow = new PreReleaseWindow
+            {
+                Start = DateTimeOffset.UtcNow.AddDays(1),
+                ScheduledPublishDate = scheduledPublishDate,
+            };
+
+            var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
-            userRepository
-                .Setup(r => r.FindUserById(activeUser.Id, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(activeUser);
+            preReleaseService
+                .Setup(s => s.GetPreReleaseWindow(userReleaseRole.ReleaseVersion))
+                .Returns(preReleaseWindow);
 
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);
             userReleaseRoleRepository
-                .Setup(r =>
-                    r.MarkEmailAsSent(
-                        activeUser.Id,
-                        releaseVersionId,
-                        ReleaseRole.PrereleaseViewer,
-                        It.IsAny<CancellationToken>()
-                    )
-                )
+                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             emailTemplateService
-                .Setup(s => s.SendPreReleaseInviteEmail(activeUser.Email, releaseVersionId, false))
-                .ReturnsAsync(Unit.Instance);
+                .Setup(s =>
+                    s.SendPreReleaseInviteEmail(
+                        userReleaseRole.User.Email,
+                        userReleaseRole.ReleaseVersion.Release.Publication.Title,
+                        userReleaseRole.ReleaseVersion.Release.Title,
+                        false, // Not a new user due to being active
+                        userReleaseRole.ReleaseVersion.Release.PublicationId,
+                        userReleaseRole.ReleaseVersionId,
+                        preReleaseWindow.Start,
+                        userReleaseRole.ReleaseVersion.PublishScheduled!.Value
+                    )
+                )
+                .Returns(Unit.Instance);
 
             var service = BuildService(
-                userRepository: userRepository.Object,
+                preReleaseService: preReleaseService.Object,
                 emailTemplateService: emailTemplateService.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
-            await service.NotifyUserOfNewPreReleaseRole(userId: activeUser.Id, releaseVersionId: releaseVersionId);
+            await service.NotifyUserOfNewPreReleaseRole(userReleaseRole.Id);
 
-            MockUtils.VerifyAllMocks(userRepository, userReleaseRoleRepository, emailTemplateService);
+            MockUtils.VerifyAllMocks(preReleaseService, userReleaseRoleRepository, emailTemplateService);
         }
 
         [Fact]
         public async Task Success_InactiveUser()
         {
-            User inactiveUser = _dataFixture.DefaultUserWithPendingInvite();
-            var releaseVersionId = Guid.NewGuid();
+            var scheduledPublishDate = DateTimeOffset.UtcNow.AddDays(7);
 
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
+            UserReleaseRole userReleaseRole = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithUser(_dataFixture.DefaultUserWithPendingInvite()) // Inactive user
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithPublishScheduled(scheduledPublishDate)
+                        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+                )
+                .WithRole(ReleaseRole.PrereleaseViewer);
+
+            var preReleaseWindow = new PreReleaseWindow
+            {
+                Start = DateTimeOffset.UtcNow.AddDays(1),
+                ScheduledPublishDate = scheduledPublishDate,
+            };
+
+            var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
-            userRepository
-                .Setup(r => r.FindUserById(inactiveUser.Id, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(inactiveUser);
+            preReleaseService
+                .Setup(s => s.GetPreReleaseWindow(userReleaseRole.ReleaseVersion))
+                .Returns(preReleaseWindow);
 
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);
             userReleaseRoleRepository
-                .Setup(r =>
-                    r.MarkEmailAsSent(
-                        inactiveUser.Id,
-                        releaseVersionId,
-                        ReleaseRole.PrereleaseViewer,
-                        It.IsAny<CancellationToken>()
-                    )
-                )
+                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             emailTemplateService
-                .Setup(s => s.SendPreReleaseInviteEmail(inactiveUser.Email, releaseVersionId, true))
-                .ReturnsAsync(Unit.Instance);
+                .Setup(s =>
+                    s.SendPreReleaseInviteEmail(
+                        userReleaseRole.User.Email,
+                        userReleaseRole.ReleaseVersion.Release.Publication.Title,
+                        userReleaseRole.ReleaseVersion.Release.Title,
+                        true, // Is new user due to pending invite
+                        userReleaseRole.ReleaseVersion.Release.PublicationId,
+                        userReleaseRole.ReleaseVersionId,
+                        preReleaseWindow.Start,
+                        userReleaseRole.ReleaseVersion.PublishScheduled!.Value
+                    )
+                )
+                .Returns(Unit.Instance);
 
             var service = BuildService(
-                userRepository: userRepository.Object,
+                preReleaseService: preReleaseService.Object,
                 emailTemplateService: emailTemplateService.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
-            await service.NotifyUserOfNewPreReleaseRole(userId: inactiveUser.Id, releaseVersionId: releaseVersionId);
+            await service.NotifyUserOfNewPreReleaseRole(userReleaseRole.Id);
 
-            MockUtils.VerifyAllMocks(userRepository, emailTemplateService, userReleaseRoleRepository);
+            MockUtils.VerifyAllMocks(preReleaseService, userReleaseRoleRepository, emailTemplateService);
         }
 
         [Fact]
         public async Task SendingEmailFails_ThrowsEmailSendFailedException()
         {
-            User activeUser = _dataFixture.DefaultUser();
-            var releaseVersionId = Guid.NewGuid();
+            var scheduledPublishDate = DateTimeOffset.UtcNow.AddDays(7);
 
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
+            UserReleaseRole userReleaseRole = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithUser(_dataFixture.DefaultUser()) // Active user
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithPublishScheduled(scheduledPublishDate)
+                        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+                )
+                .WithRole(ReleaseRole.PrereleaseViewer);
+
+            var preReleaseWindow = new PreReleaseWindow
+            {
+                Start = DateTimeOffset.UtcNow.AddDays(1),
+                ScheduledPublishDate = scheduledPublishDate,
+            };
+
+            var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
-            userRepository
-                .Setup(r => r.FindUserById(activeUser.Id, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(activeUser);
+            preReleaseService
+                .Setup(s => s.GetPreReleaseWindow(userReleaseRole.ReleaseVersion))
+                .Returns(preReleaseWindow);
 
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);
             userReleaseRoleRepository
-                .Setup(r =>
-                    r.MarkEmailAsSent(
-                        activeUser.Id,
-                        releaseVersionId,
-                        ReleaseRole.PrereleaseViewer,
-                        It.IsAny<CancellationToken>()
-                    )
-                )
+                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             emailTemplateService
-                .Setup(s => s.SendPreReleaseInviteEmail(activeUser.Email, releaseVersionId, false))
-                .ReturnsAsync(new BadRequestResult());
+                .Setup(s =>
+                    s.SendPreReleaseInviteEmail(
+                        userReleaseRole.User.Email,
+                        userReleaseRole.ReleaseVersion.Release.Publication.Title,
+                        userReleaseRole.ReleaseVersion.Release.Title,
+                        false, // Not a new user due to being active
+                        userReleaseRole.ReleaseVersion.Release.PublicationId,
+                        userReleaseRole.ReleaseVersionId,
+                        preReleaseWindow.Start,
+                        userReleaseRole.ReleaseVersion.PublishScheduled!.Value
+                    )
+                )
+                .Returns(new BadRequestResult());
 
             var service = BuildService(
-                userRepository: userRepository.Object,
+                preReleaseService: preReleaseService.Object,
                 emailTemplateService: emailTemplateService.Object,
                 userReleaseRoleRepository: userReleaseRoleRepository.Object
             );
 
             await Assert.ThrowsAsync<EmailSendFailedException>(async () =>
-                await service.NotifyUserOfNewPreReleaseRole(userId: activeUser.Id, releaseVersionId: releaseVersionId)
+                await service.NotifyUserOfNewPreReleaseRole(userReleaseRole.Id)
             );
 
-            MockUtils.VerifyAllMocks(userRepository, userReleaseRoleRepository, emailTemplateService);
+            MockUtils.VerifyAllMocks(preReleaseService, userReleaseRoleRepository, emailTemplateService);
         }
 
         [Fact]
-        public async Task UserDoesNotExist_ThrowsKeyNotFoundException()
+        public async Task RoleDoesNotExist_ThrowsKeyNotFoundException()
         {
-            var userId = Guid.NewGuid();
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
-            var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
-
-            userRepository.Setup(r => r.FindUserById(userId, It.IsAny<CancellationToken>())).ReturnsAsync((User?)null);
-
-            var service = BuildService(userRepository: userRepository.Object);
+            var service = BuildService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
 
             await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
-                await service.NotifyUserOfNewPreReleaseRole(userId: userId, releaseVersionId: Guid.NewGuid())
+                await service.NotifyUserOfNewPreReleaseRole(Guid.NewGuid())
             );
 
-            MockUtils.VerifyAllMocks(userRepository);
+            MockUtils.VerifyAllMocks(userReleaseRoleRepository);
+        }
+
+        [Theory]
+        [InlineData(ReleaseRole.Approver)]
+        [InlineData(ReleaseRole.Contributor)]
+        public async Task RoleIsNotAPrereleaseRole_ThrowsKeyNotFoundException(ReleaseRole role)
+        {
+            UserReleaseRole userReleaseRole = _dataFixture
+                .DefaultUserReleaseRole()
+                .WithUser(_dataFixture.DefaultUser())
+                .WithReleaseVersion(
+                    _dataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+                )
+                .WithRole(role);
+
+            var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);
+
+            var service = BuildService(userReleaseRoleRepository: userReleaseRoleRepository.Object);
+
+            await Assert.ThrowsAsync<ArgumentException>(async () =>
+                await service.NotifyUserOfNewPreReleaseRole(userReleaseRole.Id)
+            );
+
+            MockUtils.VerifyAllMocks(userReleaseRoleRepository);
         }
     }
 
     private static UserResourceRoleNotificationService BuildService(
         ContentDbContext? contentDbContext = null,
+        IPreReleaseService? preReleaseService = null,
         IUserRepository? userRepository = null,
         IEmailTemplateService? emailTemplateService = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
@@ -730,6 +974,7 @@ public abstract class UserResourceRoleNotificationServiceTests
 
         return new(
             contentDbContext: contentDbContext,
+            preReleaseService: preReleaseService ?? Mock.Of<IPreReleaseService>(MockBehavior.Strict),
             userRepository: userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict),
             emailTemplateService: emailTemplateService ?? Mock.Of<IEmailTemplateService>(MockBehavior.Strict),
             userReleaseRoleRepository: userReleaseRoleRepository

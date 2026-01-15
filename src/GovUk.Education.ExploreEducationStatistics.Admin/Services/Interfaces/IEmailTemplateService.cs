@@ -7,23 +7,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IEmailTemplateService
 {
-    Task<Either<ActionResult, Unit>> SendInviteEmail(
+    Either<ActionResult, Unit> SendInviteEmail(
         string email,
-        HashSet<Guid> userReleaseRoleIds,
-        HashSet<Guid> userPublicationRoleIds
+        HashSet<(string PublicationTitle, string ReleaseTitle, ReleaseRole Role)> releaseRolesInfo,
+        HashSet<(string PublicationTitle, PublicationRole Role)> publicationRolesInfo
     );
 
     Either<ActionResult, Unit> SendPublicationRoleEmail(string email, string publicationTitle, PublicationRole role);
 
-    Either<ActionResult, Unit> SendReleaseRoleEmail(string email, ReleaseVersion releaseVersion, ReleaseRole role);
-
-    Task<Either<ActionResult, Unit>> SendContributorInviteEmail(
+    Either<ActionResult, Unit> SendReleaseRoleEmail(
         string email,
         string publicationTitle,
-        HashSet<Guid> releaseVersionIds
+        string releaseTitle,
+        Guid publicationId,
+        Guid releaseVersionId,
+        ReleaseRole role
     );
 
-    Task<Either<ActionResult, Unit>> SendPreReleaseInviteEmail(string email, Guid releaseVersionId, bool isNewUser);
+    Either<ActionResult, Unit> SendContributorInviteEmail(
+        string email,
+        string publicationTitle,
+        HashSet<(int Year, TimeIdentifier TimePeriodCoverage, string Title)> releasesInfo
+    );
+
+    Either<ActionResult, Unit> SendPreReleaseInviteEmail(
+        string email,
+        string publicationTitle,
+        string releaseTitle,
+        bool isNewUser,
+        Guid publicationId,
+        Guid releaseVersionId,
+        DateTimeOffset preReleaseWindowStart,
+        DateTimeOffset publishScheduled
+    );
 
     Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email, ReleaseVersion releaseVersion);
 

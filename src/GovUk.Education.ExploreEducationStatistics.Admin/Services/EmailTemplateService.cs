@@ -1,63 +1,43 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class EmailTemplateService(
-    ContentDbContext contentDbContext,
-    IPreReleaseService preReleaseService,
     IEmailService emailService,
     IOptions<AppOptions> appOptions,
-    IOptions<NotifyOptions> notifyOptions,
-    IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository
+    IOptions<NotifyOptions> notifyOptions
 ) : IEmailTemplateService
 {
-    public async Task<Either<ActionResult, Unit>> SendInviteEmail(
+    public Either<ActionResult, Unit> SendInviteEmail(
         string email,
-        HashSet<Guid> userReleaseRoleIds,
-        HashSet<Guid> userPublicationRoleIds
+        HashSet<(string PublicationTitle, string ReleaseTitle, ReleaseRole Role)> releaseRolesInfo,
+        HashSet<(string PublicationTitle, PublicationRole Role)> publicationRolesInfo
     )
     {
-        List<UserReleaseRole> userReleaseRoles = await GetUserReleaseRoles(userReleaseRoleIds);
-        List<UserPublicationRole> userPublicationRoles = await GetUserPublicationRoles(userPublicationRoleIds);
-
-        if (
-            userReleaseRoles.Any(urr => urr.User.Email != email)
-            || userPublicationRoles.Any(upr => upr.User.Email != email)
-        )
-        {
-            throw new ArgumentException("Not all user role IDs match the provided email address");
-        }
-
         var url = appOptions.Value.Url;
         var template = notifyOptions.Value.InviteWithRolesTemplateId;
 
-        var releaseRoleList = userReleaseRoles
-            .OrderBy(urr => urr.ReleaseVersion.Release.Publication.Title)
-            .ThenBy(urr => urr.ReleaseVersion.Release.Title)
-            .ThenBy(urr => urr.Role.ToString())
-            .Select(urr =>
-                $"* {urr.ReleaseVersion.Release.Publication.Title}, {urr.ReleaseVersion.Release.Title} - {urr.Role}"
-            )
+        var releaseRoleList = releaseRolesInfo
+            .OrderBy(rri => rri.PublicationTitle)
+            .ThenBy(rri => rri.ReleaseTitle)
+            .ThenBy(rri => rri.Role.ToString())
+            .Select(rri => $"* {rri.PublicationTitle}, {rri.ReleaseTitle} - {rri.Role}")
             .ToList();
 
         // The transformation step here is necessary to ensure that the email still uses the name 'Approver' for the
         // temporarily named 'Allower' role, as this is the name used in the UI. This will be removed in the future;
         // likely in STEP 9 (EES-6196) of the permissions rework approach (NO TICKET HAS BEEN CREATED FOR THIS YET).
-        var publicationRoleList = userPublicationRoles
-            .OrderBy(upr => upr.Publication.Title)
-            .ThenBy(upr => upr.Role)
-            .Select(upr => $"* {upr.Publication.Title} - {TransformPublicationRole(upr.Role)}")
+        var publicationRoleList = publicationRolesInfo
+            .OrderBy(pri => pri.PublicationTitle)
+            .ThenBy(pri => pri.Role)
+            .Select(pri => $"* {pri.PublicationTitle} - {TransformPublicationRole(pri.Role)}")
             .ToList();
 
         var emailValues = new Dictionary<string, dynamic>
@@ -106,7 +86,10 @@ public class EmailTemplateService(
 
     public Either<ActionResult, Unit> SendReleaseRoleEmail(
         string email,
-        ReleaseVersion releaseVersion,
+        string publicationTitle,
+        string releaseTitle,
+        Guid publicationId,
+        Guid releaseVersionId,
         ReleaseRole role
     )
     {
@@ -116,34 +99,25 @@ public class EmailTemplateService(
         var link = role == ReleaseRole.PrereleaseViewer ? "prerelease " : "summary";
         var emailValues = new Dictionary<string, dynamic>
         {
-            { "url", $"{url}/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/{link}" },
+            { "url", $"{url}/publication/{publicationId}/release/{releaseVersionId}/{link}" },
             { "role", role.ToString() },
-            { "publication", releaseVersion.Release.Publication.Title },
-            { "release", releaseVersion.Release.Title },
+            { "publication", publicationTitle },
+            { "release", releaseTitle },
         };
 
         return emailService.SendEmail(email, template, emailValues);
     }
 
-    public async Task<Either<ActionResult, Unit>> SendContributorInviteEmail(
+    public Either<ActionResult, Unit> SendContributorInviteEmail(
         string email,
         string publicationTitle,
-        HashSet<Guid> releaseVersionIds
+        HashSet<(int Year, TimeIdentifier TimePeriodCoverage, string Title)> releasesInfo
     )
     {
-        if (releaseVersionIds.IsNullOrEmpty())
-        {
-            throw new ArgumentException("List of release versions cannot be empty");
-        }
-
         var url = appOptions.Value.Url;
         var template = notifyOptions.Value.ContributorTemplateId;
 
-        var releases = await contentDbContext
-            .Releases.Where(r => r.Versions.Any(rv => releaseVersionIds.Contains(rv.Id)))
-            .ToListAsync();
-
-        var releaseTitles = releases
+        var releaseTitles = releasesInfo
             .OrderBy(r => r.Year)
             .ThenBy(r => r.TimePeriodCoverage)
             .Select(r => $"* {r.Title}")
@@ -159,50 +133,46 @@ public class EmailTemplateService(
         return emailService.SendEmail(email, template, emailValues);
     }
 
-    public async Task<Either<ActionResult, Unit>> SendPreReleaseInviteEmail(
+    public Either<ActionResult, Unit> SendPreReleaseInviteEmail(
         string email,
+        string publicationTitle,
+        string releaseTitle,
+        bool isNewUser,
+        Guid publicationId,
         Guid releaseVersionId,
-        bool isNewUser
+        DateTimeOffset preReleaseWindowStart,
+        DateTimeOffset publishScheduled
     )
     {
-        return await contentDbContext
-            .ReleaseVersions.Include(rv => rv.Release)
-                .ThenInclude(r => r.Publication)
-            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
-            .OnSuccess(releaseVersion =>
-            {
-                var url = appOptions.Value.Url;
-                var template = notifyOptions.Value.PreReleaseTemplateId;
+        var url = appOptions.Value.Url;
+        var template = notifyOptions.Value.PreReleaseTemplateId;
 
-                var prereleaseUrl =
-                    $"{url}/publication/{releaseVersion.Release.Publication.Id}/release/{releaseVersion.Id}/prerelease/content";
+        var prereleaseUrl = $"{url}/publication/{publicationId}/release/{releaseVersionId}/prerelease/content";
 
-                var preReleaseWindow = preReleaseService.GetPreReleaseWindow(releaseVersion);
-                var preReleaseWindowStart = preReleaseWindow.Start.ConvertToUkTimeZone();
-                var publishScheduled = releaseVersion.PublishScheduled!.Value.ConvertToUkTimeZone();
+        var preReleaseWindowStartUkTimeZone = preReleaseWindowStart.ConvertToUkTimeZone();
+        var publishScheduledUkTimeZone = publishScheduled.ConvertToUkTimeZone();
 
-                // TODO EES-828 This time should depend on the Publisher schedule
-                var publishScheduledTime = new TimeSpan(9, 30, 0);
+        // TODO EES-828 This time should depend on the Publisher schedule
+        var publishScheduledTime = new TimeSpan(9, 30, 0);
 
-                var preReleaseDay = FormatDayForEmail(preReleaseWindowStart);
-                var preReleaseTime = FormatTimeForEmail(preReleaseWindowStart);
-                var publishDay = FormatDayForEmail(publishScheduled);
-                var publishTime = FormatTimeForEmail(publishScheduledTime);
+        var preReleaseDay = FormatDayForEmail(preReleaseWindowStartUkTimeZone);
+        var preReleaseTime = FormatTimeForEmail(preReleaseWindowStartUkTimeZone);
+        var publishDay = FormatDayForEmail(publishScheduledUkTimeZone);
+        var publishTime = FormatTimeForEmail(publishScheduledTime);
 
-                var emailValues = new Dictionary<string, dynamic>
-                {
-                    { "newUser", isNewUser ? "yes" : "no" },
-                    { "release name", releaseVersion.Release.Title },
-                    { "publication name", releaseVersion.Release.Publication.Title },
-                    { "prerelease link", prereleaseUrl },
-                    { "prerelease day", preReleaseDay },
-                    { "prerelease time", preReleaseTime },
-                    { "publish day", publishDay },
-                    { "publish time", publishTime },
-                };
+        var emailValues = new Dictionary<string, dynamic>
+        {
+            { "newUser", isNewUser ? "yes" : "no" },
+            { "release name", releaseTitle },
+            { "publication name", publicationTitle },
+            { "prerelease link", prereleaseUrl },
+            { "prerelease day", preReleaseDay },
+            { "prerelease time", preReleaseTime },
+            { "publish day", publishDay },
+            { "publish time", publishTime },
+        };
 
-                return emailService.SendEmail(email, template, emailValues);
-            });
+        return emailService.SendEmail(email, template, emailValues);
     }
 
     public Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email, ReleaseVersion releaseVersion)
@@ -236,30 +206,6 @@ public class EmailTemplateService(
         };
 
         return emailService.SendEmail(email, template, emailValues);
-    }
-
-    private async Task<List<UserReleaseRole>> GetUserReleaseRoles(HashSet<Guid> userReleaseRoleIds)
-    {
-        return await userReleaseRoleRepository
-            .Query(ResourceRoleFilter.PendingOnly)
-            .AsNoTracking()
-            .Where(urr => userReleaseRoleIds.Contains(urr.Id))
-            .Include(urr => urr.User)
-            .Include(urr => urr.ReleaseVersion)
-                .ThenInclude(rv => rv.Release)
-                    .ThenInclude(r => r.Publication)
-            .ToListAsync();
-    }
-
-    private async Task<List<UserPublicationRole>> GetUserPublicationRoles(HashSet<Guid> userPublicationRoleIds)
-    {
-        return await userPublicationRoleRepository
-            .Query(ResourceRoleFilter.PendingOnly)
-            .AsNoTracking()
-            .Where(upr => userPublicationRoleIds.Contains(upr.Id))
-            .Include(upr => upr.User)
-            .Include(upr => upr.Publication)
-            .ToListAsync();
     }
 
     private static string TransformPublicationRole(PublicationRole role)

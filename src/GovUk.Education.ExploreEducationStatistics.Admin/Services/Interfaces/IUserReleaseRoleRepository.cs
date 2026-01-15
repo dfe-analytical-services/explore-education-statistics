@@ -61,10 +61,5 @@ public interface IUserReleaseRoleRepository
         params ReleaseRole[] rolesToInclude
     );
 
-    Task MarkEmailAsSent(
-        Guid userId,
-        Guid releaseVersionId,
-        ReleaseRole role,
-        CancellationToken cancellationToken = default
-    );
+    Task MarkEmailAsSent(Guid userReleaseRoleId, CancellationToken cancellationToken = default);
 }

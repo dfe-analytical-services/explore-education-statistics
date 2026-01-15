@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -100,13 +99,11 @@ public class ReleaseInviteService(
                 })
                 .ToList();
 
-            await userReleaseRoleRepository.CreateManyIfNotExists(userReleaseRoles);
+            await userReleaseRoleRepository.CreateManyIfNotExists(userReleaseRoles); // CHECK IDS ARE POPULATED HERE!
 
-            await userResourceRoleNotificationService.NotifyUserOfNewContributorRoles(
-                userId: user.Id,
-                publicationTitle: publicationTitle,
-                releaseVersionIds: releaseVersionIds
-            );
+            var userReleaseRoleIds = userReleaseRoles.Select(urr => urr.Id).ToHashSet();
+
+            await userResourceRoleNotificationService.NotifyUserOfNewContributorRoles(userReleaseRoleIds);
 
             if (user.Active)
             {

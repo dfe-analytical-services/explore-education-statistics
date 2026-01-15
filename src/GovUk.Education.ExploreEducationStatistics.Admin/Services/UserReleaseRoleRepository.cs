@@ -166,25 +166,13 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUse
             .AnyAsync(cancellationToken);
     }
 
-    public async Task MarkEmailAsSent(
-        Guid userId,
-        Guid releaseVersionId,
-        ReleaseRole role,
-        CancellationToken cancellationToken = default
-    )
+    public async Task MarkEmailAsSent(Guid userReleaseRoleId, CancellationToken cancellationToken = default)
     {
-        var userReleaseRole = await GetByCompositeKey(
-            userId: userId,
-            releaseVersionId: releaseVersionId,
-            role: role,
-            cancellationToken: cancellationToken
-        );
+        var userReleaseRole = await GetById(userReleaseRoleId: userReleaseRoleId, cancellationToken: cancellationToken);
 
         if (userReleaseRole is null)
         {
-            throw new InvalidOperationException(
-                $"No User Release Role found for {nameof(userId)} '{userId}', {nameof(releaseVersionId)} '{releaseVersionId}', {nameof(role)} '{role}'"
-            );
+            throw new InvalidOperationException($"No User Release Role found with ID {userReleaseRoleId}.");
         }
 
         userReleaseRole.EmailSent = DateTimeOffset.UtcNow;

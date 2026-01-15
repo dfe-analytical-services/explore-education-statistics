@@ -542,6 +542,17 @@ public abstract class PreReleaseUserServiceTests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var createUserReleaseRoleFunc = (string email) =>
+                _dataFixture
+                    .DefaultUserReleaseRole()
+                    .WithUserId(
+                        existingUsersByEmail.TryGetValue(email, out var user) ? user.Id : newUserIdsByEmail[email]
+                    )
+                    .WithReleaseVersion(releaseVersion)
+                    .Generate();
+
+            var createdUserReleaseRolesByEmail = new Dictionary<string, UserReleaseRole>();
+
             var userRepository = new Mock<IUserRepository>(MockBehavior.Strict);
             foreach (var email in allEmails)
             {
@@ -642,6 +653,9 @@ public abstract class PreReleaseUserServiceTests
                         .ReturnsAsync(false);
                 }
 
+                var createdUserReleaseRole = createUserReleaseRoleFunc(email);
+                createdUserReleaseRolesByEmail.Add(email, createdUserReleaseRole);
+
                 var userId = existingUser?.Id ?? newUserIdsByEmail[email];
                 userReleaseRoleRepository
                     .Setup(mock =>
@@ -654,19 +668,7 @@ public abstract class PreReleaseUserServiceTests
                             It.IsAny<CancellationToken>()
                         )
                     )
-                    .ReturnsAsync(
-                        _dataFixture
-                            .DefaultUserReleaseRole()
-                            .WithUser(_dataFixture.DefaultUser())
-                            .WithReleaseVersion(
-                                _dataFixture
-                                    .DefaultReleaseVersion()
-                                    .WithRelease(
-                                        _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
-                                    )
-                            )
-                            .Generate()
-                    );
+                    .ReturnsAsync(createdUserReleaseRole);
             }
 
             var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(
@@ -682,13 +684,11 @@ public abstract class PreReleaseUserServiceTests
                     continue;
                 }
 
-                var userId = existingUsersByEmail.TryGetValue(email, out var existingUser)
-                    ? existingUser.Id
-                    : newUserIdsByEmail[email];
+                var createdUserReleaseRole = createdUserReleaseRolesByEmail[email];
 
                 userResourceRoleNotificationService
                     .Setup(mock =>
-                        mock.NotifyUserOfNewPreReleaseRole(userId, releaseVersion.Id, It.IsAny<CancellationToken>())
+                        mock.NotifyUserOfNewPreReleaseRole(createdUserReleaseRole.Id, It.IsAny<CancellationToken>())
                     )
                     .Returns(Task.CompletedTask);
             }

@@ -150,7 +150,7 @@ public class PreReleaseUserService(
                     createdById: userService.GetUserId()
                 );
 
-            await userReleaseRoleRepository.Create(
+            var createdUserReleaseRole = await userReleaseRoleRepository.Create(
                 userId: user.Id,
                 releaseVersionId: releaseVersion.Id,
                 role: ReleaseRole.PrereleaseViewer,
@@ -161,10 +161,7 @@ public class PreReleaseUserService(
 
             if (shouldSendEmail)
             {
-                await userResourceRoleNotificationService.NotifyUserOfNewPreReleaseRole(
-                    userId: user.Id,
-                    releaseVersionId: releaseVersion.Id
-                );
+                await userResourceRoleNotificationService.NotifyUserOfNewPreReleaseRole(createdUserReleaseRole.Id);
             }
         });
 
