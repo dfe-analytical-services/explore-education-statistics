@@ -59,7 +59,7 @@ public class PublicationReleasesService(ContentDbContext contentDbContext) : IPu
         await contentDbContext
             .ReleaseVersions.AsNoTracking()
             .Include(rv => rv.Release)
-            // Include all release updates here until EES-6414, as they are needed to determine 'last updated' for non-first versions
+            // Include all release updates here until EES-6833, as they are needed to determine 'last updated' for non-first versions
             .Include(rv => rv.Updates)
             .LatestReleaseVersions(publicationId: publication.Id, publishedOnly: true)
             // There should only be one version per release since only the latest published versions are selected
@@ -94,7 +94,8 @@ public class PublicationReleasesService(ContentDbContext contentDbContext) : IPu
         );
 
     /// <summary>
-    /// Until a change in EES-6414 makes <see cref="ReleaseVersion.Published"/> the effective public facing 'last updated'
+    /// TODO EES-6833 Remove this method and instead use <see cref="ReleaseVersion.Published"/> as the last updated date.
+    /// Until EES-6830 makes <see cref="ReleaseVersion.Published"/> the effective public facing 'last updated'
     /// date of the release, use the date from the latest release update, in the same way the frontend did for the old
     /// release page design.
     /// </summary>
