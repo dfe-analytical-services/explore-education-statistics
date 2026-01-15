@@ -1,9 +1,11 @@
+import NotificationBanner from '@common/components/NotificationBanner';
 import { NavItem } from '@common/components/PageNavExpandable';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import {
   PublicationSummaryRedesign,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
+import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import ReleasePageIntro from '@frontend/modules/find-statistics/components/ReleasePageIntro';
 import ReleasePageTabNav, {
@@ -47,6 +49,25 @@ const ReleasePageShell: NextPage<Props> = ({
           publicationSummary={publicationSummary}
           releaseTitle={releaseVersionSummary.title}
         />
+      }
+      customBannerContent={
+        <NotificationBanner
+          className="govuk-!-margin-top-6"
+          fullWidthContent
+          title="New release page"
+        >
+          <p>
+            You are viewing the new design of the Release page - if you would
+            like to provide feedback, please complete{' '}
+            <Link
+              to="https://forms.office.com/e/sBRKZgs6zB"
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+            >
+              our feedback form (opens in new window)
+            </Link>
+          </p>
+        </NotificationBanner>
       }
       width="wide"
     >
