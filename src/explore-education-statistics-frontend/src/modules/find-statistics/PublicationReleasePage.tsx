@@ -144,7 +144,7 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
 
     const queryClient = new QueryClient();
 
-    if ((redesign === 'true' || tab) && process.env.APP_ENV !== 'Production') {
+    if (redesign === 'true' || tab) {
       try {
         const publicationSummary = await queryClient.fetchQuery(
           publicationQueries.getPublicationSummaryRedesign(publicationSlug),
