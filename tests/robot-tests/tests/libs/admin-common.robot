@@ -646,7 +646,7 @@ user confirms replacement upload
     ...    ${SUBJECT_NAME}
     ...    ${EXPECTED_STATUS}=Ready
     ...    ${ROW}=1
-    user clicks element    testid:data-set-upload-row-${TESTID_INDEX}-view-details
+    user clicks element    testid:data-set-upload-row-${ROW}-view-details
 
     user waits until modal is visible    Data set details
     ${statusText}=    Get Text    xpath=//tr[td[1][text()[contains(.,'${SUBJECT_NAME}')]]]/td[3]/strong
