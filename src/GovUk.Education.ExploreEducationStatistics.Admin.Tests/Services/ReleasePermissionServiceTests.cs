@@ -375,7 +375,7 @@ public class ReleasePermissionServiceTests
             .DefaultUserReleaseRole()
             .ForIndex(0, s => s.SetUser(user1).SetReleaseVersion(release1.Versions[0]).SetRole(Contributor))
             .ForIndex(1, s => s.SetUser(user2).SetReleaseVersion(release2.Versions[1]).SetRole(Contributor))
-            // Duplicate user for different release version - should be ignored in the result
+            // Duplicate user for different release version - the user should only appear once in the result
             .ForIndex(2, s => s.SetUser(user1).SetReleaseVersion(release3.Versions[0]).SetRole(Contributor))
             .GenerateList(3);
 
