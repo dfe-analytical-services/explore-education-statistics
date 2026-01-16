@@ -52,7 +52,7 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(Type[] dbCon
     private TestContainerRegistrations _testContainers = null!;
     private WebApplicationFactory<TStartup> _factory = null!;
 
-    protected TestDbContextHolder TestTestDbContexts = null!;
+    protected TestDbContextHolder TestDbContexts = null!;
 
     public async Task InitializeAsync()
     {
@@ -85,7 +85,7 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(Type[] dbCon
 
         // Look up all required DbContexts and make them available to the fixture subclass.
         var dbContexts = dbContextTypes.Select(type => _factory.Services.GetService(type)).Cast<DbContext>().ToArray();
-        TestTestDbContexts = new TestDbContextHolder(dbContexts);
+        TestDbContexts = new TestDbContextHolder(dbContexts);
 
         // Finally, allow the fixture subclass to perform any actions post-factory creation and prior to any
         // tests from its collection starting. This might include looking up any services that the tests in the
@@ -131,9 +131,9 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(Type[] dbCon
         // In-memory DbContexts can be cleared down by default with no speed penalty.
         // Proper DbContexts add considerable time to a full project run if clearing
         // between every test, and therefore we don't clear them down by default.
-        await TestTestDbContexts.ClearInMemoryTestData();
+        await TestDbContexts.ClearInMemoryTestData();
 
-        TestTestDbContexts.ResetAnyMocks();
+        TestDbContexts.ResetAnyMocks();
     }
 
     /// <summary>
@@ -152,7 +152,7 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(Type[] dbCon
     public async Task DisposeAsync()
     {
         await _testContainers.StopAll();
-        await TestTestDbContexts.DisposeAll();
+        await TestDbContexts.DisposeAll();
         await DisposeResources();
     }
 }

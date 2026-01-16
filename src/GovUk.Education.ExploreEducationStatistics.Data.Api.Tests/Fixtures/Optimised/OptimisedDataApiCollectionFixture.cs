@@ -49,10 +49,10 @@ public abstract class OptimisedDataApiCollectionFixture()
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public ContentDbContext GetContentDbContext() => TestTestDbContexts.GetDbContext<ContentDbContext>();
+    public ContentDbContext GetContentDbContext() => TestDbContexts.GetDbContext<ContentDbContext>();
 
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public StatisticsDbContext GetStatisticsDbContext() => TestTestDbContexts.GetDbContext<StatisticsDbContext>();
+    public StatisticsDbContext GetStatisticsDbContext() => TestDbContexts.GetDbContext<StatisticsDbContext>();
 }

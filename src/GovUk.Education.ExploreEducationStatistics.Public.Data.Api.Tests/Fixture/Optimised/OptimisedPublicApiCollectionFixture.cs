@@ -147,7 +147,7 @@ public abstract class OptimisedPublicApiCollectionFixture(params PublicApiIntegr
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public PublicDataDbContext GetPublicDataDbContext() => TestTestDbContexts.GetDbContext<PublicDataDbContext>();
+    public PublicDataDbContext GetPublicDataDbContext() => TestDbContexts.GetDbContext<PublicDataDbContext>();
 
     /// <summary>
     /// Get a Mock representing this dependency that can be used for setups and verifications. This mock will be used

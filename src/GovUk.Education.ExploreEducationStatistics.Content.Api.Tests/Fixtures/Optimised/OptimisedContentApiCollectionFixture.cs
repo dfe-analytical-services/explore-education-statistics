@@ -79,12 +79,12 @@ public abstract class OptimisedContentApiCollectionFixture(params ContentApiInte
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public ContentDbContext GetContentDbContext() => TestTestDbContexts.GetDbContext<ContentDbContext>();
+    public ContentDbContext GetContentDbContext() => TestDbContexts.GetDbContext<ContentDbContext>();
 
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public StatisticsDbContext GetStatisticsDbContext() => TestTestDbContexts.GetDbContext<StatisticsDbContext>();
+    public StatisticsDbContext GetStatisticsDbContext() => TestDbContexts.GetDbContext<StatisticsDbContext>();
 
     /// <summary>
     /// Retrieve the Azurity convenience class for the purposes of test data cleardown, etc.

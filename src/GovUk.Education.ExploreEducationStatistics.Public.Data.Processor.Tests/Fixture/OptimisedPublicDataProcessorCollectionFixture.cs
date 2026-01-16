@@ -151,18 +151,18 @@ public class OptimisedPublicDataProcessorCollectionFixture(
     protected override async Task DisposeResources()
     {
         // Dispose of any DbContexts when the test class that was using this fixture has completed.
-        await TestTestDbContexts.DisposeAll();
+        await TestDbContexts.DisposeAll();
     }
 
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public PublicDataDbContext GetPublicDataDbContext() => TestTestDbContexts.GetDbContext<PublicDataDbContext>();
+    public PublicDataDbContext GetPublicDataDbContext() => TestDbContexts.GetDbContext<PublicDataDbContext>();
 
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public ContentDbContext GetContentDbContext() => TestTestDbContexts.GetDbContext<ContentDbContext>();
+    public ContentDbContext GetContentDbContext() => TestDbContexts.GetDbContext<ContentDbContext>();
 
     public IDataSetVersionPathResolver GetDataSetVersionPathResolver() => _dataSetVersionPathResolver;
 
