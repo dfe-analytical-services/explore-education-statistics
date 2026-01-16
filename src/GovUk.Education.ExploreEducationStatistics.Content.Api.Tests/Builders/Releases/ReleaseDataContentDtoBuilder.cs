@@ -7,7 +7,7 @@ public class ReleaseDataContentDtoBuilder
     private Guid _releaseId = Guid.NewGuid();
     private Guid _releaseVersionId = Guid.NewGuid();
     private string? _dataDashboards = "Data dashboards";
-    private string _dataGuidance = "Data guidance";
+    private string? _dataGuidance = "Data guidance";
     private ReleaseDataContentDataSetDto[] _dataSets = [new ReleaseDataContentDataSetDtoBuilder().Build()];
     private ReleaseDataContentFeaturedTableDto[] _featuredTables =
     [
@@ -48,7 +48,7 @@ public class ReleaseDataContentDtoBuilder
         return this;
     }
 
-    public ReleaseDataContentDtoBuilder WithDataGuidance(string dataGuidance)
+    public ReleaseDataContentDtoBuilder WithDataGuidance(string? dataGuidance)
     {
         _dataGuidance = dataGuidance;
         return this;

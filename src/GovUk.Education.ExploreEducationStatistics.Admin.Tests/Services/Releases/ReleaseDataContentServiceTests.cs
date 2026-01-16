@@ -664,51 +664,23 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
-        public async Task WhenReleaseVersionHasNoDataGuidance_ReturnsNullDataGuidance()
+        public async Task WhenReleaseVersionHasNoAssociatedData_ReturnsEmptyDataContent()
         {
             // Arrange
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+                .WithReleases(_ =>
+                    [
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithVersions(_ => [_dataFixture.DefaultReleaseVersion().WithDataGuidance(null)]),
+                    ]
+                );
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            // Release version has no data guidance (override the default value set by the fixture)
-            releaseVersion.DataGuidance = null;
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                context.Publications.Add(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var sut = BuildService(context);
-
-                // Act
-                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
-
-                // Assert
-                var result = outcome.AssertRight();
-
-                Assert.Null(result.DataGuidance);
-            }
-        }
-
-        [Fact]
-        public async Task WhenReleaseVersionHasNoContent_ReturnsEmptyDataContent()
-        {
-            // Arrange
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
-            var release = publication.Releases[0];
-            var releaseVersion = release.Versions[0];
-
-            // Release version has no content assigned to test that empty/optional properties are handled correctly
-            releaseVersion.DataGuidance = null;
+            // Release version has no associated data sets, supporting files, featured tables, related dashboards,
+            // or data guidance, to test that empty/optional properties are handled correctly
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
@@ -728,7 +700,7 @@ public abstract class ReleaseDataContentServiceTests
                 var result = outcome.AssertRight();
 
                 Assert.Null(result.DataDashboards);
-                Assert.Equal(releaseVersion.DataGuidance, result.DataGuidance);
+                Assert.Null(result.DataGuidance);
                 Assert.Empty(result.DataSets);
                 Assert.Empty(result.FeaturedTables);
                 Assert.Empty(result.SupportingFiles);
