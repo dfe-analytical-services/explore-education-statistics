@@ -2,7 +2,6 @@ using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
 
@@ -22,54 +21,64 @@ public record ReleaseSearchableDocumentDto
     public required int TypeBoost { get; init; }
     public required string HtmlContent { get; init; }
 
-    public static ReleaseSearchableDocumentDto FromModel(Publication publication, ReleaseCacheViewModel release) =>
+    public static ReleaseSearchableDocumentDto FromReleaseVersion(ReleaseVersion releaseVersion) =>
         new()
         {
-            ReleaseId = release.ReleaseId,
-            ReleaseSlug = release.Slug,
-            ReleaseVersionId = release.Id,
-            PublicationId = publication.Id,
-            PublicationSlug = publication.Slug,
-            Summary = publication.Summary,
-            PublicationTitle = publication.Title,
-            Published = release.Published ?? throw new ArgumentException("Release must have a published date"),
-            ThemeId = publication.Theme.Id,
-            ThemeTitle = publication.Theme.Title,
-            Type = release.Type.ToString(),
-            TypeBoost = release.Type.ToSearchDocumentTypeBoost(),
-            HtmlContent = RenderSearchableHtmlContent(publication, release),
+            ReleaseId = releaseVersion.ReleaseId,
+            ReleaseSlug = releaseVersion.Release.Slug,
+            ReleaseVersionId = releaseVersion.Id,
+            PublicationId = releaseVersion.Release.PublicationId,
+            PublicationSlug = releaseVersion.Release.Publication.Slug,
+            Summary = releaseVersion.Release.Publication.Summary,
+            PublicationTitle = releaseVersion.Release.Publication.Title,
+            Published =
+                releaseVersion.PublishedDisplayDate
+                ?? throw new ArgumentException("Release must have a published date"),
+            ThemeId = releaseVersion.Release.Publication.ThemeId,
+            ThemeTitle = releaseVersion.Release.Publication.Theme.Title,
+            Type = releaseVersion.Type.ToString(),
+            TypeBoost = releaseVersion.Type.ToSearchDocumentTypeBoost(),
+            HtmlContent = RenderSearchableHtmlContent(releaseVersion),
         };
 
-    private static string RenderSearchableHtmlContent(Publication publication, ReleaseCacheViewModel release)
+    private static string RenderSearchableHtmlContent(ReleaseVersion releaseVersion)
     {
         var sb = new StringBuilder();
 
         // HTML Content
-        HtmlHeader(sb, publication.Title);
+        HtmlHeader(sb, releaseVersion.Release.Publication.Title);
 
         // H1: Publication Title
-        H1(sb, publication.Title);
+        H1(sb, releaseVersion.Release.Publication.Title);
 
         // H2: Release Title
-        H2(sb, release.Title);
+        H2(sb, releaseVersion.Release.Title);
 
         // H3: "Summary"
-        AddH3Section(sb, "Summary", release.SummarySection.Content);
+        if (releaseVersion.SummarySection != null)
+        {
+            AddH3Section(sb, "Summary", releaseVersion.SummarySection.Content);
+        }
 
         // H3: "Headlines"
-        AddH3Section(sb, "Headlines", release.HeadlinesSection.Content);
+        if (releaseVersion.HeadlinesSection != null)
+        {
+            AddH3Section(sb, "Headlines", releaseVersion.HeadlinesSection.Content);
+        }
 
         // Add content blocks
-        foreach (var contentSection in release.Content)
+        var contentSections = releaseVersion.GenericContent.OrderBy(section => section.Order).ToList();
+
+        foreach (var contentSection in contentSections)
         {
-            AddH3Section(sb, contentSection.Heading, contentSection.Content);
+            AddH3Section(sb, contentSection.Heading ?? "", contentSection.Content);
         }
 
         HtmlFooter(sb);
         return sb.ToString().UseUnixNewLine(); // Ensure consistency regardless of the runtime platform
     }
 
-    private static void AddH3Section(StringBuilder sb, string sectionTitle, List<IContentBlockViewModel> contentSection)
+    private static void AddH3Section(StringBuilder sb, string sectionTitle, List<ContentBlock> contentSection)
     {
         var htmlBlocks = ExtractHtmlBlocks(contentSection);
         if (string.IsNullOrEmpty(htmlBlocks))
@@ -106,9 +115,6 @@ public record ReleaseSearchableDocumentDto
             """
         );
 
-    private static string ExtractHtmlBlocks(List<IContentBlockViewModel> content) =>
-        string.Join(
-            Environment.NewLine,
-            content.OfType<HtmlBlockViewModel>().OrderBy(c => c.Order).Select(c => c.Body)
-        );
+    private static string ExtractHtmlBlocks(List<ContentBlock> content) =>
+        string.Join(Environment.NewLine, content.OfType<HtmlBlock>().OrderBy(hb => hb.Order).Select(hb => hb.Body));
 }

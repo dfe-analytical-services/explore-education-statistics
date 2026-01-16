@@ -5,12 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Builders;
-using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
-using Microsoft.AspNetCore.Mvc;
-using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
@@ -33,6 +28,42 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
+            releaseVersion.HeadlinesSection = _dataFixture
+                .DefaultContentSection()
+                .WithType(ContentSectionType.Headlines)
+                .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Headlines content</p>")]);
+
+            releaseVersion.SummarySection = _dataFixture
+                .DefaultContentSection()
+                .WithType(ContentSectionType.ReleaseSummary)
+                .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Summary content</p>")]);
+
+            releaseVersion.GenericContent =
+            [
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithHeading("Section 1")
+                    .WithContentBlocks([
+                        _dataFixture.DefaultHtmlBlock().WithBody("<p>Section 1 block 1 content</p>"),
+                        //contentDataBlockParent.LatestPublishedVersion!.ContentBlock,
+                        _dataFixture.DefaultHtmlBlock().WithBody("<p>Section 1 block 3 content</p>"),
+                    ]),
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithHeading("Section 2")
+                    .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Section 2 block 1 content</p>")]),
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithHeading("Section 3")
+                    .WithContentBlocks([
+                        _dataFixture.DefaultEmbedBlockLink().WithEmbedBlock(_dataFixture.DefaultEmbedBlock()),
+                    ]),
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithHeading("Section 4")
+                    .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Section 4 block 1 content</p>")]),
+            ];
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
@@ -40,70 +71,37 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                 await context.SaveChangesAsync();
             }
 
-            var releaseViewModel = new ReleaseCacheViewModel(releaseVersion.Id)
-            {
-                ReleaseId = release.Id,
-                Slug = release.Slug,
-                Published = releaseVersion.PublishedDisplayDate,
-                Title = release.Title,
-                Type = releaseVersion.Type,
-                HeadlinesSection = new ContentSectionViewModelBuilder().AddHtmlContent(
-                    "<p>here is the headline content</p>"
-                ),
-                SummarySection = new ContentSectionViewModelBuilder().AddHtmlContent(
-                    "<p>This is the release summary</p>"
-                ),
-                Content =
-                [
-                    new ContentSectionViewModelBuilder()
-                        .WithHeading("section one")
-                        .AddHtmlContent("<p>content section body one</p>"),
-                    new ContentSectionViewModelBuilder()
-                        .WithHeading("section two")
-                        .AddHtmlContent("<p>content section body two</p>"),
-                    new ContentSectionViewModelBuilder()
-                        .WithHeading("section three")
-                        .AddHtmlContent("<p>content section body three</p>"),
-                ],
-            };
-
-            var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
-
-            releaseService
-                .Setup(mock => mock.GetRelease(publication.LatestPublishedReleaseVersionId!.Value, null))
-                .ReturnsAsync(releaseViewModel);
-
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var sut = BuildService(context, releaseService.Object);
+                var sut = BuildService(context);
 
                 // Act
                 var outcome = await sut.GetLatestReleaseAsSearchableDocument(publication.Slug);
 
                 // Assert
-                releaseService.VerifyAll();
                 var actual = outcome.AssertRight();
 
                 var expectedHtmlContent = $"""
-                     <html>
+                    <html>
                         <head>
                             <title>{publication.Title}</title>
                         </head>
-                         <body>
-                             <h1>{publication.Title}</h1>
-                             <h2>{release.Title}</h2>
-                             <h3>Summary</h3>
-                             <p>This is the release summary</p>
-                             <h3>Headlines</h3>
-                             <p>here is the headline content</p>
-                             <h3>section one</h3>
-                             <p>content section body one</p>
-                             <h3>section two</h3>
-                             <p>content section body two</p>
-                             <h3>section three</h3>
-                             <p>content section body three</p>
-                         </body>
-                     </html>
+                        <body>
+                            <h1>{publication.Title}</h1>
+                            <h2>{release.Title}</h2>
+                            <h3>Summary</h3>
+                            <p>Summary content</p>
+                            <h3>Headlines</h3>
+                            <p>Headlines content</p>
+                            <h3>Section 1</h3>
+                            <p>Section 1 block 1 content</p>
+                            <p>Section 1 block 3 content</p>
+                            <h3>Section 2</h3>
+                            <p>Section 2 block 1 content</p>
+                            <h3>Section 4</h3>
+                            <p>Section 4 block 1 content</p>
+                        </body>
+                    </html>
                     """;
 
                 Assert.Multiple([
@@ -121,6 +119,55 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                     () => Assert.Equal(releaseVersion.Type.ToSearchDocumentTypeBoost(), actual.TypeBoost),
                     .. GetAssertTrimmedLinesEqual(expectedHtmlContent, actual.HtmlContent),
                 ]);
+            }
+        }
+
+        [Fact]
+        public async Task WhenReleaseVersionHasNoContent_ReturnsSearchableDocumentWithMinimalHtml()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            // Initialise the release version with empty sections to match how a newly created release would be configured
+            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
+            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetLatestReleaseAsSearchableDocument(publication.Slug);
+
+                // Assert
+                var actual = outcome.AssertRight();
+
+                // The expected HTML content is missing the empty headlines, summary, and generic sections
+                var expectedHtmlContent = $"""
+                    <html>
+                        <head>
+                            <title>{publication.Title}</title>
+                        </head>
+                        <body>
+                            <h1>{publication.Title}</h1>
+                            <h2>{release.Title}</h2>
+                        </body>
+                    </html>
+                    """;
+
+                Assert.Multiple(GetAssertTrimmedLinesEqual(expectedHtmlContent, actual.HtmlContent));
             }
         }
 
@@ -193,41 +240,6 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             }
         }
 
-        [Fact]
-        public async Task WhenReleaseServiceReturnsNotFound_ReturnsNotFound()
-        {
-            // Arrange
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithTheme(_dataFixture.DefaultTheme())
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                context.Publications.Add(publication);
-                await context.SaveChangesAsync();
-            }
-
-            var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
-
-            releaseService
-                .Setup(mock => mock.GetRelease(publication.LatestPublishedReleaseVersionId!.Value, null))
-                .ReturnsAsync(new NotFoundResult());
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var sut = BuildService(context, releaseService.Object);
-
-                // Act
-                var outcome = await sut.GetLatestReleaseAsSearchableDocument(publication.Slug);
-
-                // Assert
-                releaseService.VerifyAll();
-                outcome.AssertNotFound();
-            }
-        }
-
         private static Action[] GetAssertTrimmedLinesEqual(string expectedLines, string actualLines)
         {
             // Trim each line then assert they are the same
@@ -244,8 +256,9 @@ public abstract class ReleaseSearchableDocumentsServiceTests
         }
     }
 
-    private static ReleaseSearchableDocumentsService BuildService(
-        ContentDbContext contentDbContext,
-        IReleaseService? releaseService = null
-    ) => new(contentDbContext, releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict));
+    private ContentSection CreateContentSection(ContentSectionType type) =>
+        _dataFixture.DefaultContentSection().WithType(type);
+
+    private static ReleaseSearchableDocumentsService BuildService(ContentDbContext contentDbContext) =>
+        new(contentDbContext);
 }
