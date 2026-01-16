@@ -19,7 +19,7 @@ class GrafanaService {
     timeMillis?: number;
   }) {
     http.post(
-      'http://influxdb:8086/write?db=k6&precision=ms',
+      'http://influxdb:8181/write?db=k6&precision=ms',
       `events title="${title}",text="${content}",tags="${tags.join(',')}" ${
         timeMillis ?? Date.now()
       }`,

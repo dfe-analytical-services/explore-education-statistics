@@ -1956,6 +1956,7 @@
     },
     {
       "datasource": {
+        "default": true,
         "type": "influxdb",
         "uid": "P76A45B24F43298D1"
       },
@@ -1966,11 +1967,13 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -1979,7 +1982,8 @@
               "tooltip": false,
               "viz": false
             },
-            "lineInterpolation": "linear",
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -2054,7 +2058,7 @@
           "measurement": "ees_get_release_success",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"value\") FROM \"ees_get_release_success\" WHERE $timeFilter GROUP BY time(1s) fill(null)",
+          "query": "SELECT mean(\"rps\")\nFROM (\n  SELECT count(\"value\") AS \"rps\"\n  FROM \"ees_get_release_success\"\n  WHERE $timeFilter\n  GROUP BY time(1s) fill(null)\n)\nGROUP BY time(10s) fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2080,6 +2084,7 @@
     },
     {
       "datasource": {
+        "default": true,
         "type": "influxdb",
         "uid": "P76A45B24F43298D1"
       },
@@ -2089,11 +2094,13 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -2102,6 +2109,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2177,7 +2185,7 @@
           "measurement": "ees_get_release_duration",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT mean(\"value\") FROM \"ees_get_release_duration\" WHERE $timeFilter GROUP BY time(10s) fill(none)",
+          "query": "SELECT mean(\"value\") FROM \"ees_get_release_duration\" WHERE $timeFilter GROUP BY time(10s) fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2203,6 +2211,7 @@
     },
     {
       "datasource": {
+        "default": true,
         "type": "influxdb",
         "uid": "P76A45B24F43298D1"
       },
@@ -2213,11 +2222,13 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -2226,7 +2237,8 @@
               "tooltip": false,
               "viz": false
             },
-            "lineInterpolation": "linear",
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -2301,7 +2313,7 @@
           "measurement": "ees_get_release_success",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"value\") FROM \"ees_get_release_failure\" WHERE $timeFilter GROUP BY time(1s) fill(null)",
+          "query": "SELECT count(\"value\")\nFROM (\nSELECT count(\"value\") as \"value\" FROM \"ees_get_release_failure\" WHERE $timeFilter GROUP BY time(1s) fill(null)\n)\nGROUP BY time(10s) fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2327,6 +2339,7 @@
     },
     {
       "datasource": {
+        "default": true,
         "type": "influxdb",
         "uid": "P76A45B24F43298D1"
       },
@@ -2337,11 +2350,13 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -2350,6 +2365,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2411,7 +2427,7 @@
           "groupBy": [
             {
               "params": [
-                "1s"
+                "$__interval"
               ],
               "type": "time"
             },
@@ -2422,11 +2438,9 @@
               "type": "fill"
             }
           ],
-          "measurement": "ees_get_release_success",
+          "measurement": "checks",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "",
-          "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -2439,17 +2453,24 @@
               },
               {
                 "params": [],
-                "type": "count"
+                "type": "mean"
               }
             ]
           ],
-          "tags": []
+          "tags": [
+            {
+              "key": "check::tag",
+              "operator": "=",
+              "value": "select tag value"
+            }
+          ]
         }
       ],
       "type": "timeseries"
     },
     {
       "datasource": {
+        "default": true,
         "type": "influxdb",
         "uid": "P76A45B24F43298D1"
       },
@@ -2459,11 +2480,13 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -2472,7 +2495,8 @@
               "tooltip": false,
               "viz": false
             },
-            "lineInterpolation": "linear",
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -2547,7 +2571,7 @@
           "measurement": "ees_get_release_success",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"value\") FROM \"ees_get_release_data_success\" WHERE $timeFilter GROUP BY time(1s) fill(null)",
+          "query": "SELECT mean(\"value\") FROM (SELECT count(\"value\") as \"value\" FROM \"ees_get_release_data_success\" WHERE $timeFilter GROUP BY time(1s) fill(null)) GROUP BY time(10s) fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2573,6 +2597,7 @@
     },
     {
       "datasource": {
+        "default": true,
         "type": "influxdb",
         "uid": "P76A45B24F43298D1"
       },
@@ -2582,11 +2607,13 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -2595,6 +2622,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2670,7 +2698,7 @@
           "measurement": "ees_get_release_duration",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT mean(\"value\") FROM \"ees_get_release_data_duration\" WHERE $timeFilter GROUP BY time(10s) fill(none)",
+          "query": "SELECT mean(\"value\") FROM (SELECT mean(\"value\") AS \"value\" FROM \"ees_get_release_data_duration\" WHERE $timeFilter GROUP BY time(1s) fill(null)) GROUP BY time(10s) fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2696,6 +2724,7 @@
     },
     {
       "datasource": {
+        "default": true,
         "type": "influxdb",
         "uid": "P76A45B24F43298D1"
       },
@@ -2706,11 +2735,13 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -2719,6 +2750,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -2794,7 +2826,7 @@
           "measurement": "ees_get_release_success",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT count(\"value\") FROM \"ees_get_release_data_failure\" WHERE $timeFilter GROUP BY time(1s) fill(null)",
+          "query": "SELECT mean(\"value\") FROM (SELECT count(\"value\") AS \"value\" FROM \"ees_get_release_data_failure\" WHERE $timeFilter GROUP BY time(1s) fill(null)) GROUP BY time(10s) fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2873,8 +2905,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2965,8 +2996,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3058,8 +3088,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3150,8 +3179,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3243,8 +3271,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3305,8 +3332,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               }
@@ -3397,8 +3423,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "light-red",
-                    "value": null
+                    "color": "light-red"
                   },
                   {
                     "color": "red",
@@ -3490,8 +3515,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "light-red",
-                    "value": null
+                    "color": "light-red"
                   },
                   {
                     "color": "red",
@@ -3583,8 +3607,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "light-red",
-                    "value": null
+                    "color": "light-red"
                   },
                   {
                     "color": "red",
@@ -3676,8 +3699,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "light-red",
-                    "value": null
+                    "color": "light-red"
                   },
                   {
                     "color": "red",
@@ -3738,8 +3760,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "light-red",
-                    "value": null
+                    "color": "light-red"
                   },
                   {
                     "color": "red",
@@ -3803,8 +3824,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "light-red",
-                    "value": null
+                    "color": "light-red"
                   },
                   {
                     "color": "red",
@@ -3868,8 +3888,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "light-red",
-                    "value": null
+                    "color": "light-red"
                   },
                   {
                     "color": "red",
@@ -3933,8 +3952,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "light-red",
-                    "value": null
+                    "color": "light-red"
                   },
                   {
                     "color": "red",
@@ -4011,11 +4029,13 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -4024,6 +4044,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
@@ -4083,7 +4104,7 @@
             "type": "influxdb",
             "uid": "P76A45B24F43298D1"
           },
-          "query": "SELECT sum(\"value\") FROM \"http_reqs\" WHERE $timeFilter GROUP BY time(1s) fill(null)",
+          "query": "SELECT sum(\"value\") FROM \"http_reqs\" WHERE $timeFilter GROUP BY time(10s) fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -4104,11 +4125,13 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -4117,6 +4140,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -4197,11 +4221,13 @@
             "mode": "fixed"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -4210,6 +4236,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineStyle": {
               "fill": "solid"
@@ -4320,6 +4347,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -4327,9 +4355,11 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "9.3.2",
+      "pluginVersion": "11.2.4",
       "targets": [
         {
           "datasource": {
@@ -4347,14 +4377,13 @@
     }
   ],
   "refresh": "5s",
-  "schemaVersion": 37,
-  "style": "dark",
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "ees",
           "value": "ees"
         },
@@ -4370,13 +4399,14 @@
           }
         ],
         "query": "ees",
+        "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
       }
     ]
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {},

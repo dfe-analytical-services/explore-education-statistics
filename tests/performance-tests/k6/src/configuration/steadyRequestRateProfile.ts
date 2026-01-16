@@ -39,7 +39,7 @@ export default function steadyRequestRateProfile({
         executor: 'ramping-arrival-rate',
         timeUnit: '1m',
         preAllocatedVUs: 10,
-        maxVUs: 1000,
+        maxVUs: 100,
         gracefulStop: `${cooldownStageDurationMinutes}m`,
         stages: [
           // Immediately start with the steady rate of requests.
@@ -65,7 +65,6 @@ export default function steadyRequestRateProfile({
         ],
       },
     },
-    noConnectionReuse: true,
     insecureSkipTLSVerify: true,
   };
 }

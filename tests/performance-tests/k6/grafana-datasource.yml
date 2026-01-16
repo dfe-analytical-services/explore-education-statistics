@@ -5,5 +5,5 @@ datasources:
     type: influxdb
     access: proxy
     database: k6
-    url: http://influxdb:8086
+    url: http://influxdb:8181
     isDefault: true
