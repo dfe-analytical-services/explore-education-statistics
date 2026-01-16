@@ -362,8 +362,8 @@ public abstract class PublicationReleasesServiceTests
             release.Versions[2].Updates = _dataFixture
                 .DefaultUpdate()
                 .WithReleaseVersionId(release.Versions[2].Id)
-                .ForIndex(0, s => s.SetOn(DateTime.Parse("2026-01-01T00:00:00Z")))
-                .ForIndex(1, s => s.SetOn(DateTime.Parse("2026-02-01T00:00:00Z")))
+                .ForIndex(0, s => s.SetOn(new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Local)))
+                .ForIndex(1, s => s.SetOn(new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Local)))
                 .GenerateList(2);
 
             var contextId = Guid.NewGuid().ToString();

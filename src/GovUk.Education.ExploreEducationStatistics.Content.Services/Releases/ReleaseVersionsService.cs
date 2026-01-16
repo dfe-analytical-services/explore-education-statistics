@@ -1,6 +1,5 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
@@ -98,10 +97,10 @@ public class ReleaseVersionsService(ContentDbContext contentDbContext) : IReleas
         // EES-6490 has been created to convert Update.On from DateTime to DateTimeOffset but until then, convert it here.
         // Values of Update.On are created by ReleaseNoteService in local time using DateTime.Now,
         // even though it's standard elsewhere across the service to store and return dates as UTC.
-        // Interpret the value as UK local time, create a DateTimeOffset with the correct UTC offset for the UK time zone,
+        // Interpret the value as local time, create a DateTimeOffset with the correct UTC offset for the local time zone,
         // then convert it to UTC so it is consistent with other dates.
-        var ukZoneOffset = TimeZoneUtils.GetUkTimeZone().GetUtcOffset(lastUpdated);
-        return new DateTimeOffset(lastUpdated, ukZoneOffset).ToUniversalTime();
+        var localOffset = TimeZoneInfo.Local.GetUtcOffset(lastUpdated);
+        return new DateTimeOffset(lastUpdated, localOffset).ToUniversalTime();
     }
 
     private async Task<int> GetUpdateCount(Guid releaseVersionId, CancellationToken cancellationToken) =>
