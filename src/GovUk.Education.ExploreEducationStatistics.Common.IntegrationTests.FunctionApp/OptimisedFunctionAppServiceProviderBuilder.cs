@@ -1,17 +1,22 @@
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp;
 
-public class OptimisedFunctionAppHostBuilder
+public class OptimisedFunctionAppServiceProviderBuilder
 {
-    public IHost Build(
+    public IServiceProvider Build(
         List<Action<IServiceCollection>> serviceModifications,
         List<Action<IConfigurationBuilder>> configModifications,
         List<Action<IHostBuilder>> hostBuilderModifications
     )
     {
+        // TODO - we don't actually need to build an IHost given that we only need an IServiceProvider.
+        // We can construct an IServiceCollection, IConfiguration and IHostEnvironment manually if we
+        // refactor the way our Function Apps configure these in their HostBuilders so we can extract
+        // the logic for building each of these objects more easily.
         var hostBuilder = new HostBuilder();
 
         foreach (var hostBuilderModification in hostBuilderModifications)
@@ -28,7 +33,7 @@ public class OptimisedFunctionAppHostBuilder
                         .AddEnvironmentVariables();
                 }
             )
-            .ConfigureWebHostDefaults(builder => builder.UseIntegrationTestEnvironment())
+            .ConfigureWebHostDefaults(builder => builder.UseIntegrationTestEnvironment().UseTestServer())
             .ConfigureAppConfiguration(config =>
             {
                 foreach (var modification in configModifications)
@@ -36,7 +41,6 @@ public class OptimisedFunctionAppHostBuilder
                     modification(config);
                 }
             })
-            // .ConfigureServices(services => GetFunctionTypes().ForEach(functionType => services.AddScoped(functionType)))
             .ConfigureServices(services =>
             {
                 foreach (var modification in serviceModifications)
@@ -45,6 +49,6 @@ public class OptimisedFunctionAppHostBuilder
                 }
             });
 
-        return hostBuilder.Build();
+        return hostBuilder.Build().Services;
     }
 }

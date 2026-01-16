@@ -94,6 +94,12 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
                                 _azuriteContainer.GetConnectionString()
                             },
                         }
+                    )
+                    .AddInMemoryCollection(
+                        new Dictionary<string, string?>
+                        {
+                            { "DataFiles:BasePath", Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()) },
+                        }
                     );
             })
             .ConfigureServices(services =>

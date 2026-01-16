@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -19,6 +20,13 @@ public class OptimisedServiceCollectionLookups(IServiceProvider services)
     public TService GetService<TService>()
         where TService : class
     {
+        if (typeof(TService).IsAssignableTo(typeof(DbContext)))
+        {
+            throw new ArgumentException(
+                $"Error looking up service of type {typeof(TService)} - use DbContextHolder instead to get test DbContexts"
+            );
+        }
+
         return services.GetRequiredService<TService>();
     }
 
