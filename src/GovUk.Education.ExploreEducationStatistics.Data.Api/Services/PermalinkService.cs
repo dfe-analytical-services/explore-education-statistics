@@ -85,7 +85,7 @@ public class PermalinkService : IPermalinkService
         ).OnSuccess(releaseVersionId =>
         {
             return _tableBuilderService
-                .Query(releaseVersionId, request.Query.AsFullTableQuery(ignoreMaxTableSize: true), cancellationToken)
+                .Query(releaseVersionId, request.Query.AsFullTableQuery(allowCropping: true), cancellationToken)
                 .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
                 {
                     var frontendTableTask = _frontendService.CreateTable(
@@ -133,6 +133,7 @@ public class PermalinkService : IPermalinkService
                         SubjectId = request.Query.SubjectId,
                         PublicationTitle = subjectMeta.PublicationName,
                         DataSetTitle = subjectMeta.SubjectName,
+                        IsCropped = subjectMeta.IsCroppedTable,
                     };
                     _contentDbContext.Permalinks.Add(permalink);
 
