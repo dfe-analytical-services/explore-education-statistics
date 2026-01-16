@@ -90,6 +90,10 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
     [content, hasSummarySection],
   );
 
+  // On mobile we want to show published date if there are no updates,
+  // otherwise, we want to show updated at and a (dummy) link to updates
+  const showUpdatesInfo = updates.length > 0;
+
   return (
     <ReleasePageTabPanel tabKey="home" hidden={hidden}>
       <ReleasePageLayout navItems={navItems}>
@@ -103,10 +107,10 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
             <p className="govuk-body-l">{publication.summary}</p>
 
             <ReleaseSummaryBlockMobile
-              lastUpdated={updates[0]?.on}
+              lastUpdated={showUpdatesInfo ? updates[0].on : undefined}
               publishingOrganisations={publishingOrganisations}
               releaseDate={
-                updates.length === 0
+                !showUpdatesInfo
                   ? release.published ?? release.publishScheduled
                   : undefined
               }
@@ -134,7 +138,7 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
                 )
               }
               renderUpdatesLink={
-                updates.length > 0 ? (
+                showUpdatesInfo ? (
                   <span>
                     {updates.length} update{updates.length === 1 ? '' : 's'}
                     <VisuallyHidden>for {release.title}</VisuallyHidden>

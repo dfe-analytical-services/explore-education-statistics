@@ -44,6 +44,9 @@ const PublicationReleasePage = ({
   // want to show 'actual' update number.
   const updateCountExcludingFirstPublished =
     releaseVersionSummary.updateCount - 1;
+  // On mobile we want to show published date if there are no updates,
+  // otherwise, we want to show updated at and a link to updates
+  const showUpdatesInfo = updateCountExcludingFirstPublished > 0;
 
   return (
     <>
@@ -55,17 +58,13 @@ const PublicationReleasePage = ({
 
           <ReleaseSummaryBlockMobile
             lastUpdated={
-              updateCountExcludingFirstPublished > 0
-                ? releaseVersionSummary.lastUpdated
-                : undefined
+              showUpdatesInfo ? releaseVersionSummary.lastUpdated : undefined
             }
             publishingOrganisations={
               releaseVersionSummary.publishingOrganisations
             }
             releaseDate={
-              updateCountExcludingFirstPublished === 0
-                ? releaseVersionSummary.published
-                : undefined
+              !showUpdatesInfo ? releaseVersionSummary.published : undefined
             }
             releaseType={releaseVersionSummary.type}
             renderProducerLink={
@@ -111,14 +110,14 @@ const PublicationReleasePage = ({
               </Link>
             }
             renderUpdatesLink={
-              updateCountExcludingFirstPublished > 0 ? (
+              showUpdatesInfo ? (
                 <Link
                   to={`/find-statistics/${publicationSummary.slug}/${publicationSummary.latestRelease.slug}/updates`}
                 >
                   {updateCountExcludingFirstPublished} update
                   {updateCountExcludingFirstPublished === 1 ? '' : 's'}
                   <VisuallyHidden>
-                    for `${releaseVersionSummary.title}`
+                    for {releaseVersionSummary.title}
                   </VisuallyHidden>
                 </Link>
               ) : undefined

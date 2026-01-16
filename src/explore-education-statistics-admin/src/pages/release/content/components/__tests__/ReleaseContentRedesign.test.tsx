@@ -1,4 +1,6 @@
-import generateReleaseContent from '@admin-test/generators/releaseContentGenerators';
+import generateReleaseContent, {
+  generateEditableRelease,
+} from '@admin-test/generators/releaseContentGenerators';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import ReleaseContentRedesign from '@admin/pages/release/content/components/ReleaseContentRedesign';
@@ -46,10 +48,64 @@ const renderWithContext = (
   );
 
 describe('ReleaseContentRedesign', () => {
-  test('renders the publication summary on desktop', () => {
+  test('renders the publication summary on desktop with correct info', () => {
     renderWithContext(<ReleaseContentRedesign />);
+    const releaseSummaryBlock = screen.getByTestId('release-summary-block');
 
-    expect(screen.getByTestId('release-summary-block')).toBeInTheDocument();
+    expect(releaseSummaryBlock).toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).getByTestId('Last updated-value'),
+    ).toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).getByTestId('Published-value'),
+    ).toHaveTextContent('TBA');
+  });
+
+  test('renders the publication summary correctly when published with no updates', () => {
+    renderWithContext(
+      <ReleaseContentRedesign />,
+      generateReleaseContent({
+        release: generateEditableRelease({
+          published: '2025-08-10T09:30:00+01:00',
+          updates: [],
+        }),
+      }),
+    );
+    const releaseSummaryBlock = screen.getByTestId('release-summary-block');
+
+    expect(releaseSummaryBlock).toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).queryByTestId('Last updated-value'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).getByTestId('Published-value'),
+    ).toHaveTextContent('10 August 2025');
+  });
+
+  test('renders the publication summary correctly when release scheduled', () => {
+    renderWithContext(
+      <ReleaseContentRedesign />,
+      generateReleaseContent({
+        release: generateEditableRelease({
+          publishScheduled: '2025-08-10T09:30:00+01:00',
+        }),
+      }),
+    );
+    const releaseSummaryBlock = screen.getByTestId('release-summary-block');
+
+    expect(releaseSummaryBlock).toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).getByTestId('Last updated-value'),
+    ).toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).getByTestId('Published-value'),
+    ).toHaveTextContent('10 August 2025');
   });
 
   test('does not render the publication summary on mobile', () => {

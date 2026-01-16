@@ -35,7 +35,7 @@ describe('PublicationReleasePageHome', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders summary block and publication summary on mobile', () => {
+  test('renders summary block and publication summary on mobile with updates info', () => {
     mockIsMedia = true;
     render(
       <PublicationReleasePageHome
@@ -50,6 +50,54 @@ describe('PublicationReleasePageHome', () => {
         level: 2,
         name: 'Introduction',
       }),
+    ).toBeInTheDocument();
+
+    const releaseSummaryBlock = screen.getByTestId(
+      'release-summary-block-mobile',
+    );
+
+    expect(releaseSummaryBlock).toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).getByText('Last updated'),
+    ).toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).getByRole('link', { name: /4 updates/ }),
+    ).toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).queryByText('Published'),
+    ).not.toBeInTheDocument();
+    mockIsMedia = false;
+  });
+
+  test('renders publication summary with no update info if less than 1 update', () => {
+    mockIsMedia = true;
+    render(
+      <PublicationReleasePageHome
+        publicationSummary={testPublicationSummary}
+        releaseVersionSummary={{ ...testReleaseVersionSummary, updateCount: 1 }}
+        homeContent={testReleaseHomeContent}
+      />,
+    );
+
+    const releaseSummaryBlock = screen.getByTestId(
+      'release-summary-block-mobile',
+    );
+
+    expect(releaseSummaryBlock).toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).queryByText('Last updated'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).queryByRole('link', { name: /updates/ }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).getByText('Published'),
     ).toBeInTheDocument();
 
     mockIsMedia = false;
