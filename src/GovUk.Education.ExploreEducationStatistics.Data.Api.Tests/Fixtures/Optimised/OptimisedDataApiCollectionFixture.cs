@@ -1,9 +1,7 @@
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures.Optimised;
 
@@ -33,11 +31,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Fixtures.Opt
 ///
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public abstract class OptimisedDataApiCollectionFixture : OptimisedIntegrationTestFixtureBase<Startup>
+public abstract class OptimisedDataApiCollectionFixture()
+    : OptimisedIntegrationTestFixtureBase<Startup>(
+        dbContextTypes: [typeof(ContentDbContext), typeof(StatisticsDbContext)]
+    )
 {
-    private ContentDbContext _contentDbContext = null!;
-    private StatisticsDbContext _statisticsDbContext = null!;
-
     protected override void ConfigureServicesAndConfiguration(
         OptimisedServiceAndConfigModifications serviceModifications
     )
@@ -48,51 +46,13 @@ public abstract class OptimisedDataApiCollectionFixture : OptimisedIntegrationTe
             .AddControllers<Startup>();
     }
 
-    protected override Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<Startup> lookups)
-    {
-        // Grab reusable DbContexts that can be used for test data setup and test assertions. These are looked up once
-        // per startup of a test class that uses this fixture and are disposed of at the end of its lifetime, via XUnit
-        // calling "DisposeAsync" on this fixture.
-        _contentDbContext = lookups.GetService<ContentDbContext>();
-        _statisticsDbContext = lookups.GetService<StatisticsDbContext>();
-
-        return Task.CompletedTask;
-    }
-
     /// <summary>
-    ///
-    /// This is called by the XUnit lifecycle management of test fixtures. Once the test suite that is using this
-    /// fixture has finished, this method is called for us to dispose of any disposable resources that we are keeping
-    /// handles on.
-    ///
-    /// For example, the reusable DbContexts that we use to seed test data and make assertions with are disposed of
-    /// here, ensuring that they do not hang around and allows the full disposal of the WebApplicationFactory instance
-    /// that was used by that test class.
-    ///
+    /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    protected override async Task DisposeResources()
-    {
-        // Dispose of any DbContexts when the test class that was using this fixture has completed.
-        await _contentDbContext.DisposeAsync();
-        await _statisticsDbContext.DisposeAsync();
-    }
+    public ContentDbContext GetContentDbContext() => TestDbContexts.GetDbContext<ContentDbContext>();
 
     /// <summary>
     /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
     /// </summary>
-    public ContentDbContext GetContentDbContext() => _contentDbContext;
-
-    /// <summary>
-    /// Get a reusable DbContext that should be used for setting up test data and making test assertions.
-    /// </summary>
-    public StatisticsDbContext GetStatisticsDbContext() => _statisticsDbContext;
-
-    public override async Task BeforeEachTest()
-    {
-        // In-memory DbContexts can be cleared down by default with no speed penalty.
-        // Proper DbContexts add considerable time to a full project run if clearing
-        // between every test, and therefore we don't clear them down by default.
-        await _contentDbContext.ClearTestDataIfInMemory();
-        await _statisticsDbContext.ClearTestDataIfInMemory();
-    }
+    public StatisticsDbContext GetStatisticsDbContext() => TestDbContexts.GetDbContext<StatisticsDbContext>();
 }

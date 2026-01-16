@@ -15,6 +15,9 @@
     <PackageReference Include="Testcontainers.Azurite" Version="4.9.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Azurite.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres\GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Postgres.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.csproj" />

@@ -1,54 +1,27 @@
 using System.Numerics;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Testcontainers.Azurite;
-using Testcontainers.PostgreSql;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TestData;
 
-public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTestFixture fixture)
-    : FunctionsIntegrationTest<ProcessorFunctionsIntegrationTestFixture>(fixture),
-        IAsyncLifetime
+public static class CommonTestDataUtils
 {
-    public async Task InitializeAsync()
-    {
-        ResetDbContext<ContentDbContext>();
-        await ClearTestData<PublicDataDbContext>();
-    }
+    private static readonly DataFixture DataFixture = new(new Random().Next());
 
-    public Task DisposeAsync()
-    {
-        var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
-
-        var testInstanceDataFilesDirectory = dataSetVersionPathResolver.BasePath();
-        if (Directory.Exists(testInstanceDataFilesDirectory))
-        {
-            Directory.Delete(testInstanceDataFilesDirectory, recursive: true);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    protected void SetupCsvDataFilesForDataSetVersion(
+    public static void SetupCsvDataFilesForDataSetVersion(
+        IDataSetVersionPathResolver dataSetVersionPathResolver,
         ProcessorTestData processorTestData,
         DataSetVersion dataSetVersion
     )
     {
-        var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
-
         var dataSetVersionDir = dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
+
         if (!Directory.Exists(dataSetVersionDir))
         {
             Directory.CreateDirectory(dataSetVersionDir);
@@ -65,11 +38,12 @@ public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTest
         );
     }
 
-    protected async Task<(
+    public static async Task<(
         DataSetVersion initialVersion,
         DataSetVersion nextVersion,
         Guid instanceId
     )> CreateDataSetInitialAndNextVersion(
+        PublicDataDbContext publicDataDbContext,
         DataSetVersionStatus nextVersionStatus,
         DataSetVersionImportStage nextVersionImportStage,
         DataSetVersionMeta? initialVersionMeta = null,
@@ -77,6 +51,7 @@ public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTest
     )
     {
         var (initialVersion, _) = await CreateDataSetInitialVersion(
+            publicDataDbContext: publicDataDbContext,
             dataSetStatus: DataSetStatus.Published,
             dataSetVersionStatus: DataSetVersionStatus.Published,
             importStage: DataSetVersionImportStage.Completing,
@@ -84,6 +59,7 @@ public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTest
         );
 
         var (nextVersion, instanceId) = await CreateDataSetNextVersion(
+            publicDataDbContext: publicDataDbContext,
             initialVersion: initialVersion,
             status: nextVersionStatus,
             importStage: nextVersionImportStage,
@@ -93,7 +69,8 @@ public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTest
         return (initialVersion, nextVersion, instanceId);
     }
 
-    protected async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetInitialVersion(
+    public static async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetInitialVersion(
+        PublicDataDbContext publicDataDbContext,
         DataSetVersionImportStage importStage,
         DataSetStatus dataSetStatus = DataSetStatus.Draft,
         DataSetVersionStatus dataSetVersionStatus = DataSetVersionStatus.Processing,
@@ -103,9 +80,10 @@ public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTest
     {
         DataSet dataSet = DataFixture.DefaultDataSet().WithStatus(dataSetStatus);
 
-        await AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+        await publicDataDbContext.AddTestData(context => context.DataSets.Add(dataSet));
 
         return await CreateDataSetVersion(
+            publicDataDbContext: publicDataDbContext,
             dataSetId: dataSet.Id,
             importStage: importStage,
             status: dataSetVersionStatus,
@@ -114,7 +92,8 @@ public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTest
         );
     }
 
-    protected async Task<(DataSetVersion nextVersion, Guid instanceId)> CreateDataSetNextVersion(
+    public static async Task<(DataSetVersion nextVersion, Guid instanceId)> CreateDataSetNextVersion(
+        PublicDataDbContext publicDataDbContext,
         DataSetVersion initialVersion,
         DataSetVersionStatus status,
         DataSetVersionImportStage importStage,
@@ -124,6 +103,7 @@ public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTest
         var defaultNextVersion = initialVersion.DefaultNextVersion();
 
         return await CreateDataSetVersion(
+            publicDataDbContext: publicDataDbContext,
             dataSetId: initialVersion.DataSetId,
             status: status,
             importStage: importStage,
@@ -133,7 +113,8 @@ public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTest
         );
     }
 
-    private async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetVersion(
+    private static async Task<(DataSetVersion dataSetVersion, Guid instanceId)> CreateDataSetVersion(
+        PublicDataDbContext publicDataDbContext,
         Guid dataSetId,
         DataSetVersionImportStage importStage,
         DataSetVersionStatus status = DataSetVersionStatus.Processing,
@@ -143,8 +124,6 @@ public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTest
         DataSetVersionMeta? meta = null
     )
     {
-        await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
         var dataSet = await publicDataDbContext.DataSets.SingleAsync(ds => ds.Id == dataSetId);
 
         DataSetVersionImport dataSetVersionImport = DataFixture.DefaultDataSetVersionImport().WithStage(importStage);
@@ -199,7 +178,7 @@ public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTest
 
         var dataSetVersion = dataSetVersionGenerator.Generate();
 
-        await AddTestData<PublicDataDbContext>(context =>
+        await publicDataDbContext.AddTestData(context =>
         {
             context.DataSetVersions.Add(dataSetVersion);
             context.DataSets.Update(dataSet);
@@ -208,18 +187,20 @@ public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTest
         return (dataSetVersion, dataSetVersionImport.InstanceId);
     }
 
-    protected DuckDbConnection GetDuckDbConnection(DataSetVersion dataSetVersion)
+    public static DuckDbConnection GetDuckDbConnection(
+        IDataSetVersionPathResolver dataSetVersionPathResolver,
+        DataSetVersion dataSetVersion
+    )
     {
-        var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
         return DuckDbConnection.CreateFileConnectionReadOnly(dataSetVersionPathResolver.DuckDbPath(dataSetVersion));
     }
 
-    protected void AssertDataSetVersionDirectoryContainsOnlyFiles(
+    public static void AssertDataSetVersionDirectoryContainsOnlyFiles(
+        IDataSetVersionPathResolver dataSetVersionPathResolver,
         DataSetVersion dataSetVersion,
         params string[] expectedFiles
     )
     {
-        var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
         var actualFiles = Directory
             .GetFiles(dataSetVersionPathResolver.DirectoryPath(dataSetVersion))
             .Select(Path.GetFileName)
@@ -227,91 +208,5 @@ public abstract class ProcessorFunctionsIntegrationTest(FunctionsIntegrationTest
 
         // Assert that the directory contains the expected files and no others
         Assert.Equal(expectedFiles.Order(), actualFiles.Order());
-    }
-}
-
-// ReSharper disable once ClassNeverInstantiated.Global
-public class ProcessorFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture, IAsyncLifetime
-{
-    private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
-        .WithImage("postgres:16.1-alpine")
-        .Build();
-
-    private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
-        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.35.0")
-        .Build();
-
-    public async Task DisposeAsync()
-    {
-        await _azuriteContainer.DisposeAsync();
-        await _postgreSqlContainer.DisposeAsync();
-    }
-
-    public async Task InitializeAsync()
-    {
-        await _azuriteContainer.StartAsync();
-        await _postgreSqlContainer.StartAsync();
-    }
-
-    public override IHostBuilder ConfigureTestHostBuilder()
-    {
-        return base.ConfigureTestHostBuilder()
-            .ConfigureProcessorHostBuilder()
-            .ConfigureAppConfiguration(
-                (_, config) =>
-                {
-                    config.AddInMemoryCollection(
-                        new Dictionary<string, string?>
-                        {
-                            {
-                                $"{AppOptions.Section}:{nameof(AppOptions.PrivateStorageConnectionString)}",
-                                _azuriteContainer.GetConnectionString()
-                            },
-                        }
-                    );
-                }
-            )
-            .ConfigureServices(services =>
-            {
-                services.UseInMemoryDbContext<ContentDbContext>(databaseName: Guid.NewGuid().ToString());
-
-                services.AddDbContext<PublicDataDbContext>(options =>
-                {
-                    options.UseNpgsql(
-                        _postgreSqlContainer.GetConnectionString(),
-                        psqlOptions => psqlOptions.EnableRetryOnFailure()
-                    );
-                });
-
-                using var serviceScope = services
-                    .BuildServiceProvider()
-                    .GetRequiredService<IServiceScopeFactory>()
-                    .CreateScope();
-
-                using var context = serviceScope.ServiceProvider.GetRequiredService<PublicDataDbContext>();
-                context.Database.Migrate();
-            });
-    }
-
-    protected override IEnumerable<Type> GetFunctionTypes()
-    {
-        return
-        [
-            typeof(CreateDataSetFunction),
-            typeof(CompleteInitialDataSetVersionProcessingFunction),
-            typeof(CreateNextDataSetVersionMappingsFunction),
-            typeof(ProcessNextDataSetVersionMappingsFunctions),
-            typeof(CompleteNextDataSetVersionImportFunction),
-            typeof(ProcessCompletionOfNextDataSetVersionFunctions),
-            typeof(DeleteDataSetVersionFunction),
-            typeof(CopyCsvFilesFunction),
-            typeof(ImportMetadataFunction),
-            typeof(ImportDataFunction),
-            typeof(WriteDataFilesFunction),
-            typeof(HandleProcessingFailureFunction),
-            typeof(HealthCheckFunctions),
-            typeof(BulkDeleteDataSetVersionsFunction),
-            typeof(StatusCheckFunction),
-        ];
     }
 }

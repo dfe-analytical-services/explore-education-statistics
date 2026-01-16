@@ -2,29 +2,76 @@ using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TestData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using InterpolatedSql.Dapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationTestFixture fixture)
-    : ProcessorFunctionsIntegrationTest(fixture)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class ImportMetadataFunctionTestsFixture()
+    : OptimisedPublicDataProcessorCollectionFixture(
+        capabilities: [PublicDataProcessorIntegrationTestCapability.Postgres]
+    )
 {
+    public ImportMetadataFunction Function = null!;
+
+    protected override void ConfigureServicesAndConfiguration(
+        OptimisedServiceAndConfigModifications serviceModifications
+    )
+    {
+        base.ConfigureServicesAndConfiguration(serviceModifications);
+
+        var dataFilesBasePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+        serviceModifications.AddInMemoryCollection([
+            new KeyValuePair<string, string?>("DataFiles:BasePath", dataFilesBasePath),
+        ]);
+    }
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+
+        Function = lookups.GetService<ImportMetadataFunction>();
+    }
+
+    public override async Task BeforeEachTest()
+    {
+        await base.BeforeEachTest();
+
+        // The expected test data in a great deal of these tests is dependent on id sequences
+        // beginning at 1, so for simplicity we reset data between each test.
+        await GetPublicDataDbContext().ClearTestData();
+    }
+}
+
+[CollectionDefinition(nameof(ImportMetadataFunctionTestsFixture))]
+public class ImportMetadataFunctionTestsCollection : ICollectionFixture<ImportMetadataFunctionTestsFixture>;
+
+[Collection(nameof(ImportMetadataFunctionTestsFixture))]
+public abstract class ImportMetadataFunctionTests(ImportMetadataFunctionTestsFixture fixture)
+    : OptimisedFunctionAppIntegrationTestBase(fixture)
+{
+    private static readonly DataFixture DataFixture = new();
+
     private const DataSetVersionImportStage Stage = DataSetVersionImportStage.ImportingMetadata;
 
     public static readonly TheoryData<ProcessorTestData> TestDataFiles = new()
@@ -33,27 +80,22 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         ProcessorTestData.FilterDefaultOptions,
     };
 
-    public static readonly TheoryData<ProcessorTestData, int> TestDataFilesWithMetaInsertBatchSize = new()
-    {
-        { ProcessorTestData.AbsenceSchool, 1 },
-        { ProcessorTestData.AbsenceSchool, 1000 },
-        { ProcessorTestData.FilterDefaultOptions, 1000 },
-    };
-
-    public class ImportMetadataDbTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class ImportMetadataDbTests(ImportMetadataFunctionTestsFixture fixture)
         : ImportMetadataFunctionTests(fixture)
     {
         [Theory]
         [MemberData(nameof(TestDataFiles))]
         public async Task InitialVersion_Success(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var savedImport = await publicDataDbContext
+            var savedImport = await fixture
+                .GetPublicDataDbContext()
                 .DataSetVersionImports.Include(i => i.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
             var savedDataSetVersion = savedImport.DataSetVersion;
@@ -61,7 +103,8 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             Assert.Equal(Stage, savedImport.Stage);
             Assert.Equal(DataSetVersionStatus.Processing, savedDataSetVersion.Status);
 
-            AssertDataSetVersionDirectoryContainsOnlyFiles(
+            CommonTestDataUtils.AssertDataSetVersionDirectoryContainsOnlyFiles(
+                fixture.GetDataSetVersionPathResolver(),
                 dataSetVersion,
                 DataSetFilenames.CsvDataFile,
                 DataSetFilenames.CsvMetadataFile,
@@ -100,15 +143,16 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         [MemberData(nameof(TestDataFiles))]
         public async Task InitialVersion_CorrectGeographicLevels(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var actualGeographicLevelMeta = await publicDataDbContext.GeographicLevelMetas.SingleAsync(glm =>
-                glm.DataSetVersionId == dataSetVersion.Id
-            );
+            var actualGeographicLevelMeta = await fixture
+                .GetPublicDataDbContext()
+                .GeographicLevelMetas.SingleAsync(glm => glm.DataSetVersionId == dataSetVersion.Id);
 
             var actualGeographicLevels = actualGeographicLevelMeta
                 .Levels.OrderBy(EnumToEnumLabelConverter<GeographicLevel>.ToProvider)
@@ -118,191 +162,18 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         }
 
         [Theory]
-        [MemberData(nameof(TestDataFilesWithMetaInsertBatchSize))]
-        public async Task InitialVersion_CorrectLocationOptions(ProcessorTestData testData, int metaInsertBatchSize)
-        {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
-
-            await ImportMetadata(testData, dataSetVersion, instanceId, metaInsertBatchSize);
-
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var actualLocations = await publicDataDbContext
-                .LocationMetas.Include(lm => lm.Options)
-                .Include(lm => lm.OptionLinks)
-                .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
-                .OrderBy(lm => lm.Level)
-                .ToListAsync();
-
-            // Locations are expected in order of level
-            // Location options are expected in order of code(s) and then by label
-            Assert.Equal(testData.ExpectedLocations.Count, actualLocations.Count);
-            Assert.All(
-                testData.ExpectedLocations,
-                (expectedLocation, index) =>
-                {
-                    var actualLocation = actualLocations[index];
-                    actualLocation.AssertDeepEqualTo(
-                        expectedLocation,
-                        ignoreProperties: [l => l.DataSetVersionId, l => l.Options, l => l.OptionLinks, l => l.Created]
-                    );
-
-                    Assert.Equal(dataSetVersion.Id, actualLocation.DataSetVersionId);
-                    Assert.NotEqual(expectedLocation.Created, actualLocation.Created);
-
-                    Assert.Equal(expectedLocation.Options.Count, actualLocation.Options.Count);
-                    Assert.All(
-                        expectedLocation.Options,
-                        (expectedOption, optionIndex) =>
-                        {
-                            var actualOption = actualLocation.Options[optionIndex];
-                            actualOption.AssertDeepEqualTo(
-                                expectedOption,
-                                ignoreProperties: [o => o.Metas, o => o.MetaLinks]
-                            );
-                        }
-                    );
-                }
-            );
-
-            // Public Ids should be Sqids based on the option's id.
-            var actualLinks = actualLocations.SelectMany(level => level.OptionLinks).ToList();
-
-            Assert.Equal(testData.ExpectedLocations.Sum(l => l.Options.Count), actualLinks.Count);
-            Assert.All(actualLinks, link => Assert.Equal(SqidEncoder.Encode(link.OptionId), link.PublicId));
-        }
-
-        [Theory]
-        [MemberData(nameof(TestDataFilesWithMetaInsertBatchSize))]
-        public async Task NextVersion_CorrectLocationOptions_WithMappings(
-            ProcessorTestData testData,
-            int metaInsertBatchSize
-        )
-        {
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
-
-            // In this test, we will create mappings for all the original location options.
-            // 2 of these mappings will have candidates, and the rest will have no candidates
-            // mapped.
-            DataSetVersionMapping mappings = DataFixture
-                .DefaultDataSetVersionMapping()
-                .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
-                .WithTargetDataSetVersionId(targetDataSetVersion.Id)
-                .WithLocationMappingPlan(
-                    DataFixture.LocationMappingPlanFromLocationMeta(sourceLocations: testData.ExpectedLocations)
-                );
-
-            var random = new Random();
-
-            mappings.LocationMappingPlan.Levels.ForEach(level =>
-                level.Value.Mappings.ForEach(mapping =>
-                    mapping.Value.Type = random.Next(1) == 0 ? MappingType.AutoNone : MappingType.ManualNone
-                )
-            );
-
-            // Amend a couple of arbitrary mappings to identify some candidates.
-            var firstLevel = testData.ExpectedLocations.First();
-            var lastLevel = testData.ExpectedLocations.Last();
-            var mappedOption1Key = MappingKeyGenerators.LocationOptionMeta(firstLevel.Options.First());
-            var mappedOption2Key = MappingKeyGenerators.LocationOptionMeta(lastLevel.Options.Last());
-            var mappedOption1 = mappings.GetLocationOptionMapping(firstLevel.Level, mappedOption1Key);
-            var mappedOption2 = mappings.GetLocationOptionMapping(lastLevel.Level, mappedOption2Key);
-
-            mappings.LocationMappingPlan.Levels[firstLevel.Level].Mappings[mappedOption1Key] = mappedOption1 with
-            {
-                PublicId = "id-1",
-                Type = MappingType.AutoMapped,
-                CandidateKey = mappedOption1Key,
-            };
-
-            mappings.LocationMappingPlan.Levels[lastLevel.Level].Mappings[mappedOption2Key] = mappedOption2 with
-            {
-                PublicId = "id-2",
-                Type = MappingType.ManualMapped,
-                CandidateKey = mappedOption2Key,
-            };
-
-            await AddTestData<PublicDataDbContext>(context =>
-            {
-                context.DataSetVersionMappings.Add(mappings);
-            });
-
-            await ImportMetadata(testData, targetDataSetVersion, instanceId, metaInsertBatchSize);
-
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var actualLocations = await publicDataDbContext
-                .LocationMetas.Include(lm => lm.Options)
-                .Include(lm => lm.OptionLinks)
-                    .ThenInclude(locationOptionMetaLink => locationOptionMetaLink.Option)
-                .Where(lm => lm.DataSetVersionId == targetDataSetVersion.Id)
-                .OrderBy(lm => lm.Level)
-                .ToListAsync();
-
-            // Locations are expected in order of level
-            // Location options are expected in order of code(s) and then by label
-            Assert.Equal(testData.ExpectedLocations.Count, actualLocations.Count);
-            Assert.All(
-                testData.ExpectedLocations,
-                (expectedLocation, index) =>
-                {
-                    var actualLocation = actualLocations[index];
-                    actualLocation.AssertDeepEqualTo(
-                        expectedLocation,
-                        ignoreProperties: [l => l.DataSetVersionId, l => l.Options, l => l.OptionLinks, l => l.Created]
-                    );
-
-                    Assert.Equal(targetDataSetVersion.Id, actualLocation.DataSetVersionId);
-                    Assert.NotEqual(expectedLocation.Created, actualLocation.Created);
-
-                    Assert.Equal(expectedLocation.Options.Count, actualLocation.Options.Count);
-                    Assert.All(
-                        expectedLocation.Options,
-                        (expectedOption, optionIndex) =>
-                        {
-                            var actualOption = actualLocation.Options[optionIndex];
-                            actualOption.AssertDeepEqualTo(
-                                expectedOption,
-                                ignoreProperties: [o => o.Metas, o => o.MetaLinks]
-                            );
-                        }
-                    );
-                }
-            );
-
-            var actualLinks = actualLocations.SelectMany(level => level.OptionLinks).ToList();
-
-            // Public Ids should be SQIDs based on the option's id unless otherwise directed by the
-            // mappings.
-            var actualMappedOption1Link = actualLinks.Single(link => link.Option.Label == mappedOption1.Source.Label);
-            Assert.Equal("id-1", actualMappedOption1Link.PublicId);
-
-            var actualMappedOption2Link = actualLinks.Single(link => link.Option.Label == mappedOption2.Source.Label);
-            Assert.Equal("id-2", actualMappedOption2Link.PublicId);
-
-            var otherLinks = actualLocations
-                .SelectMany(level => level.OptionLinks)
-                .Where(link => link != actualMappedOption1Link && link != actualMappedOption2Link)
-                .ToList();
-
-            Assert.Equal(testData.ExpectedLocations.Sum(l => l.Options.Count), actualLinks.Count);
-            Assert.All(otherLinks, link => Assert.Equal(SqidEncoder.Encode(link.OptionId), link.PublicId));
-        }
-
-        [Theory]
         [MemberData(nameof(TestDataFiles))]
         public async Task InitialVersion_CorrectTimePeriods_NoExistingTimePeriods(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var actualTimePeriods = await publicDataDbContext
+            var actualTimePeriods = await fixture
+                .GetPublicDataDbContext()
                 .TimePeriodMetas.Where(tpm => tpm.DataSetVersionId == dataSetVersion.Id)
                 .OrderBy(tpm => tpm.Period)
                 .ToListAsync();
@@ -324,40 +195,17 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             );
         }
 
-        [Theory]
-        [MemberData(nameof(TestDataFilesWithMetaInsertBatchSize))]
-        public async Task InitialVersion_CorrectFiltersAndOptions(ProcessorTestData testData, int metaInsertBatchSize)
-        {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
-
-            await ImportMetadata(testData, dataSetVersion, instanceId, metaInsertBatchSize);
-
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var actualFilters = await GetDbFilterMetas(dataSetVersion.Id);
-
-            Assert.Equal(testData.ExpectedFilters.Count, actualFilters.Count);
-            Assert.All(
-                testData.ExpectedFilters,
-                (expectedFilter, filterIndex) =>
-                {
-                    var actualFilter = actualFilters[filterIndex];
-
-                    AssertFiltersEqual(expectedFilter, actualFilter);
-                    AssertAllFilterOptionsEqual(expectedFilter, actualFilter);
-                }
-            );
-        }
-
         [Fact]
         public async Task NextVersion_CorrectFilters_AutoMappedWithSamePublicIds()
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    fixture.GetPublicDataDbContext(),
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping
+                );
 
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
@@ -370,11 +218,9 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                     )
                 );
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
-
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
             var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
 
@@ -396,10 +242,12 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    fixture.GetPublicDataDbContext(),
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping
+                );
 
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
@@ -418,11 +266,9 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 filterMapping.Source.Label = $"{filterMapping.Source.Label} old";
             }
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
-
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
             var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
 
@@ -447,10 +293,12 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    fixture.GetPublicDataDbContext(),
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping
+                );
 
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
@@ -471,11 +319,9 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 filterMapping.CandidateKey = null;
             }
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
-
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
             var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
 
@@ -498,10 +344,12 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    fixture.GetPublicDataDbContext(),
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping
+                );
 
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
@@ -521,11 +369,9 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 filterMapping.Source.Label = $"{filterMapping.Source.Label} old";
             }
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
-
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
             var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
 
@@ -550,10 +396,12 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    fixture.GetPublicDataDbContext(),
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping
+                );
 
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
@@ -579,11 +427,9 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             ncYearMapping.PublicId = $"{ncYearMapping.PublicId}-old";
             ncYearMapping.Source.Label = $"{ncYearMapping.Source.Label} old";
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
-
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
             var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
 
@@ -609,10 +455,12 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    fixture.GetPublicDataDbContext(),
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping
+                );
 
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
@@ -625,7 +473,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                     )
                 );
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
 
@@ -649,10 +497,12 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    fixture.GetPublicDataDbContext(),
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping
+                );
 
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
@@ -674,7 +524,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 }
             }
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
 
@@ -705,10 +555,12 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    fixture.GetPublicDataDbContext(),
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping
+                );
 
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
@@ -732,7 +584,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 }
             }
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
 
@@ -758,10 +610,12 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    fixture.GetPublicDataDbContext(),
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping
+                );
 
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
@@ -784,7 +638,7 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 }
             }
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
 
@@ -815,10 +669,12 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    fixture.GetPublicDataDbContext(),
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping
+                );
 
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
@@ -846,11 +702,9 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 optionMapping.Source.Label = $"{optionMapping.Source.Label} old";
             }
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
-
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
             var actualFilters = await GetDbFilterMetas(targetDataSetVersion.Id);
 
@@ -880,11 +734,12 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         {
             var testData = ProcessorTestData.AbsenceSchool;
 
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
-
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
 
             var actualIndicators = await GetDbIndicatorMetas(dataSetVersion.Id);
 
@@ -923,18 +778,20 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 })
                 .ToList();
 
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = existingIndicators },
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    fixture.GetPublicDataDbContext(),
+                    initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = existingIndicators },
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping
+                );
 
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
                 .WithTargetDataSetVersionId(targetDataSetVersion.Id);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
 
@@ -968,18 +825,20 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             // Set up indicators that are nothing like the test data set's indicators.
             var existingIndicators = DataFixture.DefaultIndicatorMeta().GenerateList(3);
 
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = existingIndicators },
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    fixture.GetPublicDataDbContext(),
+                    initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = existingIndicators },
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping
+                );
 
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
                 .WithTargetDataSetVersionId(targetDataSetVersion.Id);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
 
@@ -1027,18 +886,20 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 })
                 .ToList();
 
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = existingIndicators },
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    fixture.GetPublicDataDbContext(),
+                    initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = existingIndicators },
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping
+                );
 
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
                 .WithTargetDataSetVersionId(targetDataSetVersion.Id);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
 
@@ -1090,18 +951,20 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
 
             existingIndicators[4].Column = $"{existingIndicators[4].PublicId}_old";
 
-            var (sourceDataSetVersion, targetDataSetVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = existingIndicators },
-                nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
-                nextVersionStatus: DataSetVersionStatus.Mapping
-            );
+            var (sourceDataSetVersion, targetDataSetVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    fixture.GetPublicDataDbContext(),
+                    initialVersionMeta: new DataSetVersionMeta { IndicatorMetas = existingIndicators },
+                    nextVersionImportStage: DataSetVersionImportStage.ManualMapping,
+                    nextVersionStatus: DataSetVersionStatus.Mapping
+                );
 
             DataSetVersionMapping mapping = DataFixture
                 .DefaultDataSetVersionMapping()
                 .WithSourceDataSetVersionId(sourceDataSetVersion.Id)
                 .WithTargetDataSetVersionId(targetDataSetVersion.Id);
 
-            await AddTestData<PublicDataDbContext>(context => context.DataSetVersionMappings.Add(mapping));
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
 
             await ImportMetadata(testData, targetDataSetVersion, instanceId);
 
@@ -1120,14 +983,17 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         }
     }
 
-    public class ImportMetadataDuckDbTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class ImportMetadataDuckDbTests(ImportMetadataFunctionTestsFixture fixture)
         : ImportMetadataFunctionTests(fixture)
     {
         [Theory]
         [MemberData(nameof(TestDataFiles))]
         public async Task InitialVersion_CorrectLocationOptions(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 
@@ -1168,7 +1034,10 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         [MemberData(nameof(TestDataFiles))]
         public async Task InitialVersion_CorrectTimePeriods(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 
@@ -1205,7 +1074,10 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         [MemberData(nameof(TestDataFiles))]
         public async Task InitialVersion_CorrectFilterOptions(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 
@@ -1257,7 +1129,10 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         [MemberData(nameof(TestDataFiles))]
         public async Task InitialVersion_CorrectIndicators(ProcessorTestData testData)
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             await ImportMetadata(testData, dataSetVersion, instanceId);
 
@@ -1301,28 +1176,20 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
         }
     }
 
-    private async Task ImportMetadata(
-        ProcessorTestData testData,
-        DataSetVersion dataSetVersion,
-        Guid instanceId,
-        int? metaInsertBatchSize = null
-    )
+    private async Task ImportMetadata(ProcessorTestData testData, DataSetVersion dataSetVersion, Guid instanceId)
     {
-        SetupCsvDataFilesForDataSetVersion(testData, dataSetVersion);
+        CommonTestDataUtils.SetupCsvDataFilesForDataSetVersion(
+            fixture.GetDataSetVersionPathResolver(),
+            testData,
+            dataSetVersion
+        );
 
-        // Override default app settings if provided
-        if (metaInsertBatchSize.HasValue)
-        {
-            var appOptions = GetRequiredService<IOptions<AppOptions>>();
-            appOptions.Value.MetaInsertBatchSize = metaInsertBatchSize.Value;
-        }
-
-        var function = GetRequiredService<ImportMetadataFunction>();
-        await function.ImportMetadata(instanceId, CancellationToken.None);
+        await fixture.Function.ImportMetadata(instanceId, CancellationToken.None);
     }
 
     private async Task<List<FilterMeta>> GetDbFilterMetas(Guid dataSetVersionId) =>
-        await GetDbContext<PublicDataDbContext>()
+        await fixture
+            .GetPublicDataDbContext()
             .FilterMetas.Include(fm => fm.Options.OrderBy(o => o.Label))
             .Include(fm => fm.OptionLinks.OrderBy(l => l.Option.Label))
                 .ThenInclude(fm => fm.Option)
@@ -1331,7 +1198,8 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
             .ToListAsync();
 
     private Task<List<IndicatorMeta>> GetDbIndicatorMetas(Guid dataSetVersionId) =>
-        GetDbContext<PublicDataDbContext>()
+        fixture
+            .GetPublicDataDbContext()
             .IndicatorMetas.Where(im => im.DataSetVersionId == dataSetVersionId)
             .OrderBy(im => im.Label)
             .ToListAsync();
@@ -1368,6 +1236,13 @@ public abstract class ImportMetadataFunctionTests(ProcessorFunctionsIntegrationT
                 m => m.OptionLinks,
                 m => m.Created,
             ]
+        );
+    }
+
+    private DuckDbConnection GetDuckDbConnection(DataSetVersion dataSetVersion)
+    {
+        return DuckDbConnection.CreateFileConnectionReadOnly(
+            fixture.GetDataSetVersionPathResolver().DuckDbPath(dataSetVersion)
         );
     }
 }

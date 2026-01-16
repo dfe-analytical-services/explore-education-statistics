@@ -64,17 +64,6 @@ public class DataSetVersionPathResolver : IDataSetVersionPathResolver
             return Path.Combine(PathUtils.ProjectRootPath, PathUtils.OsPath(_options.Value.BasePath));
         }
 
-        if (_environment.IsIntegrationTest())
-        {
-            var randomTestInstanceDir = Guid.NewGuid().ToString();
-            return Path.Combine(
-                Path.GetTempPath(),
-                "ExploreEducationStatistics",
-                PathUtils.OsPath(_options.Value.BasePath),
-                randomTestInstanceDir
-            );
-        }
-
         return _options.Value.BasePath;
     }
 }
