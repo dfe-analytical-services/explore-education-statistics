@@ -105,7 +105,7 @@ const ReleaseContent = ({
         <ReleaseSummaryBlock
           lastUpdated={updates[0]?.on}
           publishingOrganisations={release.publishingOrganisations}
-          releaseDate={release.published}
+          releaseDate={release.published ?? release.publishScheduled}
           releaseType={release.type}
           renderProducerLink={
             publishingOrganisations?.length ? (

@@ -645,10 +645,11 @@ user confirms replacement upload
     [Arguments]
     ...    ${SUBJECT_NAME}
     ...    ${EXPECTED_STATUS}=Ready
-    ${statusText}=    Get Text    xpath=//tr[td[1][text()[contains(.,'${SUBJECT_NAME}')]]]/td[3]/strong
-    user clicks button in table cell    1    4    View details    testid:Data file replacements table
-    user waits until modal is visible    Data set details
+    ...    ${ROW}=1
+    user clicks element    testid:data-set-upload-row-${ROW}-view-details
 
+    user waits until modal is visible    Data set details
+    ${statusText}=    Get Text    xpath=//tr[td[1][text()[contains(.,'${SUBJECT_NAME}')]]]/td[3]/strong
     IF    '${statusText}' == 'Pending review'
         user acknowledges any warnings in modal
         user clicks button    Continue import with warnings

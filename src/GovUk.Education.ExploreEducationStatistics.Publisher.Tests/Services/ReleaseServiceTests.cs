@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Microsoft.EntityFrameworkCore;
@@ -337,10 +336,14 @@ public class ReleaseServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var actualRelease = await contentDbContext.ReleaseVersions.SingleAsync(rv => rv.Id == releaseVersion.Id);
+            var actualReleaseVersion = await contentDbContext.ReleaseVersions.SingleAsync(rv =>
+                rv.Id == releaseVersion.Id
+            );
 
-            // Expect the published date to have been updated with the actual published date
-            Assert.Equal(actualPublishedDate, actualRelease.Published);
+            Assert.Equal(actualPublishedDate, actualReleaseVersion.Published);
+
+            // Expect the published display date to be the actual published date for the first published release version
+            Assert.Equal(actualPublishedDate, actualReleaseVersion.PublishedDisplayDate);
 
             var actualDataBlockParents = await contentDbContext
                 .DataBlockParents.Include(dataBlockParent => dataBlockParent.LatestDraftVersion)
@@ -375,17 +378,18 @@ public class ReleaseServiceTests
     [Fact]
     public async Task CompletePublishing_AmendedRelease()
     {
-        var previousPublishedDate = DateTime.UtcNow.AddDays(-1);
+        Publication publication = _fixture
+            .DefaultPublication()
+            .WithReleases([_fixture.DefaultRelease(publishedVersions: 1, draftVersion: true)]);
 
-        var previousReleaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-            Published = previousPublishedDate,
-            PreviousVersionId = null,
-            Version = 0,
-        };
+        var previousReleaseVersion = publication
+            .Releases.Single()
+            .Versions.Single(rv => rv is { Published: not null, Version: 0 });
 
-        var releaseVersion = new ReleaseVersion { PreviousVersionId = previousReleaseVersion.Id, Version = 1 };
+        var releaseVersion = publication.Releases.Single().Versions.Single(rv => rv is { Published: null });
+
+        var actualPublishedDate = new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        var previousPublishedDate = previousReleaseVersion.Published;
 
         var amendedReleaseFileId = Guid.NewGuid();
         var amendedFileId = Guid.NewGuid();
@@ -426,7 +430,7 @@ public class ReleaseServiceTests
             var unamendedReleaseFile = new ReleaseFile
             {
                 Id = unamendedReleaseFileId,
-                Published = previousPublishedDate,
+                Published = previousPublishedDate?.UtcDateTime,
                 ReleaseVersionId = releaseVersion.Id,
                 Name = "file.csv",
                 Summary = "Summary text",
@@ -441,15 +445,21 @@ public class ReleaseServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = BuildReleaseService(contentDbContext: contentDbContext);
-            await service.CompletePublishing(releaseVersion.Id, DateTimeOffset.UtcNow);
+            await service.CompletePublishing(releaseVersion.Id, actualPublishedDate);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var actual = await contentDbContext.ReleaseVersions.SingleAsync(rv => rv.Id == releaseVersion.Id);
+            var actualReleaseVersion = await contentDbContext.ReleaseVersions.SingleAsync(rv =>
+                rv.Id == releaseVersion.Id
+            );
 
-            // Expect the published date to have been copied from the previous version
-            Assert.Equal(previousReleaseVersion.Published, actual.Published);
+            // TODO EES-6831 This should change to actualPublishedDate, but for now still expect the old behaviour
+            // where the published date should have been copied from the previous version
+            Assert.Equal(previousReleaseVersion.Published, actualReleaseVersion.Published);
+
+            // Expect the published display date to have been copied from the previous version when 'UpdatePublishedDate' is false
+            Assert.Equal(previousReleaseVersion.PublishedDisplayDate, actualReleaseVersion.PublishedDisplayDate);
 
             var actualDataBlockParents = await contentDbContext
                 .DataBlockParents.Include(dataBlockParent => dataBlockParent.LatestDraftVersion)
@@ -495,15 +505,15 @@ public class ReleaseServiceTests
     [Fact]
     public async Task CompletePublishing_AmendedRelease_DataBlockRemoved()
     {
-        var previousReleaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow.AddDays(-1),
-            PreviousVersionId = null,
-            Version = 0,
-        };
+        Publication publication = _fixture
+            .DefaultPublication()
+            .WithReleases([_fixture.DefaultRelease(publishedVersions: 1, draftVersion: true)]);
 
-        var releaseVersion = new ReleaseVersion { PreviousVersionId = previousReleaseVersion.Id, Version = 1 };
+        var previousReleaseVersion = publication
+            .Releases.Single()
+            .Versions.Single(rv => rv is { Published: not null, Version: 0 });
+
+        var releaseVersion = publication.Releases.Single().Versions.Single(rv => rv is { Published: null });
 
         // Generate Data Blocks for both the previous Release version and for the new Amendment.
         _fixture
@@ -532,11 +542,6 @@ public class ReleaseServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var actual = await contentDbContext.ReleaseVersions.SingleAsync(rv => rv.Id == releaseVersion.Id);
-
-            // Expect the published date to have been copied from the previous version
-            Assert.Equal(previousReleaseVersion.Published, actual.Published);
-
             var actualDataBlockParents = await contentDbContext
                 .DataBlockParents.Include(dataBlockParent => dataBlockParent.LatestDraftVersion)
                 .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
@@ -557,23 +562,18 @@ public class ReleaseServiceTests
     [Fact]
     public async Task CompletePublishing_AmendedReleaseAndUpdatePublishedDateIsTrue()
     {
-        var previousReleaseVersion = new ReleaseVersion
-        {
-            Id = Guid.NewGuid(),
-            Published = DateTime.UtcNow.AddDays(-1),
-            PreviousVersionId = null,
-            Version = 0,
-        };
+        Publication publication = _fixture
+            .DefaultPublication()
+            .WithReleases([_fixture.DefaultRelease(publishedVersions: 1, draftVersion: true)]);
 
-        var releaseVersion = new ReleaseVersion
-        {
-            Published = null,
-            PreviousVersionId = previousReleaseVersion.Id,
-            Version = 1,
-            UpdatePublishedDate = true,
-        };
+        var previousReleaseVersion = publication
+            .Releases.Single()
+            .Versions.Single(rv => rv is { Published: not null, Version: 0 });
 
-        var actualPublishedDate = DateTimeOffset.UtcNow;
+        var releaseVersion = publication.Releases.Single().Versions.Single(rv => rv is { Published: null });
+        releaseVersion.UpdatePublishedDate = true;
+
+        var actualPublishedDate = new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -591,10 +591,14 @@ public class ReleaseServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var actual = await contentDbContext.ReleaseVersions.SingleAsync(rv => rv.Id == releaseVersion.Id);
+            var actualReleaseVersion = await contentDbContext.ReleaseVersions.SingleAsync(rv =>
+                rv.Id == releaseVersion.Id
+            );
 
-            // Expect the published date to have been updated with the actual published date
-            Assert.Equal(actualPublishedDate, actual.Published);
+            Assert.Equal(actualPublishedDate, actualReleaseVersion.Published);
+
+            // Expect the published display date to be the actual published date when 'UpdatePublishedDate' is true
+            Assert.Equal(actualPublishedDate, actualReleaseVersion.PublishedDisplayDate);
         }
     }
 
@@ -613,6 +617,6 @@ public class ReleaseServiceTests
     {
         contentDbContext ??= InMemoryContentDbContext();
 
-        return new(contentDbContext, releaseVersionRepository: new ReleaseVersionRepository(contentDbContext));
+        return new ReleaseService(contentDbContext);
     }
 }

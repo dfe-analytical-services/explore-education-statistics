@@ -1,5 +1,5 @@
-using DotNet.Testcontainers.Containers;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
@@ -45,11 +45,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.Web
 /// minimal API projects require different approaches.
 ///
 /// </param>
-public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimalApi = false) : IAsyncLifetime
+public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(Type[] dbContextTypes, bool minimalApi = false)
+    : IAsyncLifetime
     where TStartup : class
 {
     private TestContainerRegistrations _testContainers = null!;
     private WebApplicationFactory<TStartup> _factory = null!;
+
+    protected TestDbContextHolder TestDbContexts = null!;
 
     public async Task InitializeAsync()
     {
@@ -60,30 +63,34 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimal
         // Start any registered Test Containers.
         await _testContainers.StartAll();
 
-        // Build the standard WebApplicationFactory builder based on the configuration in TStartup, choosing the
-        // correct approach based on the type of project being tested.
-        OptimisedWebApplicationFactoryBuilderBase<TStartup> factoryBuilder = minimalApi
-            ? new OptimisedWebApplicationFactoryMinimalApiBuilder<TStartup>()
-            : new OptimisedWebApplicationFactoryMvcBuilder<TStartup>();
-
         // Allow the subclass to register changes to any service or configuration setups that need to differ
         // from those found in TStartup e.g. mocking out components that communicate with external services,
         // registering in-memory DbContexts etc.
         var modifications = new OptimisedServiceAndConfigModifications();
         ConfigureServicesAndConfiguration(modifications);
 
+        // Build the standard WebApplicationFactory builder based on the configuration in TStartup, choosing the
+        // correct approach based on the type of project being tested.
+        OptimisedWebApplicationFactoryBuilderBase<TStartup> factoryBuilder = minimalApi
+            ? new OptimisedWebApplicationFactoryMinimalApiBuilder<TStartup>()
+            : new OptimisedWebApplicationFactoryMvcBuilder<TStartup>();
+
         // Build the final WebApplicationFactory, originally based on TStartup but with standard integration
         // testing support added by the WebApplicationFactory builder and then the fixture subclass' requested
         // service and configuration changes applied over the top.
         _factory = factoryBuilder.Build(
-            serviceModifications: modifications.ServiceModifications,
-            configModifications: modifications.ConfigModifications
+            serviceModifications: [.. modifications.GetServiceModifications()],
+            configModifications: [.. modifications.GetConfigModifications()]
         );
+
+        // Look up all required DbContexts and make them available to the fixture subclass.
+        var dbContexts = dbContextTypes.Select(type => _factory.Services.GetService(type)).Cast<DbContext>().ToArray();
+        TestDbContexts = new TestDbContextHolder(dbContexts);
 
         // Finally, allow the fixture subclass to perform any actions post-factory creation and prior to any
         // tests from its collection starting. This might include looking up any services that the tests in the
         // collection might need, setting up some collection-level global test data etc.
-        var lookups = new OptimisedServiceCollectionLookups<TStartup>(_factory);
+        var lookups = new OptimisedServiceCollectionLookups(_factory.Services);
         await AfterFactoryConstructed(lookups);
     }
 
@@ -109,7 +116,7 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimal
     /// WebApplicationFactory has been constructed e.g. looking up any special services that the fixture may have
     /// registered via the <see cref="ConfigureServicesAndConfiguration"/> method.
     /// </summary>
-    protected virtual Task AfterFactoryConstructed(OptimisedServiceCollectionLookups<TStartup> lookups)
+    protected virtual Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
     {
         return Task.CompletedTask;
     }
@@ -117,11 +124,16 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimal
     /// <summary>
     /// A method that can be overridden by subclasses of this fixture to perform actions before each test
     /// in a collection runs e.g. resetting any shared Mocks that were dirtied in previous tests in the
-    /// collection, unsettings users from handling requests etc.
+    /// collection, unsetting users from handling requests etc.
     /// </summary>
-    public virtual Task BeforeEachTest()
+    public virtual async Task BeforeEachTest()
     {
-        return Task.CompletedTask;
+        // In-memory DbContexts can be cleared down by default with no speed penalty.
+        // Proper DbContexts add considerable time to a full project run if clearing
+        // between every test, and therefore we don't clear them down by default.
+        await TestDbContexts.ClearInMemoryTestData();
+
+        TestDbContexts.ResetAnyMocks();
     }
 
     /// <summary>
@@ -140,28 +152,7 @@ public abstract class OptimisedIntegrationTestFixtureBase<TStartup>(bool minimal
     public async Task DisposeAsync()
     {
         await _testContainers.StopAll();
+        await TestDbContexts.DisposeAll();
         await DisposeResources();
-    }
-}
-
-public class TestContainerRegistrations
-{
-    private readonly List<DockerContainer> _testContainers = new();
-
-    public void RegisterContainer(DockerContainer container)
-    {
-        _testContainers.Add(container);
-    }
-
-    public async Task StartAll()
-    {
-        var startTasks = _testContainers.Select(container => container.StartAsync());
-        await Task.WhenAll(startTasks);
-    }
-
-    public async Task StopAll()
-    {
-        var stopTasks = _testContainers.Select(container => container.StopAsync());
-        await Task.WhenAll(stopTasks);
     }
 }

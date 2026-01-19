@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
@@ -14,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -384,7 +386,14 @@ internal class DataSetService(
         var filters = dataSetVersion.FilterMetas.Select(MapFilterOptions).OrderBy(fm => fm.Label).ToList();
 
         var indicators = dataSetVersion
-            .IndicatorMetas.Select(IndicatorViewModel.Create)
+            .IndicatorMetas.Select(meta => new IndicatorViewModel
+            {
+                Id = meta.PublicId,
+                Column = meta.Column,
+                Label = meta.Label,
+                Unit = meta.Unit,
+                DecimalPlaces = meta.DecimalPlaces,
+            })
             .OrderBy(im => im.Label)
             .ToList();
 
@@ -394,7 +403,12 @@ internal class DataSetService(
         var locations = dataSetVersion.LocationMetas.Select(MapLocationGroupOptions).ToList();
 
         var timePeriods = dataSetVersion
-            .TimePeriodMetas.Select(TimePeriodOptionViewModel.Create)
+            .TimePeriodMetas.Select(meta => new TimePeriodOptionViewModel
+            {
+                Code = meta.Code,
+                Period = meta.Period,
+                Label = TimePeriodFormatter.FormatLabel(meta.Period, meta.Code),
+            })
             .OrderBy(tm => tm.Code.GetEnumValue())
             .ThenBy(tm => tm.Period)
             .ToList();
@@ -435,7 +449,7 @@ internal class DataSetService(
     private static LocationGroupOptionsViewModel MapLocationGroupOptions(LocationMeta locationMeta)
     {
         var options = locationMeta
-            .OptionLinks.Select(LocationOptionViewModel.Create)
+            .OptionLinks.Select(optionLink => optionLink.ToViewModel())
             .OrderBy(lom => lom.Label)
             .ToList();
 

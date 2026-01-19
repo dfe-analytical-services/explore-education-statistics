@@ -26,6 +26,11 @@ public class ReleaseVersionsService(ContentDbContext contentDbContext) : IReleas
                 var isLatestRelease =
                     releaseVersion.Id == releaseVersion.Release.Publication.LatestPublishedReleaseVersionId;
 
+                var lastUpdated =
+                    releaseVersion.Version == 0
+                        ? releaseVersion.Published!.Value
+                        : await GetLastUpdatedFromReleaseUpdates(releaseVersion.Id, cancellationToken);
+
                 var publishingOrganisations = releaseVersion
                     .PublishingOrganisations.Select(PublishingOrganisationDto.FromOrganisation)
                     .OrderBy(o => o.Title)
@@ -36,6 +41,7 @@ public class ReleaseVersionsService(ContentDbContext contentDbContext) : IReleas
                 return ReleaseVersionSummaryDto.FromReleaseVersion(
                     releaseVersion,
                     isLatestRelease,
+                    lastUpdated,
                     publishingOrganisations,
                     updateCount
                 );
@@ -61,6 +67,41 @@ public class ReleaseVersionsService(ContentDbContext contentDbContext) : IReleas
             .Include(rv => rv.PublishingOrganisations)
             .LatestReleaseVersions(publication.Id, releaseSlug, publishedOnly: true)
             .SingleOrNotFoundAsync(cancellationToken);
+
+    /// <summary>
+    /// Until a change in EES-6414 makes <see cref="ReleaseVersion.Published"/> the effective public facing 'last updated'
+    /// date of the release, use the date from the latest release update, in the same way the frontend did for the old
+    /// release page design.
+    /// </summary>
+    /// <param name="releaseVersionId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>The date of the latest update for the release version.</returns>
+    private async Task<DateTimeOffset> GetLastUpdatedFromReleaseUpdates(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken
+    )
+    {
+        var lastUpdated = await contentDbContext
+            .Update.Where(u => u.ReleaseVersionId == releaseVersionId)
+            .OrderByDescending(u => u.On)
+            .Select(u => u.On)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (lastUpdated == default)
+        {
+            throw new InvalidOperationException(
+                $"Expected release version '{releaseVersionId}' to have Updates to determine last updated date from."
+            );
+        }
+
+        // EES-6490 has been created to convert Update.On from DateTime to DateTimeOffset but until then, convert it here.
+        // Values of Update.On are created by ReleaseNoteService in local time using DateTime.Now,
+        // even though it's standard elsewhere across the service to store and return dates as UTC.
+        // Interpret the value as local time, create a DateTimeOffset with the correct UTC offset for the local time zone,
+        // then convert it to UTC so it is consistent with other dates.
+        var localOffset = TimeZoneInfo.Local.GetUtcOffset(lastUpdated);
+        return new DateTimeOffset(lastUpdated, localOffset).ToUniversalTime();
+    }
 
     private async Task<int> GetUpdateCount(Guid releaseVersionId, CancellationToken cancellationToken) =>
         await contentDbContext.Update.Where(u => u.ReleaseVersionId == releaseVersionId).CountAsync(cancellationToken)

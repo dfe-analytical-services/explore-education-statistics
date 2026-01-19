@@ -60,7 +60,7 @@ export default function DataFilesReplacementTable({
             onReplacementStatusChange={onReplacementStatusChange}
           />
         ))}
-        {dataSetUploads.map(upload => (
+        {dataSetUploads.map((upload, index) => (
           <DataFilesTableUploadRow // These are rows for data sets that have been put through the screener
             canUpdateRelease={canUpdateRelease}
             dataSetUpload={upload}
@@ -68,6 +68,7 @@ export default function DataFilesReplacementTable({
             releaseVersionId={releaseVersionId}
             onConfirmDelete={onDeleteUpload}
             onConfirmImport={onDataSetImport}
+            testId={`data-set-upload-row-${index + 1}`}
           />
         ))}
       </tbody>

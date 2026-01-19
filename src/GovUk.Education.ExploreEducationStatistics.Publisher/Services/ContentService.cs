@@ -103,7 +103,7 @@ public class ContentService : IContentService
         }
     }
 
-    public async Task UpdateContent(Guid releaseVersionId)
+    public async Task UpdateContent(Guid releaseVersionId, DateTimeOffset expectedPublishDate)
     {
         var releaseVersion = await _contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
@@ -111,9 +111,10 @@ public class ContentService : IContentService
             .SingleAsync(rv => rv.Id == releaseVersionId);
 
         await _releaseCacheService.UpdateRelease(
-            releaseVersion.Id,
+            releaseVersionId: releaseVersion.Id,
             publicationSlug: releaseVersion.Release.Publication.Slug,
-            releaseSlug: releaseVersion.Release.Slug
+            releaseSlug: releaseVersion.Release.Slug,
+            expectedPublishDate: expectedPublishDate
         );
 
         var publication = releaseVersion.Release.Publication;
@@ -126,7 +127,8 @@ public class ContentService : IContentService
 
         await _releaseCacheService.UpdateRelease(
             releaseVersionId: latestReleaseVersion.Id,
-            publicationSlug: publication.Slug
+            publicationSlug: publication.Slug,
+            expectedPublishDate: expectedPublishDate
         );
     }
 

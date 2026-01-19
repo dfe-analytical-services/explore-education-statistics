@@ -57,7 +57,7 @@ public static class ProcessorHostBuilder
                     // cause the data source builder to throw a host exception.
                     if (!hostEnvironment.IsIntegrationTest())
                     {
-                        var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb")!;
+                        var connectionString = ConnectionUtils.GetPostgreSqlConnectionString("PublicDataDb");
                         services.AddFunctionAppPsqlDbContext<PublicDataDbContext>(connectionString, hostBuilderContext);
                     }
 

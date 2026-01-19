@@ -127,7 +127,8 @@ const AdminDashboardPage = () => {
               <li>
                 <Link to="/contact-us" target="_blank">
                   Contact us
-                  <VisuallyHidden> about general enquiries</VisuallyHidden>
+                  <VisuallyHidden> about general enquiries</VisuallyHidden>{' '}
+                  (opens in new tab)
                 </Link>
               </li>
             </ul>

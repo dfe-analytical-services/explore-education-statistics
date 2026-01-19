@@ -33,8 +33,7 @@ const ReleaseContentPageLoaded = () => {
     canUpdateRelease || (!canUpdateRelease && !release.published);
 
   const previewRedesign =
-    new URLSearchParams(window.location.search).get('redesign') === 'true' &&
-    !window.location.href.includes('admin.explore');
+    new URLSearchParams(window.location.search).get('redesign') === 'true';
 
   return (
     <EditingContextProvider

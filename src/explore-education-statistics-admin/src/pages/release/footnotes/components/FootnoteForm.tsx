@@ -7,6 +7,7 @@ import {
   FootnoteMeta,
   SubjectSelectionType,
 } from '@admin/services/footnoteService';
+import { Element } from '@admin/types/ckeditor';
 import footnoteToFlatFootnote from '@admin/services/utils/footnote/footnoteToFlatFootnote';
 import {
   pluginsConfigLinksOnly,
@@ -24,9 +25,10 @@ import Yup from '@common/validation/yup';
 import deepmerge from 'deepmerge';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import getContentErrors from '@admin/components/editable/utils/getContentErrors';
 
 interface Props {
   cancelButton?: ReactNode;
@@ -116,13 +118,42 @@ export default function FootnoteForm({
 
     await onSubmit(sanitizedValues);
   };
-
+  const [elements, setElements] = useState<Element[] | undefined>();
+  const [invalidContentErrors, setInvalidContentErrors] = useState<ReactNode>();
+  const handleEditorChange = (editorElements?: Element[] | undefined) => {
+    setElements(editorElements);
+  };
   const validationSchema = useMemo<ObjectSchema<BaseFootnote>>(() => {
     return Yup.object({
-      content: Yup.string().required('Footnote content must be added'),
+      content: Yup.string()
+        .required('Footnote content must be added')
+        .test('validate content', (_, { createError, path }) => {
+          if (!elements?.length) {
+            return true;
+          }
+
+          const contentErrors = getContentErrors(elements, {
+            checkContent: true,
+            checkImages: false,
+            checkLinks: false,
+          });
+
+          if (contentErrors) {
+            const { errorMessage, contentErrorDetails } = contentErrors;
+            setInvalidContentErrors(contentErrorDetails);
+
+            return createError({
+              path,
+              message: errorMessage,
+            });
+          }
+          setInvalidContentErrors(undefined);
+
+          return true;
+        }),
       subjects: Yup.object(),
     });
-  }, []);
+  }, [elements]);
 
   return (
     <FormProvider
@@ -147,6 +178,8 @@ export default function FootnoteForm({
           label="Footnote"
           includePlugins={pluginsConfigLinksOnly}
           toolbarConfig={toolbarConfigLinkOnly}
+          onChange={handleEditorChange}
+          contentErrorDetails={invalidContentErrors}
         />
 
         {orderBy(

@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using System.Text;
 using Asp.Versioning;
-using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;

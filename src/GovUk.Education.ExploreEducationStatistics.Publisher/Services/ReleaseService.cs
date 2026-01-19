@@ -3,15 +3,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
-public class ReleaseService(ContentDbContext contentDbContext, IReleaseVersionRepository releaseVersionRepository)
-    : IReleaseService
+public class ReleaseService(ContentDbContext contentDbContext) : IReleaseService
 {
     public async Task<ReleaseVersion> Get(Guid releaseVersionId)
     {
@@ -83,17 +81,47 @@ public class ReleaseService(ContentDbContext contentDbContext, IReleaseVersionRe
                 .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
             .SingleAsync(rv => rv.Id == releaseVersionId);
 
-        contentDbContext.ReleaseVersions.Update(releaseVersion);
+        var publishedDisplayDate = await CalculatePublishedDisplayDate(releaseVersion, actualPublishedDate);
+        releaseVersion.PublishedDisplayDate = publishedDisplayDate;
 
-        var publishedDate = await releaseVersionRepository.GetPublishedDate(releaseVersion.Id, actualPublishedDate);
+        // TODO EES-6831 Alter this to set Published to the actual published date,
+        // maintaining a record of when the release version was actually published.
+        // Up until now it can have been inherited from the previous release version.
+        // Provided that the values for all existing release versions are also corrected by EES-6830 in a one-off migration,
+        // Published can also become the public facing 'last updated' date of the release in EES-6833.
+        releaseVersion.Published = publishedDisplayDate;
 
-        releaseVersion.Published = publishedDate;
-
-        await UpdateReleaseFilePublishedDate(releaseVersion, publishedDate);
+        await UpdateReleaseFilePublishedDate(releaseVersion, publishedDisplayDate);
 
         await UpdatePublishedDataBlockVersions(releaseVersion);
 
         await contentDbContext.SaveChangesAsync();
+    }
+
+    private async Task<DateTimeOffset> CalculatePublishedDisplayDate(
+        ReleaseVersion releaseVersion,
+        DateTimeOffset actualPublishedDate
+    )
+    {
+        // For the first version of a release or if an update to the published display date has been requested
+        // return the actual published date
+        if (releaseVersion.Version == 0 || releaseVersion.UpdatePublishedDate)
+        {
+            return actualPublishedDate;
+        }
+
+        // Otherwise, return the published display date from the previous version
+        await contentDbContext.Entry(releaseVersion).Reference(rv => rv.PreviousVersion).LoadAsync();
+        var previousVersion = releaseVersion.PreviousVersion!;
+
+        if (!previousVersion.PublishedDisplayDate.HasValue)
+        {
+            throw new ArgumentException(
+                $"Expected previous release version '{releaseVersion.PreviousVersionId}' to be published."
+            );
+        }
+
+        return previousVersion.PublishedDisplayDate.Value;
     }
 
     private async Task UpdateReleaseFilePublishedDate(ReleaseVersion releaseVersion, DateTimeOffset publishedDate)

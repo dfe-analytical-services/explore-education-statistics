@@ -1377,6 +1377,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<DateTimeOffset?>("Published")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<DateTimeOffset?>("PublishedDisplayDate")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("RelatedInformation")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

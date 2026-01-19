@@ -202,7 +202,7 @@ public class ManageContentPageServiceTests
             Assert.Equal(releaseVersion.NextReleaseDate, contentRelease.NextReleaseDate);
             Assert.Equal(releaseVersion.Release.Year.ToString(), contentRelease.ReleaseName);
             Assert.Equal(releaseVersion.PublishScheduled?.ToUkDateOnly(), contentRelease.PublishScheduled);
-            Assert.Equal(releaseVersion.Published, contentRelease.Published);
+            Assert.Equal(releaseVersion.PublishedDisplayDate, contentRelease.Published);
             Assert.Equal(publication.Id, contentRelease.PublicationId);
             Assert.Equal(releaseVersion.Release.Slug, contentRelease.Slug);
             Assert.Equal(releaseVersion.Release.Title, contentRelease.Title);

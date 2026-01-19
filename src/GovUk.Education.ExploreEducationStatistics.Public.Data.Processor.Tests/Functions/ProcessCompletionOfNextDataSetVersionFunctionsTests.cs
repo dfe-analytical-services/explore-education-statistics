@@ -1,24 +1,64 @@
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
+using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TestData;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using FilterMeta = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Functions;
 
-public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
-    ProcessorFunctionsIntegrationTestFixture fixture
-) : ProcessorFunctionsIntegrationTest(fixture)
+// ReSharper disable once ClassNeverInstantiated.Global
+public class ProcessCompletionOfNextDataSetVersionFunctionsTestsFixture()
+    : OptimisedPublicDataProcessorCollectionFixture(
+        capabilities: [PublicDataProcessorIntegrationTestCapability.Postgres]
+    )
 {
+    public ProcessCompletionOfNextDataSetVersionFunctions Function = null!;
+
+    protected override void ConfigureServicesAndConfiguration(
+        OptimisedServiceAndConfigModifications serviceModifications
+    )
+    {
+        base.ConfigureServicesAndConfiguration(serviceModifications);
+
+        var dataFilesBasePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+        serviceModifications.AddInMemoryCollection([
+            new KeyValuePair<string, string?>("DataFiles:BasePath", dataFilesBasePath),
+        ]);
+    }
+
+    protected override async Task AfterFactoryConstructed(OptimisedServiceCollectionLookups lookups)
+    {
+        await base.AfterFactoryConstructed(lookups);
+
+        Function = lookups.GetService<ProcessCompletionOfNextDataSetVersionFunctions>();
+    }
+}
+
+[CollectionDefinition(nameof(ProcessCompletionOfNextDataSetVersionFunctionsTestsFixture))]
+public class ProcessCompletionOfNextDataSetVersionFunctionsTestsCollection
+    : ICollectionFixture<ProcessCompletionOfNextDataSetVersionFunctionsTestsFixture>;
+
+[Collection(nameof(ProcessCompletionOfNextDataSetVersionFunctionsTestsFixture))]
+public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
+    ProcessCompletionOfNextDataSetVersionFunctionsTestsFixture fixture
+) : OptimisedFunctionAppIntegrationTestBase(fixture)
+{
+    private static readonly DataFixture DataFixture = new();
+
     private static readonly string[] AllDataSetVersionFiles =
     [
         DataSetFilenames.CsvDataFile,
@@ -33,19 +73,18 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         TimePeriodsTable.ParquetFile,
     ];
 
-    public abstract class CreateChangesTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public abstract class CreateChangesTests(ProcessCompletionOfNextDataSetVersionFunctionsTestsFixture fixture)
         : ProcessCompletionOfNextDataSetVersionFunctionsTests(fixture)
     {
         protected const DataSetVersionImportStage Stage = DataSetVersionImportStage.CreatingChanges;
 
         protected async Task CreateChanges(Guid instanceId)
         {
-            var function = GetRequiredService<ProcessCompletionOfNextDataSetVersionFunctions>();
-            await function.CreateChanges(instanceId, CancellationToken.None);
+            await fixture.Function.CreateChanges(instanceId, CancellationToken.None);
         }
     }
 
-    public class CreateChangesFilterTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class CreateChangesFilterTests(ProcessCompletionOfNextDataSetVersionFunctionsTestsFixture fixture)
         : CreateChangesTests(fixture)
     {
         [Fact]
@@ -1915,7 +1954,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
 
         private async Task<IReadOnlyList<FilterMetaChange>> GetFilterMetaChanges(DataSetVersion version)
         {
-            return await GetDbContext<PublicDataDbContext>()
+            return await fixture
+                .GetPublicDataDbContext()
                 .FilterMetaChanges.AsNoTracking()
                 .Where(c => c.DataSetVersionId == version.Id)
                 .OrderBy(c => c.Id)
@@ -1924,7 +1964,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
 
         private async Task<IReadOnlyList<FilterOptionMetaChange>> GetFilterOptionMetaChanges(DataSetVersion version)
         {
-            return await GetDbContext<PublicDataDbContext>()
+            return await fixture
+                .GetPublicDataDbContext()
                 .FilterOptionMetaChanges.AsNoTracking()
                 .Where(c => c.DataSetVersionId == version.Id)
                 .OrderBy(c => c.Id)
@@ -1935,7 +1976,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             List<FilterMeta> filterMetas
         )
         {
-            return await CreateDataSetInitialVersion(
+            return await CommonTestDataUtils.CreateDataSetInitialVersion(
+                publicDataDbContext: fixture.GetPublicDataDbContext(),
                 dataSetStatus: DataSetStatus.Published,
                 dataSetVersionStatus: DataSetVersionStatus.Published,
                 importStage: DataSetVersionImportStage.Completing,
@@ -1952,7 +1994,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             List<FilterMeta> filterMetas
         )
         {
-            return await CreateDataSetNextVersion(
+            return await CommonTestDataUtils.CreateDataSetNextVersion(
+                publicDataDbContext: fixture.GetPublicDataDbContext(),
                 initialVersion: originalVersion,
                 status: DataSetVersionStatus.Mapping,
                 importStage: Stage.PreviousStage(),
@@ -1965,7 +2008,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         }
     }
 
-    public class CreateChangesLocationTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class CreateChangesLocationTests(ProcessCompletionOfNextDataSetVersionFunctionsTestsFixture fixture)
         : CreateChangesTests(fixture)
     {
         [Fact]
@@ -3105,7 +3148,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
 
         private async Task<IReadOnlyList<LocationMetaChange>> GetLocationMetaChanges(DataSetVersion version)
         {
-            return await GetDbContext<PublicDataDbContext>()
+            return await fixture
+                .GetPublicDataDbContext()
                 .LocationMetaChanges.AsNoTracking()
                 .Where(c => c.DataSetVersionId == version.Id)
                 .OrderBy(c => c.Id)
@@ -3114,7 +3158,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
 
         private async Task<IReadOnlyList<LocationOptionMetaChange>> GetLocationOptionMetaChanges(DataSetVersion version)
         {
-            return await GetDbContext<PublicDataDbContext>()
+            return await fixture
+                .GetPublicDataDbContext()
                 .LocationOptionMetaChanges.AsNoTracking()
                 .Where(c => c.DataSetVersionId == version.Id)
                 .OrderBy(c => c.Id)
@@ -3125,7 +3170,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             List<LocationMeta> locationMetas
         )
         {
-            return await CreateDataSetInitialVersion(
+            return await CommonTestDataUtils.CreateDataSetInitialVersion(
+                publicDataDbContext: fixture.GetPublicDataDbContext(),
                 dataSetStatus: DataSetStatus.Published,
                 dataSetVersionStatus: DataSetVersionStatus.Published,
                 importStage: DataSetVersionImportStage.Completing,
@@ -3142,7 +3188,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             List<LocationMeta> locationMetas
         )
         {
-            return await CreateDataSetNextVersion(
+            return await CommonTestDataUtils.CreateDataSetNextVersion(
+                publicDataDbContext: fixture.GetPublicDataDbContext(),
                 initialVersion: originalVersion,
                 status: DataSetVersionStatus.Mapping,
                 importStage: Stage.PreviousStage(),
@@ -3155,36 +3202,43 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         }
     }
 
-    public class CreateChangesGeographicLevelTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class CreateChangesGeographicLevelTests(ProcessCompletionOfNextDataSetVersionFunctionsTestsFixture fixture)
         : CreateChangesTests(fixture)
     {
         [Fact]
         public async Task GeographicLevelsAddedAndDeleted_ChangeExists()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionStatus: DataSetVersionStatus.Mapping,
-                nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture
-                        .DefaultGeographicLevelMeta()
-                        .WithLevels([GeographicLevel.Country, GeographicLevel.Region, GeographicLevel.LocalAuthority]),
-                },
-                nextVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture
-                        .DefaultGeographicLevelMeta()
-                        .WithLevels([
-                            GeographicLevel.LocalAuthority,
-                            GeographicLevel.LocalAuthorityDistrict,
-                            GeographicLevel.School,
-                        ]),
-                }
-            );
+            var (originalVersion, newVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    publicDataDbContext: fixture.GetPublicDataDbContext(),
+                    nextVersionStatus: DataSetVersionStatus.Mapping,
+                    nextVersionImportStage: Stage.PreviousStage(),
+                    initialVersionMeta: new DataSetVersionMeta
+                    {
+                        GeographicLevelMeta = DataFixture
+                            .DefaultGeographicLevelMeta()
+                            .WithLevels([
+                                GeographicLevel.Country,
+                                GeographicLevel.Region,
+                                GeographicLevel.LocalAuthority,
+                            ]),
+                    },
+                    nextVersionMeta: new DataSetVersionMeta
+                    {
+                        GeographicLevelMeta = DataFixture
+                            .DefaultGeographicLevelMeta()
+                            .WithLevels([
+                                GeographicLevel.LocalAuthority,
+                                GeographicLevel.LocalAuthorityDistrict,
+                                GeographicLevel.School,
+                            ]),
+                    }
+                );
 
             await CreateChanges(instanceId);
 
-            var actualChange = await GetDbContext<PublicDataDbContext>()
+            var actualChange = await fixture
+                .GetPublicDataDbContext()
                 .GeographicLevelMetaChanges.AsNoTracking()
                 .SingleOrDefaultAsync(c => c.DataSetVersionId == newVersion.Id);
 
@@ -3197,7 +3251,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         [Fact]
         public async Task GeographicLevelsUnchanged_ChangeIsNull()
         {
-            var (_, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
+            var (_, newVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                publicDataDbContext: fixture.GetPublicDataDbContext(),
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
                 initialVersionMeta: new DataSetVersionMeta
@@ -3216,7 +3271,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
 
             await CreateChanges(instanceId);
 
-            var actualChange = await GetDbContext<PublicDataDbContext>()
+            var actualChange = await fixture
+                .GetPublicDataDbContext()
                 .GeographicLevelMetaChanges.AsNoTracking()
                 .SingleOrDefaultAsync(c => c.DataSetVersionId == newVersion.Id);
 
@@ -3226,26 +3282,33 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         [Fact]
         public async Task GeographicLevelsAdded_ChangeExists()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionStatus: DataSetVersionStatus.Mapping,
-                nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture
-                        .DefaultGeographicLevelMeta()
-                        .WithLevels([GeographicLevel.Country]),
-                },
-                nextVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture
-                        .DefaultGeographicLevelMeta()
-                        .WithLevels([GeographicLevel.Country, GeographicLevel.Region, GeographicLevel.LocalAuthority]),
-                }
-            );
+            var (originalVersion, newVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    publicDataDbContext: fixture.GetPublicDataDbContext(),
+                    nextVersionStatus: DataSetVersionStatus.Mapping,
+                    nextVersionImportStage: Stage.PreviousStage(),
+                    initialVersionMeta: new DataSetVersionMeta
+                    {
+                        GeographicLevelMeta = DataFixture
+                            .DefaultGeographicLevelMeta()
+                            .WithLevels([GeographicLevel.Country]),
+                    },
+                    nextVersionMeta: new DataSetVersionMeta
+                    {
+                        GeographicLevelMeta = DataFixture
+                            .DefaultGeographicLevelMeta()
+                            .WithLevels([
+                                GeographicLevel.Country,
+                                GeographicLevel.Region,
+                                GeographicLevel.LocalAuthority,
+                            ]),
+                    }
+                );
 
             await CreateChanges(instanceId);
 
-            var actualChange = await GetDbContext<PublicDataDbContext>()
+            var actualChange = await fixture
+                .GetPublicDataDbContext()
                 .GeographicLevelMetaChanges.AsNoTracking()
                 .SingleOrDefaultAsync(c => c.DataSetVersionId == newVersion.Id);
 
@@ -3258,26 +3321,33 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         [Fact]
         public async Task GeographicLevelsDeleted_ChangeExists()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionStatus: DataSetVersionStatus.Mapping,
-                nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture
-                        .DefaultGeographicLevelMeta()
-                        .WithLevels([GeographicLevel.Country, GeographicLevel.Region, GeographicLevel.LocalAuthority]),
-                },
-                nextVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture
-                        .DefaultGeographicLevelMeta()
-                        .WithLevels([GeographicLevel.Country]),
-                }
-            );
+            var (originalVersion, newVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    publicDataDbContext: fixture.GetPublicDataDbContext(),
+                    nextVersionStatus: DataSetVersionStatus.Mapping,
+                    nextVersionImportStage: Stage.PreviousStage(),
+                    initialVersionMeta: new DataSetVersionMeta
+                    {
+                        GeographicLevelMeta = DataFixture
+                            .DefaultGeographicLevelMeta()
+                            .WithLevels([
+                                GeographicLevel.Country,
+                                GeographicLevel.Region,
+                                GeographicLevel.LocalAuthority,
+                            ]),
+                    },
+                    nextVersionMeta: new DataSetVersionMeta
+                    {
+                        GeographicLevelMeta = DataFixture
+                            .DefaultGeographicLevelMeta()
+                            .WithLevels([GeographicLevel.Country]),
+                    }
+                );
 
             await CreateChanges(instanceId);
 
-            var actualChange = await GetDbContext<PublicDataDbContext>()
+            var actualChange = await fixture
+                .GetPublicDataDbContext()
                 .GeographicLevelMetaChanges.AsNoTracking()
                 .SingleOrDefaultAsync(c => c.DataSetVersionId == newVersion.Id);
 
@@ -3288,7 +3358,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         }
     }
 
-    public class CreateChangesIndicatorTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class CreateChangesIndicatorTests(ProcessCompletionOfNextDataSetVersionFunctionsTestsFixture fixture)
         : CreateChangesTests(fixture)
     {
         [Fact]
@@ -3553,7 +3623,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
 
         private async Task<IReadOnlyList<IndicatorMetaChange>> GetIndicatorMetaChanges(DataSetVersion version)
         {
-            return await GetDbContext<PublicDataDbContext>()
+            return await fixture
+                .GetPublicDataDbContext()
                 .IndicatorMetaChanges.AsNoTracking()
                 .Where(c => c.DataSetVersionId == version.Id)
                 .OrderBy(c => c.Id)
@@ -3564,7 +3635,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             List<IndicatorMeta> indicatorMetas
         )
         {
-            return await CreateDataSetInitialVersion(
+            return await CommonTestDataUtils.CreateDataSetInitialVersion(
+                publicDataDbContext: fixture.GetPublicDataDbContext(),
                 dataSetStatus: DataSetStatus.Published,
                 dataSetVersionStatus: DataSetVersionStatus.Published,
                 importStage: DataSetVersionImportStage.Completing,
@@ -3581,7 +3653,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             List<IndicatorMeta> indicatorMetas
         )
         {
-            return await CreateDataSetNextVersion(
+            return await CommonTestDataUtils.CreateDataSetNextVersion(
+                publicDataDbContext: fixture.GetPublicDataDbContext(),
                 initialVersion: originalVersion,
                 status: DataSetVersionStatus.Mapping,
                 importStage: Stage.PreviousStage(),
@@ -3594,42 +3667,45 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         }
     }
 
-    public class CreateChangesTimePeriodTests(ProcessorFunctionsIntegrationTestFixture fixture)
+    public class CreateChangesTimePeriodTests(ProcessCompletionOfNextDataSetVersionFunctionsTestsFixture fixture)
         : CreateChangesTests(fixture)
     {
         [Fact]
         public async Task TimePeriodsAddedAndDeleted_ChangesContainAdditionsAndDeletions()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionStatus: DataSetVersionStatus.Mapping,
-                nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
-                    TimePeriodMetas = DataFixture
-                        .DefaultTimePeriodMeta()
-                        .WithCode(TimeIdentifier.AcademicYear)
-                        .ForIndex(0, s => s.SetPeriod("2020"))
-                        .ForIndex(1, s => s.SetPeriod("2021"))
-                        .ForIndex(2, s => s.SetPeriod("2022"))
-                        .Generate(3),
-                },
-                nextVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
-                    TimePeriodMetas = DataFixture
-                        .DefaultTimePeriodMeta()
-                        .WithCode(TimeIdentifier.AcademicYear)
-                        .ForIndex(0, s => s.SetPeriod("2022"))
-                        .ForIndex(1, s => s.SetPeriod("2023"))
-                        .ForIndex(2, s => s.SetPeriod("2024"))
-                        .Generate(3),
-                }
-            );
+            var (originalVersion, newVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    publicDataDbContext: fixture.GetPublicDataDbContext(),
+                    nextVersionStatus: DataSetVersionStatus.Mapping,
+                    nextVersionImportStage: Stage.PreviousStage(),
+                    initialVersionMeta: new DataSetVersionMeta
+                    {
+                        GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                        TimePeriodMetas = DataFixture
+                            .DefaultTimePeriodMeta()
+                            .WithCode(TimeIdentifier.AcademicYear)
+                            .ForIndex(0, s => s.SetPeriod("2020"))
+                            .ForIndex(1, s => s.SetPeriod("2021"))
+                            .ForIndex(2, s => s.SetPeriod("2022"))
+                            .Generate(3),
+                    },
+                    nextVersionMeta: new DataSetVersionMeta
+                    {
+                        GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                        TimePeriodMetas = DataFixture
+                            .DefaultTimePeriodMeta()
+                            .WithCode(TimeIdentifier.AcademicYear)
+                            .ForIndex(0, s => s.SetPeriod("2022"))
+                            .ForIndex(1, s => s.SetPeriod("2023"))
+                            .ForIndex(2, s => s.SetPeriod("2024"))
+                            .Generate(3),
+                    }
+                );
 
             await CreateChanges(instanceId);
 
-            var actualChanges = await GetDbContext<PublicDataDbContext>()
+            var actualChanges = await fixture
+                .GetPublicDataDbContext()
                 .TimePeriodMetaChanges.AsNoTracking()
                 .Where(c => c.DataSetVersionId == newVersion.Id)
                 .OrderBy(c => c.Id)
@@ -3664,7 +3740,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         [Fact]
         public async Task TimePeriodsUnchanged_ChangesAreEmpty()
         {
-            var (_, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
+            var (_, newVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                publicDataDbContext: fixture.GetPublicDataDbContext(),
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
                 initialVersionMeta: new DataSetVersionMeta
@@ -3693,7 +3770,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             await CreateChanges(instanceId);
 
             Assert.False(
-                await GetDbContext<PublicDataDbContext>()
+                await fixture
+                    .GetPublicDataDbContext()
                     .TimePeriodMetaChanges.AnyAsync(c => c.DataSetVersionId == newVersion.Id)
             );
         }
@@ -3701,7 +3779,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         [Fact]
         public async Task TimePeriodsAdded_ChangesContainOnlyAdditions()
         {
-            var (_, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
+            var (_, newVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                publicDataDbContext: fixture.GetPublicDataDbContext(),
                 nextVersionStatus: DataSetVersionStatus.Mapping,
                 nextVersionImportStage: Stage.PreviousStage(),
                 initialVersionMeta: new DataSetVersionMeta
@@ -3736,7 +3815,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
 
             await CreateChanges(instanceId);
 
-            var actualChanges = await GetDbContext<PublicDataDbContext>()
+            var actualChanges = await fixture
+                .GetPublicDataDbContext()
                 .TimePeriodMetaChanges.AsNoTracking()
                 .Where(c => c.DataSetVersionId == newVersion.Id)
                 .OrderBy(c => c.Id)
@@ -3756,42 +3836,45 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         [Fact]
         public async Task TimePeriodsDeleted_ChangesContainOnlyDeletions()
         {
-            var (originalVersion, newVersion, instanceId) = await CreateDataSetInitialAndNextVersion(
-                nextVersionStatus: DataSetVersionStatus.Mapping,
-                nextVersionImportStage: Stage.PreviousStage(),
-                initialVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
-                    TimePeriodMetas =
-                    [
-                        .. DataFixture
+            var (originalVersion, newVersion, instanceId) =
+                await CommonTestDataUtils.CreateDataSetInitialAndNextVersion(
+                    publicDataDbContext: fixture.GetPublicDataDbContext(),
+                    nextVersionStatus: DataSetVersionStatus.Mapping,
+                    nextVersionImportStage: Stage.PreviousStage(),
+                    initialVersionMeta: new DataSetVersionMeta
+                    {
+                        GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                        TimePeriodMetas =
+                        [
+                            .. DataFixture
+                                .DefaultTimePeriodMeta()
+                                .WithCode(TimeIdentifier.CalendarYear)
+                                .WithPeriod("2020")
+                                .Generate(1),
+                            .. DataFixture
+                                .DefaultTimePeriodMeta()
+                                .WithCode(TimeIdentifier.AcademicYear)
+                                .ForIndex(0, s => s.SetPeriod("2019"))
+                                .ForIndex(1, s => s.SetPeriod("2020"))
+                                .ForIndex(2, s => s.SetPeriod("2021"))
+                                .Generate(3),
+                        ],
+                    },
+                    nextVersionMeta: new DataSetVersionMeta
+                    {
+                        GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
+                        TimePeriodMetas = DataFixture
                             .DefaultTimePeriodMeta()
                             .WithCode(TimeIdentifier.CalendarYear)
                             .WithPeriod("2020")
                             .Generate(1),
-                        .. DataFixture
-                            .DefaultTimePeriodMeta()
-                            .WithCode(TimeIdentifier.AcademicYear)
-                            .ForIndex(0, s => s.SetPeriod("2019"))
-                            .ForIndex(1, s => s.SetPeriod("2020"))
-                            .ForIndex(2, s => s.SetPeriod("2021"))
-                            .Generate(3),
-                    ],
-                },
-                nextVersionMeta: new DataSetVersionMeta
-                {
-                    GeographicLevelMeta = DataFixture.DefaultGeographicLevelMeta(),
-                    TimePeriodMetas = DataFixture
-                        .DefaultTimePeriodMeta()
-                        .WithCode(TimeIdentifier.CalendarYear)
-                        .WithPeriod("2020")
-                        .Generate(1),
-                }
-            );
+                    }
+                );
 
             await CreateChanges(instanceId);
 
-            var actualChanges = await GetDbContext<PublicDataDbContext>()
+            var actualChanges = await fixture
+                .GetPublicDataDbContext()
                 .TimePeriodMetaChanges.AsNoTracking()
                 .Where(c => c.DataSetVersionId == newVersion.Id)
                 .OrderBy(c => c.Id)
@@ -3818,24 +3901,26 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         }
     }
 
-    public class CompleteNextDataSetVersionImportProcessingTests(ProcessorFunctionsIntegrationTestFixture fixture)
-        : ProcessCompletionOfNextDataSetVersionFunctionsTests(fixture)
+    public class CompleteNextDataSetVersionImportProcessingTests(
+        ProcessCompletionOfNextDataSetVersionFunctionsTestsFixture fixture
+    ) : ProcessCompletionOfNextDataSetVersionFunctionsTests(fixture)
     {
         private const DataSetVersionImportStage Stage = DataSetVersionImportStage.Completing;
 
         [Fact]
         public async Task Success()
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                publicDataDbContext: fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
-            var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
-            Directory.CreateDirectory(dataSetVersionPathResolver.DirectoryPath(dataSetVersion));
+            Directory.CreateDirectory(fixture.GetDataSetVersionPathResolver().DirectoryPath(dataSetVersion));
 
             await CompleteNextDataSetVersionImportProcessing(instanceId);
 
-            await using var publicDataDbContext = GetDbContext<PublicDataDbContext>();
-
-            var savedImport = await publicDataDbContext
+            var savedImport = await fixture
+                .GetPublicDataDbContext()
                 .DataSetVersionImports.Include(i => i.DataSetVersion)
                 .SingleAsync(i => i.InstanceId == instanceId);
 
@@ -3848,11 +3933,13 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
         [Fact]
         public async Task DuckDbFileIsDeleted()
         {
-            var (dataSetVersion, instanceId) = await CreateDataSetInitialVersion(Stage.PreviousStage());
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                publicDataDbContext: fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
 
             // Create empty data set version files for all file paths
-            var dataSetVersionPathResolver = GetRequiredService<IDataSetVersionPathResolver>();
-            var directoryPath = dataSetVersionPathResolver.DirectoryPath(dataSetVersion);
+            var directoryPath = fixture.GetDataSetVersionPathResolver().DirectoryPath(dataSetVersion);
             Directory.CreateDirectory(directoryPath);
             foreach (var filename in AllDataSetVersionFiles)
             {
@@ -3862,7 +3949,8 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
             await CompleteNextDataSetVersionImportProcessing(instanceId);
 
             // Ensure the duck db database file is the only file that was deleted
-            AssertDataSetVersionDirectoryContainsOnlyFiles(
+            CommonTestDataUtils.AssertDataSetVersionDirectoryContainsOnlyFiles(
+                dataSetVersionPathResolver: fixture.GetDataSetVersionPathResolver(),
                 dataSetVersion,
                 AllDataSetVersionFiles.Where(file => file != DataSetFilenames.DuckDbDatabaseFile).ToArray()
             );
@@ -3870,8 +3958,7 @@ public abstract class ProcessCompletionOfNextDataSetVersionFunctionsTests(
 
         private async Task CompleteNextDataSetVersionImportProcessing(Guid instanceId)
         {
-            var function = GetRequiredService<ProcessCompletionOfNextDataSetVersionFunctions>();
-            await function.CompleteNextDataSetVersionImportProcessing(instanceId, CancellationToken.None);
+            await fixture.Function.CompleteNextDataSetVersionImportProcessing(instanceId, CancellationToken.None);
         }
     }
 }

@@ -13,6 +13,7 @@ interface Props {
   isEditing?: boolean;
   lastUpdated?: string | Date;
   publishingOrganisations?: Organisation[];
+  releaseDate?: string;
   releaseType: ReleaseType;
   renderProducerLink: ReactNode;
   renderSubscribeLink?: ReactNode;
@@ -24,6 +25,7 @@ export default function ReleaseSummaryBlockMobile({
   isEditing,
   lastUpdated,
   publishingOrganisations,
+  releaseDate,
   releaseType,
   renderProducerLink,
   renderSubscribeLink,
@@ -65,11 +67,20 @@ export default function ReleaseSummaryBlockMobile({
           </Modal>
 
           <div className={styles.updatesContainer}>
-            {(isEditing || lastUpdated) && (
+            {isEditing || lastUpdated ? (
               <p>
                 <span className="dfe-colour--dark-grey">Last updated</span>{' '}
                 {isEditing && !lastUpdated && 'Currently editing'}
                 {lastUpdated && <FormattedDate>{lastUpdated}</FormattedDate>}
+              </p>
+            ) : (
+              <p>
+                <span className="dfe-colour--dark-grey">Published</span>{' '}
+                {releaseDate ? (
+                  <FormattedDate>{releaseDate}</FormattedDate>
+                ) : (
+                  <span>TBA</span>
+                )}
               </p>
             )}
 

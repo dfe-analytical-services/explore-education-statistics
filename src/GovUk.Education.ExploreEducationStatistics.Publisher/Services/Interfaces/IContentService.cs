@@ -6,7 +6,7 @@ public interface IContentService
 
     Task DeletePreviousVersionsContent(IReadOnlyList<Guid> releaseVersionIds);
 
-    Task UpdateContent(Guid releaseVersionId);
+    Task UpdateContent(Guid releaseVersionId, DateTimeOffset expectedPublishDate);
 
     Task UpdateContentStaged(DateTimeOffset expectedPublishDate, params Guid[] releaseVersionIds);
 

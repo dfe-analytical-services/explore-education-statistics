@@ -1090,9 +1090,9 @@ public class ThemeServiceTests
             ReleaseVersionUpdateRequest request
         ) => throw new NotImplementedException();
 
-        public Task<Either<ActionResult, Unit>> UpdateReleasePublished(
+        public Task<Either<ActionResult, Unit>> UpdatePublishedDisplayDate(
             Guid releaseVersionId,
-            ReleasePublishedUpdateRequest request
+            ReleaseVersionPublishedDisplayDateUpdateRequest request
         ) => throw new NotImplementedException();
 
         public Task<Either<ActionResult, IdTitleViewModel>> GetLatestPublishedRelease(Guid publicationId) =>

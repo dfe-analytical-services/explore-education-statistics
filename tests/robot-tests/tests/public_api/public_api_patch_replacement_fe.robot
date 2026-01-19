@@ -171,7 +171,7 @@ Confirm finalization of this API data set version
 Verify that API summary tags have status OK and then press 'confirm data replacement'
     user clicks link    Back to API data sets
     user clicks link    Data uploads
-    user clicks link    View details    testId:Actions
+    user clicks link containing text    View details    testId:Actions
     user waits until h3 is visible    API data set Locations: OK
     user waits until h3 is visible    API data set Filters: OK
     user waits until h3 is visible    API data set has to be finalized: OK
@@ -261,7 +261,7 @@ Confirm finalization of this API data set version for second patch replacement
 Verify that API summary tags have status OK and then press 'confirm data replacement' for second patch replacement
     user clicks link    Back to API data sets
     user clicks link    Data uploads
-    user clicks link    View details    testId:Actions
+    user clicks link containing text    View details    testId:Actions
     user waits until h3 is visible    API data set Locations: OK
     user waits until h3 is visible    API data set Filters: OK
     user waits until h3 is visible    API data set has to be finalized: OK
