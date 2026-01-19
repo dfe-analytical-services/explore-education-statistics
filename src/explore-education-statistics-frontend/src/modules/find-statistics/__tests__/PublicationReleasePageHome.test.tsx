@@ -72,7 +72,7 @@ describe('PublicationReleasePageHome', () => {
     mockIsMedia = false;
   });
 
-  test('renders publication summary with no update info if less than 1 update', () => {
+  test('renders publication summary with no update info if less than 2 updates', () => {
     mockIsMedia = true;
     render(
       <PublicationReleasePageHome

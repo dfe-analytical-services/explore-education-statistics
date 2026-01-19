@@ -72,8 +72,11 @@ describe('ReleasePageTabHome', () => {
     ).toBeInTheDocument();
 
     expect(
-      within(releaseSummaryBlock).getByText('1 update'),
+      within(releaseSummaryBlock).getByTestId('summary-mobile-updates-link'),
     ).toBeInTheDocument();
+    expect(
+      within(releaseSummaryBlock).getByTestId('summary-mobile-updates-link'),
+    ).toHaveTextContent(/1 update/);
 
     expect(
       within(releaseSummaryBlock).queryByText('Published'),
@@ -112,7 +115,7 @@ describe('ReleasePageTabHome', () => {
     ).not.toBeInTheDocument();
 
     expect(
-      within(releaseSummaryBlock).queryByText('1 update'),
+      within(releaseSummaryBlock).queryByTestId('summary-mobile-updates-link'),
     ).not.toBeInTheDocument();
 
     expect(

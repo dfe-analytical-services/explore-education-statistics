@@ -139,7 +139,7 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
               }
               renderUpdatesLink={
                 showUpdatesInfo ? (
-                  <span>
+                  <span data-testid="summary-mobile-updates-link">
                     {updates.length} update{updates.length === 1 ? '' : 's'}
                     <VisuallyHidden>for {release.title}</VisuallyHidden>
                   </span>
