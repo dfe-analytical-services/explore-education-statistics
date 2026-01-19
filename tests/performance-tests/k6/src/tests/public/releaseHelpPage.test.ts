@@ -34,13 +34,8 @@ const performTest = ({ buildId }: ReleasePageSetupData) => {
   const publicationSlug = urlSlugs[1];
   const releaseSlug = urlSlugs[2];
 
-  const themeId = '2ca22e34-b87a-4281-a0eb-b80f4f8dd374';
-  const publicationId = '24f63a6f-5a5a-4025-d8b5-08d88b0047f4';
-  const releaseVersionId = 'e642795f-22ea-4eb6-957b-08d88ad5b210';
-
   const dataUrls: string[] = [
-    `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,
-    `/data-catalogue.json?themeId=${themeId}&publicationId=${publicationId}&releaseVersionId=${releaseVersionId}`,
+    `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
   ];
 
   testPageAndDataUrls({
@@ -57,21 +52,6 @@ const performTest = ({ buildId }: ReleasePageSetupData) => {
             'response code was 200': ({ status }) => status === 200,
           }),
       })),
-      // This request is also in the list of prefetch URLs but is actually a JSON response rather than a prefetch.
-      {
-        url: `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,
-        prefetch: false,
-        successCounter: getReleaseDataSuccessCount,
-        failureCounter: getReleaseDataFailureCount,
-        durationTrend: getReleaseDataRequestDuration,
-        successCheck: response =>
-          check(response, {
-            'response code was 200': ({ status }) => status === 200,
-            'response should have contained body': ({ body }) => body != null,
-            'response contains expected content': res =>
-              res.html().text().includes('pageProps'),
-          }),
-      },
     ],
   });
 };

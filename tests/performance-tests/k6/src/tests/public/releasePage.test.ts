@@ -1,19 +1,11 @@
 /* eslint-disable no-console */
 import { Counter, Trend } from 'k6/metrics';
-import { Options } from 'k6/options';
-import exec from 'k6/execution';
 import { check } from 'k6';
-import http from 'k6/http';
-import loggingUtils from '../../utils/loggingUtils';
-import grafanaService from '../../utils/grafanaService';
-import { stringifyWithoutNulls } from '../../utils/utils';
 import getOptions from '../../configuration/options';
 import testPageAndDataUrls from './utils/publicPageTest';
-import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
-
-interface SetupData {
-  buildId: string;
-}
+import setupReleasePageTest, {
+  ReleasePageSetupData,
+} from './utils/releasePageTest';
 
 const releasePageUrl =
   __ENV.URL ?? '/find-statistics/pupil-absence-in-schools-in-england/2016-17';
@@ -21,10 +13,6 @@ const expectedPublicationTitle =
   __ENV.PUBLICATION_TITLE ?? 'Pupil absence in schools in England';
 const expectedContentSnippet =
   __ENV.CONTENT_SNIPPET ?? 'pupils missed on average 8.2 school days';
-
-const environmentAndUsers = getEnvironmentAndUsersFromFile(
-  __ENV.TEST_ENVIRONMENT,
-);
 
 export const options = getOptions();
 
@@ -48,36 +36,11 @@ export const getReleaseDataFailureCount = new Counter(
   'ees_get_release_data_failure',
 );
 
-export function logTestStart(config: Options) {
-  console.log(
-    `Starting test ${name}, with configuration:\n\n${stringifyWithoutNulls(
-      config,
-    )}\n\n`,
-  );
+export function setup(): ReleasePageSetupData {
+  return setupReleasePageTest(releasePageUrl, name);
 }
 
-export function setup(): SetupData {
-  loggingUtils.logDashboardUrls();
-
-  const response = http.get(
-    `${environmentAndUsers.environment.publicUrl}${releasePageUrl}`,
-  );
-  const regexp = /"buildId":"([-0-9a-zA-Z]*)"/g;
-  const buildId = regexp.exec(response.body as string)![1];
-
-  logTestStart(exec.test.options);
-
-  grafanaService.testStart({
-    name,
-    config: exec.test.options,
-  });
-
-  return {
-    buildId,
-  };
-}
-
-const performTest = ({ buildId }: SetupData) => {
+const performTest = ({ buildId }: ReleasePageSetupData) => {
   const urlSlugs = /\/find-statistics\/(.*)\/(.*)/g.exec(releasePageUrl)!;
   const publicationSlug = urlSlugs[1];
   const releaseSlug = urlSlugs[2];
