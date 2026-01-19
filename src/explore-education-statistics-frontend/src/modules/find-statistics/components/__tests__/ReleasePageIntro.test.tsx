@@ -303,13 +303,15 @@ describe('ReleasePageIntro', () => {
     ).toHaveAttribute('href', 'https://example.com');
   });
 
-  test('renders updates link when there are at least 2 updates', () => {
+  test('renders updates info when there are at least 2 updates', () => {
     render(
       <ReleasePageIntro
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={testReleaseVersionSummary}
       />,
     );
+
+    expect(screen.getByTestId('Last updated-value')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -321,7 +323,7 @@ describe('ReleasePageIntro', () => {
     );
   });
 
-  test('does not render updates link when there are less than 2 updates', () => {
+  test('does not render updates info when there are less than 2 updates', () => {
     render(
       <ReleasePageIntro
         publicationSummary={testPublicationSummary}
@@ -329,6 +331,7 @@ describe('ReleasePageIntro', () => {
       />,
     );
 
+    expect(screen.queryByTestId('Last updated-value')).not.toBeInTheDocument();
     expect(screen.queryByTestId('updates-link')).not.toBeInTheDocument();
   });
 });

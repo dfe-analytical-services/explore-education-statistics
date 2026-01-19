@@ -50,7 +50,7 @@ describe('ReleasePageTabHome', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders summary block and publication summary on mobile', () => {
+  test('renders summary block and publication summary on mobile with updates info', () => {
     mockIsMedia = true;
     renderWithContext(<ReleasePageTabHome hidden={false} />);
 
@@ -59,6 +59,67 @@ describe('ReleasePageTabHome', () => {
         level: 2,
         name: 'Introduction',
       }),
+    ).toBeInTheDocument();
+
+    const releaseSummaryBlock = screen.getByTestId(
+      'release-summary-block-mobile',
+    );
+
+    expect(releaseSummaryBlock).toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).getByText('Last updated'),
+    ).toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).getByTestId('summary-mobile-updates-link'),
+    ).toBeInTheDocument();
+    expect(
+      within(releaseSummaryBlock).getByTestId('summary-mobile-updates-link'),
+    ).toHaveTextContent(/1 update/);
+
+    expect(
+      within(releaseSummaryBlock).queryByText('Published'),
+    ).not.toBeInTheDocument();
+
+    mockIsMedia = false;
+  });
+
+  test('renders publication summary on mobile correctly when published with no updates', () => {
+    mockIsMedia = true;
+    renderWithContext(
+      <ReleasePageTabHome hidden={false} />,
+      generateReleaseContent({
+        release: generateEditableRelease({
+          published: '2025-08-10T09:30:00+01:00',
+          updates: [],
+        }),
+      }),
+    );
+
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: 'Introduction',
+      }),
+    ).toBeInTheDocument();
+
+    const releaseSummaryBlock = screen.getByTestId(
+      'release-summary-block-mobile',
+    );
+
+    expect(releaseSummaryBlock).toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).queryByText('Updated at'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).queryByTestId('summary-mobile-updates-link'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).getByText('Published'),
     ).toBeInTheDocument();
 
     mockIsMedia = false;
