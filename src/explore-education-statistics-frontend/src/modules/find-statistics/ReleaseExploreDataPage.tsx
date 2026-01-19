@@ -4,9 +4,12 @@ import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import ButtonText from '@common/components/ButtonText';
 import ContentHtml from '@common/components/ContentHtml';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import WarningMessage from '@common/components/WarningMessage';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import useToggle from '@common/hooks/useToggle';
-import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
+import ContactUsSection, {
+  contactUsNavItem,
+} from '@common/modules/find-statistics/components/ContactUsSectionRedesign';
 import ReleaseDataList from '@common/modules/find-statistics/components/ReleaseDataList';
 import ReleaseDataListItem from '@common/modules/find-statistics/components/ReleaseDataListItem';
 import ReleasePageContentSection from '@common/modules/find-statistics/components/ReleasePageContentSection';
@@ -44,9 +47,14 @@ const ReleaseExploreDataPage = ({
     featuredTables,
   } = dataContent;
 
+  const hasDataSets = dataSets.length > 0;
   const hasSupportingFiles = supportingFiles.length > 0;
   const hasFeaturedTables = featuredTables.length > 0;
   const hasDataDashboards = dataDashboards && dataDashboards.length > 0;
+  const hasDataGuidance = dataGuidance && dataGuidance.length > 0;
+
+  const hasAnyDataSection =
+    hasDataSets || hasDataDashboards || hasDataGuidance || hasSupportingFiles;
 
   const { isMedia: isMobileMedia } = useMobileMedia();
 
@@ -204,26 +212,39 @@ const ReleaseExploreDataPage = ({
         includeBackToTopLink={false}
         includeSectionBreak={!isMobileMedia}
       >
-        {!isMobileMedia && (
+        {!hasDataSets && (
+          <WarningMessage testId="no-data-warning">
+            This release does not have any interactive data sets associated with
+            it. If you would like to enquire about related data, please get in
+            touch using the{' '}
+            <Link to={`#${contactUsNavItem.id}`}>contact details</Link> on this
+            page.{' '}
+            {hasSupportingFiles &&
+              'Some data may be available as downloadable supporting files.'}
+          </WarningMessage>
+        )}
+        {!isMobileMedia && hasAnyDataSection && (
           <ReleaseDataPageCardLinkGrid>
-            <ReleaseDataPageCardLink
-              renderLink={
-                <Link
-                  to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
-                  onClick={() => {
-                    logEvent({
-                      category: 'Downloads',
-                      action: `Release page all files, Release: ${releaseVersionSummary.title}, File: All files`,
-                    });
-                  }}
-                  unvisited
-                >
-                  Download all data from this release (ZIP)
-                </Link>
-              }
-              caption="This includes all data sets, guidance files and any supporting files"
-              isHighlightVariant
-            />
+            {(hasDataSets || hasSupportingFiles || hasDataGuidance) && (
+              <ReleaseDataPageCardLink
+                renderLink={
+                  <Link
+                    to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
+                    onClick={() => {
+                      logEvent({
+                        category: 'Downloads',
+                        action: `Release page all files, Release: ${releaseVersionSummary.title}, File: All files`,
+                      });
+                    }}
+                    unvisited
+                  >
+                    Download all data from this release (ZIP)
+                  </Link>
+                }
+                caption="This includes all data sets, guidance files and any supporting files"
+                isHighlightVariant
+              />
+            )}
 
             {hasFeaturedTables && (
               <ReleaseDataPageCardLink
@@ -236,14 +257,16 @@ const ReleaseExploreDataPage = ({
               />
             )}
 
-            <ReleaseDataPageCardLink
-              renderLink={
-                <Link to={`#${pageSections.datasets.id}`} unvisited>
-                  {pageSections.datasets.text}
-                </Link>
-              }
-              caption={pageSections.datasets.caption}
-            />
+            {hasDataSets && (
+              <ReleaseDataPageCardLink
+                renderLink={
+                  <Link to={`#${pageSections.datasets.id}`} unvisited>
+                    {pageSections.datasets.text}
+                  </Link>
+                }
+                caption={pageSections.datasets.caption}
+              />
+            )}
 
             {hasSupportingFiles && (
               <ReleaseDataPageCardLink
@@ -267,26 +290,30 @@ const ReleaseExploreDataPage = ({
               />
             )}
 
-            <ReleaseDataPageCardLink
-              renderLink={
-                <Link to={`#${pageSections.dataGuidance.id}`} unvisited>
-                  {pageSections.dataGuidance.text}
-                </Link>
-              }
-              caption={pageSections.dataGuidance.caption}
-            />
+            {hasDataGuidance && (
+              <ReleaseDataPageCardLink
+                renderLink={
+                  <Link to={`#${pageSections.dataGuidance.id}`} unvisited>
+                    {pageSections.dataGuidance.text}
+                  </Link>
+                }
+                caption={pageSections.dataGuidance.caption}
+              />
+            )}
 
-            <ReleaseDataPageCardLink
-              renderLink={
-                <Link
-                  to={`/data-catalogue?themeId=${publicationSummary.theme.id}&publicationId=${publicationSummary.id}&releaseVersionId=${releaseVersionSummary.id}`}
-                  unvisited
-                >
-                  Data catalogue
-                </Link>
-              }
-              caption="Alternatively use our data catalogue to search and filter for specific data sets from this release or our entire library, providing full data summaries, data previews and access to API data sets."
-            />
+            {hasDataSets && (
+              <ReleaseDataPageCardLink
+                renderLink={
+                  <Link
+                    to={`/data-catalogue?themeId=${publicationSummary.theme.id}&publicationId=${publicationSummary.id}&releaseVersionId=${releaseVersionSummary.id}`}
+                    unvisited
+                  >
+                    Data catalogue
+                  </Link>
+                }
+                caption="Alternatively use our data catalogue to search and filter for specific data sets from this release or our entire library, providing full data summaries, data previews and access to API data sets."
+              />
+            )}
           </ReleaseDataPageCardLinkGrid>
         )}
       </ReleasePageContentSection>
@@ -314,13 +341,15 @@ const ReleaseExploreDataPage = ({
             </AccordionSection>
           )}
 
-          <AccordionSection
-            heading={pageSections.datasets.text}
-            id={pageSections.datasets.id}
-            caption={pageSections.datasets.caption}
-          >
-            {dataSetsContent}
-          </AccordionSection>
+          {hasDataSets && (
+            <AccordionSection
+              heading={pageSections.datasets.text}
+              id={pageSections.datasets.id}
+              caption={pageSections.datasets.caption}
+            >
+              {dataSetsContent}
+            </AccordionSection>
+          )}
 
           {hasSupportingFiles && (
             <AccordionSection
@@ -352,13 +381,15 @@ const ReleaseExploreDataPage = ({
             </AccordionSection>
           )}
 
-          <AccordionSection
-            heading={pageSections.dataGuidance.text}
-            id={pageSections.dataGuidance.id}
-            caption={pageSections.dataGuidance.caption}
-          >
-            <ContentHtml html={dataGuidance} testId="dataGuidance-content" />
-          </AccordionSection>
+          {hasDataGuidance && (
+            <AccordionSection
+              heading={pageSections.dataGuidance.text}
+              id={pageSections.dataGuidance.id}
+              caption={pageSections.dataGuidance.caption}
+            >
+              <ContentHtml html={dataGuidance} testId="dataGuidance-content" />
+            </AccordionSection>
+          )}
         </Accordion>
       ) : (
         <>
@@ -373,14 +404,16 @@ const ReleaseExploreDataPage = ({
             </ReleasePageContentSection>
           )}
 
-          <ReleasePageContentSection
-            heading={pageSections.datasets.text}
-            id={pageSections.datasets.id}
-            testId={pageSections.datasets.id}
-            caption={pageSections.datasets.caption}
-          >
-            {dataSetsContent}
-          </ReleasePageContentSection>
+          {hasDataSets && (
+            <ReleasePageContentSection
+              heading={pageSections.datasets.text}
+              id={pageSections.datasets.id}
+              testId={pageSections.datasets.id}
+              caption={pageSections.datasets.caption}
+            >
+              {dataSetsContent}
+            </ReleasePageContentSection>
+          )}
 
           {hasSupportingFiles && (
             <ReleasePageContentSection
@@ -414,14 +447,16 @@ const ReleaseExploreDataPage = ({
             </ReleasePageContentSection>
           )}
 
-          <ReleasePageContentSection
-            heading={pageSections.dataGuidance.text}
-            id={pageSections.dataGuidance.id}
-            testId={pageSections.dataGuidance.id}
-            caption={pageSections.dataGuidance.caption}
-          >
-            <ContentHtml html={dataGuidance} testId="dataGuidance-content" />
-          </ReleasePageContentSection>
+          {hasDataGuidance && (
+            <ReleasePageContentSection
+              heading={pageSections.dataGuidance.text}
+              id={pageSections.dataGuidance.id}
+              testId={pageSections.dataGuidance.id}
+              caption={pageSections.dataGuidance.caption}
+            >
+              <ContentHtml html={dataGuidance} testId="dataGuidance-content" />
+            </ReleasePageContentSection>
+          )}
         </>
       )}
 
