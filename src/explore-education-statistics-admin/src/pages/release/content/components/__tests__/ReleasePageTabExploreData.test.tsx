@@ -3,7 +3,6 @@ import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import ReleasePageTabExploreData from '@admin/pages/release/content/components/ReleasePageTabExploreData';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import _releaseContentService, {
-  DataContent,
   ReleaseContent as ReleaseContentType,
 } from '@admin/services/releaseContentService';
 import render from '@common-test/render';
@@ -12,6 +11,7 @@ import React from 'react';
 import { MemoryRouter } from 'react-router';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { noop } from 'lodash';
+import { ReleaseVersionDataContent } from '@common/services/publicationService';
 
 let mockIsMedia = false;
 jest.mock('@common/hooks/useMedia', () => ({
@@ -56,7 +56,7 @@ const renderWithContext = (
   );
 
 describe('ReleasePageTabExploreData', () => {
-  const testReleaseDataContent: DataContent = {
+  const testReleaseDataContent: ReleaseVersionDataContent = {
     releaseId: 'test-release-id',
     releaseVersionId: 'test-release-version-id',
     dataDashboards: '<h3>Data dashboard text</h3>',
@@ -134,8 +134,6 @@ describe('ReleasePageTabExploreData', () => {
       },
     ],
   };
-
-  beforeEach(() => {});
 
   test('renders correctly with all content sections', async () => {
     releaseContentService.getDataContent.mockResolvedValue(
@@ -422,6 +420,39 @@ describe('ReleasePageTabExploreData', () => {
     expect(
       screen.queryByTestId('data-dashboards-section'),
     ).not.toBeInTheDocument();
+  });
+
+  test('renders inset text in sections when data sets or guidance not present', async () => {
+    releaseContentService.getDataContent.mockResolvedValue({
+      ...testReleaseDataContent,
+      dataSets: [],
+      dataGuidance: undefined,
+    });
+
+    renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', {
+          name: 'Explore data used in this release',
+          level: 2,
+        }),
+      ).toBeInTheDocument();
+    });
+
+    const datasetsSection = screen.getByTestId('datasets-section');
+    expect(
+      within(datasetsSection).getByText(
+        'No data sets added for this release yet.',
+      ),
+    ).toBeInTheDocument();
+
+    const dataGuidanceSection = screen.getByTestId('data-guidance-section');
+    expect(
+      within(dataGuidanceSection).getByText(
+        'No data guidance available for this release yet.',
+      ),
+    ).toBeInTheDocument();
   });
 
   test('does not render links grid on mobile', async () => {

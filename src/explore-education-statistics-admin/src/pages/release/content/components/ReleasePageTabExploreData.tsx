@@ -14,6 +14,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import ButtonText from '@common/components/ButtonText';
 import ContentHtml from '@common/components/ContentHtml';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
@@ -59,6 +60,7 @@ const ReleasePageTabExploreData = ({
     isLoading: isLoadingDataContent,
   } = useQuery(releaseContentQueries.getDataContent(release.id));
 
+  const hasDataSets = dataContent && dataContent.dataSets.length > 0;
   const hasSupportingFiles =
     dataContent && dataContent.supportingFiles.length > 0;
   const hasFeaturedTables =
@@ -130,7 +132,7 @@ const ReleasePageTabExploreData = ({
     </ReleaseDataList>
   ) : undefined;
 
-  const dataSetsContent = (
+  const dataSetsContent = hasDataSets ? (
     <ReleaseDataList
       heading={`${dataContent?.dataSets.length || 0} data set${
         dataContent?.dataSets?.length === 1 ? '' : 's'
@@ -193,6 +195,8 @@ const ReleasePageTabExploreData = ({
         </ReleaseDataListItem>
       ))}
     </ReleaseDataList>
+  ) : (
+    <InsetText>No data sets added for this release yet.</InsetText>
   );
 
   const supportingFilesContent = (
@@ -226,7 +230,7 @@ const ReleasePageTabExploreData = ({
   );
 
   const dataGuidanceContent = !dataContent?.dataGuidance ? (
-    <p>No data guidance available for this release yet.</p>
+    <InsetText>No data guidance available for this release yet.</InsetText>
   ) : (
     <ContentHtml
       html={dataContent?.dataGuidance}
