@@ -108,6 +108,29 @@ describe('ReleaseContentRedesign', () => {
     ).toHaveTextContent('10 August 2025');
   });
 
+  test('renders the published date correctly when both published and release scheduled', () => {
+    renderWithContext(
+      <ReleaseContentRedesign />,
+      generateReleaseContent({
+        release: generateEditableRelease({
+          publishScheduled: '2025-08-12T09:30:00+01:00',
+          published: '2025-08-10T09:30:00+01:00',
+        }),
+      }),
+    );
+    const releaseSummaryBlock = screen.getByTestId('release-summary-block');
+
+    expect(releaseSummaryBlock).toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).getByTestId('Last updated-value'),
+    ).toBeInTheDocument();
+
+    expect(
+      within(releaseSummaryBlock).getByTestId('Published-value'),
+    ).toHaveTextContent('10 August 2025');
+  });
+
   test('does not render the publication summary on mobile', () => {
     mockIsMedia = true;
     renderWithContext(<ReleaseContentRedesign />);
