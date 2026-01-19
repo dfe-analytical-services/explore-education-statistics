@@ -66,10 +66,12 @@ public static class EducationInNumbersContentExtensions
                 Version = statTile.Version,
                 LatestPublishedVersion = statTile.LatestPublishedVersion,
                 Query = statTile.Query,
+                Statistic = statTile.Statistic,
                 IndicatorUnit = statTile.IndicatorUnit,
                 DecimalPlaces = statTile.DecimalPlaces,
                 QueryResult = statTile.QueryResult,
-                MetaResult = statTile.MetaResult,
+                PublicationSlug = statTile.PublicationSlug,
+                ReleaseSlug = statTile.ReleaseSlug,
             },
             _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found"),
         };

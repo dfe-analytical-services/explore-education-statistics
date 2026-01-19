@@ -35,7 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             migrationBuilder.AddColumn<string>(
                 name: "EinApiQueryStatTile_Statistic",
                 table: "EinTiles",
-                type: "nvarchar(max)",
+                type: "nvarchar(64)",
+                maxLength: 64,
                 nullable: true
             );
 
@@ -49,14 +50,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             migrationBuilder.AddColumn<string>(
                 name: "LatestPublishedVersion",
                 table: "EinTiles",
-                type: "nvarchar(max)",
+                type: "nvarchar(32)",
+                maxLength: 32,
                 nullable: true
             );
 
             migrationBuilder.AddColumn<string>(
-                name: "MetaResult",
+                name: "PublicationSlug",
                 table: "EinTiles",
-                type: "nvarchar(max)",
+                type: "nvarchar(512)",
+                maxLength: 512,
                 nullable: true
             );
 
@@ -70,9 +73,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             );
 
             migrationBuilder.AddColumn<string>(
+                name: "ReleaseSlug",
+                table: "EinTiles",
+                type: "nvarchar(512)",
+                maxLength: 512,
+                nullable: true
+            );
+
+            migrationBuilder.AddColumn<string>(
                 name: "Version",
                 table: "EinTiles",
-                type: "nvarchar(max)",
+                type: "nvarchar(32)",
+                maxLength: 32,
                 nullable: true
             );
         }
@@ -90,11 +102,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             migrationBuilder.DropColumn(name: "LatestPublishedVersion", table: "EinTiles");
 
-            migrationBuilder.DropColumn(name: "MetaResult", table: "EinTiles");
+            migrationBuilder.DropColumn(name: "PublicationSlug", table: "EinTiles");
 
             migrationBuilder.DropColumn(name: "Query", table: "EinTiles");
 
             migrationBuilder.DropColumn(name: "QueryResult", table: "EinTiles");
+
+            migrationBuilder.DropColumn(name: "ReleaseSlug", table: "EinTiles");
 
             migrationBuilder.DropColumn(name: "Version", table: "EinTiles");
 

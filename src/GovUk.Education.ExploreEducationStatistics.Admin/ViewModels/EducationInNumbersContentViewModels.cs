@@ -1,4 +1,5 @@
 #nullable enable
+using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -161,15 +162,16 @@ public record EinApiQueryStatTileViewModel : EinTileViewModel
     public Guid? DataSetId { get; init; }
     public string Version { get; init; } = string.Empty;
     public string LatestPublishedVersion { get; init; } = string.Empty;
-    public string Stat { get; init; }
+    public string Statistic { get; init; } = string.Empty;
     public string Query { get; init; } = string.Empty;
 
     [JsonConverter(typeof(EnumToEnumValueJsonConverter<IndicatorUnit>))]
     public IndicatorUnit? IndicatorUnit { get; init; }
 
     public int? DecimalPlaces { get; set; }
-    public string QueryResult { get; set; } = string.Empty; // @MarkFix temp?
-    public string MetaResult { get; set; } = string.Empty; // @MarkFix temp?
+    public string QueryResult { get; set; } = string.Empty; // @MarkFix remove
+    public string PublicationSlug { get; set; } = string.Empty;
+    public string ReleaseSlug { get; set; } = string.Empty;
 
     public static EinApiQueryStatTileViewModel FromModel(EinApiQueryStatTile statTile)
     {
@@ -182,12 +184,13 @@ public record EinApiQueryStatTileViewModel : EinTileViewModel
             DataSetId = statTile.DataSetId,
             Version = statTile.Version,
             LatestPublishedVersion = statTile.LatestPublishedVersion,
-            Stat = statTile.Statistic,
+            Statistic = statTile.Statistic,
             Query = statTile.Query,
             IndicatorUnit = statTile.IndicatorUnit,
             DecimalPlaces = statTile.DecimalPlaces,
             QueryResult = statTile.QueryResult,
-            MetaResult = statTile.MetaResult,
+            PublicationSlug = statTile.PublicationSlug,
+            ReleaseSlug = statTile.ReleaseSlug,
         };
     }
 }

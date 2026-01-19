@@ -75,23 +75,28 @@ public class EinApiQueryStatTile : EinTile
 {
     public Guid? DataSetId { get; set; }
 
+    [MaxLength(32)]
     public string Version { get; set; } = string.Empty;
 
+    [MaxLength(32)]
     public string LatestPublishedVersion { get; set; } = string.Empty;
 
     public string Query { get; set; } = string.Empty;
 
+    [MaxLength(64)]
     public string Statistic { get; set; } = string.Empty;
 
     public IndicatorUnit? IndicatorUnit { get; set; } = null;
 
     public int? DecimalPlaces { get; set; }
 
-    // @MarkFix should be a DataSetQueryPaginatedResultsViewModel? (And similar for MetaResult?)
     public string QueryResult { get; set; } = string.Empty;
 
-    public string MetaResult { get; set; } = string.Empty;
+    [MaxLength(512)]
+    public string PublicationSlug { get; set; } = string.Empty;
+
+    [MaxLength(512)]
+    public string ReleaseSlug { get; set; } = string.Empty;
 }
 
-// @MarkFix link to release that the api data set is from (like free stat text tile)
 // @MarkFix on a new release being published, check for api data sets - if it is in an EinTile, update isLatestVersion AND any previous version of the tile in case of amendments!

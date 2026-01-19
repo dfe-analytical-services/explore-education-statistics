@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20260119132207_Ees6778AddEinApiQueryStatTiles")]
+    [Migration("20260120102803_Ees6778AddEinApiQueryStatTiles")]
     partial class Ees6778AddEinApiQueryStatTiles
     {
         /// <inheritdoc />
@@ -1800,11 +1800,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("LatestPublishedVersion")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
-                    b.Property<string>("MetaResult")
+                    b.Property<string>("PublicationSlug")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
 
                     b.Property<string>("Query")
                         .IsRequired()
@@ -1814,13 +1816,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ReleaseSlug")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
                     b.Property<string>("Statistic")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
 
                     b.Property<string>("Version")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.ToTable("EinTiles", t =>
                         {

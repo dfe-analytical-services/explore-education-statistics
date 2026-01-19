@@ -360,6 +360,8 @@ public class EducationInNumbersContentService(
                 LatestPublishedVersion = "",
                 QueryResult = "",
                 Version = "",
+                PublicationSlug = "",
+                ReleaseSlug = "",
             },
             _ => throw new Exception($"{nameof(EinTile)} type {type} not found"),
         };
@@ -410,11 +412,23 @@ public class EducationInNumbersContentService(
         EinApiQueryStatTileUpdateRequest request
     )
     {
+        // Get tile to update
+        var tileToUpdate = contentDbContext
+            .EinTiles.OfType<EinApiQueryStatTile>()
+            .SingleOrDefault(tile =>
+                tile.Id == tileId && tile.EinParentBlock.EinContentSection.EducationInNumbersPageId == pageId
+            );
+        if (tileToUpdate == null)
+        {
+            return new NotFoundResult();
+        }
+
+        // Get indicator PublicId
         var indicatorPublicId = FetchSingleIndicator(request.Query);
         if (indicatorPublicId == null)
         {
             return new Either<ActionResult, EinTileViewModel>(
-                new BadRequestObjectResult("request query must contain exactly one indicator")
+                new BadRequestObjectResult("Request query must contain exactly one indicator")
             );
         }
 
@@ -424,21 +438,22 @@ public class EducationInNumbersContentService(
             .Single(ds => ds.Id == request.DataSetId);
         if (apiDataSet.LatestLiveVersion == null)
         {
-            return new Either<ActionResult, EinTileViewModel>(
-                new BadRequestObjectResult("API data set has no live version")
-            );
+            return new BadRequestObjectResult("API data set has no live version");
         }
         var apiDataSetLatest = apiDataSet.LatestLiveVersion;
-        //var releaseSlug = apiDataSetLatest.Release.Slug; // @MarkFix use this
+
+        var releaseSlug = apiDataSetLatest.Release.Slug;
+        var publicationSlug = contentDbContext
+            .ReleaseFiles.Where(rf => rf.Id == apiDataSetLatest.Release.ReleaseFileId)
+            .Select(rf => rf.ReleaseVersion.Release.Publication.Slug)
+            .Single();
+
         var latestVersion =
             $"{apiDataSetLatest.VersionMajor}.{apiDataSetLatest.VersionMinor}.{apiDataSetLatest.VersionPatch}";
-
         if (latestVersion != request.Version)
         {
-            return new Either<ActionResult, EinTileViewModel>(
-                new BadRequestObjectResult(
-                    $"Version provided isn't the latest version. Latest: {latestVersion} Provided: {request.Version}"
-                )
+            return new BadRequestObjectResult(
+                $"Version provided isn't the latest version. Latest: {latestVersion} Provided: {request.Version}"
             );
         }
 
@@ -447,9 +462,7 @@ public class EducationInNumbersContentService(
         );
         if (indicatorMeta == null)
         {
-            return new Either<ActionResult, EinTileViewModel>(
-                new BadRequestObjectResult($"Could not find indicator meta for {indicatorPublicId}")
-            );
+            return new BadRequestObjectResult($"Could not find indicator meta for {indicatorPublicId}");
         }
         var indicatorUnit = indicatorMeta.Unit;
         var indicatorDecimalPlaces = indicatorMeta.DecimalPlaces;
@@ -468,8 +481,6 @@ public class EducationInNumbersContentService(
                         new BadRequestObjectResult("Data set has no latest live version")
                     );
                 }
-
-                // @MarkFix Get the latest version via PAPI /versions endpoint?
 
                 if (queryResults.Warnings.Count > 0)
                 {
@@ -508,18 +519,6 @@ public class EducationInNumbersContentService(
                 }
                 var theStat = latestResults[0].Values[indicatorPublicId];
 
-                // Get tile to update
-                var tileToUpdate = contentDbContext
-                    .EinTiles.OfType<EinApiQueryStatTile>()
-                    .SingleOrDefault(tile =>
-                        tile.Id == tileId && tile.EinParentBlock.EinContentSection.EducationInNumbersPageId == pageId
-                    );
-
-                if (tileToUpdate == null)
-                {
-                    return new NotFoundResult();
-                }
-
                 tileToUpdate.Title = request.Title;
                 tileToUpdate.DataSetId = request.DataSetId;
                 tileToUpdate.Version = request.Version;
@@ -529,7 +528,8 @@ public class EducationInNumbersContentService(
                 tileToUpdate.IndicatorUnit = indicatorUnit;
                 tileToUpdate.DecimalPlaces = indicatorDecimalPlaces;
                 tileToUpdate.QueryResult = queryResults.Results.ToJson();
-                tileToUpdate.MetaResult = "{}"; // @MarkFix remove
+                tileToUpdate.PublicationSlug = publicationSlug;
+                tileToUpdate.ReleaseSlug = releaseSlug;
 
                 contentDbContext.EinTiles.Update(tileToUpdate);
                 await contentDbContext.SaveChangesAsync();
@@ -613,7 +613,7 @@ public class EducationInNumbersContentService(
         return Unit.Instance;
     }
 
-    private string? FetchSingleIndicator(string queryString)
+    private static string? FetchSingleIndicator(string queryString)
     {
         using JsonDocument doc = JsonDocument.Parse(queryString);
 

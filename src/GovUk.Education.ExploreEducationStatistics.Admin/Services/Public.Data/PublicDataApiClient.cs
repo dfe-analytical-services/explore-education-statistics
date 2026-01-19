@@ -5,7 +5,6 @@ using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Authentication;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Requests;
@@ -53,38 +52,6 @@ public class PublicDataApiClient(
         {
             using var stream = responseMsg.Content.ReadAsStream();
             return JsonSerializer.Deserialize<DataSetQueryPaginatedResultsViewModel>(
-                stream,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            )!;
-        });
-    }
-
-    public async Task<Either<ActionResult, DataSetMetaViewModel>> GetMeta(
-        Guid dataSetId,
-        string dataSetVersion,
-        string[]? types,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var requestUri = $"v1/data-sets/{dataSetId}/meta";
-        requestUri = QueryHelpers.AddQueryString(requestUri, "dataSetVersion", dataSetVersion);
-        if (types != null)
-        {
-            foreach (var type in types)
-            {
-                // Types from Public.Data.Model.DataSetMetaType
-                if (!new List<string> { "Filters", "Locations", "TimePeriods", "Indicators" }.Contains(type))
-                {
-                    throw new ArgumentException($"Invalid type provided: {type}");
-                }
-            }
-            requestUri = QueryHelpers.AddQueryString(requestUri, "types", types.JoinToString(','));
-        }
-        var result = await SendRequest(() => httpClient.GetAsync(requestUri, cancellationToken), cancellationToken);
-        return result.OnSuccess(responseMsg =>
-        {
-            using var stream = responseMsg!.Content.ReadAsStream();
-            return JsonSerializer.Deserialize<DataSetMetaViewModel>(
                 stream,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
             )!;
