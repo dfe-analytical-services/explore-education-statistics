@@ -13,11 +13,11 @@ const environmentAndUsers = getEnvironmentAndUsersFromFile(
 const testPageAndDataUrls = ({
   mainPageUrl,
   dataUrls,
-}: PublicPageTestConfig) => {
-  const mainResponse = testRequest(mainPageUrl);
-
-  const regexp = /"buildId":"([-0-9a-zA-Z]*)"/g;
-  const buildId = regexp.exec(mainResponse.body as string)![1];
+  buildId,
+}: PublicPageTestConfig & { buildId: string }) => {
+  if (mainPageUrl) {
+    testRequest(mainPageUrl);
+  }
 
   dataUrls.forEach(dataUrl => {
     testRequest({
@@ -29,6 +29,7 @@ const testPageAndDataUrls = ({
 
 function testRequest({
   url,
+  prefetch,
   successCheck,
   successCounter,
   failureCounter,
@@ -42,7 +43,7 @@ function testRequest({
 
   try {
     response = http.get(absoluteUrl, {
-      headers: url.includes('/_next/data')
+      headers: prefetch
         ? {
             'x-nextjs-data': '1',
             'x-middleware-prefetch': '1',
@@ -82,12 +83,13 @@ function testRequest({
 }
 
 export interface PublicPageTestConfig {
-  mainPageUrl: PublicPageTestUrlConfig;
+  mainPageUrl?: PublicPageTestUrlConfig;
   dataUrls: PublicPageTestUrlConfig[];
 }
 
 export interface PublicPageTestUrlConfig {
   url: string;
+  prefetch: boolean;
   successCheck: (
     response: RefinedResponse<ResponseType | undefined>,
   ) => boolean;

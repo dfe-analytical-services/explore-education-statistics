@@ -3,11 +3,17 @@ import { Counter, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import exec from 'k6/execution';
 import { check } from 'k6';
+import http from 'k6/http';
 import loggingUtils from '../../utils/loggingUtils';
 import grafanaService from '../../utils/grafanaService';
 import { stringifyWithoutNulls } from '../../utils/utils';
 import getOptions from '../../configuration/options';
 import testPageAndDataUrls from './utils/publicPageTest';
+import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
+
+interface SetupData {
+  buildId: string;
+}
 
 const releasePageUrl =
   __ENV.URL ?? '/find-statistics/pupil-absence-in-schools-in-england/2016-17';
@@ -16,9 +22,13 @@ const expectedPublicationTitle =
 const expectedContentSnippet =
   __ENV.CONTENT_SNIPPET ?? 'pupils missed on average 8.2 school days';
 
+const environmentAndUsers = getEnvironmentAndUsersFromFile(
+  __ENV.TEST_ENVIRONMENT,
+);
+
 export const options = getOptions();
 
-const name = 'getReleasePage.ts';
+const name = 'getReleasePageOld.ts';
 
 export const getReleaseSuccessCount = new Counter('ees_get_release_success');
 export const getReleaseFailureCount = new Counter('ees_get_release_failure');
@@ -46,8 +56,14 @@ export function logTestStart(config: Options) {
   );
 }
 
-export function setup() {
+export function setup(): SetupData {
   loggingUtils.logDashboardUrls();
+
+  const response = http.get(
+    `${environmentAndUsers.environment.publicUrl}${releasePageUrl}`,
+  );
+  const regexp = /"buildId":"([-0-9a-zA-Z]*)"/g;
+  const buildId = regexp.exec(response.body as string)![1];
 
   logTestStart(exec.test.options);
 
@@ -55,25 +71,27 @@ export function setup() {
     name,
     config: exec.test.options,
   });
+
+  return {
+    buildId,
+  };
 }
 
-const performTest = () => {
+const performTest = ({ buildId }: SetupData) => {
   const urlSlugs = /\/find-statistics\/(.*)\/(.*)/g.exec(releasePageUrl)!;
   const publicationSlug = urlSlugs[1];
   const releaseSlug = urlSlugs[2];
 
   const dataUrls: string[] = [
     `/find-statistics.json`,
-    `/find-statistics/${publicationSlug}/releases.json?redesign=true&publication=${publicationSlug}`,
-    `${releasePageUrl}.json?redesign=true&publication=${publicationSlug}&release=${releaseSlug}`,
-    `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,
-    `${releasePageUrl}/methodology.json?publication=${publicationSlug}&release=${releaseSlug}&tab=methodology`,
-    `${releasePageUrl}/help.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
+    `${releasePageUrl}/data-guidance.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,
   ];
 
   testPageAndDataUrls({
+    buildId,
     mainPageUrl: {
-      url: `${releasePageUrl}?redesign=true`,
+      url: releasePageUrl,
+      prefetch: false,
       successCounter: getReleaseSuccessCount,
       failureCounter: getReleaseFailureCount,
       durationTrend: getReleaseRequestDuration,
@@ -89,6 +107,7 @@ const performTest = () => {
     },
     dataUrls: dataUrls.map(dataUrl => ({
       url: dataUrl,
+      prefetch: true,
       successCounter: getReleaseDataSuccessCount,
       failureCounter: getReleaseDataFailureCount,
       durationTrend: getReleaseDataRequestDuration,
