@@ -1,6 +1,6 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels.Extensions;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Extensions;
 
 public static class ReleaseTypeExtensions
 {
