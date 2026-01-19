@@ -2379,7 +2379,7 @@ public abstract class UserPublicationRoleRepositoryTests
     public class MarkEmailAsSentTests : UserPublicationRoleRepositoryTests
     {
         [Fact]
-        public async Task Success()
+        public async Task Success_NoSuppliedDateSent()
         {
             UserPublicationRole userPublicationRole = _fixture.DefaultUserPublicationRole();
 
@@ -2404,6 +2404,37 @@ public abstract class UserPublicationRoleRepositoryTests
 
                 Assert.Equal(userPublicationRole.Id, updatedUserPublicationRole.Id);
                 updatedUserPublicationRole.EmailSent.AssertUtcNow();
+            }
+        }
+
+        [Fact]
+        public async Task Success_SuppliedDateSent()
+        {
+            UserPublicationRole userPublicationRole = _fixture.DefaultUserPublicationRole();
+
+            var dateSent = DateTimeOffset.UtcNow.AddDays(-10);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.Add(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                await repository.MarkEmailAsSent(userPublicationRole.Id, dateSent);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedUserPublicationRole = await contentDbContext.UserPublicationRoles.SingleAsync();
+
+                Assert.Equal(userPublicationRole.Id, updatedUserPublicationRole.Id);
+                Assert.Equal(dateSent, updatedUserPublicationRole.EmailSent);
             }
         }
 

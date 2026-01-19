@@ -169,7 +169,11 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUse
             .AnyAsync(cancellationToken);
     }
 
-    public async Task MarkEmailAsSent(Guid userReleaseRoleId, CancellationToken cancellationToken = default)
+    public async Task MarkEmailAsSent(
+        Guid userReleaseRoleId,
+        DateTimeOffset? dateSent = null,
+        CancellationToken cancellationToken = default
+    )
     {
         var userReleaseRole = await GetById(userReleaseRoleId: userReleaseRoleId, cancellationToken: cancellationToken);
 
@@ -178,7 +182,7 @@ public class UserReleaseRoleRepository(ContentDbContext contentDbContext) : IUse
             throw new InvalidOperationException($"No User Release Role found with ID {userReleaseRoleId}.");
         }
 
-        userReleaseRole.EmailSent = DateTimeOffset.UtcNow;
+        userReleaseRole.EmailSent = dateSent ?? DateTimeOffset.UtcNow;
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }

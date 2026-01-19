@@ -3598,7 +3598,7 @@ public abstract class UserReleaseRoleRepositoryTests
     public class MarkEmailAsSentTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
-        public async Task Success()
+        public async Task Success_NoSuppliedDateSent()
         {
             UserReleaseRole userReleaseRole = _fixture
                 .DefaultUserReleaseRole()
@@ -3630,6 +3630,44 @@ public abstract class UserReleaseRoleRepositoryTests
 
                 Assert.Equal(userReleaseRole.Id, updatedUserReleaseRole.Id);
                 updatedUserReleaseRole.EmailSent.AssertUtcNow();
+            }
+        }
+
+        [Fact]
+        public async Task Success_SuppliedDateSent()
+        {
+            UserReleaseRole userReleaseRole = _fixture
+                .DefaultUserReleaseRole()
+                .WithUser(_fixture.DefaultUser())
+                .WithReleaseVersion(
+                    _fixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
+                );
+
+            var dateSent = DateTimeOffset.UtcNow.AddDays(-10);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserReleaseRoles.Add(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(contentDbContext);
+
+                await repository.MarkEmailAsSent(userReleaseRole.Id, dateSent);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedUserReleaseRole = await contentDbContext.UserReleaseRoles.SingleAsync();
+
+                Assert.Equal(userReleaseRole.Id, updatedUserReleaseRole.Id);
+                Assert.Equal(dateSent, updatedUserReleaseRole.EmailSent);
             }
         }
 

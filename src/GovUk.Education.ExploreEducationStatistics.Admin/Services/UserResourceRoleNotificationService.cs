@@ -17,7 +17,8 @@ public class UserResourceRoleNotificationService(
     IUserRepository userRepository,
     IEmailTemplateService emailTemplateService,
     IUserReleaseRoleRepository userReleaseRoleRepository,
-    IUserPublicationRoleRepository userPublicationRoleRepository
+    IUserPublicationRoleRepository userPublicationRoleRepository,
+    TimeProvider timeProvider
 ) : IUserResourceRoleNotificationService
 {
     public async Task NotifyUserOfInvite(Guid userId, CancellationToken cancellationToken = default)
@@ -60,6 +61,8 @@ public class UserResourceRoleNotificationService(
 
         var publicationRolesInfo = userPublicationRoles.Select(upr => (upr.PublicationTitle, upr.Role)).ToHashSet();
 
+        var utcNow = timeProvider.GetUtcNow();
+
         await contentDbContext.RequireTransaction(async () =>
         {
             // Doing it in this order will technically set a `SentDate` slightly before the email is actually sent.
@@ -74,6 +77,7 @@ public class UserResourceRoleNotificationService(
                     async userReleaseRole =>
                         await userReleaseRoleRepository.MarkEmailAsSent(
                             userReleaseRoleId: userReleaseRole.Id,
+                            dateSent: utcNow,
                             cancellationToken: cancellationToken
                         ),
                     cancellationToken
@@ -85,6 +89,7 @@ public class UserResourceRoleNotificationService(
                     async userPublicationRole =>
                         await userPublicationRoleRepository.MarkEmailAsSent(
                             userPublicationRoleId: userPublicationRole.Id,
+                            dateSent: utcNow,
                             cancellationToken: cancellationToken
                         ),
                     cancellationToken

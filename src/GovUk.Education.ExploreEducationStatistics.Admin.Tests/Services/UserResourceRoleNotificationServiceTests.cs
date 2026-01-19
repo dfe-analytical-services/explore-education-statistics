@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Time.Testing;
 using MockQueryable;
 using Moq;
 
@@ -76,6 +77,8 @@ public abstract class UserResourceRoleNotificationServiceTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
+            // Set up the current time in UTC
+            var timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2026-01-01T00:00:00Z"));
 
             userRepository
                 .Setup(r => r.FindUserById(inactiveUser.Id, It.IsAny<CancellationToken>()))
@@ -88,7 +91,9 @@ public abstract class UserResourceRoleNotificationServiceTests
             foreach (var publicationRole in publicationRolesForTargetUser)
             {
                 userPublicationRoleRepository
-                    .Setup(r => r.MarkEmailAsSent(publicationRole.Id, It.IsAny<CancellationToken>()))
+                    .Setup(r =>
+                        r.MarkEmailAsSent(publicationRole.Id, timeProvider.GetUtcNow(), It.IsAny<CancellationToken>())
+                    )
                     .Returns(Task.CompletedTask);
             }
 
@@ -99,7 +104,9 @@ public abstract class UserResourceRoleNotificationServiceTests
             foreach (var releaseRole in releaseRolesForTargetUser)
             {
                 userReleaseRoleRepository
-                    .Setup(r => r.MarkEmailAsSent(releaseRole.Id, It.IsAny<CancellationToken>()))
+                    .Setup(r =>
+                        r.MarkEmailAsSent(releaseRole.Id, timeProvider.GetUtcNow(), It.IsAny<CancellationToken>())
+                    )
                     .Returns(Task.CompletedTask);
             }
 
@@ -111,7 +118,8 @@ public abstract class UserResourceRoleNotificationServiceTests
                 userRepository: userRepository.Object,
                 emailTemplateService: emailTemplateService.Object,
                 userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                timeProvider: timeProvider
             );
 
             await service.NotifyUserOfInvite(userId: inactiveUser.Id);
@@ -196,6 +204,8 @@ public abstract class UserResourceRoleNotificationServiceTests
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
+            // Set up the current time in UTC
+            var timeProvider = new FakeTimeProvider(DateTimeOffset.Parse("2026-01-01T00:00:00Z"));
 
             userRepository
                 .Setup(r => r.FindUserById(inactiveUser.Id, It.IsAny<CancellationToken>()))
@@ -208,7 +218,9 @@ public abstract class UserResourceRoleNotificationServiceTests
             foreach (var publicationRole in userPublicationRoles)
             {
                 userPublicationRoleRepository
-                    .Setup(r => r.MarkEmailAsSent(publicationRole.Id, It.IsAny<CancellationToken>()))
+                    .Setup(r =>
+                        r.MarkEmailAsSent(publicationRole.Id, timeProvider.GetUtcNow(), It.IsAny<CancellationToken>())
+                    )
                     .Returns(Task.CompletedTask);
             }
 
@@ -219,7 +231,9 @@ public abstract class UserResourceRoleNotificationServiceTests
             foreach (var releaseRole in userReleaseRoles)
             {
                 userReleaseRoleRepository
-                    .Setup(r => r.MarkEmailAsSent(releaseRole.Id, It.IsAny<CancellationToken>()))
+                    .Setup(r =>
+                        r.MarkEmailAsSent(releaseRole.Id, timeProvider.GetUtcNow(), It.IsAny<CancellationToken>())
+                    )
                     .Returns(Task.CompletedTask);
             }
 
@@ -231,7 +245,8 @@ public abstract class UserResourceRoleNotificationServiceTests
                 userRepository: userRepository.Object,
                 emailTemplateService: emailTemplateService.Object,
                 userPublicationRoleRepository: userPublicationRoleRepository.Object,
-                userReleaseRoleRepository: userReleaseRoleRepository.Object
+                userReleaseRoleRepository: userReleaseRoleRepository.Object,
+                timeProvider: timeProvider
             );
 
             await Assert.ThrowsAsync<EmailSendFailedException>(async () =>
@@ -261,7 +276,7 @@ public abstract class UserResourceRoleNotificationServiceTests
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
             userPublicationRoleRepository
-                .Setup(r => r.MarkEmailAsSent(userPublicationRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(r => r.MarkEmailAsSent(userPublicationRole.Id, null, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userPublicationRole);
 
@@ -312,7 +327,7 @@ public abstract class UserResourceRoleNotificationServiceTests
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
             userPublicationRoleRepository
-                .Setup(r => r.MarkEmailAsSent(userPublicationRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(r => r.MarkEmailAsSent(userPublicationRole.Id, null, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
             userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userPublicationRole);
 
@@ -357,7 +372,7 @@ public abstract class UserResourceRoleNotificationServiceTests
             var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
             userReleaseRoleRepository
-                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, null, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);
 
@@ -416,7 +431,7 @@ public abstract class UserResourceRoleNotificationServiceTests
 
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);
             userReleaseRoleRepository
-                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, null, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             emailTemplateService
@@ -472,7 +487,7 @@ public abstract class UserResourceRoleNotificationServiceTests
             foreach (var userReleaseRole in userReleaseRoles)
             {
                 userReleaseRoleRepository
-                    .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, It.IsAny<CancellationToken>()))
+                    .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, null, It.IsAny<CancellationToken>()))
                     .Returns(Task.CompletedTask);
             }
 
@@ -687,7 +702,7 @@ public abstract class UserResourceRoleNotificationServiceTests
             foreach (var userReleaseRole in userReleaseRoles)
             {
                 userReleaseRoleRepository
-                    .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, It.IsAny<CancellationToken>()))
+                    .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, null, It.IsAny<CancellationToken>()))
                     .Returns(Task.CompletedTask);
             }
 
@@ -742,7 +757,7 @@ public abstract class UserResourceRoleNotificationServiceTests
 
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);
             userReleaseRoleRepository
-                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, null, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             emailTemplateService
@@ -803,7 +818,7 @@ public abstract class UserResourceRoleNotificationServiceTests
 
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);
             userReleaseRoleRepository
-                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, null, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             emailTemplateService
@@ -864,7 +879,7 @@ public abstract class UserResourceRoleNotificationServiceTests
 
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);
             userReleaseRoleRepository
-                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(r => r.MarkEmailAsSent(userReleaseRole.Id, null, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             emailTemplateService
@@ -944,7 +959,8 @@ public abstract class UserResourceRoleNotificationServiceTests
         IUserRepository? userRepository = null,
         IEmailTemplateService? emailTemplateService = null,
         IUserReleaseRoleRepository? userReleaseRoleRepository = null,
-        IUserPublicationRoleRepository? userPublicationRoleRepository = null
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+        TimeProvider? timeProvider = null
     )
     {
         contentDbContext ??= DbUtils.InMemoryApplicationDbContext();
@@ -957,7 +973,8 @@ public abstract class UserResourceRoleNotificationServiceTests
             userReleaseRoleRepository: userReleaseRoleRepository
                 ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict),
             userPublicationRoleRepository: userPublicationRoleRepository
-                ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict)
+                ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict),
+            timeProvider ?? new FakeTimeProvider(DateTimeOffset.UtcNow)
         );
     }
 }

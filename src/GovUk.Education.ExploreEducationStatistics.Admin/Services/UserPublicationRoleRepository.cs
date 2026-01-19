@@ -158,7 +158,11 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
             .AnyAsync(cancellationToken);
     }
 
-    public async Task MarkEmailAsSent(Guid userPublicationRoleId, CancellationToken cancellationToken = default)
+    public async Task MarkEmailAsSent(
+        Guid userPublicationRoleId,
+        DateTimeOffset? dateSent = null,
+        CancellationToken cancellationToken = default
+    )
     {
         var userPublicationRole = await GetById(
             userPublicationRoleId: userPublicationRoleId,
@@ -170,7 +174,7 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
             throw new InvalidOperationException($"No User Publication Role found with ID {userPublicationRoleId}.");
         }
 
-        userPublicationRole.EmailSent = DateTimeOffset.UtcNow;
+        userPublicationRole.EmailSent = dateSent ?? DateTimeOffset.UtcNow;
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
     }
