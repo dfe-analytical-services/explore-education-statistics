@@ -1,4 +1,4 @@
-import http from 'k6/http';
+import http, { RefinedResponse, ResponseType } from 'k6/http';
 import { Options } from 'k6/options';
 import exec from 'k6/execution';
 import grafanaService from '../../../utils/grafanaService';
@@ -8,6 +8,7 @@ import loggingUtils from '../../../utils/loggingUtils';
 
 export interface ReleasePageSetupData {
   buildId: string;
+  response: RefinedResponse<ResponseType | undefined>;
 }
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
@@ -21,7 +22,7 @@ export default function setupReleasePageTest(
   loggingUtils.logDashboardUrls();
 
   const response = http.get(
-    `${environmentAndUsers.environment.publicUrl}${releasePageUrl}`,
+    `${environmentAndUsers.environment.publicUrl}${releasePageUrl}?redesign=true`,
   );
   const regexp = /"buildId":"([-0-9a-zA-Z]*)"/g;
   const buildId = regexp.exec(response.body as string)![1];
@@ -35,6 +36,7 @@ export default function setupReleasePageTest(
 
   return {
     buildId,
+    response,
   };
 }
 

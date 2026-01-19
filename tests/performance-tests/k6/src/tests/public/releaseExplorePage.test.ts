@@ -3,16 +3,21 @@ import { Counter, Trend } from 'k6/metrics';
 import { check } from 'k6';
 import getOptions from '../../configuration/options';
 import testPageAndDataUrls from './utils/publicPageTest';
-import setupReleasePageTest, {
-  ReleasePageSetupData,
-} from './utils/releasePageTest';
+import setupReleasePageTest from './utils/releasePageTest';
+
+interface SetupData {
+  buildId: string;
+  themeId: string;
+  publicationId: string;
+  releaseVersionId: string;
+}
 
 const releasePageUrl =
   __ENV.URL ?? '/find-statistics/pupil-absence-in-schools-in-england/2016-17';
 
 export const options = getOptions();
 
-const name = 'getReleasePage.ts';
+const name = 'releaseExplorePage.ts';
 
 export const getReleaseDataRequestDuration = new Trend(
   'ees_get_release_data_duration',
@@ -25,18 +30,38 @@ export const getReleaseDataFailureCount = new Counter(
   'ees_get_release_data_failure',
 );
 
-export function setup(): ReleasePageSetupData {
-  return setupReleasePageTest(releasePageUrl, name);
+export function setup(): SetupData {
+  const { buildId, response } = setupReleasePageTest(releasePageUrl, name);
+
+  const themeIdRegexp = /"theme":\{"id":"([-0-9a-zA-Z]*)"/g;
+  const themeId = themeIdRegexp.exec(response.body as string)![1];
+
+  const publicationIdRegexp = /"publicationSummary":\{"id":"([-0-9a-zA-Z]*)"/g;
+  const publicationId = publicationIdRegexp.exec(response.body as string)![1];
+
+  const releaseVersionIdRegexp =
+    /"releaseVersionSummary":\{"id":"([-0-9a-zA-Z]*)"/g;
+  const releaseVersionId = releaseVersionIdRegexp.exec(
+    response.body as string,
+  )![1];
+
+  return {
+    buildId,
+    themeId,
+    publicationId,
+    releaseVersionId,
+  };
 }
 
-const performTest = ({ buildId }: ReleasePageSetupData) => {
+const performTest = ({
+  buildId,
+  themeId,
+  publicationId,
+  releaseVersionId,
+}: SetupData) => {
   const urlSlugs = /\/find-statistics\/(.*)\/(.*)/g.exec(releasePageUrl)!;
   const publicationSlug = urlSlugs[1];
   const releaseSlug = urlSlugs[2];
-
-  const themeId = '2ca22e34-b87a-4281-a0eb-b80f4f8dd374';
-  const publicationId = '24f63a6f-5a5a-4025-d8b5-08d88b0047f4';
-  const releaseVersionId = 'e642795f-22ea-4eb6-957b-08d88ad5b210';
 
   const dataUrls: string[] = [
     `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,

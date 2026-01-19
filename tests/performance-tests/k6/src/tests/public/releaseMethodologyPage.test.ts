@@ -12,7 +12,7 @@ const releasePageUrl =
 
 export const options = getOptions();
 
-const name = 'releaseHelpPage.ts';
+const name = 'releaseMethodologyPage.ts';
 
 export const getReleaseDataRequestDuration = new Trend(
   'ees_get_release_data_duration',
@@ -38,7 +38,7 @@ const performTest = ({ buildId }: ReleasePageSetupData) => {
     buildId,
     dataUrls: [
       {
-        url: `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
+        url: `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=methodology`,
         prefetch: false,
         successCounter: getReleaseDataSuccessCount,
         failureCounter: getReleaseDataFailureCount,

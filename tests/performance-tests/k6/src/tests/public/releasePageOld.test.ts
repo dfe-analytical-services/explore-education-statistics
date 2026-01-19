@@ -16,7 +16,7 @@ const expectedContentSnippet =
 
 export const options = getOptions();
 
-const name = 'getReleasePageOld.ts';
+const name = 'releasePageOld.ts';
 
 export const getReleaseSuccessCount = new Counter('ees_get_release_success');
 export const getReleaseFailureCount = new Counter('ees_get_release_failure');
