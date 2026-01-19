@@ -64,16 +64,12 @@ const performTest = () => {
 
   const dataUrls: string[] = [
     `/find-statistics.json`,
-    `/find-statistics/${publicationSlug}/releases.json?redesign=true&publication=${publicationSlug}`,
-    `${releasePageUrl}.json?redesign=true&publication=${publicationSlug}&release=${releaseSlug}`,
-    `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,
-    `${releasePageUrl}/methodology.json?publication=${publicationSlug}&release=${releaseSlug}&tab=methodology`,
-    `${releasePageUrl}/help.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
+    `${releasePageUrl}/data-guidance.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,
   ];
 
   testPageAndDataUrls({
     mainPageUrl: {
-      url: `${releasePageUrl}?redesign=true`,
+      url: releasePageUrl,
       successCounter: getReleaseSuccessCount,
       failureCounter: getReleaseFailureCount,
       durationTrend: getReleaseRequestDuration,
