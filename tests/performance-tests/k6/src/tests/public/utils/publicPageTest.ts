@@ -38,11 +38,17 @@ function testRequest({
 
   const startTime = Date.now();
   let response;
-  let successfulRequest;
+  let successfulRequest = false;
 
   try {
     response = http.get(absoluteUrl, {
-      timeout: '120s',
+      headers: url.includes('/_next/data')
+        ? {
+            'x-nextjs-data': '1',
+            'x-middleware-prefetch': '1',
+            purpose: 'prefetch',
+          }
+        : {},
     });
 
     durationTrend.add(Date.now() - startTime);
@@ -53,9 +59,9 @@ function testRequest({
           response && response.error_code
         }`,
       );
+    } else {
+      successfulRequest = successCheck(response);
     }
-
-    successfulRequest = successCheck(response);
   } catch (e) {
     failureCounter.add(1);
     errorRate.add(1);

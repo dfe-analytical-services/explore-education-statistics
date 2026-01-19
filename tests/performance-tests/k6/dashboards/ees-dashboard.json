@@ -4019,6 +4019,7 @@
     },
     {
       "datasource": {
+        "default": true,
         "type": "influxdb",
         "uid": "P76A45B24F43298D1"
       },
@@ -4104,7 +4105,7 @@
             "type": "influxdb",
             "uid": "P76A45B24F43298D1"
           },
-          "query": "SELECT sum(\"value\") FROM \"http_reqs\" WHERE $timeFilter GROUP BY time(10s) fill(null)",
+          "query": "SELECT mean(\"value\") FROM (SELECT sum(\"value\") AS \"value\" FROM \"http_reqs\" WHERE $timeFilter GROUP BY time(1s) fill(null)) GROUP BY time(10s) fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -4383,7 +4384,7 @@
     "list": [
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "ees",
           "value": "ees"
         },
@@ -4406,7 +4407,7 @@
     ]
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
