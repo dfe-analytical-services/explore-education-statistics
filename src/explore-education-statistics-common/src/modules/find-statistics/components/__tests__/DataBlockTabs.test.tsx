@@ -179,7 +179,7 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
         'block-1-parent',
       );
@@ -212,7 +212,7 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
         'block-1-parent',
       );
@@ -241,7 +241,7 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
         'block-1-parent',
       );
@@ -276,7 +276,7 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
         'block-1-parent',
       );
@@ -310,7 +310,7 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
         'block-1-parent',
       );
@@ -345,7 +345,7 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
         'block-1-parent',
       );
@@ -375,12 +375,12 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
         'block-1-parent',
       );
 
-      expect(tableBuilderService.getDataBlockGeoJson).toBeCalledWith(
+      expect(tableBuilderService.getDataBlockGeoJson).toHaveBeenCalledWith(
         'release-1',
         'block-1-parent',
         1,
@@ -389,8 +389,8 @@ describe('DataBlockTabs', () => {
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
     });
     await waitFor(() => {
-      expect(tableBuilderService.getDataBlockGeoJson).toBeCalled();
-      expect(tableBuilderService.getDataBlockGeoJson).toBeCalledTimes(1);
+      expect(tableBuilderService.getDataBlockGeoJson).toHaveBeenCalled();
+      expect(tableBuilderService.getDataBlockGeoJson).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -413,7 +413,7 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
         'block-1-parent',
       );
@@ -421,19 +421,17 @@ describe('DataBlockTabs', () => {
       expect(screen.getAllByRole('tab')).toHaveLength(2);
     });
 
-    expect(
-      screen.getByRole('button', {
-        name: 'Export options for Aggregated results chart',
-      }),
-    ).toBeInTheDocument();
+    const exportButtons = screen.getAllByTestId(
+      'Expand Details Section Export options',
+    );
+    expect(exportButtons).toHaveLength(2);
 
+    expect(exportButtons[0].textContent).toMatch(
+      /Export options\s+for Aggregated results chart/,
+    );
     await user.click(screen.getByRole('tab', { name: /Table/ }));
 
-    expect(
-      screen.getByRole('button', {
-        name: 'Export options for table',
-      }),
-    ).toBeInTheDocument();
+    expect(exportButtons[1].textContent).toMatch(/Export options\s+for table/);
   });
 
   test('selecting data set with boundaryLevel retrieves and renders new map polygons', async () => {
@@ -455,12 +453,12 @@ describe('DataBlockTabs', () => {
     forceVisible();
 
     await waitFor(() => {
-      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
         'block-1-parent',
       );
 
-      expect(tableBuilderService.getDataBlockGeoJson).toBeCalledWith(
+      expect(tableBuilderService.getDataBlockGeoJson).toHaveBeenCalledWith(
         'release-1',
         'block-1-parent',
         1,
@@ -469,10 +467,10 @@ describe('DataBlockTabs', () => {
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
     });
 
-    expect(tableBuilderService.getDataBlockTableData).toBeCalledTimes(1);
+    expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(1);
 
     await waitFor(() => {
-      expect(tableBuilderService.getDataBlockGeoJson).toBeCalledTimes(1);
+      expect(tableBuilderService.getDataBlockGeoJson).toHaveBeenCalledTimes(1);
     });
 
     const mapPathSelector =
@@ -487,12 +485,12 @@ describe('DataBlockTabs', () => {
     expect(options).toHaveLength(2);
     await userEvent.selectOptions(select, options[1]);
 
-    expect(tableBuilderService.getDataBlockGeoJson).toBeCalledWith(
+    expect(tableBuilderService.getDataBlockGeoJson).toHaveBeenCalledWith(
       'release-1',
       'block-1-parent',
       2,
     );
-    expect(tableBuilderService.getDataBlockGeoJson).toBeCalledTimes(2);
+    expect(tableBuilderService.getDataBlockGeoJson).toHaveBeenCalledTimes(2);
 
     const updatedPaths =
       container.querySelectorAll<HTMLElement>(mapPathSelector);
@@ -597,7 +595,7 @@ describe('DataBlockTabs', () => {
           }}
         />,
       );
-    }).not.toThrowError();
+    }).not.toThrow();
 
     await waitFor(() => {
       expect(screen.getByRole('table')).toBeInTheDocument();

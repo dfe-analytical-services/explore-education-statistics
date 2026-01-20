@@ -158,8 +158,8 @@ describe('ReleaseDataGuidanceSection', () => {
       );
 
       await user.click(
-        dataSet1.getByRole('button', {
-          name: /Variable names and descriptions/,
+        dataSet1.getByText(/Variable names and descriptions/, {
+          selector: 'summary *',
         }),
       );
 
@@ -770,8 +770,8 @@ describe('ReleaseDataGuidanceSection', () => {
           `);
 
       await user.click(
-        dataSet1.getByRole('button', {
-          name: /Variable names and descriptions/,
+        dataSet1.getByText(/Variable names and descriptions/, {
+          selector: 'summary *',
         }),
       );
 

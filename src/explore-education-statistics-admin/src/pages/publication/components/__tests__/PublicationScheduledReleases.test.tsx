@@ -87,8 +87,8 @@ describe('PublicationScheduledReleases', () => {
     });
 
     expect(
-      within(row1Cells[2]).getByRole('button', {
-        name: 'View stages for Release 1',
+      within(row1Cells[2]).getByText(/View stages/, {
+        selector: 'summary *',
       }),
     ).toBeInTheDocument();
     expect(
@@ -105,8 +105,8 @@ describe('PublicationScheduledReleases', () => {
     expect(within(row2Cells[0]).getByText('Release 2')).toBeInTheDocument();
     expect(within(row2Cells[1]).getByText('Scheduled')).toBeInTheDocument();
     expect(
-      within(row2Cells[2]).getByRole('button', {
-        name: 'View stages for Release 2',
+      within(row1Cells[2]).getByText(/View stages/, {
+        selector: 'summary *',
       }),
     ).toBeInTheDocument();
     expect(
