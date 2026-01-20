@@ -69,7 +69,7 @@
     "react-hook-form": "7.43.9",
     "react-idle-timer": "^4.6.4",
     "react-lazyload": "3.2.1",
-    "react-leaflet": "^4.2.1",
+    "react-leaflet": "^5.0.0",
     "react-refresh": "^0.14.0",
     "react-router": "^5.3.4",
     "react-router-dom": "^5.3.4",
