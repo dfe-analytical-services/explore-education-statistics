@@ -17,7 +17,8 @@ public class PublishingCompletionService(
     IReleaseService releaseService,
     IRedirectsCacheService redirectsCacheService,
     IDataSetPublishingService dataSetPublishingService,
-    IPublisherEventRaiser publisherEventRaiser
+    IPublisherEventRaiser publisherEventRaiser,
+    IEducationInNumbersService educationInNumbersService
 ) : IPublishingCompletionService
 {
     public async Task CompletePublishingIfAllPriorStagesComplete(
@@ -95,6 +96,8 @@ public class PublishingCompletionService(
         await dataSetPublishingService.PublishDataSets(releaseVersionIdsToUpdate);
 
         await publisherEventRaiser.OnReleaseVersionsPublished(publishedPublicationInfos);
+
+        await educationInNumbersService.UpdateEinTiles(releaseVersionIdsToUpdate);
 
         // @MarkFix at what point to check for updated api data sets and check if they're used in EiN pages? here?
         // If it's being used by EiN page - then update EinApiQueryStatTile.LatestPublishedVersion and send a BAU email

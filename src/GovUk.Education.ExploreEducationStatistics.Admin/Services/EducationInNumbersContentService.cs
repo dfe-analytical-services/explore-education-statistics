@@ -450,7 +450,7 @@ public class EducationInNumbersContentService(
 
         var latestVersion =
             $"{apiDataSetLatest.VersionMajor}.{apiDataSetLatest.VersionMinor}.{apiDataSetLatest.VersionPatch}";
-        if (latestVersion != request.Version)
+        if (latestVersion != request.Version) // we always expect the full api data set version to be provided in the request
         {
             return new BadRequestObjectResult(
                 $"Version provided isn't the latest version. Latest: {latestVersion} Provided: {request.Version}"

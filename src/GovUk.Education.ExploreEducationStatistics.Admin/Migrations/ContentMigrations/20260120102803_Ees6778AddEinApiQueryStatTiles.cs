@@ -87,6 +87,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 maxLength: 32,
                 nullable: true
             );
+            migrationBuilder.Sql("GRANT SELECT ON dbo.EinTiles TO [publisher]");
+            migrationBuilder.Sql("GRANT UPDATE ON dbo.EinTiles TO [publisher]");
         }
 
         /// <inheritdoc />

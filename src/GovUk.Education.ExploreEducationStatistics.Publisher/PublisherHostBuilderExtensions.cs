@@ -155,6 +155,10 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>()
                     .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                     .AddScoped<IRedirectsService, RedirectsService>()
+                    .AddScoped<
+                        Publisher.Services.Interfaces.IEducationInNumbersService,
+                        Publisher.Services.EducationInNumbersService
+                    >()
                     .AddEventGridClient(configuration)
                     .AddScoped<IPublisherEventRaiser, PublisherEventRaiser>()
                     .AddSingleton<INotifierClient, NotifierClient>(provider => new NotifierClient(
