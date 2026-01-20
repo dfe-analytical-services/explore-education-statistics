@@ -15,7 +15,7 @@ page_requests = {
             "/_next/data/" .. buildId .. releasePageUrl .. "/help.json?publication=foundation-years-ad-hoc&release=2018-19&tab=help",
             "/_next/data/" .. buildId .. "/find-statistics.json"
         },
-        weighting = 100
+        weighting = 70
     },
     {
         page_name = 'Explore page',
@@ -24,21 +24,21 @@ page_requests = {
             "/_next/data/" .. buildId .. "/data-catalogue.json?themeId=2ca22e34-b87a-4281-a0eb-b80f4f8dd374&publicationId=24f63a6f-5a5a-4025-d8b5-08d88b0047f4&releaseVersionId=e642795f-22ea-4eb6-957b-08d88ad5b210",
             "/_next/data/" .. buildId .. releasePageUrl .. "/explore.json?publication=foundation-years-ad-hoc&release=2018-19&tab=explore",
         },
-        weighting = 0
+        weighting = 10
     },
     {
         page_name = 'Methodology page',
         requests = {
             "/_next/data/" .. buildId .. releasePageUrl .. "/methodology.json?publication=foundation-years-ad-hoc&release=2018-19&tab=methodology",
         },
-        weighting = 0
+        weighting = 10
     },
     {
         page_name = 'Help page',
         requests = {
             "/_next/data/" .. buildId .. releasePageUrl .. "/help.json?publication=foundation-years-ad-hoc&release=2018-19&tab=help"
         },
-        weighting = 0
+        weighting = 10
     }
 }
 

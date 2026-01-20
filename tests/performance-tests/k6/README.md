@@ -1,4 +1,4 @@
-# EES performance tests
+# EES K6 performance tests
 
 The performance test suite is built using [k6](https://k6.io/) and visualised using
 [Grafana](https://grafana.com/) and [InfluxDB](https://www.influxdata.com/).
