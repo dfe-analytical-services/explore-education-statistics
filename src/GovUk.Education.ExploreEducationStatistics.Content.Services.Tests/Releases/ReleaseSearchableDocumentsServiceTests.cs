@@ -1,4 +1,5 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -45,7 +46,109 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                     .WithHeading("Section 1")
                     .WithContentBlocks([
                         _dataFixture.DefaultHtmlBlock().WithBody("<p>Section 1 block 1 content</p>"),
-                        //contentDataBlockParent.LatestPublishedVersion!.ContentBlock,
+                        _dataFixture.DefaultHtmlBlock().WithBody("<p>Section 1 block 2 content</p>"),
+                    ]),
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithHeading("Section 2")
+                    .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Section 2 block 1 content</p>")]),
+            ];
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetLatestReleaseAsSearchableDocument(publication.Slug);
+
+                // Assert
+                var actual = outcome.AssertRight();
+
+                var expectedHtmlContent = $"""
+                    <html>
+                        <head>
+                            <title>{publication.Title}</title>
+                        </head>
+                        <body>
+                            <h1>{publication.Title}</h1>
+                            <h2>{release.Title}</h2>
+                            <h3>Summary</h3>
+                            <p>Summary content</p>
+                            <h3>Headlines</h3>
+                            <p>Headlines content</p>
+                            <h3>Section 1</h3>
+                            <p>Section 1 block 1 content</p>
+                            <p>Section 1 block 2 content</p>
+                            <h3>Section 2</h3>
+                            <p>Section 2 block 1 content</p>
+                        </body>
+                    </html>
+                    """;
+
+                Assert.Multiple([
+                    () => Assert.Equal(release.Id, actual.ReleaseId),
+                    () => Assert.Equal(release.Slug, actual.ReleaseSlug),
+                    () => Assert.Equal(releaseVersion.Id, actual.ReleaseVersionId),
+                    () => Assert.Equal(publication.Id, actual.PublicationId),
+                    () => Assert.Equal(publication.Slug, actual.PublicationSlug),
+                    () => Assert.Equal(publication.Summary, actual.Summary),
+                    () => Assert.Equal(publication.Title, actual.PublicationTitle),
+                    () => Assert.Equal(releaseVersion.PublishedDisplayDate!.Value, actual.Published),
+                    () => Assert.Equal(publication.Theme.Id, actual.ThemeId),
+                    () => Assert.Equal(publication.Theme.Title, actual.ThemeTitle),
+                    () => Assert.Equal(releaseVersion.Type.ToString(), actual.Type),
+                    () => Assert.Equal(releaseVersion.Type.ToSearchDocumentTypeBoost(), actual.TypeBoost),
+                    .. GetAssertTrimmedLinesEqual(expectedHtmlContent, actual.HtmlContent),
+                ]);
+            }
+        }
+
+        [Fact]
+        public async Task WhenContentContainsOtherBlockTypes_OnlyIncludesHtmlBlocksInHtmlContent()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
+            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+
+            DataBlockParent contentDataBlockParent = _dataFixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(
+                    _dataFixture
+                        .DefaultDataBlockVersion()
+                        .WithReleaseVersion(releaseVersion)
+                        .WithCharts([
+                            new InfographicChart
+                            {
+                                Title = "Chart title",
+                                FileId = "file-id",
+                                Height = 400,
+                                Width = 500,
+                            },
+                        ])
+                );
+
+            releaseVersion.GenericContent =
+            [
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithHeading("Section 1")
+                    .WithContentBlocks([
+                        _dataFixture.DefaultHtmlBlock().WithBody("<p>Section 1 block 1 content</p>"),
+                        contentDataBlockParent.LatestPublishedVersion!.ContentBlock,
                         _dataFixture.DefaultHtmlBlock().WithBody("<p>Section 1 block 3 content</p>"),
                     ]),
                 _dataFixture
@@ -81,6 +184,7 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                 // Assert
                 var actual = outcome.AssertRight();
 
+                // The expected HTML content does not include non-HTML blocks and headings for sections without HTML blocks are omitted
                 var expectedHtmlContent = $"""
                     <html>
                         <head>
@@ -89,10 +193,6 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                         <body>
                             <h1>{publication.Title}</h1>
                             <h2>{release.Title}</h2>
-                            <h3>Summary</h3>
-                            <p>Summary content</p>
-                            <h3>Headlines</h3>
-                            <p>Headlines content</p>
                             <h3>Section 1</h3>
                             <p>Section 1 block 1 content</p>
                             <p>Section 1 block 3 content</p>
@@ -104,26 +204,153 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                     </html>
                     """;
 
-                Assert.Multiple([
-                    () => Assert.Equal(release.Id, actual.ReleaseId),
-                    () => Assert.Equal(release.Slug, actual.ReleaseSlug),
-                    () => Assert.Equal(releaseVersion.Id, actual.ReleaseVersionId),
-                    () => Assert.Equal(publication.Id, actual.PublicationId),
-                    () => Assert.Equal(publication.Slug, actual.PublicationSlug),
-                    () => Assert.Equal(publication.Summary, actual.Summary),
-                    () => Assert.Equal(publication.Title, actual.PublicationTitle),
-                    () => Assert.Equal(releaseVersion.PublishedDisplayDate!.Value, actual.Published),
-                    () => Assert.Equal(publication.Theme.Id, actual.ThemeId),
-                    () => Assert.Equal(publication.Theme.Title, actual.ThemeTitle),
-                    () => Assert.Equal(releaseVersion.Type.ToString(), actual.Type),
-                    () => Assert.Equal(releaseVersion.Type.ToSearchDocumentTypeBoost(), actual.TypeBoost),
-                    .. GetAssertTrimmedLinesEqual(expectedHtmlContent, actual.HtmlContent),
-                ]);
+                Assert.Multiple(GetAssertTrimmedLinesEqual(expectedHtmlContent, actual.HtmlContent));
             }
         }
 
         [Fact]
-        public async Task WhenReleaseVersionHasNoContent_ReturnsSearchableDocumentWithMinimalHtml()
+        public async Task WhenContentContainsEmptySection_OmitsEmptySectionHeadingInHtmlContent()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
+            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+
+            // Initialise the release version with an empty section headed "Section 1", containing no HTML blocks
+            releaseVersion.GenericContent =
+            [
+                _dataFixture.DefaultContentSection().WithHeading("Section 1").WithContentBlocks([]),
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithHeading("Section 2")
+                    .WithContentBlocks([_dataFixture.DefaultHtmlBlock().WithBody("<p>Section 2 block 1 content</p>")]),
+            ];
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetLatestReleaseAsSearchableDocument(publication.Slug);
+
+                // Assert
+                var actual = outcome.AssertRight();
+
+                // The expected HTML content omits "Section 1", as the section is empty
+                var expectedHtmlContent = $"""
+                    <html>
+                        <head>
+                            <title>{publication.Title}</title>
+                        </head>
+                        <body>
+                            <h1>{publication.Title}</h1>
+                            <h2>{release.Title}</h2>
+                            <h3>Section 2</h3>
+                            <p>Section 2 block 1 content</p>
+                        </body>
+                    </html>
+                    """;
+
+                Assert.Multiple(GetAssertTrimmedLinesEqual(expectedHtmlContent, actual.HtmlContent));
+            }
+        }
+
+        [Fact]
+        public async Task WhenContentContainsComments_SanitisesHtmlContentToRemoveComments()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
+            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+
+            releaseVersion.GenericContent =
+            [
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithHeading("Section 1")
+                    .WithContentBlocks([
+                        _dataFixture
+                            .DefaultHtmlBlock()
+                            .WithBody(
+                                """
+                                <p><comment-start name="comment-1"></comment-start>Section 1 block 1 content<comment-end name="comment-1"></comment-end></p>
+                                """
+                            ),
+                        _dataFixture
+                            .DefaultHtmlBlock()
+                            .WithBody(
+                                """
+                                <p><commentplaceholder-start name="comment-2"></commentplaceholder-start>Section 1 block 2 content<commentplaceholder-end name="comment-2"></commentplaceholder-end></p>
+                                """
+                            ),
+                        _dataFixture
+                            .DefaultHtmlBlock()
+                            .WithBody(
+                                """
+                                <p><resolvedcomment-start name="comment-3"></resolvedcomment-start>Section 1 block 3 content<resolvedcomment-end name="comment-3"></resolvedcomment-end></p>
+                                """
+                            ),
+                    ]),
+            ];
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetLatestReleaseAsSearchableDocument(publication.Slug);
+
+                // Assert
+                var actual = outcome.AssertRight();
+
+                var expectedHtmlContent = $"""
+                    <html>
+                        <head>
+                            <title>{publication.Title}</title>
+                        </head>
+                        <body>
+                            <h1>{publication.Title}</h1>
+                            <h2>{release.Title}</h2>
+                            <h3>Section 1</h3>
+                            <p>Section 1 block 1 content</p>
+                            <p>Section 1 block 2 content</p>
+                            <p>Section 1 block 3 content</p>
+                        </body>
+                    </html>
+                    """;
+
+                Assert.Multiple(GetAssertTrimmedLinesEqual(expectedHtmlContent, actual.HtmlContent));
+            }
+        }
+
+        [Fact]
+        public async Task WhenReleaseVersionHasNoContent_ReturnsSearchableDocumentWithMinimalHtmlContent()
         {
             // Arrange
             Publication publication = _dataFixture

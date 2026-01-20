@@ -1,6 +1,7 @@
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
@@ -86,8 +87,10 @@ public record ReleaseSearchableDocumentDto
             return;
         }
 
+        var sanitisedHtmlBlockBodies = htmlBlocks.Select(SanitiseHtmlBlock).JoinToString(Environment.NewLine);
+
         H3(sb, sectionTitle);
-        sb.AppendLine(string.Join(Environment.NewLine, htmlBlocks.Select(hb => hb.Body)));
+        sb.AppendLine(sanitisedHtmlBlockBodies);
     }
 
     private static void HtmlHeader(StringBuilder sb, string title) =>
@@ -114,4 +117,8 @@ public record ReleaseSearchableDocumentDto
             </html>
             """
         );
+
+    private static string SanitiseHtmlBlock(HtmlBlock htmlBlock) =>
+        // Remove any comments
+        ContentFilterUtils.CommentsRegex().Replace(htmlBlock.Body, string.Empty);
 }
