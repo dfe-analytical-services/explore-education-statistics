@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`TableToolPage renders the page correctly with pre-built table when a fast track is provided 1`] = `
 <table

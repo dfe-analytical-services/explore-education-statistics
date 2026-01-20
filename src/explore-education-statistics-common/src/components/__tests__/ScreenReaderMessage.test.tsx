@@ -1,5 +1,5 @@
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 describe('ScreenReaderMessage', () => {
@@ -14,7 +14,9 @@ describe('ScreenReaderMessage', () => {
 
     expect(screen.queryByText('I am a message')).not.toBeInTheDocument();
 
-    jest.advanceTimersByTime(200);
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('I am a message')).toBeInTheDocument();
@@ -28,7 +30,9 @@ describe('ScreenReaderMessage', () => {
 
     expect(screen.queryByText('I am a message')).not.toBeInTheDocument();
 
-    jest.advanceTimersByTime(200);
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('I am a message')).toBeInTheDocument();
@@ -40,7 +44,9 @@ describe('ScreenReaderMessage', () => {
 
     expect(screen.queryByText('I am another message')).not.toBeInTheDocument();
 
-    jest.advanceTimersByTime(200);
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('I am another message')).toBeInTheDocument();

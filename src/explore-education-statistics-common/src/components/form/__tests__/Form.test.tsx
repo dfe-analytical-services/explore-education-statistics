@@ -697,9 +697,8 @@ describe('Form', () => {
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
+      expect(screen.getByTestId('errorSummary')).toHaveFocus();
     });
-
-    expect(screen.getByTestId('errorSummary')).toHaveFocus();
   });
 
   test('does not re-focus error summary when changing input', async () => {
@@ -730,9 +729,8 @@ describe('Form', () => {
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
+      expect(screen.getByTestId('errorSummary')).toHaveFocus();
     });
-
-    expect(screen.getByTestId('errorSummary')).toHaveFocus();
 
     const input = screen.getByLabelText('First name');
 
@@ -781,9 +779,8 @@ describe('Form', () => {
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
+      expect(screen.getByTestId('errorSummary')).toHaveFocus();
     });
-
-    expect(screen.getByTestId('errorSummary')).toHaveFocus();
 
     screen.getByLabelText('First name').focus();
     expect(screen.getByTestId('errorSummary')).not.toHaveFocus();

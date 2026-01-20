@@ -340,7 +340,6 @@ describe('ReleaseFileUploadsSection', () => {
       };
       releaseAncillaryFileService.createFile.mockResolvedValue(newTestFile);
       releaseAncillaryFileService.listFiles.mockResolvedValueOnce(testFiles);
-      releaseAncillaryFileService.listFiles.mockResolvedValueOnce(testFiles);
       releaseAncillaryFileService.listFiles.mockResolvedValueOnce([
         ...testFiles,
         newTestFile,

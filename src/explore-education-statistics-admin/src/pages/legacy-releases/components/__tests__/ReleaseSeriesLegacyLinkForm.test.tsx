@@ -71,8 +71,8 @@ describe('ReleaseSeriesLegacyLinkForm', () => {
     test('renders correctly`', () => {
       render(<ReleaseSeriesLegacyLinkForm onSubmit={noop} />);
 
-      expect(screen.getByLabelText('Description')).toHaveAttribute('value', '');
-      expect(screen.getByLabelText('URL')).toHaveAttribute('value', '');
+      expect(screen.getByLabelText('Description')).toHaveValue('');
+      expect(screen.getByLabelText('URL')).toHaveValue('');
     });
 
     test('cannot submit with only invalid values', async () => {
