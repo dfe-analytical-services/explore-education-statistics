@@ -10,6 +10,8 @@ const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT,
 );
 
+const useCdn = __ENV.USE_CDN ? Boolean(__ENV.USE_CDN) : false;
+
 const testPageAndDataUrls = ({
   mainPageUrl,
   dataUrls,
@@ -35,7 +37,9 @@ function testRequest({
   failureCounter,
   durationTrend,
 }: PublicPageTestUrlConfig) {
-  const absoluteUrl = `${environmentAndUsers.environment.publicUrl}${url}`;
+  const absoluteUrl = useCdn
+    ? `${environmentAndUsers.environment.publicCdnUrl}${url}`
+    : `${environmentAndUsers.environment.publicUrl}${url}`;
 
   const startTime = Date.now();
   let response;

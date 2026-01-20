@@ -11,6 +11,7 @@ export interface User {
 
 export interface Environment {
   publicUrl: string;
+  publicCdnUrl: string;
   adminUrl: string;
   contentApiUrl: string;
   dataApiUrl: string;
