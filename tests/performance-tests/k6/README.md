@@ -332,9 +332,18 @@ Full sets of options per test are available below as examples:
 `pnpm --environment=dev perftest dist/import.test.js
 -e PUBLICATION_TITLE="Import publication" -e DATA_FILE="big-file1.zip"`
 
-#### getReleasePage.test.js
+#### releaseHomePage.test.js
+
+This test tests the release home page, including its main page load requests plus any Next.JS prefetch requests
+that are included as part of the main page load.
 
 ##### Profiles
+
+* URL - relative URL of the release of the format `/find-statistics/<publication-slug>/<release-slug>`.
+* PUBLICATION_TITLE - the publication title.
+* CONTENT_SNIPPET - a snippet of release content that can be found on the page.
+* USE_CDN - whether to use the CDN URL or the App Service URL.
+* EXCLUDE_DATA_REQUESTS - whether to exclude any `/_next/data` requests from page requests.
 
 This test supports various different performance testing scenarios.
 
@@ -343,6 +352,120 @@ This test supports various different performance testing scenarios.
 Each of these profiles has a default set of configuration out-of-the-box. They can however be
 fine-tuned further using the common override parameters defined in
 [Common load profiles](#common-load-profiles).
+
+```bash
+pnpm --environment=dev perftest dist/releaseHomePage.test.js \
+  -e PROFILE=load \
+  -e MAIN_TEST_STAGE_DURATION_MINS=20 \
+  -e RPS=50 \
+  -e URL=/find-statistics/some-publication/2018-19 \
+  -e PUBLICATION_TITLE="A publication title" \
+  -e CONTENT_SNIPPET="An expected piece of release content" \
+  -e USE_CDN=true \
+  -e EXCLUDE_DATA_REQUESTS=true
+```
+
+#### releaseHomePageOld.test.js
+
+##### Profiles
+
+* URL - relative URL of the release of the format `/find-statistics/<publication-slug>/<release-slug>`.
+* PUBLICATION_TITLE - the publication title.
+* CONTENT_SNIPPET - a snippet of release content that can be found on the page.
+* USE_CDN - whether to use the CDN URL or the App Service URL.
+* EXCLUDE_DATA_REQUESTS - whether to exclude any `/_next/data` requests from page requests.
+
+This test supports various different performance testing scenarios.
+
+* PROFILE - supported values are "load", "stress", "spike", "sequential".
+
+Each of these profiles has a default set of configuration out-of-the-box. They can however be
+fine-tuned further using the common override parameters defined in
+[Common load profiles](#common-load-profiles).
+
+```bash
+pnpm --environment=dev perftest dist/releaseHomePageOld.test.js \
+  -e PROFILE=load \
+  -e MAIN_TEST_STAGE_DURATION_MINS=20 \
+  -e RPS=50 \
+  -e URL=/find-statistics/some-publication/2018-19 \
+  -e PUBLICATION_TITLE="A publication title" \
+  -e CONTENT_SNIPPET="An expected piece of release content" \
+  -e USE_CDN=true \
+  -e EXCLUDE_DATA_REQUESTS=true
+```
+
+#### releaseExplorePage.test.js
+
+##### Profiles
+
+* URL - relative URL of the release of the format `/find-statistics/<publication-slug>/<release-slug>`.
+* USE_CDN - whether to use the CDN URL or the App Service URL.
+
+This test supports various different performance testing scenarios.
+
+* PROFILE - supported values are "load", "stress", "spike", "sequential".
+
+Each of these profiles has a default set of configuration out-of-the-box. They can however be
+fine-tuned further using the common override parameters defined in
+[Common load profiles](#common-load-profiles).
+
+```bash
+pnpm --environment=dev perftest dist/releaseExplorePage.test.js \
+  -e PROFILE=load \
+  -e MAIN_TEST_STAGE_DURATION_MINS=20 \
+  -e RPS=50 \
+  -e URL=/find-statistics/some-publication/2018-19 \
+  -e USE_CDN=true
+```
+
+#### releaseMethodologyPage.test.js
+
+##### Profiles
+
+* URL - relative URL of the release of the format `/find-statistics/<publication-slug>/<release-slug>`.
+* USE_CDN - whether to use the CDN URL or the App Service URL.
+
+This test supports various different performance testing scenarios.
+
+* PROFILE - supported values are "load", "stress", "spike", "sequential".
+
+Each of these profiles has a default set of configuration out-of-the-box. They can however be
+fine-tuned further using the common override parameters defined in
+[Common load profiles](#common-load-profiles).
+
+```bash
+pnpm --environment=dev perftest dist/releaseMethodologyPage.test.js \
+  -e PROFILE=load \
+  -e MAIN_TEST_STAGE_DURATION_MINS=20 \
+  -e RPS=50 \
+  -e URL=/find-statistics/some-publication/2018-19 \
+  -e USE_CDN=true
+```
+
+#### releaseHelpPage.test.js
+
+##### Profiles
+
+* URL - relative URL of the release of the format `/find-statistics/<publication-slug>/<release-slug>`.
+* USE_CDN - whether to use the CDN URL or the App Service URL.
+
+This test supports various different performance testing scenarios.
+
+* PROFILE - supported values are "load", "stress", "spike", "sequential".
+
+Each of these profiles has a default set of configuration out-of-the-box. They can however be
+fine-tuned further using the common override parameters defined in
+[Common load profiles](#common-load-profiles).
+
+```bash
+pnpm --environment=dev perftest dist/releaseHelpPage.test.js \
+  -e PROFILE=load \
+  -e MAIN_TEST_STAGE_DURATION_MINS=20 \
+  -e RPS=50 \
+  -e URL=/find-statistics/some-publication/2018-19 \
+  -e USE_CDN=true
+```
 
 #### publicTableBuilderQuery.test.js
 
