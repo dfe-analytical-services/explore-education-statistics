@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`FormNumberInput renders correctly with minimal props 1`] = `
 <label class="govuk-label"
@@ -6,11 +6,11 @@ exports[`FormNumberInput renders correctly with minimal props 1`] = `
 >
   Test input
 </label>
-<input name="test"
-       class="govuk-input"
+<input class="govuk-input"
        id="test-input"
        inputmode="numeric"
        type="text"
        value
+       name="test"
 >
 `;

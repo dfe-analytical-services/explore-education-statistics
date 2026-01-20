@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`FormCheckbox does not render conditional content when not checked 1`] = `
 <div class="govuk-checkboxes__item"
@@ -6,9 +6,9 @@ exports[`FormCheckbox does not render conditional content when not checked 1`] =
 >
   <input class="govuk-checkboxes__input"
          id="test-checkbox"
-         name="test"
          type="checkbox"
          value="true"
+         name="test"
          aria-controls="test-checkbox-conditional"
   >
   <label class="govuk-label govuk-checkboxes__label label"
@@ -32,10 +32,10 @@ exports[`FormCheckbox renders conditional content when checked 1`] = `
 >
   <input class="govuk-checkboxes__input"
          id="test-checkbox"
-         name="test"
          type="checkbox"
          value="true"
          checked
+         name="test"
          aria-controls="test-checkbox-conditional"
          aria-expanded="true"
   >
@@ -61,9 +61,9 @@ exports[`FormCheckbox renders correctly when \`hint\` is provided 1`] = `
   <input aria-describedby="test-checkbox-item-hint"
          class="govuk-checkboxes__input"
          id="test-checkbox"
-         name="test"
          type="checkbox"
          value="true"
+         name="test"
   >
   <label class="govuk-label govuk-checkboxes__label label"
          for="test-checkbox"
@@ -84,9 +84,9 @@ exports[`FormCheckbox renders correctly with required props 1`] = `
 >
   <input class="govuk-checkboxes__input"
          id="test-checkbox"
-         name="test"
          type="checkbox"
          value="true"
+         name="test"
   >
   <label class="govuk-label govuk-checkboxes__label label"
          for="test-checkbox"

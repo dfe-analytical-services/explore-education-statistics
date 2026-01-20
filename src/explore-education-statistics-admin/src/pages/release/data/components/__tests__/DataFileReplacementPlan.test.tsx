@@ -889,9 +889,8 @@ describe('DataReplacementPlan', () => {
 
     const dataBlock1 = within(details[0]);
 
-    expect(
-      dataBlock1.getByRole('button', { name: /Data block 1/ }),
-    ).toHaveTextContent('OK');
+    expect(dataBlock1.getByText(/Data block 1/)).toBeInTheDocument();
+    expect(dataBlock1.getByText('OK')).toBeInTheDocument();
     expect(
       dataBlock1.getByText(
         'This data block has no conflicts and can be replaced.',
@@ -900,9 +899,8 @@ describe('DataReplacementPlan', () => {
 
     const dataBlock2 = within(details[1]);
 
-    expect(
-      dataBlock2.getByRole('button', { name: /Data block 2/ }),
-    ).toHaveTextContent('OK');
+    expect(dataBlock2.getByText(/Data block 2/)).toBeInTheDocument();
+    expect(dataBlock2.getByText('OK')).toBeInTheDocument();
     expect(
       dataBlock2.getByText(
         'This data block has no conflicts and can be replaced.',
@@ -911,9 +909,8 @@ describe('DataReplacementPlan', () => {
 
     const footnote1 = within(details[2]);
 
-    expect(
-      footnote1.getByRole('button', { name: /Footnote 1/ }),
-    ).toHaveTextContent('OK');
+    expect(footnote1.getByText(/Footnote 1/)).toBeInTheDocument();
+    expect(footnote1.getByText('OK')).toBeInTheDocument();
     expect(
       footnote1.getByText(
         'This footnote has no conflicts and can be replaced.',
@@ -922,9 +919,8 @@ describe('DataReplacementPlan', () => {
 
     const footnote2 = within(details[3]);
 
-    expect(
-      footnote2.getByRole('button', { name: /Footnote 2/ }),
-    ).toHaveTextContent('OK');
+    expect(footnote2.getByText(/Footnote 2/)).toBeInTheDocument();
+    expect(footnote2.getByText('OK')).toBeInTheDocument();
     expect(
       footnote2.getByText(
         'This footnote has no conflicts and can be replaced.',
