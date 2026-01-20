@@ -16,7 +16,7 @@
   "devDependencies": {
     "@commander-js/extra-typings": "^11.0.0",
     "@next/eslint-plugin-next": "15.5.9",
-    "@types/jest": "^29.5.3",
+    "@types/jest": "^30.0.0",
     "@types/lodash": "^4.14.195",
     "@types/node": "^18.17.5",
     "@types/signal-exit": "^3.0.1",

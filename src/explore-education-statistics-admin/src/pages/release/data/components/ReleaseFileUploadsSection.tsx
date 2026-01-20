@@ -62,10 +62,13 @@ export default function ReleaseFileUploadsSection({
         },
       );
 
-      queryClient.setQueryData(listFilesQuery.queryKey, [...files, newFile]);
+      queryClient.setQueryData<AncillaryFile[]>(
+        listFilesQuery.queryKey,
+        (existingFiles = []) => [...existingFiles, newFile],
+      );
       await queryClient.invalidateQueries(listFilesQuery.queryKey);
     },
-    [files, listFilesQuery.queryKey, queryClient, releaseVersionId],
+    [listFilesQuery.queryKey, queryClient, releaseVersionId],
   );
 
   const handleConfirmDelete = async () => {

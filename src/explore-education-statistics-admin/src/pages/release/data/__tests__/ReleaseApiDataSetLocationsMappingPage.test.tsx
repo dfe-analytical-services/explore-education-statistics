@@ -124,7 +124,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     // new LAs
     expect(
       newLocationsAccordion.getByRole('heading', {
-        name: 'Local Authorities (2)',
+        name: /Local Authorities \(2\)/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -136,7 +136,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     // new regions
     expect(
       newLocationsAccordion.getByRole('heading', {
-        name: 'Regions (2)',
+        name: /Regions \(2\)/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -159,7 +159,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     // auto mapped LA
     expect(
       autoMappedAccordion.getByRole('heading', {
-        name: 'Local Authorities (2)',
+        name: /Local Authorities \(2\)/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -171,7 +171,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     // auto mapped regions
     expect(
       autoMappedAccordion.getByRole('heading', {
-        name: 'Regions (1)',
+        name: /Regions \(1\)/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -183,7 +183,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     // auto mapped englishDevolvedArea
     expect(
       autoMappedAccordion.getByRole('heading', {
-        name: 'English Devolved Areas (3)',
+        name: /English Devolved Areas \(3\)/,
       }),
     ).toBeInTheDocument();
     expect(

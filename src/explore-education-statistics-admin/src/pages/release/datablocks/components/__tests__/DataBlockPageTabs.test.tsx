@@ -153,7 +153,11 @@ describe('DataBlockPageTabs', () => {
         'Test data block',
       );
       expect(screen.getByLabelText('Table title')).toHaveValue('Test title');
-      expect(screen.getByLabelText('Data source')).toHaveValue('Test source');
+      expect(
+        screen.getByLabelText('Data source', {
+          selector: 'input',
+        }),
+      ).toHaveValue('Test source');
     });
   });
 
@@ -269,7 +273,11 @@ describe('DataBlockPageTabs', () => {
           'Test data block',
         );
         expect(screen.getByLabelText('Table title')).toHaveValue('Test title');
-        expect(screen.getByLabelText('Data source')).toHaveValue('Test source');
+        expect(
+          screen.getByLabelText('Data source', {
+            selector: 'input',
+          }),
+        ).toHaveValue('Test source');
       });
 
       const nameInput = screen.getByLabelText('Data block name');
@@ -287,20 +295,23 @@ describe('DataBlockPageTabs', () => {
       await userEvent.clear(sourceInput);
       await userEvent.type(sourceInput, 'Updated test source');
 
-      expect(dataBlockService.updateDataBlock).not.toBeCalled();
+      expect(dataBlockService.updateDataBlock).not.toHaveBeenCalled();
 
       await userEvent.click(
         screen.getByRole('button', { name: 'Save data block' }),
       );
 
       await waitFor(() => {
-        expect(dataBlockService.updateDataBlock).toBeCalledTimes(1);
-        expect(dataBlockService.updateDataBlock).toBeCalledWith('block-1', {
-          ...testDataBlock,
-          name: 'Updated test data block',
-          heading: 'Updated test title',
-          source: 'Updated test source',
-        } as ReleaseDataBlock);
+        expect(dataBlockService.updateDataBlock).toHaveBeenCalledTimes(1);
+        expect(dataBlockService.updateDataBlock).toHaveBeenCalledWith(
+          'block-1',
+          {
+            ...testDataBlock,
+            name: 'Updated test data block',
+            heading: 'Updated test title',
+            source: 'Updated test source',
+          } as ReleaseDataBlock,
+        );
       });
     });
   });

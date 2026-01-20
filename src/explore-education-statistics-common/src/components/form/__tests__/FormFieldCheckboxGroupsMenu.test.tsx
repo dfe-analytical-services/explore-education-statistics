@@ -2,7 +2,7 @@ import FormFieldCheckboxGroupsMenu from '@common/components/form/FormFieldCheckb
 import Form from '@common/components/form/Form';
 import FormProvider from '@common/components/form/FormProvider';
 import Yup from '@common/validation/yup';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import React from 'react';
 import render from '@common-test/render';
 
@@ -146,12 +146,12 @@ describe('FormFieldCheckboxGroupsMenu', () => {
 
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
-    await waitFor(() => {
-      expect(screen.getByText('Option 1')).toBeVisible();
-    });
+    expect(await screen.findByText('Option 1')).toBeVisible();
 
     expect(
-      screen.getByRole('button', { name: 'Choose options - hide options' }),
+      await screen.findByRole('button', {
+        name: 'Choose options - hide options',
+      }),
     ).toHaveAttribute('aria-expanded', 'true');
   });
 
@@ -187,11 +187,9 @@ describe('FormFieldCheckboxGroupsMenu', () => {
 
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
-    await waitFor(() => {
-      expect(screen.getByText('Option 1')).toBeVisible();
-    });
+    expect(await screen.findByText('Option 1')).toBeVisible();
 
-    const button = screen.getByRole('button', {
+    const button = await screen.findByRole('button', {
       name: 'Choose options - hide options',
     });
 
