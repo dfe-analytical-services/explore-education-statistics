@@ -281,7 +281,6 @@ public abstract class ReleaseSearchableDocumentsServiceTests
 
             releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
             releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
-
             releaseVersion.GenericContent =
             [
                 _dataFixture
@@ -341,6 +340,94 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                             <p>Section 1 block 1 content</p>
                             <p>Section 1 block 2 content</p>
                             <p>Section 1 block 3 content</p>
+                        </body>
+                    </html>
+                    """;
+
+                Assert.Multiple(GetAssertTrimmedLinesEqual(expectedHtmlContent, actual.HtmlContent));
+            }
+        }
+
+        [Fact]
+        public async Task WhenContentHasMultipleSectionsAndHtmlBlocks_HtmlContentHasCorrectOrder()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
+            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+            releaseVersion.GenericContent =
+            [
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithHeading("Section 3")
+                    .WithOrder(3)
+                    .WithContentBlocks([
+                        _dataFixture.DefaultHtmlBlock().WithOrder(3).WithBody("<p>Section 3 block 3 content</p>"),
+                        _dataFixture.DefaultHtmlBlock().WithOrder(1).WithBody("<p>Section 3 block 1 content</p>"),
+                        _dataFixture.DefaultHtmlBlock().WithOrder(2).WithBody("<p>Section 3 block 2 content</p>"),
+                    ]),
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithHeading("Section 1")
+                    .WithOrder(1)
+                    .WithContentBlocks([
+                        _dataFixture.DefaultHtmlBlock().WithOrder(1).WithBody("<p>Section 1 block 1 content</p>"),
+                        _dataFixture.DefaultHtmlBlock().WithOrder(3).WithBody("<p>Section 1 block 3 content</p>"),
+                        _dataFixture.DefaultHtmlBlock().WithOrder(2).WithBody("<p>Section 1 block 2 content</p>"),
+                    ]),
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithHeading("Section 2")
+                    .WithOrder(2)
+                    .WithContentBlocks([
+                        _dataFixture.DefaultHtmlBlock().WithOrder(2).WithBody("<p>Section 2 block 2 content</p>"),
+                        _dataFixture.DefaultHtmlBlock().WithOrder(1).WithBody("<p>Section 2 block 1 content</p>"),
+                        _dataFixture.DefaultHtmlBlock().WithOrder(3).WithBody("<p>Section 2 block 3 content</p>"),
+                    ]),
+            ];
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetLatestReleaseAsSearchableDocument(publication.Slug);
+
+                // Assert
+                var actual = outcome.AssertRight();
+
+                var expectedHtmlContent = $"""
+                    <html>
+                        <head>
+                            <title>{publication.Title}</title>
+                        </head>
+                        <body>
+                            <h1>{publication.Title}</h1>
+                            <h2>{release.Title}</h2>
+                            <h3>Section 1</h3>
+                            <p>Section 1 block 1 content</p>
+                            <p>Section 1 block 2 content</p>
+                            <p>Section 1 block 3 content</p>
+                            <h3>Section 2</h3>
+                            <p>Section 2 block 1 content</p>
+                            <p>Section 2 block 2 content</p>
+                            <p>Section 2 block 3 content</p>
+                            <h3>Section 3</h3>
+                            <p>Section 3 block 1 content</p>
+                            <p>Section 3 block 2 content</p>
+                            <p>Section 3 block 3 content</p>
                         </body>
                     </html>
                     """;
