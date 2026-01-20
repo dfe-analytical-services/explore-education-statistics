@@ -45,7 +45,6 @@ public record ReleaseSearchableDocumentDto
     {
         var sb = new StringBuilder();
 
-        // HTML Content
         HtmlHeader(sb, releaseVersion.Release.Publication.Title);
 
         // H1: Publication Title
@@ -54,40 +53,41 @@ public record ReleaseSearchableDocumentDto
         // H2: Release Title
         H2(sb, releaseVersion.Release.Title);
 
-        // H3: "Summary"
+        // H3: Summary section
         if (releaseVersion.SummarySection != null)
         {
-            AddH3Section(sb, "Summary", releaseVersion.SummarySection.Content);
+            AddH3Section(sb, "Summary", releaseVersion.SummarySection);
         }
 
-        // H3: "Headlines"
+        // H3: Headlines section
         if (releaseVersion.HeadlinesSection != null)
         {
-            AddH3Section(sb, "Headlines", releaseVersion.HeadlinesSection.Content);
+            AddH3Section(sb, "Headlines", releaseVersion.HeadlinesSection);
         }
 
-        // Add content blocks
+        // Add H3 generic content sections
         var contentSections = releaseVersion.GenericContent.OrderBy(section => section.Order).ToList();
-
         foreach (var contentSection in contentSections)
         {
-            AddH3Section(sb, contentSection.Heading ?? "", contentSection.Content);
+            AddH3Section(sb, contentSection.Heading ?? "", contentSection);
         }
 
         HtmlFooter(sb);
+
         return sb.ToString().UseUnixNewLine(); // Ensure consistency regardless of the runtime platform
     }
 
-    private static void AddH3Section(StringBuilder sb, string sectionTitle, List<ContentBlock> contentSection)
+    private static void AddH3Section(StringBuilder sb, string sectionTitle, ContentSection contentSection)
     {
-        var htmlBlocks = ExtractHtmlBlocks(contentSection);
-        if (string.IsNullOrEmpty(htmlBlocks))
+        var htmlBlocks = contentSection.Content.OfType<HtmlBlock>().OrderBy(hb => hb.Order).ToList();
+
+        if (htmlBlocks.Count == 0)
         {
             return;
         }
 
         H3(sb, sectionTitle);
-        sb.AppendLine(htmlBlocks);
+        sb.AppendLine(string.Join(Environment.NewLine, htmlBlocks.Select(hb => hb.Body)));
     }
 
     private static void HtmlHeader(StringBuilder sb, string title) =>
@@ -114,7 +114,4 @@ public record ReleaseSearchableDocumentDto
             </html>
             """
         );
-
-    private static string ExtractHtmlBlocks(List<ContentBlock> content) =>
-        string.Join(Environment.NewLine, content.OfType<HtmlBlock>().OrderBy(hb => hb.Order).Select(hb => hb.Body));
 }
