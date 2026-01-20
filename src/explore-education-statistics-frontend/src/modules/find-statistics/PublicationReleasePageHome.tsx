@@ -112,7 +112,7 @@ const PublicationReleasePage = ({
             renderUpdatesLink={
               showUpdatesInfo ? (
                 <Link
-                  to={`/find-statistics/${publicationSummary.slug}/${publicationSummary.latestRelease.slug}/updates`}
+                  to={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}/updates`}
                 >
                   {updateCountExcludingFirstPublished} update
                   {updateCountExcludingFirstPublished === 1 ? '' : 's'}
