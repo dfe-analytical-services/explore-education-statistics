@@ -134,7 +134,7 @@ const ReleasePageIntro = ({
           renderUpdatesLink={
             showUpdatesInfo ? (
               <Link
-                to={`/find-statistics/${publicationSummary.slug}/${latestRelease.slug}/updates`}
+                to={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}/updates`}
                 data-testid="updates-link"
               >
                 {updateCountExcludingFirstPublished} update
