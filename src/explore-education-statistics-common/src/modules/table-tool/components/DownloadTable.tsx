@@ -27,6 +27,7 @@ interface Props {
   headingSize?: 's' | 'm' | 'l';
   tableRef: RefObject<HTMLElement>;
   tableTitle?: string;
+  hideOdsDownload?: boolean;
   onCsvDownload: () => Blob | Promise<Blob>;
   onSubmit?: (type: FileFormat) => void;
 }
@@ -39,6 +40,7 @@ const DownloadTable = ({
   headingSize = 's',
   tableRef,
   tableTitle = '',
+  hideOdsDownload = false,
   onCsvDownload,
   onSubmit,
 }: Props) => {
@@ -57,6 +59,17 @@ const DownloadTable = ({
 
     downloadTableOdsFile(fileName, tableFootnotes, tableRef, title);
   };
+
+  const options = [
+    {
+      label: 'Table in ODS format (spreadsheet, with title and footnotes)',
+      value: 'ods',
+    },
+    {
+      label: 'Table in CSV format (flat file, with location codes)',
+      value: 'csv',
+    },
+  ];
 
   return (
     <FormProvider
@@ -99,18 +112,11 @@ const DownloadTable = ({
                 name="fileFormat"
                 small
                 order={[]}
-                options={[
-                  {
-                    label:
-                      'Table in ODS format (spreadsheet, with title and footnotes)',
-                    value: 'ods',
-                  },
-                  {
-                    label:
-                      'Table in CSV format (flat file, with location codes)',
-                    value: 'csv',
-                  },
-                ]}
+                options={
+                  hideOdsDownload
+                    ? options.filter(o => o.value !== 'ods')
+                    : options
+                }
               />
               <ButtonGroup>
                 <Button type="submit" disabled={formState.isSubmitting}>

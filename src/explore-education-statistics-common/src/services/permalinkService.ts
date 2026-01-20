@@ -25,6 +25,7 @@ export interface UnmappedTableHeadersConfig {
 export interface PermalinkSnapshot {
   created: string;
   dataSetTitle: string;
+  dataSetFileId: string;
   id: string;
   publicationTitle: string;
   status:
@@ -38,6 +39,7 @@ export interface PermalinkSnapshot {
     footnotes: Footnote[];
     json: TableJson;
   };
+  tableIsCropped: boolean;
 }
 
 interface CreatePermalink {

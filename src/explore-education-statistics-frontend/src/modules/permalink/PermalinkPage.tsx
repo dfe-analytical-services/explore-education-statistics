@@ -15,6 +15,7 @@ import React, { useRef } from 'react';
 import { Dictionary } from '@common/types';
 import DataTableCaption from '@common/modules/table-tool/components/DataTableCaption';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
+import Link from '@frontend/components/Link';
 
 const captionId = 'dataTableCaption';
 const footnotesId = 'dataTableFootnotes';
@@ -81,6 +82,17 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
         </WarningMessage>
       )}
 
+      {data.tableIsCropped && (
+        <WarningMessage testId="permalink-warning">
+          The selections used to generate this table returned too many rows,
+          therefore only a subset of the data is provided. The full set of
+          relevant data can be downloaded from the data set directly.{' '}
+          <Link to={`/data-catalogue/data-set/${data.dataSetFileId}`}>
+            View data set
+          </Link>
+        </WarningMessage>
+      )}
+
       <div ref={tableRef}>
         <FixedMultiHeaderDataTable
           caption={<DataTableCaption title={caption} id={captionId} />}
@@ -96,33 +108,39 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
       </div>
 
       <div className="govuk-!-display-none-print">
-        <DownloadTable
-          fileName={`permalink-${data.id}`}
-          footnotes={footnotes}
-          headingSize="m"
-          headingTag="h2"
-          tableRef={tableRef}
-          tableTitle={caption}
-          onCsvDownload={() => permalinkService.getPermalinkCsv(data.id)}
-          onSubmit={fileFormat => {
-            logEvent({
-              category: 'Permalink page',
-              action:
-                fileFormat === 'csv'
-                  ? 'CSV download button clicked'
-                  : 'ODS download button clicked',
-              label: caption,
-            });
+        {!data.tableIsCropped && (
+          <DownloadTable
+            fileName={`permalink-${data.id}`}
+            footnotes={footnotes}
+            headingSize="m"
+            headingTag="h2"
+            tableRef={tableRef}
+            tableTitle={caption}
+            onCsvDownload={() => permalinkService.getPermalinkCsv(data.id)}
+            onSubmit={fileFormat => {
+              logEvent({
+                category: 'Permalink page',
+                action:
+                  fileFormat === 'csv'
+                    ? 'CSV download button clicked'
+                    : 'ODS download button clicked',
+                label: caption,
+              });
 
-            permalinkService.recordDownload({
-              permalinkId: data.id,
-              permalinkTitle: `${dataSetTitle}' from '${publicationTitle}`,
-              downloadFormat: fileFormat,
-            });
-          }}
-        />
+              permalinkService.recordDownload({
+                permalinkId: data.id,
+                permalinkTitle: `${dataSetTitle}' from '${publicationTitle}`,
+                downloadFormat: fileFormat,
+              });
+            }}
+          />
+        )}
 
-        <h2 className="govuk-heading-m govuk-!-margin-top-9">
+        <h2
+          className={`govuk-heading-m${
+            data.tableIsCropped ? '' : ' govuk-!-margin-top-9'
+          }`}
+        >
           Create your own tables
         </h2>
         <p>

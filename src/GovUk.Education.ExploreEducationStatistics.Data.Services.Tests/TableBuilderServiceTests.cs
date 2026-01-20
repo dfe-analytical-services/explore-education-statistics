@@ -25,7 +25,6 @@ using Snapshooter.Xunit;
 using Thinktecture.EntityFrameworkCore.TempTables;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
@@ -65,9 +64,10 @@ public class TableBuilderServiceTests
                 Id = Guid.NewGuid(),
                 Location = new Location { Id = location1Id, GeographicLevel = GeographicLevel.Country },
                 Measures = new Dictionary<Guid, string> { { indicator1Id, "123" }, { indicator2Id, "456" } },
-                FilterItems = ListOf(
-                    new ObservationFilterItem { FilterItem = new FilterItem("Filter Item 1", Guid.NewGuid()) }
-                ),
+                FilterItems =
+                [
+                    new ObservationFilterItem { FilterItem = new FilterItem("Filter Item 1", Guid.NewGuid()) },
+                ],
                 Year = 2019,
                 TimeIdentifier = AcademicYear,
             },
@@ -76,9 +76,10 @@ public class TableBuilderServiceTests
                 Id = Guid.NewGuid(),
                 Location = new Location { Id = location2Id, GeographicLevel = GeographicLevel.Institution },
                 Measures = new Dictionary<Guid, string> { { indicator1Id, "678" } },
-                FilterItems = ListOf(
-                    new ObservationFilterItem { FilterItem = new FilterItem("Filter Item 2", Guid.NewGuid()) }
-                ),
+                FilterItems =
+                [
+                    new ObservationFilterItem { FilterItem = new FilterItem("Filter Item 2", Guid.NewGuid()) },
+                ],
                 Year = 2020,
                 TimeIdentifier = AcademicYear,
             },
@@ -92,9 +93,10 @@ public class TableBuilderServiceTests
                     { Guid.NewGuid(), "1123" },
                     { Guid.NewGuid(), "1456" },
                 },
-                FilterItems = ListOf(
-                    new ObservationFilterItem { FilterItem = new FilterItem("Filter Item 3", Guid.NewGuid()) }
-                ),
+                FilterItems =
+                [
+                    new ObservationFilterItem { FilterItem = new FilterItem("Filter Item 3", Guid.NewGuid()) },
+                ],
                 Year = 2020,
                 TimeIdentifier = AcademicYear,
             },
@@ -129,7 +131,7 @@ public class TableBuilderServiceTests
             {
                 SubjectId = releaseSubject.SubjectId,
                 Indicators = [indicator1Id, indicator2Id],
-                LocationIds = ListOf(location1Id, location2Id, location3Id),
+                LocationIds = [location1Id, location2Id, location3Id],
                 TimePeriod = new TimePeriodQuery
                 {
                     StartYear = 2019,
@@ -181,7 +183,7 @@ public class TableBuilderServiceTests
             Assert.Equal(2, observationResults[0].Measures.Count);
             Assert.Equal("123", observationResults[0].Measures[indicator1Id]);
             Assert.Equal("456", observationResults[0].Measures[indicator2Id]);
-            Assert.Equal(ListOf(observations[0].FilterItems.ToList()[0].FilterItemId), observationResults[0].Filters);
+            Assert.Equal([observations[0].FilterItems.ToList()[0].FilterItemId], observationResults[0].Filters);
 
             Assert.Equal(observations[2].Id, observationResults[1].Id);
             Assert.Equal(GeographicLevel.Provider, observationResults[1].GeographicLevel);
@@ -336,9 +338,10 @@ public class TableBuilderServiceTests
                 Id = Guid.NewGuid(),
                 Location = new Location { Id = location1Id, GeographicLevel = GeographicLevel.Country },
                 Measures = new Dictionary<Guid, string> { { indicator1Id, "123" }, { indicator2Id, "456" } },
-                FilterItems = ListOf(
-                    new ObservationFilterItem { FilterItem = new FilterItem("Filter Item 1", Guid.NewGuid()) }
-                ),
+                FilterItems =
+                [
+                    new ObservationFilterItem { FilterItem = new FilterItem("Filter Item 1", Guid.NewGuid()) },
+                ],
                 Year = 2019,
                 TimeIdentifier = AcademicYear,
             },
@@ -347,9 +350,10 @@ public class TableBuilderServiceTests
                 Id = Guid.NewGuid(),
                 Location = new Location { Id = location2Id, GeographicLevel = GeographicLevel.Institution },
                 Measures = new Dictionary<Guid, string> { { indicator1Id, "678" } },
-                FilterItems = ListOf(
-                    new ObservationFilterItem { FilterItem = new FilterItem("Filter Item 2", Guid.NewGuid()) }
-                ),
+                FilterItems =
+                [
+                    new ObservationFilterItem { FilterItem = new FilterItem("Filter Item 2", Guid.NewGuid()) },
+                ],
                 Year = 2020,
                 TimeIdentifier = AcademicYear,
             },
@@ -363,9 +367,10 @@ public class TableBuilderServiceTests
                     { Guid.NewGuid(), "1123" },
                     { Guid.NewGuid(), "1456" },
                 },
-                FilterItems = ListOf(
-                    new ObservationFilterItem { FilterItem = new FilterItem("Filter Item 3", Guid.NewGuid()) }
-                ),
+                FilterItems =
+                [
+                    new ObservationFilterItem { FilterItem = new FilterItem("Filter Item 3", Guid.NewGuid()) },
+                ],
                 Year = 2020,
                 TimeIdentifier = AcademicYear,
             },

@@ -35,6 +35,22 @@ describe('TableToolShare', () => {
     });
   });
 
+  test('shows warning when table has been cropped', () => {
+    render(
+      <TableToolShare
+        query={tableQuery}
+        tableHeaders={testTableHeaders}
+        isCropped
+      />,
+    );
+
+    expect(
+      screen.getByText(
+        /this permalink will contain only the subset of data displayed above/i,
+      ),
+    ).toBeInTheDocument();
+  });
+
   test('shows the share link when the button is clicked', async () => {
     permalinkService.createPermalink.mockResolvedValue({
       id: 'permalink-id',

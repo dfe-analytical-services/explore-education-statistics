@@ -352,7 +352,7 @@ public class PermalinkServiceTests
             .Setup(s =>
                 s.Query(
                     releaseVersion.Id,
-                    It.Is<FullTableQuery>(ctx => ctx.Equals(request.Query.AsFullTableQuery(false, true))),
+                    It.Is<FullTableQuery>(ctx => ctx.Equals(request.Query.AsFullTableQuery(true, false))),
                     CancellationToken.None
                 )
             )
@@ -674,7 +674,7 @@ public class PermalinkServiceTests
             .Setup(s =>
                 s.Query(
                     releaseVersion.Id,
-                    It.Is<FullTableQuery>(ctx => ctx.Equals(request.Query.AsFullTableQuery(false, true))),
+                    It.Is<FullTableQuery>(ctx => ctx.Equals(request.Query.AsFullTableQuery(true, false))),
                     CancellationToken.None
                 )
             )

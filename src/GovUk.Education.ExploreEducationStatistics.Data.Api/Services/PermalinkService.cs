@@ -283,6 +283,8 @@ public class PermalinkService : IPermalinkService
     private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink, PermalinkTableViewModel table)
     {
         var status = await GetPermalinkStatus(permalink.SubjectId);
+        var dataSetFileId = GetDataSetFileId(permalink.SubjectId);
+
         return new PermalinkViewModel
         {
             Id = permalink.Id,
@@ -291,7 +293,16 @@ public class PermalinkService : IPermalinkService
             PublicationTitle = permalink.PublicationTitle,
             Status = status,
             Table = table,
+            TableIsCropped = permalink.IsCropped,
+            DataSetFileId = dataSetFileId,
         };
+    }
+
+    private Guid? GetDataSetFileId(Guid subjectId)
+    {
+        return _contentDbContext
+            .Files.FirstOrDefault(f => f.SubjectId == subjectId && f.Type == FileType.Data)
+            ?.DataSetFileId;
     }
 
     private async Task<Either<ActionResult, Guid>> FindLatestPublishedReleaseVersionId(Guid subjectId)
