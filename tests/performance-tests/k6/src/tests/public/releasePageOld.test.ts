@@ -14,6 +14,15 @@ const expectedPublicationTitle =
 const expectedContentSnippet =
   __ENV.CONTENT_SNIPPET ?? 'pupils missed on average 8.2 school days';
 
+const urlSlugs = /\/find-statistics\/(.*)\/(.*)/g.exec(releasePageUrl)!;
+const publicationSlug = urlSlugs[1];
+const releaseSlug = urlSlugs[2];
+
+const dataUrls: string[] = [
+  `/find-statistics.json`,
+  `${releasePageUrl}/data-guidance.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,
+];
+
 export const options = getOptions();
 
 const name = 'releasePageOld.ts';
@@ -41,15 +50,6 @@ export function setup(): ReleasePageSetupData {
 }
 
 const performTest = ({ buildId }: ReleasePageSetupData) => {
-  const urlSlugs = /\/find-statistics\/(.*)\/(.*)/g.exec(releasePageUrl)!;
-  const publicationSlug = urlSlugs[1];
-  const releaseSlug = urlSlugs[2];
-
-  const dataUrls: string[] = [
-    `/find-statistics.json`,
-    `${releasePageUrl}/data-guidance.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,
-  ];
-
   testPageAndDataUrls({
     buildId,
     mainPageUrl: {

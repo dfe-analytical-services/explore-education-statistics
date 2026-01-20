@@ -34,7 +34,7 @@ function testRequest({
   successCounter,
   failureCounter,
   durationTrend,
-}: PublicPageTestUrlConfig): RefinedResponse<ResponseType | undefined> {
+}: PublicPageTestUrlConfig) {
   const absoluteUrl = `${environmentAndUsers.environment.publicUrl}${url}`;
 
   const startTime = Date.now();
@@ -78,8 +78,6 @@ function testRequest({
       `Failure to get page at url ${absoluteUrl}.\nGot response code ${response.status}`,
     );
   }
-
-  return response;
 }
 
 export interface PublicPageTestConfig {
