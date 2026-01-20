@@ -122,7 +122,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // new Filter 1
     expect(
       newFilterOptionsAccordion.getByRole('heading', {
-        name: 'Filter 1 (1) Column: Filter1Key',
+        name: /Filter 1 \(1\) Column: Filter1Key/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -145,7 +145,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // auto mapped Filter 1
     expect(
       autoMappedAccordion.getByRole('heading', {
-        name: 'Filter 1 (1) Column: Filter1Key',
+        name: /Filter 1 \(1\) Column: Filter1Key/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -157,7 +157,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
     // auto mapped Filter3Key
     expect(
       autoMappedAccordion.getByRole('heading', {
-        name: 'Filter 3 (3) Column: Filter3Key',
+        name: /Filter 3 \(3\) Column: Filter3Key/,
       }),
     ).toBeInTheDocument();
     expect(

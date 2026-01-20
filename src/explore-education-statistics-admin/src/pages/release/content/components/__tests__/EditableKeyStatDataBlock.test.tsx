@@ -373,6 +373,6 @@ describe('EditableKeyStatDataBlock', () => {
       }),
     );
 
-    expect(handleRemove).toBeCalledTimes(1);
+    expect(handleRemove).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`FormRadioGroup renders correctly with legend 1`] = `
 <div class="govuk-form-group">
@@ -14,9 +14,9 @@ exports[`FormRadioGroup renders correctly with legend 1`] = `
       >
         <input class="govuk-radios__input"
                id="test-radios-radio-1"
-               name="test-radios"
                type="radio"
                value="1"
+               name="test-radios"
         >
         <label class="govuk-label govuk-radios__label"
                for="test-radios-radio-1"
@@ -84,9 +84,9 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
       >
         <input class="govuk-radios__input"
                id="test-radios-radio-1"
-               name="test-radios"
                type="radio"
                value="1"
+               name="test-radios"
         >
         <label class="govuk-label govuk-radios__label"
                for="test-radios-radio-1"
@@ -99,9 +99,9 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
       >
         <input class="govuk-radios__input"
                id="test-radios-radio-2"
-               name="test-radios"
                type="radio"
                value="2"
+               name="test-radios"
         >
         <label class="govuk-label govuk-radios__label"
                for="test-radios-radio-2"
@@ -114,9 +114,9 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
       >
         <input class="govuk-radios__input"
                id="test-radios-radio-3"
-               name="test-radios"
                type="radio"
                value="3"
+               name="test-radios"
         >
         <label class="govuk-label govuk-radios__label"
                for="test-radios-radio-3"
@@ -143,9 +143,9 @@ exports[`FormRadioGroup renders option with conditional contents 1`] = `
       >
         <input class="govuk-radios__input"
                id="test-radios-radio-1"
-               name="test-radios"
                type="radio"
                value="1"
+               name="test-radios"
                aria-controls="test-radios-radio-1-conditional"
                aria-expanded="false"
         >
@@ -167,10 +167,10 @@ exports[`FormRadioGroup renders option with conditional contents 1`] = `
       >
         <input class="govuk-radios__input"
                id="test-radios-radio-2"
-               name="test-radios"
                type="radio"
                value="2"
                checked
+               name="test-radios"
                aria-controls="test-radios-radio-2-conditional"
                aria-expanded="true"
         >
@@ -192,9 +192,9 @@ exports[`FormRadioGroup renders option with conditional contents 1`] = `
       >
         <input class="govuk-radios__input"
                id="test-radios-radio-3"
-               name="test-radios"
                type="radio"
                value="3"
+               name="test-radios"
                aria-controls="test-radios-radio-3-conditional"
                aria-expanded="false"
         >

@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct order 1`] = `
 <div class="govuk-form-group">
@@ -20,11 +20,11 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
     >
       Search options
     </label>
-    <input name="testCheckboxes-search"
-           class="govuk-input searchInput govuk-input--width-20"
+    <input class="govuk-input searchInput govuk-input--width-20"
            id="test-checkboxes-search"
            type="text"
            value
+           name="testCheckboxes-search"
     >
     <div aria-live="assertive"
          class="optionsContainer"
@@ -52,9 +52,9 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
             >
               <input class="govuk-checkboxes__input"
                      id="test-checkboxes-options-1-1"
-                     name="testCheckboxes"
                      type="checkbox"
                      value="1"
+                     name="testCheckboxes"
               >
               <label class="govuk-label govuk-checkboxes__label label"
                      for="test-checkboxes-options-1-1"
@@ -67,9 +67,9 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
             >
               <input class="govuk-checkboxes__input"
                      id="test-checkboxes-options-1-2"
-                     name="testCheckboxes"
                      type="checkbox"
                      value="2"
+                     name="testCheckboxes"
               >
               <label class="govuk-label govuk-checkboxes__label label"
                      for="test-checkboxes-options-1-2"
@@ -103,9 +103,9 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
             >
               <input class="govuk-checkboxes__input"
                      id="test-checkboxes-options-2-3"
-                     name="testCheckboxes"
                      type="checkbox"
                      value="3"
+                     name="testCheckboxes"
               >
               <label class="govuk-label govuk-checkboxes__label label"
                      for="test-checkboxes-options-2-3"
@@ -118,9 +118,9 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
             >
               <input class="govuk-checkboxes__input"
                      id="test-checkboxes-options-2-4"
-                     name="testCheckboxes"
                      type="checkbox"
                      value="4"
+                     name="testCheckboxes"
               >
               <label class="govuk-label govuk-checkboxes__label label"
                      for="test-checkboxes-options-2-4"
@@ -149,11 +149,11 @@ exports[`FormCheckboxSearchSubGroups renders single group of checkboxes correctl
     >
       Search options
     </label>
-    <input name="testCheckboxes-search"
-           class="govuk-input searchInput govuk-input--width-20"
+    <input class="govuk-input searchInput govuk-input--width-20"
            id="test-checkboxes-search"
            type="text"
            value
+           name="testCheckboxes-search"
     >
     <div aria-live="assertive"
          class="optionsContainer"
@@ -171,9 +171,9 @@ exports[`FormCheckboxSearchSubGroups renders single group of checkboxes correctl
         >
           <input class="govuk-checkboxes__input"
                  id="test-checkboxes-1-1"
-                 name="testCheckboxes"
                  type="checkbox"
                  value="1"
+                 name="testCheckboxes"
           >
           <label class="govuk-label govuk-checkboxes__label label"
                  for="test-checkboxes-1-1"
@@ -186,9 +186,9 @@ exports[`FormCheckboxSearchSubGroups renders single group of checkboxes correctl
         >
           <input class="govuk-checkboxes__input"
                  id="test-checkboxes-1-2"
-                 name="testCheckboxes"
                  type="checkbox"
                  value="2"
+                 name="testCheckboxes"
           >
           <label class="govuk-label govuk-checkboxes__label label"
                  for="test-checkboxes-1-2"

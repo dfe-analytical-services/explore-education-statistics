@@ -185,58 +185,58 @@ describe('ScheduledReleasesTable', () => {
       expect(
         screen.getByText('Publication / Release period'),
       ).toBeInTheDocument();
+
+      const rows = screen.getAllByRole('row');
+      expect(rows).toHaveLength(8);
+
+      expect(within(rows[1]).getByRole('columnheader')).toHaveTextContent(
+        'Publication 1',
+      );
+
+      const row3cells = within(rows[2]).getAllByRole('cell');
+      expect(row3cells[0]).toHaveTextContent('Release 1');
+      expect(row3cells[1]).toHaveTextContent('Scheduled');
+      expect(row3cells[2]).toHaveTextContent('View stages');
+      expect(row3cells[3]).toHaveTextContent('30 June 2021');
+      expect(
+        within(row3cells[4]).getByRole('link', { name: 'Edit Release 1' }),
+      ).toBeInTheDocument();
+
+      const row4cells = within(rows[3]).getAllByRole('cell');
+      expect(row4cells[0]).toHaveTextContent('Release 1');
+      expect(row4cells[1]).toHaveTextContent('Scheduled');
+      expect(row4cells[2]).toHaveTextContent('View stages');
+      expect(row4cells[3]).toHaveTextContent('1 January 2021');
+      expect(
+        within(row4cells[4]).getByRole('link', { name: 'Edit Release 1' }),
+      ).toBeInTheDocument();
+
+      expect(within(rows[4]).getByRole('columnheader')).toHaveTextContent(
+        'Publication 2',
+      );
+
+      const row6cells = within(rows[5]).getAllByRole('cell');
+      expect(row6cells[0]).toHaveTextContent('Release 2');
+      expect(row6cells[1]).toHaveTextContent('Scheduled');
+      expect(row6cells[2]).toHaveTextContent('View stages');
+      expect(row6cells[3]).toHaveTextContent('30 May 2021');
+      expect(
+        within(row6cells[4]).getByRole('link', { name: 'Edit Release 2' }),
+      ).toBeInTheDocument();
+
+      expect(within(rows[6]).getByRole('columnheader')).toHaveTextContent(
+        'Publication 3',
+      );
+
+      const row8cells = within(rows[7]).getAllByRole('cell');
+      expect(row8cells[0]).toHaveTextContent('Release 3');
+      expect(row8cells[1]).toHaveTextContent('Scheduled');
+      expect(row8cells[2]).toHaveTextContent('View stages');
+      expect(row8cells[3]).toHaveTextContent('30 May 2021');
+      expect(
+        within(row8cells[4]).getByRole('link', { name: 'Edit Release 3' }),
+      ).toBeInTheDocument();
     });
-
-    const rows = screen.getAllByRole('row');
-    expect(rows).toHaveLength(8);
-
-    expect(within(rows[1]).getByRole('columnheader')).toHaveTextContent(
-      'Publication 1',
-    );
-
-    const row3cells = within(rows[2]).getAllByRole('cell');
-    expect(row3cells[0]).toHaveTextContent('Release 1');
-    expect(row3cells[1]).toHaveTextContent('Scheduled');
-    expect(row3cells[2]).toHaveTextContent('View stages');
-    expect(row3cells[3]).toHaveTextContent('30 June 2021');
-    expect(
-      within(row3cells[4]).getByRole('link', { name: 'Edit Release 1' }),
-    ).toBeInTheDocument();
-
-    const row4cells = within(rows[3]).getAllByRole('cell');
-    expect(row4cells[0]).toHaveTextContent('Release 1');
-    expect(row4cells[1]).toHaveTextContent('Scheduled');
-    expect(row4cells[2]).toHaveTextContent('View stages');
-    expect(row4cells[3]).toHaveTextContent('1 January 2021');
-    expect(
-      within(row4cells[4]).getByRole('link', { name: 'Edit Release 1' }),
-    ).toBeInTheDocument();
-
-    expect(within(rows[4]).getByRole('columnheader')).toHaveTextContent(
-      'Publication 2',
-    );
-
-    const row6cells = within(rows[5]).getAllByRole('cell');
-    expect(row6cells[0]).toHaveTextContent('Release 2');
-    expect(row6cells[1]).toHaveTextContent('Scheduled');
-    expect(row6cells[2]).toHaveTextContent('View stages');
-    expect(row6cells[3]).toHaveTextContent('30 May 2021');
-    expect(
-      within(row6cells[4]).getByRole('link', { name: 'Edit Release 2' }),
-    ).toBeInTheDocument();
-
-    expect(within(rows[6]).getByRole('columnheader')).toHaveTextContent(
-      'Publication 3',
-    );
-
-    const row8cells = within(rows[7]).getAllByRole('cell');
-    expect(row8cells[0]).toHaveTextContent('Release 3');
-    expect(row8cells[1]).toHaveTextContent('Scheduled');
-    expect(row8cells[2]).toHaveTextContent('View stages');
-    expect(row8cells[3]).toHaveTextContent('30 May 2021');
-    expect(
-      within(row8cells[4]).getByRole('link', { name: 'Edit Release 3' }),
-    ).toBeInTheDocument();
   });
 
   test('shows a view instead of edit link if you do not have permission to edit the release', async () => {

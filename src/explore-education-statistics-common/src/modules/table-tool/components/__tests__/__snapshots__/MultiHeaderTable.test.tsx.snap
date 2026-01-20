@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`MultiHeaderTable can render a complicated table with nesting 1`] = `
 <table class="govuk-table table">
