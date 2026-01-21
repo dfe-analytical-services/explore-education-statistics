@@ -22,7 +22,7 @@ Validate title
 
 Validate Published date
     [Tags]    NotAgainstPreProd
-    user checks summary list contains    Published    25 April 2018
+    user checks summary list contains    Published    26 March 2020
 
 Validate Next update date
     [Tags]    NotAgainstPreProd
@@ -46,15 +46,15 @@ Validate "About these statistics" -- Number of other releases
     user closes details dropdown    View releases (6)
 
 Validate "About these statistics" -- "Last updated"
-    user checks summary list contains    Last updated    22 August 2022
+    user checks summary list contains    Last updated    9 March 2022
 
     user checks number of release updates    3
     user opens details dropdown    See all updates (3)
 
-    user checks release update    1    22 August 2022    Updating LAD map
+    user checks release update    1    9 March 2022    Updated boundary file on LAD map of absence rates.
     user checks release update    2    19 April 2018
     ...    Underlying data file updated to include absence data by pupil residency and school location, and updated metadata document.
-    user checks release update    3    22 March 2018    First published.
+    user checks release update    3    22 March 2018    First published on GOV.UK.
     user closes details dropdown    See all updates (3)
 
 Check quick links navigation contains links
