@@ -49,6 +49,10 @@ def create_robot_arguments(arguments: argparse.Namespace, test_run_folder: str) 
 
 def _create_include_and_exclude_args(arguments: argparse.Namespace) -> list[str]:
     include_exclude_args = ["--exclude", "Failing"]
+    include_exclude_args += [
+        "--exclude",
+        "ReleaseRedesign",
+    ]  # TODO: EES-6843: Remove this line when release redesign's feature flag has been removed
     include_exclude_args += ["--exclude", "UnderConstruction"]
     include_exclude_args += ["--exclude", "VisualTesting"]
     if arguments.exclude_tags:

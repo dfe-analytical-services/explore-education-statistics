@@ -7,92 +7,96 @@ Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-Force Tags          GeneralPublic    Local    Dev    Preprod
+Force Tags
+...    GeneralPublic
+...    Local
+...    Dev
+...    Preprod
+...    ReleaseRedesign
+#TODO: remove ReleaseRedesign tag when EES-6843 is complete
+
+
+*** Variables ***
+${BACKGROUND_INFORMATION_PARAGRAPH}     Read national statistical summaries, view charts and tables and download data files.
+${DATA_GUIDANCE_PARAGRAPH}              Test data guidance content
 
 
 *** Test Cases ***
 Navigate to Absence publication
     environment variable should be set    PUBLIC_URL
-    user navigates to    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
-    user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
+    user navigates to the Absence publication
 
 Validate title
     user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
     user waits until page contains title caption    Academic year 2016/17
 
-Validate Published date
+# Release home tab
+
+Validate summary list items
     [Tags]    NotAgainstPreProd
-    user checks summary list contains    Published    26 March 2020
+    user checks summary list contains    Published    25 April 2018
+    user checks summary list contains    Produced by    Department for Education
+    user checks summary list contains    Last updated    22 August 2022
+    user checks summary list contains    Release type    Official statistics
+    user checks element contains    testid:release-summary-block    3 updates
 
 Validate Next update date
     [Tags]    NotAgainstPreProd
-    user checks summary list contains    Next update    March 2019
+    user checks element should contain    testid:Next update    March 2019
 
 Validate Email alerts link
-    user checks page contains link with text and url    Sign up for email alerts
+    user checks page contains link with text and url    Get email alerts
     ...    /subscriptions/new-subscription/${PUPIL_ABSENCE_PUBLICATION_SLUG}
 
-Validate "About these statistics" -- Number of other releases
-    user checks number of other releases is correct    6
-    user opens details dropdown    View releases (6)
-    user checks other release is shown in position    Academic year 2014/15    1
-    user checks other release is shown in position    Academic year 2013/14    2
-    user checks other release is shown in position    Academic year 2012/13    3
-    user checks other release is shown in position    Academic year 2011/12    4
-    user checks other release is shown in position    Academic year 2010/11    5
-    user checks other release is shown in position    Academic year 2009/10    6
-    user closes details dropdown    View releases (6)
+Validate "Number of other releases" page
+    user checks page contains link with text and url    All releases in this series
+    ...    /find-statistics/${PUPIL_ABSENCE_PUBLICATION_SLUG}/releases
+    user clicks link    All releases in this series
+    user waits until page finishes loading
 
-Validate "About these statistics" -- "Last updated"
-    user checks summary list contains    Last updated    9 March 2022
+    user checks element contains    testid:next-release-date    March 2019
+    user checks page contains link with text and url    Release home (latest release)
+    ...    ${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
 
-    user checks number of release updates    3
-    user opens details dropdown    See all updates (3)
+    user checks table body has x rows    7    testid:release-updates-table
+    user checks table cell contains    1    1    Academic year 2016/17    testid:release-updates-table
+    user checks table cell contains    1    2    25 April 2018    testid:release-updates-table
+    user checks table cell contains    1    3    22 August 2022    testid:release-updates-table
 
-    user checks release update    1    9 March 2022    Updated boundary file on LAD map of absence rates.
-    user checks release update    2    19 April 2018
-    ...    Underlying data file updated to include absence data by pupil residency and school location, and updated metadata document.
-    user checks release update    3    22 March 2018    First published on GOV.UK.
-    user closes details dropdown    See all updates (3)
+    user checks table cell contains    2    1    Academic year 2014/15    testid:release-updates-table
+    user checks table cell contains    2    2    Not available    testid:release-updates-table
+    user checks table cell contains    2    3    Not available    testid:release-updates-table
 
-Check quick links navigation contains links
-    user checks element contains link    testid:quick-links    Explore data
-    user checks element contains link    testid:quick-links    Release contents
-    user checks element contains link    testid:quick-links    Help and support
-    user checks element contains link    testid:quick-links    Download all data (zip)
+    user checks table cell contains    3    1    Academic year 2013/14    testid:release-updates-table
+    user checks table cell contains    3    2    Not available    testid:release-updates-table
+    user checks table cell contains    3    3    Not available    testid:release-updates-table
 
-Check supporting information contains methodology link
-    user checks page contains link with text and url    ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
-    ...    ${PUPIL_ABSENCE_METHODOLOGY_RELATIVE_URL}
+    user checks table cell contains    4    1    Academic year 2012/13    testid:release-updates-table
+    user checks table cell contains    4    2    Not available    testid:release-updates-table
+    user checks table cell contains    4    3    Not available    testid:release-updates-table
 
-Validate subject files file type and file unit style
-    [Documentation]    DFE-958    DFE-562
-    [Tags]    NotAgainstLocal    Failing
-    user opens details dropdown    Download data files
-    user checks page contains    Absence in PRUs (CSV, 141 Kb)
-    user closes details dropdown    Download data files
+    user checks table cell contains    5    1    Academic year 2011/12    testid:release-updates-table
+    user checks table cell contains    5    2    Not available    testid:release-updates-table
+    user checks table cell contains    5    3    Not available    testid:release-updates-table
 
-Validate absence_in_prus.csv file can be downloaded
-    [Documentation]    DFE-958    DFE-562
-    [Tags]    NotAgainstLocal    Failing
+    user checks table cell contains    6    1    Academic year 2010/11    testid:release-updates-table
+    user checks table cell contains    6    2    Not available    testid:release-updates-table
+    user checks table cell contains    6    3    Not available    testid:release-updates-table
 
-    # TODO: This needs new file utils to be added to (related to EES-3241):
-    # * unzip the directory once download
-    # * navigate to the 'data' directory
-    # * find 'absence_in_prus.csv' in the directory
-    #    * run 'downloaded file should have first line' keyword
+    user checks table cell contains    7    1    Academic year 2009/10    testid:release-updates-table
+    user checks table cell contains    7    2    Not available    testid:release-updates-table
+    user checks table cell contains    7    3    Not available    testid:release-updates-table
 
-    user opens details dropdown    Download data files
+    user clicks link    Release home (latest release)
+    user waits until page finishes loading
 
-    download file    link:Absence in PRUs    absence_in_prus.csv
-    downloaded file should have first line    absence_in_prus.csv
-    ...    time_identifier,time_period,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,school_type,num_schools,enrolments,sess_possible,sess_overall,sess_authorised,sess_unauthorised,sess_overall_percent,sess_authorised_percent,sess_unauthorised_percent,enrolments_pa10_exact,enrolments_pa10_exact_percent,sess_auth_illness,sess_auth_appointments,sess_auth_religious,sess_auth_study,sess_auth_traveller,sess_auth_holiday,sess_auth_ext_holiday,sess_auth_excluded,sess_auth_other,sess_auth_totalreasons,sess_unauth_holiday,sess_unauth_late,sess_unauth_other,sess_unauth_noyet,sess_unauth_totalreasons,sess_overall_totalreasons
+Validate Release Home tab - Background information
+    user waits until h2 is visible    Background information
+    user checks section with ID contains elements and back to top link    background-information
+    ...    ${BACKGROUND_INFORMATION_PARAGRAPH}
 
-    user closes details dropdown    Download data files
-
-Validate headlines -- Summary tab key stats
+Validate Release Home tab - Headline facts and figures
     user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
-
     user checks key stat contents    1    Overall absence rate    4.7%    Up from 4.6% in 2015/16    %{WAIT_MEDIUM}
     user checks key stat guidance    1    What is overall absence?
     ...    Total number of all authorised and unauthorised absences from possible school sessions for all pupils.
@@ -105,8 +109,9 @@ Validate headlines -- Summary tab key stats
     user checks key stat guidance    3    What is unauthorized absence rate?
     ...    Number of unauthorised absences as a percentage of the overall school population.
 
-Validate headlines -- Summary tab content
+Validate Headlines facts and figures -- Summary tab content
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    ...    # TODO: Test charts more thoroughly in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    NotAgainstPreProd    Failing
     user checks headline summary contains    pupils missed on average 8.2 school days
     user checks headline summary contains    overall and unauthorised absence rates up on 2015/16
@@ -132,10 +137,10 @@ Validate Headlines facts and figures -- Charts tab
     ...    2%
     ...    4%
     ...    6%
-#TODO: Test mouse over tooltips in https://dfedigital.atlassian.net/browse/EES-6851
+    #TODO: Test mouse over tooltips in https://dfedigital.atlassian.net/browse/EES-6851
 
-Validate Key Statistics data block -- Charts tab (OLD DESIGN)
-    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+Validate Key Statistics data block -- Charts tab (old design, includes mouse over checks)
+    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269.
     ...    Some aspects of this test are covered by the step above 'Validate Headlines facts and figures -- Charts tab'
     ...    # TODO: Test charts more thoroughly in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
@@ -189,7 +194,7 @@ Validate Key Statistics data block -- Charts tab (OLD DESIGN)
     user checks list item contains    testid:footnotes    3
     ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.    ${headline_chart}
 
-Validate Key Statistics data block -- Data tables tab
+Validate Headlines facts and figures -- Data tables tab
     user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
     user clicks element    id:releaseHeadlines-tables-tab
     user waits until element contains    css:[data-testid="dataTableCaption"]
@@ -230,17 +235,49 @@ Validate Key Statistics data block -- Data tables tab
     ...    Data symbols
     ...    back_to_top=False
 
-Validate accordion sections order
-    user checks accordion is in position    About these statistics    1    id:content
-    user checks accordion is in position    Pupil absence rates    2    id:content
-    user checks accordion is in position    Persistent absence    3    id:content
-    user checks accordion is in position    Reasons for absence    4    id:content
-    user checks accordion is in position    Distribution of absence    5    id:content
-    user checks accordion is in position    Absence by pupil characteristics    6    id:content
-    user checks accordion is in position    Absence for 4-year-olds    7    id:content
-    user checks accordion is in position    Pupil referral unit absence    8    id:content
-    user checks accordion is in position    Regional and local authority (LA) breakdown    9    id:content
-    user checks there are x accordion sections    9    id:content
+Validate content sections order
+    user waits until parent contains element    testid:home-content    css:[data-testid="home-content-section"]
+    ...    count=9
+    user checks section is in position    About these statistics    1    testid:home-content
+    user checks section is in position    Pupil absence rates    2    testid:home-content
+    user checks section is in position    Persistent absence    3    testid:home-content
+    user checks section is in position    Reasons for absence    4    testid:home-content
+    user checks section is in position    Distribution of absence    5    testid:home-content
+    user checks section is in position    Absence by pupil characteristics    6    testid:home-content
+    user checks section is in position    Absence for 4-year-olds    7    testid:home-content
+    user checks section is in position    Pupil referral unit absence    8    testid:home-content
+    user checks section is in position    Regional and local authority (LA) breakdown    9    testid:home-content
+
+Validate content section basic content
+    user checks section with ID contains elements and back to top link    section-about-these-statistics
+    ...    About these statistics
+    ...    The statistics and data cover the absence of pupils of compulsory school age during the 2016/17 academic year
+    user checks section with ID contains elements and back to top link    section-pupil-absence-rates
+    ...    Pupil absence rates
+    ...    The overall absence rate has increased across state-funded primary, secondary and special schools between 2015/16 and 2016/17.
+    user checks section with ID contains elements and back to top link    section-persistent-absence
+    ...    Persistent absence
+    ...    The overall absence rate for persistent absentees across all schools increased to 18.1% - nearly 4 times higher than the rate for all pupils.
+    user checks section with ID contains elements and back to top link    section-reasons-for-absence
+    ...    Reasons for absence
+    ...    Illness is the main driver behind overall absence and accounted for 55.3% of all absence - down from 57.3% in 2015/16 and 60.1% in 2014/15.
+    user checks section with ID contains elements and back to top link    section-distribution-of-absence
+    ...    Distribution of absence
+    ...    Nearly half of all pupils (48.9%) were absent for 5 days or less across primary, secondary and special schools - down from 49.1% in 2015/16.
+    user checks section with ID contains elements and back to top link    section-absence-by-pupil-characteristics
+    ...    Absence by pupil characteristics
+    ...    The overall absence and persistent absence patterns for pupils with different characteristics have been consistent over recent years.
+    user checks section with ID contains elements and back to top link    section-absence-for-4-year-olds
+    ...    Absence for 4-year-olds
+    ...    The overall absence rate decreased to 5.1% - down from 5.2% for the previous two years.
+    user checks section with ID contains elements and back to top link    section-pupil-referral-unit-absence
+    ...    Pupil referral unit absence
+    ...    The overall absence rate increased to 33.9% - up from 32.6% in 2015/16.
+    user checks section with ID contains elements and back to top link
+    ...    section-regional-and-local-authority-la-breakdown    Regional and local authority (LA) breakdown
+    ...    Overall absence and persistent absence rates vary across primary, secondary and special schools by region and local authority (LA).
+    # TODO: Test charts more thoroughly in https://dfedigital.atlassian.net/browse/EES-6851
+    Check the contact us section has expected details
 
 Verify help and support section is correct
     user checks page contains    Help and support
@@ -250,6 +287,7 @@ Verify help and support section is correct
 
 Validate Regional and local authority (LA) breakdown table
     [Documentation]    BAU-540    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    ...    # TODO: Test charts more thoroughly in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user waits until element contains    css:#content_9_datablock-tables [data-testid="dataTableCaption"]
@@ -298,6 +336,7 @@ Validate Regional and local authority (LA) breakdown table
 
 Check Regional and local authority (LA) breakdown table has footnotes
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    ...    # TODO: Test charts more thoroughly in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
     ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user scrolls down    500
@@ -318,7 +357,8 @@ Check Regional and local authority (LA) breakdown table has footnotes
     ...    ${data_block_table}
 
 Validate Regional and local authority (LA) breakdown chart
-    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269 -
+    ...    # TODO: Test charts more thoroughly in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user scrolls to accordion section    Regional and local authority (LA) breakdown    id:content
@@ -357,6 +397,7 @@ Validate Regional and local authority (LA) breakdown chart
 
 Check Regional and local authority (LA) breakdown chart has footnotes
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    ...    # TODO: Test charts more thoroughly in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
     ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
     ${data_block_chart}=    user gets data block chart from parent    LAD map    ${accordion}
@@ -378,10 +419,140 @@ Check Regional and local authority (LA) breakdown chart has footnotes
     ...    This map uses the boundary data Local Authority Districts (December 2021) UK BUC
     ...    ${data_block_chart}
 
-Clicking "Create tables" takes user to Table Tool page with absence publication selected
-    user clicks link    View or create your own tables
+# Explore and download data tab
+
+Verify Explore and Download data
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    user waits until h2 is visible    Data sets: download or create tables
+    Check main links for page are persistent
+    ...    Download all data from this release (ZIP)
+    ...    Data sets: download or create tables
+    ...    Data guidance
+    ...    Data catalogue
+    User checks data set list item properties    Absence by characteristic    201,625    2012/13 to 2016/17
+    User checks data set list item properties    Absence in PRUs    612    2013/14 to 2016/17
+    user checks section with ID contains elements and back to top link    data-guidance-section
+    ...    ${DATA_GUIDANCE_PARAGRAPH}
+    Check the contact us section has expected details
+
+# Methodology tab
+
+Verify Methodology tab
+    user clicks link    Methodology
+    user waits until h2 is visible    Methodology
+    user checks page contains link with text and url    Seed methodology - Pupil absence statistics: methodology
+    ...    /methodology/seed-methodology-pupil-absence-statistics-methodology
+    user checks section with ID contains elements and back to top link    methodology-section
+    ...    Find out how and why we collect, process and publish these statistics.
+    Check the contact us section has expected details
+
+# Help and related information tab
+
+Verify Help and related information tab
+    user clicks link    Help and related information
+    user waits until h2 is visible    Get help by contacting us
+    Check the contact us section has expected details
+
+    user checks page contains link with text and url
+    ...    Standards for official statistics published by DfE guidance (opens in new tab)
+    ...    https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education
+    user checks page contains link with text and url    Code of Practice for Statistics (opens in new tab)
+    ...    https://code.statisticsauthority.gov.uk/the-code/
+    user checks page contains link with text and url    OSR website (opens in new tab)
+    ...    https://osr.statisticsauthority.gov.uk/
+
+
+*** Keywords ***
+user navigates to the Absence publication
+    user navigates to    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
+    user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
+
+user checks section is in position
+    [Arguments]    ${section_text}    ${position}    ${parent}=css:[data-testid="accordion"]    ${exact_match}=${False}
+    ${text_matcher}=    get xpath text matcher    ${section_text}    ${exact_match}
+    user waits until parent contains element    ${parent}
+    ...    xpath:(.//*[@data-testid="home-content-section"])[${position}]//h2[${text_matcher}]
+
+User checks data set list item properties
+    [Arguments]    ${data_set_name}    ${expected_row_count}    ${expected_time_period}
+
+    ${dataset_xpath}=    Set Variable
+    ...    //article//li[@data-testid="release-data-list-item"][.//h4[normalize-space()="${data_set_name}"]]
+
+    # Wait for dataset to exist
+    Wait Until Element Is Visible    xpath=${dataset_xpath}
+
+    # Expand accordion if collapsed
+    ${toggle_xpath}=    Set Variable
+    ...    ${dataset_xpath}//button[@aria-expanded="false"]
+
+    Run Keyword And Ignore Error
+    ...    Click Element    xpath=${toggle_xpath}
+
+    # Assert "Number of rows" dt exists
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Number of rows"]
+    ...    Dataset "${data_set_name}" is missing "Number of rows" label
+
+    # Assert dd value for "Number of rows"
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}
+    ...    //dt[normalize-space(.)="Number of rows"]/following-sibling::dd[normalize-space(.)="${expected_row_count}"]
+    ...    Dataset "${data_set_name}" has incorrect Number of rows
+
+    # Assert dd value for "Time period"
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}
+    ...    //dt[normalize-space(.)="Time period"]/following-sibling::dd[normalize-space(.)="${expected_time_period}"]
+    ...    Dataset "${data_set_name}" has incorrect Time period
+
+    # Verify data guidance content
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}//p[contains(normalize-space(.), "${data_set_name} data guidance content")]
+    ...    Dataset "${data_set_name}" is missing the data guidance content link
+
+    # Verify Data set information page link
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Data set information page")]
+    ...    Dataset "${data_set_name}" is missing the "Data set information page" link
+
+    # Verify Create table link
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
+    ...    Dataset "${data_set_name}" is missing the "Create table" link
+
+    # Verify Download (ZIP) button
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}//button[contains(normalize-space(.), "Download")]
+    ...    Dataset "${data_set_name}" is missing the "Download (ZIP)" button
+
+    user clicks element    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
     user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
     user waits until page finishes loading
 
     user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user navigates to the Absence publication
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    user waits until h2 is visible    Data sets: download or create tables
+
+Check main links for page are persistent
+    [Arguments]    @{expected_link_texts}
+    FOR    ${link_text}    IN    @{expected_link_texts}
+        ${button_xpath}=    Set Variable
+        ...    //section[@data-testid="explore-section"]//ul[@data-testid="links-grid"]//a[text()="${link_text}"]
+        Page Should Contain Element
+        ...    xpath=${button_xpath}
+        ...    Page is missing "${button_xpath}" button
+    END
+
+Check the contact us section has expected details
+    user checks section with ID contains elements and back to top link    contact-us-section
+    ...    UI test team name
+    ...    UI test contact name
+    ...    ui_test@test.com
+    ...    0123 4567
+    ...    037 0000 2288
+    ...    Monday to Friday from 9.30am to 5pm (excluding bank holidays)
