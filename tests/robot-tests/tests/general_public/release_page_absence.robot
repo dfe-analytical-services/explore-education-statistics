@@ -134,7 +134,7 @@ Validate Headlines facts and figures -- Charts tab
     ...    6%
 #TODO: Test mouse over tooltips in https://dfedigital.atlassian.net/browse/EES-6851
 
-Validate Key Statistics data block -- Charts tab (OLD DESIGN)
+Validate Key Statistics data block -- Charts tab
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     ...    Some aspects of this test are covered by the step above 'Validate Headlines facts and figures -- Charts tab'
     ...    # TODO: Test charts more thoroughly in https://dfedigital.atlassian.net/browse/EES-6851
