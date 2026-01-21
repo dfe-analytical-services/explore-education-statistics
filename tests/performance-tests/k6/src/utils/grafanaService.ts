@@ -18,6 +18,11 @@ class GrafanaService {
     tags?: string[];
     timeMillis?: number;
   }) {
+    console.log(
+      'Creation of annotations programmatically is now supported with a new HTTP API via Grafana itself. ' +
+        'See https://grafana.com/docs/grafana/latest/developer-resources/api-reference/http-api/annotations/',
+    );
+
     http.post(
       'http://influxdb:8181/write?db=k6&precision=ms',
       `events title="${title}",text="${content}",tags="${tags.join(',')}" ${
