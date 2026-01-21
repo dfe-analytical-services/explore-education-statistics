@@ -78,8 +78,7 @@ public class PreReleaseUserServicePermissionTests
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IUserService? userService = null,
         IUserRepository? userRepository = null,
-        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
-        IUserReleaseInviteRepository? userReleaseInviteRepository = null
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null
     )
     {
         return new(
@@ -88,8 +87,7 @@ public class PreReleaseUserServicePermissionTests
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
             userService ?? Mock.Of<IUserService>(Strict),
             userRepository ?? Mock.Of<IUserRepository>(Strict),
-            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
-            userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict)
+            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict)
         );
     }
 }

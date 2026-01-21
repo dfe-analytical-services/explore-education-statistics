@@ -35,7 +35,7 @@ public class UpdateReleaseRoleAuthorizationHandlerTests
             UpdateReleaseRoleRequirement,
             Tuple<Publication, ReleaseRole>
         >(
-            publication.Id,
+            publication,
             tuple,
             contentDbContext => contentDbContext.Add(publication),
             CreateHandler,
@@ -51,7 +51,7 @@ public class UpdateReleaseRoleAuthorizationHandlerTests
         await AssertHandlerOnlySucceedsWithPublicationRoles<
             UpdateReleaseRoleRequirement,
             Tuple<Publication, ReleaseRole>
-        >(publication.Id, tuple, contentDbContext => contentDbContext.Add(publication), CreateHandler);
+        >(publication, tuple, contentDbContext => contentDbContext.Add(publication), CreateHandler);
     }
 
     private static UpdateReleaseRoleAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)

@@ -49,7 +49,7 @@ public class DeleteSpecificReleaseAuthorizationHandler
             }
 
             if (
-                await _authorizationHandlerService.HasRolesOnPublication(
+                await _authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
                     userId: context.User.GetUserId(),
                     publicationId: releaseVersion.PublicationId,
                     Owner

@@ -3,11 +3,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
@@ -22,6 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 // ReSharper disable once ClassNeverInstantiated.Global
 public class ReleaseStatusAuthorizationHandlersTests
 {
+    private static readonly DataFixture _fixture = new();
+
     public class MarkReleaseAsDraftAuthorizationHandlerTests
     {
         [Fact]
@@ -52,12 +55,10 @@ public class ReleaseStatusAuthorizationHandlersTests
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async status =>
                 {
-                    var releaseVersion = new ReleaseVersion
-                    {
-                        Id = Guid.NewGuid(),
-                        Publication = new Publication { Id = Guid.NewGuid() },
-                        ApprovalStatus = status,
-                    };
+                    ReleaseVersion releaseVersion = _fixture
+                        .DefaultReleaseVersion()
+                        .WithApprovalStatus(status)
+                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
                     var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
@@ -69,20 +70,14 @@ public class ReleaseStatusAuthorizationHandlersTests
                                 ReleasePublishingStatusOverallStage.Complete
                             )
                         )
-                        .ReturnsAsync(new List<ReleasePublishingStatus>());
+                        .ReturnsAsync([]);
 
                     // Assert that a user who has the "Contributor" or "Approver"
                     // role on a Release can update its status if it is not Approved
                     if (status != ReleaseApprovalStatus.Approved)
                     {
                         await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MarkReleaseAsDraftRequirement>(
-                            context =>
-                            {
-                                context.ReleaseVersions.Add(releaseVersion);
-                                context.SaveChanges();
-
-                                return CreateHandler(context, releaseStatusRepository.Object);
-                            },
+                            context => CreateHandler(context, releaseStatusRepository.Object),
                             releaseVersion,
                             ReleaseRole.Contributor,
                             ReleaseRole.Approver
@@ -93,13 +88,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                         // Assert that a user who has the "Approver" role on a
                         // Release can update its status if it is Approved
                         await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MarkReleaseAsDraftRequirement>(
-                            context =>
-                            {
-                                context.ReleaseVersions.Add(releaseVersion);
-                                context.SaveChanges();
-
-                                return CreateHandler(context, releaseStatusRepository.Object);
-                            },
+                            context => CreateHandler(context, releaseStatusRepository.Object),
                             releaseVersion,
                             ReleaseRole.Approver
                         );
@@ -114,12 +103,10 @@ public class ReleaseStatusAuthorizationHandlersTests
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async status =>
                 {
-                    var releaseVersion = new ReleaseVersion
-                    {
-                        Id = Guid.NewGuid(),
-                        Publication = new Publication { Id = Guid.NewGuid() },
-                        ApprovalStatus = status,
-                    };
+                    ReleaseVersion releaseVersion = _fixture
+                        .DefaultReleaseVersion()
+                        .WithApprovalStatus(status)
+                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
                     var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
@@ -131,20 +118,14 @@ public class ReleaseStatusAuthorizationHandlersTests
                                 ReleasePublishingStatusOverallStage.Complete
                             )
                         )
-                        .ReturnsAsync(new List<ReleasePublishingStatus>());
+                        .ReturnsAsync([]);
 
                     // Assert that a User who has the Publication Owner or Approver role
                     // on a Release can mark its status as Draft if it is not yet Approved.
                     if (status != ReleaseApprovalStatus.Approved)
                     {
                         await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MarkReleaseAsDraftRequirement>(
-                            context =>
-                            {
-                                context.ReleaseVersions.Add(releaseVersion);
-                                context.SaveChanges();
-
-                                return CreateHandler(context, releaseStatusRepository.Object);
-                            },
+                            context => CreateHandler(context, releaseStatusRepository.Object),
                             releaseVersion,
                             Owner,
                             Allower
@@ -156,13 +137,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                         // Release can mark its status as draft if it is currently Approved
                         // but not yet published, just as a Release Approver can.
                         await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MarkReleaseAsDraftRequirement>(
-                            context =>
-                            {
-                                context.ReleaseVersions.Add(releaseVersion);
-                                context.SaveChanges();
-
-                                return CreateHandler(context, releaseStatusRepository.Object);
-                            },
+                            context => CreateHandler(context, releaseStatusRepository.Object),
                             releaseVersion,
                             Allower
                         );
@@ -192,10 +167,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                 new AuthorizationHandlerService(
                     releaseVersionRepository: new ReleaseVersionRepository(context),
                     userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext: context),
-                    userReleaseRoleRepository: new UserReleaseRoleRepository(
-                        contentDbContext: context,
-                        logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
-                    ),
+                    userReleaseRoleRepository: new UserReleaseRoleRepository(contentDbContext: context),
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)
                 )
             );
@@ -232,12 +204,10 @@ public class ReleaseStatusAuthorizationHandlersTests
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async status =>
                 {
-                    var releaseVersion = new ReleaseVersion
-                    {
-                        Id = Guid.NewGuid(),
-                        Publication = new Publication { Id = Guid.NewGuid() },
-                        ApprovalStatus = status,
-                    };
+                    ReleaseVersion releaseVersion = _fixture
+                        .DefaultReleaseVersion()
+                        .WithApprovalStatus(status)
+                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
                     var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
@@ -249,20 +219,14 @@ public class ReleaseStatusAuthorizationHandlersTests
                                 ReleasePublishingStatusOverallStage.Complete
                             )
                         )
-                        .ReturnsAsync(new List<ReleasePublishingStatus>());
+                        .ReturnsAsync([]);
 
                     // Assert that a user who has the "Contributor" or "Approver"
                     // role on a Release can update its status if it is not Approved
                     if (status != ReleaseApprovalStatus.Approved)
                     {
                         await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MarkReleaseAsHigherLevelReviewRequirement>(
-                            context =>
-                            {
-                                context.ReleaseVersions.Add(releaseVersion);
-                                context.SaveChanges();
-
-                                return CreateHandler(context, releaseStatusRepository.Object);
-                            },
+                            context => CreateHandler(context, releaseStatusRepository.Object),
                             releaseVersion,
                             ReleaseRole.Contributor,
                             ReleaseRole.Approver
@@ -273,13 +237,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                         // Assert that a user who has the "Approver" role on a
                         // Release can update its status if it is Approved
                         await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MarkReleaseAsHigherLevelReviewRequirement>(
-                            context =>
-                            {
-                                context.ReleaseVersions.Add(releaseVersion);
-                                context.SaveChanges();
-
-                                return CreateHandler(context, releaseStatusRepository.Object);
-                            },
+                            context => CreateHandler(context, releaseStatusRepository.Object),
                             releaseVersion,
                             ReleaseRole.Approver
                         );
@@ -294,12 +252,10 @@ public class ReleaseStatusAuthorizationHandlersTests
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async status =>
                 {
-                    var releaseVersion = new ReleaseVersion
-                    {
-                        Id = Guid.NewGuid(),
-                        Publication = new Publication { Id = Guid.NewGuid() },
-                        ApprovalStatus = status,
-                    };
+                    ReleaseVersion releaseVersion = _fixture
+                        .DefaultReleaseVersion()
+                        .WithApprovalStatus(status)
+                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
                     var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
@@ -311,20 +267,14 @@ public class ReleaseStatusAuthorizationHandlersTests
                                 ReleasePublishingStatusOverallStage.Complete
                             )
                         )
-                        .ReturnsAsync(new List<ReleasePublishingStatus>());
+                        .ReturnsAsync([]);
 
                     // Assert that a User who has the Publication Owner or Approver role on a
                     // Release can mark it for higher review if it is not Approved
                     if (status != ReleaseApprovalStatus.Approved)
                     {
                         await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MarkReleaseAsHigherLevelReviewRequirement>(
-                            context =>
-                            {
-                                context.ReleaseVersions.Add(releaseVersion);
-                                context.SaveChanges();
-
-                                return CreateHandler(context, releaseStatusRepository.Object);
-                            },
+                            context => CreateHandler(context, releaseStatusRepository.Object),
                             releaseVersion,
                             Owner,
                             Allower
@@ -335,13 +285,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                         // Assert that a User who has the Publication Approver role on a
                         // Release can mark it for higher review even if it is not Approved
                         await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MarkReleaseAsHigherLevelReviewRequirement>(
-                            context =>
-                            {
-                                context.ReleaseVersions.Add(releaseVersion);
-                                context.SaveChanges();
-
-                                return CreateHandler(context, releaseStatusRepository.Object);
-                            },
+                            context => CreateHandler(context, releaseStatusRepository.Object),
                             releaseVersion,
                             Allower
                         );
@@ -371,10 +315,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                 new AuthorizationHandlerService(
                     releaseVersionRepository: new ReleaseVersionRepository(context),
                     userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext: context),
-                    userReleaseRoleRepository: new UserReleaseRoleRepository(
-                        contentDbContext: context,
-                        logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
-                    ),
+                    userReleaseRoleRepository: new UserReleaseRoleRepository(contentDbContext: context),
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)
                 )
             );
@@ -411,12 +352,10 @@ public class ReleaseStatusAuthorizationHandlersTests
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async status =>
                 {
-                    var releaseVersion = new ReleaseVersion
-                    {
-                        Id = Guid.NewGuid(),
-                        Publication = new Publication { Id = Guid.NewGuid() },
-                        ApprovalStatus = status,
-                    };
+                    ReleaseVersion releaseVersion = _fixture
+                        .DefaultReleaseVersion()
+                        .WithApprovalStatus(status)
+                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
                     var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
@@ -428,18 +367,12 @@ public class ReleaseStatusAuthorizationHandlersTests
                                 ReleasePublishingStatusOverallStage.Complete
                             )
                         )
-                        .ReturnsAsync(new List<ReleasePublishingStatus>());
+                        .ReturnsAsync([]);
 
                     // Assert that a user who has the "Approver" role on a
                     // Release can update its status if it is Approved
                     await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<MarkReleaseAsApprovedRequirement>(
-                        context =>
-                        {
-                            context.ReleaseVersions.Add(releaseVersion);
-                            context.SaveChanges();
-
-                            return CreateHandler(context, releaseStatusRepository.Object);
-                        },
+                        context => CreateHandler(context, releaseStatusRepository.Object),
                         releaseVersion,
                         ReleaseRole.Approver
                     );
@@ -453,12 +386,10 @@ public class ReleaseStatusAuthorizationHandlersTests
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async status =>
                 {
-                    var releaseVersion = new ReleaseVersion
-                    {
-                        Id = Guid.NewGuid(),
-                        Publication = new Publication { Id = Guid.NewGuid() },
-                        ApprovalStatus = status,
-                    };
+                    ReleaseVersion releaseVersion = _fixture
+                        .DefaultReleaseVersion()
+                        .WithApprovalStatus(status)
+                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
                     var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
@@ -470,20 +401,12 @@ public class ReleaseStatusAuthorizationHandlersTests
                                 ReleasePublishingStatusOverallStage.Complete
                             )
                         )
-                        .ReturnsAsync(new List<ReleasePublishingStatus>());
+                        .ReturnsAsync([]);
 
                     // Assert that a user who has the "Approver" role on the
                     // Publication for the Release can update its status
                     await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<MarkReleaseAsApprovedRequirement>(
-                        context =>
-                        {
-                            context.ReleaseVersions.Add(releaseVersion);
-                            context.SaveChanges();
-
-                            var userRepository = new UserRepository(context);
-
-                            return CreateHandler(context, releaseStatusRepository.Object);
-                        },
+                        context => CreateHandler(context, releaseStatusRepository.Object),
                         releaseVersion,
                         Allower
                     );
@@ -512,10 +435,7 @@ public class ReleaseStatusAuthorizationHandlersTests
                 new AuthorizationHandlerService(
                     releaseVersionRepository: new ReleaseVersionRepository(context),
                     userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext: context),
-                    userReleaseRoleRepository: new UserReleaseRoleRepository(
-                        contentDbContext: context,
-                        logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
-                    ),
+                    userReleaseRoleRepository: new UserReleaseRoleRepository(contentDbContext: context),
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)
                 )
             );
@@ -532,12 +452,10 @@ public class ReleaseStatusAuthorizationHandlersTests
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async status =>
             {
-                var releaseVersion = new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Publication = new Publication { Id = Guid.NewGuid() },
-                    ApprovalStatus = status,
-                };
+                ReleaseVersion releaseVersion = _fixture
+                    .DefaultReleaseVersion()
+                    .WithApprovalStatus(status)
+                    .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
                 var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
@@ -549,18 +467,12 @@ public class ReleaseStatusAuthorizationHandlersTests
                             ReleasePublishingStatusOverallStage.Complete
                         )
                     )
-                    .ReturnsAsync(new List<ReleasePublishingStatus>());
+                    .ReturnsAsync([]);
 
                 // Assert that users with the specified claims can update the
                 // Release status if it has not started publishing
                 await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, TRequirement>(
-                    context =>
-                    {
-                        context.ReleaseVersions.Add(releaseVersion);
-                        context.SaveChanges();
-
-                        return authorizationHandlerSupplier(context, releaseStatusRepository.Object);
-                    },
+                    context => authorizationHandlerSupplier(context, releaseStatusRepository.Object),
                     releaseVersion,
                     claims
                 );
@@ -576,12 +488,10 @@ public class ReleaseStatusAuthorizationHandlersTests
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async status =>
             {
-                var releaseVersion = new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Publication = new Publication { Id = Guid.NewGuid() },
-                    ApprovalStatus = status,
-                };
+                ReleaseVersion releaseVersion = _fixture
+                    .DefaultReleaseVersion()
+                    .WithApprovalStatus(status)
+                    .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
                 var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
@@ -593,17 +503,11 @@ public class ReleaseStatusAuthorizationHandlersTests
                             ReleasePublishingStatusOverallStage.Complete
                         )
                     )
-                    .ReturnsAsync(new List<ReleasePublishingStatus> { new() });
+                    .ReturnsAsync([new()]);
 
                 // Assert that no users can update a Release status once it has started publishing
                 await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, TRequirement>(
-                    context =>
-                    {
-                        context.ReleaseVersions.Add(releaseVersion);
-                        context.SaveChanges();
-
-                        return authorizationHandlerSupplier(context, releaseStatusRepository.Object);
-                    },
+                    context => authorizationHandlerSupplier(context, releaseStatusRepository.Object),
                     releaseVersion
                 );
             });
@@ -618,13 +522,11 @@ public class ReleaseStatusAuthorizationHandlersTests
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async status =>
             {
-                var releaseVersion = new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Publication = new Publication { Id = Guid.NewGuid() },
-                    ApprovalStatus = status,
-                    Published = DateTimeOffset.UtcNow,
-                };
+                ReleaseVersion releaseVersion = _fixture
+                    .DefaultReleaseVersion()
+                    .WithApprovalStatus(status)
+                    .WithPublished(DateTimeOffset.UtcNow)
+                    .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
                 var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
@@ -636,17 +538,11 @@ public class ReleaseStatusAuthorizationHandlersTests
                             ReleasePublishingStatusOverallStage.Complete
                         )
                     )
-                    .ReturnsAsync(new List<ReleasePublishingStatus>());
+                    .ReturnsAsync([]);
 
                 // Assert that no users can update a Release status once it has been published
                 await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, TRequirement>(
-                    context =>
-                    {
-                        context.ReleaseVersions.Add(releaseVersion);
-                        context.SaveChanges();
-
-                        return authorizationHandlerSupplier(context, releaseStatusRepository.Object);
-                    },
+                    context => authorizationHandlerSupplier(context, releaseStatusRepository.Object),
                     releaseVersion
                 );
             });
@@ -661,12 +557,10 @@ public class ReleaseStatusAuthorizationHandlersTests
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async status =>
             {
-                var releaseVersion = new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Publication = new Publication { Id = Guid.NewGuid() },
-                    ApprovalStatus = status,
-                };
+                ReleaseVersion releaseVersion = _fixture
+                    .DefaultReleaseVersion()
+                    .WithApprovalStatus(status)
+                    .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
                 var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
@@ -678,29 +572,17 @@ public class ReleaseStatusAuthorizationHandlersTests
                             ReleasePublishingStatusOverallStage.Complete
                         )
                     )
-                    .ReturnsAsync(new List<ReleasePublishingStatus> { new() });
+                    .ReturnsAsync([new()]);
 
                 // Assert that no user release roles allow updating a Release status once it has started publishing
                 await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
-                    context =>
-                    {
-                        context.ReleaseVersions.Add(releaseVersion);
-                        context.SaveChanges();
-
-                        return authorizationHandlerSupplier(context, releaseStatusRepository.Object);
-                    },
+                    context => authorizationHandlerSupplier(context, releaseStatusRepository.Object),
                     releaseVersion
                 );
 
                 // Assert that no user publication roles allow updating a Release status once it has started publishing
                 await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<TRequirement>(
-                    context =>
-                    {
-                        context.ReleaseVersions.Add(releaseVersion);
-                        context.SaveChanges();
-
-                        return authorizationHandlerSupplier(context, releaseStatusRepository.Object);
-                    },
+                    context => authorizationHandlerSupplier(context, releaseStatusRepository.Object),
                     releaseVersion
                 );
             });
@@ -715,13 +597,11 @@ public class ReleaseStatusAuthorizationHandlersTests
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async status =>
             {
-                var releaseVersion = new ReleaseVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Publication = new Publication { Id = Guid.NewGuid() },
-                    ApprovalStatus = status,
-                    Published = DateTimeOffset.UtcNow,
-                };
+                ReleaseVersion releaseVersion = _fixture
+                    .DefaultReleaseVersion()
+                    .WithApprovalStatus(status)
+                    .WithPublished(DateTimeOffset.UtcNow)
+                    .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
 
                 var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
@@ -733,33 +613,17 @@ public class ReleaseStatusAuthorizationHandlersTests
                             ReleasePublishingStatusOverallStage.Complete
                         )
                     )
-                    .ReturnsAsync(new List<ReleasePublishingStatus>());
+                    .ReturnsAsync([]);
 
                 // Assert that no user release roles allow updating a Release status once it has been published
                 await AssertReleaseVersionHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
-                    context =>
-                    {
-                        context.ReleaseVersions.Add(releaseVersion);
-                        context.SaveChanges();
-
-                        var userRepository = new UserRepository(context);
-
-                        return authorizationHandlerSupplier(context, releaseStatusRepository.Object);
-                    },
+                    context => authorizationHandlerSupplier(context, releaseStatusRepository.Object),
                     releaseVersion
                 );
 
                 // Assert that no user publication roles allow updating a Release status once it has started publishing
                 await AssertReleaseVersionHandlerSucceedsWithCorrectPublicationRoles<TRequirement>(
-                    context =>
-                    {
-                        context.ReleaseVersions.Add(releaseVersion);
-                        context.SaveChanges();
-
-                        var userRepository = new UserRepository(context);
-
-                        return authorizationHandlerSupplier(context, releaseStatusRepository.Object);
-                    },
+                    context => authorizationHandlerSupplier(context, releaseStatusRepository.Object),
                     releaseVersion
                 );
             });

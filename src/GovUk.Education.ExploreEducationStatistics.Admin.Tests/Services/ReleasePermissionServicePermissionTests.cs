@@ -1,19 +1,18 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using Microsoft.Extensions.Logging;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -167,16 +166,10 @@ public class ReleasePermissionServicePermissionTests
 
     private static ReleasePermissionService BuildService(ContentDbContext contentDbContext, IUserService userService)
     {
-        var userReleaseRoleRepository = new UserReleaseRoleRepository(
-            contentDbContext,
-            logger: Mock.Of<ILogger<UserReleaseRoleRepository>>()
-        );
-
         return new(
-            contentDbContext: contentDbContext,
             persistenceHelper: new PersistenceHelper<ContentDbContext>(contentDbContext),
-            releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-            userReleaseRoleRepository: userReleaseRoleRepository,
+            userReleaseRoleRepository: Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict),
+            userReleaseRoleService: Mock.Of<IUserReleaseRoleService>(MockBehavior.Strict),
             userService: userService
         );
     }

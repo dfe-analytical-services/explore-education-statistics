@@ -79,6 +79,7 @@
         "Microsoft.EntityFrameworkCore",
         "Microsoft.Extensions",
         "Moq.EntityFrameworkCore",
+        "MockQueryable.EntityFrameworkCore",
         "MockQueryable.Moq",
         "Npgsql.EntityFrameworkCore.PostgreSQL",
         "Thinktecture.EntityFrameworkCore",

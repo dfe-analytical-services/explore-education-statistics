@@ -644,8 +644,18 @@ public class ContentDbContext : DbContext
     {
         modelBuilder
             .Entity<UserPublicationRole>()
+            .HasIndex(upr => new
+            {
+                upr.UserId,
+                upr.PublicationId,
+                upr.Role,
+            })
+            .IsUnique();
+
+        modelBuilder
+            .Entity<UserPublicationRole>()
             .Property(upr => upr.Created)
-            .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
         modelBuilder
             .Entity<UserPublicationRole>()
@@ -656,7 +666,8 @@ public class ContentDbContext : DbContext
         modelBuilder
             .Entity<UserPublicationRole>()
             .Property(upr => upr.Role)
-            .HasConversion(new EnumToStringConverter<PublicationRole>());
+            .HasConversion(new EnumToStringConverter<PublicationRole>())
+            .HasMaxLength(20);
 
         // This will be changed when we start introducing the use of the NEW publication roles in the
         // UI, in STEP 9 (EES-6196) of the Permissions Rework. For now, we want to
@@ -670,13 +681,24 @@ public class ContentDbContext : DbContext
     {
         modelBuilder
             .Entity<UserReleaseRole>()
+            .HasIndex(urr => new
+            {
+                urr.UserId,
+                urr.ReleaseVersionId,
+                urr.Role,
+            })
+            .IsUnique();
+
+        modelBuilder
+            .Entity<UserReleaseRole>()
             .Property(userReleaseRole => userReleaseRole.Created)
-            .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+            .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
         modelBuilder
             .Entity<UserReleaseRole>()
             .Property(r => r.Role)
-            .HasConversion(new EnumToStringConverter<ReleaseRole>());
+            .HasConversion(new EnumToStringConverter<ReleaseRole>())
+            .HasMaxLength(20);
     }
 
     private static void ConfigureUserReleaseInvite(ModelBuilder modelBuilder)

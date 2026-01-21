@@ -1,4 +1,5 @@
 #nullable enable
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -8,6 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Security;
 
@@ -22,7 +25,7 @@ public class PermissionsControllerTestsCollection : ICollectionFixture<Permissio
 public class PermissionsControllerTests(PermissionsControllerTestsFixture fixture)
     : OptimisedIntegrationTestBase<Startup>(fixture)
 {
-    private static readonly DataFixture DataFixture = new();
+    private static readonly DataFixture _dataFixture = new();
 
     [Fact]
     public async Task GetGlobalPermissions_AuthenticatedUser()
@@ -69,7 +72,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     [Fact]
     public async Task GetGlobalPermissions_AnalystUser_NotReleaseOrPublicationApprover()
     {
-        var user = DataFixture.AnalystUser().Generate();
+        var user = _dataFixture.AnalystUser().Generate();
 
         await fixture
             .GetContentDbContext()
@@ -77,12 +80,28 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
             {
                 // Add test data that gives the user access to a Release without being an Approver.
                 context.UserReleaseRoles.Add(
-                    new UserReleaseRole { UserId = user.GetUserId(), Role = ReleaseRole.Contributor }
+                    _dataFixture
+                        .DefaultUserReleaseRole()
+                        .WithUserId(user.GetUserId())
+                        .WithRole(ReleaseRole.Contributor)
+                        .WithReleaseVersion(
+                            _dataFixture
+                                .DefaultReleaseVersion()
+                                .WithRelease(
+                                    _dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication())
+                                )
+                        )
+                        .Generate()
                 );
 
                 // Add test data that gives the user access to a Publication without being an Approver.
                 context.UserPublicationRoles.Add(
-                    new UserPublicationRole { UserId = user.GetUserId(), Role = PublicationRole.Owner }
+                    _dataFixture
+                        .DefaultUserPublicationRole()
+                        .WithUserId(user.GetUserId())
+                        .WithRole(PublicationRole.Owner)
+                        .WithPublication(_dataFixture.DefaultPublication())
+                        .Generate()
                 );
             });
 
@@ -107,18 +126,21 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     [Fact]
     public async Task GetGlobalPermissions_AnalystUser_ReleaseApprover()
     {
-        var user = DataFixture.AnalystUser().Generate();
+        ClaimsPrincipal identityUser = _dataFixture.AnalystUser();
+        User user = _dataFixture.DefaultUser().WithId(identityUser.GetUserId());
+        UserReleaseRole userReleaseRole = _dataFixture
+            .DefaultUserReleaseRole()
+            .WithUser(user)
+            .WithRole(ReleaseRole.Approver);
 
         await fixture
             .GetContentDbContext()
             .AddTestData(context =>
             {
-                context.UserReleaseRoles.Add(
-                    new UserReleaseRole { UserId = user.GetUserId(), Role = ReleaseRole.Approver }
-                );
+                context.UserReleaseRoles.Add(userReleaseRole);
             });
 
-        var client = fixture.CreateClient(user: user);
+        var client = fixture.CreateClient(user: identityUser);
 
         var response = await client.GetAsync("/api/permissions/access");
 
@@ -139,18 +161,21 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
     [Fact]
     public async Task GetGlobalPermissions_AnalystUser_PublicationApprover()
     {
-        var user = DataFixture.AnalystUser().Generate();
+        ClaimsPrincipal identityUser = _dataFixture.AnalystUser();
+        User user = _dataFixture.DefaultUser().WithId(identityUser.GetUserId());
+        UserPublicationRole userPublicationRole = _dataFixture
+            .DefaultUserPublicationRole()
+            .WithUser(user)
+            .WithRole(PublicationRole.Allower);
 
         await fixture
             .GetContentDbContext()
             .AddTestData(context =>
             {
-                context.UserReleaseRoles.Add(
-                    new UserReleaseRole { UserId = user.GetUserId(), Role = ReleaseRole.Approver }
-                );
+                context.UserPublicationRoles.Add(userPublicationRole);
             });
 
-        var client = fixture.CreateClient(user: user);
+        var client = fixture.CreateClient(user: identityUser);
 
         var response = await client.GetAsync("/api/permissions/access");
 

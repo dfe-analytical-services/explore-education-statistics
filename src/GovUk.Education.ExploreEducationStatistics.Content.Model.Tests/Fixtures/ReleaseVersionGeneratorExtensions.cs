@@ -115,8 +115,10 @@ public static class ReleaseVersionGeneratorExtensions
         Guid previousVersionId
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetPreviousVersionId(previousVersionId));
 
-    public static Generator<ReleaseVersion> WithSoftDeleted(this Generator<ReleaseVersion> generator) =>
-        generator.ForInstance(releaseVersion => releaseVersion.SetSoftDeleted());
+    public static Generator<ReleaseVersion> WithSoftDeleted(
+        this Generator<ReleaseVersion> generator,
+        bool softDeleted = true
+    ) => generator.ForInstance(releaseVersion => releaseVersion.SetSoftDeleted(softDeleted));
 
     public static Generator<ReleaseVersion> WithType(this Generator<ReleaseVersion> generator, ReleaseType type) =>
         generator.ForInstance(releaseVersion => releaseVersion.SetType(type));
@@ -351,8 +353,10 @@ public static class ReleaseVersionGeneratorExtensions
         Guid? previousVersionId
     ) => setters.Set(releaseVersion => releaseVersion.PreviousVersionId, previousVersionId);
 
-    public static InstanceSetters<ReleaseVersion> SetSoftDeleted(this InstanceSetters<ReleaseVersion> setters) =>
-        setters.Set(releaseVersion => releaseVersion.SoftDeleted, true);
+    public static InstanceSetters<ReleaseVersion> SetSoftDeleted(
+        this InstanceSetters<ReleaseVersion> setters,
+        bool softDeleted = true
+    ) => setters.Set(releaseVersion => releaseVersion.SoftDeleted, softDeleted);
 
     public static InstanceSetters<ReleaseVersion> SetType(
         this InstanceSetters<ReleaseVersion> setters,

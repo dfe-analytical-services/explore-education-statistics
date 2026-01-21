@@ -24,10 +24,10 @@ public class UpdateSpecificReleaseAuthorizationHandler(AuthorizationHandlerServi
         const PublicationRole allowedPublicationRole = PublicationRole.Owner;
 
         if (
-            await authorizationHandlerService.HasRolesOnPublication(
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
                 userId: context.User.GetUserId(),
                 publicationId: release.PublicationId,
-                publicationRoles: allowedPublicationRole
+                rolesToInclude: allowedPublicationRole
             )
         )
         {

@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -9,9 +10,7 @@ using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
@@ -79,8 +78,16 @@ public class DropMethodologyLinkAuthorizationHandlerTests
                 if (!expectedToPassByClaimAlone)
                 {
                     userPublicationRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
-                        .ReturnsAsync(new List<PublicationRole>());
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
+                                UserId,
+                                NonOwningLink.PublicationId,
+                                ResourceRoleFilter.ActiveOnly,
+                                It.IsAny<CancellationToken>(),
+                                PublicationRole.Owner
+                            )
+                        )
+                        .ReturnsAsync(false);
                 }
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId).WithClaim(claim.ToString());
@@ -130,15 +137,23 @@ public class DropMethodologyLinkAuthorizationHandlerTests
             await ForEachPublicationRoleAsync(async publicationRole =>
             {
                 // If the user has Publication Owner role on the publication they are allowed to drop methodology links
-                var expectedToPassByPublicationRole = publicationRole == Owner;
+                var isOwnerRole = publicationRole == PublicationRole.Owner;
 
                 var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
 
                 var handler = SetupHandler(userPublicationRoleRepository.Object);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
-                    .ReturnsAsync(ListOf(publicationRole));
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
+                            UserId,
+                            NonOwningLink.PublicationId,
+                            ResourceRoleFilter.ActiveOnly,
+                            It.IsAny<CancellationToken>(),
+                            PublicationRole.Owner
+                        )
+                    )
+                    .ReturnsAsync(isOwnerRole);
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
                 var authContext = CreateAuthorizationHandlerContext<
@@ -150,20 +165,28 @@ public class DropMethodologyLinkAuthorizationHandlerTests
 
                 VerifyAllMocks(userPublicationRoleRepository);
 
-                Assert.Equal(expectedToPassByPublicationRole, authContext.HasSucceeded);
+                Assert.Equal(isOwnerRole, authContext.HasSucceeded);
             });
         }
 
         [Fact]
-        public async Task UsersWithNoRolesOnOwningPublicationsCannotDropLinks()
+        public async Task UsersWithoutPublicationOwnerRoleCannotDropLinks()
         {
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
 
             var handler = SetupHandler(userPublicationRoleRepository.Object);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
+                        UserId,
+                        NonOwningLink.PublicationId,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        PublicationRole.Owner
+                    )
+                )
+                .ReturnsAsync(false);
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
             var authContext = CreateAuthorizationHandlerContext<DropMethodologyLinkRequirement, PublicationMethodology>(

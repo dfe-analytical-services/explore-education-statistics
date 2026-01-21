@@ -1,19 +1,35 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IUserPublicationRoleRepository
 {
-    Task<UserPublicationRole> Create(Guid userId, Guid publicationId, PublicationRole role, Guid createdById);
+    Task<UserPublicationRole> Create(
+        Guid userId,
+        Guid publicationId,
+        PublicationRole role,
+        Guid createdById,
+        DateTime? createdDate = null,
+        CancellationToken cancellationToken = default
+    );
 
-    Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId);
+    Task<List<UserPublicationRole>> CreateManyIfNotExists(
+        IReadOnlyList<UserPublicationRole> userPublicationRoles,
+        CancellationToken cancellationToken = default
+    );
 
-    Task<List<PublicationRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId);
+    Task<UserPublicationRole?> GetById(Guid userPublicationRoleId, CancellationToken cancellationToken = default);
 
-    Task<UserPublicationRole?> GetUserPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
+    Task<UserPublicationRole?> GetByCompositeKey(
+        Guid userId,
+        Guid publicationId,
+        PublicationRole role,
+        CancellationToken cancellationToken = default
+    );
 
-    Task<bool> UserHasRoleOnPublication(Guid userId, Guid publicationId, PublicationRole role);
+    IQueryable<UserPublicationRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly);
 
     Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default);
 
@@ -24,11 +40,25 @@ public interface IUserPublicationRoleRepository
 
     Task RemoveForUser(Guid userId, CancellationToken cancellationToken = default);
 
-    Task MarkEmailAsSent(
+    Task<bool> UserHasRoleOnPublication(
         Guid userId,
         Guid publicationId,
         PublicationRole role,
-        DateTimeOffset? emailSent = null,
+        ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<bool> UserHasAnyRoleOnPublication(
+        Guid userId,
+        Guid publicationId,
+        ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly,
+        CancellationToken cancellationToken = default,
+        params PublicationRole[] rolesToInclude
+    );
+
+    Task MarkEmailAsSent(
+        Guid userPublicationRoleId,
+        DateTimeOffset? dateSent = null,
         CancellationToken cancellationToken = default
     );
 }

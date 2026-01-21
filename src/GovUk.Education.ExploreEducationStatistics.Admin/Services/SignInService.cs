@@ -21,9 +21,7 @@ public class SignInService(
     UserManager<ApplicationUser> userManager,
     ContentDbContext contentDbContext,
     IUserReleaseRoleRepository userReleaseRoleRepository,
-    IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserReleaseInviteRepository userReleaseInviteRepository,
-    IUserPublicationInviteRepository userPublicationInviteRepository
+    IUserPublicationRoleRepository userPublicationRoleRepository
 ) : ISignInService
 {
     public async Task<Either<ActionResult, SignInResponseViewModel>> RegisterOrSignIn()
@@ -68,7 +66,7 @@ public class SignInService(
     {
         if (userInvitedToSystem.IsInviteExpired())
         {
-            await HandleExpiredInvite(profile.Email);
+            await HandleExpiredInvite(userInvitedToSystem.Id);
             return new SignInResponseViewModel(LoginResult.ExpiredInvite);
         }
 
@@ -96,16 +94,13 @@ public class SignInService(
                 throw new InvalidOperationException("Failed to add role to invited user");
             }
 
-            // Now we have created Identity Framework user records, we can create internal Role
+            // Now we have created Identity Framework user records, we can create an internal Role
             // for the application itself.
 
             // Update your domain user
             userInvitedToSystem.FirstName = newAspNetUser.FirstName;
             userInvitedToSystem.LastName = newAspNetUser.LastName;
             userInvitedToSystem.Active = true;
-
-            await HandleReleaseInvites(userInvitedToSystem.Id, userInvitedToSystem.Email);
-            await HandlePublicationInvites(userInvitedToSystem.Id, userInvitedToSystem.Email);
 
             await usersAndRolesDbContext.SaveChangesAsync();
             await contentDbContext.SaveChangesAsync();
@@ -117,73 +112,12 @@ public class SignInService(
         );
     }
 
-    private async Task HandleReleaseInvites(Guid userId, string email)
-    {
-        var releaseInvites = await userReleaseInviteRepository.GetInvitesByEmail(email);
-
-        await releaseInvites
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async invite =>
-            {
-                await userReleaseRoleRepository.Create(
-                    userId: userId,
-                    releaseVersionId: invite.ReleaseVersionId,
-                    role: invite.Role,
-                    createdById: invite.CreatedById
-                );
-
-                // This will be removed in EES-6511 when we stop using UserReleaseRoleInvites/UserPublicationRoleInvites altogether.
-                // At that point, a role will always exist at the point of sending an email; which means we can always set the date at the point
-                // of sending.
-                if (invite.EmailSent)
-                {
-                    await userReleaseRoleRepository.MarkEmailAsSent(
-                        userId: userId,
-                        releaseVersionId: invite.ReleaseVersionId,
-                        role: invite.Role,
-                        emailSent: DateTimeOffset.MinValue
-                    );
-                }
-            });
-
-        await userReleaseInviteRepository.RemoveByUserEmail(email);
-    }
-
-    private async Task HandlePublicationInvites(Guid userId, string email)
-    {
-        var publicationInvites = await userPublicationInviteRepository.GetInvitesByEmail(email);
-
-        await publicationInvites
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async invite =>
-            {
-                await userPublicationRoleRepository.Create(
-                    userId: userId,
-                    publicationId: invite.PublicationId,
-                    role: invite.Role,
-                    createdById: invite.CreatedById
-                );
-
-                // This will be removed in EES-6511 when we stop using UserReleaseRoleInvites/UserPublicationRoleInvites altogether.
-                // At that point, a role will always exist at the point of sending an email; which means we can always set the date at the point
-                // of sending.
-                await userPublicationRoleRepository.MarkEmailAsSent(
-                    userId: userId,
-                    publicationId: invite.PublicationId,
-                    role: invite.Role,
-                    emailSent: DateTimeOffset.MinValue
-                );
-            });
-
-        await userPublicationInviteRepository.RemoveByUserEmail(email);
-    }
-
-    private async Task HandleExpiredInvite(string email)
+    private async Task HandleExpiredInvite(Guid userId)
     {
         await contentDbContext.RequireTransaction(async () =>
         {
-            await userReleaseInviteRepository.RemoveByUserEmail(email);
-            await userPublicationInviteRepository.RemoveByUserEmail(email);
+            await userReleaseRoleRepository.RemoveForUser(userId);
+            await userPublicationRoleRepository.RemoveForUser(userId);
 
             await contentDbContext.SaveChangesAsync();
         });
