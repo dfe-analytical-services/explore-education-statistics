@@ -113,10 +113,10 @@ public class ReleaseApprovalService(
                         {
                             context.ReleaseVersions.Update(releaseVersion);
                             context.ReleaseStatus.Add(releaseStatus);
-                            await context.SaveChangesAsync();
 
-                            return await NotifyPublisher(releasePublishingKey, request, oldStatus)
-                                .OnSuccess(() => SendEmailNotificationsAndInvites(request, releaseVersion));
+                            return await SendEmailNotificationsAndInvites(request, releaseVersion)
+                                .OnSuccess(() => NotifyPublisher(releasePublishingKey, request, oldStatus))
+                                .OnSuccessDo(async () => await context.SaveChangesAsync());
                         })
                     );
             });
