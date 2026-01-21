@@ -1,18 +1,24 @@
 local buildId = os.getenv("BUILD_ID")
-local releasePageUrl = os.getenv("RELEASE_PAGE_URL")
+local themeId = os.getenv("THEME_ID")
+local publicationId = os.getenv("PUBLICATION_ID")
+local releaseVersionId = os.getenv("RELEASE_VERSION_ID")
+local publicationSlug = os.getenv("PUBLICATION_SLUG")
+local releaseSlug = os.getenv("RELEASE_SLUG")
 local exclude_data_requests = os.getenv("EXCLUDE_DATA_REQUESTS") == "true"
 local print_urls = os.getenv("PRINT_URLS") == "true"
+
+local releasePageUrl = '/find-statistics/' .. publicationSlug .. '/' .. releaseSlug
 
 page_requests = {
     {
         page_name = 'Main release content page',
         requests = {
             "/find-statistics/foundation-years-ad-hoc/2018-19?redesign=true",
-            "/_next/data/" .. buildId .. releasePageUrl .. "/releases.json?publication=foundation-years-ad-hoc",
-            "/_next/data/" .. buildId .. releasePageUrl .. ".json?publication=foundation-years-ad-hoc&release=2018-19",
-            "/_next/data/" .. buildId .. releasePageUrl .. "/explore.json?publication=foundation-years-ad-hoc&release=2018-19&tab=explore",
-            "/_next/data/" .. buildId .. releasePageUrl .. "/methodology.json?publication=foundation-years-ad-hoc&release=2018-19&tab=methodology",
-            "/_next/data/" .. buildId .. releasePageUrl .. "/help.json?publication=foundation-years-ad-hoc&release=2018-19&tab=help",
+            "/_next/data/" .. buildId .. releasePageUrl .. "/releases.json?publication=" .. publicationSlug,
+            "/_next/data/" .. buildId .. releasePageUrl .. ".json?publication=" .. publicationSlug .. "&release=" .. releaseSlug,
+            "/_next/data/" .. buildId .. releasePageUrl .. "/explore.json?publication=" .. publicationSlug .. "&release=" .. releaseSlug .. "&tab=explore",
+            "/_next/data/" .. buildId .. releasePageUrl .. "/methodology.json?publication=" .. publicationSlug .. "&release=" .. releaseSlug .. "&tab=methodology",
+            "/_next/data/" .. buildId .. releasePageUrl .. "/help.json?publication=" .. publicationSlug .. "&release=" .. releaseSlug .. "&tab=help",
             "/_next/data/" .. buildId .. "/find-statistics.json"
         },
         weighting = 70
@@ -20,23 +26,23 @@ page_requests = {
     {
         page_name = 'Explore page',
         requests = {
-            "/_next/data/" .. buildId .. releasePageUrl .. "/explore.json?publication=foundation-years-ad-hoc&release=2018-19&tab=explore",
-            "/_next/data/" .. buildId .. "/data-catalogue.json?themeId=2ca22e34-b87a-4281-a0eb-b80f4f8dd374&publicationId=24f63a6f-5a5a-4025-d8b5-08d88b0047f4&releaseVersionId=e642795f-22ea-4eb6-957b-08d88ad5b210",
-            "/_next/data/" .. buildId .. releasePageUrl .. "/explore.json?publication=foundation-years-ad-hoc&release=2018-19&tab=explore",
+            "/_next/data/" .. buildId .. releasePageUrl .. "/explore.json?publication="  .. publicationSlug .. "&release=" .. releaseSlug .. "&tab=explore",
+            "/_next/data/" .. buildId .. "/data-catalogue.json?themeId=" .. themeId .. "&publicationId=" .. publicationId .. "&releaseVersionId=" .. releaseVersionId,
+            "/_next/data/" .. buildId .. releasePageUrl .. "/explore.json?publication=" .. publicationSlug .. "&release=" .. releaseSlug .. "&tab=explore",
         },
         weighting = 10
     },
     {
         page_name = 'Methodology page',
         requests = {
-            "/_next/data/" .. buildId .. releasePageUrl .. "/methodology.json?publication=foundation-years-ad-hoc&release=2018-19&tab=methodology",
+            "/_next/data/" .. buildId .. releasePageUrl .. "/methodology.json?publication=" .. publicationSlug .. "&release=" .. releaseSlug .. "&tab=methodology",
         },
         weighting = 10
     },
     {
         page_name = 'Help page',
         requests = {
-            "/_next/data/" .. buildId .. releasePageUrl .. "/help.json?publication=foundation-years-ad-hoc&release=2018-19&tab=help"
+            "/_next/data/" .. buildId .. releasePageUrl .. "/help.json?publication=" .. publicationSlug .. "&release=" .. releaseSlug .. "&tab=help"
         },
         weighting = 10
     }
