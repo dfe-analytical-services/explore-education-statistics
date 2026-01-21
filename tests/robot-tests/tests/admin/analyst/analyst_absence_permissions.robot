@@ -132,6 +132,7 @@ Validate Analyst1 can see 'Content' page key stats
     user checks element count is x    css:[data-testid="keyStat"]    3
 
 Validate Analyst1 can see 'Content' page accordion sections
+    #TODO: When EES-6843 is complete, this test should be REPLACED by 'Validate Analyst1 can see 'Content' page sections'
     user checks accordion is in position    About these statistics    1    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user checks accordion is in position    Pupil absence rates    2    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user checks accordion is in position    Persistent absence    3    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
@@ -145,7 +146,21 @@ Validate Analyst1 can see 'Content' page accordion sections
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user checks there are x accordion sections    9    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
+Validate Analyst1 can see 'Content' page sections
+    [Tags]    ReleaseRedesign
+    #TODO: When EES-6843 is complete, the 'ReleaseRedesign' tag should be removed
+    user checks section is in position    About these statistics    1    testid:home-content
+    user checks section is in position    Pupil absence rates    2    testid:home-content
+    user checks section is in position    Persistent absence    3    testid:home-content
+    user checks section is in position    Reasons for absence    4    testid:home-content
+    user checks section is in position    Distribution of absence    5    testid:home-content
+    user checks section is in position    Absence by pupil characteristics    6    testid:home-content
+    user checks section is in position    Absence for 4-year-olds    7    testid:home-content
+    user checks section is in position    Pupil referral unit absence    8    testid:home-content
+    user checks section is in position    Regional and local authority (LA) breakdown    9    testid:home-content
+
 Validate Analyst1 can see help and support section
+    #TODO: When EES-6843 is complete, this step should be removed.
     user checks page contains    Help and support
     user checks page contains    Methodology
     user checks page contains    Official statistics
