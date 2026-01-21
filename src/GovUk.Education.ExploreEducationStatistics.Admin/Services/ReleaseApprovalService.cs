@@ -109,14 +109,15 @@ public class ReleaseApprovalService(
 
                 return await ValidateReleaseWithChecklist(releaseVersion)
                     .OnSuccess(() =>
-                        SendEmailNotificationsAndInvites(request, releaseVersion)
-                            .OnSuccess(() => NotifyPublisher(releasePublishingKey, request, oldStatus))
-                            .OnSuccessDo(async () =>
-                            {
-                                context.ReleaseVersions.Update(releaseVersion);
-                                await context.AddAsync(releaseStatus);
-                                await context.SaveChangesAsync();
-                            })
+                        context.RequireTransaction(async () =>
+                        {
+                            context.ReleaseVersions.Update(releaseVersion);
+                            context.ReleaseStatus.Add(releaseStatus);
+                            await context.SaveChangesAsync();
+
+                            return await NotifyPublisher(releasePublishingKey, request, oldStatus)
+                                .OnSuccess(() => SendEmailNotificationsAndInvites(request, releaseVersion));
+                        })
                     );
             });
     }
