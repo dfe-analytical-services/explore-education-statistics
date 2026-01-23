@@ -1,7 +1,7 @@
 import useAsyncCallback, {
   AsyncStateSetterParam,
 } from '@common/hooks/useAsyncCallback';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 
 describe('useAsyncCallback', () => {
   test('returns correct state when callback not invoked', () => {
@@ -17,16 +17,15 @@ describe('useAsyncCallback', () => {
   });
 
   // EES-4936 This test doesn't work with the new version of renderHook.
-  test.skip('returns correct state when callback invoked', () => {
+  test.skip('returns correct state when callback invoked', async () => {
     const { result } = renderHook(() =>
       useAsyncCallback(() => Promise.resolve('some value')),
     );
 
-    const [, run] = result.current;
+    const [state, run] = result.current;
 
-    run();
+    act(() => run());
 
-    const [state] = result.current;
     expect(state.isLoading).toBe(true);
     expect(state.value).toBeUndefined();
     expect(state.error).toBeUndefined();
@@ -39,7 +38,7 @@ describe('useAsyncCallback', () => {
 
     const [, run] = result.current;
 
-    run();
+    await act(() => run());
 
     await waitFor(() => {
       const [state] = result.current;
@@ -57,7 +56,7 @@ describe('useAsyncCallback', () => {
 
     const [, run] = result.current;
 
-    run();
+    await act(() => run());
 
     await waitFor(() => {
       const [state] = result.current;
@@ -75,9 +74,11 @@ describe('useAsyncCallback', () => {
 
     let [state] = result.current;
 
-    state.setState({
-      isLoading: false,
-    });
+    await act(() =>
+      state.setState({
+        isLoading: false,
+      }),
+    );
 
     await waitFor(() => {
       [state] = result.current;
@@ -95,10 +96,12 @@ describe('useAsyncCallback', () => {
 
     let [state] = result.current;
 
-    state.setState({
-      isLoading: true,
-      value: 'a custom value',
-    } as AsyncStateSetterParam<string>);
+    await act(() =>
+      state.setState({
+        isLoading: true,
+        value: 'a custom value',
+      } as AsyncStateSetterParam<string>),
+    );
 
     await waitFor(() => {
       [state] = result.current;
@@ -118,10 +121,12 @@ describe('useAsyncCallback', () => {
 
     let [state] = result.current;
 
-    state.setState({
-      isLoading: true,
-      error: new Error('some error'),
-    } as AsyncStateSetterParam<string>);
+    await act(() =>
+      state.setState({
+        isLoading: true,
+        error: new Error('some error'),
+      } as AsyncStateSetterParam<string>),
+    );
 
     await waitFor(() => {
       [state] = result.current;
@@ -139,9 +144,11 @@ describe('useAsyncCallback', () => {
 
     let [state] = result.current;
 
-    state.setState({
-      value: 'a custom value',
-    });
+    await act(() =>
+      state.setState({
+        value: 'a custom value',
+      }),
+    );
 
     await waitFor(() => {
       [state] = result.current;
@@ -159,9 +166,11 @@ describe('useAsyncCallback', () => {
 
     let [state] = result.current;
 
-    state.setState({
-      error: new Error('some error'),
-    });
+    await act(() =>
+      state.setState({
+        error: new Error('some error'),
+      }),
+    );
 
     await waitFor(() => {
       [state] = result.current;
@@ -217,7 +226,7 @@ describe('useAsyncCallback', () => {
     expect(state.value).toBe('first value');
     expect(state.error).toBeUndefined();
 
-    run();
+    await act(() => run());
 
     jest.advanceTimersByTime(400);
 
@@ -263,7 +272,7 @@ describe('useAsyncCallback', () => {
 
     const [, run] = result.current;
 
-    run();
+    await act(() => run());
 
     let state;
 
@@ -275,7 +284,7 @@ describe('useAsyncCallback', () => {
       expect(state.error).toBeUndefined();
     });
 
-    run();
+    await act(() => run());
 
     [state] = result.current;
 

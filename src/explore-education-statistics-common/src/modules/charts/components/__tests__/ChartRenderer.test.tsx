@@ -61,7 +61,7 @@ describe('ChartRenderer', () => {
 
   test('renders auto-generated boundary level footnote successfully', async () => {
     render(<ChartRenderer {...testMapChartRenderer} />);
-    const footnotes = screen.queryByTestId('footnotes');
+    const footnotes = await screen.findByTestId('footnotes');
 
     expect(footnotes).toBeInTheDocument();
     expect(footnotes).toHaveTextContent(
@@ -72,6 +72,6 @@ describe('ChartRenderer', () => {
   test('renders export button successfully', async () => {
     render(<ChartRenderer {...testMapChartRenderer} />);
 
-    expect(screen.queryByText('Export options')).toBeInTheDocument();
+    expect(await screen.findByText('Export options')).toBeInTheDocument();
   });
 });

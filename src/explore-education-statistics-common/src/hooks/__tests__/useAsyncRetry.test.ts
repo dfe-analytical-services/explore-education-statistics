@@ -10,6 +10,11 @@ describe('useAsyncRetry', () => {
     expect(result.current.isLoading).toBe(true);
     expect(result.current.value).toBeUndefined();
     expect(result.current.error).toBeUndefined();
+
+    waitFor(() => {
+      // promise resolved
+      expect(result.current.value).toBe('some value');
+    });
   });
 
   test('returns correct state when callback promise is resolved', async () => {

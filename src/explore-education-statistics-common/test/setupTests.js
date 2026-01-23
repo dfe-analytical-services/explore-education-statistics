@@ -3,6 +3,7 @@ import 'core-js/features/array/flat-map';
 import 'core-js/features/string/replace-all';
 import './setupGlobals';
 import './extend-expect';
+import failOnConsole from 'jest-fail-on-console';
 
 jest.setTimeout(10000);
 
@@ -28,3 +29,10 @@ global.document.createElementNS = function (namespaceURI, qualifiedName) {
   // eslint-disable-next-line prefer-rest-params
   return createElementNSOrig.apply(this, arguments);
 };
+
+failOnConsole({
+  skipTest: ({ testName }) => testName.includes('skip-console-errors'),
+  allowMessage: errorMessage =>
+    errorMessage.includes('`DialogContent` requires a `DialogTitle`'),
+  shouldFailOnWarn: false,
+});

@@ -20,6 +20,7 @@ import userEvent from '@testing-library/user-event';
 import { AxiosError } from 'axios';
 import { forceVisible } from 'react-lazyload';
 import React, { ReactNode } from 'react';
+import { act } from '@testing-library/react';
 
 jest.mock('@common/services/tableBuilderService');
 
@@ -176,7 +177,9 @@ describe('DataBlockTabs', () => {
       />,
     );
 
-    forceVisible();
+    await act(() => {
+      forceVisible();
+    });
 
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
@@ -209,7 +212,9 @@ describe('DataBlockTabs', () => {
       />,
     );
 
-    forceVisible();
+    await act(() => {
+      forceVisible();
+    });
 
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
@@ -238,7 +243,9 @@ describe('DataBlockTabs', () => {
       />,
     );
 
-    forceVisible();
+    await act(() => {
+      forceVisible();
+    });
 
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
@@ -273,7 +280,9 @@ describe('DataBlockTabs', () => {
       />,
     );
 
-    forceVisible();
+    await act(() => {
+      forceVisible();
+    });
 
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
@@ -307,7 +316,9 @@ describe('DataBlockTabs', () => {
       />,
     );
 
-    forceVisible();
+    await act(() => {
+      forceVisible();
+    });
 
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
@@ -342,7 +353,9 @@ describe('DataBlockTabs', () => {
       />,
     );
 
-    forceVisible();
+    await act(() => {
+      forceVisible();
+    });
 
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
@@ -372,7 +385,9 @@ describe('DataBlockTabs', () => {
       />,
     );
 
-    forceVisible();
+    await act(() => {
+      forceVisible();
+    });
 
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
@@ -410,7 +425,9 @@ describe('DataBlockTabs', () => {
       />,
     );
 
-    forceVisible();
+    await act(() => {
+      forceVisible();
+    });
 
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
@@ -450,7 +467,9 @@ describe('DataBlockTabs', () => {
       />,
     );
 
-    forceVisible();
+    await act(() => {
+      forceVisible();
+    });
 
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
@@ -519,7 +538,9 @@ describe('DataBlockTabs', () => {
       />,
     );
 
-    forceVisible();
+    await act(() => {
+      forceVisible();
+    });
 
     await waitFor(() => {
       expect(screen.getByRole('table')).toBeInTheDocument();
