@@ -168,7 +168,8 @@ const ReleasePageTabExploreData = ({
             <>
               <span>
                 Create table{' '}
-                <VisuallyHidden>using {dataset.title}</VisuallyHidden>
+                <VisuallyHidden>using {dataset.title}</VisuallyHidden> (public
+                site only)
               </span>
               <ButtonText
                 onClick={() => {
@@ -188,7 +189,8 @@ const ReleasePageTabExploreData = ({
             renderLink={
               <span>
                 Data set information page{' '}
-                <VisuallyHidden>for {dataset.title}</VisuallyHidden>
+                <VisuallyHidden>for {dataset.title}</VisuallyHidden> (public
+                site only)
               </span>
             }
           />
