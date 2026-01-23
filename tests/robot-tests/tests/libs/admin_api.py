@@ -67,13 +67,13 @@ def user_deletes_theme_via_api(theme_id: str):
     assert resp.status_code == 204, f"Could not delete theme! Responded with {resp.status_code} and {resp.text}"
 
 
-def user_creates_test_publication_via_api(publication_name: str):
+def user_creates_test_publication_via_api(publication_name: str, theme_id: str = None):
     response = admin_client.post(
         "/api/publications",
         {
             "title": publication_name,
             "summary": f"{publication_name} summary",
-            "themeId": os.getenv("TEST_THEME_ID"),
+            "themeId": theme_id or os.getenv("TEST_THEME_ID"),
             "contact": {
                 "contactName": "UI test contact name",
                 "contactTelNo": "0123 4567",
