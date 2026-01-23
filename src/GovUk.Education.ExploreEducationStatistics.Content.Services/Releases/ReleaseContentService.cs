@@ -4,10 +4,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Utils.ContentFilterUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Releases;
 
@@ -25,7 +25,7 @@ public class ReleaseContentService(ContentDbContext contentDbContext) : IRelease
             .OnSuccess(releaseVersion =>
             {
                 var releaseContentDto = ReleaseContentDto.FromReleaseVersion(releaseVersion);
-                SanitiseContent(releaseContentDto);
+                RemoveCommentsFromContent(releaseContentDto);
                 return releaseContentDto;
             });
 
@@ -51,19 +51,12 @@ public class ReleaseContentService(ContentDbContext contentDbContext) : IRelease
             .LatestReleaseVersions(publication.Id, releaseSlug, publishedOnly: true)
             .SingleOrNotFoundAsync(cancellationToken);
 
-    private static void SanitiseContent(ReleaseContentDto content)
-    {
-        content.GetAllSections().ForEach(SanitiseContentSection);
-    }
+    private static void RemoveCommentsFromContent(ReleaseContentDto content) =>
+        content.GetAllSections().ForEach(RemoveCommentsFromContentSection);
 
-    private static void SanitiseContentSection(ContentSectionDto section)
-    {
-        section.Content.OfType<HtmlBlockDto>().ForEach(SanitiseHtmlBlock);
-    }
+    private static void RemoveCommentsFromContentSection(ContentSectionDto section) =>
+        section.Content.OfType<HtmlBlockDto>().ForEach(RemoveCommentsFromHtmlBlock);
 
-    private static void SanitiseHtmlBlock(HtmlBlockDto htmlBlock)
-    {
-        // Remove any comments
-        htmlBlock.Body = CommentsRegex().Replace(htmlBlock.Body, string.Empty);
-    }
+    private static void RemoveCommentsFromHtmlBlock(HtmlBlockDto htmlBlock) =>
+        htmlBlock.Body = ContentFilterUtils.CommentsRegex().Replace(htmlBlock.Body, string.Empty);
 }

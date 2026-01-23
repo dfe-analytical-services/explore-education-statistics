@@ -150,7 +150,7 @@ public abstract class ReleaseContentServiceTests
         }
 
         [Fact]
-        public async Task WhenContentContainsComments_SanitisesHtmlContentToRemoveComments()
+        public async Task WhenContentContainsComments_RemovesComments()
         {
             // Arrange
             Publication publication = _dataFixture

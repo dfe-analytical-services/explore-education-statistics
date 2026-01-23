@@ -269,7 +269,7 @@ public abstract class ReleaseSearchableDocumentsServiceTests
         }
 
         [Fact]
-        public async Task WhenContentContainsComments_SanitisesHtmlContentToRemoveComments()
+        public async Task WhenContentContainsComments_RemovesCommentsFromHtmlContent()
         {
             // Arrange
             Publication publication = _dataFixture

@@ -87,10 +87,10 @@ public record ReleaseSearchableDocumentDto
             return;
         }
 
-        var sanitisedHtmlBlockBodies = htmlBlocks.Select(SanitiseHtmlBlock).JoinToString(Environment.NewLine);
+        var htmlBlockBodies = htmlBlocks.Select(hb => RemoveComments(hb.Body)).JoinToString(Environment.NewLine);
 
         H3(sb, sectionTitle);
-        sb.AppendLine(sanitisedHtmlBlockBodies);
+        sb.AppendLine(htmlBlockBodies);
     }
 
     private static void HtmlHeader(StringBuilder sb, string title) =>
@@ -118,7 +118,6 @@ public record ReleaseSearchableDocumentDto
             """
         );
 
-    private static string SanitiseHtmlBlock(HtmlBlock htmlBlock) =>
-        // Remove any comments
-        ContentFilterUtils.CommentsRegex().Replace(htmlBlock.Body, string.Empty);
+    private static string RemoveComments(string input) =>
+        ContentFilterUtils.CommentsRegex().Replace(input, string.Empty);
 }
