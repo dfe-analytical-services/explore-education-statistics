@@ -94,6 +94,7 @@ const ReleasePageIntro = ({
         <Link
           to={`/find-statistics/${publicationSummary.slug}/releases`}
           className="govuk-!-display-none-print"
+          prefetch={false}
         >
           All releases in this series
         </Link>
@@ -136,6 +137,7 @@ const ReleasePageIntro = ({
               <Link
                 to={`/find-statistics/${publicationSummary.slug}/${releaseVersionSummary.slug}/updates`}
                 data-testid="updates-link"
+                prefetch={false}
               >
                 {updateCountExcludingFirstPublished} update
                 {updateCountExcludingFirstPublished === 1 ? '' : 's'}
