@@ -211,7 +211,7 @@ describe('ReleaseExploreDataPage', () => {
     ).toBeInTheDocument();
     expect(
       within(dataGuidanceSection).getByText(
-        'Description of the data included in this release, this is a methodology document, providing information on data sources, their coverage and quality and how the data is produced.',
+        'Description of the data sets included in this release, including information on data sources, coverage, quality and any data conventions used.',
       ),
     ).toBeInTheDocument();
   });
