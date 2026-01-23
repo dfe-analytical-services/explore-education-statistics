@@ -106,7 +106,7 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
             {
                 services.MockService<IPublicBlobCacheService>(MockBehavior.Loose);
 
-                services.UseInMemoryDbContext<ContentDbContext>();
+                services.UseInMemoryDbContext<ContentDbContext>(Guid.NewGuid().ToString());
 
                 services.AddDbContext<PublicDataDbContext>(options =>
                     options.UseNpgsql(

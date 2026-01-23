@@ -1,17 +1,26 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Moq.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using IndicatorMeta = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMeta;
+using Release = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -879,6 +888,48 @@ public class EducationInNumbersContentServiceTests
     }
 
     [Fact]
+    public async Task AddTile_ApiQueryStatTile_Success()
+    {
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.EinContentBlocks.AddAsync(
+                new EinTileGroupBlock
+                {
+                    Id = _blockAId,
+                    EinContentSection = new EinContentSection { Id = _sectionAId, EducationInNumbersPageId = _pageId },
+                }
+            );
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = BuildService(context);
+            var result = await service.AddTile(_pageId, _blockAId, EinTileType.ApiQueryStatTile, 1);
+
+            var viewModel = result.AssertRight();
+            var apiTile = Assert.IsType<EinApiQueryStatTileViewModel>(viewModel);
+            Assert.Equal(1, apiTile.Order);
+            Assert.Empty(apiTile.Title);
+            Assert.Null(apiTile.DataSetId);
+            Assert.Empty(apiTile.Version);
+            Assert.Empty(apiTile.LatestPublishedVersion);
+            Assert.Empty(apiTile.Query);
+            Assert.Null(apiTile.IndicatorUnit);
+            Assert.Empty(apiTile.Statistic);
+            Assert.Null(apiTile.DecimalPlaces);
+            Assert.Empty(apiTile.PublicationSlug);
+            Assert.Empty(apiTile.ReleaseSlug);
+
+            var dbTile = await context.EinTiles.SingleAsync();
+            Assert.Equal(viewModel.Id, dbTile.Id);
+            Assert.Equal(1, dbTile.Order);
+            Assert.Equal(_blockAId, dbTile.EinParentBlockId);
+        }
+    }
+
+    [Fact]
     public async Task UpdateFreeTextStatTile_Success()
     {
         var contextId = Guid.NewGuid().ToString();
@@ -945,6 +996,674 @@ public class EducationInNumbersContentServiceTests
 
         var result = await service.UpdateFreeTextStatTile(_pageId, Guid.NewGuid(), request);
         result.AssertNotFound();
+    }
+
+    [Fact]
+    public async Task UpdateApiQueryStatTile_Success()
+    {
+        DataFixture dataFixture = new DataFixture();
+
+        Publication publication = dataFixture
+            .DefaultPublication()
+            .WithReleases(dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
+
+        var dataSetFileId = Guid.NewGuid();
+
+        ReleaseFile releaseFile = dataFixture
+            .DefaultReleaseFile()
+            .WithFile(dataFixture.DefaultFile().WithDataSetFileId(dataSetFileId))
+            .WithReleaseVersion(publication.Releases[0].Versions[0]);
+
+        var originalDataSetId = Guid.NewGuid();
+        var newDataSetId = Guid.NewGuid();
+        var latestDataSetVersionId = Guid.NewGuid();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.Publications.AddAsync(publication);
+
+            await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+
+            await contentDbContext.EinContentBlocks.AddAsync(
+                new EinTileGroupBlock
+                {
+                    Id = _blockAId,
+                    Tiles =
+                    [
+                        new EinApiQueryStatTile
+                        {
+                            Id = _tileAId,
+                            Title = "Old tile title",
+                            Order = 1,
+
+                            DataSetId = originalDataSetId,
+                            Version = "1.0.0",
+                            LatestPublishedVersion = "1.0.1",
+                            Query = """
+                            {"indicators":["aaaaa"]}
+                            """,
+                            Statistic = "Old stat",
+                            IndicatorUnit = IndicatorUnit.Percent,
+                            DecimalPlaces = null,
+                        },
+                    ],
+                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                }
+            );
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataSet = new DataSet
+        {
+            Id = newDataSetId,
+            Title = "Old dataset title",
+            Summary = "Dataset summary",
+            PublicationId = publication.Id,
+            Status = DataSetStatus.Published,
+            LatestLiveVersionId = latestDataSetVersionId,
+            LatestLiveVersion = new DataSetVersion
+            {
+                Id = latestDataSetVersionId,
+                DataSetId = newDataSetId,
+                Release = new Release
+                {
+                    Title = publication.Releases[0].Title,
+                    Slug = publication.Releases[0].Slug,
+                    DataSetFileId = dataSetFileId,
+                    ReleaseFileId = releaseFile.Id,
+                },
+                Status = DataSetVersionStatus.Published,
+                VersionMajor = 1,
+                VersionMinor = 0,
+                VersionPatch = 1,
+                Notes = "test dataset notes",
+            },
+        };
+
+        var publicDataSetRepository = new Mock<IPublicDataSetRepository>(MockBehavior.Strict);
+        publicDataSetRepository.Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId))).ReturnsAsync(dataSet);
+        publicDataSetRepository
+            .Setup(c =>
+                c.GetIndicatorMeta(
+                    It.Is<Guid>(id => id == latestDataSetVersionId),
+                    It.Is<string>(indId => indId == "bbbbb")
+                )
+            )
+            .ReturnsAsync(
+                dataFixture
+                    .DefaultIndicatorMeta()
+                    .WithDataSetVersionId(latestDataSetVersionId)
+                    .WithPublicId("bbbbb")
+                    .WithDecimalPlaces(2)
+                    .WithUnit(IndicatorUnit.MillionPounds)
+            );
+
+        var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
+        publicDataApiClient
+            .Setup(c =>
+                c.RunQuery(
+                    It.Is<Guid>(dataSetId => dataSetId == newDataSetId),
+                    It.Is<string>(version => version == "1.0.1"),
+                    It.Is<string>(query =>
+                        query
+                        == """
+                        {"indicators":["bbbbb"]}
+                        """
+                    ),
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(
+                new DataSetQueryPaginatedResultsViewModel
+                {
+                    Warnings = [],
+                    Paging = new PagingViewModel(1, 100, 10),
+                    Results =
+                    [
+                        new DataSetQueryResultViewModel
+                        {
+                            Filters = [],
+                            Locations = [], // normally there would be locations, but not needed for this test
+                            GeographicLevel = GeographicLevel.Country,
+                            TimePeriod = new TimePeriodOptionViewModel
+                            {
+                                Label = "Academic Year 2000/01",
+                                Code = TimeIdentifier.AcademicYear,
+                                Period = "2001",
+                            },
+                            Values = new Dictionary<string, string> { { "bbbbb", "9393" } },
+                        },
+                        new DataSetQueryResultViewModel
+                        {
+                            // This result isn't the latest year so filtered
+                            Filters = [],
+                            Locations = [],
+                            GeographicLevel = GeographicLevel.Country,
+                            TimePeriod = new TimePeriodOptionViewModel
+                            {
+                                Label = "Academic Year 2000/01",
+                                Code = TimeIdentifier.AcademicYear,
+                                Period = "2000",
+                            },
+                            Values = new Dictionary<string, string> { { "bbbbb", "shouldn't see this" } },
+                        },
+                        new DataSetQueryResultViewModel
+                        {
+                            // This result isn't GeogLvl.Country, so filtered
+                            Filters = [],
+                            Locations = [],
+                            GeographicLevel = GeographicLevel.LocalAuthority,
+                            TimePeriod = new TimePeriodOptionViewModel
+                            {
+                                Label = "Academic Year 2000/01",
+                                Code = TimeIdentifier.AcademicYear,
+                                Period = "2001",
+                            },
+                            Values = new Dictionary<string, string> { { "bbbbb", "shouldn't see this" } },
+                        },
+                    ],
+                }
+            );
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = BuildService(
+                contentDbContext,
+                dataSetRepository: publicDataSetRepository.Object,
+                publicDataApiClient: publicDataApiClient.Object
+            );
+            var request = new EinApiQueryStatTileUpdateRequest
+            {
+                Title = "New title",
+                DataSetId = newDataSetId,
+                Version = "1.0.1",
+                Query = """
+                    {"indicators":["bbbbb"]}
+                    """,
+            };
+            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request);
+
+            var viewModel = result.AssertRight();
+            var apiTile = Assert.IsType<EinApiQueryStatTileViewModel>(viewModel);
+
+            Assert.Equal(_tileAId, apiTile.Id);
+            Assert.Equal("New title", apiTile.Title);
+            Assert.Equal(1, apiTile.Order);
+            Assert.Equal(
+                """
+                {"indicators":["bbbbb"]}
+                """,
+                apiTile.Query
+            );
+            Assert.Equal("9393", apiTile.Statistic);
+            Assert.Equal(IndicatorUnit.MillionPounds, apiTile.IndicatorUnit);
+            Assert.Equal(2, apiTile.DecimalPlaces);
+            Assert.Equal(publication.Slug, apiTile.PublicationSlug);
+            Assert.Equal(publication.Releases[0].Slug, apiTile.ReleaseSlug);
+
+            var dbTile = await contentDbContext.EinTiles.OfType<EinApiQueryStatTile>().SingleAsync();
+            Assert.Equal(_tileAId, dbTile.Id);
+            Assert.Equal("New title", dbTile.Title);
+            Assert.Equal("9393", dbTile.Statistic);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateApiQueryStatTile_Fail_ProvidedVersionNotLatest()
+    {
+        DataFixture dataFixture = new DataFixture();
+
+        Publication publication = dataFixture
+            .DefaultPublication()
+            .WithReleases(dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
+
+        var dataSetFileId = Guid.NewGuid();
+
+        ReleaseFile releaseFile = dataFixture
+            .DefaultReleaseFile()
+            .WithFile(dataFixture.DefaultFile().WithDataSetFileId(dataSetFileId))
+            .WithReleaseVersion(publication.Releases[0].Versions[0]);
+
+        var originalDataSetId = Guid.NewGuid();
+        var newDataSetId = Guid.NewGuid();
+        var latestDataSetVersionId = Guid.NewGuid();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.Publications.AddAsync(publication);
+
+            await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+
+            await contentDbContext.EinContentBlocks.AddAsync(
+                new EinTileGroupBlock
+                {
+                    Id = _blockAId,
+                    Tiles =
+                    [
+                        new EinApiQueryStatTile
+                        {
+                            Id = _tileAId,
+                            Title = "Old tile title",
+                            Order = 1,
+
+                            DataSetId = originalDataSetId,
+                            Version = "1.0.0",
+                            LatestPublishedVersion = "1.0.1",
+                            Query = """
+                            {"indicators":["aaaaa"]}
+                            """,
+                            Statistic = "Old stat",
+                            IndicatorUnit = IndicatorUnit.Percent,
+                            DecimalPlaces = null,
+                        },
+                    ],
+                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                }
+            );
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataSet = new DataSet
+        {
+            Id = newDataSetId,
+            Title = "Old dataset title",
+            Summary = "Dataset summary",
+            PublicationId = publication.Id,
+            Status = DataSetStatus.Published,
+            LatestLiveVersionId = latestDataSetVersionId,
+            LatestLiveVersion = new DataSetVersion
+            {
+                Id = latestDataSetVersionId,
+                DataSetId = newDataSetId,
+                Release = new Release
+                {
+                    Title = publication.Releases[0].Title,
+                    Slug = publication.Releases[0].Slug,
+                    DataSetFileId = dataSetFileId,
+                    ReleaseFileId = releaseFile.Id,
+                },
+                Status = DataSetVersionStatus.Published,
+                VersionMajor = 1,
+                VersionMinor = 0,
+                VersionPatch = 1,
+                Notes = "test dataset notes",
+            },
+        };
+
+        var publicDataSetRepository = new Mock<IPublicDataSetRepository>(MockBehavior.Strict);
+        publicDataSetRepository.Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId))).ReturnsAsync(dataSet);
+        publicDataSetRepository
+            .Setup(c =>
+                c.GetIndicatorMeta(
+                    It.Is<Guid>(id => id == latestDataSetVersionId),
+                    It.Is<string>(indId => indId == "bbbbb")
+                )
+            )
+            .ReturnsAsync(
+                dataFixture
+                    .DefaultIndicatorMeta()
+                    .WithDataSetVersionId(latestDataSetVersionId)
+                    .WithPublicId("bbbbb")
+                    .WithDecimalPlaces(2)
+                    .WithUnit(IndicatorUnit.MillionPounds)
+            );
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = BuildService(contentDbContext, dataSetRepository: publicDataSetRepository.Object);
+            var request = new EinApiQueryStatTileUpdateRequest
+            {
+                Title = "New title",
+                DataSetId = newDataSetId,
+                Version = "1.0.0",
+                Query = """
+                    {"indicators":["bbbbb"]}
+                    """,
+            };
+            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request);
+
+            var actionResult = result.AssertLeft();
+            Assert.Equal(
+                "Version provided isn't the latest version. Latest: 1.0.1 Provided: 1.0.0",
+                ((BadRequestObjectResult)actionResult).Value
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateApiQueryStatTile_Fail_PapiQueryReturnsWarnings()
+    {
+        DataFixture dataFixture = new DataFixture();
+
+        Publication publication = dataFixture
+            .DefaultPublication()
+            .WithReleases(dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
+
+        var dataSetFileId = Guid.NewGuid();
+
+        ReleaseFile releaseFile = dataFixture
+            .DefaultReleaseFile()
+            .WithFile(dataFixture.DefaultFile().WithDataSetFileId(dataSetFileId))
+            .WithReleaseVersion(publication.Releases[0].Versions[0]);
+
+        var originalDataSetId = Guid.NewGuid();
+        var newDataSetId = Guid.NewGuid();
+        var latestDataSetVersionId = Guid.NewGuid();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.Publications.AddAsync(publication);
+
+            await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+
+            await contentDbContext.EinContentBlocks.AddAsync(
+                new EinTileGroupBlock
+                {
+                    Id = _blockAId,
+                    Tiles =
+                    [
+                        new EinApiQueryStatTile
+                        {
+                            Id = _tileAId,
+                            Title = "Old tile title",
+                            Order = 1,
+
+                            DataSetId = originalDataSetId,
+                            Version = "1.0.0",
+                            LatestPublishedVersion = "1.0.1",
+                            Query = """
+                            {"indicators":["aaaaa"]}
+                            """,
+                            Statistic = "Old stat",
+                            IndicatorUnit = IndicatorUnit.Percent,
+                            DecimalPlaces = null,
+                        },
+                    ],
+                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                }
+            );
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataSet = new DataSet
+        {
+            Id = newDataSetId,
+            Title = "Old dataset title",
+            Summary = "Dataset summary",
+            PublicationId = publication.Id,
+            Status = DataSetStatus.Published,
+            LatestLiveVersionId = latestDataSetVersionId,
+            LatestLiveVersion = new DataSetVersion
+            {
+                Id = latestDataSetVersionId,
+                DataSetId = newDataSetId,
+                Release = new Release
+                {
+                    Title = publication.Releases[0].Title,
+                    Slug = publication.Releases[0].Slug,
+                    DataSetFileId = dataSetFileId,
+                    ReleaseFileId = releaseFile.Id,
+                },
+                Status = DataSetVersionStatus.Published,
+                VersionMajor = 1,
+                VersionMinor = 0,
+                VersionPatch = 1,
+                Notes = "test dataset notes",
+            },
+        };
+
+        var publicDataSetRepository = new Mock<IPublicDataSetRepository>(MockBehavior.Strict);
+        publicDataSetRepository.Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId))).ReturnsAsync(dataSet);
+        publicDataSetRepository
+            .Setup(c =>
+                c.GetIndicatorMeta(
+                    It.Is<Guid>(id => id == latestDataSetVersionId),
+                    It.Is<string>(indId => indId == "bbbbb")
+                )
+            )
+            .ReturnsAsync(
+                dataFixture
+                    .DefaultIndicatorMeta()
+                    .WithDataSetVersionId(latestDataSetVersionId)
+                    .WithPublicId("bbbbb")
+                    .WithDecimalPlaces(2)
+                    .WithUnit(IndicatorUnit.MillionPounds)
+            );
+
+        var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
+        publicDataApiClient
+            .Setup(c =>
+                c.RunQuery(
+                    It.Is<Guid>(dataSetId => dataSetId == newDataSetId),
+                    It.Is<string>(version => version == "1.0.1"),
+                    It.Is<string>(query =>
+                        query
+                        == """
+                        {"indicators":["bbbbb"]}
+                        """
+                    ),
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(
+                new DataSetQueryPaginatedResultsViewModel
+                {
+                    Warnings =
+                    [
+                        new WarningViewModel { Code = "PapiTestWarningCode", Message = "PAPI test warning message" },
+                    ],
+                    Paging = new PagingViewModel(1, 100, 10),
+                    Results = [],
+                }
+            );
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = BuildService(
+                contentDbContext,
+                dataSetRepository: publicDataSetRepository.Object,
+                publicDataApiClient: publicDataApiClient.Object
+            );
+            var request = new EinApiQueryStatTileUpdateRequest
+            {
+                Title = "New title",
+                DataSetId = newDataSetId,
+                Version = "1.0.1",
+                Query = """
+                    {"indicators":["bbbbb"]}
+                    """,
+            };
+            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request);
+
+            var actionResult = result.AssertLeft();
+            Assert.Equal(
+                "PAPI query returned warnings: PAPI test warning message",
+                ((BadRequestObjectResult)actionResult).Value
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateApiQueryStatTile_Fail_MoreThanOneResultAfterFiltering()
+    {
+        DataFixture dataFixture = new DataFixture();
+
+        Publication publication = dataFixture
+            .DefaultPublication()
+            .WithReleases(dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
+
+        var dataSetFileId = Guid.NewGuid();
+
+        ReleaseFile releaseFile = dataFixture
+            .DefaultReleaseFile()
+            .WithFile(dataFixture.DefaultFile().WithDataSetFileId(dataSetFileId))
+            .WithReleaseVersion(publication.Releases[0].Versions[0]);
+
+        var originalDataSetId = Guid.NewGuid();
+        var newDataSetId = Guid.NewGuid();
+        var latestDataSetVersionId = Guid.NewGuid();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.Publications.AddAsync(publication);
+
+            await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+
+            await contentDbContext.EinContentBlocks.AddAsync(
+                new EinTileGroupBlock
+                {
+                    Id = _blockAId,
+                    Tiles =
+                    [
+                        new EinApiQueryStatTile
+                        {
+                            Id = _tileAId,
+                            Title = "Old tile title",
+                            Order = 1,
+
+                            DataSetId = originalDataSetId,
+                            Version = "1.0.0",
+                            LatestPublishedVersion = "1.0.1",
+                            Query = """
+                            {"indicators":["aaaaa"]}
+                            """,
+                            Statistic = "Old stat",
+                            IndicatorUnit = IndicatorUnit.Percent,
+                            DecimalPlaces = null,
+                        },
+                    ],
+                    EinContentSection = new EinContentSection { EducationInNumbersPageId = _pageId },
+                }
+            );
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataSet = new DataSet
+        {
+            Id = newDataSetId,
+            Title = "Old dataset title",
+            Summary = "Dataset summary",
+            PublicationId = publication.Id,
+            Status = DataSetStatus.Published,
+            LatestLiveVersionId = latestDataSetVersionId,
+            LatestLiveVersion = new DataSetVersion
+            {
+                Id = latestDataSetVersionId,
+                DataSetId = newDataSetId,
+                Release = new Release
+                {
+                    Title = publication.Releases[0].Title,
+                    Slug = publication.Releases[0].Slug,
+                    DataSetFileId = dataSetFileId,
+                    ReleaseFileId = releaseFile.Id,
+                },
+                Status = DataSetVersionStatus.Published,
+                VersionMajor = 1,
+                VersionMinor = 0,
+                VersionPatch = 1,
+                Notes = "test dataset notes",
+            },
+        };
+
+        var publicDataSetRepository = new Mock<IPublicDataSetRepository>(MockBehavior.Strict);
+        publicDataSetRepository.Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId))).ReturnsAsync(dataSet);
+        publicDataSetRepository
+            .Setup(c =>
+                c.GetIndicatorMeta(
+                    It.Is<Guid>(id => id == latestDataSetVersionId),
+                    It.Is<string>(indId => indId == "bbbbb")
+                )
+            )
+            .ReturnsAsync(
+                dataFixture
+                    .DefaultIndicatorMeta()
+                    .WithDataSetVersionId(latestDataSetVersionId)
+                    .WithPublicId("bbbbb")
+                    .WithDecimalPlaces(2)
+                    .WithUnit(IndicatorUnit.MillionPounds)
+            );
+
+        var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
+        publicDataApiClient
+            .Setup(c =>
+                c.RunQuery(
+                    It.Is<Guid>(dataSetId => dataSetId == newDataSetId),
+                    It.Is<string>(version => version == "1.0.1"),
+                    It.Is<string>(query =>
+                        query
+                        == """
+                        {"indicators":["bbbbb"]}
+                        """
+                    ),
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(
+                new DataSetQueryPaginatedResultsViewModel
+                {
+                    Warnings = [],
+                    Paging = new PagingViewModel(1, 100, 10),
+                    Results =
+                    [
+                        new DataSetQueryResultViewModel
+                        {
+                            Filters = [],
+                            Locations = [], // normally there would be locations, but not needed for this test
+                            GeographicLevel = GeographicLevel.Country,
+                            TimePeriod = new TimePeriodOptionViewModel
+                            {
+                                Label = "Academic Year 2000/01",
+                                Code = TimeIdentifier.AcademicYear,
+                                Period = "2001",
+                            },
+                            Values = new Dictionary<string, string> { { "bbbbb", "9393" } },
+                        },
+                        new DataSetQueryResultViewModel
+                        {
+                            // Duplicate of above result
+                            Filters = [],
+                            Locations = [],
+                            GeographicLevel = GeographicLevel.Country,
+                            TimePeriod = new TimePeriodOptionViewModel
+                            {
+                                Label = "Academic Year 2000/01",
+                                Code = TimeIdentifier.AcademicYear,
+                                Period = "2001",
+                            },
+                            Values = new Dictionary<string, string> { { "bbbbb", "9394" } },
+                        },
+                    ],
+                }
+            );
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = BuildService(
+                contentDbContext,
+                dataSetRepository: publicDataSetRepository.Object,
+                publicDataApiClient: publicDataApiClient.Object
+            );
+            var request = new EinApiQueryStatTileUpdateRequest
+            {
+                Title = "New title",
+                DataSetId = newDataSetId,
+                Version = "1.0.1",
+                Query = """
+                    {"indicators":["bbbbb"]}
+                    """,
+            };
+            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request);
+
+            var actionResult = result.AssertLeft();
+            Assert.Equal(
+                "Should only be one result with NAT and latest year. Found 2 results",
+                ((BadRequestObjectResult)actionResult).Value
+            );
+        }
     }
 
     [Fact]
@@ -1099,13 +1818,13 @@ public class EducationInNumbersContentServiceTests
 
     private EducationInNumbersContentService BuildService(
         ContentDbContext contentDbContext,
-        PublicDataDbContext? publicDataDbContext = null,
+        IPublicDataSetRepository? dataSetRepository = null,
         IPublicDataApiClient? publicDataApiClient = null
     )
     {
         return new EducationInNumbersContentService(
             contentDbContext,
-            publicDataDbContext ?? new Mock<PublicDataDbContext>().Object, // @MarkFix not strict?
+            dataSetRepository ?? Mock.Of<IPublicDataSetRepository>(MockBehavior.Strict),
             publicDataApiClient ?? new Mock<IPublicDataApiClient>(MockBehavior.Strict).Object
         );
     }

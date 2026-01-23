@@ -162,20 +162,19 @@ public record EinApiQueryStatTileViewModel : EinTileViewModel
     public Guid? DataSetId { get; init; }
     public string Version { get; init; } = string.Empty;
     public string LatestPublishedVersion { get; init; } = string.Empty;
-    public string Statistic { get; init; } = string.Empty;
     public string Query { get; init; } = string.Empty;
+    public string Statistic { get; init; } = string.Empty;
 
     [JsonConverter(typeof(EnumToEnumValueJsonConverter<IndicatorUnit>))]
     public IndicatorUnit? IndicatorUnit { get; init; }
 
     public int? DecimalPlaces { get; set; }
-    public string QueryResult { get; set; } = string.Empty; // @MarkFix remove
     public string PublicationSlug { get; set; } = string.Empty;
     public string ReleaseSlug { get; set; } = string.Empty;
 
     public static EinApiQueryStatTileViewModel FromModel(EinApiQueryStatTile statTile)
     {
-        return new EinApiQueryStatTileViewModel // @MarkFix validate this is all correct / as desired
+        return new EinApiQueryStatTileViewModel
         {
             Id = statTile.Id,
             Order = statTile.Order,
@@ -184,11 +183,10 @@ public record EinApiQueryStatTileViewModel : EinTileViewModel
             DataSetId = statTile.DataSetId,
             Version = statTile.Version,
             LatestPublishedVersion = statTile.LatestPublishedVersion,
-            Statistic = statTile.Statistic,
             Query = statTile.Query,
+            Statistic = statTile.Statistic,
             IndicatorUnit = statTile.IndicatorUnit,
             DecimalPlaces = statTile.DecimalPlaces,
-            QueryResult = statTile.QueryResult,
             PublicationSlug = statTile.PublicationSlug,
             ReleaseSlug = statTile.ReleaseSlug,
         };

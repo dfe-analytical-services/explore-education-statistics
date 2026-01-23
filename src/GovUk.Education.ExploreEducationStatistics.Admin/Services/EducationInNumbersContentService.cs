@@ -1,5 +1,6 @@
 #nullable enable
 using System.Text.Json;
+using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -11,7 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Profiling.Internal;
@@ -20,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class EducationInNumbersContentService(
     ContentDbContext contentDbContext,
-    PublicDataDbContext publicDataDbContext,
+    IPublicDataSetRepository publicDataSetRepository,
     IPublicDataApiClient publicDataApiClient
 ) : IEducationInNumbersContentService
 {
@@ -320,7 +321,7 @@ public class EducationInNumbersContentService(
         return Unit.Instance;
     }
 
-    public async Task<Either<ActionResult, EinTileViewModel>> AddTile( // @MarkFix add tests
+    public async Task<Either<ActionResult, EinTileViewModel>> AddTile(
         Guid pageId,
         Guid parentBlockId,
         EinTileType type,
@@ -406,7 +407,7 @@ public class EducationInNumbersContentService(
         return EinTileViewModel.FromModel(tileToUpdate);
     }
 
-    public async Task<Either<ActionResult, EinTileViewModel>> UpdateApiQueryStatTile( // @MarkFix add tests
+    public async Task<Either<ActionResult, EinTileViewModel>> UpdateApiQueryStatTile(
         Guid pageId,
         Guid tileId,
         EinApiQueryStatTileUpdateRequest request
@@ -433,20 +434,12 @@ public class EducationInNumbersContentService(
         }
 
         // Get data from publicDataDbContext where possible
-        var apiDataSet = publicDataDbContext
-            .DataSets.Include(ds => ds.LatestLiveVersion)
-            .Single(ds => ds.Id == request.DataSetId);
+        var apiDataSet = await publicDataSetRepository.GetDataSet(request.DataSetId);
         if (apiDataSet.LatestLiveVersion == null)
         {
             return new BadRequestObjectResult("API data set has no live version");
         }
         var apiDataSetLatest = apiDataSet.LatestLiveVersion;
-
-        var releaseSlug = apiDataSetLatest.Release.Slug;
-        var publicationSlug = contentDbContext
-            .ReleaseFiles.Where(rf => rf.Id == apiDataSetLatest.Release.ReleaseFileId)
-            .Select(rf => rf.ReleaseVersion.Release.Publication.Slug)
-            .Single();
 
         var latestVersion =
             $"{apiDataSetLatest.VersionMajor}.{apiDataSetLatest.VersionMinor}.{apiDataSetLatest.VersionPatch}";
@@ -457,34 +450,35 @@ public class EducationInNumbersContentService(
             );
         }
 
-        var indicatorMeta = publicDataDbContext.IndicatorMetas.SingleOrDefault(im =>
-            im.DataSetVersionId == apiDataSetLatest.Id && im.PublicId == indicatorPublicId
-        );
+        var releaseSlug = apiDataSetLatest.Release.Slug;
+
+        var publicationSlug = contentDbContext
+            .ReleaseFiles.Where(rf => rf.Id == apiDataSetLatest.Release.ReleaseFileId)
+            .Select(rf => rf.ReleaseVersion.Release.Publication.Slug)
+            .Single();
+
+        var indicatorMeta = await publicDataSetRepository.GetIndicatorMeta(apiDataSetLatest.Id, indicatorPublicId);
         if (indicatorMeta == null)
         {
-            return new BadRequestObjectResult($"Could not find indicator meta for {indicatorPublicId}");
+            return new BadRequestObjectResult(
+                $"Could not find indicator meta for {indicatorPublicId} for API data set {apiDataSetLatest.Id}"
+            );
         }
         var indicatorUnit = indicatorMeta.Unit;
         var indicatorDecimalPlaces = indicatorMeta.DecimalPlaces;
 
+        // Make the actual PAPI query
         return await publicDataApiClient
             .RunQuery(request.DataSetId, request.Version, request.Query)
             .OnSuccess(async queryResults =>
             {
-                var latestLiveDataSetVersion = publicDataDbContext
-                    .DataSets.Where(ds => ds.Id == request.DataSetId)
-                    .Select(ds => ds.LatestLiveVersion)
-                    .Single();
-                if (latestLiveDataSetVersion == null)
-                {
-                    return new Either<ActionResult, EinTileViewModel>(
-                        new BadRequestObjectResult("Data set has no latest live version")
-                    );
-                }
-
                 if (queryResults.Warnings.Count > 0)
                 {
-                    return new BadRequestObjectResult("Warnings returned, {queryResults.Warnings}");
+                    return new Either<ActionResult, EinTileViewModel>(
+                        new BadRequestObjectResult(
+                            $"PAPI query returned warnings: {queryResults.Warnings.Select(w => w.Message).JoinToString(',')}"
+                        )
+                    );
                 }
 
                 if (queryResults.Paging.TotalPages > 1)
@@ -492,24 +486,12 @@ public class EducationInNumbersContentService(
                     return new BadRequestObjectResult("Results need to all fit on the first page");
                 }
 
-                // filter query results to National and latest year, for THE ONE result we intend to display
-                var natResults = queryResults.Results.Where(result =>
-                    result.GeographicLevel == GeographicLevel.Country
-                );
+                if (queryResults.Results.Count == 0)
+                {
+                    return new BadRequestObjectResult("PAPI query returned no results");
+                }
 
-                var latestTimePeriod2 = queryResults
-                    .Results.OrderBy(result => result.TimePeriod.Period[..4])
-                    .ThenBy(result => result.TimePeriod.Code)
-                    .ToList();
-
-                var latestTimePeriod = latestTimePeriod2.Select(result => result.TimePeriod).Last();
-
-                var latestResults = natResults
-                    .Where(result =>
-                        result.TimePeriod.Period == latestTimePeriod.Period
-                        && result.TimePeriod.Code == latestTimePeriod.Code
-                    )
-                    .ToList();
+                var latestResults = FetchLatestYearNationalResults(queryResults);
 
                 if (latestResults.Count != 1)
                 {
@@ -517,6 +499,7 @@ public class EducationInNumbersContentService(
                         $"Should only be one result with NAT and latest year. Found {latestResults.Count} results"
                     );
                 }
+
                 var theStat = latestResults[0].Values[indicatorPublicId];
 
                 tileToUpdate.Title = request.Title;
@@ -627,5 +610,25 @@ public class EducationInNumbersContentService(
             return null;
         }
         return indicators[0].ToString();
+    }
+
+    private static List<DataSetQueryResultViewModel> FetchLatestYearNationalResults(
+        DataSetQueryPaginatedResultsViewModel queryResults
+    )
+    {
+        var natResults = queryResults.Results.Where(result => result.GeographicLevel == GeographicLevel.Country);
+
+        var latestTimePeriod2 = queryResults
+            .Results.OrderBy(result => result.TimePeriod.Period[..4])
+            .ThenBy(result => result.TimePeriod.Code)
+            .ToList();
+
+        var latestTimePeriod = latestTimePeriod2.Select(result => result.TimePeriod).Last();
+
+        return natResults
+            .Where(result =>
+                result.TimePeriod.Period == latestTimePeriod.Period && result.TimePeriod.Code == latestTimePeriod.Code
+            )
+            .ToList();
     }
 }

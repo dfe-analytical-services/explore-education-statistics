@@ -34,6 +34,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using EducationInNumbersService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.EducationInNumbersService;
+using IEducationInNumbersService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IEducationInNumbersService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.MethodologyService;
@@ -155,10 +157,7 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>()
                     .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                     .AddScoped<IRedirectsService, RedirectsService>()
-                    .AddScoped<
-                        Publisher.Services.Interfaces.IEducationInNumbersService,
-                        Publisher.Services.EducationInNumbersService
-                    >()
+                    .AddScoped<IEducationInNumbersService, EducationInNumbersService>()
                     .AddEventGridClient(configuration)
                     .AddScoped<IPublisherEventRaiser, PublisherEventRaiser>()
                     .AddSingleton<INotifierClient, NotifierClient>(provider => new NotifierClient(
@@ -179,10 +178,12 @@ public static class PublisherHostBuilderExtensions
                         .Bind(configuration.GetRequiredSection(DataFilesOptions.Section));
                     services.AddScoped<IDataSetVersionPathResolver, DataSetVersionPathResolver>();
                     services.AddScoped<IDataSetPublishingService, DataSetPublishingService>();
+                    services.AddScoped<IEducationInNumbersService, EducationInNumbersService>();
                 }
                 else
                 {
                     services.AddScoped<IDataSetPublishingService, NoOpDataSetPublishingService>();
+                    services.AddScoped<IEducationInNumbersService, NoOpEducationInNumbersService>();
                 }
 
                 // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
@@ -223,6 +224,14 @@ public static class PublisherHostBuilderExtensions
     public class NoOpDataSetPublishingService : IDataSetPublishingService
     {
         public Task PublishDataSets(Guid[] releaseVersionIds)
+        {
+            return Task.CompletedTask;
+        }
+    }
+
+    public class NoOpEducationInNumbersService : IEducationInNumbersService
+    {
+        public Task UpdateEinTiles(Guid[] releaseVersionIdsToUpdate)
         {
             return Task.CompletedTask;
         }

@@ -456,6 +456,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IPreReleaseSummaryService, PreReleaseSummaryService>();
         services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
         services.AddTransient<IEducationInNumbersContentService, EducationInNumbersContentService>();
+        services.AddTransient<IPublicDataSetRepository, PublicPublicDataSetRepository>();
 
         services.AddTransient<IManageContentPageService, ManageContentPageService>();
         services.AddTransient<IContentBlockService, ContentBlockService>();

@@ -6,9 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
-/// <summary>
-/// Publish events specific to the Publisher
-/// </summary>
 public class EducationInNumbersService(ContentDbContext contentDbContext, PublicDataDbContext publicDataDbContext)
     : IEducationInNumbersService
 {
@@ -40,8 +37,8 @@ public class EducationInNumbersService(ContentDbContext contentDbContext, Public
             if (tile.LatestPublishedVersion != dataSetLatestVersion)
             {
                 tile.LatestPublishedVersion = dataSetLatestVersion;
-                // TODO Send email to inform BAU that a tile needs updating
                 await contentDbContext.SaveChangesAsync();
+                // TODO EES-6868 Send email to inform BAU that a tile needs updating
             }
         }
     }
