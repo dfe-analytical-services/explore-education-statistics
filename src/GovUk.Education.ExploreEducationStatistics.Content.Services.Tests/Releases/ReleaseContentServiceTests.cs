@@ -150,6 +150,82 @@ public abstract class ReleaseContentServiceTests
         }
 
         [Fact]
+        public async Task WhenContentContainsComments_RemovesComments()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
+            releaseVersion.KeyStatisticsSecondarySection = CreateContentSection(
+                ContentSectionType.KeyStatisticsSecondary
+            );
+            releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
+
+            releaseVersion.GenericContent =
+            [
+                _dataFixture
+                    .DefaultContentSection()
+                    .WithHeading("Section 1")
+                    .WithContentBlocks([
+                        _dataFixture
+                            .DefaultHtmlBlock()
+                            .WithBody(
+                                """
+                                <p><comment-start name="comment-1"></comment-start>Section 1 block 1 content<comment-end name="comment-1"></comment-end></p>
+                                """
+                            ),
+                        _dataFixture
+                            .DefaultHtmlBlock()
+                            .WithBody(
+                                """
+                                <p><commentplaceholder-start name="comment-2"></commentplaceholder-start>Section 1 block 2 content<commentplaceholder-end name="comment-2"></commentplaceholder-end></p>
+                                """
+                            ),
+                        _dataFixture
+                            .DefaultHtmlBlock()
+                            .WithBody(
+                                """
+                                <p><resolvedcomment-start name="comment-3"></resolvedcomment-start>Section 1 block 3 content<resolvedcomment-end name="comment-3"></resolvedcomment-end></p>
+                                """
+                            ),
+                    ]),
+            ];
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseContent(publicationSlug: publication.Slug, releaseSlug: release.Slug);
+
+                // Assert
+                var actual = outcome.AssertRight();
+
+                var contentSection1 = Assert.Single(actual.Content);
+
+                Assert.Equal(3, contentSection1.Content.Length);
+                var htmlBlock1 = Assert.IsType<HtmlBlockDto>(contentSection1.Content[0]);
+                Assert.Equal("<p>Section 1 block 1 content</p>", htmlBlock1.Body);
+                var htmlBlock2 = Assert.IsType<HtmlBlockDto>(contentSection1.Content[1]);
+                Assert.Equal("<p>Section 1 block 2 content</p>", htmlBlock2.Body);
+                var htmlBlock3 = Assert.IsType<HtmlBlockDto>(contentSection1.Content[2]);
+                Assert.Equal("<p>Section 1 block 3 content</p>", htmlBlock3.Body);
+            }
+        }
+
+        [Fact]
         public async Task WhenReleaseVersionHasNoContent_ReturnsEmptyContent()
         {
             // Arrange
