@@ -7,7 +7,7 @@ import {
 } from '@common/contexts/NetworkActivityContext';
 import Client from '@common/services/api/Client';
 import delay from '@common/utils/delay';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { AxiosError } from 'axios';
 import React, { FC, ReactNode } from 'react';
 import xhrMock from 'xhr-mock';
@@ -44,9 +44,9 @@ describe('useNetworkActivityContext', () => {
     });
     expect(document.body).toHaveAttribute('data-network-activity', 'idle');
 
-    const request = client.get('/test');
-
-    await request;
+    await act(async () => {
+      client.get('/test');
+    });
 
     await waitFor(() => {
       expect(result.current).toEqual<NetworkActivityState>({
@@ -116,11 +116,15 @@ describe('useNetworkActivityContext', () => {
     });
     expect(document.body).toHaveAttribute('data-network-activity', 'idle');
 
-    const request = Promise.all([
-      client.get('/test'),
-      client.get('/test-slow'),
-      client.get('/test-slower'),
-    ]);
+    let request: Promise<unknown>;
+
+    await act(async () => {
+      request = Promise.all([
+        client.get('/test'),
+        client.get('/test-slow'),
+        client.get('/test-slower'),
+      ]);
+    });
 
     await waitFor(() => {
       expect(result.current).toEqual<NetworkActivityState>({
@@ -146,7 +150,10 @@ describe('useNetworkActivityContext', () => {
     });
     expect(document.body).toHaveAttribute('data-network-activity', 'active');
 
-    await request;
+    await act(async () => {
+      await request;
+    });
+
     await waitFor(() => {
       expect(result.current).toEqual<NetworkActivityState>({
         status: 'idle',
@@ -177,24 +184,31 @@ describe('useNetworkActivityContext', () => {
 
     const request = client.get('/test-error');
 
-    try {
-      await request;
-    } catch (err) {
-      const error = err as AxiosError;
+    let error: AxiosError | undefined;
 
-      expect(error).toBeInstanceOf(Error);
-      expect(error.response?.status).toBe(500);
-      expect(error.response?.data).toEqual({
-        message: 'Something went wrong',
-      });
-    }
+    await act(async () => {
+      try {
+        await request;
 
-    await waitFor(() => {
-      expect(result.current).toEqual<NetworkActivityState>({
-        status: 'active',
-        requestCount: 1,
-      });
-      expect(document.body).toHaveAttribute('data-network-activity', 'active');
+        await waitFor(() => {
+          expect(result.current).toEqual<NetworkActivityState>({
+            status: 'active',
+            requestCount: 1,
+          });
+          expect(document.body).toHaveAttribute(
+            'data-network-activity',
+            'active',
+          );
+        });
+      } catch (err) {
+        error = err as AxiosError;
+      }
+    });
+
+    expect(error).toBeInstanceOf(Error);
+    expect(error?.response?.status).toBe(500);
+    expect(error?.response?.data).toEqual({
+      message: 'Something went wrong',
     });
 
     await waitFor(() => {
