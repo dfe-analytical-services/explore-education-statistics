@@ -879,6 +879,48 @@ public class EducationInNumbersContentServiceTests
     }
 
     [Fact]
+    public async Task AddTile_ApiQueryStatTile_Success()
+    {
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.EinContentBlocks.AddAsync(
+                new EinTileGroupBlock
+                {
+                    Id = _blockAId,
+                    EinContentSection = new EinContentSection { Id = _sectionAId, EducationInNumbersPageId = _pageId },
+                }
+            );
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var service = BuildService(context);
+            var result = await service.AddTile(_pageId, _blockAId, EinTileType.ApiQueryStatTile, 1);
+
+            var viewModel = result.AssertRight();
+            var apiTile = Assert.IsType<EinApiQueryStatTileViewModel>(viewModel);
+            Assert.Equal(1, apiTile.Order);
+            Assert.Empty(apiTile.Title);
+            Assert.Null(apiTile.DataSetId);
+            Assert.Empty(apiTile.Version);
+            Assert.Empty(apiTile.LatestPublishedVersion);
+            Assert.Empty(apiTile.Query);
+            Assert.Null(apiTile.IndicatorUnit);
+            Assert.Empty(apiTile.Statistic);
+            Assert.Null(apiTile.DecimalPlaces);
+            Assert.Empty(apiTile.PublicationSlug);
+            Assert.Empty(apiTile.ReleaseSlug);
+
+            var dbTile = await context.EinTiles.SingleAsync();
+            Assert.Equal(viewModel.Id, dbTile.Id);
+            Assert.Equal(1, dbTile.Order);
+            Assert.Equal(_blockAId, dbTile.EinParentBlockId);
+        }
+    }
+
+    [Fact]
     public async Task UpdateFreeTextStatTile_Success()
     {
         var contextId = Guid.NewGuid().ToString();
@@ -1105,7 +1147,7 @@ public class EducationInNumbersContentServiceTests
     {
         return new EducationInNumbersContentService(
             contentDbContext,
-            publicDataDbContext ?? new Mock<PublicDataDbContext>().Object, // @MarkFix not strict?
+            publicDataDbContext ?? new Mock<PublicDataDbContext>().Object,
             publicDataApiClient ?? new Mock<IPublicDataApiClient>(MockBehavior.Strict).Object
         );
     }

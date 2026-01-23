@@ -320,7 +320,7 @@ public class EducationInNumbersContentService(
         return Unit.Instance;
     }
 
-    public async Task<Either<ActionResult, EinTileViewModel>> AddTile( // @MarkFix add tests
+    public async Task<Either<ActionResult, EinTileViewModel>> AddTile(
         Guid pageId,
         Guid parentBlockId,
         EinTileType type,

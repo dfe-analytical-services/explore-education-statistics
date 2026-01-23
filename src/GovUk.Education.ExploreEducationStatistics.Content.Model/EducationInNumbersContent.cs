@@ -98,5 +98,3 @@ public class EinApiQueryStatTile : EinTile
     [MaxLength(512)]
     public string ReleaseSlug { get; set; } = string.Empty;
 }
-
-// @MarkFix on a new release being published, check for api data sets - if it is in an EinTile, update isLatestVersion AND any previous version of the tile in case of amendments!
