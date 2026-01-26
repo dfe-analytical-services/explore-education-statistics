@@ -54,6 +54,7 @@ public record ReleaseDataContentDataSetDto
             Meta = ReleaseDataContentDataSetMetaDto.FromReleaseFile(releaseFile),
             // Summaries created before EES-4353 may contain HTML. Convert them to plain text here.
             // TODO: Remove HtmlToText after migrating all summaries to plain text.
+            // Summary is only set when data guidance has been added, so a data set can initially have no summary.
             Summary = releaseFile.Summary != null ? HtmlToTextUtils.HtmlToText(releaseFile.Summary) : null,
             Title = releaseFile.Name ?? throw new ArgumentException("ReleaseFile must have Name"),
         };
