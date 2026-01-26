@@ -85,38 +85,35 @@ public class PermalinkService : IPermalinkService
         ).OnSuccess(releaseVersionId =>
         {
             return _tableBuilderService
-                .Query(releaseVersionId, request.Query.AsFullTableQuery(), cancellationToken)
+                .Query(releaseVersionId, request.Query.AsFullTableQuery(allowCropping: true), cancellationToken)
                 .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
                 {
-                    var frontendTableTask = _frontendService.CreateTable(
+                    var frontendTableResult = await _frontendService.CreateTable(
                         tableResult,
                         request.Configuration,
                         cancellationToken
                     );
-
-                    var csvMetaTask = _permalinkCsvMetaService.GetCsvMeta(
-                        request.Query.SubjectId,
-                        tableResult.SubjectMeta,
-                        cancellationToken
-                    );
-
-                    await Task.WhenAll(frontendTableTask, csvMetaTask);
-
-                    var frontendTableResult = frontendTableTask.Result;
-                    var csvMetaResult = csvMetaTask.Result;
 
                     if (frontendTableResult.IsLeft)
                     {
                         return frontendTableResult.Left;
                     }
 
-                    if (csvMetaResult.IsLeft)
+                    var csvMetaResult = tableResult.SubjectMeta.IsCroppedTable
+                        ? null
+                        : await _permalinkCsvMetaService.GetCsvMeta(
+                            request.Query.SubjectId,
+                            tableResult.SubjectMeta,
+                            cancellationToken
+                        );
+
+                    if (csvMetaResult is not null && csvMetaResult.IsLeft)
                     {
                         return csvMetaResult.Left;
                     }
 
                     var table = frontendTableResult.Right;
-                    var csvMeta = csvMetaResult.Right;
+                    var csvMeta = csvMetaResult?.Right;
 
                     var subjectMeta = tableResult.SubjectMeta;
 
@@ -133,12 +130,14 @@ public class PermalinkService : IPermalinkService
                         SubjectId = request.Query.SubjectId,
                         PublicationTitle = subjectMeta.PublicationName,
                         DataSetTitle = subjectMeta.SubjectName,
+                        IsCropped = subjectMeta.IsCroppedTable,
                     };
+
                     _contentDbContext.Permalinks.Add(permalink);
 
                     await UploadSnapshot(
                         permalink: permalink,
-                        observations: tableResult.Results.ToList(),
+                        observations: [.. tableResult.Results],
                         csvMeta: csvMeta,
                         table: tableWithFootnotes,
                         cancellationToken: cancellationToken
@@ -179,7 +178,7 @@ public class PermalinkService : IPermalinkService
         await csv.NextRecordAsync();
     }
 
-    private async Task WriteCsvRows(
+    private static async Task WriteCsvRows(
         IWriter csv,
         List<ObservationViewModel> observations,
         PermalinkCsvMetaViewModel meta,
@@ -197,7 +196,7 @@ public class PermalinkService : IPermalinkService
         await csv.WriteRecordsAsync(rows, cancellationToken);
     }
 
-    private object MapCsvRow(
+    private static object MapCsvRow(
         ObservationViewModel observation,
         PermalinkCsvMetaViewModel meta,
         HashSet<string> locationHeaders
@@ -215,7 +214,7 @@ public class PermalinkService : IPermalinkService
         return row;
     }
 
-    private string GetCsvRowValue(
+    private static string GetCsvRowValue(
         string header,
         ObservationViewModel observation,
         (int Year, TimeIdentifier TimeIdentifier) timePeriod,
@@ -282,6 +281,8 @@ public class PermalinkService : IPermalinkService
     private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink, PermalinkTableViewModel table)
     {
         var status = await GetPermalinkStatus(permalink.SubjectId);
+        var dataSetFileId = GetDataSetFileId(permalink.SubjectId);
+
         return new PermalinkViewModel
         {
             Id = permalink.Id,
@@ -290,7 +291,16 @@ public class PermalinkService : IPermalinkService
             PublicationTitle = permalink.PublicationTitle,
             Status = status,
             Table = table,
+            TableIsCropped = permalink.IsCropped,
+            DataSetFileId = dataSetFileId,
         };
+    }
+
+    private Guid? GetDataSetFileId(Guid subjectId)
+    {
+        return _contentDbContext
+            .Files.FirstOrDefault(f => f.SubjectId == subjectId && f.Type == FileType.Data)
+            ?.DataSetFileId;
     }
 
     private async Task<Either<ActionResult, Guid>> FindLatestPublishedReleaseVersionId(Guid subjectId)
@@ -371,18 +381,28 @@ public class PermalinkService : IPermalinkService
         )!;
     }
 
+    /// <summary>
+    /// Upload a snapshot of the permalink data to blob storage.
+    /// The snapshot includes the table markup in JSON format, and associated CSV file for download.
+    /// </summary>
+    /// <remarks>
+    /// Excluding <paramref name="csvMeta"/> means that no CSV file will be generated.
+    /// This is useful when table data has been cropped, as no file download options are provided.
+    /// </remarks>
     private async Task UploadSnapshot(
         Permalink permalink,
         List<ObservationViewModel> observations,
-        PermalinkCsvMetaViewModel csvMeta,
+        PermalinkCsvMetaViewModel? csvMeta,
         PermalinkTableViewModel table,
         CancellationToken cancellationToken = default
     )
     {
-        await Task.WhenAll(
-            UploadTableCsv(permalink, observations, csvMeta, cancellationToken),
-            UploadTable(permalink, table, cancellationToken)
-        );
+        await UploadTable(permalink, table, cancellationToken);
+
+        if (csvMeta is not null)
+        {
+            await UploadTableCsv(permalink, observations, csvMeta, cancellationToken);
+        }
     }
 
     private async Task UploadTableCsv(

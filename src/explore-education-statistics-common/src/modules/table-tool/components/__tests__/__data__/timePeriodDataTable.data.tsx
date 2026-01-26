@@ -55,6 +55,7 @@ export const testData1Table: TableDataResponse = {
     },
     footnotes: [],
     geoJsonAvailable: false,
+    isCroppedTable: false,
     indicators: [
       {
         value: 'indicator-1',
@@ -364,6 +365,7 @@ export const testData2Table: TableDataResponse = {
     },
     footnotes: [],
     geoJsonAvailable: false,
+    isCroppedTable: false,
     indicators: [
       {
         value: 'indicator-3',
@@ -614,6 +616,7 @@ export const testData3Table: TableDataResponse = {
     },
     footnotes: [],
     geoJsonAvailable: false,
+    isCroppedTable: false,
     indicators: [
       {
         value: 'indicator-3',
@@ -751,6 +754,7 @@ export const testData3TableHeadersConfig: UnmappedTableHeadersConfig = {
 export const testDataNoFiltersTable: TableDataResponse = {
   subjectMeta: {
     geoJsonAvailable: false,
+    isCroppedTable: false,
     filters: {},
     footnotes: [],
     indicators: [
@@ -866,6 +870,7 @@ export const testDataNoFiltersTableHeadersConfig: UnmappedTableHeadersConfig = {
 export const testDataFiltersWithNoResults: TableDataResponse = {
   subjectMeta: {
     geoJsonAvailable: false,
+    isCroppedTable: false,
     filters: {
       Characteristic: {
         autoSelectFilterItemId: '',

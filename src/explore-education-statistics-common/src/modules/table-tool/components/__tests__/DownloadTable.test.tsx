@@ -27,6 +27,7 @@ jest.mock('xlsx', () => {
 describe('DownloadTable', () => {
   const basicSubjectMeta: FullTableMeta = {
     geoJsonAvailable: false,
+    isCroppedTable: false,
     publicationName: '',
     subjectName: 'The subject',
     footnotes: [],

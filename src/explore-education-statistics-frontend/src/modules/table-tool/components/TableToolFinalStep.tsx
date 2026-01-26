@@ -125,13 +125,18 @@ const TableToolFinalStep = ({
       {!hasTableError && (
         <>
           <div className="govuk-!-margin-bottom-7">
-            <TableToolShare tableHeaders={tableHeaders} query={query} />
+            <TableToolShare
+              tableHeaders={tableHeaders}
+              query={query}
+              isCropped={table.subjectMeta.isCroppedTable}
+            />
           </div>
 
           <DownloadTable
             fullTable={table}
             fileName={`data-${selectedPublication.slug}`}
             onCsvDownload={() => tableBuilderService.getTableCsv(query)}
+            hideOdsDownload={table.subjectMeta.isCroppedTable}
             tableRef={dataTableRef}
             onSubmit={fileFormat => {
               logEvent({

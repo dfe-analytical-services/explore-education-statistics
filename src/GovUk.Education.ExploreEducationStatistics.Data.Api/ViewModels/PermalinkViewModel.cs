@@ -13,6 +13,10 @@ public record PermalinkViewModel
 
     public string DataSetTitle { get; init; } = string.Empty;
 
+    public Guid? DataSetFileId { get; set; }
+
+    public bool TableIsCropped { get; set; }
+
     public string PublicationTitle { get; init; } = string.Empty;
 
     [JsonConverter(typeof(StringEnumConverter))]

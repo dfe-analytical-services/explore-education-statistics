@@ -82,9 +82,7 @@ User clicks Create table button
 
 Validate the query could exceed the maximum allowable table size
     user waits until page contains
-    ...    Could not create table as the filters chosen may exceed the maximum allowed table size.
-    user waits until page contains    Select different filters or download the subject data.
-    user waits until page contains button    Download Exclusions by geographic level (csv, 37 Mb)    %{WAIT_MEDIUM}
+    ...    The selected options return too many rows to be displayed here and so the table shows only a subset of the data provided by your selections.
 
 Go back to Locations step
     user clicks button    Edit locations
@@ -114,20 +112,14 @@ Select new start and end date
     user waits until page contains element    id:filtersForm-indicators
     user checks previous table tool step contains    4    Time period    2006/07 to 2008/09
 
-Select Indicator again - Number of pupils
-    user clicks indicator checkbox    Number of pupils
+Check the indicators are still selected
     user checks indicator checkbox is checked    Number of pupils
-
-Select Indicator again - Number of permanent exclusions
-    user clicks indicator checkbox    Number of permanent exclusions
     user checks indicator checkbox is checked    Number of permanent exclusions
-
-Select Indicator again - Number of fixed period exclusions
-    user clicks indicator checkbox    Number of fixed period exclusions
     user checks indicator checkbox is checked    Number of fixed period exclusions
 
-Select Characteristic School type - State-funded secondary
-    user clicks category checkbox    School type    State-funded secondary
+Deselect school types
+    user clicks checkbox    State-funded primary
+    user clicks checkbox    Special
 
 Create table again
     user clicks element    id:filtersForm-submit

@@ -45,7 +45,7 @@ public class TableBuilderController(
 
             return await tableBuilderService
                 .QueryToCsvStream(
-                    query: request.AsFullTableQuery(),
+                    query: request.AsFullTableQuery(ignoreMaxTableSize: true),
                     stream: Response.BodyWriter.AsStream(),
                     cancellationToken: cancellationTokenWithTimeout.Token
                 )
@@ -53,7 +53,7 @@ public class TableBuilderController(
         }
 
         return await tableBuilderService
-            .Query(request.AsFullTableQuery(), cancellationTokenWithTimeout.Token)
+            .Query(request.AsFullTableQuery(allowCropping: true), cancellationTokenWithTimeout.Token)
             .HandleFailuresOr(Ok);
     }
 
@@ -75,7 +75,7 @@ public class TableBuilderController(
             return await tableBuilderService
                 .QueryToCsvStream(
                     releaseVersionId: releaseVersionId,
-                    query: request.AsFullTableQuery(),
+                    query: request.AsFullTableQuery(ignoreMaxTableSize: true),
                     stream: Response.BodyWriter.AsStream(),
                     cancellationToken: cancellationTokenWithTimeout.Token
                 )
@@ -83,7 +83,7 @@ public class TableBuilderController(
         }
 
         return await tableBuilderService
-            .Query(releaseVersionId, request.AsFullTableQuery(), cancellationTokenWithTimeout.Token)
+            .Query(releaseVersionId, request.AsFullTableQuery(allowCropping: true), cancellationTokenWithTimeout.Token)
             .HandleFailuresOr(Ok);
     }
 

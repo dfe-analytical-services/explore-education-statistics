@@ -138,6 +138,13 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
         },
     };
 
+    private static readonly FullTableQuery CroppedTableQuery = FullTableQuery with { AllowCropping = true };
+
+    private static readonly FullTableQuery UnrestrictedFullTableQuery = FullTableQuery with
+    {
+        IgnoreMaxTableSize = true,
+    };
+
     private static readonly TableBuilderConfiguration TableConfiguration = new()
     {
         TableHeaders = new TableHeaders { Rows = [new TableHeader("table header 1", TableHeaderType.Filter)] },
@@ -165,13 +172,13 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
     {
         fixture
             .TableBuilderServiceMock.Setup(s =>
-                s.Query(ItIs.DeepEqualTo(FullTableQuery), It.IsAny<CancellationToken>())
+                s.Query(ItIs.DeepEqualTo(CroppedTableQuery), It.IsAny<CancellationToken>())
             )
             .ReturnsAsync(_tableBuilderResults);
 
         var response = await fixture
             .CreateClient()
-            .PostAsync("/api/tablebuilder", new JsonNetContent(ToRequest(FullTableQuery)));
+            .PostAsync("/api/tablebuilder", new JsonNetContent(ToRequest(CroppedTableQuery)));
 
         VerifyAllMocks(fixture.TableBuilderServiceMock);
 
@@ -183,7 +190,11 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
     {
         fixture
             .TableBuilderServiceMock.Setup(s =>
-                s.QueryToCsvStream(ItIs.DeepEqualTo(FullTableQuery), It.IsAny<Stream>(), It.IsAny<CancellationToken>())
+                s.QueryToCsvStream(
+                    ItIs.DeepEqualTo(UnrestrictedFullTableQuery),
+                    It.IsAny<Stream>(),
+                    It.IsAny<CancellationToken>()
+                )
             )
             .ReturnsAsync(Unit.Instance)
             .Callback<FullTableQuery, Stream, CancellationToken>((_, stream, _) => stream.WriteText("Test csv"));
@@ -192,7 +203,7 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
             .CreateClient()
             .PostAsync(
                 "/api/tablebuilder",
-                content: new JsonNetContent(ToRequest(FullTableQuery)),
+                content: new JsonNetContent(ToRequest(UnrestrictedFullTableQuery)),
                 headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
             );
 
@@ -214,13 +225,16 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
 
         fixture
             .TableBuilderServiceMock.Setup(s =>
-                s.Query(releaseVersion.Id, ItIs.DeepEqualTo(FullTableQuery), It.IsAny<CancellationToken>())
+                s.Query(releaseVersion.Id, ItIs.DeepEqualTo(CroppedTableQuery), It.IsAny<CancellationToken>())
             )
             .ReturnsAsync(_tableBuilderResults);
 
         var response = await fixture
             .CreateClient()
-            .PostAsync($"/api/tablebuilder/release/{releaseVersion.Id}", new JsonNetContent(ToRequest(FullTableQuery)));
+            .PostAsync(
+                $"/api/tablebuilder/release/{releaseVersion.Id}",
+                new JsonNetContent(ToRequest(CroppedTableQuery))
+            );
 
         VerifyAllMocks(fixture.TableBuilderServiceMock);
 
@@ -243,7 +257,7 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
             .TableBuilderServiceMock.Setup(s =>
                 s.QueryToCsvStream(
                     releaseVersion.Id,
-                    ItIs.DeepEqualTo(FullTableQuery),
+                    ItIs.DeepEqualTo(UnrestrictedFullTableQuery),
                     It.IsAny<Stream>(),
                     It.IsAny<CancellationToken>()
                 )
@@ -257,7 +271,7 @@ public class TableBuilderControllerTests(TableBuilderControllerTestsFixture fixt
             .CreateClient()
             .PostAsync(
                 $"/api/tablebuilder/release/{releaseVersion.Id}",
-                content: new JsonNetContent(ToRequest(FullTableQuery)),
+                content: new JsonNetContent(ToRequest(UnrestrictedFullTableQuery)),
                 headers: new Dictionary<string, string> { { HeaderNames.Accept, ContentTypes.Csv } }
             );
 

@@ -122,6 +122,7 @@ describe('mapTableHeadersConfig', () => {
       },
       footnotes: [],
       geoJsonAvailable: false,
+      isCroppedTable: false,
       indicators: [
         {
           value: '9cf0dcf1-367e-4207-2b50-08d78f6f2b08',
@@ -302,6 +303,7 @@ describe('mapTableHeadersConfig', () => {
         boundaryLevels: [],
         timePeriodRange: [],
         geoJsonAvailable: false,
+        isCroppedTable: false,
       },
     });
 

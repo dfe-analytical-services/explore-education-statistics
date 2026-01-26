@@ -24,4 +24,10 @@ public class Permalink : ICreatedTimestamp<DateTime>
     public bool MigratedFromLegacy { get; init; }
 
     public DateTime Created { get; set; }
+
+    /// <summary>
+    /// Indicates whether the permalink represents a cropped version of the originally selected data.
+    /// This flag is used to warn consumers that they are only viewing a subset of the expected data.
+    /// </summary>
+    public bool IsCropped { get; set; }
 }
