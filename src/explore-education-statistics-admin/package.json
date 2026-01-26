@@ -45,7 +45,6 @@
     "govuk-frontend": "^5.11.1",
     "history": "^4.10.1",
     "html-webpack-plugin": "^5.5.0",
-    "i": "^0.3.7",
     "identity-obj-proxy": "^3.0.0",
     "immer": "^10.2.0",
     "leaflet": "^1.9.4",
