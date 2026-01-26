@@ -111,12 +111,14 @@ public class ReleaseApprovalService(
                     .OnSuccess(() =>
                         context.RequireTransaction(async () =>
                         {
-                            context.ReleaseVersions.Update(releaseVersion);
-                            context.ReleaseStatus.Add(releaseStatus);
-
                             return await SendEmailNotificationsAndInvites(request, releaseVersion)
                                 .OnSuccess(() => NotifyPublisher(releasePublishingKey, request, oldStatus))
-                                .OnSuccessDo(async () => await context.SaveChangesAsync());
+                                .OnSuccessDo(async () =>
+                                {
+                                    context.ReleaseVersions.Update(releaseVersion);
+                                    context.ReleaseStatus.Add(releaseStatus);
+                                    await context.SaveChangesAsync();
+                                });
                         })
                     );
             });

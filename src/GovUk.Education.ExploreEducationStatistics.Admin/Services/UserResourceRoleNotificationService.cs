@@ -315,9 +315,14 @@ public class UserResourceRoleNotificationService(
         CancellationToken cancellationToken
     )
     {
+        // Intentionally not using AsNoTracking.
+        // This entity is updated in ReleaseApprovalService.CreateReleaseStatus, but SaveChanges occurs
+        // after NotifyUserOfNewPreReleaseRole (in this class), which requires ReleaseVersion.PublishScheduled.
+        // Using AsNoTracking causes PublishScheduled to be null.
+        // Reordering to notify after SaveChanges would avoid this, but breaks
+        // unit tests because the in-memory provider does not support transactions.
         return await userReleaseRoleRepository
                 .Query(ResourceRoleFilter.AllButExpired)
-                .AsNoTracking()
                 .Include(urr => urr.User)
                 .Include(urr => urr.ReleaseVersion)
                     .ThenInclude(rv => rv.Release)
