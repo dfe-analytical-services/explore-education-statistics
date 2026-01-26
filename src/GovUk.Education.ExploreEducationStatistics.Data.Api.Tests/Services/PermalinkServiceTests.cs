@@ -427,47 +427,7 @@ public class PermalinkServiceTests
     [Fact]
     public async Task CreatePermalink_WithReleaseVersionId()
     {
-        Subject subject = _fixture
-            .DefaultSubject()
-            .WithFilters(
-                _fixture
-                    .DefaultFilter()
-                    .ForIndex(
-                        0,
-                        s =>
-                            s.SetGroupCsvColumn("filter_0_grouping")
-                                .SetFilterGroups(
-                                    _fixture
-                                        .DefaultFilterGroup(filterItemCount: 1)
-                                        .ForInstance(s =>
-                                            s.Set(
-                                                fg => fg.Label,
-                                                (_, _, context) => $"Filter group {context.FixtureTypeIndex}"
-                                            )
-                                        )
-                                        .Generate(2)
-                                )
-                    )
-                    .ForIndex(
-                        1,
-                        s =>
-                            s.SetGroupCsvColumn("filter_1_grouping")
-                                .SetFilterGroups(
-                                    _fixture
-                                        .DefaultFilterGroup(filterItemCount: 1)
-                                        .ForInstance(s =>
-                                            s.Set(
-                                                fg => fg.Label,
-                                                (_, _, context) => $"Filter group {context.FixtureTypeIndex}"
-                                            )
-                                        )
-                                        .Generate(2)
-                                )
-                    )
-                    .ForIndex(2, s => s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2).Generate(1)))
-                    .GenerateList()
-            )
-            .WithIndicatorGroups(_fixture.DefaultIndicatorGroup(indicatorCount: 1).Generate(3));
+        var subject = GenerateCreatePermalinkSubject();
 
         var indicators = subject.IndicatorGroups.SelectMany(ig => ig.Indicators).ToList();
 
@@ -486,66 +446,26 @@ public class PermalinkServiceTests
             )
             .GenerateList(4);
 
-        var observations = _fixture
-            .DefaultObservation()
-            .WithSubject(subject)
-            .WithMeasures(indicators)
-            .ForRange(
-                ..2,
-                o =>
-                    o.SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
-                        .SetLocation(locations[0])
-                        .SetTimePeriod(2022, AcademicYear)
-            )
-            .ForRange(
-                2..4,
-                o =>
-                    o.SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
-                        .SetLocation(locations[1])
-                        .SetTimePeriod(2022, AcademicYear)
-            )
-            .ForRange(
-                4..6,
-                o =>
-                    o.SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
-                        .SetLocation(locations[2])
-                        .SetTimePeriod(2023, AcademicYear)
-            )
-            .ForRange(
-                6..8,
-                o =>
-                    o.SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
-                        .SetLocation(locations[3])
-                        .SetTimePeriod(2023, AcademicYear)
-            )
-            .GenerateList(8);
+        var observations = GenerateCreatePermalinkObservations(
+            subject,
+            indicators,
+            filter0Items,
+            filter1Items,
+            filter2Items,
+            locations
+        );
 
         var footnotes = _fixture.DefaultFootnote().GenerateList(2);
 
         var footnoteViewModels = FootnotesViewModelBuilder.BuildFootnotes(footnotes);
 
-        var tableResult = new TableBuilderResultViewModel
-        {
-            SubjectMeta = new SubjectResultMetaViewModel
-            {
-                SubjectName = "Test data set",
-                PublicationName = "Test publication",
-                Locations = LocationViewModelBuilder
-                    .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                    .ToDictionary(level => level.Key.ToString().CamelCase(), level => level.Value),
-                Filters = FiltersMetaViewModelBuilder.BuildFilters(subject.Filters),
-                Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
-                Footnotes = footnoteViewModels,
-                TimePeriodRange =
-                [
-                    new TimePeriodMetaViewModel(2022, AcademicYear) { Label = "2022/23" },
-                    new TimePeriodMetaViewModel(2023, AcademicYear) { Label = "2023/24" },
-                ],
-            },
-            Results = observations
-                .Select(o => ObservationViewModelBuilder.BuildObservation(o, indicators.Select(i => i.Id)))
-                .ToList(),
-        };
+        var tableResult = GenerateCreatePermalinkTableResultVm(
+            subject,
+            indicators,
+            locations,
+            observations,
+            footnoteViewModels
+        );
 
         Publication publication = _fixture
             .DefaultPublication()
@@ -739,9 +659,308 @@ public class PermalinkServiceTests
             Assert.Equal("Test data set", permalink.DataSetTitle);
             Assert.Equal(releaseVersion.Id, permalink.ReleaseVersionId);
             Assert.Equal(subject.Id, permalink.SubjectId);
-
             Assert.False(permalink.MigratedFromLegacy);
+            Assert.False(permalink.IsCropped);
         }
+    }
+
+    [Fact]
+    public async Task CreatePermalink_CroppedQuery_DoesNotCreateCsv()
+    {
+        var subject = GenerateCreatePermalinkSubject();
+
+        var indicators = subject.IndicatorGroups.SelectMany(ig => ig.Indicators).ToList();
+
+        var filter0Items = subject.Filters[0].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
+
+        var filter1Items = subject.Filters[1].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
+
+        var filter2Items = subject.Filters[2].FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
+
+        var locations = _fixture
+            .DefaultLocation()
+            .ForRange(..2, l => l.SetPresetRegion().SetGeographicLevel(GeographicLevel.Region))
+            .ForRange(
+                2..4,
+                l => l.SetPresetRegionAndLocalAuthority().SetGeographicLevel(GeographicLevel.LocalAuthority)
+            )
+            .GenerateList(4);
+
+        var observations = GenerateCreatePermalinkObservations(
+            subject,
+            indicators,
+            filter0Items,
+            filter1Items,
+            filter2Items,
+            locations
+        );
+
+        var footnotes = _fixture.DefaultFootnote().GenerateList(2);
+
+        var footnoteViewModels = FootnotesViewModelBuilder.BuildFootnotes(footnotes);
+
+        var tableResult = GenerateCreatePermalinkTableResultVm(
+            subject,
+            indicators,
+            locations,
+            observations,
+            footnoteViewModels,
+            croppedTable: true
+        );
+
+        Publication publication = _fixture
+            .DefaultPublication()
+            .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)])
+            .WithTheme(_fixture.DefaultTheme());
+
+        var releaseVersion = publication.Releases.Single().Versions.Single();
+
+        var releaseDataFile = ReleaseDataFile(releaseVersion, subject.Id);
+
+        var request = new PermalinkCreateRequest
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            Configuration = new TableBuilderConfiguration { TableHeaders = new TableHeaders() },
+            Query = { SubjectId = subject.Id },
+        };
+
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
+
+        Guid expectedPermalinkId;
+
+        string? capturedTableJsonBlobPath = null;
+        publicBlobStorageService
+            .Setup(s =>
+                s.UploadAsJson(
+                    BlobContainers.PermalinkSnapshots,
+                    It.Is<string>(path => path.EndsWith(".json.zst")),
+                    It.IsAny<PermalinkTableViewModel>(),
+                    ContentEncodings.Zstd,
+                    null,
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .Callback<
+                IBlobContainer,
+                string,
+                PermalinkTableViewModel,
+                string,
+                JsonSerializerSettings?,
+                CancellationToken
+            >(
+                (_, path, table, _, _, _) =>
+                {
+                    // Capture the blob path
+                    capturedTableJsonBlobPath = path;
+
+                    // Compare the captured table upload with the expected json
+                    Snapshot.Match(table, SnapshotNameExtension.Create("json"));
+                }
+            )
+            .Returns(Task.CompletedTask);
+
+        var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
+
+        frontendService
+            .Setup(s => s.CreateTable(tableResult, request.Configuration, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(_frontendTableResponse);
+
+        var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
+
+        var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
+
+        tableBuilderService
+            .Setup(s =>
+                s.Query(
+                    releaseVersion.Id,
+                    It.Is<FullTableQuery>(ctx => ctx.Equals(request.Query.AsFullTableQuery(true, false))),
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(tableResult);
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            contentDbContext.Publications.Add(publication);
+            contentDbContext.ReleaseFiles.Add(releaseDataFile);
+
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                publicBlobStorageService: publicBlobStorageService.Object,
+                frontendService: frontendService.Object,
+                permalinkCsvMetaService: permalinkCsvMetaService.Object,
+                tableBuilderService: tableBuilderService.Object
+            );
+
+            var result = (await service.CreatePermalink(request)).AssertRight();
+
+            MockUtils.VerifyAllMocks(
+                publicBlobStorageService,
+                frontendService,
+                permalinkCsvMetaService,
+                tableBuilderService
+            );
+
+            // Expect the uploaded blob paths to be the same apart from the extension
+            Assert.NotNull(capturedTableJsonBlobPath);
+            var tableJsonBlobPathWithoutExtension = capturedTableJsonBlobPath.Replace(".json.zst", string.Empty);
+
+            // Expect the blob paths to contain a parseable Guid which is the generated permalink Id
+            Assert.True(Guid.TryParse(tableJsonBlobPathWithoutExtension, out expectedPermalinkId));
+
+            Assert.Equal(expectedPermalinkId, result.Id);
+            Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
+            Assert.Equal("Test data set", result.DataSetTitle);
+            Assert.Equal("Test publication", result.PublicationTitle);
+            Assert.Equal(PermalinkStatus.Current, result.Status);
+            Assert.Equal(_frontendTableResponse.Caption, result.Table.Caption);
+            Assert.Equal(_frontendTableResponse.Json, result.Table.Json);
+            Assert.Equal(footnoteViewModels, result.Table.Footnotes);
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            // Verify details of the created permalink have been saved
+            var permalink = contentDbContext.Permalinks.Single(p => p.Id == expectedPermalinkId);
+
+            Assert.Equal(expectedPermalinkId, permalink.Id);
+            Assert.InRange(DateTime.UtcNow.Subtract(permalink.Created).Milliseconds, 0, 1500);
+            Assert.Equal("Test publication", permalink.PublicationTitle);
+            Assert.Equal("Test data set", permalink.DataSetTitle);
+            Assert.Equal(releaseVersion.Id, permalink.ReleaseVersionId);
+            Assert.Equal(subject.Id, permalink.SubjectId);
+            Assert.False(permalink.MigratedFromLegacy);
+            Assert.True(permalink.IsCropped);
+        }
+    }
+
+    private Subject GenerateCreatePermalinkSubject()
+    {
+        return _fixture
+            .DefaultSubject()
+            .WithFilters(
+                _fixture
+                    .DefaultFilter()
+                    .ForIndex(
+                        0,
+                        s =>
+                            s.SetGroupCsvColumn("filter_0_grouping")
+                                .SetFilterGroups(
+                                    _fixture
+                                        .DefaultFilterGroup(filterItemCount: 1)
+                                        .ForInstance(s =>
+                                            s.Set(
+                                                fg => fg.Label,
+                                                (_, _, context) => $"Filter group {context.FixtureTypeIndex}"
+                                            )
+                                        )
+                                        .Generate(2)
+                                )
+                    )
+                    .ForIndex(
+                        1,
+                        s =>
+                            s.SetGroupCsvColumn("filter_1_grouping")
+                                .SetFilterGroups(
+                                    _fixture
+                                        .DefaultFilterGroup(filterItemCount: 1)
+                                        .ForInstance(s =>
+                                            s.Set(
+                                                fg => fg.Label,
+                                                (_, _, context) => $"Filter group {context.FixtureTypeIndex}"
+                                            )
+                                        )
+                                        .Generate(2)
+                                )
+                    )
+                    .ForIndex(2, s => s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2).Generate(1)))
+                    .GenerateList()
+            )
+            .WithIndicatorGroups(_fixture.DefaultIndicatorGroup(indicatorCount: 1).Generate(3));
+    }
+
+    private List<Observation> GenerateCreatePermalinkObservations(
+        Subject subject,
+        List<Indicator> indicators,
+        List<FilterItem> filter0Items,
+        List<FilterItem> filter1Items,
+        List<FilterItem> filter2Items,
+        List<Location> locations
+    )
+    {
+        return _fixture
+            .DefaultObservation()
+            .WithSubject(subject)
+            .WithMeasures(indicators)
+            .ForRange(
+                ..2,
+                o =>
+                    o.SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
+                        .SetLocation(locations[0])
+                        .SetTimePeriod(2022, AcademicYear)
+            )
+            .ForRange(
+                2..4,
+                o =>
+                    o.SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
+                        .SetLocation(locations[1])
+                        .SetTimePeriod(2022, AcademicYear)
+            )
+            .ForRange(
+                4..6,
+                o =>
+                    o.SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
+                        .SetLocation(locations[2])
+                        .SetTimePeriod(2023, AcademicYear)
+            )
+            .ForRange(
+                6..8,
+                o =>
+                    o.SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
+                        .SetLocation(locations[3])
+                        .SetTimePeriod(2023, AcademicYear)
+            )
+            .GenerateList(8);
+    }
+
+    private TableBuilderResultViewModel GenerateCreatePermalinkTableResultVm(
+        Subject subject,
+        List<Indicator> indicators,
+        List<Location> locations,
+        List<Observation> observations,
+        List<FootnoteViewModel> footnoteViewModels,
+        bool croppedTable = false
+    )
+    {
+        return new TableBuilderResultViewModel
+        {
+            SubjectMeta = new SubjectResultMetaViewModel
+            {
+                SubjectName = "Test data set",
+                PublicationName = "Test publication",
+                Locations = LocationViewModelBuilder
+                    .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
+                    .ToDictionary(level => level.Key.ToString().CamelCase(), level => level.Value),
+                Filters = FiltersMetaViewModelBuilder.BuildFilters(subject.Filters),
+                Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                Footnotes = footnoteViewModels,
+                TimePeriodRange =
+                [
+                    new TimePeriodMetaViewModel(2022, AcademicYear) { Label = "2022/23" },
+                    new TimePeriodMetaViewModel(2023, AcademicYear) { Label = "2023/24" },
+                ],
+                IsCroppedTable = croppedTable,
+            },
+            Results = observations
+                .Select(o => ObservationViewModelBuilder.BuildObservation(o, indicators.Select(i => i.Id)))
+                .ToList(),
+        };
     }
 
     [Fact]

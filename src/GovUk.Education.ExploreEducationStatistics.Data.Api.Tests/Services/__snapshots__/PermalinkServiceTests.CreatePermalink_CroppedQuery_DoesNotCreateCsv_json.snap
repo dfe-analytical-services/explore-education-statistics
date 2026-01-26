@@ -1,0 +1,57 @@
+﻿{
+  "Caption": "Admission Numbers for 'Sample publication' in North East between 2022 and 2023",
+  "Footnotes": [
+    {
+      "Id": "1caba0c4-8887-81f0-ef5d-28c3c4307aaa",
+      "Label": "Footnote 0 :: Content"
+    },
+    {
+      "Id": "2feb63ef-aa6a-4df0-d6c5-c23438b412a7",
+      "Label": "Footnote 1 :: Content"
+    }
+  ],
+  "Json": {
+    "thead": [
+      [
+        {
+          "colSpan": 1,
+          "rowSpan": 1,
+          "tag": "td"
+        },
+        {
+          "colSpan": 1,
+          "rowSpan": 1,
+          "scope": "col",
+          "text": "2022",
+          "tag": "th"
+        },
+        {
+          "colSpan": 1,
+          "rowSpan": 1,
+          "scope": "col",
+          "text": "2023",
+          "tag": "th"
+        }
+      ]
+    ],
+    "tbody": [
+      [
+        {
+          "rowSpan": 1,
+          "colSpan": 1,
+          "scope": "row",
+          "text": "Admission Numbers",
+          "tag": "th"
+        },
+        {
+          "tag": "td",
+          "text": "7,731"
+        },
+        {
+          "tag": "td",
+          "text": "7,357"
+        }
+      ]
+    ]
+  }
+}
