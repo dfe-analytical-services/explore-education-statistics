@@ -183,7 +183,8 @@ describe('ReleaseEditableBlock', () => {
           locked: '2022-02-16T12:05:00Z',
           lockedUntil: '2022-02-16T12:15:00Z',
           lockedBy: testCurrentUser,
-        });
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        }) as Promise<any>;
       }
 
       return Promise.resolve();
@@ -649,7 +650,8 @@ describe('ReleaseEditableBlock', () => {
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:20:00Z',
           lockedBy: testCurrentUser,
-        });
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        }) as Promise<any>;
       }
 
       return Promise.resolve();
@@ -1354,7 +1356,6 @@ describe('ReleaseEditableBlock', () => {
             permissions: {} as GlobalPermissions,
           }}
         >
-          unattachedDataBlocks: [],
           <ReleaseContentHubContextProvider
             releaseVersionId={releaseContent.release.id}
           >

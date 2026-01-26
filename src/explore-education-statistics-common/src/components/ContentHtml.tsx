@@ -16,7 +16,7 @@ import parseHtmlString, {
   attributesToProps,
   domToReact,
 } from 'html-react-parser';
-import React, { ReactNode, useMemo, type JSX } from 'react';
+import React, { ReactElement, useMemo, type JSX } from 'react';
 
 export interface ContentHtmlProps {
   blockId?: string;
@@ -62,7 +62,7 @@ export default function ContentHtml({
 
       // Links
       if (node.name === 'a') {
-        const text = domToReact(node.children);
+        const text = domToReact(node.children as DOMNode[]);
 
         // Glossary links
         if (
@@ -121,15 +121,13 @@ export default function ContentHtml({
       }
 
       if (node.name === 'h3') {
-        const text = domToReact(node.children);
-        return typeof text === 'string' ? (
+        const text = domToReact(node.children as DOMNode[]);
+        if (typeof text === 'string') {
           // generate an id optionally using 4 chars of the block id to ensure uniqueness
           <h3 id={generateIdFromHeading(text, blockId?.substring(0, 4))}>
             {text}
-          </h3>
-        ) : (
-          node
-        );
+          </h3>;
+        }
       }
 
       return undefined;
@@ -151,7 +149,7 @@ export default function ContentHtml({
  * replacing the figure/figcaption implementation (which does not
  * get read out correctly) with a standard table/caption.
  */
-function renderTable(element: Element): ReactNode | undefined {
+function renderTable(element: Element): ReactElement | undefined {
   const { children } = element;
 
   const table = children.find(
@@ -173,8 +171,10 @@ function renderTable(element: Element): ReactNode | undefined {
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...attributesToProps(table.attribs)}
       >
-        {figcaption && <caption>{domToReact(figcaption.children)}</caption>}
-        {domToReact(table.children, { trim: true })}
+        {figcaption && (
+          <caption>{domToReact(figcaption.children as DOMNode[])}</caption>
+        )}
+        {domToReact(table.children as DOMNode[], { trim: true })}
       </table>
     </div>
   );
