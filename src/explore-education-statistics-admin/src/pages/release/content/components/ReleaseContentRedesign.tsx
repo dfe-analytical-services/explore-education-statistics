@@ -8,6 +8,7 @@ import ReleasePageTabMethodology from '@admin/pages/release/content/components/R
 import ReleasePageTitle from '@admin/pages/release/content/components/ReleasePageTitle';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
+import InsetText from '@common/components/InsetText';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
@@ -75,6 +76,20 @@ const ReleaseContent = ({
 
   return (
     <>
+      <InsetText>
+        <p>
+          You are viewing the new design of the Release page - if you would like
+          to provide feedback, please complete{' '}
+          <Link
+            to="https://forms.office.com/e/sBRKZgs6zB"
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+          >
+            our feedback form (opens in new window)
+          </Link>
+        </p>
+      </InsetText>
+
       <ReleasePageTitle
         publicationSummary={publication.summary || ''}
         publicationTitle={publication.title}

@@ -457,6 +457,49 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
+        public async Task WhenDataSetHasNoSummary_ReturnsEmptySummary()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            // Data set has no summary (override the default value set by the fixture) to test that a null summary is handled correctly.
+            // Some older data sets predate the summary requirement and may not have summaries.
+            ReleaseFile dataSet = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(releaseVersion)
+                .WithSummary(null);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(dataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(
+                    publicationSlug: publication.Slug,
+                    releaseSlug: release.Slug
+                );
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Empty(result.DataSets[0].Summary);
+            }
+        }
+
+        [Fact]
         public async Task WhenDataSetSummaryIsHtml_ReturnsPlainTextSummary()
         {
             // Arrange
@@ -496,6 +539,49 @@ public abstract class ReleaseDataContentServiceTests
                 var result = outcome.AssertRight();
 
                 Assert.Equal("Test paragraph with bold text and italic text", result.DataSets[0].Summary);
+            }
+        }
+
+        [Fact]
+        public async Task WhenSupportingFileHasNoSummary_ReturnsEmptySummary()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            // Supporting file has no summary (override the default value set by the fixture) to test that a null summary is handled correctly.
+            // Some older supporting files predate the summary requirement and may not have summaries.
+            var supportingFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Ancillary))
+                .WithReleaseVersion(releaseVersion)
+                .WithSummary(null);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(supportingFile);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(
+                    publicationSlug: publication.Slug,
+                    releaseSlug: release.Slug
+                );
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Empty(result.SupportingFiles[0].Summary);
             }
         }
 

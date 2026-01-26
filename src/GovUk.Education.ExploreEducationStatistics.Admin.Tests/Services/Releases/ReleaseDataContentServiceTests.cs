@@ -489,7 +489,7 @@ public abstract class ReleaseDataContentServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            // Data set has no summary (override the default value set by the fixture) to test that an empty summary is handled correctly.
+            // Data set has no summary (override the default value set by the fixture) to test that a null summary is handled correctly.
             // The summary is set only if provided in the Data Guidance section of the UI.
             ReleaseFile dataSet = _dataFixture
                 .DefaultReleaseFile()
@@ -660,6 +660,46 @@ public abstract class ReleaseDataContentServiceTests
                 // Only the original data set should be returned as the replacement is still in progress
                 var dataSet = Assert.Single(result.DataSets);
                 AssertDataSetEqual(originalDataSet, dataSet);
+            }
+        }
+
+        [Fact]
+        public async Task WhenSupportingFileHasNoSummary_ReturnsEmptySummary()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            // Supporting file has no summary (override the default value set by the fixture) to test that a null summary is handled correctly.
+            // Some older supporting files predate the summary requirement and may not have summaries.
+            var supportingFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Ancillary))
+                .WithReleaseVersion(releaseVersion)
+                .WithSummary(null);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(supportingFile);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Empty(result.SupportingFiles[0].Summary);
             }
         }
 
