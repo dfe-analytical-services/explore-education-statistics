@@ -783,7 +783,7 @@ Add content sections to ${RELEASE_2_NAME}
 
 Add release notes to ${RELEASE_2_NAME}
     user adds a release note
-    ...    First published.
+    ...    First published on GOV.UK.
     ...    19
     ...    07
     ...    2018
@@ -799,7 +799,7 @@ Approve ${RELEASE_2_NAME}
 
 Backdate ${RELEASE_2_NAME} published date
     ${release_id}=    get release id from url
-    ${published_override}=    Convert Date    2018-07-19 00:00:00    datetime
+    ${published_override}=    Convert Date    2020-03-26 09:30:00    datetime
     user updates release published date via api    ${release_id}    ${published_override}
 
 Create methodology ${EXCLUSIONS_METHODOLOGY_TITLE}
