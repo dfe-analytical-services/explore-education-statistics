@@ -2,9 +2,27 @@
 @import '@common/styles/variables';
 
 .container {
-  display: flex;
-  flex-wrap: wrap;
   margin: 0 -#{govuk-spacing(1)} govuk-spacing(2);
+  display: grid;
+
+  // If there is only one child, make it full width
+  &:has(> :only-child) {
+    --min-item-width: 1fr;
+  }
+
+  // If there are exactly two or four tiles, set a width value
+  // that results in two per row instead of 3
+  &:has(> :nth-child(4):last-child),
+  &:has(> :nth-child(2):last-child) {
+    --min-item-width: 340px;
+  }
+
+  @include govuk-media-query($from: tablet) {
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(var(--min-item-width, 250px), 1fr)
+    );
+  }
 }
 
 .guidanceText {
@@ -56,6 +74,7 @@
   text-align: left;
   width: 100%;
   border: 1px solid $_govuk-rebrand-border-colour-on-blue-tint-95;
+  align-self: start;
 
   :global(.govuk-details__summary) {
     @include govuk-font-size($size: 16);
@@ -132,33 +151,13 @@
   max-width: 100%;
   padding: 0 govuk-spacing(1);
 
-  @include govuk-media-query($from: tablet, $until: desktop) {
-    flex: 0 1 50%;
-    max-width: 50%;
-  }
-
-  @include govuk-media-query($from: desktop) {
-    flex: 1 0 33.33%;
-    max-width: 33.33%;
-
-    // If there are two or four key stat tiles, have two per row
-    &:first-child:nth-last-child(2),
-    &:first-child:nth-last-child(2) ~ &,
-    &:first-child:nth-last-child(4),
-    &:first-child:nth-last-child(4) ~ & {
-      flex: 0 1 50%;
-      max-width: 50%;
-    }
-  }
-
-  // If there is only one key stat it should be full width
   &:only-child {
-    flex: 1;
-    max-width: 100%;
     text-align: center;
   }
 }
 
 .wrapperRedesign {
-  align-self: flex-start;
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 2;
 }
