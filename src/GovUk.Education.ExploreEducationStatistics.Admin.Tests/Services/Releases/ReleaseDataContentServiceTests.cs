@@ -664,6 +664,46 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
+        public async Task WhenSupportingFileHasNoSummary_ReturnsEmptySummary()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            // Supporting file has no summary (override the default value set by the fixture) to test that a null summary is handled correctly.
+            // Some older supporting files predate the summary requirement and may not have summaries.
+            var supportingFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(() => _dataFixture.DefaultFile(FileType.Ancillary))
+                .WithReleaseVersion(releaseVersion)
+                .WithSummary(null);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(supportingFile);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Empty(result.SupportingFiles[0].Summary);
+            }
+        }
+
+        [Fact]
         public async Task WhenReleaseVersionHasNoAssociatedData_ReturnsEmptyDataContent()
         {
             // Arrange

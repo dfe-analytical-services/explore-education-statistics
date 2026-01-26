@@ -170,7 +170,8 @@ public record ReleaseDataContentSupportingFileDto
             Extension = releaseFile.File.Extension,
             Filename = releaseFile.File.Filename,
             Size = releaseFile.File.DisplaySize(),
-            Summary = releaseFile.Summary ?? throw new ArgumentException("ReleaseFile must have Summary"),
+            // Default to an empty summary for older supporting files that predate the summary requirement.
+            Summary = releaseFile.Summary ?? "",
             Title = releaseFile.Name ?? throw new ArgumentException("ReleaseFile must have Name"),
         };
 }
