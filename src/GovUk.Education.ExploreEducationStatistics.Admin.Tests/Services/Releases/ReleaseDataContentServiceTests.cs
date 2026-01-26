@@ -489,7 +489,7 @@ public abstract class ReleaseDataContentServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            // Data set has no summary (override the default value set by the fixture) to test that an empty summary is handled correctly.
+            // Data set has no summary (override the default value set by the fixture) to test that a null summary is handled correctly.
             // The summary is set only if provided in the Data Guidance section of the UI.
             ReleaseFile dataSet = _dataFixture
                 .DefaultReleaseFile()
