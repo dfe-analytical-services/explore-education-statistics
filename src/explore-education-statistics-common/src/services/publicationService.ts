@@ -286,7 +286,7 @@ export interface ReleaseVersionDataContent {
   releaseId: string;
   releaseVersionId: string;
   dataDashboards?: string;
-  dataGuidance: string;
+  dataGuidance?: string;
   dataSets: DataSetItem[];
   featuredTables: FeaturedTableItem[];
   supportingFiles: SupportingFileItem[];
