@@ -105,7 +105,7 @@ public class ReleaseService(ContentDbContext contentDbContext) : IReleaseService
     {
         // For the first version of a release or if an update to the published display date has been requested
         // return the actual published date
-        if (releaseVersion.Version == 0 || releaseVersion.UpdatePublishedDate)
+        if (releaseVersion.Version == 0 || releaseVersion.UpdatePublishedDisplayDate)
         {
             return actualPublishedDate;
         }

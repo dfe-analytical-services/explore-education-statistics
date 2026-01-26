@@ -556,7 +556,7 @@ public class ReleaseServiceTests
     }
 
     [Fact]
-    public async Task GetRelease_AmendedReleaseAndUpdatePublishedDateIsFalse()
+    public async Task GetRelease_AmendedReleaseAndUpdatePublishedDisplayDateIsFalse()
     {
         Publication publication = _dataFixture
             .DefaultPublication()
@@ -564,7 +564,7 @@ public class ReleaseServiceTests
         var release = publication.Releases[0];
         var (previousReleaseVersion, releaseVersion) = release.Versions.ToTuple2();
 
-        releaseVersion.UpdatePublishedDate = false;
+        releaseVersion.UpdatePublishedDisplayDate = false;
 
         var expectedPublishDate = new DateTimeOffset(2025, 1, 1, 9, 30, 0, TimeSpan.Zero);
 
@@ -581,7 +581,7 @@ public class ReleaseServiceTests
 
             // Test scenario of the publisher getting an unpublished amended release to cache it in advance of
             // publishing it.
-            // An update to the published date *has not* been requested.
+            // An update to the published display date *has not* been requested.
             var result = await service.GetRelease(releaseVersion.Id, expectedPublishDate);
 
             var viewModel = result.AssertRight();
@@ -593,7 +593,7 @@ public class ReleaseServiceTests
     }
 
     [Fact]
-    public async Task GetRelease_AmendedReleaseAndUpdatePublishedDateIsTrue()
+    public async Task GetRelease_AmendedReleaseAndUpdatePublishedDisplayDateIsTrue()
     {
         Publication publication = _dataFixture
             .DefaultPublication()
@@ -601,7 +601,7 @@ public class ReleaseServiceTests
         var release = publication.Releases[0];
         var releaseVersion = release.Versions.Single(rv => rv is { Published: null });
 
-        releaseVersion.UpdatePublishedDate = true;
+        releaseVersion.UpdatePublishedDisplayDate = true;
 
         var expectedPublishDate = new DateTimeOffset(2025, 1, 1, 9, 30, 0, TimeSpan.Zero);
 
@@ -618,7 +618,7 @@ public class ReleaseServiceTests
 
             // Test scenario of the publisher getting an unpublished amended release to cache it in advance of
             // publishing it.
-            // An update to the published date *has* been requested.
+            // An update to the published display date *has* been requested.
             var result = await service.GetRelease(releaseVersion.Id, expectedPublishDate);
 
             var viewModel = result.AssertRight();

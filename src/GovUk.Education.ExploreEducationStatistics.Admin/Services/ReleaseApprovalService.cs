@@ -90,7 +90,7 @@ public class ReleaseApprovalService(
                 releaseVersion.ApprovalStatus = request.ApprovalStatus;
                 releaseVersion.NextReleaseDate = request.NextReleaseDate;
                 releaseVersion.NotifySubscribers = releaseVersion.Version == 0 || (request.NotifySubscribers ?? false);
-                releaseVersion.UpdatePublishedDate = request.UpdatePublishedDate ?? false;
+                releaseVersion.UpdatePublishedDisplayDate = request.UpdatePublishedDate ?? false;
                 releaseVersion.PublishScheduled =
                     request.PublishMethod == PublishMethod.Immediate
                         ? timeProvider.GetUtcNow()
