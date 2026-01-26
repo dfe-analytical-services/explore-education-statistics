@@ -84,7 +84,7 @@ const ReleasePageIntro = ({
               Next release{' '}
               <time
                 className="govuk-!-font-weight-bold"
-                data-testid="Next update"
+                data-testid="Next release"
               >
                 {formatPartialDate(nextReleaseDate)}
               </time>

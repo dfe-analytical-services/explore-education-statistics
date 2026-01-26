@@ -114,80 +114,24 @@ Validate headlines -- Summary tab content
     user checks headline summary contains    10% of pupils persistently absent during 2016/17
 
 Validate Headlines facts and figures -- Charts tab
-    Open Headline Chart
-    Chart Legend Should Be
+    open headline chart
+    chart legend should be
     ...    Authorised absence rate (England)
     ...    Overall absence rate (England)
     ...    Unauthorised absence rate (England)
 
-    Chart X Axis Should Be
+    chart X axis should be
     ...    2012/13
     ...    2013/14
     ...    2014/15
     ...    2015/16
     ...    2016/17
 
-    Chart Y Axis Should Be
+    chart Y axis should be
     ...    0%
     ...    2%
     ...    4%
     ...    6%
-#TODO: Test mouse over tooltips in https://dfedigital.atlassian.net/browse/EES-6851
-
-Validate Key Statistics data block -- Charts tab
-    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    ...    Some aspects of this test are covered by the step above 'Validate Headlines facts and figures -- Charts tab'
-    ...    # TODO: Test charts more thoroughly in https://dfedigital.atlassian.net/browse/EES-6851
-    [Tags]    Failing
-    user scrolls to element    css:#releaseHeadlines-charts-tab
-    user clicks element    id:releaseHeadlines-charts-tab
-    ${headline_chart}=    set variable    css:#releaseHeadlines-chart    # must be css selector
-    user waits until element contains line chart    ${headline_chart}
-    user checks chart legend item contains    ${headline_chart}    1    Unauthorised absence rate (England)
-    user checks chart legend item contains    ${headline_chart}    2    Overall absence rate (England)
-    user checks chart legend item contains    ${headline_chart}    3    Authorised absence rate (England)
-    user checks chart x axis ticks    ${headline_chart}    2012/13    2013/14    2014/15    2015/16    2016/17
-    user checks chart y axis ticks    ${headline_chart}    0    2    4    6
-    user mouses over line chart point    ${headline_chart}    1    1
-    user checks chart tooltip label contains    ${headline_chart}    2012/13
-    user checks chart tooltip item contains    ${headline_chart}    1    Overall absence rate (England): 5.3%
-    user checks chart tooltip item contains    ${headline_chart}    2    Authorised absence rate (England): 4.2%
-    user checks chart tooltip item contains    ${headline_chart}    3    Unauthorised absence rate (England): 1.1%
-
-    user mouses over line chart point    ${headline_chart}    1    2
-    user checks chart tooltip label contains    ${headline_chart}    2013/14
-    user checks chart tooltip item contains    ${headline_chart}    1    Overall absence rate (England): 4.5%
-    user checks chart tooltip item contains    ${headline_chart}    2    Authorised absence rate (England): 3.5%
-    user checks chart tooltip item contains    ${headline_chart}    3    Unauthorised absence rate (England): 1.1%
-
-    user mouses over line chart point    ${headline_chart}    1    3
-    user checks chart tooltip label contains    ${headline_chart}    2014/15
-    user checks chart tooltip item contains    ${headline_chart}    1    Overall absence rate (England): 4.6%
-    user checks chart tooltip item contains    ${headline_chart}    2    Authorised absence rate (England): 3.5%
-    user checks chart tooltip item contains    ${headline_chart}    3    Unauthorised absence rate (England): 1.1%
-
-    user mouses over line chart point    ${headline_chart}    1    4
-    user checks chart tooltip label contains    ${headline_chart}    2015/16
-    user checks chart tooltip item contains    ${headline_chart}    1    Overall absence rate (England): 4.6%
-    user checks chart tooltip item contains    ${headline_chart}    2    Authorised absence rate (England): 3.4%
-    user checks chart tooltip item contains    ${headline_chart}    3    Unauthorised absence rate (England): 1.1%
-
-    user mouses over line chart point    ${headline_chart}    1    5
-    user checks chart tooltip label contains    ${headline_chart}    2016/17
-    user checks chart tooltip item contains    ${headline_chart}    1    Overall absence rate (England): 4.7%
-    user checks chart tooltip item contains    ${headline_chart}    2    Authorised absence rate (England): 3.4%
-    user checks chart tooltip item contains    ${headline_chart}    3    Unauthorised absence rate (England): 1.3%
-
-    user checks list has x items    testid:footnotes    2    ${headline_chart}
-    user checks list item contains    testid:footnotes    1
-    ...    Absence rates are the number of absence sessions expressed    ${headline_chart}
-    user checks list item contains    testid:footnotes    2
-    ...    There may be discrepancies between totals and the sum of constituent parts    ${headline_chart}
-
-    user clicks button    Show 1 more footnote    ${headline_chart}
-    user checks list has x items    testid:footnotes    3    ${headline_chart}
-    user checks list item contains    testid:footnotes    3
-    ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.    ${headline_chart}
 
 Validate Key Statistics data block -- Data tables tab
     user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]

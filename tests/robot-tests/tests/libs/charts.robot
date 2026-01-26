@@ -235,7 +235,7 @@ user saves chart configuration
     user waits until button is enabled    Save chart options
     user waits until page contains    Chart preview
 
-Chart Legend Should Be
+chart legend should be
     [Arguments]    @{expected_items}
     ${legend_items}=    Get Texts From Elements
     ...    xpath=//ul[contains(@class,'recharts-default-legend')]//li[contains(@class,'recharts-legend-item')]
@@ -245,7 +245,7 @@ Chart Legend Should Be
         Should Be Equal    ${legend_items}[${index}]    ${expected}
     END
 
-Chart X Axis Should Be
+chart X axis should be
     [Arguments]    @{expected_labels}
     ${years}=    Get Texts From Elements
     ...    xpath=//*[contains(@class,'recharts-xAxis')]//*[name()='tspan']
@@ -253,7 +253,7 @@ Chart X Axis Should Be
         Should Be Equal    ${years}[${index}]    ${expected}
     END
 
-Chart Y Axis Should Be
+chart Y axis should be
     [Arguments]    @{expected_labels}
     ${values}=    Get Texts From Elements
     ...    xpath=//*[contains(@class,'recharts-yAxis')]//*[name()='tspan']
@@ -261,7 +261,7 @@ Chart Y Axis Should Be
         Should Be Equal    ${values}[${index}]    ${expected}
     END
 
-Open Headline Chart
+open headline chart
     user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
     user clicks element    id:releaseHeadlines-charts-tab
     user waits until parent contains element
