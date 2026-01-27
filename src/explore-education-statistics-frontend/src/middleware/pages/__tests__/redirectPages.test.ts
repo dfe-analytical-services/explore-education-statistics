@@ -264,21 +264,12 @@ describe('redirectPages', () => {
     ],
   };
 
-  const findStatisticsPublicationDataGuidancePageTestData: RoutePatternTestCases =
-    {
-      routePattern: `find-statistics/${publicationSlugPlaceholder}/data-guidance`,
-      redirectedCases: findStatisticsPublicationPageTestData.redirectedCases,
-      nonRedirectedCases:
-        findStatisticsPublicationPageTestData.nonRedirectedCases,
-    };
-
-  const findStatisticsPublicationPrereleaseAccessListPageTestData: RoutePatternTestCases =
-    {
-      routePattern: `find-statistics/${publicationSlugPlaceholder}/prerelease-access-list`,
-      redirectedCases: findStatisticsPublicationPageTestData.redirectedCases,
-      nonRedirectedCases:
-        findStatisticsPublicationPageTestData.nonRedirectedCases,
-    };
+  const findStatisticsPublicationReleasesPageTestData: RoutePatternTestCases = {
+    routePattern: `find-statistics/${publicationSlugPlaceholder}/releases`,
+    redirectedCases: findStatisticsPublicationPageTestData.redirectedCases,
+    nonRedirectedCases:
+      findStatisticsPublicationPageTestData.nonRedirectedCases,
+  };
 
   const findStatisticsReleasePageTestData: RoutePatternTestCases = {
     routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}`,
@@ -286,18 +277,29 @@ describe('redirectPages', () => {
     nonRedirectedCases: mixedPublicationReleasePageNonRedirectedCases,
   };
 
-  const findStatisticsReleaseDataGuidancePageTestData: RoutePatternTestCases = {
-    routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/data-guidance`,
+  const findStatisticsReleaseExplorePageTestData: RoutePatternTestCases = {
+    routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/explore`,
     redirectedCases: findStatisticsReleasePageTestData.redirectedCases,
     nonRedirectedCases: findStatisticsReleasePageTestData.nonRedirectedCases,
   };
 
-  const findStatisticsReleasePrereleaseAccessListPageTestData: RoutePatternTestCases =
-    {
-      routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/prerelease-access-list`,
-      redirectedCases: findStatisticsReleasePageTestData.redirectedCases,
-      nonRedirectedCases: findStatisticsReleasePageTestData.nonRedirectedCases,
-    };
+  const findStatisticsReleaseMethodologyPageTestData: RoutePatternTestCases = {
+    routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/methodology`,
+    redirectedCases: findStatisticsReleasePageTestData.redirectedCases,
+    nonRedirectedCases: findStatisticsReleasePageTestData.nonRedirectedCases,
+  };
+
+  const findStatisticsReleaseHelpPageTestData: RoutePatternTestCases = {
+    routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/help`,
+    redirectedCases: findStatisticsReleasePageTestData.redirectedCases,
+    nonRedirectedCases: findStatisticsReleasePageTestData.nonRedirectedCases,
+  };
+
+  const findStatisticsReleaseUpdatesPageTestData: RoutePatternTestCases = {
+    routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/updates`,
+    redirectedCases: findStatisticsReleasePageTestData.redirectedCases,
+    nonRedirectedCases: findStatisticsReleasePageTestData.nonRedirectedCases,
+  };
 
   const dataTablesPublicationPageTestData: RoutePatternTestCases = {
     routePattern: `data-tables/${publicationSlugPlaceholder}`,
@@ -335,11 +337,12 @@ describe('redirectPages', () => {
   const routePatternTestCases: RoutePatternTestCases[] = [
     methodologyPageTestData,
     findStatisticsPublicationPageTestData,
-    findStatisticsPublicationDataGuidancePageTestData,
-    findStatisticsPublicationPrereleaseAccessListPageTestData,
+    findStatisticsPublicationReleasesPageTestData,
     findStatisticsReleasePageTestData,
-    findStatisticsReleaseDataGuidancePageTestData,
-    findStatisticsReleasePrereleaseAccessListPageTestData,
+    findStatisticsReleaseExplorePageTestData,
+    findStatisticsReleaseMethodologyPageTestData,
+    findStatisticsReleaseHelpPageTestData,
+    findStatisticsReleaseUpdatesPageTestData,
     dataTablesPublicationPageTestData,
     dataTablesReleasePageTestData,
   ];
@@ -374,13 +377,7 @@ describe('redirectPages', () => {
       },
     },
     {
-      routePattern: `find-statistics/${publicationSlugPlaceholder}/data-guidance/child-route`,
-      oldSlugsByPlaceholder: {
-        [publicationSlugPlaceholder]: 'original-publication-slug-1',
-      },
-    },
-    {
-      routePattern: `find-statistics/${publicationSlugPlaceholder}/prerelease-access-list/child-route`,
+      routePattern: `find-statistics/${publicationSlugPlaceholder}/releases/child-route`,
       oldSlugsByPlaceholder: {
         [publicationSlugPlaceholder]: 'original-publication-slug-1',
       },
@@ -393,14 +390,28 @@ describe('redirectPages', () => {
       },
     },
     {
-      routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/data-guidance/child-route`,
+      routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/updates/child-route`,
       oldSlugsByPlaceholder: {
         [publicationSlugPlaceholder]: 'original-publication-slug-1',
         [releaseSlugPlaceholder]: 'original-release-slug-1',
       },
     },
     {
-      routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/prerelease-access-list/child-route`,
+      routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/explore/child-route`,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'original-publication-slug-1',
+        [releaseSlugPlaceholder]: 'original-release-slug-1',
+      },
+    },
+    {
+      routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/methodology/child-route`,
+      oldSlugsByPlaceholder: {
+        [publicationSlugPlaceholder]: 'original-publication-slug-1',
+        [releaseSlugPlaceholder]: 'original-release-slug-1',
+      },
+    },
+    {
+      routePattern: `find-statistics/${publicationSlugPlaceholder}/${releaseSlugPlaceholder}/help/child-route`,
       oldSlugsByPlaceholder: {
         [publicationSlugPlaceholder]: 'original-publication-slug-1',
         [releaseSlugPlaceholder]: 'original-release-slug-1',
