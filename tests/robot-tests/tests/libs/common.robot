@@ -1184,3 +1184,13 @@ check option exist in dropdown
         Log to console    \n\tAvailable options were: ${all_texts}
     END
     [Return]    ${matched}
+
+Get Texts From Elements
+    [Arguments]    ${locator}
+    ${elements}=    Get WebElements    ${locator}
+    ${texts}=    Create List
+    FOR    ${element}    IN    @{elements}
+        ${text}=    Get Text    ${element}
+        Append To List    ${texts}    ${text}
+    END
+    [Return]    ${texts}

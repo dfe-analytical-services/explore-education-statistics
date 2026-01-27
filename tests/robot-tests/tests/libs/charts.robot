@@ -234,3 +234,37 @@ user saves chart configuration
     user clicks button    Save chart options
     user waits until button is enabled    Save chart options
     user waits until page contains    Chart preview
+
+chart legend should be
+    [Arguments]    @{expected_items}
+    ${legend_items}=    Get Texts From Elements
+    ...    xpath=//ul[contains(@class,'recharts-default-legend')]//li[contains(@class,'recharts-legend-item')]
+    ${expected_length}=    Get Length    ${expected_items}
+    Length Should Be    ${legend_items}    ${expected_length}
+    FOR    ${index}    ${expected}    IN ENUMERATE    @{expected_items}
+        Should Be Equal    ${legend_items}[${index}]    ${expected}
+    END
+
+chart X axis should be
+    [Arguments]    @{expected_labels}
+    ${years}=    Get Texts From Elements
+    ...    xpath=//*[contains(@class,'recharts-xAxis')]//*[name()='tspan']
+    FOR    ${index}    ${expected}    IN ENUMERATE    @{expected_labels}
+        Should Be Equal    ${years}[${index}]    ${expected}
+    END
+
+chart Y axis should be
+    [Arguments]    @{expected_labels}
+    ${values}=    Get Texts From Elements
+    ...    xpath=//*[contains(@class,'recharts-yAxis')]//*[name()='tspan']
+    FOR    ${index}    ${expected}    IN ENUMERATE    @{expected_labels}
+        Should Be Equal    ${values}[${index}]    ${expected}
+    END
+
+open headline chart
+    user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
+    user clicks element    id:releaseHeadlines-charts-tab
+    user waits until parent contains element
+    ...    css:#releaseHeadlines-charts
+    ...    class:recharts-responsive-container
+    user scrolls down    300

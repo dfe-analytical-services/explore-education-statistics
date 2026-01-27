@@ -142,7 +142,7 @@ describe('ReleasePageIntro', () => {
         releaseVersionSummary={testReleaseVersionSummary}
       />,
     );
-    const nextUpdateValue = screen.getByTestId('Next update');
+    const nextUpdateValue = screen.getByTestId('Next release');
     expect(nextUpdateValue.textContent).toEqual('March 2026');
   });
 
@@ -160,7 +160,7 @@ describe('ReleasePageIntro', () => {
       />,
     );
 
-    expect(screen.queryByTestId('Next update')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('Next release')).not.toBeInTheDocument();
   });
 
   test(`doesn't render "Next release" section if the Release is not the latest Release for the Publication`, () => {
@@ -174,7 +174,7 @@ describe('ReleasePageIntro', () => {
       />,
     );
 
-    expect(screen.queryByTestId('Next update')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('Next release')).not.toBeInTheDocument();
   });
 
   test('does not render ReleaseSummaryBlock on small screens', () => {
