@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -30,6 +31,7 @@ public class ReleaseChecklistService : IReleaseChecklistService
     private readonly IReleaseDataFileRepository _fileRepository;
     private readonly IFootnoteRepository _footnoteRepository;
     private readonly IDataBlockService _dataBlockService;
+    private readonly IDataSetService _dataSetService;
     private readonly IDataSetVersionService _dataSetVersionService;
 
     public ReleaseChecklistService(
@@ -41,6 +43,7 @@ public class ReleaseChecklistService : IReleaseChecklistService
         IMethodologyVersionRepository methodologyVersionRepository,
         IFootnoteRepository footnoteRepository,
         IDataBlockService dataBlockService,
+        IDataSetService dataSetService,
         IDataSetVersionService dataSetVersionService
     )
     {
@@ -52,6 +55,7 @@ public class ReleaseChecklistService : IReleaseChecklistService
         _methodologyVersionRepository = methodologyVersionRepository;
         _footnoteRepository = footnoteRepository;
         _dataBlockService = dataBlockService;
+        _dataSetService = dataSetService;
         _dataSetVersionService = dataSetVersionService;
     }
 
@@ -248,8 +252,53 @@ public class ReleaseChecklistService : IReleaseChecklistService
             warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.UnresolvedComments));
         }
 
+        if (await IsMissingUpdatedApiDataSet(releaseVersion))
+        {
+            warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.MissingUpdatedApiDataSet));
+        }
+
         return warnings;
     }
+
+    private async Task<bool> IsMissingUpdatedApiDataSet(ReleaseVersion releaseVersion)
+    {
+        // if it's a new/unpublished publication, there's no previous release to check
+        if (releaseVersion.Release.Publication.LatestPublishedReleaseVersionId is null)
+        {
+            return false;
+        }
+
+        // get data sets already linked to this publication
+        // TODO: Add method without paging (might also need additional filters)
+        var existingDataSetsForPublication = await _dataSetService.ListDataSets(
+            1,
+            10,
+            releaseVersion.Release.PublicationId
+        );
+
+        // for each data set, check if a version is associated with this release already
+        foreach (var item in existingDataSetsForPublication.Right.Results)
+        {
+            if (DataSetVersionIsNotAssociatedToRelease(item, releaseVersion.Id))
+            {
+                // add the warning
+                return true;
+            }
+        }
+
+        // a new API version has been associated to this release already, don't show the warning
+        return false;
+    }
+
+    private static bool DataSetVersionIsNotAssociatedToRelease(
+        DataSetSummaryViewModel dataSet,
+        Guid releaseVersionId
+    ) =>
+        dataSet.LatestLiveVersion.ReleaseVersion.Id != releaseVersionId
+        && (
+            dataSet.DraftVersion.ReleaseVersion.Id != releaseVersionId
+            || dataSet.DraftVersion.Status != DataSetVersionStatus.Draft
+        );
 
     private async Task<bool> HasUnresolvedComments(Guid releaseVersionId)
     {
