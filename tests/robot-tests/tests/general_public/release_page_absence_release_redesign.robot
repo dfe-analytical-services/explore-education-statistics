@@ -367,7 +367,7 @@ Validate Regional and local authority (LA) breakdown chart
 
 Check Regional and local authority (LA) breakdown chart has footnotes
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    ...    # TODO: Test charts more thoroughly in https://dfedigital.atlassian.net/browse/EES-6851
+    ...    # TODO: Test charts footnote displays as expected in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
     ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
     ${data_block_chart}=    user gets data block chart from parent    LAD map    ${accordion}
