@@ -1429,7 +1429,7 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(releaseVersion.Type, viewModel.Type);
                 Assert.Equal(releaseVersion.Release.TimePeriodCoverage, viewModel.TimePeriodCoverage);
                 Assert.Equal(releaseVersion.NotifySubscribers, viewModel.NotifySubscribers);
-                Assert.Equal(releaseVersion.UpdatePublishedDisplayDate, viewModel.UpdatePublishedDate);
+                Assert.Equal(releaseVersion.UpdatePublishedDisplayDate, viewModel.UpdatePublishedDisplayDate);
 
                 Assert.Equal(releaseVersion.PublishingOrganisations.Count, viewModel.PublishingOrganisations.Count);
                 Assert.All(

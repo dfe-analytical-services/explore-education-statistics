@@ -25,6 +25,5 @@ public record ReleaseStatusCreateRequest
     [PartialDateValidator]
     public PartialDate? NextReleaseDate { get; init; }
 
-    // TODO EES-6832 rename this to UpdatePublishedDisplayDate.
-    public bool? UpdatePublishedDate { get; init; }
+    public bool? UpdatePublishedDisplayDate { get; init; }
 }
