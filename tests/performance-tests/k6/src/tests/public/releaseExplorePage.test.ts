@@ -7,7 +7,6 @@ import setupReleasePageTest from './utils/releasePageTest';
 
 interface SetupData {
   buildId: string;
-  dataUrls: string[];
 }
 
 const releasePageUrl =
@@ -39,40 +38,23 @@ export const getReleaseDataFailureCount = new Counter(
 );
 
 export function setup(): SetupData {
-  const { buildId, response } = setupReleasePageTest(releasePageUrl, name);
-
-  const themeIdRegexp = /"theme":\{"id":"([-0-9a-zA-Z]*)"/g;
-  const themeId = themeIdRegexp.exec(response.body as string)![1];
-
-  const publicationIdRegexp = /"publicationSummary":\{"id":"([-0-9a-zA-Z]*)"/g;
-  const publicationId = publicationIdRegexp.exec(response.body as string)![1];
-
-  const releaseVersionIdRegexp =
-    /"releaseVersionSummary":\{"id":"([-0-9a-zA-Z]*)"/g;
-  const releaseVersionId = releaseVersionIdRegexp.exec(
-    response.body as string,
-  )![1];
-
-  const dataUrls = [
-    `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,
-    `/data-catalogue.json?themeId=${themeId}&publicationId=${publicationId}&releaseVersionId=${releaseVersionId}`,
-  ];
+  const { buildId } = setupReleasePageTest(releasePageUrl, name);
 
   return {
     buildId,
-    dataUrls,
   };
 }
 
-const performTest = ({ buildId, dataUrls }: SetupData) => {
+const performTest = ({ buildId }: SetupData) => {
   const startTime = Date.now();
 
   try {
     testPageAndDataUrls({
       buildId,
       dataUrls: [
-        ...dataUrls.map(dataUrl => ({
-          url: dataUrl,
+        // This request occurs on hover-over of the navigation link to the Explore tab.
+        {
+          url: `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,
           prefetch: true,
           successCounter: getReleaseDataSuccessCount,
           failureCounter: getReleaseDataFailureCount,
@@ -81,11 +63,23 @@ const performTest = ({ buildId, dataUrls }: SetupData) => {
             check(response, {
               'response code was 200': ({ status }) => status === 200,
             }),
-        })),
-        // This request is also in the list of prefetch URLs but is actually a JSON response rather than a prefetch.
+        },
+        // This request occurs when actually navigating to the Explore tab.
         {
           url: `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,
-          prefetch: false,
+          prefetch: true,
+          successCounter: getReleaseDataSuccessCount,
+          failureCounter: getReleaseDataFailureCount,
+          durationTrend: getReleaseDataRequestDuration,
+          successCheck: response =>
+            check(response, {
+              'response code was 200': ({ status }) => status === 200,
+            }),
+        },
+        // We then see another prefetch request to explore.json when the Explore tab renders.
+        {
+          url: `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,
+          prefetch: true,
           successCounter: getReleaseDataSuccessCount,
           failureCounter: getReleaseDataFailureCount,
           durationTrend: getReleaseDataRequestDuration,

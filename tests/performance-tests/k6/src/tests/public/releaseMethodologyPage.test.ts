@@ -46,8 +46,21 @@ const performTest = ({ buildId }: ReleasePageSetupData) => {
     testPageAndDataUrls({
       buildId,
       dataUrls: [
+        // This request occurs on hover-over of the navigation link to the Methodology tab.
         {
-          url: `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=methodology`,
+          url: `${releasePageUrl}/methodology.json?publication=${publicationSlug}&release=${releaseSlug}&tab=methodology`,
+          prefetch: true,
+          successCounter: getReleaseDataSuccessCount,
+          failureCounter: getReleaseDataFailureCount,
+          durationTrend: getReleaseDataRequestDuration,
+          successCheck: response =>
+            check(response, {
+              'response code was 200': ({ status }) => status === 200,
+            }),
+        },
+        // This request occurs when actually navigating to the Methodology tab.
+        {
+          url: `${releasePageUrl}/methodology.json?publication=${publicationSlug}&release=${releaseSlug}&tab=methodology`,
           prefetch: false,
           successCounter: getReleaseDataSuccessCount,
           failureCounter: getReleaseDataFailureCount,

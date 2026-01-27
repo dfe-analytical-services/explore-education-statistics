@@ -10,7 +10,7 @@ const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT,
 );
 
-const useCdn = __ENV.USE_CDN ? Boolean(__ENV.USE_CDN) : false;
+const useCdn = __ENV.USE_CDN?.toLowerCase() === 'true';
 
 const testPageAndDataUrls = ({
   mainPageUrl,

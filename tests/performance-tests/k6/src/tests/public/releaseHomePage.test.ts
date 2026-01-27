@@ -13,24 +13,9 @@ const expectedPublicationTitle =
   __ENV.PUBLICATION_TITLE ?? 'Pupil absence in schools in England';
 const expectedContentSnippet =
   __ENV.CONTENT_SNIPPET ?? 'pupils missed on average 8.2 school days';
-const excludeDataUrls = __ENV.EXCLUDE_DATA_REQUESTS
-  ? Boolean(__ENV.EXCLUDE_DATA_REQUESTS)
-  : false;
+const excludeDataUrls = __ENV.EXCLUDE_DATA_REQUESTS?.toLowerCase() === 'true';
 
-const urlSlugs = /\/find-statistics\/(.*)\/(.*)/g.exec(releasePageUrl)!;
-const publicationSlug = urlSlugs[1];
-const releaseSlug = urlSlugs[2];
-
-const dataUrls: string[] = excludeDataUrls
-  ? []
-  : [
-      `/find-statistics.json`,
-      `/find-statistics/${publicationSlug}/releases.json?redesign=true&publication=${publicationSlug}`,
-      `${releasePageUrl}.json?redesign=true&publication=${publicationSlug}&release=${releaseSlug}`,
-      `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=explore`,
-      `${releasePageUrl}/methodology.json?publication=${publicationSlug}&release=${releaseSlug}&tab=methodology`,
-      `${releasePageUrl}/help.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
-    ];
+const dataUrls: string[] = excludeDataUrls ? [] : [`/find-statistics.json`];
 
 export const options = getOptions();
 

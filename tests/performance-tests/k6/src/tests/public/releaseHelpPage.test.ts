@@ -46,8 +46,24 @@ const performTest = ({ buildId }: ReleasePageSetupData) => {
     testPageAndDataUrls({
       buildId,
       dataUrls: [
+        // This request occurs on hover-over of the navigation link to the Help tab.
         {
-          url: `${releasePageUrl}/explore.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
+          url: `${releasePageUrl}/help.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
+          prefetch: true,
+          successCounter: getReleaseDataSuccessCount,
+          failureCounter: getReleaseDataFailureCount,
+          durationTrend: getReleaseDataRequestDuration,
+          successCheck: response =>
+            check(response, {
+              'response code was 200': ({ status }) => status === 200,
+              'response should have contained body': ({ body }) => body != null,
+              'response contains expected content': res =>
+                res.html().text().includes('pageProps'),
+            }),
+        },
+        // This request occurs when actually navigating to the Help tab.
+        {
+          url: `${releasePageUrl}/help.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
           prefetch: false,
           successCounter: getReleaseDataSuccessCount,
           failureCounter: getReleaseDataFailureCount,
