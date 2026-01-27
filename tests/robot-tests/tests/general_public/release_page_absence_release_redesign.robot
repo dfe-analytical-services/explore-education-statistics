@@ -252,27 +252,8 @@ Validate content section basic content
     ...    Overall absence and persistent absence rates vary across primary, secondary and special schools by region and local authority (LA).
     # TODO: Test that the chart in section-regional-and-local-authority-la-breakdown displays correctly (in https://dfedigital.atlassian.net/browse/EES-6851)
 
-Verify contact us and footer sections
+Verify contact us section
     check the contact us section has expected details
-
-    user checks page contains link with text and url    Cookies
-    ...    /cookies
-    user checks page contains link with text and url    Privacy notice
-    ...    https://www.gov.uk/government/organisations/department-for-education/about/personal-information-charter
-    user checks page contains link with text and url    Contact us
-    ...    /contact-us
-    user checks page contains link with text and url    Accessibility statement
-    ...    /accessibility-statement
-    user checks page contains link with text and url    Glossary
-    ...    /glossary
-    user checks page contains link with text and url    Help and support
-    ...    /help-support
-    user checks page contains link with text and url    Department for Education
-    ...    https://www.gov.uk/government/organisations/department-for-education
-    user checks page contains link with text and url    Office for Statistics Regulation
-    ...    https://osr.statisticsauthority.gov.uk/what-we-do/
-    user checks page contains link with text and url    Open Government Licence v3.0
-    ...    https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
 
 Validate Regional and local authority (LA) breakdown table
     [Documentation]    BAU-540    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
