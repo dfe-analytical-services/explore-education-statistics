@@ -29,36 +29,42 @@ Validate title
     user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
     user waits until page contains title caption    Academic year 2016/17
 
-#
-# Release home tab
-#
-
 Validate Email alerts link
     user checks page contains link with text and url    Get email alerts
     ...    /subscriptions/new-subscription/${PUPIL_ABSENCE_PUBLICATION_SLUG}
 
-Validate next release, summary list items and 'On this page' section
+Validate next release and summary list items
     user checks element should contain    testid:Next release    March 2019
     user checks summary list contains    Release type    Official statistics
     user checks summary list contains    Produced by    Department for Education
     user checks summary list contains    Published    26 March 2020
     user checks summary list contains    Last updated    9 March 2022
     user checks element contains    testid:release-summary-block    3 updates
-    check 'On this page section' for this tab contains
-    ...    Skip in page navigation
-    ...    Background information
-    ...    Headline facts and figures
-    ...    About these statistics
-    ...    Pupil absence rates
-    ...    Persistent absence
-    ...    Reasons for absence
-    ...    Distribution of absence
-    ...    Absence by pupil characteristics
-    ...    Absence for 4-year-olds
-    ...    Pupil referral unit absence
-    ...    Regional and local authority (LA) breakdown
-    ...    Contact us
-    ...    Back to top
+
+Verify the release updates page
+    user clicks element    xpath://div[@id='summary-section']//a[contains(normalize-space(.), '3 updates')]
+    user waits until page contains    Table showing updates to this release
+    user checks page contains link with text and url    Release home
+    ...    ${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
+
+    user checks table body has x rows    4    testid:release-updates-table
+    user checks table cell contains    1    1    9 March 2022    testid:release-updates-table
+    user checks table cell contains    1    2    Updated boundary file on LAD map of absence rates.
+    ...    testid:release-updates-table
+
+    user checks table cell contains    2    1    26 March 2020    testid:release-updates-table
+    user checks table cell contains    2    2    First published    testid:release-updates-table
+
+    user checks table cell contains    3    1    19 April 2018    testid:release-updates-table
+    user checks table cell contains    3    2
+    ...    Underlying data file updated to include absence data by pupil residency and school location, and updated metadata document.
+    ...    testid:release-updates-table
+
+    user checks table cell contains    4    1    22 March 2018    testid:release-updates-table
+    user checks table cell contains    4    2    First published on GOV.UK.    testid:release-updates-table
+
+    user clicks link    Release home
+    user waits until h2 is visible    Headline facts and figures
 
 Validate "Releases in this series" page
     user checks page contains link with text and url    All releases in this series
@@ -102,6 +108,27 @@ Validate "Releases in this series" page
     user clicks link    Release home (latest release)
     user waits until page finishes loading
 
+#
+# Release home tab
+#
+
+Validate 'On this page section'
+    check 'On this page section' for this tab contains
+    ...    Skip in page navigation
+    ...    Background information
+    ...    Headline facts and figures
+    ...    About these statistics
+    ...    Pupil absence rates
+    ...    Persistent absence
+    ...    Reasons for absence
+    ...    Distribution of absence
+    ...    Absence by pupil characteristics
+    ...    Absence for 4-year-olds
+    ...    Pupil referral unit absence
+    ...    Regional and local authority (LA) breakdown
+    ...    Contact us
+    ...    Back to top
+
 Validate Release Home tab - Background information
     user waits until h2 is visible    Background information
     user checks section with ID contains elements and back to top link    background-information
@@ -120,15 +147,6 @@ Validate Release Home tab - Headline facts and figures
     user checks key stat contents    3    Unauthorised absence rate    1.3%    Up from 1.1% in 2015/16
     user checks key stat guidance    3    What is unauthorized absence rate?
     ...    Number of unauthorised absences as a percentage of the overall school population.
-
-Validate Headlines facts and figures -- Summary tab content
-    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    ...    # TODO: Test charts more thoroughly in https://dfedigital.atlassian.net/browse/EES-6851
-    [Tags]    NotAgainstPreProd    Failing
-    user checks headline summary contains    pupils missed on average 8.2 school days
-    user checks headline summary contains    overall and unauthorised absence rates up on 2015/16
-    user checks headline summary contains    unauthorised absence rise due to higher rates of unauthorised holidays
-    user checks headline summary contains    10% of pupils persistently absent during 2016/17
 
 Validate Headlines facts and figures -- Charts tab
     open headline chart
@@ -329,7 +347,7 @@ Check Regional and local authority (LA) breakdown table has footnotes
 
 Validate Regional and local authority (LA) breakdown chart
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269 -
-    ...    # TODO: Test charts more thoroughly in https://dfedigital.atlassian.net/browse/EES-6851
+    ...    # TODO: Test charts display as expected in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user scrolls to accordion section    Regional and local authority (LA) breakdown    id:content
