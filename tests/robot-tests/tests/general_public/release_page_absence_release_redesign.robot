@@ -37,7 +37,7 @@ Validate Email alerts link
     user checks page contains link with text and url    Get email alerts
     ...    /subscriptions/new-subscription/${PUPIL_ABSENCE_PUBLICATION_SLUG}
 
-Validate summary list items
+Validate next release, summary list items and 'On this page' section
     user checks element should contain    testid:Next release    March 2019
     user checks summary list contains    Release type    Official statistics
     user checks summary list contains    Produced by    Department for Education
