@@ -1,5 +1,4 @@
 import { Options } from 'k6/options';
-import merge from 'lodash/merge';
 import { parseFloatOptional, parseIntOptional } from '../utils/utils';
 
 interface Config {
@@ -37,7 +36,10 @@ export default function spikeProfile({
     postSpikeStageDurationMinutes,
     normalTrafficRequestRatePerSecond,
     spikeRequestRatePerSecond,
-  } = merge({}, defaultConfig, overrides);
+  } = {
+    ...defaultConfig,
+    ...overrides,
+  };
 
   return {
     scenarios: {

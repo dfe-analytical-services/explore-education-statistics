@@ -1,5 +1,4 @@
 import { Options } from 'k6/options';
-import merge from 'lodash/merge';
 import { parseFloatOptional } from '../utils/utils';
 
 interface Config {
@@ -17,7 +16,11 @@ const overrides: Partial<Config> = {
 export default function sequentialRequestProfile(
   defaultConfig: Config,
 ): Options {
-  const { mainStageDurationMinutes } = merge({}, defaultConfig, overrides);
+  const { mainStageDurationMinutes } = {
+    ...defaultConfig,
+    ...overrides,
+  };
+
   return {
     duration: `${mainStageDurationMinutes}m`,
     vus: 1,

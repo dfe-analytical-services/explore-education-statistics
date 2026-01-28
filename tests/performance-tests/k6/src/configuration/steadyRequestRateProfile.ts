@@ -1,5 +1,4 @@
 import { Options } from 'k6/options';
-import merge from 'lodash/merge';
 import { parseFloatOptional, parseIntOptional } from '../utils/utils';
 
 interface Config {
@@ -31,7 +30,10 @@ export default function steadyRequestRateProfile({
     steadyRequestRatePerSecond,
     mainStageDurationMinutes,
     cooldownStageDurationMinutes,
-  } = merge({}, defaultConfig, overrides);
+  } = {
+    ...defaultConfig,
+    ...overrides,
+  };
 
   return {
     scenarios: {
