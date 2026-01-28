@@ -39,7 +39,6 @@ public record ReleaseVersionSummaryDto
     public static ReleaseVersionSummaryDto FromReleaseVersion(
         ReleaseVersion releaseVersion,
         bool isLatestRelease,
-        DateTimeOffset lastUpdated,
         PublishingOrganisationDto[] publishingOrganisations,
         int updateCount
     ) =>
@@ -49,7 +48,7 @@ public record ReleaseVersionSummaryDto
             ReleaseId = releaseVersion.ReleaseId,
             IsLatestRelease = isLatestRelease,
             Label = releaseVersion.Release.Label,
-            LastUpdated = lastUpdated,
+            LastUpdated = releaseVersion.Published ?? throw new ArgumentException("ReleaseVersion must be published"),
             Published =
                 releaseVersion.PublishedDisplayDate ?? throw new ArgumentException("ReleaseVersion must be published"),
             PublishingOrganisations = publishingOrganisations,
