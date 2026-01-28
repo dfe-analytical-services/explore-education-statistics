@@ -467,12 +467,6 @@ user navigates to the Absence publication
     user navigates to    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
     user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
 
-user checks section is in position
-    [Arguments]    ${section_text}    ${position}    ${parent}=css:[data-testid="accordion"]    ${exact_match}=${False}
-    ${text_matcher}=    get xpath text matcher    ${section_text}    ${exact_match}
-    user waits until parent contains element    ${parent}
-    ...    xpath:(.//*[@data-testid="home-content-section"])[${position}]//h2[${text_matcher}]
-
 User checks data set list item properties
     [Arguments]    ${data_set_name}    ${expected_row_count}    ${expected_time_period}
 

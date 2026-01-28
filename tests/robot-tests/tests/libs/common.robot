@@ -1194,3 +1194,34 @@ Get Texts From Elements
         Append To List    ${texts}    ${text}
     END
     [Return]    ${texts}
+
+user checks section is in position
+    [Arguments]    ${section_text}    ${position}    ${parent}=css:[data-testid="accordion"]    ${exact_match}=${False}
+    ${text_matcher}=    get xpath text matcher    ${section_text}    ${exact_match}
+    user waits until parent contains element    ${parent}
+    ...    xpath:(.//*[@data-testid="home-content-section"])[${position}]//h2[${text_matcher}]
+
+Go to explore and download data and navigate to data set details page
+    [Arguments]    ${SUBJECT_NAME}
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    user opens data set details for subject    ${SUBJECT_NAME}
+
+    Page Should Contain Link    Data set information page
+    user clicks link containing text    Data set information page
+    user waits until h1 is visible    ${SUBJECT_NAME}
+
+user opens data set details for subject
+    [Arguments]    ${SUBJECT_NAME}
+    ${dataset_xpath}=    Set Variable
+    ...    //article//li[@data-testid="release-data-list-item"][.//h4[normalize-space()="${SUBJECT_NAME}"]]
+
+    # Wait for dataset to exist
+    Wait Until Element Is Visible    xpath=${dataset_xpath}
+
+    # Expand accordion if collapsed
+    ${toggle_xpath}=    Set Variable
+    ...    ${dataset_xpath}//button[@aria-expanded="false"]
+
+    Run Keyword And Ignore Error
+    ...    Click Element    xpath=${toggle_xpath}
