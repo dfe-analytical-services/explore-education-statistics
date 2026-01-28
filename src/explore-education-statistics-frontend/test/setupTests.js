@@ -21,7 +21,6 @@ global.Request = jest.requireActual('node-fetch').Request;
 global.Response = jest.requireActual('node-fetch').Response;
 
 failOnConsole({
-  skipTest: ({ testName }) => testName.includes('skip-console-errors'),
   allowMessage: errorMessage =>
     errorMessage.includes('`DialogContent` requires a `DialogTitle`'),
   shouldFailOnWarn: false,

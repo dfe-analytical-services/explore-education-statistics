@@ -31,7 +31,6 @@ global.document.createElementNS = function (namespaceURI, qualifiedName) {
 };
 
 failOnConsole({
-  skipTest: ({ testName }) => testName.includes('skip-console-errors'),
   allowMessage: errorMessage =>
     errorMessage.includes('`DialogContent` requires a `DialogTitle`'),
   shouldFailOnWarn: false,
