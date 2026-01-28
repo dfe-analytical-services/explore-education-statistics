@@ -1,4 +1,4 @@
-import { replaceMultiple } from '../functions.bicep'
+import { replaceMultiple } from '../../functions.bicep'
 
 @description('The name of the Key Vault to store the secret within')
 param keyVaultName string

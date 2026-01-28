@@ -205,7 +205,7 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
   }
 }
 
-module storePublicApiContainerAppPrivateUrl '../../components/keyVaultSecret.bicep' = {
+module storePublicApiContainerAppPrivateUrl '../../../common/components/key-vault/keyVaultSecret.bicep' = {
   name: 'storePublicApiContainerAppPrivateUrl'
   params: {
     keyVaultName: resourceNames.existingResources.keyVault

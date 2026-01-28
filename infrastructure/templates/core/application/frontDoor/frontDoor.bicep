@@ -15,11 +15,11 @@ param subscription string
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
-@description('A set of tags with which to tag the resource in Azure.')
-param tagValues object
-
 @description('The Id of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
+
+@description('A set of tags with which to tag the resource in Azure.')
+param tagValues object
 
 var frontDoorName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}'
 
@@ -76,6 +76,19 @@ resource origin 'Microsoft.Cdn/profiles/origingroups/origins@2025-04-15' = {
     weight: 1000
     enabledState: 'Enabled'
     enforceCertificateNameCheck: true
+  }
+}
+
+resource customDomain 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = {
+  parent: frontDoor
+  name: 'dev-explore-education-statistics-service-gov-uk-3db1'
+  properties: {
+    hostName: publicSiteUrl
+    tlsSettings: {
+      certificateType: 'ManagedCertificate'
+      minimumTlsVersion: 'TLS12'
+      cipherSuiteSetType: 'TLS12_2023'
+    }
   }
 }
 

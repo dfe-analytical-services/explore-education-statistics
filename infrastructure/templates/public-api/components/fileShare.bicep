@@ -1,6 +1,6 @@
 import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
 import { AllValuesForDimension } from 'alerts/types.bicep'
-import { percentage, gbsToBytes } from '../functions.bicep'
+import { percentage, gbsToBytes } from '../../common/functions.bicep'
 
 @description('Size in GB of the file share')
 param fileShareQuotaGbs int = 6
