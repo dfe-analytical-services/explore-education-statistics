@@ -14,7 +14,7 @@ import _apiDataSetService, {
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
 
@@ -805,7 +805,9 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         screen.queryByRole('heading', { name: 'Draft version tasks' }),
       ).not.toBeInTheDocument();
 
-      jest.runOnlyPendingTimers();
+      await act(async () => {
+        jest.runOnlyPendingTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -902,7 +904,9 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         }),
       ).not.toBeInTheDocument();
 
-      jest.runOnlyPendingTimers();
+      await act(async () => {
+        jest.runOnlyPendingTimers();
+      });
 
       await waitFor(() => {
         expect(banner.getByText('There is a problem')).toBeInTheDocument();

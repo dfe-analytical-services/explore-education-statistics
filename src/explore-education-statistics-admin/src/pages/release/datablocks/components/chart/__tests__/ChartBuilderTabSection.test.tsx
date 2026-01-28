@@ -139,7 +139,7 @@ describe('ChartBuilderTabSection', () => {
     },
   };
 
-  test('renders the ChartBuilder', () => {
+  test('renders the ChartBuilder', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartBuilderTabSection
@@ -154,7 +154,7 @@ describe('ChartBuilderTabSection', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Chart preview' }),
+      await screen.findByRole('button', { name: 'Chart preview' }),
     ).toBeInTheDocument();
 
     const tabs = screen.getAllByRole('tab');

@@ -114,7 +114,7 @@ describe('ChartAxisConfiguration', () => {
 
   const testTable = testFullTable;
 
-  test('renders correctly with initial values', () => {
+  test('renders correctly with initial values', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartAxisConfiguration
@@ -131,7 +131,7 @@ describe('ChartAxisConfiguration', () => {
     );
 
     const generalSection = within(
-      screen.getByRole('group', { name: 'General' }),
+      await screen.findByRole('group', { name: 'General' }),
     );
     expect(
       generalSection.getByLabelText('Size of axis (pixels)'),
@@ -450,7 +450,7 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
       expect(
-        screen.getByLabelText('Displayed decimal places'),
+        await screen.findByLabelText('Displayed decimal places'),
       ).toBeInTheDocument();
     });
 
@@ -469,9 +469,12 @@ describe('ChartAxisConfiguration', () => {
           />
         </ChartBuilderFormsContextProvider>,
       );
-      expect(
-        screen.queryByLabelText('Displayed decimal places'),
-      ).not.toBeInTheDocument();
+
+      await waitFor(() => {
+        expect(
+          screen.queryByLabelText('Displayed decimal places'),
+        ).not.toBeInTheDocument();
+      });
     });
 
     test('shows validation error if invalid decimal places given', async () => {
@@ -658,12 +661,14 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      expect(
-        screen.queryByLabelText('Group by filter groups'),
-      ).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(
+          screen.queryByLabelText('Group by filter groups'),
+        ).not.toBeInTheDocument();
+      });
     });
 
-    test('does not show the `Group by filter groups` option when data is grouped by a filter with filter groups but bars are not stacked', () => {
+    test('does not show the `Group by filter groups` option when data is grouped by a filter with filter groups but bars are not stacked', async () => {
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartAxisConfiguration
@@ -686,9 +691,11 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      expect(
-        screen.queryByLabelText('Group by filter groups'),
-      ).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(
+          screen.queryByLabelText('Group by filter groups'),
+        ).not.toBeInTheDocument();
+      });
     });
 
     test('shows the `Group by filter groups` option when data is grouped by a filter with filter groups and bars are stacked', async () => {
@@ -716,7 +723,7 @@ describe('ChartAxisConfiguration', () => {
       );
 
       expect(
-        screen.getByLabelText('Group by filter groups'),
+        await screen.findByLabelText('Group by filter groups'),
       ).toBeInTheDocument();
     });
 
