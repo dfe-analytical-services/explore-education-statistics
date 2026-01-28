@@ -20,7 +20,7 @@ public partial class InitialMigration : Migration
         {
             // Grant privileges to the 'public_data_read_write' group role for objects in the public schema
             // subsequently created by this applications user role. Membership of the role will be granted to other
-            // application and indvidual user roles who require read and write privileges on public schema objects.
+            // application and individual user roles who require read and write privileges on public schema objects.
 
             // In Azure `public_data_read_write` should be created manually before the initial migration is run using:
             // `CREATE ROLE public_data_read_write WITH NOLOGIN`.
@@ -31,7 +31,7 @@ public partial class InitialMigration : Migration
             // A check ensures the role exists for cases where the migration is applied outside an app deployment,
             // e.g. with the EF Core CLI command `dotnet ef database update command`, when no environment variable
             // is set. This also applies to running integration tests which identify as a Production environment
-            // if the enviroment is not set. Integration tests connect as the Postgres superuser without running
+            // if the environment is not set. Integration tests connect as the Postgres superuser without running
             // the Docker script.
 
             // A separate grant is needed for the __EFMigrationsHistory table, as it was created prior to this migration.
