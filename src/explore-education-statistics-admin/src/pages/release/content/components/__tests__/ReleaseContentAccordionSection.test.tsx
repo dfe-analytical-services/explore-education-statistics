@@ -13,7 +13,7 @@ import {
 } from '@admin-test/generators/contentGenerators';
 import MockDate from '@common-test/mockDate';
 import { getDescribedBy } from '@common-test/queries';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
@@ -22,7 +22,7 @@ jest.mock('@admin/services/hubs/utils/createConnection');
 describe('ReleaseContentAccordionSection', () => {
   const testReleaseContent = generateReleaseContent({});
 
-  test('renders correctly in editable mode', () => {
+  test('renders correctly in editable mode', async () => {
     render(
       <EditingContextProvider editingMode="edit">
         <ReleaseContentProvider
@@ -51,7 +51,7 @@ describe('ReleaseContentAccordionSection', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: /Edit section title/ }),
+      await screen.findByRole('button', { name: /Edit section title/ }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /Reorder this section/ }),
@@ -71,7 +71,7 @@ describe('ReleaseContentAccordionSection', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders the Embed a URL button for BAU users', () => {
+  test('renders the Embed a URL button for BAU users', async () => {
     render(
       <AuthContextTestProvider
         user={{
@@ -110,7 +110,7 @@ describe('ReleaseContentAccordionSection', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: /Edit section title/ }),
+      await screen.findByRole('button', { name: /Edit section title/ }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /Reorder this section/ }),
@@ -130,7 +130,7 @@ describe('ReleaseContentAccordionSection', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders correctly in preview mode', () => {
+  test('renders correctly in preview mode', async () => {
     render(
       <EditingContextProvider editingMode="preview">
         <ReleaseContentProvider
@@ -158,9 +158,11 @@ describe('ReleaseContentAccordionSection', () => {
       </EditingContextProvider>,
     );
 
-    expect(
-      screen.queryByRole('button', { name: /Edit section title/ }),
-    ).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('button', { name: /Edit section title/ }),
+      ).not.toBeInTheDocument();
+    });
     expect(
       screen.queryByRole('button', { name: /Reorder this section/ }),
     ).not.toBeInTheDocument();
@@ -179,7 +181,7 @@ describe('ReleaseContentAccordionSection', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders heading with unsaved changes if there are any unsaved blocks', () => {
+  test('renders heading with unsaved changes if there are any unsaved blocks', async () => {
     render(
       <EditingContextProvider
         editingMode="edit"
@@ -211,13 +213,13 @@ describe('ReleaseContentAccordionSection', () => {
     );
 
     expect(
-      screen.getByRole('heading', {
+      await screen.findByRole('heading', {
         name: /Content section 1 \(unsaved changes\)/,
       }),
     ).toBeInTheDocument();
   });
 
-  test('renders heading with unsaved changes if there are any pending comment deletions', () => {
+  test('renders heading with unsaved changes if there are any pending comment deletions', async () => {
     render(
       <EditingContextProvider
         editingMode="edit"
@@ -251,13 +253,13 @@ describe('ReleaseContentAccordionSection', () => {
     );
 
     expect(
-      screen.getByRole('heading', {
+      await screen.findByRole('heading', {
         name: /Content section 1 \(unsaved changes\)/,
       }),
     ).toBeInTheDocument();
   });
 
-  test('renders locked state if any child blocks are locked', () => {
+  test('renders locked state if any child blocks are locked', async () => {
     MockDate.set('2022-03-12T12:05:00Z');
 
     const testOtherUser: UserDetails = {
@@ -307,7 +309,7 @@ describe('ReleaseContentAccordionSection', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: /Edit section title/ }),
+      await screen.findByRole('button', { name: /Edit section title/ }),
     ).not.toBeAriaDisabled();
 
     const reorderButton = screen.getByRole('button', {
