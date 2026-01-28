@@ -1,9 +1,9 @@
+import errorOnConsoleError from '@common-test/errorOnConsoleError';
 import '@testing-library/jest-dom';
 import 'core-js/features/array/flat-map';
 import 'core-js/features/string/replace-all';
-import './setupGlobals';
 import './extend-expect';
-import failOnConsole from 'jest-fail-on-console';
+import './setupGlobals';
 
 jest.setTimeout(10000);
 
@@ -30,8 +30,4 @@ global.document.createElementNS = function (namespaceURI, qualifiedName) {
   return createElementNSOrig.apply(this, arguments);
 };
 
-failOnConsole({
-  allowMessage: errorMessage =>
-    errorMessage.includes('`DialogContent` requires a `DialogTitle`'),
-  shouldFailOnWarn: false,
-});
+errorOnConsoleError();
