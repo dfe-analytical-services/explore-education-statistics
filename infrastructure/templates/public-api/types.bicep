@@ -314,9 +314,6 @@ type PrincipalNameAndId = {
 type ContainerRegistryRole = 'AcrPull'
 
 @export()
-type KeyVaultRole = 'Secrets User' | 'Certificate User'
-
-@export()
 type StaticWebAppSku = 'Free' | 'Standard'
 
 @export()

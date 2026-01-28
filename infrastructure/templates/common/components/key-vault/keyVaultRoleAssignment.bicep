@@ -1,4 +1,4 @@
-import { KeyVaultRole } from '../types.bicep'
+import { KeyVaultRole } from 'types.bicep'
 
 @description('Specifies the name of the Key Vault.')
 param keyVaultName string
