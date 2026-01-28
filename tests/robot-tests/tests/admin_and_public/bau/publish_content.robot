@@ -15,6 +15,8 @@ Force Tags          Admin    Local    Dev    AltersData
 ${PUBLICATION_NAME}=    Publish content %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Calendar year 2001
 
+# There are 8 TODOs that when EES-6843 is complete, should be completed to get this test to pass.
+
 
 *** Test Cases ***
 Create new publication and release via API
@@ -65,6 +67,7 @@ Add text block with link to absence glossary entry to accordion section
 Check glossary info icon appears on release preview
     user clicks radio    Preview release page
     user opens accordion section    Test section    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    # TODO: When EES-6843 is complete, remove the line above which opens accodion section to get the tests to pass
     user waits until page contains button    Absence
 
 Click glossary info icon and validate glossary entry
@@ -89,24 +92,45 @@ Verify newly published release is public
 
 Check latest release is correct
     user checks page contains    This is the latest release
+    # TODO: When EES-6843 is complete, replace the line above with the following line to get the tests to pass
+    # user checks page contains    Latest release
 
 Check latest release contains related dashboards section
+    # TODO: When EES-6843 is complete, delete this test step and replace it with the test `Check latest release contains related data dashboards section`
     user checks there are x accordion sections    1    id:data-accordion
     user checks accordion is in position    View related dashboard(s)    1    id:data-accordion
     user checks element contains    id:related-dashboards-content    Related dashboards test text
 
+Check latest release contains related data dashboards section
+    [Tags]    ReleaseRedesign
+    # TODO: When EES-6843 is complete, remove the `[Tags]    ReleaseRedesign` tag from this test
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    user waits until h2 is visible    Data dashboards
+    user checks section with ID contains elements and back to top link    data-dashboards-section
+    ...    Related dashboards test text
+
 Check quick links navigation contains link to related dashboards
+    # TODO: When EES-6843 is complete, delete this test step
     user checks element contains link    testid:quick-links    View related dashboard(s)
 
 Check related dashboard link opens accordion section
+    # TODO: When EES-6843 is complete, delete this test step
     user verifies accordion is closed    View related dashboard(s)
     user clicks link    View related dashboard(s)    testid:quick-links
     user verifies accordion is open    View related dashboard(s)
     user closes accordion section    View related dashboard(s)    id:data-accordion
 
 Check latest release contains glossary info icon
+    # TODO: When EES-6843 is complete, delete this test step
     user opens accordion section    Test section    css:#content
     user waits until page contains button    Absence
+
+Navigate back to the release home tab
+    [Tags]    ReleaseRedesign
+    #TODO When EES-6843 is complete, remove the line above which adds the ReleaseRedesign tag
+    user clicks link    Release home
+    user waits until h2 is visible    Headline facts and figures
 
 Click glossary info icon and verify entry is correct
     user clicks button    Absence
