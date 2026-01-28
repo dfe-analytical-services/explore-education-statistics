@@ -21,5 +21,5 @@ export const testRelease: ReleaseVersion = {
   type: 'OfficialStatistics',
   previousVersionId: '',
   preReleaseAccessList: '',
-  updatePublishedDate: false,
+  updatePublishedDisplayDate: false,
 };

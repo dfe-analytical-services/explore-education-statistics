@@ -29,7 +29,7 @@ export interface ReleaseVersion {
   version: number;
   approvalStatus: ReleaseApprovalStatus;
   notifySubscribers?: boolean;
-  updatePublishedDate: boolean;
+  updatePublishedDisplayDate: boolean;
   latestRelease: boolean;
   live: boolean;
   amendment: boolean;
@@ -102,7 +102,7 @@ export interface CreateReleaseVersionStatusRequest {
   publishScheduled?: string;
   nextReleaseDate?: PartialDate;
   notifySubscribers?: boolean;
-  updatePublishedDate?: boolean;
+  updatePublishedDisplayDate?: boolean;
 }
 
 type PublishingStage =

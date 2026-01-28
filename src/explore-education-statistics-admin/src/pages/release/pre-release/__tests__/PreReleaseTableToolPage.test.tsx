@@ -198,7 +198,7 @@ describe('PreReleaseTableToolPage', () => {
     releaseId: '456',
     slug: '123',
     approvalStatus: 'Draft',
-    updatePublishedDate: false,
+    updatePublishedDisplayDate: false,
     latestRelease: true,
     live: true,
     amendment: false,
