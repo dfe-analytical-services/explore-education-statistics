@@ -1,9 +1,9 @@
+import errorOnConsoleError from '@common-test/errorOnConsoleError';
+import '@common-test/extend-expect';
+import '@common-test/setupGlobals';
 import '@testing-library/jest-dom';
 import 'core-js/features/array/flat-map';
 import 'core-js/features/string/replace-all';
-import '@common-test/setupGlobals';
-import '@common-test/extend-expect';
-import failOnConsole from 'jest-fail-on-console';
 
 jest.setTimeout(10000);
 
@@ -13,8 +13,4 @@ if (typeof window !== 'undefined') {
   require('intersection-observer');
 }
 
-failOnConsole({
-  allowMessage: errorMessage =>
-    errorMessage.includes('`DialogContent` requires a `DialogTitle`'),
-  shouldFailOnWarn: false,
-});
+errorOnConsoleError();
