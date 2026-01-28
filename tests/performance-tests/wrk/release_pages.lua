@@ -1,4 +1,4 @@
-local utils = require('utils')
+require('utils')
 
 local build_id = os.getenv("BUILD_ID")
 local publication_slug = os.getenv("PUBLICATION_SLUG")
@@ -142,7 +142,7 @@ for _, page in ipairs(page_requests) do
     running_total_weighting = running_total_weighting + page.weighting
 end
 
-local page_being_processed = nil
+local page_being_processed
 local page_request_counter = 0
 
 math.randomseed(os.time())
@@ -152,39 +152,16 @@ math.randomseed(os.time())
 -- a new page and repeat the process.
 function request()
 
-    page_request_counter = page_request_counter + 1
-
-    local next_request
-
-    -- If we're currently processing a page's requests and we've not reached the end of its list of requests yet,
-    -- select the next one.
-    if page_being_processed ~= nil and page_request_counter <= #page_being_processed.requests then
-        next_request = page_being_processed.requests[page_request_counter]
-    else
-        -- If we've reached the final request for the current page being processed, set the current page to nil so that
-        -- a new one will be chosen for the next request.
-        page_being_processed = nil
-    end
-
-    -- If the next request to be processed is the start of our prefetch requests and we're excluding prefetch requests,
-    -- deselect the current page being processed so that a new one will be chosen for the next request.
-    if next_request ~= nil and next_request.prefetch and exclude_prefetch_requests then
-        page_being_processed = nil
-    end
-
-    -- If no page is currently selected for being processed, select a new one and proceed to run through its requests
-    -- one by one.
-    if page_being_processed == nil then
-        random = math.random(running_total_weighting - 1)
-        page_being_processed = table.filter_array(page_weightings, function(page_weighting)
-            return random >= page_weighting.min and random < page_weighting.max
-        end)[1]
+    -- If no page is currently selected for processing, select a new one to process at random, based on their weighted
+    -- probabilities.
+    if is_new_page_required(page_being_processed, page_request_counter + 1) then
+        page_being_processed = get_random_page()
         page_request_counter = 1
-        next_request = page_being_processed.requests[page_request_counter]
-        if print_urls then
-            print('Processing page ', page_being_processed.page_name)
-        end
+    else
+        page_request_counter = page_request_counter + 1
     end
+
+    local next_request = page_being_processed.requests[page_request_counter]
 
     if print_urls then
         print('Processing request ', page_request_counter, ' of page ', page_being_processed.page_name, ': ', next_request.url)
@@ -197,8 +174,41 @@ function request()
     end
 end
 
-function response(status, headers, body)
+function response(status, _, _)
     if print_responses then
         print('Got response code ', status)
     end
+end
+
+function is_new_page_required(current_page, next_request_number)
+
+    -- If no page is currently being processed, we need a new page selection.
+    if current_page == nil then
+        return true
+    end
+
+    -- If we've reached the final request for the current page being processed, we need a new page selection.
+    if next_request_number > #current_page.requests then
+        return true
+    end
+
+    -- If the next request to process is a prefetch and we're excluding prefetch requests, we need a new page
+    -- selection.
+    if current_page.requests[next_request_number].prefetch and exclude_prefetch_requests then
+        return true
+    end
+
+    -- Otherwise, continue to send requests from the existing page being processed.
+    return false
+end
+
+function get_random_page()
+    local random = math.random(running_total_weighting - 1)
+    local random_page = table.filter_array(page_weightings, function(page_weighting)
+        return random >= page_weighting.min and random < page_weighting.max
+    end)[1]
+    if print_urls then
+        print('Processing page ', random_page.page_name)
+    end
+    return random_page
 end
