@@ -94,7 +94,7 @@ public class ReleaseVersionRepositoryTests
             }
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userPublicationRoles]);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, [.. userPublicationRoles]);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
             userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
@@ -177,14 +177,10 @@ public class ReleaseVersionRepositoryTests
             }
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
-            userPublicationRoleRepository
-                .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(userPublicationRoles.BuildMock());
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, [.. userPublicationRoles]);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository
-                .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(userReleaseRoles.BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -245,14 +241,10 @@ public class ReleaseVersionRepositoryTests
             }
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>();
-            userPublicationRoleRepository
-                .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(new[] { userPublicationRole }.BuildMock());
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, userPublicationRole);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-            userReleaseRoleRepository
-                .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(new[] { userReleaseRole }.BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, userReleaseRole);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {

@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -59,18 +60,10 @@ public class UserReleaseRoleServiceTests
             .ReturnsAsync([publication.Releases[0].Versions[0].Id, publication.Releases[1].Versions[0].Id]);
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
-        userReleaseRoleRepository
-            .Setup(m => m.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(
-                new[]
-                {
-                    userReleaseRole1,
-                    userReleaseRole2,
-                    userReleaseRole3,
-                    userReleaseRoleIgnored1,
-                    userReleaseRoleIgnored2,
-                }.BuildMock()
-            );
+        userReleaseRoleRepository.SetupQuery(
+            ResourceRoleFilter.ActiveOnly,
+            [userReleaseRole1, userReleaseRole2, userReleaseRole3, userReleaseRoleIgnored1, userReleaseRoleIgnored2]
+        );
 
         var service = BuildService(
             userReleaseRoleRepository: userReleaseRoleRepository.Object,
@@ -123,9 +116,7 @@ public class UserReleaseRoleServiceTests
             .ReturnsAsync([publication.Releases[0].Versions[0].Id]);
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
-        userReleaseRoleRepository
-            .Setup(m => m.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(userReleaseRoles.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
         var service = BuildService(
             userReleaseRoleRepository: userReleaseRoleRepository.Object,

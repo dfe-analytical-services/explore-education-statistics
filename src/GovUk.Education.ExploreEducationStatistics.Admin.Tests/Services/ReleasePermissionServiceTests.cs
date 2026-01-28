@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -61,9 +62,7 @@ public class ReleasePermissionServiceTests
         }
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
-            .Setup(m => m.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(userReleaseRoles.ToArray().BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -130,9 +129,7 @@ public class ReleasePermissionServiceTests
         }
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
-            .Setup(m => m.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(userReleaseRoles.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -177,9 +174,7 @@ public class ReleasePermissionServiceTests
         }
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
-            .Setup(m => m.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -236,9 +231,7 @@ public class ReleasePermissionServiceTests
         }
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
-            .Setup(m => m.Query(ResourceRoleFilter.PendingOnly))
-            .Returns(userReleaseRoles.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -293,9 +286,7 @@ public class ReleasePermissionServiceTests
         }
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
-            .Setup(m => m.Query(ResourceRoleFilter.PendingOnly))
-            .Returns(userReleaseRoles.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -341,9 +332,7 @@ public class ReleasePermissionServiceTests
         }
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
-            .Setup(m => m.Query(ResourceRoleFilter.PendingOnly))
-            .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, []);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -506,9 +495,7 @@ public class ReleasePermissionServiceTests
         }
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
-            .Setup(m => m.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(userReleaseRoles.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
         // The first role should be removed
         userReleaseRoleRepository
             .Setup(m =>
@@ -649,9 +636,7 @@ public class ReleasePermissionServiceTests
         }
 
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>();
-        userReleaseRoleRepository
-            .Setup(m => m.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(userReleaseRoles.BuildMock());
+        userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. userReleaseRoles]);
         userReleaseRoleRepository
             .Setup(m =>
                 m.RemoveMany(
