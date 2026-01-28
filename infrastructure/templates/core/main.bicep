@@ -7,6 +7,9 @@ param location string = resourceGroup().location
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
 
+@description('The public site URL for use with Azure Front Door.')
+param publicSiteUrl string = ''
+
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool = true
 
@@ -29,6 +32,7 @@ var tagValues = union(resourceTags ?? {}, {
 })
 
 var resourcePrefix = '${subscription}-ees'
+var legacyResourcePrefix = '${subscription}-'
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
   name: '${resourcePrefix}-log'
@@ -50,7 +54,12 @@ module frontDoorModule 'application/frontDoor/frontDoor.bicep' = {
   params: {
     subscription: subscription
     resourcePrefix: resourcePrefix
-    tagValues: tagValues
+    publicSiteUrl: publicSiteUrl
+    publicSiteCertificateDetails: {
+      keyVaultName: '${legacyResourcePrefix}kv-ees-01'
+      certificateName: '${legacyResourcePrefix}as-ees-public-site-certificate'
+    }
     logAnalyticsWorkspaceId: logAnalyticsWorkspace.id
+    tagValues: tagValues
   }
 }

@@ -15,6 +15,15 @@ param subscription string
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
+@description('URL of the public site.')
+param publicSiteUrl string
+
+@description('Optional certificate to apply to Azure Front Door. If not specified, it will provision its own certificate.')
+param publicSiteCertificateDetails {
+  keyVaultName: string
+  certificateName: string
+}?
+
 @description('The Id of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
 
@@ -22,6 +31,7 @@ param logAnalyticsWorkspaceId string
 param tagValues object
 
 var frontDoorName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}'
+var publicSiteHostName = replace(publicSiteUrl, 'https://', '')
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' = {
   name: frontDoorName
@@ -30,8 +40,11 @@ resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' = {
   sku: {
     name: 'Standard_AzureFrontDoor'
   }
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
-    originResponseTimeoutSeconds: 60 // @MarkFix maybe want longer - for table tool exclusively?
+    originResponseTimeoutSeconds: 220 // Timeout set to just under Azure's standard App Service timeout of 3.8 minutes.
   }
 }
 
@@ -76,6 +89,36 @@ resource origin 'Microsoft.Cdn/profiles/origingroups/origins@2025-04-15' = {
     weight: 1000
     enabledState: 'Enabled'
     enforceCertificateNameCheck: true
+  }
+}
+
+module publicSiteCertificate 'publicSiteCertificate.bicep' = if (publicSiteCertificateDetails != null) {
+  name: '${publicSiteCertificateDetails!.certificateName}ModuleDeploy'
+  params: {
+    frontDoorName: frontDoorName
+    certificateName: publicSiteCertificateDetails!.certificateName
+    keyVaultName: publicSiteCertificateDetails!.keyVaultName
+    publicSiteHostName: publicSiteHostName
+  }
+}
+
+resource customDomain 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = {
+  parent: frontDoor
+  name: '${resourcePrefix}-public-site-${abbreviations.frontDoorDomains}'
+  properties: {
+    hostName: publicSiteHostName
+    tlsSettings: publicSiteCertificate != null ? {
+      certificateType: 'CustomerCertificate'
+      minimumTlsVersion: 'TLS12'
+      cipherSuiteSetType: 'TLS12_2023'
+      secret: {
+        id: publicSiteCertificate!.outputs.certificateSecretId
+      }
+    } : {
+      certificateType: 'ManagedCertificate'
+      minimumTlsVersion: 'TLS12'
+      cipherSuiteSetType: 'TLS12_2023'
+    }
   }
 }
 
@@ -137,7 +180,11 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
       }
       queryStringCachingBehavior: 'UseQueryString'
     }
-    customDomains: []
+    customDomains: [
+      {
+        id: customDomain.id
+      }
+    ]
     originGroup: {
       id: originGroup.id
     }
