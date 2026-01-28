@@ -275,19 +275,10 @@ public class ReleaseChecklistService : IReleaseChecklistService
         }
 
         // get data sets associated to this publication
-        // TODO: Create service method without paging (might also need additional filters)
-        var existingDataSetsForPublication = await _dataSetService.ListDataSets(
-            1,
-            10,
-            releaseVersion.Release.PublicationId
-        );
+        var existingDataSetsForPublication = await _dataSetService.ListDataSets(releaseVersion.Release.PublicationId);
 
         // if no new data set version has been associated to this release, add the warning
-        if (
-            existingDataSetsForPublication.Right.Results.Any(r =>
-                DataSetVersionIsNotAssociatedToRelease(r, releaseVersion.Id)
-            )
-        )
+        if (existingDataSetsForPublication.Right.Any(r => DataSetVersionIsNotAssociatedToRelease(r, releaseVersion.Id)))
         {
             return true;
         }

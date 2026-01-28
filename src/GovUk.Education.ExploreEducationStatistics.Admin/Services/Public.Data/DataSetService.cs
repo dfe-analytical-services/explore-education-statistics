@@ -65,6 +65,31 @@ internal class DataSetService(
             });
     }
 
+    public async Task<Either<ActionResult, List<DataSetSummaryViewModel>>> ListDataSets(
+        Guid publicationId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await CheckPublicationExists(publicationId, cancellationToken)
+            .OnSuccess(userService.CheckCanViewPublication)
+            .OnSuccess(async () =>
+            {
+                var dataSets = await publicDataDbContext
+                    .DataSets.AsNoTracking()
+                    .Include(ds => ds.Versions)
+                    .Include(ds => ds.LatestDraftVersion)
+                    .Include(ds => ds.LatestLiveVersion)
+                    .Where(ds => ds.PublicationId == publicationId)
+                    .ToListAsync();
+
+                var dataSetReleaseVersions = await GetDataSetReleaseVersions(dataSets, cancellationToken);
+
+                return dataSets
+                    .Select(ds => MapDataSetSummary(ds, dataSetReleaseVersions[ds.Id].ReleaseFilesByDataSetVersionId))
+                    .ToList();
+            });
+    }
+
     public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
         Guid dataSetId,
         CancellationToken cancellationToken = default
