@@ -252,7 +252,7 @@ public class ReleaseChecklistService : IReleaseChecklistService
             warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.UnresolvedComments));
         }
 
-        if (await IsMissingUpdatedApiDataSet(releaseVersion))
+        if (await IsMissingUpdatedApiDataSet(releaseVersion, dataFiles))
         {
             warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.MissingUpdatedApiDataSet));
         }
@@ -260,7 +260,7 @@ public class ReleaseChecklistService : IReleaseChecklistService
         return warnings;
     }
 
-    private async Task<bool> IsMissingUpdatedApiDataSet(ReleaseVersion releaseVersion)
+    private async Task<bool> IsMissingUpdatedApiDataSet(ReleaseVersion releaseVersion, IList<File> dataFiles)
     {
         // if it's a new/unpublished publication, there's no previous release to check
         if (releaseVersion.Release.Publication.LatestPublishedReleaseVersionId is null)
@@ -268,36 +268,42 @@ public class ReleaseChecklistService : IReleaseChecklistService
             return false;
         }
 
-        // get data sets already linked to this publication
-        // TODO: Add method without paging (might also need additional filters)
+        // if no data files were uploaded, there's no data to attribute to an existing API data set
+        if (!dataFiles.Any())
+        {
+            return false;
+        }
+
+        // get data sets associated to this publication
+        // TODO: Create service method without paging (might also need additional filters)
         var existingDataSetsForPublication = await _dataSetService.ListDataSets(
             1,
             10,
             releaseVersion.Release.PublicationId
         );
 
-        // for each data set, check if a version is associated with this release already
-        foreach (var item in existingDataSetsForPublication.Right.Results)
+        // if no new data set version has been associated to this release, add the warning
+        if (
+            existingDataSetsForPublication.Right.Results.Any(r =>
+                DataSetVersionIsNotAssociatedToRelease(r, releaseVersion.Id)
+            )
+        )
         {
-            if (DataSetVersionIsNotAssociatedToRelease(item, releaseVersion.Id))
-            {
-                // add the warning
-                return true;
-            }
+            return true;
         }
 
-        // a new API version has been associated to this release already, don't show the warning
         return false;
     }
 
     private static bool DataSetVersionIsNotAssociatedToRelease(
         DataSetSummaryViewModel dataSet,
         Guid releaseVersionId
-    ) =>
-        dataSet.LatestLiveVersion.ReleaseVersion.Id != releaseVersionId
+    ) => // might be wrong logic? Been suggested that this shouldn't work with amendment scenarios when comparing releaseVersionIds
+        dataSet.LatestLiveVersion?.ReleaseVersion.Id != releaseVersionId
         && (
-            dataSet.DraftVersion.ReleaseVersion.Id != releaseVersionId
-            || dataSet.DraftVersion.Status != DataSetVersionStatus.Draft
+            dataSet.DraftVersion is null
+            || dataSet.DraftVersion.ReleaseVersion.Id != releaseVersionId
+            || dataSet.DraftVersion.Status is not DataSetVersionStatus.Mapping and not DataSetVersionStatus.Draft
         );
 
     private async Task<bool> HasUnresolvedComments(Guid releaseVersionId)
