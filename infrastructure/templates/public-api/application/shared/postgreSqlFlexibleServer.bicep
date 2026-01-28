@@ -1,5 +1,5 @@
 import { ResourceNames, IpRange, PrincipalNameAndId, PostgreSqlFlexibleServerConfig } from '../../types.bicep'
-import { replaceMultiple } from '../../functions.bicep'
+import { replaceMultiple } from '../../../common/functions.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -111,7 +111,7 @@ var connectionStringTemplate = postgreSqlServerModule.outputs.managedIdentityCon
 
 var dataProcessorPsqlConnectionStringSecretKey = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
 
-module storeDataProcessorPsqlConnectionString '../../components/keyVaultSecret.bicep' = {
+module storeDataProcessorPsqlConnectionString '../../../common/components/key-vault/keyVaultSecret.bicep' = {
   name: 'storeDataProcessorPsqlConnectionString'
   params: {
     keyVaultName: resourceNames.existingResources.keyVault
@@ -125,7 +125,7 @@ module storeDataProcessorPsqlConnectionString '../../components/keyVaultSecret.b
 
 var publisherPsqlConnectionStringSecretKey = 'ees-publisher-connectionstring-publicdatadb'
 
-module storePublisherPsqlConnectionString '../../components/keyVaultSecret.bicep' = {
+module storePublisherPsqlConnectionString '../../../common/components/key-vault/keyVaultSecret.bicep' = {
   name: 'storePublisherPsqlConnectionString'
   params: {
     keyVaultName: resourceNames.existingResources.keyVault
@@ -139,7 +139,7 @@ module storePublisherPsqlConnectionString '../../components/keyVaultSecret.bicep
 
 var adminPsqlConnectionStringSecretKey = 'ees-admin-connectionstring-publicdatadb'
 
-module storeAdminPsqlConnectionString '../../components/keyVaultSecret.bicep' = {
+module storeAdminPsqlConnectionString '../../../common/components/key-vault/keyVaultSecret.bicep' = {
   name: 'storeAdminPsqlConnectionString'
   params: {
     keyVaultName: resourceNames.existingResources.keyVault

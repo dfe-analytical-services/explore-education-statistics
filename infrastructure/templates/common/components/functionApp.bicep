@@ -311,7 +311,7 @@ resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = if
   )
 }
 
-module keyVaultRoleAssignmentModule '../../public-api/components/keyVaultRoleAssignment.bicep' = {
+module keyVaultRoleAssignmentModule 'key-vault/keyVaultRoleAssignment.bicep' = {
   name: '${functionAppName}KeyVaultRoleAssignmentModuleDeploy'
   params: {
     principalIds: [functionApp.identity.principalId]
