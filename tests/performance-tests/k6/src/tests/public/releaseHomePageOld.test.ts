@@ -8,11 +8,13 @@ import setupReleasePageTest, {
 } from './utils/releasePageTest';
 
 const releasePageUrl =
-  __ENV.URL ?? '/find-statistics/pupil-absence-in-schools-in-england/2016-17';
+  __ENV.URL ??
+  '/find-statistics/seed-publication-pupil-absence-in-schools-in-england/2016-17';
 const expectedPublicationTitle =
-  __ENV.PUBLICATION_TITLE ?? 'Pupil absence in schools in England';
+  __ENV.PUBLICATION_TITLE ??
+  'Seed publication - Pupil absence in schools in England';
 const expectedContentSnippet =
-  __ENV.CONTENT_SNIPPET ?? 'pupils missed on average 8.2 school days';
+  __ENV.CONTENT_SNIPPET ?? 'Pupils missed on average 8.2 school days';
 
 const urlSlugs = /\/find-statistics\/(.*)\/(.*)/g.exec(releasePageUrl)!;
 const publicationSlug = urlSlugs[1];

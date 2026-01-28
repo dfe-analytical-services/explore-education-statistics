@@ -8,7 +8,8 @@ import setupReleasePageTest, {
 } from './utils/releasePageTest';
 
 const releasePageUrl =
-  __ENV.URL ?? '/find-statistics/pupil-absence-in-schools-in-england/2016-17';
+  __ENV.URL ??
+  '/find-statistics/seed-publication-pupil-absence-in-schools-in-england/2016-17';
 
 const urlSlugs = /\/find-statistics\/(.*)\/(.*)/g.exec(releasePageUrl)!;
 const publicationSlug = urlSlugs[1];

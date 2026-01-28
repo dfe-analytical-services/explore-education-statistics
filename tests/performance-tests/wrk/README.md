@@ -15,7 +15,7 @@ Example usage:
 BUILD_ID=<Next.JS build ID> \
 PUBLICATION_SLUG=<publication slug> \
 RELEASE_SLUG=<release slug> \
-EXCLUDE_DATA_REQUESTS=false \
+EXCLUDE_PREFETCH_REQUESTS=false \
 PRINT_URLS=true \
 PRINT_RESPONSES=true \
 BASIC_AUTH_USERNAME=<username> \
