@@ -29,7 +29,10 @@ public interface IUserPublicationRoleRepository
         CancellationToken cancellationToken = default
     );
 
-    IQueryable<UserPublicationRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly);
+    IQueryable<UserPublicationRole> Query(
+        ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly,
+        bool includeNewPermissionsSystemRoles = false
+    );
 
     Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default);
 

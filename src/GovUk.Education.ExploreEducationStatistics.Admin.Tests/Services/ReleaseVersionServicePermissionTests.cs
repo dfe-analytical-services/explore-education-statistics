@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -217,14 +218,10 @@ public class ReleaseVersionServicePermissionTests
             .WithRole(ReleaseRole.Contributor);
 
         var userReleaseRoleRepositoryMock = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
-        userReleaseRoleRepositoryMock
-            .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(new[] { userReleaseRole }.BuildMock());
+        userReleaseRoleRepositoryMock.SetupQuery(ResourceRoleFilter.ActiveOnly, userReleaseRole);
 
         var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
-        userPublicationRoleRepositoryMock
-            .Setup(r => r.Query(ResourceRoleFilter.ActiveOnly))
-            .Returns(Array.Empty<UserPublicationRole>().BuildMock());
+        userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
 
         await PolicyCheckBuilder<SecurityPolicies>()
             .SetupCheck(RegisteredUser)

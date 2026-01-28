@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -822,9 +823,7 @@ public abstract class ReleaseVersionServiceTests
                 .Returns(Task.CompletedTask);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.AllButExpired))
-                .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             var updatedType = EnumUtil
                 .GetEnums<ReleaseType>()
@@ -993,9 +992,7 @@ public abstract class ReleaseVersionServiceTests
                 .Returns(Task.CompletedTask);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.AllButExpired))
-                .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1086,9 +1083,7 @@ public abstract class ReleaseVersionServiceTests
                 .Returns(Task.CompletedTask);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.AllButExpired))
-                .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1185,9 +1180,7 @@ public abstract class ReleaseVersionServiceTests
                 .Returns(Task.CompletedTask);
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.AllButExpired))
-                .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1311,9 +1304,7 @@ public abstract class ReleaseVersionServiceTests
             var dataSetVersionService = new DataSetVersionServiceMockBuilder();
             var releaseSlugValidator = new ReleaseSlugValidatorMockBuilder();
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.AllButExpired))
-                .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             var sut = BuildService(
                 context,
@@ -1395,9 +1386,7 @@ public abstract class ReleaseVersionServiceTests
             }
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.AllButExpired))
-                .Returns(new[] { nonPreReleaseUserRole }.BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, nonPreReleaseUserRole);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1474,9 +1463,7 @@ public abstract class ReleaseVersionServiceTests
             }
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.AllButExpired))
-                .Returns(new[] { preReleaseUserRole }.BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, preReleaseUserRole);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1515,9 +1502,7 @@ public abstract class ReleaseVersionServiceTests
             }
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.AllButExpired))
-                .Returns(new[] { preReleaseUserRole }.BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, preReleaseUserRole);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1553,9 +1538,7 @@ public abstract class ReleaseVersionServiceTests
             }
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.AllButExpired))
-                .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1589,9 +1572,7 @@ public abstract class ReleaseVersionServiceTests
             }
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.AllButExpired))
-                .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1850,9 +1831,7 @@ public abstract class ReleaseVersionServiceTests
                 )
                 .ReturnsAsync(Unit.Instance);
 
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.All))
-                .Returns(new[] { userReleaseRoles[0], userReleaseRoles[1] }.BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userReleaseRoles[0], userReleaseRoles[1]]);
             userReleaseRoleRepository
                 .Setup(mock => mock.RemoveMany(ListOf(userReleaseRoles[0], userReleaseRoles[1]), default))
                 .Returns(Task.CompletedTask);
@@ -2210,9 +2189,7 @@ public abstract class ReleaseVersionServiceTests
                 )
                 .ReturnsAsync(Unit.Instance);
 
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.All))
-                .Returns(new[] { userReleaseRoles[0], userReleaseRoles[1] }.BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, [userReleaseRoles[0], userReleaseRoles[1]]);
             userReleaseRoleRepository
                 .Setup(mock => mock.RemoveMany(ListOf(userReleaseRoles[0], userReleaseRoles[1]), default))
                 .Returns(Task.CompletedTask);
@@ -2703,21 +2680,18 @@ public abstract class ReleaseVersionServiceTests
             }
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(
-                    contributorReleaseRolesForUser
-                        .Concat(approverReleaseRolesForUser)
-                        .Concat(prereleaseReleaseRolesForUser)
-                        .Concat(approverReleaseRolesForOtherUser)
-                        .ToArray()
-                        .BuildMock()
-                );
+            userReleaseRoleRepository.SetupQuery(
+                ResourceRoleFilter.ActiveOnly,
+                [
+                    .. contributorReleaseRolesForUser,
+                    .. approverReleaseRolesForUser,
+                    .. prereleaseReleaseRolesForUser,
+                    .. approverReleaseRolesForOtherUser,
+                ]
+            );
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(Array.Empty<UserPublicationRole>().BuildMock());
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, false, []);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -2832,21 +2806,19 @@ public abstract class ReleaseVersionServiceTests
             }
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(
-                    new[] { ownerPublicationRoleForUser }
-                        .Concat([approverPublicationRoleForUser])
-                        .Concat(ownerPublicationRolesForOtherUser)
-                        .Concat(approverPublicationRolesForOtherUser)
-                        .ToArray()
-                        .BuildMock()
-                );
+            userPublicationRoleRepository.SetupQuery(
+                ResourceRoleFilter.ActiveOnly,
+                false,
+                [
+                    ownerPublicationRoleForUser,
+                    approverPublicationRoleForUser,
+                    .. ownerPublicationRolesForOtherUser,
+                    .. approverPublicationRolesForOtherUser,
+                ]
+            );
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(Array.Empty<UserReleaseRole>().BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, []);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -2910,14 +2882,14 @@ public abstract class ReleaseVersionServiceTests
             }
 
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            userReleaseRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(approverReleaseRolesForUser.BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.ActiveOnly, [.. approverReleaseRolesForUser]);
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-            userPublicationRoleRepository
-                .Setup(m => m.Query(ResourceRoleFilter.ActiveOnly))
-                .Returns(new[] { approverPublicationRoleForUser }.BuildMock());
+            userPublicationRoleRepository.SetupQuery(
+                ResourceRoleFilter.ActiveOnly,
+                false,
+                approverPublicationRoleForUser
+            );
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {

@@ -84,9 +84,11 @@ public abstract class UserResourceRoleNotificationServiceTests
                 .Setup(r => r.FindUserById(inactiveUser.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(inactiveUser);
 
-            userPublicationRoleRepository
-                .Setup(r => r.Query(ResourceRoleFilter.PendingOnly))
-                .Returns(allUserPublicationRoles.BuildMock());
+            userPublicationRoleRepository.SetupQuery(
+                ResourceRoleFilter.PendingOnly,
+                false,
+                [.. allUserPublicationRoles]
+            );
 
             foreach (var publicationRole in publicationRolesForTargetUser)
             {
@@ -97,9 +99,7 @@ public abstract class UserResourceRoleNotificationServiceTests
                     .Returns(Task.CompletedTask);
             }
 
-            userReleaseRoleRepository
-                .Setup(r => r.Query(ResourceRoleFilter.PendingOnly))
-                .Returns(allUserReleaseRoles.BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. allUserReleaseRoles]);
 
             foreach (var releaseRole in releaseRolesForTargetUser)
             {
@@ -211,9 +211,7 @@ public abstract class UserResourceRoleNotificationServiceTests
                 .Setup(r => r.FindUserById(inactiveUser.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(inactiveUser);
 
-            userPublicationRoleRepository
-                .Setup(r => r.Query(ResourceRoleFilter.PendingOnly))
-                .Returns(userPublicationRoles.BuildMock());
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, false, [.. userPublicationRoles]);
 
             foreach (var publicationRole in userPublicationRoles)
             {
@@ -224,9 +222,7 @@ public abstract class UserResourceRoleNotificationServiceTests
                     .Returns(Task.CompletedTask);
             }
 
-            userReleaseRoleRepository
-                .Setup(r => r.Query(ResourceRoleFilter.PendingOnly))
-                .Returns(userReleaseRoles.BuildMock());
+            userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.PendingOnly, [.. userReleaseRoles]);
 
             foreach (var releaseRole in userReleaseRoles)
             {
@@ -278,7 +274,7 @@ public abstract class UserResourceRoleNotificationServiceTests
             userPublicationRoleRepository
                 .Setup(r => r.MarkEmailAsSent(userPublicationRole.Id, null, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userPublicationRole);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, false, userPublicationRole);
 
             emailTemplateService
                 .Setup(s =>
@@ -304,7 +300,7 @@ public abstract class UserResourceRoleNotificationServiceTests
         public async Task RoleDoesNotExist_ThrowsKeyNotFoundException()
         {
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, false, []);
 
             var service = BuildService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
 
@@ -329,7 +325,7 @@ public abstract class UserResourceRoleNotificationServiceTests
             userPublicationRoleRepository
                 .Setup(r => r.MarkEmailAsSent(userPublicationRole.Id, null, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
-            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userPublicationRole);
+            userPublicationRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, false, userPublicationRole);
 
             emailTemplateService
                 .Setup(s =>

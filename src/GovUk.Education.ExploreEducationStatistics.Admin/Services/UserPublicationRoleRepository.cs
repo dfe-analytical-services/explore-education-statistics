@@ -83,18 +83,40 @@ public class UserPublicationRoleRepository(ContentDbContext contentDbContext) : 
             .SingleOrDefaultAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// <para>
+    /// The optional <paramref name="includeNewPermissionsSystemRoles"/> parameter will be removed once we remove all OLD publication
+    /// roles from the DB in STEP 11 (EES-6212) of the Permissions Rework. For now, in certain situations, we need to be able to grab
+    /// ALL of the publication roles (NEW &amp; OLD permissions system roles).
+    /// </para>
+    /// </summary>
+    /// <param name="resourceRoleFilter">Filter resource roles by their status (see <see cref="ResourceRoleFilter"/>).</param>
+    /// <param name="includeNewPermissionsSystemRoles">
+    /// <para>Temporary parameter that controls which roles are included.</para>
+    /// <para>When <c>true</c>, includes NEW permissions system roles in addition to OLD roles.</para>
+    /// <para>When <c>false</c>, includes only OLD roles.</para>
+    /// </param>
     public IQueryable<UserPublicationRole> Query(
-        ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly
-    ) =>
-        resourceRoleFilter switch
+        ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly,
+        bool includeNewPermissionsSystemRoles = false
+    )
+    {
+        var userPublicationRoles = contentDbContext.UserPublicationRoles.AsQueryable();
+
+        if (includeNewPermissionsSystemRoles)
         {
-            ResourceRoleFilter.ActiveOnly => contentDbContext.UserPublicationRoles.WhereUserIsActive(),
-            ResourceRoleFilter.PendingOnly => contentDbContext.UserPublicationRoles.WhereUserHasPendingInvite(),
-            ResourceRoleFilter.AllButExpired =>
-                contentDbContext.UserPublicationRoles.WhereUserIsActiveOrHasPendingInvite(),
-            ResourceRoleFilter.All => contentDbContext.UserPublicationRoles,
+            userPublicationRoles = userPublicationRoles.IgnoreQueryFilters();
+        }
+
+        return resourceRoleFilter switch
+        {
+            ResourceRoleFilter.ActiveOnly => userPublicationRoles.WhereUserIsActive(),
+            ResourceRoleFilter.PendingOnly => userPublicationRoles.WhereUserHasPendingInvite(),
+            ResourceRoleFilter.AllButExpired => userPublicationRoles.WhereUserIsActiveOrHasPendingInvite(),
+            ResourceRoleFilter.All => userPublicationRoles,
             _ => throw new ArgumentOutOfRangeException(nameof(resourceRoleFilter), resourceRoleFilter, null),
         };
+    }
 
     public async Task Remove(UserPublicationRole userPublicationRole, CancellationToken cancellationToken = default)
     {
