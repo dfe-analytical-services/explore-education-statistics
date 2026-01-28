@@ -30,4 +30,5 @@ steps:
           --parameters ${{ parameters.parameterFile }} \
           --parameters \
               subscription='$(subscription)' \
+              publicSiteUrl='$(publicSiteUrl)' \
               resourceTags='$(resourceTags)'

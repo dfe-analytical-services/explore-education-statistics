@@ -15,6 +15,15 @@ param subscription string
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
+@description('URL of the public site.')
+param publicSiteUrl string
+
+@description('Optional certificate to apply to Azure Front Door. If not specified, it will provision its own certificate.')
+param publicSiteCertificate {
+  keyVaultName: string
+  certificateName: string
+}?
+
 @description('The Id of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
 
@@ -30,8 +39,20 @@ resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' = {
   sku: {
     name: 'Standard_AzureFrontDoor'
   }
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
-    originResponseTimeoutSeconds: 60 // @MarkFix maybe want longer - for table tool exclusively?
+    originResponseTimeoutSeconds: 220 // Timeout set to just under Azure's standard App Service timeout of 3.8 minutes.
+  }
+}
+
+module keyVaultRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = {
+  name: '${frontDoorName}KeyVaultRoleAssignmentModuleDeploy'
+  params: {
+    principalIds: [frontDoor.identity.principalId]
+    keyVaultName: ''
+    role: 'Certificate User'
   }
 }
 
@@ -81,10 +102,14 @@ resource origin 'Microsoft.Cdn/profiles/origingroups/origins@2025-04-15' = {
 
 resource customDomain 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = {
   parent: frontDoor
-  name: 'dev-explore-education-statistics-service-gov-uk-3db1'
+  name: '${resourcePrefix}-public-site-${abbreviations.frontDoorDomains}'
   properties: {
-    hostName: publicSiteUrl
-    tlsSettings: {
+    hostName: replace(publicSiteUrl, 'https://', '')
+    tlsSettings: publicSiteCertificate != null ? {
+      certificateType: 'ManagedCertificate'
+      minimumTlsVersion: 'TLS12'
+      cipherSuiteSetType: 'TLS12_2023'
+    } : {
       certificateType: 'ManagedCertificate'
       minimumTlsVersion: 'TLS12'
       cipherSuiteSetType: 'TLS12_2023'

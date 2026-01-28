@@ -55,6 +55,7 @@ var abbreviations = {
   eventHubNamespacesEventHubs: 'evh'
   fileShare: 'share'
   frontDoorProfiles: 'afd'
+  frontDoorDomains: 'afd-domain'
   frontDoorEndpoints: 'fde'
   frontDoorRoutes: 'fdr'
   frontDoorOriginGroups: 'fdog'
