@@ -14,7 +14,6 @@ if (typeof window !== 'undefined') {
 }
 
 failOnConsole({
-  skipTest: ({ testName }) => testName.includes('skip-console-errors'),
   allowMessage: errorMessage =>
     errorMessage.includes('`DialogContent` requires a `DialogTitle`'),
   shouldFailOnWarn: false,
