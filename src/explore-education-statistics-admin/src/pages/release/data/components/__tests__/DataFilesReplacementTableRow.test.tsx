@@ -8,7 +8,7 @@ import _dataReplacementService, {
 import DataFilesReplacementTableRow from '@admin/pages/release/data/components/DataFilesReplacementTableRow';
 import render from '@common-test/render';
 import React from 'react';
-import { screen, within } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('@admin/services/releaseDataFileService');
@@ -85,16 +85,22 @@ describe('DataFilesReplacementTableRow', () => {
       testDataReplacementPlan,
     );
 
-    render(
-      <MemoryRouter>
-        <DataFilesReplacementTableRow
-          dataFile={testDataFile}
-          publicationId="test-publication"
-          releaseVersionId="test-release-version"
-          onReplacementStatusChange={() => {}}
-        />
-      </MemoryRouter>,
-    );
+    await act(async () => {
+      render(
+        <MemoryRouter>
+          <table>
+            <tbody>
+              <DataFilesReplacementTableRow
+                dataFile={testDataFile}
+                publicationId="test-publication"
+                releaseVersionId="test-release-version"
+                onReplacementStatusChange={() => {}}
+              />
+            </tbody>
+          </table>
+        </MemoryRouter>,
+      );
+    });
 
     expect(await screen.findByText('Test File')).toBeInTheDocument();
     expect(await screen.findByText('Ready')).toBeInTheDocument();
@@ -128,12 +134,16 @@ describe('DataFilesReplacementTableRow', () => {
 
     render(
       <MemoryRouter>
-        <DataFilesReplacementTableRow
-          dataFile={testDataFile}
-          publicationId="test-publication"
-          releaseVersionId="test-release-version"
-          onReplacementStatusChange={() => {}}
-        />
+        <table>
+          <tbody>
+            <DataFilesReplacementTableRow
+              dataFile={testDataFile}
+              publicationId="test-publication"
+              releaseVersionId="test-release-version"
+              onReplacementStatusChange={() => {}}
+            />
+          </tbody>
+        </table>
       </MemoryRouter>,
     );
 
@@ -170,12 +180,16 @@ describe('DataFilesReplacementTableRow', () => {
 
     render(
       <MemoryRouter>
-        <DataFilesReplacementTableRow
-          dataFile={testDataFile}
-          publicationId="test-publication"
-          releaseVersionId="test-release-version"
-          onReplacementStatusChange={() => {}}
-        />
+        <table>
+          <tbody>
+            <DataFilesReplacementTableRow
+              dataFile={testDataFile}
+              publicationId="test-publication"
+              releaseVersionId="test-release-version"
+              onReplacementStatusChange={() => {}}
+            />
+          </tbody>
+        </table>
       </MemoryRouter>,
     );
 
@@ -213,24 +227,28 @@ describe('DataFilesReplacementTableRow', () => {
     });
     render(
       <MemoryRouter>
-        <AuthContext.Provider
-          value={{
-            user: {
-              ...user,
-              permissions: { ...defaultPermissions, isBauUser: false },
-            },
-          }}
-        >
-          <DataFilesReplacementTableRow
-            dataFile={{
-              ...testDataFile,
-              publicApiDataSetId: 'api-dataset-id',
-            }}
-            publicationId="test-publication"
-            releaseVersionId="test-release-version"
-            onReplacementStatusChange={() => {}}
-          />
-        </AuthContext.Provider>
+        <table>
+          <tbody>
+            <AuthContext.Provider
+              value={{
+                user: {
+                  ...user,
+                  permissions: { ...defaultPermissions, isBauUser: false },
+                },
+              }}
+            >
+              <DataFilesReplacementTableRow
+                dataFile={{
+                  ...testDataFile,
+                  publicApiDataSetId: 'api-dataset-id',
+                }}
+                publicationId="test-publication"
+                releaseVersionId="test-release-version"
+                onReplacementStatusChange={() => {}}
+              />
+            </AuthContext.Provider>
+          </tbody>
+        </table>
       </MemoryRouter>,
     );
 
@@ -268,24 +286,28 @@ describe('DataFilesReplacementTableRow', () => {
 
     render(
       <MemoryRouter>
-        <AuthContext.Provider
-          value={{
-            user: {
-              ...user,
-              permissions: { ...defaultPermissions, isBauUser: false },
-            },
-          }}
-        >
-          <DataFilesReplacementTableRow
-            dataFile={{
-              ...testDataFile,
-              publicApiDataSetId: undefined,
-            }}
-            publicationId="test-publication"
-            releaseVersionId="test-release-version"
-            onReplacementStatusChange={() => {}}
-          />
-        </AuthContext.Provider>
+        <table>
+          <tbody>
+            <AuthContext.Provider
+              value={{
+                user: {
+                  ...user,
+                  permissions: { ...defaultPermissions, isBauUser: false },
+                },
+              }}
+            >
+              <DataFilesReplacementTableRow
+                dataFile={{
+                  ...testDataFile,
+                  publicApiDataSetId: undefined,
+                }}
+                publicationId="test-publication"
+                releaseVersionId="test-release-version"
+                onReplacementStatusChange={() => {}}
+              />
+            </AuthContext.Provider>
+          </tbody>
+        </table>
       </MemoryRouter>,
     );
 
@@ -323,24 +345,28 @@ describe('DataFilesReplacementTableRow', () => {
 
     render(
       <MemoryRouter>
-        <AuthContext.Provider
-          value={{
-            user: {
-              ...user,
-              permissions: { ...defaultPermissions, isBauUser: true },
-            },
-          }}
-        >
-          <DataFilesReplacementTableRow
-            dataFile={{
-              ...testDataFile,
-              publicApiDataSetId: 'api-dataset-id',
-            }}
-            publicationId="test-publication"
-            releaseVersionId="test-release-version"
-            onReplacementStatusChange={() => {}}
-          />
-        </AuthContext.Provider>
+        <table>
+          <tbody>
+            <AuthContext.Provider
+              value={{
+                user: {
+                  ...user,
+                  permissions: { ...defaultPermissions, isBauUser: true },
+                },
+              }}
+            >
+              <DataFilesReplacementTableRow
+                dataFile={{
+                  ...testDataFile,
+                  publicApiDataSetId: 'api-dataset-id',
+                }}
+                publicationId="test-publication"
+                releaseVersionId="test-release-version"
+                onReplacementStatusChange={() => {}}
+              />
+            </AuthContext.Provider>
+          </tbody>
+        </table>
       </MemoryRouter>,
     );
 

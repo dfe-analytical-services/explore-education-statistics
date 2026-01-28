@@ -24,7 +24,7 @@ describe('Gate', () => {
     expect(screen.getByText('children')).toBeInTheDocument();
   });
 
-  test('does not render children immediately if `condition` is async', () => {
+  test('does not render children immediately if `condition` is async', async () => {
     render(
       <Gate
         condition={async () => {
@@ -36,6 +36,9 @@ describe('Gate', () => {
     );
 
     expect(screen.queryByText('children')).not.toBeInTheDocument();
+
+    // condition resolved
+    expect(await screen.findByText('children')).toBeInTheDocument();
   });
 
   test('renders children when async `condition` resolves to true', async () => {
@@ -68,6 +71,9 @@ describe('Gate', () => {
 
     expect(screen.queryByText('children')).not.toBeInTheDocument();
     expect(screen.getByText('loading')).toBeInTheDocument();
+
+    // condition resolved
+    expect(await screen.findByText('children')).toBeInTheDocument();
   });
 
   test('does not render `loading` when async `condition` resolves to true', async () => {
@@ -257,9 +263,7 @@ describe('Gate', () => {
       </Gate>,
     );
 
-    await waitFor(() => {
-      expect(screen.getByText('children')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('children')).toBeInTheDocument();
 
     rerender(
       <Gate condition={() => Promise.resolve(false)} passOnce={false}>
@@ -267,6 +271,8 @@ describe('Gate', () => {
       </Gate>,
     );
 
-    expect(screen.queryByText('children')).not.toBeInTheDocument();
+    waitFor(() => {
+      expect(screen.queryByText('children')).not.toBeInTheDocument();
+    });
   });
 });

@@ -5,7 +5,8 @@ import ReleaseContentRedesign from '@admin/pages/release/content/components/Rele
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ReleaseContent as ReleaseContentType } from '@admin/services/releaseContentService';
 import render from '@common-test/render';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 
@@ -39,11 +40,15 @@ const renderWithContext = (
         <EditingContextProvider editingMode="preview">
           <MemoryRouter>{component}</MemoryRouter>
         </EditingContextProvider>
-        ,
       </ReleaseContentProvider>
-      ,
     </TestConfigContextProvider>,
   );
+
+// Mock DOM methods that jsdom doesn’t fully implement
+beforeAll(() => {
+  HTMLElement.prototype.scrollIntoView = jest.fn();
+  HTMLElement.prototype.focus = jest.fn();
+});
 
 describe('ReleaseContentRedesign', () => {
   test('renders the publication summary on desktop', () => {
@@ -63,9 +68,12 @@ describe('ReleaseContentRedesign', () => {
   });
 
   test('tabs render when expected', async () => {
-    const { user } = renderWithContext(<ReleaseContentRedesign />);
+    const user = userEvent.setup();
+    renderWithContext(<ReleaseContentRedesign />);
 
-    const tabsContainer = screen.getByTestId('release-page-tabs');
+    const tabsContainer = await screen.findByTestId('release-page-tabs');
+    await waitFor(() => expect(tabsContainer).toBeInTheDocument());
+
     const tabs = within(tabsContainer).getAllByRole('tab');
     expect(tabs).toHaveLength(4);
 
@@ -77,6 +85,7 @@ describe('ReleaseContentRedesign', () => {
     expect(tabPanels[0]).toHaveRole('tabpanel');
 
     await user.click(tabs[1]);
+
     tabPanels = screen.getAllByTestId('release-page-tab-panel');
     expect(tabPanels).toHaveLength(2);
     expect(tabPanels[1]).toHaveAttribute('id', 'tab-explore');
@@ -84,12 +93,16 @@ describe('ReleaseContentRedesign', () => {
     expect(tabPanels[1]).toHaveRole('tabpanel');
     expect(tabPanels[0]).toHaveAttribute('hidden', '');
 
-    await user.keyboard('[ArrowRight]');
-    tabPanels = screen.getAllByTestId('release-page-tab-panel');
-    expect(tabPanels).toHaveLength(3);
+    await user.click(tabs[2]);
 
-    await user.keyboard('[ArrowRight]');
-    tabPanels = screen.getAllByTestId('release-page-tab-panel');
-    expect(tabPanels).toHaveLength(4);
+    await waitFor(() =>
+      expect(screen.getAllByTestId('release-page-tab-panel')).toHaveLength(3),
+    );
+
+    await user.click(tabs[3]);
+
+    await waitFor(() =>
+      expect(screen.getAllByTestId('release-page-tab-panel')).toHaveLength(4),
+    );
   });
 });

@@ -1,8 +1,9 @@
+import errorOnConsoleError from '@common-test/errorOnConsoleError';
+import '@common-test/extend-expect';
+import '@common-test/setupGlobals';
 import '@testing-library/jest-dom';
 import 'core-js/features/array/flat-map';
 import 'core-js/features/string/replace-all';
-import '@common-test/setupGlobals';
-import '@common-test/extend-expect';
 
 jest.setTimeout(10000);
 
@@ -11,3 +12,5 @@ if (typeof window !== 'undefined') {
   require('cross-fetch');
   require('intersection-observer');
 }
+
+errorOnConsoleError();

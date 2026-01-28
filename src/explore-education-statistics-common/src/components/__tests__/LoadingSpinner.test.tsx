@@ -1,5 +1,5 @@
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 
 describe('LoadingSpinner', () => {
@@ -16,7 +16,9 @@ describe('LoadingSpinner', () => {
 
     expect(screen.queryByText('Test text')).not.toBeInTheDocument();
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByText('Test text')).toBeInTheDocument();
 
@@ -28,7 +30,9 @@ describe('LoadingSpinner', () => {
 
     const { rerender } = render(<LoadingSpinner alert text="Test text" />);
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByText('Test text')).toBeInTheDocument();
 
@@ -36,7 +40,9 @@ describe('LoadingSpinner', () => {
 
     expect(screen.getByText('Test text')).toBeInTheDocument();
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByText('Test text updated')).toBeInTheDocument();
 
