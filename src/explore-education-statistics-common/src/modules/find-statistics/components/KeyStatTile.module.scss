@@ -8,6 +8,7 @@
   justify-content: space-evenly;
   overflow-wrap: break-word;
   padding: 0.7rem 1rem;
+  min-width: 0;
 
   @include govuk-media-query($until: tablet) {
     flex-basis: auto;
