@@ -345,16 +345,16 @@ describe('DataFilesReplacementTableRow', () => {
 
     render(
       <MemoryRouter>
-        <table>
-          <tbody>
-            <AuthContext.Provider
-              value={{
-                user: {
-                  ...user,
-                  permissions: { ...defaultPermissions, isBauUser: true },
-                },
-              }}
-            >
+        <AuthContext.Provider
+          value={{
+            user: {
+              ...user,
+              permissions: { ...defaultPermissions, isBauUser: true },
+            },
+          }}
+        >
+          <table>
+            <tbody>
               <DataFilesReplacementTableRow
                 dataFile={{
                   ...testDataFile,
@@ -364,9 +364,9 @@ describe('DataFilesReplacementTableRow', () => {
                 releaseVersionId="test-release-version"
                 onReplacementStatusChange={() => {}}
               />
-            </AuthContext.Provider>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </AuthContext.Provider>
       </MemoryRouter>,
     );
 

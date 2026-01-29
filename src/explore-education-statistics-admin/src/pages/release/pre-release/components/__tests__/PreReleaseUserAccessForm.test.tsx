@@ -3,7 +3,7 @@ import _preReleaseUserService, {
   PreReleaseUser,
 } from '@admin/services/preReleaseUserService';
 import render from '@common-test/render';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 
 const preReleaseUserService = _preReleaseUserService as jest.Mocked<
   typeof _preReleaseUserService
@@ -147,14 +147,14 @@ describe('PreReleaseUserAccessForm', () => {
         'Invite new users by email',
       );
 
-      // type values up to but not exceeding the limit of lines
+      // type values exceeding the limit of lines
       await user.type(emailsTextarea, `test@test.com{enter}`.repeat(51));
 
-      const inviteUsersButton = await screen.findByRole('button', {
-        name: 'Invite new users',
-      });
+      await user.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
 
-      await user.click(inviteUsersButton);
+      expect(preReleaseUserService.inviteUsers).toHaveBeenCalledTimes(0);
 
       expect(
         await screen.findByText(
