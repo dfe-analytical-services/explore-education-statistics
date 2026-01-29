@@ -62,6 +62,7 @@ public class ReleaseChecklistPermissionServiceTests
         IMethodologyVersionRepository? methodologyVersionRepository = null,
         IFootnoteRepository? footnoteRepository = null,
         IDataBlockService? dataBlockService = null,
+        IDataSetService? dataSetService = null,
         IDataSetVersionService? dataSetVersionService = null
     )
     {
@@ -74,6 +75,7 @@ public class ReleaseChecklistPermissionServiceTests
             methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
             footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
             dataBlockService ?? new Mock<IDataBlockService>().Object,
+            dataSetService ?? new Mock<IDataSetService>().Object,
             dataSetVersionService ?? new Mock<IDataSetVersionService>().Object
         );
     }

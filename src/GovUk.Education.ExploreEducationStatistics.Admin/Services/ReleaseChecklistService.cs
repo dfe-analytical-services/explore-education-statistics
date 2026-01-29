@@ -268,14 +268,21 @@ public class ReleaseChecklistService : IReleaseChecklistService
             return false;
         }
 
-        // if no data files were uploaded, there's no data to attribute to an existing API data set
+        // if no data files were uploaded, there's no data to associate with an existing API data set
         if (!dataFiles.Any())
         {
             return false;
         }
 
         // get data sets associated to this publication
+        // TODO: Use results pattern
         var existingDataSetsForPublication = await _dataSetService.ListDataSets(releaseVersion.Release.PublicationId);
+
+        // if there are fewer uploads than API data sets, this may be intentional (e.g. two API data sets, but only one needs updating)
+        if (dataFiles.Count < existingDataSetsForPublication.Right.Count)
+        {
+            return false;
+        }
 
         // if no new data set version has been associated to this release, add the warning
         if (existingDataSetsForPublication.Right.Any(r => DataSetVersionIsNotAssociatedToRelease(r, releaseVersion.Id)))
