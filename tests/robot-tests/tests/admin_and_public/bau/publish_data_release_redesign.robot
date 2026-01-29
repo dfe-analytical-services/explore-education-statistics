@@ -529,7 +529,7 @@ Get public release link
 Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_2_NAME}
 
-Check latest release is correct
+Check latest release is correct and the other releases are correct
     user checks page contains    Latest release
     user clicks link    All releases in this series
     user waits until page finishes loading
