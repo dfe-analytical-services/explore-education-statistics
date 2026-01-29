@@ -1225,3 +1225,76 @@ user opens data set details for subject
 
     Run Keyword And Ignore Error
     ...    Click Element    xpath=${toggle_xpath}
+
+check main links for page 'Explore and download data' are persistent
+    [Arguments]    @{expected_link_texts}
+    FOR    ${link_text}    IN    @{expected_link_texts}
+        ${button_xpath}=    Set Variable
+        ...    //section[@data-testid="explore-section"]//ul[@data-testid="links-grid"]//a[text()="${link_text}"]
+        Page Should Contain Element
+        ...    xpath=${button_xpath}
+        ...    Page is missing "${button_xpath}" button
+    END
+
+User checks page 'Explore and download data' data set available properties
+    [Arguments]    ${data_set_name}
+    ...    ${expected_row_count}
+    ...    ${expected_time_period}
+    ...    ${expected_data_guidance}="${data_set_name} data guidance content"
+
+    ${dataset_xpath}=    Set Variable
+    ...    //article//li[@data-testid="release-data-list-item"][.//h4[normalize-space()="${data_set_name}"]]
+
+    # Wait for dataset to exist
+    Wait Until Element Is Visible    xpath=${dataset_xpath}
+
+    # Expand accordion if collapsed
+    ${toggle_xpath}=    Set Variable
+    ...    ${dataset_xpath}//button[@aria-expanded="false"]
+
+    Run Keyword And Ignore Error
+    ...    Click Element    xpath=${toggle_xpath}
+
+    # Assert "Number of rows" dt exists
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Number of rows"]
+    ...    Dataset "${data_set_name}" is missing "Number of rows" label
+
+    # Assert dd value for "Number of rows"
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}
+    ...    //dt[normalize-space(.)="Number of rows"]/following-sibling::dd[normalize-space(.)="${expected_row_count}"]
+    ...    Dataset "${data_set_name}" has incorrect Number of rows
+
+    # Assert dd value for "Time period"
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}
+    ...    //dt[normalize-space(.)="Time period"]/following-sibling::dd[normalize-space(.)="${expected_time_period}"]
+    ...    Dataset "${data_set_name}" has incorrect Time period
+
+    # Verify data guidance content
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}//p[contains(normalize-space(.), "${data_set_name} data guidance content")]
+    ...    Dataset "${data_set_name}" is missing the data guidance content link
+
+    # Verify Data set information page link
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Data set information page")]
+    ...    Dataset "${data_set_name}" is missing the "Data set information page" link
+
+    # Verify Create table link
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
+    ...    Dataset "${data_set_name}" is missing the "Create table" link
+
+    # Verify Download (ZIP) button
+    Page Should Contain Element
+    ...    xpath=${dataset_xpath}//button[contains(normalize-space(.), "Download")]
+    ...    Dataset "${data_set_name}" is missing the "Download (ZIP)" button
+
+    user clicks element    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
+    user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
+    user waits until page finishes loading
+
+    user waits until table tool wizard step is available    2    Select a data set
+    user checks previous table tool step contains    1    Publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}

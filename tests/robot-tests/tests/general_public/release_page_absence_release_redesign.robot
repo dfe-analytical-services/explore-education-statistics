@@ -12,7 +12,7 @@ Force Tags
 ...                 Local
 ...                 Dev
 ...                 Preprod
-...                 ReleaseRedesign
+# ...    ReleaseRedesign
 #TODO: remove ReleaseRedesign tag when EES-6843 is complete
 
 
@@ -404,7 +404,7 @@ Verify Explore and Download data
     ...    Data guidance
     ...    Contact us
     ...    Back to top
-    check main links for page are persistent
+    check main links for page 'Explore and download data' are persistent
     ...    Download all data from this release (ZIP)
     ...    Data sets: download or create tables
     ...    Data guidance
@@ -417,8 +417,21 @@ Verify Explore and Download data
     ${file_size}=    Get File Size    ${DOWNLOAD_DIR}/seed-publication-pupil-absence-in-schools-in-england_2016-17.zip
     Should Be True    ${file_size} > 0
 
-    User checks data set list item properties    Absence by characteristic    201,625    2012/13 to 2016/17
-    User checks data set list item properties    Absence in PRUs    612    2013/14 to 2016/17
+    User checks page 'Explore and download data' data set available properties    Absence by characteristic    201,625
+    ...    2012/13 to 2016/17
+
+    user navigates to the Absence publication
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    user waits until h2 is visible    Data sets: download or create tables
+    User checks page 'Explore and download data' data set available properties    Absence in PRUs    612
+    ...    2013/14 to 2016/17
+
+    user navigates to the Absence publication
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    user waits until h2 is visible    Data sets: download or create tables
+
     user checks section with ID contains elements and back to top link    data-guidance-section
     ...    Test data guidance content
     check the contact us section has expected details
@@ -466,80 +479,6 @@ Verify Help and related information tab
 user navigates to the Absence publication
     user navigates to    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
     user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
-
-User checks data set list item properties
-    [Arguments]    ${data_set_name}    ${expected_row_count}    ${expected_time_period}
-
-    ${dataset_xpath}=    Set Variable
-    ...    //article//li[@data-testid="release-data-list-item"][.//h4[normalize-space()="${data_set_name}"]]
-
-    # Wait for dataset to exist
-    Wait Until Element Is Visible    xpath=${dataset_xpath}
-
-    # Expand accordion if collapsed
-    ${toggle_xpath}=    Set Variable
-    ...    ${dataset_xpath}//button[@aria-expanded="false"]
-
-    Run Keyword And Ignore Error
-    ...    Click Element    xpath=${toggle_xpath}
-
-    # Assert "Number of rows" dt exists
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Number of rows"]
-    ...    Dataset "${data_set_name}" is missing "Number of rows" label
-
-    # Assert dd value for "Number of rows"
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}
-    ...    //dt[normalize-space(.)="Number of rows"]/following-sibling::dd[normalize-space(.)="${expected_row_count}"]
-    ...    Dataset "${data_set_name}" has incorrect Number of rows
-
-    # Assert dd value for "Time period"
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}
-    ...    //dt[normalize-space(.)="Time period"]/following-sibling::dd[normalize-space(.)="${expected_time_period}"]
-    ...    Dataset "${data_set_name}" has incorrect Time period
-
-    # Verify data guidance content
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//p[contains(normalize-space(.), "${data_set_name} data guidance content")]
-    ...    Dataset "${data_set_name}" is missing the data guidance content link
-
-    # Verify Data set information page link
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Data set information page")]
-    ...    Dataset "${data_set_name}" is missing the "Data set information page" link
-
-    # Verify Create table link
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
-    ...    Dataset "${data_set_name}" is missing the "Create table" link
-
-    # Verify Download (ZIP) button
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//button[contains(normalize-space(.), "Download")]
-    ...    Dataset "${data_set_name}" is missing the "Download (ZIP)" button
-
-    user clicks element    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
-    user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
-    user waits until page finishes loading
-
-    user waits until table tool wizard step is available    2    Select a data set
-    user checks previous table tool step contains    1    Publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user navigates to the Absence publication
-    user clicks link    Explore and download data
-    user waits until h2 is visible    Explore data used in this release
-    user waits until h2 is visible    Data sets: download or create tables
-
-check main links for page are persistent
-    [Arguments]    @{expected_link_texts}
-    FOR    ${link_text}    IN    @{expected_link_texts}
-        ${button_xpath}=    Set Variable
-        ...    //section[@data-testid="explore-section"]//ul[@data-testid="links-grid"]//a[text()="${link_text}"]
-        Page Should Contain Element
-        ...    xpath=${button_xpath}
-        ...    Page is missing "${button_xpath}" button
-    END
 
 check the contact us section has expected details
     user checks section with ID contains elements and back to top link    contact-us-section
