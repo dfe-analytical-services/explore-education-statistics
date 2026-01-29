@@ -1,4 +1,5 @@
 import { abbreviations } from '../../../common/abbreviations.bicep'
+import { replaceMultiple } from '../../../common/functions.bicep'  
 
 @description('Environment: Subscription name. Used as a prefix for created resources.')
 @allowed([
@@ -15,14 +16,14 @@ param subscription string
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
+@description('Resource prefix for legacy resources.')
+param legacyResourcePrefix string
+
 @description('URL of the public site.')
 param publicSiteUrl string
 
-@description('Optional certificate to apply to Azure Front Door. If not specified, it will provision its own certificate.')
-param publicSiteCertificateDetails {
-  keyVaultName: string
-  certificateName: string
-}?
+@description('Choose whether to use a manually-generated Key Vault certificate or a certificate provisioned by Azure Front Door.')
+param certificateType 'Provisioned' | 'BringYourOwn'
 
 @description('The Id of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
@@ -31,7 +32,15 @@ param logAnalyticsWorkspaceId string
 param tagValues object
 
 var frontDoorName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}'
-var publicSiteHostName = replace(publicSiteUrl, 'https://', '')
+
+// TODO EES-6883 - remove the "afd.explore-education" line below once we are ready to switch the public site DNS
+// over to Azure Front Door properly.  In the meantime, we will host the site through AFD on a temporary
+// https://<env name>afd.explore-education-statistics.service.gov.uk with an associated certificate so as
+// not to break the use of the environment for others.
+var publicSiteHostName = replaceMultiple(publicSiteUrl, {
+  'https://': ''
+  '.explore-education': 'afd.explore-education'
+})
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' = {
   name: frontDoorName
@@ -92,12 +101,11 @@ resource origin 'Microsoft.Cdn/profiles/origingroups/origins@2025-04-15' = {
   }
 }
 
-module publicSiteCertificate 'publicSiteCertificate.bicep' = if (publicSiteCertificateDetails != null) {
-  name: '${publicSiteCertificateDetails!.certificateName}ModuleDeploy'
+module publicSiteCertificateModule 'publicSiteCertificate.bicep' = if (certificateType == 'BringYourOwn') {
+  name: 'publicSiteCertificateModuleDeploy'
   params: {
+    legacyResourcePrefix: legacyResourcePrefix
     frontDoorName: frontDoorName
-    certificateName: publicSiteCertificateDetails!.certificateName
-    keyVaultName: publicSiteCertificateDetails!.keyVaultName
     publicSiteHostName: publicSiteHostName
   }
 }
@@ -107,12 +115,12 @@ resource customDomain 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = {
   name: '${resourcePrefix}-public-site-${abbreviations.frontDoorDomains}'
   properties: {
     hostName: publicSiteHostName
-    tlsSettings: publicSiteCertificate != null ? {
+    tlsSettings: publicSiteCertificateModule != null ? {
       certificateType: 'CustomerCertificate'
       minimumTlsVersion: 'TLS12'
       cipherSuiteSetType: 'TLS12_2023'
       secret: {
-        id: publicSiteCertificate!.outputs.certificateSecretId
+        id: publicSiteCertificateModule!.outputs.certificateSecretId
       }
     } : {
       certificateType: 'ManagedCertificate'

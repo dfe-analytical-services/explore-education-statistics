@@ -1,3 +1,5 @@
+import { FrontDoorCertificateType } from 'application/frontDoor/types.bicep'
+
 @description('Environment : Subscription name. Used as a prefix for created resources.')
 param subscription string = ''
 
@@ -9,6 +11,9 @@ param environmentName string
 
 @description('The public site URL for use with Azure Front Door.')
 param publicSiteUrl string = ''
+
+@description('Certificate type for Azure Front Door.')
+param certificateType FrontDoorCertificateType = 'Provisioned'
 
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool = true
@@ -54,11 +59,9 @@ module frontDoorModule 'application/frontDoor/frontDoor.bicep' = {
   params: {
     subscription: subscription
     resourcePrefix: resourcePrefix
+    legacyResourcePrefix: legacyResourcePrefix
     publicSiteUrl: publicSiteUrl
-    publicSiteCertificateDetails: {
-      keyVaultName: '${legacyResourcePrefix}kv-ees-01'
-      certificateName: '${legacyResourcePrefix}as-ees-public-site-certificate'
-    }
+    certificateType: certificateType
     logAnalyticsWorkspaceId: logAnalyticsWorkspace.id
     tagValues: tagValues
   }
