@@ -22,7 +22,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -45,10 +44,7 @@ public class ReleaseChecklistServiceTests
             Release = release,
             Version = 0,
             Created = DateTime.UtcNow.AddMonths(-2),
-            Updates = new List<Update>
-            {
-                new() { Reason = "Original release note", Created = DateTime.UtcNow.AddMonths(-2).AddDays(1) },
-            },
+            Updates = [new() { Reason = "Original release note", Created = DateTime.UtcNow.AddMonths(-2).AddDays(1) }],
         };
 
         var releaseVersion = new ReleaseVersion
@@ -57,34 +53,26 @@ public class ReleaseChecklistServiceTests
             PreviousVersion = originalReleaseVersion,
             Version = 1,
             Created = DateTime.UtcNow.AddMonths(-1),
-            GenericContent = new List<ContentSection>
-            {
-                new() { Type = ContentSectionType.Generic, Content = new List<ContentBlock>() },
+            GenericContent =
+            [
+                new() { Type = ContentSectionType.Generic, Content = [] },
                 new()
                 {
                     Type = ContentSectionType.Generic,
-                    Content = new List<ContentBlock>
-                    {
-                        new HtmlBlock { Body = "<p>Test</p>" },
-                        new DataBlock(),
-                        new HtmlBlock { Body = "" },
-                    },
+                    Content = [new HtmlBlock { Body = "<p>Test</p>" }, new DataBlock(), new HtmlBlock { Body = "" }],
                 },
-            },
+            ],
             RelatedDashboardsSection = new ContentSection
             {
                 Type = ContentSectionType.RelatedDashboards,
-                Content = new List<ContentBlock> { new HtmlBlock { Body = "" } },
+                Content = [new HtmlBlock { Body = "" }],
             },
             SummarySection = new ContentSection
             {
                 Type = ContentSectionType.ReleaseSummary,
-                Content = new List<ContentBlock> { new HtmlBlock { Body = "" } },
+                Content = [new HtmlBlock { Body = "" }],
             },
-            Updates = new List<Update>
-            {
-                new() { Reason = "Original release note", Created = DateTime.UtcNow.AddMonths(-2).AddDays(1) },
-            },
+            Updates = [new() { Reason = "Original release note", Created = DateTime.UtcNow.AddMonths(-2).AddDays(1) }],
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -105,13 +93,11 @@ public class ReleaseChecklistServiceTests
         {
             methodologyVersionRepository
                 .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.Release.PublicationId))
-                .ReturnsAsync(new List<MethodologyVersion>());
+                .ReturnsAsync([]);
 
-            releaseDataFileRepository.Setup(r => r.ListDataFiles(releaseVersion.Id)).ReturnsAsync(new List<File>());
+            releaseDataFileRepository.Setup(r => r.ListDataFiles(releaseVersion.Id)).ReturnsAsync([]);
 
-            releaseDataFileRepository
-                .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
-                .ReturnsAsync(new List<File> { new() });
+            releaseDataFileRepository.Setup(r => r.ListReplacementDataFiles(releaseVersion.Id)).ReturnsAsync([new()]);
 
             dataImportService.Setup(s => s.HasIncompleteImports(releaseVersion.Id)).ReturnsAsync(true);
 
@@ -199,13 +185,11 @@ public class ReleaseChecklistServiceTests
         {
             methodologyVersionRepository
                 .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.Release.PublicationId))
-                .ReturnsAsync(new List<MethodologyVersion>());
+                .ReturnsAsync([]);
 
-            releaseDataFileRepository.Setup(r => r.ListDataFiles(releaseVersion.Id)).ReturnsAsync(new List<File>());
+            releaseDataFileRepository.Setup(r => r.ListDataFiles(releaseVersion.Id)).ReturnsAsync([]);
 
-            releaseDataFileRepository
-                .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
-                .ReturnsAsync(new List<File>());
+            releaseDataFileRepository.Setup(r => r.ListReplacementDataFiles(releaseVersion.Id)).ReturnsAsync([]);
 
             dataGuidanceService
                 .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, CancellationToken.None))
@@ -276,45 +260,36 @@ public class ReleaseChecklistServiceTests
 
             methodologyVersionRepository
                 .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.Release.PublicationId))
-                .ReturnsAsync(new List<MethodologyVersion>());
+                .ReturnsAsync([]);
 
             releaseDataFileRepository
                 .Setup(r => r.ListDataFiles(releaseVersion.Id))
-                .ReturnsAsync(
-                    new List<File>
+                .ReturnsAsync([
+                    new()
                     {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Filename = "test-file-1.csv",
-                            Type = FileType.Data,
-                            SubjectId = subject.Id,
-                        },
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Filename = "test-file-2.csv",
-                            Type = FileType.Data,
-                            SubjectId = otherSubject.Id,
-                        },
-                    }
-                );
+                        Id = Guid.NewGuid(),
+                        Filename = "test-file-1.csv",
+                        Type = FileType.Data,
+                        SubjectId = subject.Id,
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Filename = "test-file-2.csv",
+                        Type = FileType.Data,
+                        SubjectId = otherSubject.Id,
+                    },
+                ]);
 
             dataGuidanceService
                 .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, CancellationToken.None))
                 .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
-            footnoteRepository
-                .Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id))
-                .ReturnsAsync(new List<Subject> { subject });
+            footnoteRepository.Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id)).ReturnsAsync([subject]);
 
-            releaseDataFileRepository
-                .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
-                .ReturnsAsync(new List<File>());
+            releaseDataFileRepository.Setup(r => r.ListReplacementDataFiles(releaseVersion.Id)).ReturnsAsync([]);
 
-            dataBlockService
-                .Setup(s => s.ListDataBlocks(releaseVersion.Id))
-                .ReturnsAsync(new List<DataBlock> { new(), new() });
+            dataBlockService.Setup(s => s.ListDataBlocks(releaseVersion.Id)).ReturnsAsync([new(), new()]);
 
             dataSetVersionService
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
@@ -411,11 +386,9 @@ public class ReleaseChecklistServiceTests
                 .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.Release.PublicationId))
                 .ReturnsAsync(AsList(methodologyVersion));
 
-            releaseDataFileRepository.Setup(r => r.ListDataFiles(releaseVersion.Id)).ReturnsAsync(new List<File>());
+            releaseDataFileRepository.Setup(r => r.ListDataFiles(releaseVersion.Id)).ReturnsAsync([]);
 
-            releaseDataFileRepository
-                .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
-                .ReturnsAsync(new List<File>());
+            releaseDataFileRepository.Setup(r => r.ListReplacementDataFiles(releaseVersion.Id)).ReturnsAsync([]);
 
             dataGuidanceService
                 .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, CancellationToken.None))
@@ -484,37 +457,29 @@ public class ReleaseChecklistServiceTests
             Created = DateTime.UtcNow.AddMonths(-1),
             DataGuidance = "Test guidance",
             PreReleaseAccessList = "Test access list",
-            GenericContent = new List<ContentSection>
-            {
-                new()
-                {
-                    Type = ContentSectionType.Generic,
-                    Content = new List<ContentBlock> { new HtmlBlock { Body = "<p>test</p>" } },
-                },
-                new()
-                {
-                    Type = ContentSectionType.Generic,
-                    Content = new List<ContentBlock> { new DataBlock { Id = dataBlockId } },
-                },
-            },
+            GenericContent =
+            [
+                new() { Type = ContentSectionType.Generic, Content = [new HtmlBlock { Body = "<p>test</p>" }] },
+                new() { Type = ContentSectionType.Generic, Content = [new DataBlock { Id = dataBlockId }] },
+            ],
             HeadlinesSection = new ContentSection
             {
                 Type = ContentSectionType.Headlines,
-                Content = new List<ContentBlock> { new HtmlBlock { Body = "Not empty" } },
+                Content = [new HtmlBlock { Body = "Not empty" }],
             },
             RelatedDashboardsSection = new ContentSection
             {
                 Type = ContentSectionType.RelatedDashboards,
-                Content = new List<ContentBlock> { new HtmlBlock { Body = "Not empty" } },
+                Content = [new HtmlBlock { Body = "Not empty" }],
             },
             SummarySection = new ContentSection
             {
                 Type = ContentSectionType.ReleaseSummary,
-                Content = new List<ContentBlock> { new HtmlBlock { Body = "Not empty" } },
+                Content = [new HtmlBlock { Body = "Not empty" }],
             },
             NextReleaseDate = new PartialDate { Month = "12", Year = "2021" },
-            Updates = new List<Update>
-            {
+            Updates =
+            [
                 new()
                 {
                     Reason = "Test reason 2",
@@ -522,7 +487,7 @@ public class ReleaseChecklistServiceTests
                     // created after release.Created
                     Created = DateTime.UtcNow,
                 },
-            },
+            ],
         };
 
         var featuredTable = new FeaturedTable { DataBlockId = dataBlockId };
@@ -553,52 +518,37 @@ public class ReleaseChecklistServiceTests
 
             releaseDataFileRepository
                 .Setup(r => r.ListDataFiles(releaseVersion.Id))
-                .ReturnsAsync(
-                    new List<File>
+                .ReturnsAsync([
+                    new()
                     {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Filename = "test-file-1.csv",
-                            Type = FileType.Data,
-                            SubjectId = subject.Id,
-                        },
-                    }
-                );
+                        Id = Guid.NewGuid(),
+                        Filename = "test-file-1.csv",
+                        Type = FileType.Data,
+                        SubjectId = subject.Id,
+                    },
+                ]);
 
-            releaseDataFileRepository
-                .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
-                .ReturnsAsync(new List<File>());
+            releaseDataFileRepository.Setup(r => r.ListReplacementDataFiles(releaseVersion.Id)).ReturnsAsync([]);
 
             dataGuidanceService
                 .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, CancellationToken.None))
                 .ReturnsAsync(Unit.Instance);
 
-            footnoteRepository
-                .Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id))
-                .ReturnsAsync(new List<Subject>());
+            footnoteRepository.Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id)).ReturnsAsync([]);
 
-            dataBlockService
-                .Setup(s => s.ListDataBlocks(releaseVersion.Id))
-                .ReturnsAsync(new List<DataBlock> { new() { Id = dataBlockId } });
+            dataBlockService.Setup(s => s.ListDataBlocks(releaseVersion.Id)).ReturnsAsync([new() { Id = dataBlockId }]);
 
             dataSetVersionService
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
-                .ReturnsAsync(
-                    new[]
+                .ReturnsAsync([
+                    .. new[]
                     {
                         DataSetVersionStatus.Draft,
                         DataSetVersionStatus.Withdrawn,
                         DataSetVersionStatus.Published,
                         DataSetVersionStatus.Deprecated,
-                    }
-                        .Select(status => new DataSetVersionStatusSummary(
-                            Id: Guid.NewGuid(),
-                            Title: "",
-                            Status: status
-                        ))
-                        .ToList()
-                );
+                    }.Select(status => new DataSetVersionStatusSummary(Id: Guid.NewGuid(), Title: "", Status: status)),
+                ]);
 
             var service = BuildReleaseChecklistService(
                 context,
