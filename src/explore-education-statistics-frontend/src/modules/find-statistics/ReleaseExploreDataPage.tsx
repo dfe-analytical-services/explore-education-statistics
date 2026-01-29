@@ -249,9 +249,12 @@ const ReleaseExploreDataPage = ({
             {hasFeaturedTables && (
               <ReleaseDataPageCardLink
                 renderLink={
-                  <Link to={`#${pageSections.featuredTables.id}`} unvisited>
+                  <a
+                    href={`#${pageSections.featuredTables.id}`}
+                    className="govuk-link govuk-link--no-visited-state"
+                  >
                     {pageSections.featuredTables.text}
-                  </Link>
+                  </a>
                 }
                 caption={pageSections.featuredTables.shortCaption}
               />
@@ -260,9 +263,12 @@ const ReleaseExploreDataPage = ({
             {hasDataSets && (
               <ReleaseDataPageCardLink
                 renderLink={
-                  <Link to={`#${pageSections.datasets.id}`} unvisited>
+                  <a
+                    href={`#${pageSections.datasets.id}`}
+                    className="govuk-link govuk-link--no-visited-state"
+                  >
                     {pageSections.datasets.text}
-                  </Link>
+                  </a>
                 }
                 caption={pageSections.datasets.caption}
               />
@@ -271,9 +277,12 @@ const ReleaseExploreDataPage = ({
             {hasSupportingFiles && (
               <ReleaseDataPageCardLink
                 renderLink={
-                  <Link to={`#${pageSections.supportingFiles.id}`} unvisited>
+                  <a
+                    href={`#${pageSections.supportingFiles.id}`}
+                    className="govuk-link govuk-link--no-visited-state"
+                  >
                     {pageSections.supportingFiles.text}
-                  </Link>
+                  </a>
                 }
                 caption={pageSections.supportingFiles.caption}
               />
@@ -282,9 +291,12 @@ const ReleaseExploreDataPage = ({
             {hasDataDashboards && (
               <ReleaseDataPageCardLink
                 renderLink={
-                  <Link to={`#${pageSections.dataDashboards.id}`} unvisited>
+                  <a
+                    href={`#${pageSections.dataDashboards.id}`}
+                    className="govuk-link govuk-link--no-visited-state"
+                  >
                     {pageSections.dataDashboards.text}
-                  </Link>
+                  </a>
                 }
                 caption={pageSections.dataDashboards.caption}
               />
@@ -293,9 +305,12 @@ const ReleaseExploreDataPage = ({
             {hasDataGuidance && (
               <ReleaseDataPageCardLink
                 renderLink={
-                  <Link to={`#${pageSections.dataGuidance.id}`} unvisited>
+                  <a
+                    href={`#${pageSections.dataGuidance.id}`}
+                    className="govuk-link govuk-link--no-visited-state"
+                  >
                     {pageSections.dataGuidance.text}
-                  </Link>
+                  </a>
                 }
                 caption={pageSections.dataGuidance.caption}
               />
