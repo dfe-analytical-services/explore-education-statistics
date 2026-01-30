@@ -823,14 +823,14 @@ public class ReleaseApprovalServiceTests
             );
 
             // Alter the approval status to Approved,
-            // toggling the values of NotifySubscribers and UpdatePublishedDate from their initial values
+            // toggling the values of NotifySubscribers and UpdatePublishedDisplayDate from their initial values
             var result = await releaseService.CreateReleaseStatus(
                 amendedReleaseVersion.Id,
                 new ReleaseStatusCreateRequest
                 {
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
                     NotifySubscribers = false,
-                    UpdatePublishedDate = true,
+                    UpdatePublishedDisplayDate = true,
                 }
             );
 
