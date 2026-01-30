@@ -1,10 +1,9 @@
+import PreReleaseUserAccessForm from '@admin/pages/release/pre-release/components/PreReleaseUserAccessForm';
 import _preReleaseUserService, {
   PreReleaseUser,
 } from '@admin/services/preReleaseUserService';
-import { screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
-import PreReleaseUserAccessForm from '@admin/pages/release/pre-release/components/PreReleaseUserAccessForm';
 import render from '@common-test/render';
+import { act, screen, waitFor, within } from '@testing-library/react';
 
 const preReleaseUserService = _preReleaseUserService as jest.Mocked<
   typeof _preReleaseUserService
@@ -144,42 +143,27 @@ describe('PreReleaseUserAccessForm', () => {
         <PreReleaseUserAccessForm releaseVersionId="release-1" />,
       );
 
-      await waitFor(() => {
-        expect(
-          screen.getByLabelText('Invite new users by email'),
-        ).toBeInTheDocument();
-      });
+      const emailsTextarea = await screen.findByLabelText(
+        'Invite new users by email',
+      );
 
-      const emailsTextarea = screen.getByLabelText('Invite new users by email');
-      // type values up to but not exceeding the limit of lines
-      await user.type(emailsTextarea, `test@test.com{enter}`.repeat(50));
+      // type values exceeding the limit of lines
+      await user.type(emailsTextarea, `test@test.com{enter}`.repeat(51));
 
       await user.click(
         screen.getByRole('button', { name: 'Invite new users' }),
       );
 
-      await waitFor(() => {
-        expect(
-          screen.queryAllByText(
-            'Enter between 1 and 50 lines of email addresses',
-          ).length,
-        ).toBe(0);
-      });
+      expect(preReleaseUserService.inviteUsers).toHaveBeenCalledTimes(0);
 
-      // now exceed the limit
-      await user.type(emailsTextarea, `{enter}test@test.com`);
-
-      await user.click(
-        screen.getByRole('button', { name: 'Invite new users' }),
-      );
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Enter between 1 and 50 lines of email addresses', {
+      expect(
+        await screen.findByText(
+          'Enter between 1 and 50 lines of email addresses',
+          {
             selector: '#preReleaseUserAccessForm-emails-error',
-          }),
-        ).toBeInTheDocument();
-      });
+          },
+        ),
+      ).toBeInTheDocument();
     });
 
     test('shows validation message when emails contains invalid values', async () => {

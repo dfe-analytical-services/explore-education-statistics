@@ -133,7 +133,7 @@ describe('PublicationScheduledReleases', () => {
     ).toBeInTheDocument();
   });
 
-  test('shows a view instead of edit link if you do not have permission to edit the release', () => {
+  test('shows a view instead of edit link if you do not have permission to edit the release', async () => {
     render(
       <PublicationScheduledReleases
         publicationId={testPublicationId}
@@ -150,7 +150,7 @@ describe('PublicationScheduledReleases', () => {
       />,
     );
 
-    const rows = screen.getAllByRole('row');
+    const rows = await screen.findAllByRole('row');
     const row1Cells = within(rows[1]).getAllByRole('cell');
 
     expect(within(row1Cells[0]).getByText('Release 1')).toBeInTheDocument();

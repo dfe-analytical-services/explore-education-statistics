@@ -4,8 +4,8 @@ import {
 } from '@admin/contexts/ReleaseContentHubContext';
 import connectionMock from '@admin/services/hubs/utils/__mocks__/connectionMock';
 import { HubConnectionState } from '@microsoft/signalr';
-import { renderHook, waitFor } from '@testing-library/react';
-import React, { FC, ReactNode } from 'react';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { FC, ReactNode } from 'react';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
 
@@ -22,12 +22,15 @@ describe('ReleaseContentHubContext', () => {
     jest.useFakeTimers();
   });
 
-  test('starts in a Disconnected state', () => {
+  test('starts in a Disconnected state', async () => {
     const { result } = renderHook(() => useReleaseContentHubContext(), {
       wrapper,
     });
 
     expect(result.current.status).toBe(HubConnectionState.Disconnected);
+
+    // flush pending effects
+    await act(async () => {});
   });
 
   test('changes to a Connected state', async () => {

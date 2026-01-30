@@ -39,7 +39,7 @@ describe('ChartLegendConfiguration', () => {
     },
   };
 
-  test('renders correctly with no legend items', () => {
+  test('renders correctly with no legend items', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
@@ -65,11 +65,11 @@ describe('ChartLegendConfiguration', () => {
     );
 
     expect(
-      screen.getByText('No legend items to customize.'),
+      await screen.findByText('No legend items to customize.'),
     ).toBeInTheDocument();
   });
 
-  test('renders correctly with single legend item from new data set', () => {
+  test('renders correctly with single legend item from new data set', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
@@ -103,7 +103,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Legend position')).toHaveValue('top');
+    expect(await screen.findByLabelText('Legend position')).toHaveValue('top');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(1);
@@ -123,7 +123,7 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem1.getByLabelText('Style')).toHaveValue('solid');
   });
 
-  test('renders correctly with multiple legend items from new data set', () => {
+  test('renders correctly with multiple legend items from new data set', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
@@ -153,7 +153,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Legend position')).toHaveValue('top');
+    expect(await screen.findByLabelText('Legend position')).toHaveValue('top');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(2);
@@ -185,7 +185,7 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem2.getByLabelText('Style')).toHaveValue('solid');
   });
 
-  test('renders correctly with single legend item from deprecated data sets', () => {
+  test('renders correctly with single legend item from deprecated data sets', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
@@ -225,7 +225,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Legend position')).toHaveValue('top');
+    expect(await screen.findByLabelText('Legend position')).toHaveValue('top');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(1);
@@ -242,7 +242,7 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem1.getByLabelText('Style')).toHaveValue('dashed');
   });
 
-  test('renders correctly with multiple legend items from deprecated data sets', () => {
+  test('renders correctly with multiple legend items from deprecated data sets', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
@@ -296,7 +296,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Legend position')).toHaveValue('top');
+    expect(await screen.findByLabelText('Legend position')).toHaveValue('top');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(2);
@@ -324,7 +324,7 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem2.getByLabelText('Style')).toHaveValue('dashed');
   });
 
-  test('renders correctly with single existing legend item', () => {
+  test('renders correctly with single existing legend item', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
@@ -373,7 +373,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Legend position')).toHaveValue('top');
+    expect(await screen.findByLabelText('Legend position')).toHaveValue('top');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(1);
@@ -390,7 +390,7 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem1.getByLabelText('Style')).toHaveValue('dashed');
   });
 
-  test('renders correctly with multiple existing legend items', () => {
+  test('renders correctly with multiple existing legend items', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
@@ -449,7 +449,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Legend position')).toHaveValue('top');
+    expect(await screen.findByLabelText('Legend position')).toHaveValue('top');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(2);
@@ -477,7 +477,7 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem2.getByLabelText('Style')).toHaveValue('dotted');
   });
 
-  test('does not render Symbol field if chart does not have capability', () => {
+  test('does not render Symbol field if chart does not have capability', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
@@ -530,14 +530,14 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    const legendItems = screen.getAllByRole('group');
+    const legendItems = await screen.findAllByRole('group');
     expect(legendItems).toHaveLength(1);
 
     const legendItem1 = within(legendItems[0]);
     expect(legendItem1.queryByLabelText('Symbol')).not.toBeInTheDocument();
   });
 
-  test('does not render Style field if chart does not have capability', () => {
+  test('does not render Style field if chart does not have capability', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
@@ -590,14 +590,14 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    const legendItems = screen.getAllByRole('group');
+    const legendItems = await screen.findAllByRole('group');
     expect(legendItems).toHaveLength(1);
 
     const legendItem1 = within(legendItems[0]);
     expect(legendItem1.queryByLabelText('Style')).not.toBeInTheDocument();
   });
 
-  test('renders the item position, label colour and y offset fields when the legend position is `inline`', () => {
+  test('renders the item position, label colour and y offset fields when the legend position is `inline`', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
@@ -644,7 +644,9 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Legend position')).toHaveValue('inline');
+    expect(await screen.findByLabelText('Legend position')).toHaveValue(
+      'inline',
+    );
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(1);
@@ -1046,7 +1048,7 @@ describe('ChartLegendConfiguration', () => {
     });
   });
 
-  test('shows the sequential colours checkbox for data sets with categorical data in maps', () => {
+  test('shows the sequential colours checkbox for data sets with categorical data in maps', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
@@ -1084,7 +1086,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    const legendItems = screen.getAllByRole('group');
+    const legendItems = await screen.findAllByRole('group');
     expect(legendItems).toHaveLength(2);
     expect(
       within(legendItems[0]).getByRole('checkbox', {
@@ -1156,7 +1158,7 @@ describe('ChartLegendConfiguration', () => {
   });
 
   describe('reorder categories in map key', () => {
-    test('shows the reorder button for data sets with categorical data in maps', () => {
+    test('shows the reorder button for data sets with categorical data in maps', async () => {
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartLegendConfiguration
@@ -1194,7 +1196,7 @@ describe('ChartLegendConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      const legendItems = screen.getAllByRole('group');
+      const legendItems = await screen.findAllByRole('group');
       expect(legendItems).toHaveLength(2);
       expect(
         within(legendItems[0]).getByRole('button', {
@@ -1208,7 +1210,7 @@ describe('ChartLegendConfiguration', () => {
       ).toBeInTheDocument();
     });
 
-    test('does not show the reorder button for data sets with numerical data in maps', () => {
+    test('does not show the reorder button for data sets with numerical data in maps', async () => {
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartLegendConfiguration
@@ -1243,7 +1245,7 @@ describe('ChartLegendConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      const legendItems = screen.getAllByRole('group');
+      const legendItems = await screen.findAllByRole('group');
       expect(legendItems).toHaveLength(2);
       expect(
         within(legendItems[0]).queryByRole('button', {
@@ -1257,7 +1259,7 @@ describe('ChartLegendConfiguration', () => {
       ).not.toBeInTheDocument();
     });
 
-    test('does not show the reorder button for charts', () => {
+    test('does not show the reorder button for charts', async () => {
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartLegendConfiguration
@@ -1291,7 +1293,7 @@ describe('ChartLegendConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      const legendItems = screen.getAllByRole('group');
+      const legendItems = await screen.findAllByRole('group');
       expect(legendItems).toHaveLength(1);
       expect(
         within(legendItems[0]).queryByRole('button', {
