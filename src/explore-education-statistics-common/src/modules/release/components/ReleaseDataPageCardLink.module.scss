@@ -12,6 +12,10 @@
   @include govuk-media-query($until: desktop) {
     grid-template-columns: 1fr;
   }
+
+  @media print {
+    display: none !important;
+  }
 }
 
 .card {

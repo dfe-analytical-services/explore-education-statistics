@@ -78,6 +78,7 @@ const PublicationReleaseHeadlinesSection = ({
 
   return (
     <ReleasePageContentSection
+      className="dfe-print-break-before"
       heading="Headline facts and figures"
       id="headlines-section"
       testId="headlines-section"
