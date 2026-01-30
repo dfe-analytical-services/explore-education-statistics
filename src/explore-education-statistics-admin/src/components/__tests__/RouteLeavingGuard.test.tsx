@@ -1,8 +1,7 @@
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
-import React from 'react';
 import { Route, Router } from 'react-router';
 import { Link } from 'react-router-dom';
 
@@ -55,15 +54,15 @@ describe('RouteLeavingGuard', () => {
       </Router>,
     );
 
-    // We push an entry instead of clicking the link.
-    // The result should still be the same.
-    history.push('/other');
+    act(() => {
+      // We push an entry instead of clicking the link.
+      // The result should still be the same.
+      history.push('/other');
+    });
 
     expect(history.location.pathname).toBe('/');
 
-    await waitFor(() => {
-      expect(screen.getByText('Test modal title')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('Test modal title')).toBeInTheDocument();
 
     expect(
       within(screen.getByRole('dialog')).getByText('Test modal content'),

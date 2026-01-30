@@ -41,8 +41,10 @@ export default function ScreenerResultsTable({
       data-testid="screener-result-table"
     >
       <thead>
-        <th>Test</th>
-        <th>Status</th>
+        <tr>
+          <th>Test</th>
+          <th>Status</th>
+        </tr>
       </thead>
       <tbody>
         {testResults.map(testResult => (

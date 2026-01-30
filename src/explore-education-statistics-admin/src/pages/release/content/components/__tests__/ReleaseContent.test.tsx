@@ -24,10 +24,12 @@ jest.mock('@admin/services/hubs/utils/createConnection');
 describe('ReleaseContent', () => {
   const testReleaseContent = generateReleaseContent({});
 
-  test('renders the content', () => {
+  test('renders the content', async () => {
     render(<ReleaseContent />);
 
-    expect(screen.getByTestId('Published-value')).toHaveTextContent('TBA');
+    expect(await screen.findByTestId('Published-value')).toHaveTextContent(
+      'TBA',
+    );
 
     expect(
       within(screen.getByTestId('release-summary')).getByText(
@@ -106,33 +108,33 @@ describe('ReleaseContent', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders the "release contents" quick link in edit mode when there is no content', () => {
+  test('renders the "release contents" quick link in edit mode when there is no content', async () => {
     const testReleaseContentWithoutContent = generateReleaseContent({
       release: generateEditableRelease({ content: [] }),
     });
     render(<ReleaseContent />, testReleaseContentWithoutContent);
 
-    const quickLinks = within(
-      screen.getByRole('navigation', {
-        name: 'Quick links',
-      }),
-    ).getAllByRole('link');
+    const navigation = await screen.findByRole('navigation', {
+      name: 'Quick links',
+    });
+
+    const quickLinks = within(navigation).getAllByRole('link');
     expect(quickLinks).toHaveLength(3);
     expect(quickLinks[0]).toHaveTextContent('Release contents');
     expect(quickLinks[0]).toHaveAttribute('href', '#releaseMainContent');
   });
 
-  test('does not render the "release contents" quick link in preview mode when there is no content', () => {
+  test('does not render the "release contents" quick link in preview mode when there is no content', async () => {
     const testReleaseContentWithoutContent = generateReleaseContent({
       release: generateEditableRelease({ content: [] }),
     });
     render(<ReleaseContent />, testReleaseContentWithoutContent, 'preview');
 
-    const quickLinks = within(
-      screen.getByRole('navigation', {
-        name: 'Quick links',
-      }),
-    ).getAllByRole('link');
+    const navigation = await screen.findByRole('navigation', {
+      name: 'Quick links',
+    });
+
+    const quickLinks = within(navigation).getAllByRole('link');
     expect(quickLinks).toHaveLength(2);
     expect(quickLinks[0]).toHaveTextContent('Explore data');
     expect(quickLinks[0]).toHaveAttribute('href', '#explore-data-and-files');
