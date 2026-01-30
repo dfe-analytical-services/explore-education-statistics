@@ -458,7 +458,7 @@ public class ReleaseServiceTests
             // where the published date should have been copied from the previous version
             Assert.Equal(previousReleaseVersion.Published, actualReleaseVersion.Published);
 
-            // Expect the published display date to have been copied from the previous version when 'UpdatePublishedDate' is false
+            // Expect the published display date to have been copied from the previous version when 'UpdatePublishedDisplayDate' is false
             Assert.Equal(previousReleaseVersion.PublishedDisplayDate, actualReleaseVersion.PublishedDisplayDate);
 
             var actualDataBlockParents = await contentDbContext
@@ -560,7 +560,7 @@ public class ReleaseServiceTests
     }
 
     [Fact]
-    public async Task CompletePublishing_AmendedReleaseAndUpdatePublishedDateIsTrue()
+    public async Task CompletePublishing_AmendedReleaseAndUpdatePublishedDisplayDateIsTrue()
     {
         Publication publication = _fixture
             .DefaultPublication()
@@ -571,7 +571,7 @@ public class ReleaseServiceTests
             .Versions.Single(rv => rv is { Published: not null, Version: 0 });
 
         var releaseVersion = publication.Releases.Single().Versions.Single(rv => rv is { Published: null });
-        releaseVersion.UpdatePublishedDate = true;
+        releaseVersion.UpdatePublishedDisplayDate = true;
 
         var actualPublishedDate = new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
@@ -597,7 +597,7 @@ public class ReleaseServiceTests
 
             Assert.Equal(actualPublishedDate, actualReleaseVersion.Published);
 
-            // Expect the published display date to be the actual published date when 'UpdatePublishedDate' is true
+            // Expect the published display date to be the actual published date when 'UpdatePublishedDisplayDate' is true
             Assert.Equal(actualPublishedDate, actualReleaseVersion.PublishedDisplayDate);
         }
     }
