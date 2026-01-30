@@ -454,9 +454,7 @@ public class ReleaseServiceTests
                 rv.Id == releaseVersion.Id
             );
 
-            // TODO EES-6831 This should change to actualPublishedDate, but for now still expect the old behaviour
-            // where the published date should have been copied from the previous version
-            Assert.Equal(previousReleaseVersion.Published, actualReleaseVersion.Published);
+            Assert.Equal(actualPublishedDate, actualReleaseVersion.Published);
 
             // Expect the published display date to have been copied from the previous version when 'UpdatePublishedDate' is false
             Assert.Equal(previousReleaseVersion.PublishedDisplayDate, actualReleaseVersion.PublishedDisplayDate);
