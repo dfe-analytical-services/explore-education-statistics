@@ -1,6 +1,6 @@
 import ReleasePublishingStatus from '@admin/pages/release/components/ReleasePublishingStatus';
 import _releaseService from '@admin/services/releaseVersionService';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 
 jest.mock('@admin/services/releaseVersionService');
@@ -43,7 +43,9 @@ describe('ReleasePublishingStatus', () => {
       filesStage: 'Complete',
     });
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByText('Complete')).toBeInTheDocument();
 
@@ -74,7 +76,9 @@ describe('ReleasePublishingStatus', () => {
 
     expect(handleChange).toHaveBeenCalledTimes(1);
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByText('Started')).toBeInTheDocument();
 
@@ -88,7 +92,9 @@ describe('ReleasePublishingStatus', () => {
       filesStage: 'Complete',
     });
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByText('Complete')).toBeInTheDocument();
 
@@ -123,7 +129,9 @@ describe('ReleasePublishingStatus', () => {
       overallStage: 'Complete',
     });
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByText('Complete')).toBeInTheDocument();
 
@@ -137,7 +145,9 @@ describe('ReleasePublishingStatus', () => {
       overallStage: 'Failed',
     });
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     expect(await screen.findByText('Complete')).toBeInTheDocument();
 

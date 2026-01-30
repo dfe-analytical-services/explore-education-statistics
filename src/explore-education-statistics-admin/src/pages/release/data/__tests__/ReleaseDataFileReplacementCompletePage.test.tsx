@@ -6,9 +6,8 @@ import {
 import _releaseDataFileService, {
   DataSetAccoutrements,
 } from '@admin/services/releaseDataFileService';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { createMemoryHistory, MemoryHistory } from 'history';
-import React from 'react';
 import { generatePath, Route, Router } from 'react-router-dom';
 
 jest.mock('@admin/services/releaseDataFileService');
@@ -31,7 +30,7 @@ describe('ReleaseDataFilePage', () => {
     await renderPage();
 
     expect(
-      screen.getByRole('heading', { name: 'Data replacement complete' }),
+      await screen.findByRole('heading', { name: 'Data replacement complete' }),
     ).toBeInTheDocument();
   });
 
@@ -42,11 +41,9 @@ describe('ReleaseDataFilePage', () => {
 
     await renderPage();
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('There was a problem with the data replacement.'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('There was a problem with the data replacement.'),
+    ).toBeInTheDocument();
   });
 
   async function renderPage(history: MemoryHistory = createMemoryHistory()) {
@@ -61,13 +58,15 @@ describe('ReleaseDataFilePage', () => {
       ),
     );
 
-    render(
-      <Router history={history}>
-        <Route
-          path={releaseDataFileReplacementCompleteRoute.path}
-          component={ReleaseDataFileReplacementCompletePage}
-        />
-      </Router>,
+    await act(async () =>
+      render(
+        <Router history={history}>
+          <Route
+            path={releaseDataFileReplacementCompleteRoute.path}
+            component={ReleaseDataFileReplacementCompletePage}
+          />
+        </Router>,
+      ),
     );
   }
 });

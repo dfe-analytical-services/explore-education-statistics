@@ -180,7 +180,7 @@ const MethodologyStatusPage = () => {
                             </td>
                             <td>{status.approvalStatus}</td>
                             <td>{status.internalReleaseNote}</td>
-                            <td>{`${status.methodologyVersion + 1}`}</td>{' '}
+                            <td>{`${status.methodologyVersion + 1}`}</td>
                             {/* +1 because version starts from 0 in DB */}
                             <td>
                               {status.createdByEmail ? (

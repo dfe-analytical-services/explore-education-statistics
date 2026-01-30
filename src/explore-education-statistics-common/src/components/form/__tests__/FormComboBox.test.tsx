@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
 import FormComboBox from '../FormComboBox';
@@ -34,7 +34,7 @@ describe('FormComboBox', () => {
       />,
     );
 
-    await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+    await userEvent.type(await screen.findByLabelText('Choose option'), 'Test');
 
     const options = screen.queryAllByRole('option');
 
@@ -58,13 +58,15 @@ describe('FormComboBox', () => {
         />,
       );
 
-      const input = screen.getByLabelText('Choose option') as HTMLInputElement;
+      const input = (await screen.findByLabelText(
+        'Choose option',
+      )) as HTMLInputElement;
 
       await userEvent.type(input, 'Test');
 
-      const option1 = screen.getByText('Option 1');
-      const option2 = screen.getByText('Option 2');
-      const option3 = screen.getByText('Option 3');
+      const option1 = await screen.findByText('Option 1');
+      const option2 = await screen.findByText('Option 2');
+      const option3 = await screen.findByText('Option 3');
 
       expect(option1).toHaveAttribute('aria-selected', 'false');
       expect(option1).not.toHaveFocus();
@@ -75,8 +77,9 @@ describe('FormComboBox', () => {
       expect(option3).toHaveAttribute('aria-selected', 'false');
       expect(option3).not.toHaveFocus();
 
-      fireEvent.keyDown(input, {
-        key: 'ArrowDown',
+      input.focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowDown}');
       });
 
       expect(option1).toHaveAttribute('aria-selected', 'true');
@@ -100,11 +103,14 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
-      const option1 = screen.getByText('Option 1');
-      const option2 = screen.getByText('Option 2');
-      const option3 = screen.getByText('Option 3');
+      const option1 = await screen.findByText('Option 1');
+      const option2 = await screen.findByText('Option 2');
+      const option3 = await screen.findByText('Option 3');
 
       expect(option1).toHaveAttribute('aria-selected', 'false');
       expect(option1).not.toHaveFocus();
@@ -115,8 +121,9 @@ describe('FormComboBox', () => {
       expect(option3).toHaveAttribute('aria-selected', 'false');
       expect(option3).not.toHaveFocus();
 
-      fireEvent.keyDown(screen.getByLabelText('Choose option'), {
-        key: 'ArrowDown',
+      (await screen.findByLabelText('Choose option')).focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowDown}');
       });
 
       expect(option1).toHaveAttribute('aria-selected', 'true');
@@ -140,17 +147,21 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
-      const listBox = screen.getByRole('listbox');
+      const listBox = await screen.findByRole('listbox');
 
       expect(listBox).not.toHaveFocus();
 
-      fireEvent.keyDown(screen.getByLabelText('Choose option'), {
-        key: 'ArrowUp',
+      (await screen.findByLabelText('Choose option')).focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowUp}');
       });
 
-      const option = screen.getByText('Option 3');
+      const option = await screen.findByText('Option 3');
       expect(option).toHaveFocus();
     });
 
@@ -165,11 +176,14 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
-      const option1 = screen.getByText('Option 1');
-      const option2 = screen.getByText('Option 2');
-      const option3 = screen.getByText('Option 3');
+      const option1 = await screen.findByText('Option 1');
+      const option2 = await screen.findByText('Option 2');
+      const option3 = await screen.findByText('Option 3');
 
       expect(option1).toHaveAttribute('aria-selected', 'false');
       expect(option1).not.toHaveFocus();
@@ -180,8 +194,9 @@ describe('FormComboBox', () => {
       expect(option3).toHaveAttribute('aria-selected', 'false');
       expect(option3).not.toHaveFocus();
 
-      fireEvent.keyDown(screen.getByLabelText('Choose option'), {
-        key: 'ArrowUp',
+      (await screen.findByLabelText('Choose option')).focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowUp}');
       });
 
       expect(option1).toHaveAttribute('aria-selected', 'false');
@@ -205,16 +220,17 @@ describe('FormComboBox', () => {
         />,
       );
 
-      const input = screen.getByLabelText('Choose option');
+      const input = await screen.findByLabelText('Choose option');
 
       await userEvent.type(input, 'Test');
 
       expect(input).toHaveValue('Test');
-      expect(screen.getByRole('listbox')).toBeInTheDocument();
+      expect(await screen.findByRole('listbox')).toBeInTheDocument();
       expect(screen.queryAllByRole('option')).toHaveLength(3);
 
-      fireEvent.keyDown(screen.getByLabelText('Choose option'), {
-        key: 'Esc',
+      (await screen.findByLabelText('Choose option')).focus();
+      await act(async () => {
+        await userEvent.keyboard('{Escape}');
       });
 
       expect(input).toHaveValue('');
@@ -233,16 +249,17 @@ describe('FormComboBox', () => {
         />,
       );
 
-      const input = screen.getByLabelText('Choose option');
+      const input = await screen.findByLabelText('Choose option');
 
       await userEvent.type(input, 'Test');
 
       expect(input).toHaveValue('Test');
-      expect(screen.getByRole('listbox')).toBeInTheDocument();
+      expect(await screen.findByRole('listbox')).toBeInTheDocument();
       expect(screen.queryAllByRole('option')).toHaveLength(3);
 
-      fireEvent.keyDown(screen.getByLabelText('Choose option'), {
-        key: 'Tab',
+      (await screen.findByLabelText('Choose option')).focus();
+      await act(async () => {
+        await userEvent.keyboard('{Tab}');
       });
 
       expect(input).toHaveValue('Test');
@@ -264,16 +281,19 @@ describe('FormComboBox', () => {
         </div>,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
-      await userEvent.click(screen.getByText('Target'));
+      await userEvent.click(await screen.findByText('Target'));
 
       expect(screen.queryAllByRole('option')).toHaveLength(0);
 
-      await userEvent.click(screen.getByLabelText('Choose option'));
+      await userEvent.click(await screen.findByLabelText('Choose option'));
 
-      expect(screen.getByRole('listbox')).toBeInTheDocument();
-      expect(screen.getAllByRole('option')).toHaveLength(3);
+      expect(await screen.findByRole('listbox')).toBeInTheDocument();
+      expect(await screen.findAllByRole('option')).toHaveLength(3);
     });
   });
 
@@ -289,13 +309,16 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
-      const listBox = screen.getByRole('listbox');
+      const listBox = await screen.findByRole('listbox');
 
-      const option1 = screen.getByText('Option 1');
-      const option2 = screen.getByText('Option 2');
-      const option3 = screen.getByText('Option 3');
+      const option1 = await screen.findByText('Option 1');
+      const option2 = await screen.findByText('Option 2');
+      const option3 = await screen.findByText('Option 3');
 
       expect(option1).toHaveAttribute('aria-selected', 'false');
       expect(option1).not.toHaveFocus();
@@ -306,7 +329,10 @@ describe('FormComboBox', () => {
       expect(option3).toHaveAttribute('aria-selected', 'false');
       expect(option3).not.toHaveFocus();
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+      listBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowUp}');
+      });
 
       expect(option1).toHaveAttribute('aria-selected', 'false');
       expect(option1).not.toHaveFocus();
@@ -317,7 +343,9 @@ describe('FormComboBox', () => {
       expect(option3).toHaveAttribute('aria-selected', 'true');
       expect(option3).toHaveFocus();
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+      await act(async () => {
+        await userEvent.keyboard('{ArrowUp}');
+      });
 
       expect(option1).toHaveAttribute('aria-selected', 'false');
       expect(option1).not.toHaveFocus();
@@ -328,7 +356,9 @@ describe('FormComboBox', () => {
       expect(option3).toHaveAttribute('aria-selected', 'false');
       expect(option3).not.toHaveFocus();
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+      await act(async () => {
+        await userEvent.keyboard('{ArrowUp}');
+      });
 
       expect(option1).toHaveAttribute('aria-selected', 'true');
       expect(option1).toHaveFocus();
@@ -339,7 +369,9 @@ describe('FormComboBox', () => {
       expect(option3).toHaveAttribute('aria-selected', 'false');
       expect(option3).not.toHaveFocus();
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+      await act(async () => {
+        await userEvent.keyboard('{ArrowUp}');
+      });
 
       expect(option1).toHaveAttribute('aria-selected', 'false');
       expect(option1).not.toHaveFocus();
@@ -362,29 +394,43 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
-      const listBox = screen.getByRole('listbox');
+      const listBox = await screen.findByRole('listbox');
 
       expect(listBox.scrollTop).toBe(0);
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+      listBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowUp}');
+      });
 
       expect(listBox.scrollTop).toBe(listBox.scrollHeight);
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+      await act(async () => {
+        await userEvent.keyboard('{ArrowUp}');
+      });
 
       expect(listBox.scrollTop).toBe(
-        listBox.scrollHeight - screen.getByText('Option 3').scrollHeight,
+        listBox.scrollHeight -
+          (await screen.findByText('Option 3')).scrollHeight,
       );
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+      await act(async () => {
+        await userEvent.keyboard('{ArrowUp}');
+      });
 
       expect(listBox.scrollTop).toBe(
-        listBox.scrollHeight - screen.getByText('Option 2').scrollHeight,
+        listBox.scrollHeight -
+          (await screen.findByText('Option 2')).scrollHeight,
       );
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+      await act(async () => {
+        await userEvent.keyboard('{ArrowUp}');
+      });
       expect(listBox.scrollTop).toBe(0);
     });
 
@@ -399,13 +445,16 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
-      const listBox = screen.getByRole('combobox');
+      const listBox = await screen.findByRole('combobox');
 
-      const option1 = screen.getByText('Option 1');
-      const option2 = screen.getByText('Option 2');
-      const option3 = screen.getByText('Option 3');
+      const option1 = await screen.findByText('Option 1');
+      const option2 = await screen.findByText('Option 2');
+      const option3 = await screen.findByText('Option 3');
 
       expect(option1).toHaveAttribute('aria-selected', 'false');
       expect(option1).not.toHaveFocus();
@@ -416,7 +465,10 @@ describe('FormComboBox', () => {
       expect(option3).toHaveAttribute('aria-selected', 'false');
       expect(option3).not.toHaveFocus();
 
-      fireEvent.keyDown(listBox, { key: 'ArrowDown' });
+      listBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowDown}');
+      });
 
       expect(option1).toHaveAttribute('aria-selected', 'true');
       expect(option1).toHaveFocus();
@@ -427,7 +479,9 @@ describe('FormComboBox', () => {
       expect(option3).toHaveAttribute('aria-selected', 'false');
       expect(option3).not.toHaveFocus();
 
-      fireEvent.keyDown(listBox, { key: 'ArrowDown' });
+      await act(async () => {
+        await userEvent.keyboard('{ArrowDown}');
+      });
 
       expect(option1).toHaveAttribute('aria-selected', 'false');
       expect(option1).not.toHaveFocus();
@@ -438,7 +492,9 @@ describe('FormComboBox', () => {
       expect(option3).toHaveAttribute('aria-selected', 'false');
       expect(option3).not.toHaveFocus();
 
-      fireEvent.keyDown(listBox, { key: 'ArrowDown' });
+      await act(async () => {
+        await userEvent.keyboard('{ArrowDown}');
+      });
 
       expect(option1).toHaveAttribute('aria-selected', 'false');
       expect(option1).not.toHaveFocus();
@@ -449,7 +505,9 @@ describe('FormComboBox', () => {
       expect(option3).toHaveAttribute('aria-selected', 'true');
       expect(option3).toHaveFocus();
 
-      fireEvent.keyDown(listBox, { key: 'ArrowDown' });
+      await act(async () => {
+        await userEvent.keyboard('{ArrowDown}');
+      });
 
       expect(option1).toHaveAttribute('aria-selected', 'true');
       expect(option1).toHaveFocus();
@@ -472,26 +530,40 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
-      const comboBox = screen.getByRole('combobox');
+      const comboBox = await screen.findByRole('combobox');
 
       expect(comboBox.scrollTop).toBe(0);
 
-      fireEvent.keyDown(comboBox, { key: 'ArrowDown' });
+      comboBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowDown}');
+      });
+
       expect(comboBox.scrollTop).toBe(0);
 
-      fireEvent.keyDown(comboBox, { key: 'ArrowDown' });
+      await act(async () => {
+        await userEvent.keyboard('{ArrowDown}');
+      });
       expect(comboBox.scrollTop).toBe(
-        screen.getByText('Option 1').scrollHeight,
+        (await screen.findByText('Option 1')).scrollHeight,
       );
 
-      fireEvent.keyDown(comboBox, { key: 'ArrowDown' });
+      await act(async () => {
+        await userEvent.keyboard('{ArrowDown}');
+      });
       expect(comboBox.scrollTop).toBe(
-        comboBox.scrollHeight + screen.getByText('Option 2').scrollHeight,
+        comboBox.scrollHeight +
+          (await screen.findByText('Option 2')).scrollHeight,
       );
 
-      fireEvent.keyDown(comboBox, { key: 'ArrowDown' });
+      await act(async () => {
+        await userEvent.keyboard('{ArrowDown}');
+      });
       expect(comboBox.scrollTop).toBe(comboBox.scrollHeight);
     });
 
@@ -506,18 +578,27 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
-      const input = screen.getByLabelText('Choose option');
+      const input = await screen.findByLabelText('Choose option');
 
-      fireEvent.keyDown(input, { key: 'ArrowDown' });
-      expect(screen.getByLabelText('Choose option')).not.toHaveFocus();
+      input.focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowDown}');
+      });
+      expect(await screen.findByLabelText('Choose option')).not.toHaveFocus();
 
-      const listBox = screen.getByRole('listbox');
+      const listBox = await screen.findByRole('listbox');
 
-      fireEvent.keyDown(listBox, { key: 'ArrowLeft' });
+      listBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowLeft}');
+      });
 
-      expect(screen.getByLabelText('Choose option')).toHaveFocus();
+      expect(await screen.findByLabelText('Choose option')).toHaveFocus();
     });
 
     test('pressing ArrowLeft moves input field selection one character to the left', async () => {
@@ -531,16 +612,21 @@ describe('FormComboBox', () => {
         />,
       );
 
-      const input = screen.getByLabelText('Choose option') as HTMLInputElement;
+      const input = (await screen.findByLabelText(
+        'Choose option',
+      )) as HTMLInputElement;
 
       await userEvent.type(input, 'Test');
 
       input.selectionStart = 2;
       input.selectionEnd = 2;
 
-      const listBox = screen.getByRole('listbox');
+      const listBox = await screen.findByRole('listbox');
 
-      fireEvent.keyDown(listBox, { key: 'ArrowLeft' });
+      listBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowLeft}');
+      });
 
       expect(input.selectionStart).toBe(1);
       expect(input.selectionEnd).toBe(1);
@@ -557,13 +643,19 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
-      const listBox = screen.getByRole('listbox');
+      const listBox = await screen.findByRole('listbox');
 
-      fireEvent.keyDown(listBox, { key: 'ArrowRight' });
+      listBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowRight}');
+      });
 
-      expect(screen.getByLabelText('Choose option')).toHaveFocus();
+      expect(await screen.findByLabelText('Choose option')).toHaveFocus();
     });
 
     test('pressing ArrowRight moves input field selection one character to the left', async () => {
@@ -577,16 +669,21 @@ describe('FormComboBox', () => {
         />,
       );
 
-      const input = screen.getByLabelText('Choose option') as HTMLInputElement;
+      const input = (await screen.findByLabelText(
+        'Choose option',
+      )) as HTMLInputElement;
 
       await userEvent.type(input, 'Test');
 
       input.selectionStart = 2;
       input.selectionEnd = 2;
 
-      const listBox = screen.getByRole('listbox');
+      const listBox = await screen.findByRole('listbox');
 
-      fireEvent.keyDown(listBox, { key: 'ArrowRight' });
+      listBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowRight}');
+      });
 
       expect(input.selectionStart).toBe(3);
       expect(input.selectionEnd).toBe(3);
@@ -603,7 +700,9 @@ describe('FormComboBox', () => {
         />,
       );
 
-      const input = screen.getByLabelText('Choose option') as HTMLInputElement;
+      const input = (await screen.findByLabelText(
+        'Choose option',
+      )) as HTMLInputElement;
 
       await userEvent.type(input, 'Test');
 
@@ -611,9 +710,12 @@ describe('FormComboBox', () => {
       input.selectionStart = 2;
       input.selectionEnd = 2;
 
-      const listBox = screen.getByRole('listbox');
+      const listBox = await screen.findByRole('listbox');
 
-      fireEvent.keyDown(listBox, { key: 'Home' });
+      listBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{Home}');
+      });
 
       expect(input).toHaveFocus();
       expect(input.selectionStart).toBe(0);
@@ -631,15 +733,20 @@ describe('FormComboBox', () => {
         />,
       );
 
-      const input = screen.getByLabelText('Choose option') as HTMLInputElement;
+      const input = (await screen.findByLabelText(
+        'Choose option',
+      )) as HTMLInputElement;
 
       await userEvent.type(input, 'Test');
       input.selectionStart = 2;
       input.selectionEnd = 2;
 
-      const listBox = screen.getByRole('listbox');
+      const listBox = await screen.findByRole('listbox');
 
-      fireEvent.keyDown(listBox, { key: 'End' });
+      listBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{End}');
+      });
 
       expect(input).toHaveFocus();
       expect(input.selectionStart).toBe(4);
@@ -659,14 +766,19 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
       expect(onSelect).not.toHaveBeenCalled();
 
-      const listBox = screen.getByRole('listbox');
+      const listBox = await screen.findByRole('listbox');
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
-      fireEvent.keyDown(listBox, { key: 'Enter' });
+      listBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowUp}{Enter}');
+      });
 
       expect(onSelect).toHaveBeenCalledWith(2);
     });
@@ -682,11 +794,17 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
-      const listBox = screen.getByRole('listbox');
+      const listBox = await screen.findByRole('listbox');
 
-      fireEvent.keyDown(listBox, { key: 'Tab' });
+      listBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{Tab}');
+      });
 
       expect(listBox).not.toBeInTheDocument();
       expect(screen.queryAllByRole('option')).toHaveLength(0);
@@ -703,12 +821,17 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
-      const listBox = screen.getByRole('listbox');
+      const listBox = await screen.findByRole('listbox');
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
-      fireEvent.keyDown(listBox, { key: 'Enter' });
+      listBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{ArrowUp}{Enter}');
+      });
 
       expect(screen.queryAllByRole('option')).toHaveLength(0);
     });
@@ -724,23 +847,31 @@ describe('FormComboBox', () => {
         />,
       );
 
-      const input = screen.getByLabelText('Choose option') as HTMLInputElement;
+      const input = (await screen.findByLabelText(
+        'Choose option',
+      )) as HTMLInputElement;
 
       await userEvent.type(input, 'Test');
 
-      const listBox = screen.getByRole('listbox');
+      const listBox = await screen.findByRole('listbox');
 
       expect(input).toHaveAttribute('value', 'Test');
       expect(input).toHaveFocus();
       expect(screen.queryAllByRole('option')).toHaveLength(3);
 
-      fireEvent.keyDown(listBox, { key: 'Escape' });
+      listBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{Escape}');
+      });
 
       expect(input).toHaveAttribute('value', '');
       expect(input).toHaveFocus();
       expect(screen.queryAllByRole('option')).toHaveLength(0);
 
-      fireEvent.keyDown(listBox, { key: 'Escape' });
+      listBox.focus();
+      await act(async () => {
+        await userEvent.keyboard('{Escape}');
+      });
 
       expect(input).toHaveFocus();
     });
@@ -756,14 +887,19 @@ describe('FormComboBox', () => {
         />,
       );
 
-      const input = screen.getByLabelText('Choose option') as HTMLInputElement;
+      const input = (await screen.findByLabelText(
+        'Choose option',
+      )) as HTMLInputElement;
 
       await userEvent.type(input, 'Test');
 
       expect(input).toHaveAttribute('value', 'Test');
       expect(screen.queryAllByRole('option')).toHaveLength(3);
 
-      fireEvent.keyDown(input, { key: 'Escape' });
+      input.focus();
+      await act(async () => {
+        await userEvent.keyboard('{Escape}');
+      });
 
       expect(input).toHaveAttribute('value', '');
       expect(screen.queryAllByRole('option')).toHaveLength(0);
@@ -782,11 +918,14 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
       expect(onSelect).not.toHaveBeenCalled();
 
-      await userEvent.click(screen.getByText('Option 2'));
+      await userEvent.click(await screen.findByText('Option 2'));
 
       expect(onSelect).toHaveBeenCalledWith(1);
     });
@@ -802,9 +941,12 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
-      await userEvent.click(screen.getByText('Option 2'));
+      await userEvent.click(await screen.findByText('Option 2'));
 
       expect(screen.queryAllByRole('option')).toHaveLength(0);
     });
@@ -824,11 +966,14 @@ describe('FormComboBox', () => {
         </div>,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      await userEvent.type(
+        await screen.findByLabelText('Choose option'),
+        'Test',
+      );
 
       expect(screen.queryAllByRole('option')).toHaveLength(3);
 
-      await userEvent.click(screen.getByText('Target'));
+      await userEvent.click(await screen.findByText('Target'));
 
       expect(screen.queryAllByRole('option')).toHaveLength(0);
     });

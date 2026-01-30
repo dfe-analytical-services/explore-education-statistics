@@ -15,7 +15,7 @@ import testFiltersMapping, {
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
 
@@ -559,7 +559,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      act(() => jest.runAllTimers());
 
       await waitFor(() => {
         expect(
@@ -660,7 +660,9 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -730,7 +732,9 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         }),
       );
 
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -847,7 +851,9 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -977,7 +983,9 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -1078,7 +1086,9 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         }),
       );
 
-      jest.runAllTimers();
+      act(() => {
+        jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(

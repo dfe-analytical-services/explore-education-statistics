@@ -1,11 +1,10 @@
-import React from 'react';
-import { ImportStatusCode } from '@admin/services/releaseDataFileService';
-import { render, screen, waitFor } from '@testing-library/react';
-import { AuthContext } from '@admin/contexts/AuthContext';
+import { AuthContext, AuthContextState } from '@admin/contexts/AuthContext';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import { ReleaseDataFileReplaceRouteParams } from '@admin/routes/releaseRoutes';
+import { ImportStatusCode } from '@admin/services/releaseDataFileService';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { RouteComponentProps } from 'react-router';
-import { ReleaseDataFileReplaceRouteParams } from '@admin/routes/releaseRoutes';
 import PendingDataReplacementSection from '../PendingDataReplacementSection';
 
 jest.mock('@admin/services/releaseDataFileService', () => ({
@@ -71,24 +70,16 @@ const defaultPermissions = {
   isApprover: true,
 };
 
-const bau = {
+const bau: AuthContextState['user'] = {
   id: 'user-1',
   name: 'Test User',
   permissions: defaultPermissions,
 };
-const analyst = {
+
+const analyst: AuthContextState['user'] = {
   ...bau,
   permissions: { ...defaultPermissions, isBauUser: false },
 };
-
-const renderWithAuth = (props = {}, user = { ...bau }) =>
-  render(
-    <TestConfigContextProvider>
-      <AuthContext.Provider value={{ user }}>
-        <PendingDataReplacementSection {...defaultProps} {...props} />
-      </AuthContext.Provider>
-    </TestConfigContextProvider>,
-  );
 
 describe('PendingDataReplacementSection', () => {
   afterEach(() => {
@@ -96,17 +87,24 @@ describe('PendingDataReplacementSection', () => {
   });
 
   test('cancelling as an analyst when there is a public API linked to the data file is not possible', async () => {
-    renderWithAuth({ ...defaultProps }, analyst);
-    await waitFor(async () => {
-      expect(
-        screen.getByRole('button', { name: /cancel data replacement/i }),
-      ).toBeInTheDocument();
-    });
+    render(
+      <TestConfigContextProvider>
+        <AuthContext.Provider value={{ user: analyst }}>
+          <PendingDataReplacementSection {...defaultProps} />,
+        </AuthContext.Provider>
+      </TestConfigContextProvider>,
+    );
+
+    expect(
+      await screen.findByRole('button', { name: /cancel data replacement/i }),
+    ).toBeInTheDocument();
+
     await userEvent.click(
       screen.getByRole('button', { name: /cancel data replacement/i }),
     );
+
     expect(
-      screen.getByText(
+      await screen.findByText(
         /You do not have permission to cancel this data replacement. This is because it is linked to an API data set version which can only be modified by BAU users./i,
       ),
     ).toBeInTheDocument();
@@ -125,12 +123,18 @@ describe('PendingDataReplacementSection', () => {
   });
 
   test('cancelling as an bau when there is a public API linked to the data file is not possible', async () => {
-    renderWithAuth({ ...defaultProps }, bau);
-    await waitFor(async () => {
-      expect(
-        screen.getByRole('button', { name: /cancel data replacement/i }),
-      ).toBeInTheDocument();
-    });
+    render(
+      <TestConfigContextProvider>
+        <AuthContext.Provider value={{ user: bau }}>
+          <PendingDataReplacementSection {...defaultProps} />
+        </AuthContext.Provider>
+      </TestConfigContextProvider>,
+    );
+
+    expect(
+      await screen.findByRole('button', { name: /cancel data replacement/i }),
+    ).toBeInTheDocument();
+
     await userEvent.click(
       screen.getByRole('button', { name: /cancel data replacement/i }),
     );

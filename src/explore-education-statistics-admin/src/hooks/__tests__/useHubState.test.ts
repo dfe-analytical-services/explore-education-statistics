@@ -1,7 +1,7 @@
 import useHubState from '@admin/hooks/useHubState';
 import Hub from '@admin/services/hubs/utils/Hub';
 import { HubConnectionState } from '@microsoft/signalr';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { mock } from 'jest-mock-extended';
 
 describe('useHubState', () => {
@@ -11,12 +11,14 @@ describe('useHubState', () => {
     jest.useFakeTimers();
   });
 
-  test('calls `start` on hub when mounted', () => {
+  test('calls `start` on hub when mounted', async () => {
     mockHub.start.mockResolvedValue();
 
     renderHook(() => useHubState(() => mockHub));
 
-    expect(mockHub.start).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(mockHub.start).toHaveBeenCalledTimes(1);
+    });
   });
 
   test('returns updated `status` when hub has started', async () => {
@@ -32,7 +34,9 @@ describe('useHubState', () => {
 
     mockHub.status.mockReturnValue(HubConnectionState.Connected);
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     await waitFor(() => {
       expect(result.current.status).toBe(HubConnectionState.Connected);
@@ -62,7 +66,9 @@ describe('useHubState', () => {
 
     expect(mockHub.stop).toHaveBeenCalledTimes(1);
 
-    jest.runOnlyPendingTimers();
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
 
     await waitFor(() => {
       expect(mockHub.stop).toHaveBeenCalledTimes(2);
