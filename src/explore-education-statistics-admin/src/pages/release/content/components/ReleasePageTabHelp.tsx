@@ -14,11 +14,7 @@ import { releaseTypes } from '@common/services/types/releaseType';
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
 
-interface Props {
-  hidden: boolean;
-}
-
-const ReleasePageTabHelp = ({ hidden }: Props) => {
+const ReleasePageTabHelp = () => {
   const { release } = useReleaseContentState();
 
   const {
@@ -58,7 +54,7 @@ const ReleasePageTabHelp = ({ hidden }: Props) => {
   );
 
   return (
-    <ReleasePageTabPanel tabKey="help" hidden={hidden}>
+    <ReleasePageTabPanel tabKey="help">
       <ReleasePageLayout navItems={navItems}>
         <ContactUsSection
           publicationContact={publication.contact}

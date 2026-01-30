@@ -31,7 +31,6 @@ export default function ReleasePageContentSection({
       <section
         className={className}
         id={id}
-        data-page-section
         data-scroll={dataScrollId}
         data-testid={testId}
       >

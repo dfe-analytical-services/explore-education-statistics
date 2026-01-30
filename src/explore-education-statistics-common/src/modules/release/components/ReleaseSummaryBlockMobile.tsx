@@ -37,7 +37,6 @@ export default function ReleaseSummaryBlockMobile({
       id="summary-section-mobile"
       className={styles.container}
       data-testid="release-summary-block-mobile"
-      data-page-section="true"
     >
       <div className={styles.innerWrap}>
         <div className={styles.innerContent}>
