@@ -126,7 +126,7 @@ public class ReleaseChecklistServiceTests
                 dataSetVersionService: dataSetVersionService.Object
             );
 
-            var result = await service.GetChecklist(releaseVersion.Id);
+            var result = await service.GetChecklist(releaseVersion.Id, default);
 
             MockUtils.VerifyAllMocks(
                 dataImportService,
@@ -166,6 +166,7 @@ public class ReleaseChecklistServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
             .WithNextReleaseDate(null)
+            .WithContent(DefaultContentSections())
             .WithPreReleaseAccessList(string.Empty);
 
         var contextId = Guid.NewGuid().ToString();
@@ -180,6 +181,7 @@ public class ReleaseChecklistServiceTests
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
         var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
         var dataSetVersionService = new Mock<IDataSetVersionService>(MockBehavior.Strict);
+        var releasePublishingValidator = new Mock<IReleasePublishingValidator>(MockBehavior.Strict);
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
@@ -199,15 +201,30 @@ public class ReleaseChecklistServiceTests
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
                 .ReturnsAsync([]);
 
+            dataSetVersionService
+                .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
+                .ReturnsAsync([]);
+
+            releasePublishingValidator
+                .Setup(mock =>
+                    mock.IsMissingUpdatedApiDataSet(
+                        It.IsAny<ReleaseVersion>(),
+                        It.IsAny<IList<Content.Model.File>>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(true);
+
             var service = BuildReleaseChecklistService(
                 context,
                 releaseDataFileRepository: releaseDataFileRepository.Object,
                 methodologyVersionRepository: methodologyVersionRepository.Object,
                 dataGuidanceService: dataGuidanceService.Object,
-                dataSetVersionService: dataSetVersionService.Object
+                dataSetVersionService: dataSetVersionService.Object,
+                releasePublishingValidator: releasePublishingValidator.Object
             );
 
-            var result = await service.GetChecklist(releaseVersion.Id);
+            var result = await service.GetChecklist(releaseVersion.Id, default);
 
             MockUtils.VerifyAllMocks(
                 dataGuidanceService,
@@ -220,11 +237,13 @@ public class ReleaseChecklistServiceTests
 
             Assert.False(checklist.Valid);
 
-            Assert.Equal(4, checklist.Warnings.Count);
+            Assert.Equal(6, checklist.Warnings.Count);
             Assert.Equal(NoMethodology, checklist.Warnings[0].Code);
             Assert.Equal(NoNextReleaseDate, checklist.Warnings[1].Code);
             Assert.Equal(NoDataFiles, checklist.Warnings[2].Code);
             Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[3].Code);
+            Assert.Equal(UnresolvedComments, checklist.Warnings[4].Code);
+            Assert.Equal(MissingUpdatedApiDataSet, checklist.Warnings[5].Code);
         }
     }
 
@@ -235,6 +254,7 @@ public class ReleaseChecklistServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
             .WithNextReleaseDate(null)
+            .WithContent(DefaultContentSections())
             .WithPreReleaseAccessList(string.Empty);
 
         var contextId = Guid.NewGuid().ToString();
@@ -251,6 +271,7 @@ public class ReleaseChecklistServiceTests
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
         var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
         var dataSetVersionService = new Mock<IDataSetVersionService>(MockBehavior.Strict);
+        var releasePublishingValidator = new Mock<IReleasePublishingValidator>(MockBehavior.Strict);
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
@@ -295,6 +316,16 @@ public class ReleaseChecklistServiceTests
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
                 .ReturnsAsync([]);
 
+            releasePublishingValidator
+                .Setup(mock =>
+                    mock.IsMissingUpdatedApiDataSet(
+                        It.IsAny<ReleaseVersion>(),
+                        It.IsAny<IList<Content.Model.File>>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(true);
+
             var service = BuildReleaseChecklistService(
                 context,
                 releaseDataFileRepository: releaseDataFileRepository.Object,
@@ -302,10 +333,11 @@ public class ReleaseChecklistServiceTests
                 dataGuidanceService: dataGuidanceService.Object,
                 footnoteRepository: footnoteRepository.Object,
                 dataBlockService: dataBlockService.Object,
-                dataSetVersionService: dataSetVersionService.Object
+                dataSetVersionService: dataSetVersionService.Object,
+                releasePublishingValidator: releasePublishingValidator.Object
             );
 
-            var result = await service.GetChecklist(releaseVersion.Id);
+            var result = await service.GetChecklist(releaseVersion.Id, default);
 
             MockUtils.VerifyAllMocks(
                 dataBlockService,
@@ -313,14 +345,15 @@ public class ReleaseChecklistServiceTests
                 dataGuidanceService,
                 methodologyVersionRepository,
                 releaseDataFileRepository,
-                dataSetVersionService
+                dataSetVersionService,
+                releasePublishingValidator
             );
 
             var checklist = result.AssertRight();
 
             Assert.False(checklist.Valid);
 
-            Assert.Equal(5, checklist.Warnings.Count);
+            Assert.Equal(7, checklist.Warnings.Count);
             Assert.Equal(NoMethodology, checklist.Warnings[0].Code);
             Assert.Equal(NoNextReleaseDate, checklist.Warnings[1].Code);
 
@@ -330,6 +363,8 @@ public class ReleaseChecklistServiceTests
 
             Assert.Equal(NoFeaturedTables, checklist.Warnings[3].Code);
             Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[4].Code);
+            Assert.Equal(UnresolvedComments, checklist.Warnings[5].Code);
+            Assert.Equal(MissingUpdatedApiDataSet, checklist.Warnings[6].Code);
         }
     }
 
@@ -340,29 +375,7 @@ public class ReleaseChecklistServiceTests
             .DefaultReleaseVersion()
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
             .WithNextReleaseDate(null)
-            .WithContent(
-                _dataFixture
-                    .DefaultContentSection()
-                    .ForIndex(
-                        0,
-                        s =>
-                            s.SetContentBlocks([
-                                _dataFixture
-                                    .DefaultHtmlBlock()
-                                    .WithBody("<div></div>")
-                                    .WithComments([
-                                        new()
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Content = "Comment 1 Text",
-                                            Resolved = DateTime.UtcNow,
-                                        },
-                                        new() { Id = Guid.NewGuid(), Content = "Comment 2 Text" },
-                                    ]),
-                            ])
-                    )
-                    .GenerateList()
-            )
+            .WithContent(DefaultContentSections())
             .WithPreReleaseAccessList(string.Empty);
 
         var methodologyVersion = new MethodologyVersion { Status = Draft };
@@ -379,6 +392,7 @@ public class ReleaseChecklistServiceTests
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
         var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
         var dataSetVersionService = new Mock<IDataSetVersionService>(MockBehavior.Strict);
+        var releasePublishingValidator = new Mock<IReleasePublishingValidator>(MockBehavior.Strict);
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
@@ -398,15 +412,30 @@ public class ReleaseChecklistServiceTests
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
                 .ReturnsAsync([]);
 
+            dataSetVersionService
+                .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
+                .ReturnsAsync([]);
+
+            releasePublishingValidator
+                .Setup(mock =>
+                    mock.IsMissingUpdatedApiDataSet(
+                        It.IsAny<ReleaseVersion>(),
+                        It.IsAny<IList<Content.Model.File>>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(true);
+
             var service = BuildReleaseChecklistService(
                 context,
                 releaseDataFileRepository: releaseDataFileRepository.Object,
                 methodologyVersionRepository: methodologyVersionRepository.Object,
                 dataGuidanceService: dataGuidanceService.Object,
-                dataSetVersionService: dataSetVersionService.Object
+                dataSetVersionService: dataSetVersionService.Object,
+                releasePublishingValidator: releasePublishingValidator.Object
             );
 
-            var result = await service.GetChecklist(releaseVersion.Id);
+            var result = await service.GetChecklist(releaseVersion.Id, default);
 
             MockUtils.VerifyAllMocks(
                 dataGuidanceService,
@@ -420,7 +449,7 @@ public class ReleaseChecklistServiceTests
 
             Assert.False(checklist.Valid);
 
-            Assert.Equal(5, checklist.Warnings.Count);
+            Assert.Equal(6, checklist.Warnings.Count);
 
             var methodologyMustBeApprovedError = Assert.IsType<MethodologyNotApprovedWarning>(checklist.Warnings[0]);
             Assert.Equal(MethodologyNotApproved, methodologyMustBeApprovedError.Code);
@@ -430,6 +459,7 @@ public class ReleaseChecklistServiceTests
             Assert.Equal(NoDataFiles, checklist.Warnings[2].Code);
             Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[3].Code);
             Assert.Equal(UnresolvedComments, checklist.Warnings[4].Code);
+            Assert.Equal(MissingUpdatedApiDataSet, checklist.Warnings[5].Code);
         }
     }
 
@@ -559,7 +589,7 @@ public class ReleaseChecklistServiceTests
                 dataBlockService: dataBlockService.Object,
                 dataSetVersionService: dataSetVersionService.Object
             );
-            var result = await service.GetChecklist(releaseVersion.Id);
+            var result = await service.GetChecklist(releaseVersion.Id, default);
 
             var checklist = result.AssertRight();
 
@@ -584,9 +614,34 @@ public class ReleaseChecklistServiceTests
         await using var context = InMemoryContentDbContext();
         var service = BuildReleaseChecklistService(context);
 
-        var result = await service.GetChecklist(releaseVersionId: Guid.NewGuid());
+        var result = await service.GetChecklist(releaseVersionId: Guid.NewGuid(), default);
 
         result.AssertNotFound();
+    }
+
+    private List<ContentSection> DefaultContentSections()
+    {
+        return _dataFixture
+            .DefaultContentSection()
+            .ForIndex(
+                0,
+                s =>
+                    s.SetContentBlocks([
+                        _dataFixture
+                            .DefaultHtmlBlock()
+                            .WithBody("<div></div>")
+                            .WithComments([
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Content = "Comment 1 Text",
+                                    Resolved = DateTime.UtcNow,
+                                },
+                                new() { Id = Guid.NewGuid(), Content = "Comment 2 Text" },
+                            ]),
+                    ])
+            )
+            .GenerateList();
     }
 
     private static ReleaseChecklistService BuildReleaseChecklistService(
@@ -598,8 +653,8 @@ public class ReleaseChecklistServiceTests
         IMethodologyVersionRepository? methodologyVersionRepository = null,
         IFootnoteRepository? footnoteRepository = null,
         IDataBlockService? dataBlockService = null,
-        IDataSetService? dataSetService = null,
-        IDataSetVersionService? dataSetVersionService = null
+        IDataSetVersionService? dataSetVersionService = null,
+        IReleasePublishingValidator? releasePublishingValidator = null
     )
     {
         return new(
@@ -611,8 +666,8 @@ public class ReleaseChecklistServiceTests
             methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
             footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
             dataBlockService ?? new Mock<IDataBlockService>().Object,
-            dataSetService ?? new Mock<IDataSetService>().Object,
-            dataSetVersionService ?? new Mock<IDataSetVersionService>().Object
+            dataSetVersionService ?? new Mock<IDataSetVersionService>().Object,
+            releasePublishingValidator ?? new Mock<IReleasePublishingValidator>().Object
         );
     }
 }

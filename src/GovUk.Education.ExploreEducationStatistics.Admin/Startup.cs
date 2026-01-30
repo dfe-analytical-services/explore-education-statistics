@@ -534,6 +534,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
             services.AddTransient<IDataSetService, DataSetService>();
             services.AddTransient<IDataSetVersionService, DataSetVersionService>();
+            services.AddTransient<IReleasePublishingValidator, ReleasePublishingValidator>();
             services.AddTransient<IDataSetVersionMappingService, DataSetVersionMappingService>();
             services.AddTransient<IPreviewTokenService, PreviewTokenService>();
             services.AddTransient<IDataSetVersionRepository, DataSetVersionRepository>();

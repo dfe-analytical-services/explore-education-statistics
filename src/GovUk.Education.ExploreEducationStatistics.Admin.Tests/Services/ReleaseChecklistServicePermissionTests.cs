@@ -48,7 +48,7 @@ public class ReleaseChecklistPermissionServiceTests
                         contentDbContext: contentDbContext,
                         userService: userService.Object
                     );
-                    return await service.GetChecklist(releaseVersion.Id);
+                    return await service.GetChecklist(releaseVersion.Id, default);
                 }
             });
     }
@@ -62,8 +62,8 @@ public class ReleaseChecklistPermissionServiceTests
         IMethodologyVersionRepository? methodologyVersionRepository = null,
         IFootnoteRepository? footnoteRepository = null,
         IDataBlockService? dataBlockService = null,
-        IDataSetService? dataSetService = null,
-        IDataSetVersionService? dataSetVersionService = null
+        IDataSetVersionService? dataSetVersionService = null,
+        IReleasePublishingValidator? releasePublishingValidator = null
     )
     {
         return new(
@@ -75,8 +75,8 @@ public class ReleaseChecklistPermissionServiceTests
             methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
             footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
             dataBlockService ?? new Mock<IDataBlockService>().Object,
-            dataSetService ?? new Mock<IDataSetService>().Object,
-            dataSetVersionService ?? new Mock<IDataSetVersionService>().Object
+            dataSetVersionService ?? new Mock<IDataSetVersionService>().Object,
+            releasePublishingValidator ?? new Mock<IReleasePublishingValidator>().Object
         );
     }
 }

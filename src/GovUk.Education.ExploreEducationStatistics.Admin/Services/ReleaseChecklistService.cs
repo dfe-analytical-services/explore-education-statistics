@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Publi
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -31,8 +30,8 @@ public class ReleaseChecklistService : IReleaseChecklistService
     private readonly IReleaseDataFileRepository _fileRepository;
     private readonly IFootnoteRepository _footnoteRepository;
     private readonly IDataBlockService _dataBlockService;
-    private readonly IDataSetService _dataSetService;
     private readonly IDataSetVersionService _dataSetVersionService;
+    private readonly IReleasePublishingValidator _releasePublishingValidator;
 
     public ReleaseChecklistService(
         ContentDbContext contentDbContext,
@@ -43,8 +42,8 @@ public class ReleaseChecklistService : IReleaseChecklistService
         IMethodologyVersionRepository methodologyVersionRepository,
         IFootnoteRepository footnoteRepository,
         IDataBlockService dataBlockService,
-        IDataSetService dataSetService,
-        IDataSetVersionService dataSetVersionService
+        IDataSetVersionService dataSetVersionService,
+        IReleasePublishingValidator releasePublishingValidator
     )
     {
         _contentDbContext = contentDbContext;
@@ -55,23 +54,29 @@ public class ReleaseChecklistService : IReleaseChecklistService
         _methodologyVersionRepository = methodologyVersionRepository;
         _footnoteRepository = footnoteRepository;
         _dataBlockService = dataBlockService;
-        _dataSetService = dataSetService;
         _dataSetVersionService = dataSetVersionService;
+        _releasePublishingValidator = releasePublishingValidator;
     }
 
-    public async Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(Guid releaseVersionId)
+    public async Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default
+    )
     {
         return await _contentDbContext
             .ReleaseVersions.HydrateReleaseForChecklist()
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async release => new ReleaseChecklistViewModel(
-                await GetErrors(release),
-                await GetWarnings(release)
+                await GetErrors(release, cancellationToken),
+                await GetWarnings(release, cancellationToken)
             ));
     }
 
-    public async Task<List<ReleaseChecklistIssue>> GetErrors(ReleaseVersion releaseVersion)
+    public async Task<List<ReleaseChecklistIssue>> GetErrors(
+        ReleaseVersion releaseVersion,
+        CancellationToken cancellationToken = default
+    )
     {
         var errors = new List<ReleaseChecklistIssue>();
 
@@ -194,7 +199,10 @@ public class ReleaseChecklistService : IReleaseChecklistService
             .AnyAsync(htmlBlock => !string.IsNullOrEmpty(htmlBlock.Body));
     }
 
-    public async Task<List<ReleaseChecklistIssue>> GetWarnings(ReleaseVersion releaseVersion)
+    public async Task<List<ReleaseChecklistIssue>> GetWarnings(
+        ReleaseVersion releaseVersion,
+        CancellationToken cancellationToken = default
+    )
     {
         var warnings = new List<ReleaseChecklistIssue>();
 
@@ -252,57 +260,13 @@ public class ReleaseChecklistService : IReleaseChecklistService
             warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.UnresolvedComments));
         }
 
-        if (await IsMissingUpdatedApiDataSet(releaseVersion, dataFiles))
+        if (await _releasePublishingValidator.IsMissingUpdatedApiDataSet(releaseVersion, dataFiles, cancellationToken))
         {
             warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.MissingUpdatedApiDataSet));
         }
 
         return warnings;
     }
-
-    private async Task<bool> IsMissingUpdatedApiDataSet(ReleaseVersion releaseVersion, IList<File> dataFiles)
-    {
-        // if it's a new/unpublished publication, there's no previous release to check
-        if (releaseVersion.Release.Publication.LatestPublishedReleaseVersionId is null)
-        {
-            return false;
-        }
-
-        // if no data files were uploaded, there's no data to associate with an existing API data set
-        if (!dataFiles.Any())
-        {
-            return false;
-        }
-
-        // get data sets associated to this publication
-        // TODO: Use results pattern
-        var existingDataSetsForPublication = await _dataSetService.ListDataSets(releaseVersion.Release.PublicationId);
-
-        // if there are fewer uploads than API data sets, this may be intentional (e.g. two API data sets, but only one needs updating)
-        if (dataFiles.Count < existingDataSetsForPublication.Right.Count)
-        {
-            return false;
-        }
-
-        // if no new data set version has been associated to this release, add the warning
-        if (existingDataSetsForPublication.Right.Any(r => DataSetVersionIsNotAssociatedToRelease(r, releaseVersion.Id)))
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    private static bool DataSetVersionIsNotAssociatedToRelease(
-        DataSetSummaryViewModel dataSet,
-        Guid releaseVersionId
-    ) => // might be wrong logic? Been suggested that this shouldn't work with amendment scenarios when comparing releaseVersionIds
-        dataSet.LatestLiveVersion?.ReleaseVersion.Id != releaseVersionId
-        && (
-            dataSet.DraftVersion is null
-            || dataSet.DraftVersion.ReleaseVersion.Id != releaseVersionId
-            || dataSet.DraftVersion.Status is not DataSetVersionStatus.Mapping and not DataSetVersionStatus.Draft
-        );
 
     private async Task<bool> HasUnresolvedComments(Guid releaseVersionId)
     {
