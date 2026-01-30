@@ -40,7 +40,7 @@ const renderWithContext = (
 
 describe('ReleasePageTabHome', () => {
   test('does not render summary block and publication summary on desktop', () => {
-    renderWithContext(<ReleasePageTabHome hidden={false} />);
+    renderWithContext(<ReleasePageTabHome />);
 
     expect(
       screen.queryByRole('heading', {
@@ -52,7 +52,7 @@ describe('ReleasePageTabHome', () => {
 
   test('renders summary block and publication summary on mobile with updates info', () => {
     mockIsMedia = true;
-    renderWithContext(<ReleasePageTabHome hidden={false} />);
+    renderWithContext(<ReleasePageTabHome />);
 
     expect(
       screen.getByRole('heading', {
@@ -88,7 +88,7 @@ describe('ReleasePageTabHome', () => {
   test('renders publication summary on mobile correctly when published with no updates', () => {
     mockIsMedia = true;
     renderWithContext(
-      <ReleasePageTabHome hidden={false} />,
+      <ReleasePageTabHome />,
       generateReleaseContent({
         release: generateEditableRelease({
           published: '2025-08-10T09:30:00+01:00',
@@ -126,7 +126,7 @@ describe('ReleasePageTabHome', () => {
   });
 
   test('renders summary section if summary content exists', () => {
-    renderWithContext(<ReleasePageTabHome hidden={false} />);
+    renderWithContext(<ReleasePageTabHome />);
 
     expect(
       screen.getByRole('heading', {
@@ -138,7 +138,7 @@ describe('ReleasePageTabHome', () => {
 
   test('does not render summary section if no summary content', () => {
     renderWithContext(
-      <ReleasePageTabHome hidden={false} />,
+      <ReleasePageTabHome />,
       generateReleaseContent({
         release: generateEditableRelease({
           summarySection: {
@@ -160,7 +160,7 @@ describe('ReleasePageTabHome', () => {
   });
 
   test('renders headlines section', () => {
-    renderWithContext(<ReleasePageTabHome hidden={false} />);
+    renderWithContext(<ReleasePageTabHome />);
     const headlinesSection = screen.getByTestId('headlines-section');
     expect(headlinesSection).toBeInTheDocument();
 
@@ -173,7 +173,7 @@ describe('ReleasePageTabHome', () => {
   });
 
   test('renders content sections as normal sections on desktop', () => {
-    renderWithContext(<ReleasePageTabHome hidden={false} />);
+    renderWithContext(<ReleasePageTabHome />);
 
     const content = screen.getByTestId('home-content');
     expect(content).toBeInTheDocument();
@@ -192,7 +192,7 @@ describe('ReleasePageTabHome', () => {
 
   test('renders content sections as accordions on mobile', () => {
     mockIsMedia = true;
-    renderWithContext(<ReleasePageTabHome hidden={false} />);
+    renderWithContext(<ReleasePageTabHome />);
 
     const content = screen.getByTestId('home-content');
 

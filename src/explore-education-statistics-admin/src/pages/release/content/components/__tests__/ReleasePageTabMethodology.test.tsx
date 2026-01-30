@@ -32,7 +32,7 @@ const renderWithContext = (
 
 describe('ReleasePageTabMethodology', () => {
   test('renders methodology tab content', () => {
-    renderWithContext(<ReleasePageTabMethodology hidden={false} />);
+    renderWithContext(<ReleasePageTabMethodology />);
 
     expect(
       screen.getByRole('heading', {
@@ -60,7 +60,7 @@ describe('ReleasePageTabMethodology', () => {
 
   test('renders external methodology', () => {
     renderWithContext(
-      <ReleasePageTabMethodology hidden={false} />,
+      <ReleasePageTabMethodology />,
       generateReleaseContent({
         release: generateEditableRelease({
           publication: {

@@ -152,23 +152,21 @@ describe('ReleaseContentRedesign', () => {
 
     expect(tabPanels).toHaveLength(1);
     expect(tabPanels[0]).toHaveAttribute('id', 'tab-home');
-    expect(tabPanels[0]).not.toHaveAttribute('hidden', '');
     expect(tabPanels[0]).toHaveRole('tabpanel');
 
     await user.click(tabs[1]);
     tabPanels = screen.getAllByTestId('release-page-tab-panel');
-    expect(tabPanels).toHaveLength(2);
-    expect(tabPanels[1]).toHaveAttribute('id', 'tab-explore');
-    expect(tabPanels[1]).not.toHaveAttribute('hidden', '');
-    expect(tabPanels[1]).toHaveRole('tabpanel');
-    expect(tabPanels[0]).toHaveAttribute('hidden', '');
+    expect(tabPanels).toHaveLength(1);
+    expect(tabPanels[0]).toHaveAttribute('id', 'tab-explore');
 
     await user.keyboard('[ArrowRight]');
     tabPanels = screen.getAllByTestId('release-page-tab-panel');
-    expect(tabPanels).toHaveLength(3);
+    expect(tabPanels[0]).toHaveAttribute('id', 'tab-methodology');
+    expect(tabPanels).toHaveLength(1);
 
     await user.keyboard('[ArrowRight]');
     tabPanels = screen.getAllByTestId('release-page-tab-panel');
-    expect(tabPanels).toHaveLength(4);
+    expect(tabPanels[0]).toHaveAttribute('id', 'tab-help');
+    expect(tabPanels).toHaveLength(1);
   });
 });
