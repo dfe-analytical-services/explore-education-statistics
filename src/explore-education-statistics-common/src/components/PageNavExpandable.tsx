@@ -1,5 +1,5 @@
 import styles from '@common/components/PageNavExpandable.module.scss';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useToggle from '@common/hooks/useToggle';
@@ -16,24 +16,55 @@ export default function PageNavExpandable({
   onClickNavItem,
 }: Props) {
   const [activeSection, setActiveSection] = useState(items[0].id);
+  const [activeSubSection, setActiveSubSection] = useState<string | null>(null);
+
   const [isScrollHandlingBlocked, toggleScrollHandlingBlocked] =
     useToggle(false);
 
   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    setActiveSection(items[0].id);
+  // Calculate the parent map for lookups (subitem -> parent)
+  // and a flattened array of all IDs
+  const { parentMap, allIds } = useMemo(() => {
+    const map: Map<string, string> = new Map();
+    const ids: string[] = [];
+
+    items.forEach(item => {
+      ids.push(item.id);
+      if (item.subNavItems) {
+        item.subNavItems.forEach(sub => {
+          map.set(sub.id, item.id);
+          ids.push(sub.id);
+        });
+      }
+    });
+
+    return { parentMap: map, allIds: ids };
   }, [items]);
 
-  const setActiveSectionIfValid = (sectionId: string) => {
-    if (items.some(item => item.id === sectionId)) {
-      setActiveSection(sectionId);
+  useEffect(() => {
+    setActiveSection(items[0].id);
+    setActiveSubSection(null);
+  }, [items]);
+
+  // Update logic accepts either a parent or child ID
+  const updateActiveSection = (id: string) => {
+    const parentId = parentMap.get(id);
+
+    if (parentId) {
+      // It's a sub-item: Set active section and subsection
+      setActiveSection(parentId);
+      setActiveSubSection(id);
+    } else {
+      // It's a top-level item: Set active section and clear subsection
+      setActiveSection(id);
+      setActiveSubSection(null);
     }
   };
 
   const handleNavItemClick = (id: string) => {
     startBlocking();
-    setActiveSection(id);
+    updateActiveSection(id);
   };
 
   // Set temporary state to 'block' scroll handling when nav item is clicked
@@ -66,27 +97,34 @@ export default function PageNavExpandable({
       return;
     }
 
-    const sections = document.querySelectorAll('[data-page-section]');
-
-    // Set a section as active when it's in the top third of the page.
+    // We need to find out which of our potential nav item targets is closest to the
+    // top of the page (accounting for a buffer space for the sticky nav)
     const buffer = window.innerHeight / 4;
-    const scrollPosition = window.scrollY + buffer;
+    const windowScrollPosition = window.scrollY + buffer;
 
-    sections.forEach(section => {
-      if (section.id === activeSection) {
-        return;
-      }
+    let currentActiveId = items[0].id; // Default to first item
 
-      const { height } = section.getBoundingClientRect();
-      const { offsetTop } = section as HTMLElement;
-      const offsetBottom = offsetTop + height;
+    // Map over allIds to find their DOM element targets
+    allIds.forEach(id => {
+      const element = document.getElementById(id);
+      if (!element) return;
 
-      const pageSectionId = section.id;
+      const { offsetTop } = element;
 
-      if (scrollPosition > offsetTop && scrollPosition < offsetBottom) {
-        setActiveSectionIfValid(pageSectionId);
+      // If we have scrolled past this element's top, it is a candidate
+      if (windowScrollPosition >= offsetTop) {
+        currentActiveId = id;
       }
     });
+
+    // Update state based on the last element past the scroll position
+    // and avoid re-renders if nothing changed
+    if (
+      currentActiveId !== activeSubSection &&
+      currentActiveId !== activeSection
+    ) {
+      updateActiveSection(currentActiveId);
+    }
   }, 10);
 
   useEffect(() => {
@@ -116,12 +154,14 @@ export default function PageNavExpandable({
           {items.map(item => (
             <NavItem
               key={item.id}
+              activeSubSection={activeSubSection}
               id={item.id}
               isActive={activeSection === item.id}
               text={item.text}
               subNavItems={item.subNavItems}
               onClick={(id, title) => {
                 handleNavItemClick(id);
+                // onClickNavItem is used for GA event tracking
                 onClickNavItem?.(title);
               }}
             />
@@ -139,6 +179,7 @@ export default function PageNavExpandable({
 }
 
 export interface NavItem {
+  activeSubSection?: string | null;
   className?: string;
   id: string;
   isActive?: boolean;
@@ -148,6 +189,7 @@ export interface NavItem {
 }
 
 function NavItem({
+  activeSubSection,
   className,
   id,
   isActive = false,
@@ -182,9 +224,18 @@ function NavItem({
           {subNavItems.map(item => (
             <li className={styles.subNavItem} key={item.id}>
               <a
-                className={`${styles.subNavLink} govuk-link--no-visited-state govuk-link--no-underline`}
+                className={classNames(
+                  styles.navLink,
+                  'govuk-link--no-underline govuk-link--no-visited-state',
+                  {
+                    'govuk-!-font-weight-bold': activeSubSection === item.id,
+                  },
+                )}
                 href={`#${item.id}`}
-                onClick={() => onClick?.(id, `${text} - ${item.text}`)}
+                onClick={() => onClick?.(item.id, `${text} - ${item.text}`)}
+                aria-current={
+                  activeSubSection === item.id ? 'location' : undefined
+                }
               >
                 {item.text}
               </a>

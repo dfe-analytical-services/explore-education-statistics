@@ -20,10 +20,9 @@ import ReleaseSummaryBlockMobile from '@common/modules/release/components/Releas
 import React, { Fragment, useEffect, useMemo } from 'react';
 
 interface Props {
-  hidden: boolean;
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }
-const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
+const ReleasePageTabHome = ({ transformFeaturedTableLinks }: Props) => {
   const { setActiveSection } = useEditingContext();
 
   const { release } = useReleaseContentState();
@@ -95,7 +94,7 @@ const ReleasePageTabHome = ({ hidden, transformFeaturedTableLinks }: Props) => {
   const showUpdatesInfo = updates.length > 0;
 
   return (
-    <ReleasePageTabPanel tabKey="home" hidden={hidden}>
+    <ReleasePageTabPanel tabKey="home">
       <ReleasePageLayout navItems={navItems}>
         {isMobileMedia && (
           <section

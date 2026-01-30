@@ -37,13 +37,11 @@ import React, { useMemo } from 'react';
 import { generatePath } from 'react-router-dom';
 
 interface Props {
-  hidden: boolean;
   isPra?: boolean;
   handleFeaturedTableItemClick?: (id: string) => void;
 }
 
 const ReleasePageTabExploreData = ({
-  hidden,
   isPra = false,
   handleFeaturedTableItemClick,
 }: Props) => {
@@ -241,7 +239,7 @@ const ReleasePageTabExploreData = ({
   );
 
   return (
-    <ReleasePageTabPanel tabKey="explore" hidden={hidden}>
+    <ReleasePageTabPanel tabKey="explore">
       <ReleasePageLayout navItems={navItems}>
         <LoadingSpinner loading={isLoadingDataContent}>
           {isErrorDataContent ? (

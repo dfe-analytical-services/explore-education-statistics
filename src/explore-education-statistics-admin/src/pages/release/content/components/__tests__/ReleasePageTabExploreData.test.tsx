@@ -140,7 +140,7 @@ describe('ReleasePageTabExploreData', () => {
       testReleaseDataContent,
     );
 
-    renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+    renderWithContext(<ReleasePageTabExploreData />);
 
     await waitFor(() => {
       expect(
@@ -312,7 +312,7 @@ describe('ReleasePageTabExploreData', () => {
     releaseContentService.getDataContent.mockResolvedValue(
       testReleaseDataContent,
     );
-    renderWithContext(<ReleasePageTabExploreData hidden={false} isPra />);
+    renderWithContext(<ReleasePageTabExploreData isPra />);
 
     await waitFor(() => {
       expect(
@@ -339,11 +339,7 @@ describe('ReleasePageTabExploreData', () => {
       testReleaseDataContent,
     );
     renderWithContext(
-      <ReleasePageTabExploreData
-        hidden={false}
-        isPra
-        handleFeaturedTableItemClick={noop}
-      />,
+      <ReleasePageTabExploreData isPra handleFeaturedTableItemClick={noop} />,
     );
 
     await waitFor(() => {
@@ -376,7 +372,7 @@ describe('ReleasePageTabExploreData', () => {
       dataDashboards: undefined,
     });
 
-    renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+    renderWithContext(<ReleasePageTabExploreData />);
 
     await waitFor(() => {
       expect(
@@ -429,7 +425,7 @@ describe('ReleasePageTabExploreData', () => {
       dataGuidance: undefined,
     });
 
-    renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+    renderWithContext(<ReleasePageTabExploreData />);
 
     await waitFor(() => {
       expect(
@@ -460,7 +456,7 @@ describe('ReleasePageTabExploreData', () => {
       testReleaseDataContent,
     );
     mockIsMedia = true;
-    renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+    renderWithContext(<ReleasePageTabExploreData />);
     await waitFor(() => {
       expect(
         screen.getByRole('heading', {
@@ -478,7 +474,7 @@ describe('ReleasePageTabExploreData', () => {
     releaseContentService.getDataContent.mockResolvedValue(
       testReleaseDataContent,
     );
-    renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+    renderWithContext(<ReleasePageTabExploreData />);
     await waitFor(() => {
       expect(
         screen.getByRole('heading', {
@@ -496,7 +492,7 @@ describe('ReleasePageTabExploreData', () => {
       testReleaseDataContent,
     );
     mockIsMedia = true;
-    renderWithContext(<ReleasePageTabExploreData hidden={false} />);
+    renderWithContext(<ReleasePageTabExploreData />);
     await waitFor(() => {
       expect(
         screen.getByRole('heading', {
