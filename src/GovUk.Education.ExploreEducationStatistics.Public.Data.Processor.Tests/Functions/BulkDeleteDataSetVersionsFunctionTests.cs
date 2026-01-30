@@ -12,7 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Tests.TheoryData;
-using LinqToDB;
+using LinqToDB.Async;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;

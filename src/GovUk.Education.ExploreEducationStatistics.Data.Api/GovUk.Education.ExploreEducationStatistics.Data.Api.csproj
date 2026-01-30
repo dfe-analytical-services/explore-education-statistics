@@ -19,7 +19,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.23" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.15.0" />
     <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="3.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
     <PackageReference Include="System.Text.Json" Version="10.0.2" />
     <PackageReference Include="Thinktecture.EntityFrameworkCore.SqlServer" Version="8.4.0" />

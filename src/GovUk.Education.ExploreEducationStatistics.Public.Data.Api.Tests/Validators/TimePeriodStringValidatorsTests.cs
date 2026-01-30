@@ -170,7 +170,7 @@ public class TimePeriodStringValidatorsTests
                     {
                         var yearFormat = EnumUtil
                             .GetFromEnumValue<TimeIdentifier>(allowedCode)
-                            .GetEnumAttribute<TimeIdentifierMetaAttribute>()
+                            .GetEnumAttribute<TimeIdentifierMetaAttribute>()!
                             .YearFormat;
 
                         var isValidYearFormat =
