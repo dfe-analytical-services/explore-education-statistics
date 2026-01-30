@@ -460,7 +460,7 @@ jobs:
       - task: UseRubyVersion@0
         displayName: Install Ruby $(RubyVersion)
         inputs:
-          versionSpec: '>= $(RubyVersion)'
+          versionSpec: '$(RubyVersion)'
 
       - task: Cache@2
         displayName: Cache Gems
