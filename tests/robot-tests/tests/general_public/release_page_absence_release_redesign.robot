@@ -12,7 +12,7 @@ Force Tags
 ...                 Local
 ...                 Dev
 ...                 Preprod
-# ...    ReleaseRedesign
+...                 ReleaseRedesign
 #TODO: remove ReleaseRedesign tag when EES-6843 is complete
 
 
@@ -419,6 +419,7 @@ Verify Explore and Download data
 
     User checks page 'Explore and download data' data set available properties    Absence by characteristic    201,625
     ...    2012/13 to 2016/17
+    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
     user navigates to the Absence publication
     user clicks link    Explore and download data
@@ -426,6 +427,7 @@ Verify Explore and Download data
     user waits until h2 is visible    Data sets: download or create tables
     User checks page 'Explore and download data' data set available properties    Absence in PRUs    612
     ...    2013/14 to 2016/17
+    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
     user navigates to the Absence publication
     user clicks link    Explore and download data

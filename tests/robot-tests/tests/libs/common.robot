@@ -1240,6 +1240,7 @@ User checks page 'Explore and download data' data set available properties
     [Arguments]    ${data_set_name}
     ...    ${expected_row_count}
     ...    ${expected_time_period}
+    ...    ${PUBLICATION_TITLE}
     ...    ${expected_data_guidance}="${data_set_name} data guidance content"
 
     ${dataset_xpath}=    Set Variable
@@ -1274,8 +1275,8 @@ User checks page 'Explore and download data' data set available properties
 
     # Verify data guidance content
     Page Should Contain Element
-    ...    xpath=${dataset_xpath}//p[contains(normalize-space(.), "${data_set_name} data guidance content")]
-    ...    Dataset "${data_set_name}" is missing the data guidance content link
+    ...    xpath=${dataset_xpath}//p[contains(normalize-space(.), "${expected_data_guidance}")]
+    ...    Dataset "${data_set_name}" is missing the data guidance content text
 
     # Verify Data set information page link
     Page Should Contain Element
@@ -1297,4 +1298,4 @@ User checks page 'Explore and download data' data set available properties
     user waits until page finishes loading
 
     user waits until table tool wizard step is available    2    Select a data set
-    user checks previous table tool step contains    1    Publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks previous table tool step contains    1    Publication    ${PUBLICATION_TITLE}
