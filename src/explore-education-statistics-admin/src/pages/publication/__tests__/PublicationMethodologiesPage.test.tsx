@@ -1397,7 +1397,12 @@ describe('PublicationMethodologiesPage', () => {
 
         const modal = within(screen.getByRole('dialog'));
 
-        expect(modal.getByTestId('modal-title')).toBeInTheDocument();
+        const modalTitle = modal.getByTestId('modal-title');
+        expect(modalTitle).toBeInTheDocument();
+        expect(modalTitle.tagName).toBe('H2');
+        expect(
+          within(modalTitle).getByText('Remove external methodology'),
+        ).toBeInTheDocument();
 
         expect(
           modal.getByText(
