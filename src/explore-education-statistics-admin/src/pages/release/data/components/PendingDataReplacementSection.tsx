@@ -94,12 +94,10 @@ const PendingDataReplacementSection: React.FC<{
         fetchDataFile();
       }}
     >
-      <p>
-        {getCancelBodyText(
-          publicApiDataSetId !== undefined,
-          !!user?.permissions.isBauUser,
-        )}
-      </p>
+      {getCancelBodyText(
+        publicApiDataSetId !== undefined,
+        !!user?.permissions.isBauUser,
+      )}
     </ModalConfirm>
   );
 

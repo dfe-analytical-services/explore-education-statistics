@@ -15,7 +15,7 @@ import testLocationsMapping, {
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
 
@@ -755,7 +755,9 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      await act(async () => {
+        await jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -853,7 +855,9 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      await act(async () => {
+        await jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -918,7 +922,9 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         }),
       );
 
-      jest.runAllTimers();
+      await act(async () => {
+        await jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -1033,7 +1039,9 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      await act(async () => {
+        await jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -1161,7 +1169,9 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         ).not.toBeInTheDocument(),
       );
 
-      jest.runAllTimers();
+      await act(async () => {
+        await jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(
@@ -1252,7 +1262,9 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
         }),
       );
 
-      jest.runAllTimers();
+      await act(async () => {
+        await jest.runAllTimers();
+      });
 
       await waitFor(() => {
         expect(

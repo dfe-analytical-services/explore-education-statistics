@@ -1,26 +1,27 @@
-import { AuthContextTestProvider } from '@admin/contexts/AuthContext';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContentHubContext';
-import { testComments } from '@admin/components/comments/__data__/testComments';
-import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
-import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
-import { ReleaseContentBlockLockEvent } from '@admin/services/hubs/releaseContentHub';
-import connectionMock from '@admin/services/hubs/utils/__mocks__/connectionMock';
-import { GlobalPermissions } from '@admin/services/permissionService';
-import _releaseContentService, {
-  ReleaseContent as ReleaseContentType,
-} from '@admin/services/releaseContentService';
-import _releaseContentCommentService from '@admin/services/releaseContentCommentService';
-import { UserDetails } from '@admin/services/types/user';
-import generateReleaseContent from '@admin-test/generators/releaseContentGenerators';
 import {
   generateEditableContentBlock,
   generateEditableDataBlock,
   generateEditableEmbedBlock,
 } from '@admin-test/generators/contentGenerators';
+import generateReleaseContent from '@admin-test/generators/releaseContentGenerators';
+import { testComments } from '@admin/components/comments/__data__/testComments';
+import { AuthContextTestProvider } from '@admin/contexts/AuthContext';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContentHubContext';
+import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
+import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
+import { ReleaseContentBlockLockEvent } from '@admin/services/hubs/releaseContentHub';
+import connectionMock from '@admin/services/hubs/utils/__mocks__/connectionMock';
+import { GlobalPermissions } from '@admin/services/permissionService';
+import _releaseContentCommentService from '@admin/services/releaseContentCommentService';
+import _releaseContentService, {
+  ReleaseContent as ReleaseContentType,
+} from '@admin/services/releaseContentService';
+import { UserDetails } from '@admin/services/types/user';
 import mockDate from '@common-test/mockDate';
 import { HubConnectionState } from '@microsoft/signalr';
 import {
+  act,
   render as baseRender,
   RenderResult,
   screen,
@@ -29,7 +30,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
@@ -46,6 +47,10 @@ const releaseContentCommentService =
   >;
 
 describe('ReleaseEditableBlock', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   const testReleaseContent = generateReleaseContent({});
 
   const testCurrentUser: UserDetails = {
@@ -60,7 +65,7 @@ describe('ReleaseEditableBlock', () => {
     email: 'rob@test.com',
   };
 
-  test('renders HTML block', () => {
+  test('renders HTML block', async () => {
     render(
       <ReleaseEditableBlock
         label="Test block"
@@ -73,7 +78,7 @@ describe('ReleaseEditableBlock', () => {
     );
 
     expect(
-      screen.getByText('Content block body', { selector: 'p' }),
+      await screen.findByText('Content block body', { selector: 'p' }),
     ).toBeInTheDocument();
 
     expect(
@@ -81,7 +86,7 @@ describe('ReleaseEditableBlock', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders HTML block with correct image urls', () => {
+  test('renders HTML block with correct image urls', async () => {
     const image1SrcSet =
       '/api/releases/release-1/images/some-image-id-100 100w, ' +
       '/api/releases/release-1/images/some-image-id-200 200w, ' +
@@ -110,7 +115,7 @@ describe('ReleaseEditableBlock', () => {
       />,
     );
 
-    expect(screen.getByAltText('Test image 1')).toHaveAttribute(
+    expect(await screen.findByAltText('Test image 1')).toHaveAttribute(
       'src',
       '/api/releases/release-1/images/some-image-id',
     );
@@ -131,7 +136,7 @@ describe('ReleaseEditableBlock', () => {
     );
   });
 
-  test('renders editing state for current user', () => {
+  test('renders editing state for current user', async () => {
     mockDate.set('2022-02-16T12:05:00Z');
 
     render(
@@ -149,10 +154,10 @@ describe('ReleaseEditableBlock', () => {
       />,
     );
 
-    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(await screen.findByRole('textbox')).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Save & close' }),
+      await screen.findByRole('button', { name: 'Save & close' }),
     ).toBeInTheDocument();
 
     // This message only shows for other users
@@ -215,7 +220,7 @@ describe('ReleaseEditableBlock', () => {
     expect(screen.getByRole('textbox')).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Save & close' }),
+      await screen.findByRole('button', { name: 'Save & close' }),
     ).toBeInTheDocument();
 
     // This message only shows for other users
@@ -267,10 +272,10 @@ describe('ReleaseEditableBlock', () => {
     });
 
     expect(
-      screen.getByRole('button', { name: 'Edit block' }),
+      await screen.findByRole('button', { name: 'Edit block' }),
     ).not.toBeDisabled();
     expect(
-      screen.getByRole('button', { name: 'Remove block' }),
+      await screen.findByRole('button', { name: 'Remove block' }),
     ).not.toBeDisabled();
   });
 
@@ -298,7 +303,7 @@ describe('ReleaseEditableBlock', () => {
       />,
     );
 
-    expect(screen.getByText('Save & close')).toBeInTheDocument();
+    expect(await screen.findByText('Save & close')).toBeInTheDocument();
 
     await userEvent.type(screen.getByRole('textbox'), 'test');
 
@@ -309,10 +314,10 @@ describe('ReleaseEditableBlock', () => {
     });
 
     expect(
-      screen.getByRole('button', { name: 'Edit block' }),
+      await screen.findByRole('button', { name: 'Edit block' }),
     ).not.toBeDisabled();
     expect(
-      screen.getByRole('button', { name: 'Remove block' }),
+      await screen.findByRole('button', { name: 'Remove block' }),
     ).not.toBeDisabled();
 
     jest.useFakeTimers();
@@ -328,14 +333,14 @@ describe('ReleaseEditableBlock', () => {
     ).not.toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Edit block' }),
+      await screen.findByRole('button', { name: 'Edit block' }),
     ).not.toBeDisabled();
     expect(
-      screen.getByRole('button', { name: 'Remove block' }),
+      await screen.findByRole('button', { name: 'Remove block' }),
     ).not.toBeDisabled();
   });
 
-  test('renders locked state when already locked by other user', () => {
+  test('renders locked state when already locked by other user', async () => {
     mockDate.set('2022-02-16T12:09:00Z');
 
     render(
@@ -354,7 +359,7 @@ describe('ReleaseEditableBlock', () => {
     );
 
     expect(
-      screen.getByText(
+      await screen.findByText(
         'Rob Rowe (rob@test.com) is currently editing this block (last updated 12:00)',
       ),
     ).toBeInTheDocument();
@@ -372,7 +377,7 @@ describe('ReleaseEditableBlock', () => {
     ).not.toBeInTheDocument();
   });
 
-  test("renders unlocked state when other user's lock has already expired", () => {
+  test("renders unlocked state when other user's lock has already expired", async () => {
     // Lock has already expired
     mockDate.set('2022-02-16T12:11:00Z');
 
@@ -396,10 +401,10 @@ describe('ReleaseEditableBlock', () => {
     ).not.toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Edit block' }),
+      await screen.findByRole('button', { name: 'Edit block' }),
     ).not.toBeDisabled();
     expect(
-      screen.getByRole('button', { name: 'Remove block' }),
+      await screen.findByRole('button', { name: 'Remove block' }),
     ).not.toBeDisabled();
 
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
@@ -428,7 +433,7 @@ describe('ReleaseEditableBlock', () => {
     );
 
     expect(
-      screen.getByText(
+      await screen.findByText(
         'Rob Rowe (rob@test.com) is currently editing this block (last updated 12:00)',
       ),
     ).toBeInTheDocument();
@@ -452,11 +457,12 @@ describe('ReleaseEditableBlock', () => {
       expect(
         screen.queryByText(/This block was locked for editing/),
       ).not.toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', { name: 'Edit block' }),
+      ).not.toBeAriaDisabled();
     });
 
-    expect(
-      screen.getByRole('button', { name: 'Edit block' }),
-    ).not.toBeAriaDisabled();
     expect(
       screen.getByRole('button', { name: 'Remove block' }),
     ).not.toBeAriaDisabled();
@@ -505,7 +511,7 @@ describe('ReleaseEditableBlock', () => {
 
     expect(screen.getByRole('textbox')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Save & close' }),
+      await screen.findByRole('button', { name: 'Save & close' }),
     ).toBeInTheDocument();
 
     expect(connectionMock.invoke).not.toHaveBeenCalled();
@@ -531,10 +537,10 @@ describe('ReleaseEditableBlock', () => {
     ).not.toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Edit block' }),
+      await screen.findByRole('button', { name: 'Edit block' }),
     ).not.toBeDisabled();
     expect(
-      screen.getByRole('button', { name: 'Remove block' }),
+      await screen.findByRole('button', { name: 'Remove block' }),
     ).not.toBeDisabled();
 
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
@@ -575,7 +581,7 @@ describe('ReleaseEditableBlock', () => {
     );
 
     expect(
-      screen.getByText(
+      await screen.findByText(
         'Rob Rowe (rob@test.com) is currently editing this block (last updated 12:00)',
       ),
     ).toBeInTheDocument();
@@ -595,15 +601,17 @@ describe('ReleaseEditableBlock', () => {
     // Lock is about to expire
     mockDate.set('2022-02-16T12:08:00Z');
 
-    // Simulates lock being renewed
-    onContentBlockLocked({
-      id: 'content-block-id',
-      releaseVersionId: 'release-1',
-      sectionId: 'section-1',
-      locked: '2022-02-16T12:08:00Z',
-      lockedUntil: '2022-02-16T12:18:00Z',
-      lockedBy: testOtherUser,
-    });
+    await act(async () =>
+      // Simulates lock being renewed
+      onContentBlockLocked({
+        id: 'content-block-id',
+        releaseVersionId: 'release-1',
+        sectionId: 'section-1',
+        locked: '2022-02-16T12:08:00Z',
+        lockedUntil: '2022-02-16T12:18:00Z',
+        lockedBy: testOtherUser,
+      }),
+    );
 
     await waitFor(() => {
       expect(
@@ -627,10 +635,10 @@ describe('ReleaseEditableBlock', () => {
   });
 
   test('re-renders locked state when current user interacts with block before expiry', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
     // Lock is about to expire
     mockDate.set('2022-02-16T12:09:00Z');
-
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
     jest.useFakeTimers({
       doNotFake: ['Date'],
@@ -655,19 +663,21 @@ describe('ReleaseEditableBlock', () => {
       return Promise.resolve();
     });
 
-    render(
-      <ReleaseEditableBlock
-        label="Test block"
-        publicationId="publication-1"
-        releaseVersionId="release-1"
-        sectionId="section-1"
-        sectionKey="content"
-        block={generateEditableContentBlock({
-          locked: '2022-02-16T12:00:00Z',
-          lockedUntil: '2022-02-16T12:10:00Z',
-          lockedBy: testCurrentUser,
-        })}
-      />,
+    await act(async () =>
+      render(
+        <ReleaseEditableBlock
+          label="Test block"
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          sectionId="section-1"
+          sectionKey="content"
+          block={generateEditableContentBlock({
+            locked: '2022-02-16T12:00:00Z',
+            lockedUntil: '2022-02-16T12:10:00Z',
+            lockedBy: testCurrentUser,
+          })}
+        />,
+      ),
     );
 
     expect(
@@ -691,7 +701,9 @@ describe('ReleaseEditableBlock', () => {
     // Interact with textbox
     await user.type(screen.getByRole('textbox'), 'Test text');
 
-    jest.advanceTimersByTime(60_000);
+    await act(async () => {
+      jest.advanceTimersByTime(60_000);
+    });
 
     await waitFor(() => {
       expect(connectionMock.invoke).toHaveBeenCalledTimes(1);
@@ -750,23 +762,23 @@ describe('ReleaseEditableBlock', () => {
 
     mockDate.set('2022-02-16T12:00:00Z');
 
-    // Simulates locking of block by other user
-    onContentBlockLocked({
-      id: 'content-block-id',
-      releaseVersionId: 'release-1',
-      sectionId: 'section-1',
-      locked: '2022-02-16T12:00:00Z',
-      lockedUntil: '2022-02-16T12:10:00Z',
-      lockedBy: testOtherUser,
+    await act(async () => {
+      // Simulates locking of block by other user
+      onContentBlockLocked({
+        id: 'content-block-id',
+        releaseVersionId: 'release-1',
+        sectionId: 'section-1',
+        locked: '2022-02-16T12:00:00Z',
+        lockedUntil: '2022-02-16T12:10:00Z',
+        lockedBy: testOtherUser,
+      });
     });
 
-    await waitFor(() => {
-      expect(
-        screen.getByText(
-          'Rob Rowe (rob@test.com) is currently editing this block (last updated 12:00)',
-        ),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText(
+        'Rob Rowe (rob@test.com) is currently editing this block (last updated 12:00)',
+      ),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', { name: 'Edit block' }),
@@ -834,7 +846,7 @@ describe('ReleaseEditableBlock', () => {
     >('release-1', 'section-1', 'content-block-id');
   });
 
-  test('renders Embed block', () => {
+  test('renders Embed block', async () => {
     render(
       <ReleaseEditableBlock
         label="Test block"
@@ -846,13 +858,13 @@ describe('ReleaseEditableBlock', () => {
       />,
     );
 
-    expect(screen.getByTitle('Embed block title')).toHaveAttribute(
+    expect(await screen.findByTitle('Embed block title')).toHaveAttribute(
       'src',
       'https://department-for-education.shinyapps.io/test-dashboard',
     );
   });
 
-  test('renders data block', () => {
+  test('renders data block', async () => {
     render(
       <ReleaseEditableBlock
         label="Test block"
@@ -864,11 +876,11 @@ describe('ReleaseEditableBlock', () => {
       />,
     );
 
-    expect(screen.getByText('Edit data block')).toBeInTheDocument();
+    expect(await screen.findByText('Edit data block')).toBeInTheDocument();
   });
 
   describe('data block comments', () => {
-    test('renders comments correctly', () => {
+    test('renders comments correctly', async () => {
       render(
         <ReleaseEditableBlock
           label="Test block"
@@ -881,7 +893,7 @@ describe('ReleaseEditableBlock', () => {
       );
 
       expect(
-        screen.getByRole('button', { name: 'Add comment' }),
+        await screen.findByRole('button', { name: 'Add comment' }),
       ).toBeInTheDocument();
 
       const unresolvedComments = within(
@@ -1105,7 +1117,7 @@ describe('ReleaseEditableBlock', () => {
   });
 
   describe('embed block comments', () => {
-    test('renders comments correctly', () => {
+    test('renders comments correctly', async () => {
       render(
         <ReleaseEditableBlock
           label="Test block"
@@ -1118,7 +1130,7 @@ describe('ReleaseEditableBlock', () => {
       );
 
       expect(
-        screen.getByRole('button', { name: 'Add comment' }),
+        await screen.findByRole('button', { name: 'Add comment' }),
       ).toBeInTheDocument();
 
       const unresolvedComments = within(

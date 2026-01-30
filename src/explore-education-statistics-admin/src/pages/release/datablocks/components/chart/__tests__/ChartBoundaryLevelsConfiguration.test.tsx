@@ -177,7 +177,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
     expect(row2BoundaryLevels[3]).toHaveValue('3');
   });
 
-  test('renders data sets with initial boundary levels', () => {
+  test('renders data sets with initial boundary levels', async () => {
     render(
       <ChartBoundaryLevelsConfiguration
         map={{
@@ -206,7 +206,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Default boundary level')).toHaveValue(
+    expect(await screen.findByLabelText('Default boundary level')).toHaveValue(
       String(testMeta.boundaryLevels[2].id),
     );
     const rows = screen.getAllByRole('row');
