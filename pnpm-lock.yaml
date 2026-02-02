@@ -575,8 +575,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0(date-fns@3.6.0)
       domhandler:
-        specifier: ^4.2.2
-        version: 4.3.1
+        specifier: ^5.0.3
+        version: 5.0.3
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
@@ -15184,7 +15184,7 @@ packages:
     dependencies:
       universalify: 2.0.0
     optionalDependencies:
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
 
   /jsonify@0.0.1:
     resolution: {integrity: sha512-2/Ki0GcmuqSrgFyelQq9M05y7PS0mEwuIzrf3f1fPqkVDVRvZrPZtVSMHxdgo8Aq0sxAOb/cr2aqqA3LeWHVPg==}

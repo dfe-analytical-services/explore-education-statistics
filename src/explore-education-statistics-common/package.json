@@ -19,7 +19,7 @@
     "cross-fetch": "^3.0.6",
     "date-fns": "^3.6.0",
     "date-fns-tz": "^3.2.0",
-    "domhandler": "^4.2.2",
+    "domhandler": "^5.0.3",
     "geojson": "^0.5.0",
     "govuk-frontend": "^5.11.1",
     "html-react-parser": "^5.2.11",

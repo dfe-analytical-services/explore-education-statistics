@@ -10,7 +10,7 @@ import sanitizeHtml, {
 import formatContentLinkUrl from '@common/utils/url/formatContentLinkUrl';
 import getUrlAttributes from '@common/utils/url/getUrlAttributes';
 import classNames from 'classnames';
-import { Element } from 'domhandler/lib/node';
+import { Element, isTag } from 'domhandler';
 import parseHtmlString, {
   DOMNode,
   attributesToProps,
@@ -56,7 +56,7 @@ export default function ContentHtml({
 
   const parsedContent = parseHtmlString(cleanHtml, {
     replace: (node: DOMNode) => {
-      if (!(node instanceof Element)) {
+      if (!isTag(node)) {
         return undefined;
       }
 
@@ -122,12 +122,14 @@ export default function ContentHtml({
 
       if (node.name === 'h3') {
         const text = domToReact(node.children as DOMNode[]);
-        if (typeof text === 'string') {
+        return typeof text === 'string' ? (
           // generate an id optionally using 4 chars of the block id to ensure uniqueness
           <h3 id={generateIdFromHeading(text, blockId?.substring(0, 4))}>
             {text}
-          </h3>;
-        }
+          </h3>
+        ) : (
+          node
+        );
       }
 
       return undefined;
@@ -153,7 +155,7 @@ function renderTable(element: Element): ReactElement | undefined {
   const { children } = element;
 
   const table = children.find(
-    child => child instanceof Element && child.name === 'table',
+    child => isTag(child) && child.name === 'table',
   ) as Element | undefined;
 
   if (!table) {
@@ -161,7 +163,7 @@ function renderTable(element: Element): ReactElement | undefined {
   }
 
   const figcaption = children.find(
-    child => child instanceof Element && child.name === 'figcaption',
+    child => isTag(child) && child.name === 'figcaption',
   ) as Element | undefined;
 
   return (
