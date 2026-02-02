@@ -67,8 +67,11 @@ const ReleaseDataReorderSection = ({
         <h3>Before you start</h3>
         <p>
           Reorder the groups and options for filters and indicators on this
-          page. This order will be reflected in the table tool on the public
-          website.
+          page. Reorder by using drag and drop or by pressing the up and down
+          arrows next to each item.
+        </p>
+        <p>
+          This order will be reflected in the table tool on the public website.
         </p>
       </InsetText>
 

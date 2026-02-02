@@ -39,6 +39,10 @@ export default function PublicationReleaseSeriesPage() {
         reordered.
       </p>
       <p>
+        Reorder releases order using drag and drop or by pressing the up and
+        down arrows next to each release.
+      </p>
+      <p>
         Legacy releases which link to extenal pages outside the service can be
         created, edited, deleted, and are included in the release order.
       </p>
