@@ -1,10 +1,10 @@
-import { Helmet } from 'react-helmet';
 import React from 'react';
+import { Head } from '@unhead/react';
 
 export default function PageMetaTitle({ title }: { title: string }) {
   return (
-    <Helmet>
+    <Head>
       <title>{`${title} - Explore education statistics - GOV.UK`}</title>
-    </Helmet>
+    </Head>
   );
 }
