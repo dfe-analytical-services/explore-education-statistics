@@ -1389,6 +1389,8 @@
     "adminAllowedOrigins": "[union(variables('baseAdminAllowedOrigins'), parameters('additionalAdminAllowedOrigins'))]",
     "basePublicAllowedOrigins": [
       "[concat('https://', parameters('domain'))]",
+      // TODO EES-6883 - remove the entry below when no longer using the temporary URLs for Azure Front Door testing.
+      "[concat('https://', replace(parameters('domain'), '.explore-education', 'afd.explore-education'))]",
       "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]"
       // NOTE: reference() cannot be used in variables, so the default FrontDoor hostname cannot be put here. It must added in place wherever we use publicAllowedOrigins
     ],
