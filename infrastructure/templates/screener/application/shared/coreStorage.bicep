@@ -15,7 +15,7 @@ var coreStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${
 var coreStorageConnectionStringSecretKey = 'ees-core-storage-connectionstring'
 var coreStorageAccessKey = 'ees-core-storage-access-key'
 
-module storeCoreStorageConnectionString '../../../public-api/components/keyVaultSecret.bicep' = {
+module storeCoreStorageConnectionString '../../../common/components/key-vault/keyVaultSecret.bicep' = {
   name: 'storeCoreStorageConnectionString'
   params: {
     keyVaultName: resourceNames.existingResources.keyVault
@@ -24,7 +24,7 @@ module storeCoreStorageConnectionString '../../../public-api/components/keyVault
   }
 }
 
-module storeCoreStorageAccessKey '../../../public-api/components/keyVaultSecret.bicep' = {
+module storeCoreStorageAccessKey '../../../common/components/key-vault/keyVaultSecret.bicep' = {
   name: 'storeCoreStorageAccessKey'
   params: {
     keyVaultName: resourceNames.existingResources.keyVault

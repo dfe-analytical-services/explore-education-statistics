@@ -15,11 +15,11 @@ param subscription string
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
-@description('A set of tags with which to tag the resource in Azure.')
-param tagValues object
-
 @description('The Id of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
+
+@description('A set of tags with which to tag the resource in Azure.')
+param tagValues object
 
 var frontDoorName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}'
 
