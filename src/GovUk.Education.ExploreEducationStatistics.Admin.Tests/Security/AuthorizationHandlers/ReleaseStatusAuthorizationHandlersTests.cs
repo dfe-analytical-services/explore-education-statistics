@@ -162,12 +162,29 @@ public class ReleaseStatusAuthorizationHandlersTests
             IReleasePublishingStatusRepository releasePublishingStatusRepository
         )
         {
+            var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
+
+            var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(context);
+
+            var userPublicationRoleRepository = new UserPublicationRoleRepository(
+                contentDbContext: context,
+                newPermissionsSystemHelper: newPermissionsSystemHelper,
+                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            );
+
+            var userReleaseRoleRepository = new UserReleaseRoleRepository(
+                contentDbContext: context,
+                userPublicationRoleRepository: userPublicationRoleRepository,
+                newPermissionsSystemHelper: newPermissionsSystemHelper,
+                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            );
+
             return new MarkReleaseAsDraftAuthorizationHandler(
                 releasePublishingStatusRepository: releasePublishingStatusRepository,
                 new AuthorizationHandlerService(
                     releaseVersionRepository: new ReleaseVersionRepository(context),
-                    userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext: context),
-                    userReleaseRoleRepository: new UserReleaseRoleRepository(contentDbContext: context),
+                    userPublicationRoleRepository: userPublicationRoleRepository,
+                    userReleaseRoleRepository: userReleaseRoleRepository,
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)
                 )
             );
@@ -310,12 +327,29 @@ public class ReleaseStatusAuthorizationHandlersTests
             IReleasePublishingStatusRepository releasePublishingStatusRepository
         )
         {
+            var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
+
+            var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(context);
+
+            var userPublicationRoleRepository = new UserPublicationRoleRepository(
+                contentDbContext: context,
+                newPermissionsSystemHelper: newPermissionsSystemHelper,
+                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            );
+
+            var userReleaseRoleRepository = new UserReleaseRoleRepository(
+                contentDbContext: context,
+                userPublicationRoleRepository: userPublicationRoleRepository,
+                newPermissionsSystemHelper: newPermissionsSystemHelper,
+                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            );
+
             return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
                 releasePublishingStatusRepository: releasePublishingStatusRepository,
                 new AuthorizationHandlerService(
                     releaseVersionRepository: new ReleaseVersionRepository(context),
-                    userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext: context),
-                    userReleaseRoleRepository: new UserReleaseRoleRepository(contentDbContext: context),
+                    userPublicationRoleRepository: userPublicationRoleRepository,
+                    userReleaseRoleRepository: userReleaseRoleRepository,
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)
                 )
             );
@@ -430,12 +464,29 @@ public class ReleaseStatusAuthorizationHandlersTests
             IReleasePublishingStatusRepository releasePublishingStatusRepository
         )
         {
+            var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
+
+            var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(context);
+
+            var userPublicationRoleRepository = new UserPublicationRoleRepository(
+                contentDbContext: context,
+                newPermissionsSystemHelper: newPermissionsSystemHelper,
+                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            );
+
+            var userReleaseRoleRepository = new UserReleaseRoleRepository(
+                contentDbContext: context,
+                userPublicationRoleRepository: userPublicationRoleRepository,
+                newPermissionsSystemHelper: newPermissionsSystemHelper,
+                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            );
+
             return new MarkReleaseAsApprovedAuthorizationHandler(
                 releasePublishingStatusRepository: releasePublishingStatusRepository,
                 new AuthorizationHandlerService(
                     releaseVersionRepository: new ReleaseVersionRepository(context),
-                    userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext: context),
-                    userReleaseRoleRepository: new UserReleaseRoleRepository(contentDbContext: context),
+                    userPublicationRoleRepository: userPublicationRoleRepository,
+                    userReleaseRoleRepository: userReleaseRoleRepository,
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)
                 )
             );

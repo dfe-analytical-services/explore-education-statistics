@@ -1,169 +1,109 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using LinqToDB;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-// This class will mostly likely remain but be amended slightly in EES-6196, when we no longer have to cater for the old roles.
-public class NewPermissionsSystemHelper(
-    IUserPublicationRoleRepository userPublicationRoleRepository,
-    IUserReleaseRoleRepository userReleaseRoleRepository
-) : INewPermissionsSystemHelper
+// This class will be amended slightly in EES-6196, when we no longer have to cater for the old roles.
+// I envisage that the 'DetermineNewPermissionsSystemChanges' logic will be changed/moved into the UserPublicationRoleRepository, and
+// the 'DetermineNewPermissionsSystemRoleToDelete' method will be removed entirely. The reason the former will still be required,
+// is to assist in determining when a NEW permissions system publication role will need upgrading from Drafter to Approver.
+public class NewPermissionsSystemHelper : INewPermissionsSystemHelper
 {
-    public async Task<(
+    public (
         PublicationRole? newSystemPublicationRoleToRemove,
         PublicationRole? newSystemPublicationRoleToCreate
-    )> DetermineNewPermissionsSystemChanges(PublicationRole publicationRoleToCreate, Guid userId, Guid publicationId)
+    ) DetermineNewPermissionsSystemChanges(
+        HashSet<PublicationRole> existingPublicationRoles,
+        PublicationRole publicationRoleToCreate
+    )
     {
-        var existingUserPublicationRoles = (
-            await userPublicationRoleRepository.GetAllRolesByUserAndPublication(
-                userId: userId,
-                publicationId: publicationId,
-                includeNewPermissionsSystemRoles: true
-            )
-        ).ToHashSet();
+        var publicationRoleToCreateNewSystemEquivalent =
+            PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole(publicationRoleToCreate);
 
-        var newPermissionsSystemPublicationRole = PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole(
-            publicationRoleToCreate
-        );
-
-        return existingUserPublicationRoles.Contains(newPermissionsSystemPublicationRole)
-            ? (null, null)
-            : DetermineRolesToRemoveAndCreate(existingUserPublicationRoles, newPermissionsSystemPublicationRole);
+        return DetermineRolesToRemoveAndCreate(existingPublicationRoles, publicationRoleToCreateNewSystemEquivalent);
     }
 
-    public async Task<(
+    public (
         PublicationRole? newSystemPublicationRoleToRemove,
         PublicationRole? newSystemPublicationRoleToCreate
-    )> DetermineNewPermissionsSystemChanges(ReleaseRole releaseRoleToCreate, Guid userId, Guid publicationId)
+    ) DetermineNewPermissionsSystemChanges(
+        HashSet<PublicationRole> existingPublicationRoles,
+        ReleaseRole releaseRoleToCreate
+    )
     {
-        var existingUserPublicationRoles = (
-            await userPublicationRoleRepository.GetAllRolesByUserAndPublication(
-                userId: userId,
-                publicationId: publicationId,
-                includeNewPermissionsSystemRoles: true
-            )
-        ).ToHashSet();
-
         if (
             !releaseRoleToCreate.TryConvertToNewPermissionsSystemPublicationRole(
-                out var newPermissionsSystemPublicationRole
+                out var releaseRoleToCreateNewSystemEquivalent
             )
         )
         {
             return (null, null);
         }
 
-        return existingUserPublicationRoles.Contains(newPermissionsSystemPublicationRole.Value)
-            ? (null, null)
-            : DetermineRolesToRemoveAndCreate(existingUserPublicationRoles, newPermissionsSystemPublicationRole);
+        return DetermineRolesToRemoveAndCreate(existingPublicationRoles, releaseRoleToCreateNewSystemEquivalent.Value);
     }
 
     // This particular method will be REMOVED in EES-6196, when we no longer have to cater for the old roles.
-    public async Task<UserPublicationRole?> DetermineNewPermissionsSystemRoleToDelete(
-        UserPublicationRole oldUserPublicationRoleToDelete
+    public PublicationRole? DetermineNewPermissionsSystemRoleToRemove(
+        HashSet<PublicationRole> existingPublicationRoles,
+        HashSet<ReleaseRole> existingReleaseRoles,
+        PublicationRole oldPublicationRoleToRemove
     )
     {
-        if (oldUserPublicationRoleToDelete.Role.IsNewPermissionsSystemPublicationRole())
+        if (oldPublicationRoleToRemove.IsNewPermissionsSystemPublicationRole())
         {
             throw new ArgumentException(
-                $"Unexpected OLD permissions system publication role: '{oldUserPublicationRoleToDelete.Role}'."
+                $"Unexpected publication role: '{oldPublicationRoleToRemove}'. Expected an OLD permissions system role."
             );
         }
 
-        var userId = oldUserPublicationRoleToDelete.UserId;
-        var publicationId = oldUserPublicationRoleToDelete.PublicationId;
-
-        var allUserPublicationRolesForPublication =
-            await userPublicationRoleRepository.ListUserPublicationRolesByUserAndPublication(
-                userId: userId,
-                publicationId: publicationId,
-                includeNewPermissionsSystemRoles: true
-            );
-
-        var oldUserPublicationRoleToDeleteExists = allUserPublicationRolesForPublication.Any(upr =>
-            upr.Id == oldUserPublicationRoleToDelete.Id
-        );
-
-        if (!oldUserPublicationRoleToDeleteExists)
+        if (!existingPublicationRoles.Contains(oldPublicationRoleToRemove))
         {
             throw new ArgumentException(
-                $"User does not have the publication role '{oldUserPublicationRoleToDelete.Role}' assigned to the publication."
+                $"The publication role '{oldPublicationRoleToRemove}' is not in the existing list of publication roles."
             );
         }
 
         var equivalentNewPermissionsSystemPublicationRoleToDelete =
-            PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole(oldUserPublicationRoleToDelete.Role);
+            PublicationRoleUtils.ConvertToNewPermissionsSystemPublicationRole(oldPublicationRoleToRemove);
 
-        var equivalentNewPermissionsSystemPublicationRoleToDeleteExists = allUserPublicationRolesForPublication.Any(
-            upr => upr.Role == equivalentNewPermissionsSystemPublicationRoleToDelete
-        );
-
-        if (!equivalentNewPermissionsSystemPublicationRoleToDeleteExists)
+        if (!existingPublicationRoles.Contains(equivalentNewPermissionsSystemPublicationRoleToDelete))
         {
             return null;
         }
 
-        var remainingPublicationRolesForPublication = allUserPublicationRolesForPublication
-            .Where(upr => upr.Id != oldUserPublicationRoleToDelete.Id)
-            .Select(upr => upr.Role)
-            .ToHashSet();
+        var remainingPublicationRoles = existingPublicationRoles.Except([oldPublicationRoleToRemove]).ToHashSet();
 
-        var allReleaseRolesForPublication = (
-            await userReleaseRoleRepository.GetAllRolesByUserAndPublication(
-                userId: userId,
-                publicationId: publicationId
-            )
-        ).ToHashSet();
-
-        var shouldDeleteNewPermissionsSystemPublicationRole = ShouldDeleteNewPermissionsSystemPublicationRole(
+        var shouldRemoveNewPermissionsSystemPublicationRole = ShouldRemoveNewPermissionsSystemPublicationRole(
             newPermissionsSystemPublicationRoleToCheck: equivalentNewPermissionsSystemPublicationRoleToDelete,
-            remainingPublicationRoles: remainingPublicationRolesForPublication,
-            remainingReleaseRoles: allReleaseRolesForPublication
+            remainingPublicationRoles: remainingPublicationRoles,
+            remainingReleaseRoles: existingReleaseRoles
         );
 
-        return shouldDeleteNewPermissionsSystemPublicationRole
-            ? await userPublicationRoleRepository.GetUserPublicationRole(
-                userId: userId,
-                publicationId: publicationId,
-                role: equivalentNewPermissionsSystemPublicationRoleToDelete,
-                includeNewPermissionsSystemRoles: true
-            )
+        return shouldRemoveNewPermissionsSystemPublicationRole
+            ? equivalentNewPermissionsSystemPublicationRoleToDelete
             : null;
     }
 
     // This particular method will be REMOVED in EES-6196, when we no longer have to cater for the old roles.
-    public async Task<UserPublicationRole?> DetermineNewPermissionsSystemRoleToDelete(
-        UserReleaseRole userReleaseRoleToDelete
+    public PublicationRole? DetermineNewPermissionsSystemRoleToRemove(
+        HashSet<PublicationRole> existingPublicationRoles,
+        HashSet<ReleaseRole> existingReleaseRoles,
+        ReleaseRole releaseRoleToRemove
     )
     {
-        var userId = userReleaseRoleToDelete.UserId;
-        var publicationId = userReleaseRoleToDelete.ReleaseVersion.Release.PublicationId;
-
-        var allUserReleaseRolesForPublication =
-            await userReleaseRoleRepository.ListUserReleaseRolesByUserAndPublication(
-                userId: userId,
-                publicationId: publicationId
-            );
-
-        var oldUserReleaseRoleToDeleteExists = allUserReleaseRolesForPublication.Any(urr =>
-            urr.Id == userReleaseRoleToDelete.Id
-        );
-
-        if (!oldUserReleaseRoleToDeleteExists)
+        if (!existingReleaseRoles.Contains(releaseRoleToRemove))
         {
             throw new ArgumentException(
-                $"User does not have the release role '{userReleaseRoleToDelete.Role}' assigned to the publication."
+                $"The release role '{releaseRoleToRemove}' is not in the existing list of release roles."
             );
         }
 
         if (
-            !userReleaseRoleToDelete.Role.TryConvertToNewPermissionsSystemPublicationRole(
+            !releaseRoleToRemove.TryConvertToNewPermissionsSystemPublicationRole(
                 out var equivalentNewPermissionsSystemPublicationRoleToDelete
             )
         )
@@ -171,41 +111,21 @@ public class NewPermissionsSystemHelper(
             return null;
         }
 
-        var allPublicationRolesForPublication = (
-            await userPublicationRoleRepository.GetAllRolesByUserAndPublication(
-                userId: userId,
-                publicationId: publicationId,
-                includeNewPermissionsSystemRoles: true
-            )
-        ).ToHashSet();
-
-        var equivalentNewPermissionsSystemPublicationRoleToDeleteExists = allPublicationRolesForPublication.Any(pr =>
-            pr == equivalentNewPermissionsSystemPublicationRoleToDelete
-        );
-
-        if (!equivalentNewPermissionsSystemPublicationRoleToDeleteExists)
+        if (!existingPublicationRoles.Contains(equivalentNewPermissionsSystemPublicationRoleToDelete.Value))
         {
             return null;
         }
 
-        var remainingReleaseRolesForPublication = allUserReleaseRolesForPublication
-            .Where(urr => urr.Id != userReleaseRoleToDelete.Id)
-            .Select(urr => urr.Role)
-            .ToHashSet();
+        var remainingReleaseRoles = existingReleaseRoles.Except([releaseRoleToRemove]).ToHashSet();
 
-        var shouldDeleteNewPermissionsSystemPublicationRole = ShouldDeleteNewPermissionsSystemPublicationRole(
+        var shouldRemoveNewPermissionsSystemPublicationRole = ShouldRemoveNewPermissionsSystemPublicationRole(
             newPermissionsSystemPublicationRoleToCheck: equivalentNewPermissionsSystemPublicationRoleToDelete.Value,
-            remainingPublicationRoles: allPublicationRolesForPublication,
-            remainingReleaseRoles: remainingReleaseRolesForPublication
+            remainingPublicationRoles: existingPublicationRoles,
+            remainingReleaseRoles: remainingReleaseRoles
         );
 
-        return shouldDeleteNewPermissionsSystemPublicationRole
-            ? await userPublicationRoleRepository.GetUserPublicationRole(
-                userId: userId,
-                publicationId: publicationId,
-                role: equivalentNewPermissionsSystemPublicationRoleToDelete.Value,
-                includeNewPermissionsSystemRoles: true
-            )
+        return shouldRemoveNewPermissionsSystemPublicationRole
+            ? equivalentNewPermissionsSystemPublicationRoleToDelete.Value
             : null;
     }
 
@@ -213,34 +133,43 @@ public class NewPermissionsSystemHelper(
         PublicationRole? newSystemPublicationRoleToRemove,
         PublicationRole? newSystemPublicationRoleToCreate
     ) DetermineRolesToRemoveAndCreate(
-        HashSet<PublicationRole> existingUserPublicationRoles,
-        PublicationRole? newPermissionsSystemPublicationRole
+        HashSet<PublicationRole> existingPublicationRoles,
+        PublicationRole resourceRoleToCreateNewSystemEquivalent
     )
     {
-        return newPermissionsSystemPublicationRole switch
+        if (!resourceRoleToCreateNewSystemEquivalent.IsNewPermissionsSystemPublicationRole())
         {
-            PublicationRole.Approver when existingUserPublicationRoles.Contains(PublicationRole.Drafter) => (
+            throw new ArgumentException(
+                $"Unexpected publication role: '{resourceRoleToCreateNewSystemEquivalent}'. Only NEW permissions system roles should be passed into this method."
+            );
+        }
+
+        if (existingPublicationRoles.Contains(resourceRoleToCreateNewSystemEquivalent))
+        {
+            return (null, null);
+        }
+
+        return resourceRoleToCreateNewSystemEquivalent switch
+        {
+            PublicationRole.Approver when existingPublicationRoles.Contains(PublicationRole.Drafter) => (
                 PublicationRole.Drafter,
                 PublicationRole.Approver
             ),
 
             PublicationRole.Approver => (null, PublicationRole.Approver),
 
-            PublicationRole.Drafter when existingUserPublicationRoles.Contains(PublicationRole.Approver) => (
-                null,
-                null
-            ),
+            PublicationRole.Drafter when existingPublicationRoles.Contains(PublicationRole.Approver) => (null, null),
 
             PublicationRole.Drafter => (null, PublicationRole.Drafter),
 
             _ => throw new ArgumentException(
-                $"Unexpected new permissions system publication role: '{newPermissionsSystemPublicationRole}'"
+                $"Unexpected new permissions system publication role: '{resourceRoleToCreateNewSystemEquivalent}'"
             ),
         };
     }
 
     // This particular method will be REMOVED in EES-6196, when we no longer have to cater for the old roles.
-    private static bool ShouldDeleteNewPermissionsSystemPublicationRole(
+    private static bool ShouldRemoveNewPermissionsSystemPublicationRole(
         PublicationRole newPermissionsSystemPublicationRoleToCheck,
         HashSet<PublicationRole> remainingPublicationRoles,
         HashSet<ReleaseRole> remainingReleaseRoles

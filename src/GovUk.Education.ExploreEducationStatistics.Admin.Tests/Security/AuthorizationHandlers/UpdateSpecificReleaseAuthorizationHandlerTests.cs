@@ -56,13 +56,28 @@ public class UpdateSpecificReleaseAuthorizationHandlerTests
             contentDbContext.Releases.Add(release);
             contentDbContext.SaveChanges();
 
+            var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
+
+            var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(contentDbContext);
+
+            var userPublicationRoleRepository = new UserPublicationRoleRepository(
+                contentDbContext: contentDbContext,
+                newPermissionsSystemHelper: newPermissionsSystemHelper,
+                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            );
+
+            var userReleaseRoleRepository = new UserReleaseRoleRepository(
+                contentDbContext: contentDbContext,
+                userPublicationRoleRepository: userPublicationRoleRepository,
+                newPermissionsSystemHelper: newPermissionsSystemHelper,
+                userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+            );
+
             return new UpdateSpecificReleaseAuthorizationHandler(
                 new AuthorizationHandlerService(
                     releaseVersionRepository: new ReleaseVersionRepository(contentDbContext),
-                    userReleaseRoleRepository: new UserReleaseRoleRepository(contentDbContext: contentDbContext),
-                    userPublicationRoleRepository: new UserPublicationRoleRepository(
-                        contentDbContext: contentDbContext
-                    ),
+                    userReleaseRoleRepository: userReleaseRoleRepository,
+                    userPublicationRoleRepository: userPublicationRoleRepository,
                     preReleaseService: Mock.Of<IPreReleaseService>(Strict)
                 )
             );

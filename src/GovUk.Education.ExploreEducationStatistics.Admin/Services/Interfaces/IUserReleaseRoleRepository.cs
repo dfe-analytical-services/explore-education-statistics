@@ -29,6 +29,7 @@ public interface IUserReleaseRoleRepository
         CancellationToken cancellationToken = default
     );
 
+    /// <param name="resourceRoleFilter">Filter resource roles by their status (see <see cref="ResourceRoleFilter"/>).</param>
     IQueryable<UserReleaseRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly);
 
     Task Remove(UserReleaseRole userReleaseRole, CancellationToken cancellationToken = default);
