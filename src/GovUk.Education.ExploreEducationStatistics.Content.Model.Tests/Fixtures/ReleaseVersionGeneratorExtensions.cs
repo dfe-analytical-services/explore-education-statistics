@@ -43,17 +43,17 @@ public static class ReleaseVersionGeneratorExtensions
 
     public static Generator<ReleaseVersion> WithPublished(
         this Generator<ReleaseVersion> generator,
-        DateTimeOffset published
+        DateTimeOffset? published
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetPublished(published));
 
     public static Generator<ReleaseVersion> WithPublishedDisplayDate(
         this Generator<ReleaseVersion> generator,
-        DateTimeOffset publishedDisplayDate
+        DateTimeOffset? publishedDisplayDate
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetPublishedDisplayDate(publishedDisplayDate));
 
     public static Generator<ReleaseVersion> WithPublishScheduled(
         this Generator<ReleaseVersion> generator,
-        DateTimeOffset publishScheduled
+        DateTimeOffset? publishScheduled
     ) => generator.ForInstance(releaseVersion => releaseVersion.SetPublishScheduled(publishScheduled));
 
     public static Generator<ReleaseVersion> WithPublishingOrganisations(
@@ -298,17 +298,17 @@ public static class ReleaseVersionGeneratorExtensions
 
     public static InstanceSetters<ReleaseVersion> SetPublished(
         this InstanceSetters<ReleaseVersion> setters,
-        DateTimeOffset published
+        DateTimeOffset? published
     ) => setters.Set(releaseVersion => releaseVersion.Published, published);
 
     public static InstanceSetters<ReleaseVersion> SetPublishedDisplayDate(
         this InstanceSetters<ReleaseVersion> setters,
-        DateTimeOffset publishedDisplayDate
+        DateTimeOffset? publishedDisplayDate
     ) => setters.Set(releaseVersion => releaseVersion.PublishedDisplayDate, publishedDisplayDate);
 
     public static InstanceSetters<ReleaseVersion> SetPublishScheduled(
         this InstanceSetters<ReleaseVersion> setters,
-        DateTimeOffset publishScheduled
+        DateTimeOffset? publishScheduled
     ) => setters.Set(releaseVersion => releaseVersion.PublishScheduled, publishScheduled);
 
     public static InstanceSetters<ReleaseVersion> SetPublishingOrganisations(
