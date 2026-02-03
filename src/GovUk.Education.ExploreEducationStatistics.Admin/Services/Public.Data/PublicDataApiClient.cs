@@ -20,6 +20,11 @@ public class PublicDataApiClient(
     IHttpClientAzureAuthenticationManager<PublicDataApiOptions> authenticationManager
 ) : IPublicDataApiClient
 {
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    };
+
     public async Task<Either<ActionResult, HttpResponseMessage>> GetDataSetVersionChanges(
         Guid dataSetId,
         string dataSetVersion,
@@ -32,7 +37,7 @@ public class PublicDataApiClient(
         );
     }
 
-    public async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(
+    public async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> QueryDataSetPost( // @MarkFix add tests
         Guid dataSetId,
         string dataSetVersion,
         string queryBody,
@@ -51,10 +56,7 @@ public class PublicDataApiClient(
         return result.OnSuccess(responseMsg =>
         {
             using var stream = responseMsg.Content.ReadAsStream();
-            return JsonSerializer.Deserialize<DataSetQueryPaginatedResultsViewModel>(
-                stream,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            )!;
+            return JsonSerializer.Deserialize<DataSetQueryPaginatedResultsViewModel>(stream, _jsonSerializerOptions)!;
         });
     }
 

@@ -19,7 +19,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using IndicatorMeta = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMeta;
 using Release = GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -100,7 +99,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.GetPageContent(_pageId);
+            var result = await service.GetPageContent(_pageId, CancellationToken.None);
 
             var viewModel = result.AssertRight();
             Assert.Equal(_pageId, viewModel.Id);
@@ -145,7 +144,7 @@ public class EducationInNumbersContentServiceTests
         await using var context = InMemoryApplicationDbContext(contextId);
         var service = BuildService(context);
 
-        var result = await service.GetPageContent(Guid.NewGuid());
+        var result = await service.GetPageContent(Guid.NewGuid(), CancellationToken.None);
         result.AssertNotFound();
     }
 
@@ -162,7 +161,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.AddSection(_pageId, 0);
+            var result = await service.AddSection(_pageId, 0, CancellationToken.None);
 
             var viewModel = result.AssertRight();
             Assert.Equal(0, viewModel.Order);
@@ -204,7 +203,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.AddSection(_pageId, 0);
+            var result = await service.AddSection(_pageId, 0, CancellationToken.None);
 
             var viewModel = result.AssertRight();
             Assert.Equal(0, viewModel.Order);
@@ -255,7 +254,12 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.UpdateSectionHeading(_pageId, _sectionAId, "New Heading");
+            var result = await service.UpdateSectionHeading(
+                _pageId,
+                _sectionAId,
+                "New Heading",
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             Assert.Equal("New Heading", viewModel.Heading);
@@ -278,7 +282,7 @@ public class EducationInNumbersContentServiceTests
         await using var context = InMemoryApplicationDbContext(contextId);
         var service = BuildService(context);
 
-        var result = await service.UpdateSectionHeading(_pageId, Guid.NewGuid(), "New Heading");
+        var result = await service.UpdateSectionHeading(_pageId, Guid.NewGuid(), "New Heading", CancellationToken.None);
         result.AssertNotFound();
     }
 
@@ -308,7 +312,7 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             var newOrder = new List<Guid> { _sectionBId, sectionCId, _sectionAId };
-            var result = await service.ReorderSections(_pageId, newOrder);
+            var result = await service.ReorderSections(_pageId, newOrder, CancellationToken.None);
 
             var viewModels = result.AssertRight();
             Assert.Equal(3, viewModels.Count);
@@ -333,7 +337,7 @@ public class EducationInNumbersContentServiceTests
         await using var context = InMemoryApplicationDbContext(contextId);
         var service = BuildService(context);
 
-        var result = await service.ReorderSections(Guid.NewGuid(), new List<Guid>());
+        var result = await service.ReorderSections(Guid.NewGuid(), new List<Guid>(), CancellationToken.None);
         result.AssertNotFound();
     }
 
@@ -358,7 +362,7 @@ public class EducationInNumbersContentServiceTests
             var service = BuildService(context);
             // Providing a different set of IDs
             var newOrder = new List<Guid> { _sectionAId, _sectionBId };
-            var result = await service.ReorderSections(_pageId, newOrder);
+            var result = await service.ReorderSections(_pageId, newOrder, CancellationToken.None);
 
             var validationResult = result.AssertBadRequestWithValidationProblem();
             validationResult.AssertHasGlobalError(
@@ -392,7 +396,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.DeleteSection(_pageId, _sectionBId);
+            var result = await service.DeleteSection(_pageId, _sectionBId, CancellationToken.None);
 
             var viewModels = result.AssertRight();
             Assert.Equal(2, viewModels.Count);
@@ -426,7 +430,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.DeleteSection(_pageId, Guid.NewGuid());
+            var result = await service.DeleteSection(_pageId, Guid.NewGuid(), CancellationToken.None);
             result.AssertNotFound();
         }
     }
@@ -446,7 +450,13 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.AddBlock(_pageId, _sectionAId, EinBlockType.HtmlBlock, 2);
+            var result = await service.AddBlock(
+                _pageId,
+                _sectionAId,
+                EinBlockType.HtmlBlock,
+                2,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             Assert.IsType<EinHtmlBlockViewModel>(viewModel);
@@ -480,7 +490,13 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             // order is null, so should be added to the end
-            var result = await service.AddBlock(_pageId, _sectionAId, EinBlockType.HtmlBlock, null);
+            var result = await service.AddBlock(
+                _pageId,
+                _sectionAId,
+                EinBlockType.HtmlBlock,
+                null,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             Assert.Equal(1, viewModel.Order);
@@ -515,7 +531,13 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             // order is null, so should be added to the end
-            var result = await service.AddBlock(_pageId, _sectionAId, EinBlockType.TileGroupBlock, null);
+            var result = await service.AddBlock(
+                _pageId,
+                _sectionAId,
+                EinBlockType.TileGroupBlock,
+                null,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             Assert.Equal(1, viewModel.Order);
@@ -558,7 +580,13 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.AddBlock(_pageId, _sectionAId, EinBlockType.HtmlBlock, 0);
+            var result = await service.AddBlock(
+                _pageId,
+                _sectionAId,
+                EinBlockType.HtmlBlock,
+                0,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             Assert.IsType<EinHtmlBlockViewModel>(viewModel);
@@ -600,7 +628,13 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             var request = new EinHtmlBlockUpdateRequest { Body = "New body" };
-            var result = await service.UpdateHtmlBlock(_pageId, _sectionAId, _blockAId, request);
+            var result = await service.UpdateHtmlBlock(
+                _pageId,
+                _sectionAId,
+                _blockAId,
+                request,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight() as EinHtmlBlockViewModel;
             Assert.NotNull(viewModel);
@@ -621,7 +655,13 @@ public class EducationInNumbersContentServiceTests
         var service = BuildService(context);
         var request = new EinHtmlBlockUpdateRequest { Body = "New body" };
 
-        var result = await service.UpdateHtmlBlock(_pageId, _sectionAId, Guid.NewGuid(), request);
+        var result = await service.UpdateHtmlBlock(
+            _pageId,
+            _sectionAId,
+            Guid.NewGuid(),
+            request,
+            CancellationToken.None
+        );
         result.AssertNotFound();
     }
 
@@ -647,7 +687,13 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             var request = new EinTileGroupBlockUpdateRequest { Title = "New title" };
-            var result = await service.UpdateTileGroupBlock(_pageId, _sectionAId, _blockAId, request);
+            var result = await service.UpdateTileGroupBlock(
+                _pageId,
+                _sectionAId,
+                _blockAId,
+                request,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             var tileGroupBlock = Assert.IsType<EinTileGroupBlockViewModel>(viewModel);
@@ -675,7 +721,13 @@ public class EducationInNumbersContentServiceTests
             var service = BuildService(context);
             var request = new EinTileGroupBlockUpdateRequest { Title = "New title" };
 
-            var result = await service.UpdateTileGroupBlock(_pageId, _sectionAId, Guid.NewGuid(), request);
+            var result = await service.UpdateTileGroupBlock(
+                _pageId,
+                _sectionAId,
+                Guid.NewGuid(),
+                request,
+                CancellationToken.None
+            );
             result.AssertNotFound();
         }
     }
@@ -707,7 +759,7 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             var newOrder = new List<Guid> { _blockBId, blockCId, _blockAId };
-            var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder);
+            var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder, CancellationToken.None);
 
             var viewModels = result.AssertRight();
             Assert.Equal(3, viewModels.Count);
@@ -742,7 +794,7 @@ public class EducationInNumbersContentServiceTests
             var service = BuildService(context);
 
             var newOrder = new List<Guid> { _blockAId, _blockBId }; // _blockBId does not exist in the section
-            var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder);
+            var result = await service.ReorderBlocks(_pageId, _sectionAId, newOrder, CancellationToken.None);
 
             var validationResult = result.AssertBadRequestWithValidationProblem();
             validationResult.AssertHasGlobalError(ValidationErrorMessages.EinProvidedBlockIdsDifferFromActualBlockIds);
@@ -775,7 +827,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.DeleteBlock(_pageId, _sectionAId, _blockBId);
+            var result = await service.DeleteBlock(_pageId, _sectionAId, _blockBId, CancellationToken.None);
 
             result.AssertRight();
 
@@ -797,7 +849,7 @@ public class EducationInNumbersContentServiceTests
         await using var context = InMemoryApplicationDbContext(contextId);
         var service = BuildService(context);
 
-        var result = await service.DeleteBlock(_pageId, Guid.NewGuid(), _blockAId);
+        var result = await service.DeleteBlock(_pageId, Guid.NewGuid(), _blockAId, CancellationToken.None);
         result.AssertNotFound();
     }
 
@@ -816,7 +868,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.DeleteBlock(_pageId, _sectionAId, Guid.NewGuid());
+            var result = await service.DeleteBlock(_pageId, _sectionAId, Guid.NewGuid(), CancellationToken.None);
             result.AssertNotFound();
         }
     }
@@ -840,13 +892,19 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.AddTile(_pageId, _blockAId, EinTileType.FreeTextStatTile, 1);
+            var result = await service.AddTile(
+                _pageId,
+                _blockAId,
+                EinTileType.FreeTextStatTile,
+                1,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             var freeTextTile = Assert.IsType<EinFreeTextStatTileViewModel>(viewModel);
             Assert.Equal(1, freeTextTile.Order);
-            Assert.Equal("", freeTextTile.Title);
-            Assert.Equal("", freeTextTile.Statistic);
+            Assert.Null(freeTextTile.Title);
+            Assert.Null(freeTextTile.Statistic);
 
             var dbTile = await context.EinTiles.SingleAsync();
             Assert.Equal(viewModel.Id, dbTile.Id);
@@ -876,7 +934,13 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             // order is null, so should be added to the end of the list
-            var result = await service.AddTile(_pageId, _blockAId, EinTileType.FreeTextStatTile, null);
+            var result = await service.AddTile(
+                _pageId,
+                _blockAId,
+                EinTileType.FreeTextStatTile,
+                null,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             Assert.Equal(1, viewModel.Order);
@@ -906,18 +970,24 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.AddTile(_pageId, _blockAId, EinTileType.ApiQueryStatTile, 1);
+            var result = await service.AddTile(
+                _pageId,
+                _blockAId,
+                EinTileType.ApiQueryStatTile,
+                1,
+                CancellationToken.None
+            );
 
             var viewModel = result.AssertRight();
             var apiTile = Assert.IsType<EinApiQueryStatTileViewModel>(viewModel);
             Assert.Equal(1, apiTile.Order);
-            Assert.Empty(apiTile.Title);
+            Assert.Null(apiTile.Title);
             Assert.Null(apiTile.DataSetId);
-            Assert.Empty(apiTile.Version);
-            Assert.Empty(apiTile.LatestPublishedVersion);
-            Assert.Empty(apiTile.Query);
-            Assert.Equal(IndicatorUnit.None, apiTile.IndicatorUnit);
-            Assert.Empty(apiTile.Statistic);
+            Assert.Null(apiTile.Version);
+            Assert.Null(apiTile.LatestPublishedVersion);
+            Assert.Null(apiTile.Query);
+            Assert.Null(apiTile.IndicatorUnit);
+            Assert.Null(apiTile.Statistic);
             Assert.Null(apiTile.DecimalPlaces);
             Assert.Empty(apiTile.PublicationSlug);
             Assert.Empty(apiTile.ReleaseSlug);
@@ -968,7 +1038,7 @@ public class EducationInNumbersContentServiceTests
                 LinkUrl = "http://new.url",
                 LinkText = "New link text",
             };
-            var result = await service.UpdateFreeTextStatTile(_pageId, _tileAId, request);
+            var result = await service.UpdateFreeTextStatTile(_pageId, _tileAId, request, CancellationToken.None);
 
             var viewModel = result.AssertRight();
             var freeTextTile = Assert.IsType<EinFreeTextStatTileViewModel>(viewModel);
@@ -994,7 +1064,7 @@ public class EducationInNumbersContentServiceTests
         var service = BuildService(context);
         var request = new EinFreeTextStatTileUpdateRequest();
 
-        var result = await service.UpdateFreeTextStatTile(_pageId, Guid.NewGuid(), request);
+        var result = await service.UpdateFreeTextStatTile(_pageId, Guid.NewGuid(), request, CancellationToken.None);
         result.AssertNotFound();
     }
 
@@ -1082,12 +1152,15 @@ public class EducationInNumbersContentServiceTests
         };
 
         var publicDataSetRepository = new Mock<IPublicDataSetRepository>(MockBehavior.Strict);
-        publicDataSetRepository.Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId))).ReturnsAsync(dataSet);
+        publicDataSetRepository
+            .Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId), CancellationToken.None))
+            .ReturnsAsync(dataSet);
         publicDataSetRepository
             .Setup(c =>
                 c.GetIndicatorMeta(
                     It.Is<Guid>(id => id == latestDataSetVersionId),
-                    It.Is<string>(indId => indId == "bbbbb")
+                    It.Is<string>(indId => indId == "bbbbb"),
+                    CancellationToken.None
                 )
             )
             .ReturnsAsync(
@@ -1102,7 +1175,7 @@ public class EducationInNumbersContentServiceTests
         var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
         publicDataApiClient
             .Setup(c =>
-                c.RunQuery(
+                c.QueryDataSetPost(
                     It.Is<Guid>(dataSetId => dataSetId == newDataSetId),
                     It.Is<string>(version => version == "1.0.1"),
                     It.Is<string>(query =>
@@ -1182,7 +1255,7 @@ public class EducationInNumbersContentServiceTests
                     {"indicators":["bbbbb"]}
                     """,
             };
-            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request);
+            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request, CancellationToken.None);
 
             var viewModel = result.AssertRight();
             var apiTile = Assert.IsType<EinApiQueryStatTileViewModel>(viewModel);
@@ -1293,12 +1366,15 @@ public class EducationInNumbersContentServiceTests
         };
 
         var publicDataSetRepository = new Mock<IPublicDataSetRepository>(MockBehavior.Strict);
-        publicDataSetRepository.Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId))).ReturnsAsync(dataSet);
+        publicDataSetRepository
+            .Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId), CancellationToken.None))
+            .ReturnsAsync(dataSet);
         publicDataSetRepository
             .Setup(c =>
                 c.GetIndicatorMeta(
                     It.Is<Guid>(id => id == latestDataSetVersionId),
-                    It.Is<string>(indId => indId == "bbbbb")
+                    It.Is<string>(indId => indId == "bbbbb"),
+                    CancellationToken.None
                 )
             )
             .ReturnsAsync(
@@ -1322,7 +1398,7 @@ public class EducationInNumbersContentServiceTests
                     {"indicators":["bbbbb"]}
                     """,
             };
-            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request);
+            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request, CancellationToken.None);
 
             var actionResult = result.AssertLeft();
             Assert.Equal(
@@ -1416,12 +1492,15 @@ public class EducationInNumbersContentServiceTests
         };
 
         var publicDataSetRepository = new Mock<IPublicDataSetRepository>(MockBehavior.Strict);
-        publicDataSetRepository.Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId))).ReturnsAsync(dataSet);
+        publicDataSetRepository
+            .Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId), CancellationToken.None))
+            .ReturnsAsync(dataSet);
         publicDataSetRepository
             .Setup(c =>
                 c.GetIndicatorMeta(
                     It.Is<Guid>(id => id == latestDataSetVersionId),
-                    It.Is<string>(indId => indId == "bbbbb")
+                    It.Is<string>(indId => indId == "bbbbb"),
+                    CancellationToken.None
                 )
             )
             .ReturnsAsync(
@@ -1436,7 +1515,7 @@ public class EducationInNumbersContentServiceTests
         var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
         publicDataApiClient
             .Setup(c =>
-                c.RunQuery(
+                c.QueryDataSetPost(
                     It.Is<Guid>(dataSetId => dataSetId == newDataSetId),
                     It.Is<string>(version => version == "1.0.1"),
                     It.Is<string>(query =>
@@ -1476,7 +1555,7 @@ public class EducationInNumbersContentServiceTests
                     {"indicators":["bbbbb"]}
                     """,
             };
-            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request);
+            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request, CancellationToken.None);
 
             var actionResult = result.AssertLeft();
             Assert.Equal(
@@ -1570,12 +1649,15 @@ public class EducationInNumbersContentServiceTests
         };
 
         var publicDataSetRepository = new Mock<IPublicDataSetRepository>(MockBehavior.Strict);
-        publicDataSetRepository.Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId))).ReturnsAsync(dataSet);
+        publicDataSetRepository
+            .Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId), CancellationToken.None))
+            .ReturnsAsync(dataSet);
         publicDataSetRepository
             .Setup(c =>
                 c.GetIndicatorMeta(
                     It.Is<Guid>(id => id == latestDataSetVersionId),
-                    It.Is<string>(indId => indId == "bbbbb")
+                    It.Is<string>(indId => indId == "bbbbb"),
+                    CancellationToken.None
                 )
             )
             .ReturnsAsync(
@@ -1590,7 +1672,7 @@ public class EducationInNumbersContentServiceTests
         var publicDataApiClient = new Mock<IPublicDataApiClient>(MockBehavior.Strict);
         publicDataApiClient
             .Setup(c =>
-                c.RunQuery(
+                c.QueryDataSetPost(
                     It.Is<Guid>(dataSetId => dataSetId == newDataSetId),
                     It.Is<string>(version => version == "1.0.1"),
                     It.Is<string>(query =>
@@ -1656,7 +1738,7 @@ public class EducationInNumbersContentServiceTests
                     {"indicators":["bbbbb"]}
                     """,
             };
-            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request);
+            var result = await service.UpdateApiQueryStatTile(_pageId, _tileAId, request, CancellationToken.None);
 
             var actionResult = result.AssertLeft();
             Assert.Equal(
@@ -1693,7 +1775,7 @@ public class EducationInNumbersContentServiceTests
         {
             var service = BuildService(context);
             var newOrder = new List<Guid> { _tileBId, tileCId, _tileAId };
-            var result = await service.ReorderTiles(_pageId, _blockAId, newOrder);
+            var result = await service.ReorderTiles(_pageId, _blockAId, newOrder, CancellationToken.None);
 
             var viewModels = result.AssertRight();
             Assert.Equal(3, viewModels.Count);
@@ -1733,7 +1815,7 @@ public class EducationInNumbersContentServiceTests
             var service = BuildService(context);
 
             var newOrder = new List<Guid> { _tileAId, _tileBId }; // _tileBId does not exist
-            var result = await service.ReorderTiles(_pageId, _blockAId, newOrder);
+            var result = await service.ReorderTiles(_pageId, _blockAId, newOrder, CancellationToken.None);
 
             var validationResult = result.AssertBadRequestWithValidationProblem();
             validationResult.AssertHasGlobalError(ValidationErrorMessages.EinProvidedTileIdsDifferFromActualTileIds);
@@ -1766,7 +1848,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.DeleteTile(_pageId, _blockAId, _tileBId);
+            var result = await service.DeleteTile(_pageId, _blockAId, _tileBId, CancellationToken.None);
 
             result.AssertRight();
 
@@ -1788,7 +1870,7 @@ public class EducationInNumbersContentServiceTests
         await using var context = InMemoryApplicationDbContext(contextId);
         var service = BuildService(context);
 
-        var result = await service.DeleteTile(_pageId, Guid.NewGuid(), _tileAId);
+        var result = await service.DeleteTile(_pageId, Guid.NewGuid(), _tileAId, CancellationToken.None);
         result.AssertNotFound();
     }
 
@@ -1811,7 +1893,7 @@ public class EducationInNumbersContentServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var service = BuildService(context);
-            var result = await service.DeleteTile(_pageId, _blockAId, Guid.NewGuid());
+            var result = await service.DeleteTile(_pageId, _blockAId, Guid.NewGuid(), CancellationToken.None);
             result.AssertNotFound();
         }
     }

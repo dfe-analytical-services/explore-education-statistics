@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -7,19 +8,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.D
 
 public class PublicDataSetRepository(PublicDataDbContext publicDataDbContext) : IPublicDataSetRepository
 {
-    public async Task<DataSet> GetDataSet(Guid dataSetId)
-    {
-        var apiDataSet = await publicDataDbContext
+    public async Task<DataSet> GetDataSet(Guid dataSetId, CancellationToken cancellationToken = default) =>
+        await publicDataDbContext
             .DataSets.Include(ds => ds.LatestLiveVersion)
-            .SingleAsync(ds => ds.Id == dataSetId);
-        return apiDataSet;
-    }
+            .SingleAsync(ds => ds.Id == dataSetId, cancellationToken);
 
-    public async Task<IndicatorMeta> GetIndicatorMeta(Guid dataSetVersionId, string indicatorPublicId)
-    {
-        var indicatorMeta = await publicDataDbContext.IndicatorMetas.SingleOrDefaultAsync(im =>
-            im.DataSetVersionId == dataSetVersionId && im.PublicId == indicatorPublicId
+    public async Task<IndicatorMeta?> GetIndicatorMeta(
+        Guid dataSetVersionId,
+        string indicatorPublicId,
+        CancellationToken cancellationToken = default
+    ) =>
+        await publicDataDbContext.IndicatorMetas.SingleOrDefaultAsync(
+            im => im.DataSetVersionId == dataSetVersionId && im.PublicId == indicatorPublicId,
+            cancellationToken
         );
-        return indicatorMeta;
-    }
 }

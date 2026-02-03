@@ -1,5 +1,4 @@
 #nullable enable
-using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -114,12 +113,12 @@ public record EinTileGroupBlockViewModel : EinContentBlockViewModel
 
 public record EinTileViewModel
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; init; }
 
-    public int Order { get; set; }
+    public required int Order { get; init; }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public EinTileType Type { get; set; }
+    public required EinTileType Type { get; set; }
 
     public static EinTileViewModel FromModel(EinTile tile)
     {
@@ -134,11 +133,11 @@ public record EinTileViewModel
 
 public record EinFreeTextStatTileViewModel : EinTileViewModel
 {
-    public string Title { get; set; } = string.Empty;
-    public string Statistic { get; set; } = string.Empty;
-    public string Trend { get; set; } = string.Empty;
-    public string? LinkUrl { get; set; }
-    public string? LinkText { get; set; }
+    public required string? Title { get; init; }
+    public required string? Statistic { get; init; }
+    public required string? Trend { get; init; }
+    public required string? LinkUrl { get; init; }
+    public required string? LinkText { get; init; }
 
     public static EinFreeTextStatTileViewModel FromModel(EinFreeTextStatTile statTile)
     {
@@ -158,19 +157,19 @@ public record EinFreeTextStatTileViewModel : EinTileViewModel
 
 public record EinApiQueryStatTileViewModel : EinTileViewModel
 {
-    public string Title { get; init; } = string.Empty;
-    public Guid? DataSetId { get; init; }
-    public string Version { get; init; } = string.Empty;
-    public string LatestPublishedVersion { get; init; } = string.Empty;
-    public string Query { get; init; } = string.Empty;
-    public string Statistic { get; init; } = string.Empty;
+    public required string? Title { get; init; }
+    public required Guid? DataSetId { get; init; }
+    public required string? Version { get; init; }
+    public required string? LatestPublishedVersion { get; init; }
+    public required string? Query { get; init; }
+    public required string? Statistic { get; init; }
 
     [JsonConverter(typeof(EnumToEnumValueJsonConverter<IndicatorUnit>))]
-    public IndicatorUnit IndicatorUnit { get; init; }
+    public required IndicatorUnit? IndicatorUnit { get; init; }
 
-    public int? DecimalPlaces { get; set; }
-    public string PublicationSlug { get; set; } = string.Empty;
-    public string ReleaseSlug { get; set; } = string.Empty;
+    public required int? DecimalPlaces { get; init; }
+    public required string PublicationSlug { get; init; }
+    public required string ReleaseSlug { get; init; }
 
     public static EinApiQueryStatTileViewModel FromModel(EinApiQueryStatTile statTile)
     {

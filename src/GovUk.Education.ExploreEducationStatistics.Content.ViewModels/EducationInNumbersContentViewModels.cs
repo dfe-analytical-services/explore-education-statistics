@@ -5,9 +5,9 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-public class EducationInNumbersContentViewModels
+public static class EducationInNumbersContentViewModels
 {
-    public class EinContentSectionViewModel
+    public record EinContentSectionViewModel
     {
         public Guid Id { get; set; }
 
@@ -32,7 +32,7 @@ public class EducationInNumbersContentViewModels
         }
     }
 
-    public class EinContentBlockViewModel
+    public record EinContentBlockViewModel
     {
         public Guid Id { get; set; }
 
@@ -52,7 +52,7 @@ public class EducationInNumbersContentViewModels
         }
     }
 
-    public class EinHtmlBlockViewModel : EinContentBlockViewModel
+    public record EinHtmlBlockViewModel : EinContentBlockViewModel
     {
         public string Body { get; set; } = string.Empty;
 
@@ -68,7 +68,7 @@ public class EducationInNumbersContentViewModels
         }
     }
 
-    public class EinTileGroupBlockViewModel : EinContentBlockViewModel
+    public record EinTileGroupBlockViewModel : EinContentBlockViewModel
     {
         public string? Title { get; set; }
         public List<EinTileViewModel> Tiles { get; set; } = new();
@@ -86,7 +86,7 @@ public class EducationInNumbersContentViewModels
         }
     }
 
-    public class EinTileViewModel
+    public record EinTileViewModel
     {
         public Guid Id { get; set; }
 
@@ -108,7 +108,7 @@ public class EducationInNumbersContentViewModels
         }
     }
 
-    public class EinFreeTextStatTileViewModel : EinTileViewModel
+    public record EinFreeTextStatTileViewModel : EinTileViewModel
     {
         public string Statistic { get; set; } = string.Empty;
         public string Trend { get; set; } = string.Empty;
@@ -131,7 +131,7 @@ public class EducationInNumbersContentViewModels
         }
     }
 
-    public class EinApiQueryStatTileViewModel : EinTileViewModel
+    public record EinApiQueryStatTileViewModel : EinTileViewModel
     {
         public Guid? DataSetId { get; init; }
         public string Statistic { get; init; } = string.Empty;

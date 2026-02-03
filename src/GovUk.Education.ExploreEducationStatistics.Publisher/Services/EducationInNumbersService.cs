@@ -9,24 +9,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 public class EducationInNumbersService(ContentDbContext contentDbContext, PublicDataDbContext publicDataDbContext)
     : IEducationInNumbersService
 {
-    public async Task UpdateEinTiles(Guid[] releaseVersionIdsToUpdate)
+    public async Task UpdateEinTiles(Guid[] releaseVersionIdsToUpdate, CancellationToken cancellationToken = default)
     {
-        var updatedPublicationIds = contentDbContext
-            .ReleaseVersions.Include(rv => rv.Release.Publication)
+        var updatedPublicationIds = await contentDbContext
+            .ReleaseVersions.AsNoTracking()
             .Select(rv => rv.Release.PublicationId)
-            .ToList();
+            .ToListAsync(cancellationToken);
 
-        var dataSets = publicDataDbContext
-            .DataSets.Include(ds => ds.LatestLiveVersion)
+        var dataSets = await publicDataDbContext
+            .DataSets.AsNoTracking()
+            .Include(ds => ds.LatestLiveVersion)
             .Where(ds => updatedPublicationIds.Contains(ds.PublicationId) && ds.LatestLiveVersion != null)
-            .ToList();
+            .ToListAsync(cancellationToken);
 
         var dataSetIds = dataSets.Select(ds => ds.Id).ToList();
 
-        var apiQueryTiles = contentDbContext
+        var apiQueryTiles = await contentDbContext
             .EinTiles.OfType<EinApiQueryStatTile>()
             .Where(t => t.DataSetId != null && dataSetIds.Contains(t.DataSetId.Value))
-            .ToList();
+            .ToListAsync(cancellationToken);
 
         foreach (var tile in apiQueryTiles)
         {
@@ -37,9 +38,9 @@ public class EducationInNumbersService(ContentDbContext contentDbContext, Public
             if (tile.LatestPublishedVersion != dataSetLatestVersion)
             {
                 tile.LatestPublishedVersion = dataSetLatestVersion;
-                await contentDbContext.SaveChangesAsync();
                 // TODO EES-6868 Send email to inform BAU that a tile's papi query needs updating
             }
         }
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 }

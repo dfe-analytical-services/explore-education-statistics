@@ -232,7 +232,7 @@ public static class PublisherHostBuilderExtensions
 
     public class NoOpEducationInNumbersService : IEducationInNumbersService
     {
-        public Task UpdateEinTiles(Guid[] releaseVersionIdsToUpdate)
+        public Task UpdateEinTiles(Guid[] releaseVersionIdsToUpdate, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

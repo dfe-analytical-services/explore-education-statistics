@@ -2,5 +2,5 @@
 
 public interface IEducationInNumbersService
 {
-    Task UpdateEinTiles(Guid[] releaseVersionIdsToUpdate);
+    Task UpdateEinTiles(Guid[] releaseVersionIdsToUpdate, CancellationToken cancellationToken = default);
 }

@@ -1,6 +1,9 @@
 ﻿#nullable enable
 using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -45,15 +48,28 @@ public class EinTileGroupBlock : EinContentBlock
 
 public class EinTile
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } // @MarkFix Add required to all these?
 
     [MaxLength(2048)]
-    public string Title { get; set; } = string.Empty;
+    public string? Title { get; set; }
 
     public int Order { get; set; }
 
     public Guid EinParentBlockId { get; set; }
     public EinTileGroupBlock EinParentBlock { get; set; } = null!;
+
+    internal class EinTileConfig : IEntityTypeConfiguration<EinTile> // @MarkFix redo migration
+    {
+        public void Configure(EntityTypeBuilder<EinTile> builder)
+        {
+            builder
+                .HasDiscriminator<string>("Type")
+                .HasValue<EinFreeTextStatTile>("FreeTextStatTile")
+                .HasValue<EinApiQueryStatTile>("ApiQueryStatTile");
+
+            builder.Property(o => o.Title).HasMaxLength(2048);
+        }
+    }
 }
 
 public enum EinTileType
@@ -65,8 +81,8 @@ public enum EinTileType
 
 public class EinFreeTextStatTile : EinTile
 {
-    public string Statistic { get; set; } = string.Empty;
-    public string Trend { get; set; } = string.Empty;
+    public string? Statistic { get; set; }
+    public string? Trend { get; set; }
     public string? LinkUrl { get; set; }
     public string? LinkText { get; set; }
 }
@@ -74,27 +90,25 @@ public class EinFreeTextStatTile : EinTile
 public class EinApiQueryStatTile : EinTile
 {
     public Guid? DataSetId { get; set; }
-
-    [MaxLength(32)]
-    public string Version { get; set; } = string.Empty;
-
-    [MaxLength(32)]
-    public string LatestPublishedVersion { get; set; } = string.Empty;
-
-    public string Query { get; set; } = string.Empty;
-
-    [MaxLength(64)]
-    public string Statistic { get; set; } = string.Empty;
-
-    public IndicatorUnit IndicatorUnit { get; set; } = IndicatorUnit.None;
-
+    public string? Version { get; set; }
+    public string? LatestPublishedVersion { get; set; }
+    public string? Query { get; set; }
+    public string? Statistic { get; set; }
+    public IndicatorUnit? IndicatorUnit { get; set; }
     public int? DecimalPlaces { get; set; }
+    public string? QueryResult { get; set; }
+    public Guid? ReleaseId { get; set; }
+    public Release? Release { get; set; }
 
-    public string QueryResult { get; set; } = string.Empty;
+    internal class EinApiQueryStatTileConfig : IEntityTypeConfiguration<EinApiQueryStatTile>
+    {
+        public void Configure(EntityTypeBuilder<EinApiQueryStatTile> builder)
+        {
+            builder.Property(e => e.IndicatorUnit).HasConversion(new EnumToStringConverter<IndicatorUnit>());
 
-    [MaxLength(512)]
-    public string PublicationSlug { get; set; } = string.Empty;
-
-    [MaxLength(512)]
-    public string ReleaseSlug { get; set; } = string.Empty;
+            builder.Property(o => o.Version).HasMaxLength(32);
+            builder.Property(o => o.LatestPublishedVersion).HasMaxLength(32);
+            builder.Property(o => o.Statistic).HasMaxLength(64);
+        }
+    }
 }

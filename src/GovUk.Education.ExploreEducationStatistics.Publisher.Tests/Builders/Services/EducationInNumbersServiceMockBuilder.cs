@@ -13,14 +13,14 @@ public class EducationInNumbersServiceMockBuilder
 
     public EducationInNumbersServiceMockBuilder()
     {
-        _mock.Setup(m => m.UpdateEinTiles(It.IsAny<Guid[]>())).Returns(Task.CompletedTask);
+        _mock.Setup(m => m.UpdateEinTiles(It.IsAny<Guid[]>(), CancellationToken.None)).Returns(Task.CompletedTask);
     }
 
     public class Asserter(Mock<IEducationInNumbersService> mock)
     {
         public void UpdateEinTilesCalled()
         {
-            mock.Verify(m => m.UpdateEinTiles(It.IsAny<Guid[]>()), Times.Once);
+            mock.Verify(m => m.UpdateEinTiles(It.IsAny<Guid[]>(), CancellationToken.None), Times.Once);
         }
     }
 }

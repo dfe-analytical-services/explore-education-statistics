@@ -134,7 +134,6 @@ public class ContentDbContext : DbContext
         ConfigurePageFeedback(modelBuilder);
         ConfigureReleasePublishingFeedback(modelBuilder);
         ConfigureEinContentBlock(modelBuilder);
-        ConfigureEinTile(modelBuilder);
 
         // Apply model configuration for types which implement IEntityTypeConfiguration
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContentDbContext).Assembly);
@@ -850,20 +849,6 @@ public class ContentDbContext : DbContext
             .HasDiscriminator<string>("Type")
             .HasValue<EinHtmlBlock>("HtmlBlock")
             .HasValue<EinTileGroupBlock>("TileGroupBlock");
-    }
-
-    private static void ConfigureEinTile(ModelBuilder modelBuilder)
-    {
-        modelBuilder
-            .Entity<EinTile>()
-            .HasDiscriminator<string>("Type")
-            .HasValue<EinFreeTextStatTile>("FreeTextStatTile")
-            .HasValue<EinApiQueryStatTile>("ApiQueryStatTile");
-
-        modelBuilder
-            .Entity<EinApiQueryStatTile>()
-            .Property(e => e.IndicatorUnit)
-            .HasConversion(new EnumToStringConverter<IndicatorUnit>());
     }
 }
 

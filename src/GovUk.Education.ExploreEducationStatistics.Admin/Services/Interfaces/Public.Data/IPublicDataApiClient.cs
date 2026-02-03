@@ -13,7 +13,7 @@ public interface IPublicDataApiClient
         CancellationToken cancellationToken = default
     );
 
-    Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(
+    Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> QueryDataSetPost(
         Guid dataSetId,
         string dataSetVersion,
         string queryBody,

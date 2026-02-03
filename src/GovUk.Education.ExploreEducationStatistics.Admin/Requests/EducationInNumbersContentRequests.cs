@@ -37,7 +37,7 @@ public record EinTileAddRequest
     public int? Order { get; set; }
 }
 
-public record EinFreeTextStatTileUpdateRequest
+public record EinFreeTextStatTileUpdateRequest // @MarkFix add fluent validation
 {
     public string Title { get; set; } = string.Empty;
     public string Statistic { get; set; } = string.Empty;
@@ -46,7 +46,7 @@ public record EinFreeTextStatTileUpdateRequest
     public string? LinkText { get; set; }
 }
 
-public record EinApiQueryStatTileUpdateRequest
+public record EinApiQueryStatTileUpdateRequest // @MarkFix add fluent validation
 {
     public string Title { get; set; } = string.Empty;
     public Guid DataSetId { get; set; }

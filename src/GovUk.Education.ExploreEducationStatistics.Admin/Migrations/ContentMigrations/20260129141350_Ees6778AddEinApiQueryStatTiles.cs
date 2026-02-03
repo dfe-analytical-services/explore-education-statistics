@@ -124,6 +124,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 oldType: "nvarchar(2048)",
                 oldMaxLength: 2048
             );
+
+            migrationBuilder.Sql("REVOKE SELECT ON dbo.EinTiles TO [publisher]");
+            migrationBuilder.Sql("REVOKE UPDATE ON dbo.EinTiles TO [publisher]");
         }
     }
 }
