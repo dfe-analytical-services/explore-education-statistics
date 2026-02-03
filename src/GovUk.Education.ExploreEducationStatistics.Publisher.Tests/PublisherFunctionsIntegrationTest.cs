@@ -40,12 +40,11 @@ public abstract class PublisherFunctionsIntegrationTest(PublisherFunctionsIntegr
 // ReSharper disable once ClassNeverInstantiated.Global
 public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture, IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
-        .WithImage("postgres:16.1-alpine")
-        .Build();
+    private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder("postgres:16.1-alpine").Build();
 
-    private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder()
-        .WithImage("mcr.microsoft.com/azure-storage/azurite:3.35.0")
+    private readonly AzuriteContainer _azuriteContainer = new AzuriteBuilder(
+        "mcr.microsoft.com/azure-storage/azurite:3.35.0"
+    )
         .WithInMemoryPersistence()
         .Build();
 
