@@ -55,7 +55,7 @@
     {
       "description": "Disable Swashbuckle.AspNetCore.* packages which requires Microsoft.OpenApi / .NET 10 update",
       "matchDatasources": ["nuget"],
-      "matchPackageNames": ["Swashbuckle.AspNetCore","Swashbuckle.AspNetCore.Annotations","Swashbuckle.AspNetCore.SwaggerGen"],
+      "matchPackageNames": ["Swashbuckle.AspNetCore","Swashbuckle.AspNetCore.Annotations", "Swashbuckle.AspNetCore.Cli", "Swashbuckle.AspNetCore.SwaggerGen"],
       "matchCurrentVersion": "9.0.6",
       "enabled": false
     },
