@@ -710,28 +710,36 @@ Go to release page
     user waits until page contains title caption    ${RELEASE_2_NAME}
 
 Validate data guidance data set details variables and footnotes
-    Go to explore and download data and navigate to data set details page    ${SUBJECT_1_NAME}
-    ${subject_variables}=    set variable    testid:variables-table
+    user goes to explore and download data and navigates to data set details page    ${SUBJECT_1_NAME}
+    Page Should Contain    UI test subject 1 data guidance content
+    user checks summary list contains    Geographic levels
+    ...    National
+    ...    id:dataSetDetails
+
+    user checks summary list contains    Time period
+    ...    2017/18
+    ...    id:dataSetDetails
+
     user clicks button    Show all 9 variables
-    user checks table body has x rows    9    ${subject_variables}
+    user checks table body has x rows    9    testid:variables-table
 
-    user checks table column heading contains    1    1    Variable name    ${subject_variables}
-    user checks table column heading contains    1    2    Variable description    ${subject_variables}
+    user checks table column heading contains    1    1    Variable name    testid:variables-table
+    user checks table column heading contains    1    2    Variable description    testid:variables-table
 
-    user checks table cell contains    1    1    colour    ${subject_variables}
-    user checks table cell contains    1    2    Colour    ${subject_variables}
+    user checks table cell contains    1    1    colour    testid:variables-table
+    user checks table cell contains    1    2    Colour    testid:variables-table
 
-    user checks table cell contains    2    1    enrolments    ${subject_variables}
-    user checks table cell contains    2    2    Number of pupil enrolments    ${subject_variables}
+    user checks table cell contains    2    1    enrolments    testid:variables-table
+    user checks table cell contains    2    2    Number of pupil enrolments    testid:variables-table
 
-    user checks table cell contains    4    1    enrolments_pa_10_exact_percent    ${subject_variables}
-    user checks table cell contains    4    2    Percentage of persistent absentees    ${subject_variables}
+    user checks table cell contains    4    1    enrolments_pa_10_exact_percent    testid:variables-table
+    user checks table cell contains    4    2    Percentage of persistent absentees    testid:variables-table
 
-    user checks table cell contains    8    1    sess_overall_percent    ${subject_variables}
-    user checks table cell contains    8    2    Overall absence rate    ${subject_variables}
+    user checks table cell contains    8    1    sess_overall_percent    testid:variables-table
+    user checks table cell contains    8    2    Overall absence rate    testid:variables-table
 
-    user checks table cell contains    9    1    sess_unauthorised_percent    ${subject_variables}
-    user checks table cell contains    9    2    Unauthorised absence rate    ${subject_variables}
+    user checks table cell contains    9    1    sess_unauthorised_percent    testid:variables-table
+    user checks table cell contains    9    2    Unauthorised absence rate    testid:variables-table
 
     user scrolls to element    id:dataSetFootnotes
     Footnotes Should Equal    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
@@ -754,16 +762,16 @@ Validate data guidance data set details variables and footnotes
 
     user waits until h1 is visible    ${SUBJECT_2_NAME}
 
-    user checks table body has x rows    2    ${subject_variables}
+    user checks table body has x rows    2    testid:variables-table
 
-    user checks table column heading contains    1    1    Variable name    ${subject_variables}
-    user checks table column heading contains    1    2    Variable description    ${subject_variables}
+    user checks table column heading contains    1    1    Variable name    testid:variables-table
+    user checks table column heading contains    1    2    Variable description    testid:variables-table
 
-    user checks table cell contains    1    1    admission_numbers    ${subject_variables}
-    user checks table cell contains    1    2    Admission Numbers    ${subject_variables}
+    user checks table cell contains    1    1    admission_numbers    testid:variables-table
+    user checks table cell contains    1    2    Admission Numbers    testid:variables-table
 
-    user checks table cell contains    2    1    some_filter    ${subject_variables}
-    user checks table cell contains    2    2    Random Filter    ${subject_variables}
+    user checks table cell contains    2    1    some_filter    testid:variables-table
+    user checks table cell contains    2    2    Random Filter    testid:variables-table
 
     user scrolls to element    id:dataSetFootnotes
     Footnotes Should Equal    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
@@ -800,7 +808,7 @@ Validate the number of featured tables and featured table link
 Footnotes Should Equal
     [Arguments]    @{expected}
     @{items}=    Get WebElements
-    ...    xpath=//section[@id='dataSetFootnotes']//ol/li/div[contains(@class,'dfe-content')]
+    ...    xpath=//section[@id='dataSetFootnotes']//div[contains(@class,'dfe-content')]
     @{item_texts}=    Create List
     FOR    ${item}    IN    @{items}
         ${text}=    Get Text    ${item}

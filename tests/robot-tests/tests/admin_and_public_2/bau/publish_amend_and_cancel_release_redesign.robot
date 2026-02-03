@@ -487,13 +487,11 @@ Verify that the Dates data block accordion is unchanged
     ...    ${data_block_table}
 
 Verify that the Test text accordion is unchanged
-    ${section}=    Get WebElement    id:section-test-text
-    user waits until parent contains element    ${section}    xpath:.//p[text()="Some test text !"]
+    user waits until parent contains element    id:section-test-text    xpath:.//p[text()="Some test text !"]
 
 Verify that the Embedded URL accordion section is unchanged
-    ${section}=    Get WebElement    id:section-test-embedded-dashboard-section
-
-    user waits until parent contains element    ${section}    xpath:.//iframe[@title="Test embedded dashboard title"]
+    user waits until parent contains element    id:section-test-embedded-dashboard-section
+    ...    xpath:.//iframe[@title="Test embedded dashboard title"]
 
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
     user waits until h1 is visible    Analysts’ Guide    %{WAIT_SMALL}

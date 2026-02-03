@@ -13,7 +13,7 @@ Force Tags
 ...                 Dev
 ...                 Preprod
 ...                 ReleaseRedesign
-#TODO: remove ReleaseRedesign tag when EES-6843 is complete
+#TODO EES-6843: remove ReleaseRedesign tag when EES-6843 is complete
 
 
 *** Variables ***
@@ -113,7 +113,7 @@ Validate "Releases in this series" page
 #
 
 Validate 'On this page section'
-    check 'On this page section' for this tab contains
+    user checks 'On this page section' for this tab contains
     ...    Skip in page navigation
     ...    Background information
     ...    Headline facts and figures
@@ -250,14 +250,14 @@ Validate content section basic content
     user checks section with ID contains elements and back to top link
     ...    section-regional-and-local-authority-la-breakdown    Regional and local authority (LA) breakdown
     ...    Overall absence and persistent absence rates vary across primary, secondary and special schools by region and local authority (LA).
-    # TODO: Test that the chart in section-regional-and-local-authority-la-breakdown displays correctly (in https://dfedigital.atlassian.net/browse/EES-6851)
+    # TODO EES-6851: Test that the chart in section-regional-and-local-authority-la-breakdown displays correctly (in https://dfedigital.atlassian.net/browse/EES-6851)
 
 Verify contact us section
     check the contact us section has expected details
 
 Validate Regional and local authority (LA) breakdown table
     [Documentation]    BAU-540    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    ...    # TODO: Test that the tables are as expected in https://dfedigital.atlassian.net/browse/EES-6851
+    ...    # TODO EES-6851: Test that the tables are as expected in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user waits until element contains    css:#content_9_datablock-tables [data-testid="dataTableCaption"]
@@ -306,7 +306,7 @@ Validate Regional and local authority (LA) breakdown table
 
 Check Regional and local authority (LA) breakdown table has footnotes
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    ...    # TODO: Test that the footers are as expected in https://dfedigital.atlassian.net/browse/EES-6851
+    ...    # TODO EES-6851: Test that the footers are as expected in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
     ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user scrolls down    500
@@ -328,7 +328,7 @@ Check Regional and local authority (LA) breakdown table has footnotes
 
 Validate Regional and local authority (LA) breakdown chart
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269 -
-    ...    # TODO: Test charts display as expected in https://dfedigital.atlassian.net/browse/EES-6851
+    ...    # TODO EES-6851: Test charts display as expected in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user scrolls to accordion section    Regional and local authority (LA) breakdown    id:content
@@ -367,7 +367,7 @@ Validate Regional and local authority (LA) breakdown chart
 
 Check Regional and local authority (LA) breakdown chart has footnotes
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    ...    # TODO: Test charts footnote displays as expected in https://dfedigital.atlassian.net/browse/EES-6851
+    ...    # TODO EES-6851: Test charts footnote displays as expected in https://dfedigital.atlassian.net/browse/EES-6851
     [Tags]    Failing
     ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
     ${data_block_chart}=    user gets data block chart from parent    LAD map    ${accordion}
@@ -397,14 +397,14 @@ Verify Explore and Download data
     user clicks link    Explore and download data
     user waits until h2 is visible    Explore data used in this release
     user waits until h2 is visible    Data sets: download or create tables
-    check 'On this page section' for this tab contains
+    user checks 'On this page section' for this tab contains
     ...    Skip in page navigation
     ...    Explore data used in this release
     ...    Data sets: download or create tables
     ...    Data guidance
     ...    Contact us
     ...    Back to top
-    check main links for page 'Explore and download data' are persistent
+    user checks main links for page 'Explore and download data' are persistent
     ...    Download all data from this release (ZIP)
     ...    Data sets: download or create tables
     ...    Data guidance
@@ -445,7 +445,7 @@ Verify Explore and Download data
 Verify Methodology tab
     user clicks link    Methodology
     user waits until h2 is visible    Methodology
-    check 'On this page section' for this tab contains
+    user checks 'On this page section' for this tab contains
     ...    Skip in page navigation
     ...    Methodology
     ...    Contact us
@@ -463,7 +463,7 @@ Verify Methodology tab
 Verify Help and related information tab
     user clicks link    Help and related information
     user waits until h2 is visible    Get help by contacting us
-    check 'On this page section' for this tab contains
+    user checks 'On this page section' for this tab contains
     ...    Get help by contacting us
     ...    Official statistics
     ...    Back to top
@@ -490,13 +490,3 @@ check the contact us section has expected details
     ...    0123 4567
     ...    037 0000 2288
     ...    Monday to Friday from 9.30am to 5pm (excluding bank holidays)
-
-check 'On this page section' for this tab contains
-    [Arguments]    @{expected_link_texts}
-    FOR    ${link_text}    IN    @{expected_link_texts}
-        ${button_xpath}=    Set Variable
-        ...    //h2[normalize-space(.)='On this page']/parent::div//a[text()="${link_text}"]
-        Page Should Contain Element
-        ...    xpath=${button_xpath}
-        ...    Page is missing "${button_xpath}" button
-    END

@@ -300,7 +300,7 @@ Verify release associated files
     user clicks link    Explore and download data
     user waits until h2 is visible    Explore data used in this release
     user waits until h2 is visible    Data sets: download or create tables
-    check main links for page 'Explore and download data' are persistent
+    user checks main links for page 'Explore and download data' are persistent
     ...    Download all data from this release (ZIP)
     ...    Data sets: download or create tables
     ...    Data guidance
@@ -311,9 +311,9 @@ Verify release associated files
     user goes back
 
     ${supporting_files_xpath}=    Set Variable
-    ...    xpath:*//section[@data-testid="supporting-files-section"]//article//ul//li
+    ...    xpath:*//section[@data-testid="supporting-files-section"]//li
     ${download_xpath}=    Set Variable
-    ...    xpath:*//section[@data-testid="supporting-files-section"]//article//ul//li//a[contains(., "Download")]
+    ...    ${supporting_files_xpath}//a[contains(., "Download")]
 
     user waits until page contains element    id:supporting-files-section
 
@@ -335,9 +335,19 @@ Navigate to public Data set information page
     user clicks link containing text    Data set information page
     user waits until h1 is visible    ${SUBJECT_NAME}
 
-Verify public metadata guidance document
+Verify 'Data set information' page
     user scrolls to element    id:dataSetVariables
     user clicks button    Show all 17 variables
+
+    Page Should Contain    Dates test subject test data guidance content
+
+    user checks summary list contains    Geographic levels
+    ...    National
+    ...    id:dataSetDetails
+
+    user checks summary list contains    Time period
+    ...    2020 Week 13 to 2021 Week 24
+    ...    id:dataSetDetails
 
     user checks table column heading contains    1    1    Variable name    css:table[data-testid="variables-table"]
     user checks table column heading contains    1    2    Variable description
@@ -375,21 +385,23 @@ Verify free text key stat is correct
 Verify Dates data block section and footnotes
     user scrolls to element    id:section-dates-data-block
     user waits until page finishes loading
-    ${section}=    Get WebElement    id:section-dates-data-block
 
-    user checks chart title contains    ${section}    Updated dates table title
-    user checks infographic chart contains alt    ${section}    Sample alt text
+    user checks chart title contains    id:section-dates-data-block    Updated dates table title
+    user checks infographic chart contains alt    id:section-dates-data-block    Sample alt text
 
-    user clicks link containing text    Table    ${section}
-    user waits until parent contains element    ${section}
+    user clicks link containing text    Table    id:section-dates-data-block
+    user waits until parent contains element    id:section-dates-data-block
     ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
-    user waits until parent contains element    ${section}    xpath:.//*[.="Source: Updated dates source"]
+    user waits until parent contains element    id:section-dates-data-block
+    ...    xpath:.//*[.="Source: Updated dates source"]
 
-    user checks table column heading contains    1    1    2020 Week 13    ${section}
-    user checks headed table body row cell contains    Number of open settings    1    22,900    ${section}
-    user checks headed table body row cell contains    Proportion of settings open    1    1%    ${section}
+    user checks table column heading contains    1    1    2020 Week 13    id:section-dates-data-block
+    user checks headed table body row cell contains    Number of open settings    1    22,900
+    ...    id:section-dates-data-block
+    user checks headed table body row cell contains    Proportion of settings open    1    1%
+    ...    id:section-dates-data-block
 
-    ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${section}
+    ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    id:section-dates-data-block
 
     user checks list has x items    testid:footnotes    2    ${data_block_table}
     user checks list item contains    testid:footnotes    1
@@ -721,8 +733,16 @@ Navigate to amendment release page
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
 
-Verify amendment is displayed as the latest release
+Verify amendment is displayed as the latest release and the 'All releases in this series' page only displays the latest release
     user checks page contains    Latest release
+    user clicks link    All releases in this series
+    user waits until page finishes loading
+
+    user checks table body has x rows    1    testid:release-updates-table
+    user checks table cell contains    1    1    ${RELEASE_NAME}    testid:release-updates-table
+
+    user goes back
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Verify amendment is published
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
@@ -738,18 +758,18 @@ Verify amendment files
     user waits until h2 is visible    Explore data used in this release
     user waits until h2 is visible    Data sets: download or create tables
 
-    check main links for page 'Explore and download data' are persistent
+    user checks main links for page 'Explore and download data' are persistent
     ...    Download all data from this release (ZIP)
     ...    Data sets: download or create tables
     ...    Data guidance
     ...    Data catalogue
 
     ${supporting_files_xpath}=    Set Variable
-    ...    xpath:*//section[@data-testid="supporting-files-section"]//article//ul//li
+    ...    xpath:*//section[@data-testid="supporting-files-section"]//li
     ${download_file_1_xpath}=    Set Variable
-    ...    xpath:*//section[@data-testid="supporting-files-section"]//article//ul//li//a[contains(., "Download") and contains(.,"Test ancillary file 1")]
+    ...    ${supporting_files_xpath}//a[contains(., "Download") and contains(.,"Test ancillary file 1")]
     ${download_file_2_xpath}=    Set Variable
-    ...    xpath:*//section[@data-testid="supporting-files-section"]//article//ul//li//a[contains(., "Download") and contains(.,"Test ancillary file 2")]
+    ...    ${supporting_files_xpath}//a[contains(., "Download") and contains(.,"Test ancillary file 2")]
 
     user checks element count is x    ${supporting_files_xpath}    2
 

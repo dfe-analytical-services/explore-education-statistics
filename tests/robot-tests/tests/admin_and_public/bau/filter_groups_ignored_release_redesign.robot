@@ -111,18 +111,18 @@ Verify newly published release is public
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Verify the variables and descriptions only contain one filter.
-    Go to explore and download data and navigate to data set details page    ${SUBJECT_1_NAME}
-    ${subject_1_variables}=    set variable    testid:variables-table
-    user checks table body has x rows    2    ${subject_1_variables}
+    user goes to explore and download data and navigates to data set details page    ${SUBJECT_1_NAME}
 
-    user checks table column heading contains    1    1    Variable name    ${subject_1_variables}
-    user checks table column heading contains    1    2    Variable description    ${subject_1_variables}
+    user checks table body has x rows    2    testid:variables-table
 
-    user checks table cell contains    1    1    course_title    ${subject_1_variables}
-    user checks table cell contains    1    2    Name of course being studied    ${subject_1_variables}
+    user checks table column heading contains    1    1    Variable name    testid:variables-table
+    user checks table column heading contains    1    2    Variable description    testid:variables-table
+
+    user checks table cell contains    1    1    course_title    testid:variables-table
+    user checks table cell contains    1    2    Name of course being studied    testid:variables-table
     # Below is an indicator not a filter
-    user checks table cell contains    2    1    enrollment_count    ${subject_1_variables}
-    user checks table cell contains    2    2    Number of students enrolled    ${subject_1_variables}
+    user checks table cell contains    2    1    enrollment_count    testid:variables-table
+    user checks table cell contains    2    2    Number of students enrolled    testid:variables-table
 
 Go back to Explore and download data page
     user goes back

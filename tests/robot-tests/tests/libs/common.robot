@@ -1196,106 +1196,11 @@ Get Texts From Elements
     [Return]    ${texts}
 
 user checks section is in position
-    [Arguments]    ${section_text}    ${position}    ${parent}=css:[data-testid="accordion"]    ${exact_match}=${False}
+    [Arguments]
+    ...    ${section_text}
+    ...    ${position}
+    ...    ${parent}=css:[data-testid="home-content"]
+    ...    ${exact_match}=${False}
     ${text_matcher}=    get xpath text matcher    ${section_text}    ${exact_match}
     user waits until parent contains element    ${parent}
     ...    xpath:(.//*[@data-testid="home-content-section"])[${position}]//h2[${text_matcher}]
-
-Go to explore and download data and navigate to data set details page
-    [Arguments]    ${SUBJECT_NAME}
-    user clicks link    Explore and download data
-    user waits until h2 is visible    Explore data used in this release
-    user opens data set details for subject    ${SUBJECT_NAME}
-
-    Page Should Contain Link    Data set information page
-    user clicks link containing text    Data set information page
-    user waits until h1 is visible    ${SUBJECT_NAME}
-
-user opens data set details for subject
-    [Arguments]    ${SUBJECT_NAME}
-    ${dataset_xpath}=    Set Variable
-    ...    //article//li[@data-testid="release-data-list-item"][.//h4[normalize-space()="${SUBJECT_NAME}"]]
-
-    # Wait for dataset to exist
-    Wait Until Element Is Visible    xpath=${dataset_xpath}
-
-    # Expand accordion if collapsed
-    ${toggle_xpath}=    Set Variable
-    ...    ${dataset_xpath}//button[@aria-expanded="false"]
-
-    Run Keyword And Ignore Error
-    ...    Click Element    xpath=${toggle_xpath}
-
-check main links for page 'Explore and download data' are persistent
-    [Arguments]    @{expected_link_texts}
-    FOR    ${link_text}    IN    @{expected_link_texts}
-        ${button_xpath}=    Set Variable
-        ...    //section[@data-testid="explore-section"]//ul[@data-testid="links-grid"]//a[text()="${link_text}"]
-        Page Should Contain Element
-        ...    xpath=${button_xpath}
-        ...    Page is missing "${button_xpath}" button
-    END
-
-User checks page 'Explore and download data' data set available properties
-    [Arguments]    ${data_set_name}
-    ...    ${expected_row_count}
-    ...    ${expected_time_period}
-    ...    ${PUBLICATION_TITLE}
-    ...    ${expected_data_guidance}="${data_set_name} data guidance content"
-
-    ${dataset_xpath}=    Set Variable
-    ...    //article//li[@data-testid="release-data-list-item"][.//h4[normalize-space()="${data_set_name}"]]
-
-    # Wait for dataset to exist
-    Wait Until Element Is Visible    xpath=${dataset_xpath}
-
-    # Expand accordion if collapsed
-    ${toggle_xpath}=    Set Variable
-    ...    ${dataset_xpath}//button[@aria-expanded="false"]
-
-    Run Keyword And Ignore Error
-    ...    Click Element    xpath=${toggle_xpath}
-
-    # Assert "Number of rows" dt exists
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//dt[normalize-space(.)="Number of rows"]
-    ...    Dataset "${data_set_name}" is missing "Number of rows" label
-
-    # Assert dd value for "Number of rows"
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}
-    ...    //dt[normalize-space(.)="Number of rows"]/following-sibling::dd[normalize-space(.)="${expected_row_count}"]
-    ...    Dataset "${data_set_name}" has incorrect Number of rows
-
-    # Assert dd value for "Time period"
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}
-    ...    //dt[normalize-space(.)="Time period"]/following-sibling::dd[normalize-space(.)="${expected_time_period}"]
-    ...    Dataset "${data_set_name}" has incorrect Time period
-
-    # Verify data guidance content
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//p[contains(normalize-space(.), "${expected_data_guidance}")]
-    ...    Dataset "${data_set_name}" is missing the data guidance content text
-
-    # Verify Data set information page link
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Data set information page")]
-    ...    Dataset "${data_set_name}" is missing the "Data set information page" link
-
-    # Verify Create table link
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
-    ...    Dataset "${data_set_name}" is missing the "Create table" link
-
-    # Verify Download (ZIP) button
-    Page Should Contain Element
-    ...    xpath=${dataset_xpath}//button[contains(normalize-space(.), "Download")]
-    ...    Dataset "${data_set_name}" is missing the "Download (ZIP)" button
-
-    user clicks element    xpath=${dataset_xpath}//a[contains(normalize-space(.), "Create table")]
-    user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
-    user waits until page finishes loading
-
-    user waits until table tool wizard step is available    2    Select a data set
-    user checks previous table tool step contains    1    Publication    ${PUBLICATION_TITLE}

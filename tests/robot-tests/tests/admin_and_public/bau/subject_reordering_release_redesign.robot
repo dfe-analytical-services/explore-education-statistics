@@ -238,5 +238,19 @@ Check subject order in data catalogue
     ...    Four
     ...    locator=xpath://*[@data-testid="data-set-file-list"]/li/h4
 
-Verify newly published release is public
+Verify newly published release is public and check data sets available
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+    user clicks link    Explore and download data
+    user waits until h2 is visible    Explore data used in this release
+    user checks data set is in position    One    1
+    user checks data set is in position    Two    2
+    user checks data set is in position    Three    3
+    user checks data set is in position    Four    4
+
+
+*** Keywords ***
+user checks data set is in position
+    [Arguments]    ${section_text}    ${position}    ${parent}=css:body    ${exact_match}=${False}
+    ${text_matcher}    get xpath text matcher    ${section_text}    ${exact_match}
+    user waits until parent contains element    ${parent}
+    ...    xpath://section[@data-testid="datasets-section"]//li[${position}]//h4[${text_matcher}]
