@@ -15,7 +15,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <!-- Required to execute unit tests in IDE -->
-    <PackageReference Include="Testcontainers.Azurite" Version="4.10.0" />
+    <PackageReference Include="Testcontainers.Azurite" Version="4.9.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />
