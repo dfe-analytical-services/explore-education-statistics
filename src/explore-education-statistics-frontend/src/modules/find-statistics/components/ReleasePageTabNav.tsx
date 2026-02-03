@@ -72,6 +72,7 @@ const ReleasePageTabNavLink = ({
         }#content`}
         aria-current={activePage === pageKey ? 'page' : undefined}
         unvisited
+        prefetch={false}
       >
         {title}
       </Link>

@@ -19,4 +19,6 @@ public record SubjectResultMetaViewModel
     public List<TimePeriodMetaViewModel> TimePeriodRange { get; init; } = new();
 
     public bool GeoJsonAvailable { get; init; }
+
+    public bool IsCroppedTable { get; init; }
 }

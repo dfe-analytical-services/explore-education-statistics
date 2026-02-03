@@ -37,13 +37,11 @@ import React, { useMemo } from 'react';
 import { generatePath } from 'react-router-dom';
 
 interface Props {
-  hidden: boolean;
   isPra?: boolean;
   handleFeaturedTableItemClick?: (id: string) => void;
 }
 
 const ReleasePageTabExploreData = ({
-  hidden,
   isPra = false,
   handleFeaturedTableItemClick,
 }: Props) => {
@@ -168,7 +166,8 @@ const ReleasePageTabExploreData = ({
             <>
               <span>
                 Create table{' '}
-                <VisuallyHidden>using {dataset.title}</VisuallyHidden>
+                <VisuallyHidden>using {dataset.title}</VisuallyHidden> (public
+                site only)
               </span>
               <ButtonText
                 onClick={() => {
@@ -188,7 +187,8 @@ const ReleasePageTabExploreData = ({
             renderLink={
               <span>
                 Data set information page{' '}
-                <VisuallyHidden>for {dataset.title}</VisuallyHidden>
+                <VisuallyHidden>for {dataset.title}</VisuallyHidden> (public
+                site only)
               </span>
             }
           />
@@ -239,7 +239,7 @@ const ReleasePageTabExploreData = ({
   );
 
   return (
-    <ReleasePageTabPanel tabKey="explore" hidden={hidden}>
+    <ReleasePageTabPanel tabKey="explore">
       <ReleasePageLayout navItems={navItems}>
         <LoadingSpinner loading={isLoadingDataContent}>
           {isErrorDataContent ? (

@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -9,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static Moq.MockBehavior;
@@ -63,6 +63,8 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
         {
             await ForEachPublicationRoleAsync(async publicationRole =>
             {
+                var isApproverOrOwner = publicationRole is PublicationRole.Owner or PublicationRole.Allower;
+
                 var (handler, methodologyRepository, userPublicationRoleRepository, userReleaseRoleRepository) =
                     CreateHandlerAndDependencies();
 
@@ -71,17 +73,30 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(ListOf(publicationRole));
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
+                            UserId,
+                            OwningPublication.Id,
+                            ResourceRoleFilter.ActiveOnly,
+                            It.IsAny<CancellationToken>(),
+                            new[] { PublicationRole.Owner, PublicationRole.Allower }
+                        )
+                    )
+                    .ReturnsAsync(isApproverOrOwner);
 
-                var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Allower)
-                    .Contains(publicationRole);
-
-                if (!expectedToPassByRole)
+                if (!isApproverOrOwner)
                 {
                     userReleaseRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                        .ReturnsAsync(new List<ReleaseRole>());
+                        .Setup(mock =>
+                            mock.UserHasAnyRoleOnPublication(
+                                UserId,
+                                OwningPublication.Id,
+                                ResourceRoleFilter.ActiveOnly,
+                                It.IsAny<CancellationToken>(),
+                                AuthorizationHandlerService.ReleaseEditorAndApproverRoles.ToArray()
+                            )
+                        )
+                        .ReturnsAsync(false);
                 }
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
@@ -95,7 +110,7 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
 
                 VerifyAllMocks(methodologyRepository, userReleaseRoleRepository, userPublicationRoleRepository);
 
-                Assert.Equal(expectedToPassByRole, authContext.HasSucceeded);
+                Assert.Equal(isApproverOrOwner, authContext.HasSucceeded);
             });
         }
     }
@@ -105,10 +120,12 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
         [Fact]
         public async Task EditorsOrApproversOnAnyOwningPublicationReleaseCanUpdateMethodology()
         {
-            var expectedReleaseRolesToPass = ListOf(ReleaseRole.Approver, ReleaseRole.Contributor);
-
             await ForEachReleaseRoleAsync(async releaseRole =>
             {
+                var isEditorOrApprover = AuthorizationHandlerService.ReleaseEditorAndApproverRoles.Contains(
+                    releaseRole
+                );
+
                 var (handler, methodologyRepository, userPublicationRoleRepository, userReleaseRoleRepository) =
                     CreateHandlerAndDependencies();
 
@@ -117,12 +134,28 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(new List<PublicationRole>());
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
+                            UserId,
+                            OwningPublication.Id,
+                            ResourceRoleFilter.ActiveOnly,
+                            It.IsAny<CancellationToken>(),
+                            new[] { PublicationRole.Owner, PublicationRole.Allower }
+                        )
+                    )
+                    .ReturnsAsync(false);
 
                 userReleaseRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(ListOf(releaseRole));
+                    .Setup(mock =>
+                        mock.UserHasAnyRoleOnPublication(
+                            UserId,
+                            OwningPublication.Id,
+                            ResourceRoleFilter.ActiveOnly,
+                            It.IsAny<CancellationToken>(),
+                            AuthorizationHandlerService.ReleaseEditorAndApproverRoles.ToArray()
+                        )
+                    )
+                    .ReturnsAsync(isEditorOrApprover);
 
                 var user = DataFixture.AuthenticatedUser(userId: UserId);
 
@@ -135,7 +168,7 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
 
                 VerifyAllMocks(methodologyRepository, userPublicationRoleRepository, userReleaseRoleRepository);
 
-                Assert.Equal(expectedReleaseRolesToPass.Contains(releaseRole), authContext.HasSucceeded);
+                Assert.Equal(isEditorOrApprover, authContext.HasSucceeded);
             });
         }
 
@@ -150,12 +183,28 @@ public class UpdateSpecificMethodologyAuthorizationHandlerTests
                 .ReturnsAsync(OwningPublication);
 
             userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        new[] { PublicationRole.Owner, PublicationRole.Allower }
+                    )
+                )
+                .ReturnsAsync(false);
 
             userReleaseRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<ReleaseRole>());
+                .Setup(mock =>
+                    mock.UserHasAnyRoleOnPublication(
+                        UserId,
+                        OwningPublication.Id,
+                        ResourceRoleFilter.ActiveOnly,
+                        It.IsAny<CancellationToken>(),
+                        AuthorizationHandlerService.ReleaseEditorAndApproverRoles.ToArray()
+                    )
+                )
+                .ReturnsAsync(false);
 
             var user = DataFixture.AuthenticatedUser(userId: UserId);
 

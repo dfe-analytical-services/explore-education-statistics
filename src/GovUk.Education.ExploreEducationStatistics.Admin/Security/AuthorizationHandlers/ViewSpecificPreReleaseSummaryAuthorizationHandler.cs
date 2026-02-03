@@ -15,8 +15,11 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandler
 {
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
-    private static readonly ReleaseRole[] UnrestrictedReleaseViewerAndPrereleaseViewerRoles =
-        UnrestrictedReleaseViewerRoles.Append(ReleaseRole.PrereleaseViewer).ToArray();
+    private static readonly HashSet<ReleaseRole> UnrestrictedReleaseViewerAndPrereleaseViewerRoles =
+    [
+        .. UnrestrictedReleaseViewerRoles,
+        ReleaseRole.PrereleaseViewer,
+    ];
 
     public ViewSpecificPreReleaseSummaryAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
     {
@@ -36,11 +39,11 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandler
         }
 
         if (
-            await _authorizationHandlerService.HasRolesOnPublicationOrReleaseVersion(
+            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrReleaseVersion(
                 context.User.GetUserId(),
                 releaseVersion.PublicationId,
                 releaseVersion.Id,
-                ListOf(PublicationRole.Owner, PublicationRole.Allower),
+                SetOf(PublicationRole.Owner, PublicationRole.Allower),
                 UnrestrictedReleaseViewerAndPrereleaseViewerRoles
             )
         )

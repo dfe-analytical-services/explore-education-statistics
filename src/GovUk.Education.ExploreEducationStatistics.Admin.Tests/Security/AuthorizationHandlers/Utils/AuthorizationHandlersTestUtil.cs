@@ -2,24 +2,22 @@ using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.PublicationAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlerContextFactory;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils;
 
 public static class AuthorizationHandlersTestUtil
 {
-    private static readonly DataFixture DataFixture = new();
+    private static readonly DataFixture _fixture = new();
 
     /**
      * Assert that the given handler succeeds when a user has any of the "claimsExpectedToSucceed", and is tested
@@ -88,11 +86,10 @@ public static class AuthorizationHandlersTestUtil
     )
         where TRequirement : IAuthorizationRequirement
     {
-        using (var context = InMemoryApplicationDbContext())
-        {
-            var handler = handlerSupplier(context);
-            await AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario);
-        }
+        using var context = InMemoryApplicationDbContext();
+
+        var handler = handlerSupplier(context);
+        await AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario);
     }
 
     private static List<HandlerTestScenario> GetClaimTestScenarios(
@@ -103,7 +100,7 @@ public static class AuthorizationHandlersTestUtil
         return GetEnums<SecurityClaimTypes>()
             .Select(claim =>
             {
-                var user = DataFixture.AuthenticatedUser().WithClaim(claim.ToString());
+                ClaimsPrincipal user = _fixture.AuthenticatedUser().WithClaim(claim.ToString());
 
                 return new HandlerTestScenario
                 {
@@ -125,7 +122,7 @@ public static class AuthorizationHandlersTestUtil
         return GetEnums<GlobalRoles.Role>()
             .Select(role =>
             {
-                var user = DataFixture.AuthenticatedUser().WithRole(role.GetEnumLabel());
+                ClaimsPrincipal user = _fixture.AuthenticatedUser().WithRole(role.GetEnumLabel());
 
                 return new HandlerTestScenario
                 {
@@ -196,7 +193,8 @@ public static class AuthorizationHandlersTestUtil
     )
         where TRequirement : IAuthorizationRequirement
     {
-        var user = DataFixture.AuthenticatedUser().Generate();
+        User user = _fixture.DefaultUser();
+        ClaimsPrincipal identityUser = _fixture.AuthenticatedUser(userId: user.Id);
 
         await ForEachPublicationRoleAsync(async role =>
         {
@@ -205,17 +203,17 @@ public static class AuthorizationHandlersTestUtil
                 handlerSupplier,
                 new PublicationRoleTestScenario
                 {
-                    User = user,
+                    User = identityUser,
                     Entity = entity,
                     // Setup a UserPublicationRole for this Publication and User
-                    UserPublicationRoles = ListOf(
-                        new UserPublicationRole
-                        {
-                            PublicationId = publicationId,
-                            UserId = user.GetUserId(),
-                            Role = role,
-                        }
-                    ),
+                    UserPublicationRoles =
+                    [
+                        _fixture
+                            .DefaultUserPublicationRole()
+                            .WithUser(user)
+                            .WithPublicationId(publicationId)
+                            .WithRole(role),
+                    ],
                     ExpectedToPass = publicationRolesExpectedToPass.Contains(role),
                     UnexpectedFailMessage =
                         $"Expected having role {role} on the Publication to have made the handler succeed",
@@ -227,24 +225,15 @@ public static class AuthorizationHandlersTestUtil
                 handlerSupplier,
                 new PublicationRoleTestScenario
                 {
-                    User = user,
+                    User = identityUser,
                     Entity = entity,
-                    // Setup a UserPublicationRole for this Publication but a different User
-                    UserPublicationRoles = ListOf(
-                        new UserPublicationRole
-                        {
-                            PublicationId = publicationId,
-                            UserId = Guid.NewGuid(),
-                            Role = role,
-                        },
+                    UserPublicationRoles =
+                    [
+                        // Setup a UserPublicationRole for this Publication but a different User
+                        _fixture.DefaultUserPublicationRole().WithPublicationId(publicationId).WithRole(role),
                         // Setup a UserPublicationRoles for this User but a different Publication
-                        new UserPublicationRole
-                        {
-                            PublicationId = Guid.NewGuid(),
-                            UserId = user.GetUserId(),
-                            Role = role,
-                        }
-                    ),
+                        _fixture.DefaultUserPublicationRole().WithUser(user).WithRole(role),
+                    ],
                     ExpectedToPass = false,
                     UnexpectedPassMessage =
                         $"Expected not having {role} role on the Publication would have made the handler fail",
@@ -265,7 +254,7 @@ public static class AuthorizationHandlersTestUtil
         {
             if (scenario.UserPublicationRoles != null)
             {
-                await context.AddRangeAsync(scenario.UserPublicationRoles);
+                context.AddRange(scenario.UserPublicationRoles);
                 await context.SaveChangesAsync();
             }
         }

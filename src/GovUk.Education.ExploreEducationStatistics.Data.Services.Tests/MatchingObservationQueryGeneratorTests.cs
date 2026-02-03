@@ -30,7 +30,7 @@ public class MatchingObservationQueryGeneratorTests
         var subjectId = Guid.NewGuid();
         await using var context = InMemoryStatisticsDbContext();
 
-        var cancellationTokenSource = new CancellationTokenSource();
+        using var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
         var tempTableCreator = new Mock<ITemporaryTableCreator>();
@@ -88,7 +88,7 @@ public class MatchingObservationQueryGeneratorTests
         var subjectId = Guid.NewGuid();
         await using var context = InMemoryStatisticsDbContext();
 
-        var cancellationTokenSource = new CancellationTokenSource();
+        using var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
         var tempTableCreator = new Mock<ITemporaryTableCreator>();
@@ -160,7 +160,7 @@ public class MatchingObservationQueryGeneratorTests
         var subjectId = Guid.NewGuid();
         await using var context = InMemoryStatisticsDbContext();
 
-        var cancellationTokenSource = new CancellationTokenSource();
+        using var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
         var tempTableCreator = new Mock<ITemporaryTableCreator>();
@@ -258,7 +258,7 @@ public class MatchingObservationQueryGeneratorTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
 
             // We are selecting half or less of the Filter Items out of the
@@ -375,7 +375,7 @@ public class MatchingObservationQueryGeneratorTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
 
             // We are selecting more than half of the Filter Items out of the
@@ -505,7 +505,7 @@ public class MatchingObservationQueryGeneratorTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
 
             // Set up some selected Filter Item Ids for only 1 Filter from this Subject.
@@ -630,7 +630,7 @@ public class MatchingObservationQueryGeneratorTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
 
             // Set up ALL selected Filter Item Ids for Filter1, and select just some
@@ -793,7 +793,7 @@ public class MatchingObservationQueryGeneratorTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
 
             // Set up some selected Filter Item Ids from 3 of the 4 Filters on this Subject.
@@ -1025,7 +1025,7 @@ public class MatchingObservationQueryGeneratorTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
 
             Guid[] selectedFilterItemIds =

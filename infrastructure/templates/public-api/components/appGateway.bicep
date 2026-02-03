@@ -65,7 +65,7 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-
 }
 
 // Allow the managed identity to access certificates from Key Vault.
-module keyVaultSecretsUserRoleAssignmentModule 'keyVaultRoleAssignment.bicep' = {
+module keyVaultSecretsUserRoleAssignmentModule '../../common/components/key-vault/keyVaultRoleAssignment.bicep' = {
   name: '${appGatewayName}KeyVaultSecretsUserRoleAssignment'
   params: {
     keyVaultName: keyVaultName
@@ -74,20 +74,12 @@ module keyVaultSecretsUserRoleAssignmentModule 'keyVaultRoleAssignment.bicep' = 
   }
 }
 
-module keyVaultCertificateUserRoleAssignmentModule 'keyVaultRoleAssignment.bicep' = {
+module keyVaultCertificateUserRoleAssignmentModule '../../common/components/key-vault/keyVaultRoleAssignment.bicep' = {
   name: '${appGatewayName}KeyVaultCertificateUserRoleAssignment'
   params: {
     keyVaultName: keyVaultName
     principalIds: [managedIdentity.properties.principalId]
     role: 'Certificate User'
-  }
-}
-
-module keyVaultAccessPolicyModule 'keyVaultAccessPolicy.bicep' = {
-  name: '${appGatewayName}KeyVaultAccessPolicy'
-  params: {
-    keyVaultName: keyVaultName
-    principalIds: [managedIdentity.properties.principalId]
   }
 }
 

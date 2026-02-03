@@ -1,0 +1,3 @@
+*.zip
+!small-file.csv
+!small-file.meta.csv

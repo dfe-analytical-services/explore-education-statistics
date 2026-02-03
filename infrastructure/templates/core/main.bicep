@@ -1,3 +1,5 @@
+import { FrontDoorCertificateType } from 'application/frontDoor/types.bicep'
+
 @description('Environment : Subscription name. Used as a prefix for created resources.')
 param subscription string = ''
 
@@ -6,6 +8,12 @@ param location string = resourceGroup().location
 
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
+
+@description('The public site URL for use with Azure Front Door.')
+param publicSiteUrl string = ''
+
+@description('Certificate type for Azure Front Door.')
+param certificateType FrontDoorCertificateType = 'Provisioned'
 
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool = true
@@ -29,6 +37,7 @@ var tagValues = union(resourceTags ?? {}, {
 })
 
 var resourcePrefix = '${subscription}-ees'
+var legacyResourcePrefix = '${subscription}-'
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
   name: '${resourcePrefix}-log'
@@ -50,7 +59,10 @@ module frontDoorModule 'application/frontDoor/frontDoor.bicep' = {
   params: {
     subscription: subscription
     resourcePrefix: resourcePrefix
-    tagValues: tagValues
+    legacyResourcePrefix: legacyResourcePrefix
+    publicSiteUrl: publicSiteUrl
+    certificateType: certificateType
     logAnalyticsWorkspaceId: logAnalyticsWorkspace.id
+    tagValues: tagValues
   }
 }

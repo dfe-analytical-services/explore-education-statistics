@@ -227,24 +227,24 @@ public class PublicationServiceTests
         {
             await contentDbContext.Publications.AddRangeAsync(publication1, publication2, publication3);
             await contentDbContext.UserPublicationRoles.AddRangeAsync(
-                new UserPublicationRole
-                {
-                    User = user,
-                    Publication = publication1,
-                    Role = PublicationRole.Owner,
-                },
-                new UserPublicationRole
-                {
-                    User = user,
-                    Publication = publication2,
-                    Role = PublicationRole.Owner,
-                },
-                new UserPublicationRole
-                {
-                    User = user,
-                    Publication = publication3,
-                    Role = PublicationRole.Owner,
-                }
+                _dataFixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithRole(PublicationRole.Owner)
+                    .WithPublication(publication1)
+                    .Generate(),
+                _dataFixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithRole(PublicationRole.Owner)
+                    .WithPublication(publication2)
+                    .Generate(),
+                _dataFixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithRole(PublicationRole.Owner)
+                    .WithPublication(publication3)
+                    .Generate()
             );
             await contentDbContext.SaveChangesAsync();
         }
@@ -300,24 +300,24 @@ public class PublicationServiceTests
         {
             await contentDbContext.Publications.AddRangeAsync(publication2, publication3, publication1);
             await contentDbContext.UserPublicationRoles.AddRangeAsync(
-                new UserPublicationRole
-                {
-                    User = user,
-                    Publication = publication1,
-                    Role = PublicationRole.Owner,
-                },
-                new UserPublicationRole
-                {
-                    User = user,
-                    Publication = publication2,
-                    Role = PublicationRole.Owner,
-                },
-                new UserPublicationRole
-                {
-                    User = user,
-                    Publication = publication3,
-                    Role = PublicationRole.Owner,
-                }
+                _dataFixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithRole(PublicationRole.Owner)
+                    .WithPublication(publication3)
+                    .Generate(),
+                _dataFixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithRole(PublicationRole.Owner)
+                    .WithPublication(publication1)
+                    .Generate(),
+                _dataFixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithRole(PublicationRole.Owner)
+                    .WithPublication(publication2)
+                    .Generate()
             );
             await contentDbContext.SaveChangesAsync();
         }
@@ -370,24 +370,24 @@ public class PublicationServiceTests
         {
             await contentDbContext.Publications.AddRangeAsync(publication1, publication2, publication3, publication4);
             await contentDbContext.UserPublicationRoles.AddRangeAsync(
-                new UserPublicationRole
-                {
-                    User = user,
-                    Publication = publication1,
-                    Role = PublicationRole.Owner,
-                },
-                new UserPublicationRole
-                {
-                    User = user,
-                    Publication = publication2,
-                    Role = PublicationRole.Owner,
-                },
-                new UserPublicationRole
-                {
-                    User = user,
-                    Publication = publication3,
-                    Role = PublicationRole.Owner,
-                }
+                _dataFixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithRole(PublicationRole.Owner)
+                    .WithPublication(publication1)
+                    .Generate(),
+                _dataFixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithRole(PublicationRole.Owner)
+                    .WithPublication(publication2)
+                    .Generate(),
+                _dataFixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithRole(PublicationRole.Owner)
+                    .WithPublication(publication3)
+                    .Generate()
             );
             await contentDbContext.SaveChangesAsync();
         }
@@ -3496,7 +3496,12 @@ public class PublicationServiceTests
             AdminMapper(),
             new PersistenceHelper<ContentDbContext>(context),
             userService ?? AlwaysTrueUserService().Object,
-            publicationRepository ?? new PublicationRepository(context),
+            publicationRepository
+                ?? new PublicationRepository(
+                    context: context,
+                    userReleaseRoleRepository: new UserReleaseRoleRepository(context),
+                    userPublicationRoleRepository: new UserPublicationRoleRepository(context)
+                ),
             releaseVersionRepository ?? new ReleaseVersionRepository(context),
             methodologyService ?? Mock.Of<IMethodologyService>(Strict),
             publicationCacheService ?? _publicationCacheServiceMockBuilder.Build(),

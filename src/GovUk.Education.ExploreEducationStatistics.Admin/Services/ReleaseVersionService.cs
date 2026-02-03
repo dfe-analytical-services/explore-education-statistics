@@ -1,6 +1,7 @@
 #nullable enable
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -16,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -54,8 +56,8 @@ public class ReleaseVersionService(
     IProcessorClient processorClient,
     IPrivateBlobCacheService privateCacheService,
     IOrganisationsValidator organisationsValidator,
-    IUserReleaseInviteRepository userReleaseInviteRepository,
     IUserReleaseRoleRepository userReleaseRoleRepository,
+    IUserPublicationRoleRepository userPublicationRoleRepository,
     IReleaseSlugValidator releaseSlugValidator,
     ILogger<ReleaseVersionService> logger
 ) : IReleaseVersionService
@@ -69,19 +71,17 @@ public class ReleaseVersionService(
             .Include(rv => rv.ReleaseStatuses)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanViewReleaseVersion)
-            .OnSuccess(releaseVersion =>
+            .OnSuccess(async releaseVersion =>
             {
-                var prereleaseRolesOrInvitesAdded =
-                    context.UserReleaseRoles.Any(role =>
-                        role.ReleaseVersionId == releaseVersionId && role.Role == ReleaseRole.PrereleaseViewer
-                    )
-                    || context.UserReleaseInvites.Any(role =>
-                        role.ReleaseVersionId == releaseVersionId && role.Role == ReleaseRole.PrereleaseViewer
-                    );
+                var prereleaseRolesAdded = await userReleaseRoleRepository
+                    .Query(ResourceRoleFilter.AllButExpired)
+                    .WhereForReleaseVersion(releaseVersionId)
+                    .WhereRolesIn(ReleaseRole.PrereleaseViewer)
+                    .AnyAsync();
 
                 return mapper.Map<ReleaseVersionViewModel>(releaseVersion) with
                 {
-                    PreReleaseUsersOrInvitesAdded = prereleaseRolesOrInvitesAdded,
+                    PreReleaseUsersOrInvitesAdded = prereleaseRolesAdded,
                 };
             });
     }
@@ -257,7 +257,7 @@ public class ReleaseVersionService(
             await context.SaveChangesAsync(cancellationToken);
         }
 
-        await RemoveRolesAndInvites(releaseVersion, cancellationToken);
+        await RemoveRoles(releaseVersion, cancellationToken);
     }
 
     private async Task SoftDeleteReleaseVersion(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
@@ -265,21 +265,19 @@ public class ReleaseVersionService(
         releaseVersion.SoftDeleted = true;
         context.ReleaseVersions.Update(releaseVersion);
 
-        await RemoveRolesAndInvites(releaseVersion, cancellationToken);
+        await RemoveRoles(releaseVersion, cancellationToken);
     }
 
-    private async Task RemoveRolesAndInvites(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
+    private async Task RemoveRoles(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
     {
         // TODO: UserReleaseRoles deletion should probably be handled by cascade deletion of the associated ReleaseVersion (investigate as part of EES-1295)
-        await userReleaseRoleRepository.RemoveForReleaseVersion(
-            releaseVersionId: releaseVersion.Id,
-            cancellationToken: cancellationToken
-        );
 
-        await userReleaseInviteRepository.RemoveByReleaseVersion(
-            releaseVersionId: releaseVersion.Id,
-            cancellationToken: cancellationToken
-        );
+        var releaseRolesToRemove = await userReleaseRoleRepository
+            .Query(ResourceRoleFilter.All)
+            .WhereForReleaseVersion(releaseVersion.Id)
+            .ToListAsync(cancellationToken);
+
+        await userReleaseRoleRepository.RemoveMany(releaseRolesToRemove, cancellationToken);
     }
 
     private async Task DeleteReleaseSeriesItem(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
@@ -489,18 +487,22 @@ public class ReleaseVersionService(
     {
         var userId = userService.GetUserId();
 
-        var directReleasesWithApprovalRole = await context
-            .UserReleaseRoles.Where(role => role.UserId == userId && role.Role == ReleaseRole.Approver)
-            .Select(role => role.ReleaseVersionId)
+        var directReleaseVersionsWithApprovalRole = await userReleaseRoleRepository
+            .Query()
+            .WhereForUser(userId)
+            .WhereRolesIn(ReleaseRole.Approver)
+            .Select(urr => urr.ReleaseVersionId)
             .ToListAsync();
 
-        var indirectReleasesWithApprovalRole = await context
-            .UserPublicationRoles.Where(role => role.UserId == userId && role.Role == PublicationRole.Allower)
-            .SelectMany(role => role.Publication.ReleaseVersions.Select(releaseVersion => releaseVersion.Id))
+        var indirectReleaseVersionsWithApprovalRole = await userPublicationRoleRepository
+            .Query()
+            .WhereForUser(userId)
+            .WhereRolesIn(PublicationRole.Allower)
+            .SelectMany(upr => upr.Publication.Releases.SelectMany(r => r.Versions.Select(rv => rv.Id)))
             .ToListAsync();
 
-        var releaseVersionIdsForApproval = directReleasesWithApprovalRole
-            .Concat(indirectReleasesWithApprovalRole)
+        var releaseVersionIdsForApproval = directReleaseVersionsWithApprovalRole
+            .Concat(indirectReleaseVersionsWithApprovalRole)
             .Distinct();
 
         var releaseVersionsForApproval = await context

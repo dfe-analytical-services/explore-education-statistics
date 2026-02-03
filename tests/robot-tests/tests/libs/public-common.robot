@@ -83,3 +83,13 @@ user checks methodology note
 
 user checks related information panel is visible
     user waits until page contains element    xpath://h2[text()='Related information']
+
+user checks section with ID contains elements and back to top link
+    [Arguments]    ${section_id}    @{paragraph_texts}    ${back_to_top}=True
+    ${section}=    Get WebElement    id:${section_id}
+    FOR    ${paragraph_text}    IN    @{paragraph_texts}
+        user checks element should contain    ${section}    ${paragraph_text}
+    END
+    IF    ${back_to_top}
+        user waits until parent contains element    ${section}    xpath://a[text()="Back to top" and @href="\#top"]
+    END

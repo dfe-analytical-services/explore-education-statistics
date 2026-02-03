@@ -15,11 +15,7 @@ interface MethodologyLink {
   external?: boolean;
 }
 
-interface Props {
-  hidden: boolean;
-}
-
-const ReleasePageTabMethodology = ({ hidden }: Props) => {
+const ReleasePageTabMethodology = () => {
   const {
     release: { publication, publishingOrganisations },
   } = useReleaseContentState();
@@ -59,7 +55,7 @@ const ReleasePageTabMethodology = ({ hidden }: Props) => {
   );
 
   return (
-    <ReleasePageTabPanel tabKey="methodology" hidden={hidden}>
+    <ReleasePageTabPanel tabKey="methodology">
       <ReleasePageLayout navItems={navItems}>
         {allMethodologies.length > 0 && (
           <ReleasePageContentSection

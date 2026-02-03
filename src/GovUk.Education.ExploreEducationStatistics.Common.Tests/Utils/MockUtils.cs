@@ -190,4 +190,9 @@ public static class MockUtils
             )
         );
     }
+
+    public static List<Guid> GenerateGuids(int count)
+    {
+        return [.. Enumerable.Range(0, count).Select(_ => Guid.NewGuid())];
+    }
 }

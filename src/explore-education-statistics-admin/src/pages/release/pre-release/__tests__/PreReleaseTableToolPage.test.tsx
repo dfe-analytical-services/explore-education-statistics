@@ -151,6 +151,7 @@ describe('PreReleaseTableToolPage', () => {
       subjectName: 'Absence by characteristic',
       timePeriodRange: [{ code: 'AY', label: '2014/15', year: 2014 }],
       geoJsonAvailable: false,
+      isCroppedTable: false,
     },
     results: [
       {

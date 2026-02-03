@@ -1,5 +1,4 @@
 import Link from '@admin/components/Link';
-import { useEditingContext } from '@admin/contexts/EditingContext';
 import ReleasePageTabBar from '@admin/pages/release/content/components/ReleasePageTabBar';
 import ReleasePageTabExploreData from '@admin/pages/release/content/components/ReleasePageTabExploreData';
 import ReleasePageTabHelp from '@admin/pages/release/content/components/ReleasePageTabHelp';
@@ -17,7 +16,7 @@ import {
   formatPartialDate,
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
-import React, { Fragment, useCallback, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 
 export const releasePageTabSections = {
   home: {
@@ -49,27 +48,9 @@ const ReleaseContent = ({
   transformFeaturedTableLinks,
 }: Props) => {
   const { release } = useReleaseContentState();
-  const { setActiveSection } = useEditingContext();
-
   const { isMedia: isMobileMedia } = useMobileMedia();
 
-  const [activeTabSection, setActiveTabSection] =
-    useState<ReleasePageTabSectionKey>('home');
-
-  const [renderedTabs, setRenderedTabs] = useState<ReleasePageTabSectionKey[]>([
-    'home',
-  ]);
-
-  const handleChangeTab = useCallback(
-    (sectionKey: ReleasePageTabSectionKey) => {
-      if (!renderedTabs.includes(sectionKey)) {
-        setRenderedTabs(prevTabs => [...prevTabs, sectionKey]);
-      }
-      setActiveTabSection(sectionKey);
-      setActiveSection('summary-section');
-    },
-    [renderedTabs, setActiveSection],
-  );
+  const [activeTab, setActiveTab] = useState<ReleasePageTabSectionKey>('home');
 
   const { nextReleaseDate, publication, publishingOrganisations, updates } =
     release;
@@ -104,7 +85,7 @@ const ReleaseContent = ({
             Next release{' '}
             <time
               className="govuk-!-font-weight-bold"
-              data-testid="Next update"
+              data-testid="Next release"
             >
               {formatPartialDate(nextReleaseDate)}
             </time>
@@ -156,32 +137,21 @@ const ReleaseContent = ({
         />
       )}
 
-      <ReleasePageTabBar
-        activeTab={activeTabSection}
-        onChangeTab={handleChangeTab}
-      />
+      <ReleasePageTabBar activeTab={activeTab} onChangeTab={setActiveTab} />
 
-      {renderedTabs.includes('home') && (
+      {activeTab === 'home' && (
         <ReleasePageTabHome
-          hidden={activeTabSection !== 'home'}
           transformFeaturedTableLinks={transformFeaturedTableLinks}
         />
       )}
-      {renderedTabs.includes('explore') && (
+      {activeTab === 'explore' && (
         <ReleasePageTabExploreData
-          hidden={activeTabSection !== 'explore'}
           isPra={isPra}
           handleFeaturedTableItemClick={handleFeaturedTableItemClick}
         />
       )}
-      {renderedTabs.includes('methodology') && (
-        <ReleasePageTabMethodology
-          hidden={activeTabSection !== 'methodology'}
-        />
-      )}
-      {renderedTabs.includes('help') && (
-        <ReleasePageTabHelp hidden={activeTabSection !== 'help'} />
-      )}
+      {activeTab === 'methodology' && <ReleasePageTabMethodology />}
+      {activeTab === 'help' && <ReleasePageTabHelp />}
     </>
   );
 };

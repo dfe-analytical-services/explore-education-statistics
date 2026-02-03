@@ -74,6 +74,13 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
               not exist in the underlying file.
             </WarningMessage>
           )}
+          {fullTable.subjectMeta.isCroppedTable && (
+            <WarningMessage testId="missing-data-warning">
+              The selected options return too many rows to be displayed here and
+              so the table shows only a subset of the data provided by your
+              selections.
+            </WarningMessage>
+          )}
           {dataBlockId && query && (
             <TableExportMenu
               fileName={captionTitle}

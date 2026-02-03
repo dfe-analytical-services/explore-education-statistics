@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using Newtonsoft.Json;
 
@@ -29,6 +30,20 @@ public record FullTableQuery
         return Filters;
 #pragma warning restore CS0618 // Type or member is obsolete
     }
+
+    [NotMapped]
+    [JsonIgnore]
+    public bool AllowCropping { get; set; }
+
+    /// <summary>
+    /// Determines whether the query should be cropped if the resulting table is expected to exceed the maximum allowable size.
+    /// </summary>
+    /// <remarks>
+    /// Ignoring the maximum table size is required for full data exports, but may be undesirable for table previews.
+    /// </remarks>
+    [NotMapped]
+    [JsonIgnore]
+    public bool IgnoreMaxTableSize { get; set; }
 
     public List<Guid> GetFilterItemIds()
     {

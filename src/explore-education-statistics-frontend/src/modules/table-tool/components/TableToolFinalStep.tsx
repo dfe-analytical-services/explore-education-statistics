@@ -125,7 +125,11 @@ const TableToolFinalStep = ({
       {!hasTableError && (
         <>
           <div className="govuk-!-margin-bottom-7">
-            <TableToolShare tableHeaders={tableHeaders} query={query} />
+            <TableToolShare
+              tableHeaders={tableHeaders}
+              query={query}
+              isCropped={table.subjectMeta.isCroppedTable}
+            />
           </div>
 
           <DownloadTable

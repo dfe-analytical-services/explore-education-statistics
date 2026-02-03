@@ -8,7 +8,7 @@ public class UserPublicationRole : ResourceRole<PublicationRole, Publication>
         set => Resource = value;
     }
 
-    public Guid PublicationId
+    public required Guid PublicationId
     {
         get => ResourceId;
         set => ResourceId = value;

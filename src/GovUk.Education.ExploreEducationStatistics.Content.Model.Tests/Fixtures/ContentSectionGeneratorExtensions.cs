@@ -18,6 +18,9 @@ public static class ContentSectionGeneratorExtensions
     public static Generator<ContentSection> WithHeading(this Generator<ContentSection> generator, string heading) =>
         generator.ForInstance(s => s.SetHeading(heading));
 
+    public static Generator<ContentSection> WithOrder(this Generator<ContentSection> generator, int order) =>
+        generator.ForInstance(s => s.SetOrder(order));
+
     public static Generator<ContentSection> WithType(
         this Generator<ContentSection> generator,
         ContentSectionType type
@@ -39,6 +42,9 @@ public static class ContentSectionGeneratorExtensions
         this InstanceSetters<ContentSection> setters,
         string heading
     ) => setters.Set(cs => cs.Heading, heading);
+
+    public static InstanceSetters<ContentSection> SetOrder(this InstanceSetters<ContentSection> setters, int order) =>
+        setters.Set(cs => cs.Order, order);
 
     public static InstanceSetters<ContentSection> SetType(
         this InstanceSetters<ContentSection> setters,

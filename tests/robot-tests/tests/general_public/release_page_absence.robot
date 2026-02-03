@@ -22,7 +22,7 @@ Validate title
 
 Validate Published date
     [Tags]    NotAgainstPreProd
-    user checks summary list contains    Published    25 April 2018
+    user checks summary list contains    Published    26 March 2020
 
 Validate Next update date
     [Tags]    NotAgainstPreProd
@@ -33,8 +33,6 @@ Validate Email alerts link
     ...    /subscriptions/new-subscription/${PUPIL_ABSENCE_PUBLICATION_SLUG}
 
 Validate "About these statistics" -- Number of other releases
-    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    [Tags]    Failing
     user checks number of other releases is correct    6
     user opens details dropdown    View releases (6)
     user checks other release is shown in position    Academic year 2014/15    1
@@ -46,15 +44,15 @@ Validate "About these statistics" -- Number of other releases
     user closes details dropdown    View releases (6)
 
 Validate "About these statistics" -- "Last updated"
-    user checks summary list contains    Last updated    22 August 2022
+    user checks summary list contains    Last updated    9 March 2022
 
     user checks number of release updates    3
     user opens details dropdown    See all updates (3)
 
-    user checks release update    1    22 August 2022    Updating LAD map
+    user checks release update    1    9 March 2022    Updated boundary file on LAD map of absence rates.
     user checks release update    2    19 April 2018
     ...    Underlying data file updated to include absence data by pupil residency and school location, and updated metadata document.
-    user checks release update    3    22 March 2018    First published.
+    user checks release update    3    22 March 2018    First published on GOV.UK.
     user closes details dropdown    See all updates (3)
 
 Check quick links navigation contains links
@@ -93,8 +91,6 @@ Validate absence_in_prus.csv file can be downloaded
     user closes details dropdown    Download data files
 
 Validate headlines -- Summary tab key stats
-    [Documentation]    DFE-915    EES-806    EES-1508    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    [Tags]    Failing
     user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
 
     user checks key stat contents    1    Overall absence rate    4.7%    Up from 4.6% in 2015/16    %{WAIT_MEDIUM}
@@ -117,62 +113,28 @@ Validate headlines -- Summary tab content
     user checks headline summary contains    unauthorised absence rise due to higher rates of unauthorised holidays
     user checks headline summary contains    10% of pupils persistently absent during 2016/17
 
-Validate Key Statistics data block -- Charts tab
-    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    [Tags]    Failing
-    user scrolls to element    css:#releaseHeadlines-charts-tab
-    user clicks element    id:releaseHeadlines-charts-tab
-    ${headline_chart}=    set variable    css:#releaseHeadlines-chart    # must be css selector
-    user waits until element contains line chart    ${headline_chart}
-    user checks chart legend item contains    ${headline_chart}    1    Unauthorised absence rate (England)
-    user checks chart legend item contains    ${headline_chart}    2    Overall absence rate (England)
-    user checks chart legend item contains    ${headline_chart}    3    Authorised absence rate (England)
-    user checks chart x axis ticks    ${headline_chart}    2012/13    2013/14    2014/15    2015/16    2016/17
-    user checks chart y axis ticks    ${headline_chart}    0    2    4    6
-    user mouses over line chart point    ${headline_chart}    1    1
-    user checks chart tooltip label contains    ${headline_chart}    2012/13
-    user checks chart tooltip item contains    ${headline_chart}    1    Overall absence rate (England): 5.3%
-    user checks chart tooltip item contains    ${headline_chart}    2    Authorised absence rate (England): 4.2%
-    user checks chart tooltip item contains    ${headline_chart}    3    Unauthorised absence rate (England): 1.1%
+Validate Headlines facts and figures -- Charts tab
+    open headline chart
+    chart legend should be
+    ...    Authorised absence rate (England)
+    ...    Overall absence rate (England)
+    ...    Unauthorised absence rate (England)
 
-    user mouses over line chart point    ${headline_chart}    1    2
-    user checks chart tooltip label contains    ${headline_chart}    2013/14
-    user checks chart tooltip item contains    ${headline_chart}    1    Overall absence rate (England): 4.5%
-    user checks chart tooltip item contains    ${headline_chart}    2    Authorised absence rate (England): 3.5%
-    user checks chart tooltip item contains    ${headline_chart}    3    Unauthorised absence rate (England): 1.1%
+    chart X axis should be
+    ...    2012/13
+    ...    2013/14
+    ...    2014/15
+    ...    2015/16
+    ...    2016/17
 
-    user mouses over line chart point    ${headline_chart}    1    3
-    user checks chart tooltip label contains    ${headline_chart}    2014/15
-    user checks chart tooltip item contains    ${headline_chart}    1    Overall absence rate (England): 4.6%
-    user checks chart tooltip item contains    ${headline_chart}    2    Authorised absence rate (England): 3.5%
-    user checks chart tooltip item contains    ${headline_chart}    3    Unauthorised absence rate (England): 1.1%
-
-    user mouses over line chart point    ${headline_chart}    1    4
-    user checks chart tooltip label contains    ${headline_chart}    2015/16
-    user checks chart tooltip item contains    ${headline_chart}    1    Overall absence rate (England): 4.6%
-    user checks chart tooltip item contains    ${headline_chart}    2    Authorised absence rate (England): 3.4%
-    user checks chart tooltip item contains    ${headline_chart}    3    Unauthorised absence rate (England): 1.1%
-
-    user mouses over line chart point    ${headline_chart}    1    5
-    user checks chart tooltip label contains    ${headline_chart}    2016/17
-    user checks chart tooltip item contains    ${headline_chart}    1    Overall absence rate (England): 4.7%
-    user checks chart tooltip item contains    ${headline_chart}    2    Authorised absence rate (England): 3.4%
-    user checks chart tooltip item contains    ${headline_chart}    3    Unauthorised absence rate (England): 1.3%
-
-    user checks list has x items    testid:footnotes    2    ${headline_chart}
-    user checks list item contains    testid:footnotes    1
-    ...    Absence rates are the number of absence sessions expressed    ${headline_chart}
-    user checks list item contains    testid:footnotes    2
-    ...    There may be discrepancies between totals and the sum of constituent parts    ${headline_chart}
-
-    user clicks button    Show 1 more footnote    ${headline_chart}
-    user checks list has x items    testid:footnotes    3    ${headline_chart}
-    user checks list item contains    testid:footnotes    3
-    ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.    ${headline_chart}
+    chart Y axis should be
+    ...    0%
+    ...    2%
+    ...    4%
+    ...    6%
 
 Validate Key Statistics data block -- Data tables tab
-    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    [Tags]    Failing
+    user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
     user clicks element    id:releaseHeadlines-tables-tab
     user waits until element contains    css:[data-testid="dataTableCaption"]
     ...    'Absence by characteristic' in England between 2012/13 and 2016/17    %{WAIT_SMALL}
@@ -183,8 +145,7 @@ Validate Key Statistics data block -- Data tables tab
     user checks table column heading contains    1    4    2015/16    css:#releaseHeadlines-tables table
     user checks table column heading contains    1    5    2016/17    css:#releaseHeadlines-tables table
 
-    ${row}=    user gets row with group and indicator    England    Authorised absence rate
-    ...    css:#releaseHeadlines-tables table
+    ${row}=    set variable    xpath://tbody/tr[th[normalize-space() = 'Authorised absence rate']]
     user checks row contains heading    ${row}    Authorised absence rate
     user checks row cell contains text    ${row}    1    4.2
     user checks row cell contains text    ${row}    2    3.5
@@ -192,8 +153,7 @@ Validate Key Statistics data block -- Data tables tab
     user checks row cell contains text    ${row}    4    3.4
     user checks row cell contains text    ${row}    5    3.4
 
-    ${row}=    user gets row with group and indicator    England    Unauthorised absence rate
-    ...    css:#releaseHeadlines-tables table
+    ${row}=    set variable    xpath://tbody/tr[th[normalize-space() = 'Unauthorised absence rate']]
     user checks row contains heading    ${row}    Unauthorised absence rate
     user checks row cell contains text    ${row}    1    1.1
     user checks row cell contains text    ${row}    2    1.1
@@ -201,8 +161,7 @@ Validate Key Statistics data block -- Data tables tab
     user checks row cell contains text    ${row}    4    1.1
     user checks row cell contains text    ${row}    5    1.3
 
-    ${row}=    user gets row with group and indicator    England    Overall absence rate
-    ...    css:#releaseHeadlines-tables table
+    ${row}=    set variable    xpath://tbody/tr[th[normalize-space() = 'Overall absence rate']]
     user checks row contains heading    ${row}    Overall absence rate
     user checks row cell contains text    ${row}    1    5.3
     user checks row cell contains text    ${row}    2    4.5
@@ -210,19 +169,12 @@ Validate Key Statistics data block -- Data tables tab
     user checks row cell contains text    ${row}    4    4.6
     user checks row cell contains text    ${row}    5    4.7
 
-    user checks list has x items    testid:footnotes    2    id:releaseHeadlines-tables
-    user checks list item contains    testid:footnotes    1
-    ...    Absence rates are the number of absence sessions expressed    id:releaseHeadlines-tables
-    user checks list item contains    testid:footnotes    2
-    ...    There may be discrepancies between totals and the sum of constituent parts    id:releaseHeadlines-tables
-    user clicks button    Show 1 more footnote    id:releaseHeadlines-tables
-    user checks list has x items    testid:footnotes    3    id:releaseHeadlines-tables
-    user checks list item contains    testid:footnotes    3
-    ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.    id:releaseHeadlines-tables
+    user checks section with ID contains elements and back to top link    releaseHeadlines-tables
+    ...    Show full screen table
+    ...    Data symbols
+    ...    back_to_top=False
 
 Validate accordion sections order
-    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    [Tags]    Failing
     user checks accordion is in position    About these statistics    1    id:content
     user checks accordion is in position    Pupil absence rates    2    id:content
     user checks accordion is in position    Persistent absence    3    id:content
@@ -371,8 +323,6 @@ Check Regional and local authority (LA) breakdown chart has footnotes
     ...    ${data_block_chart}
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
-    [Documentation]    DFE-898    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
-    [Tags]    Failing
     user clicks link    View or create your own tables
     user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
     user waits until page finishes loading

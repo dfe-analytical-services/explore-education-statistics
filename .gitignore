@@ -60,11 +60,11 @@ src/explore-education-statistics-frontend/*.xml
 seed-data-files.zip
 src/**/TestResults
 
-/tests/performance-tests/.env.*
-!/tests/performance-tests/.env.example.json
-/tests/performance-tests/dist
-/tests/performance-tests/big-files
-/tests/performance-tests/*.html
+/tests/performance-tests/k6/.env.*
+!/tests/performance-tests/k6/.env.example.json
+/tests/performance-tests/k6/dist
+/tests/performance-tests/k6/big-files
+/tests/performance-tests/k6/*.html
 
 ## Scripts
 

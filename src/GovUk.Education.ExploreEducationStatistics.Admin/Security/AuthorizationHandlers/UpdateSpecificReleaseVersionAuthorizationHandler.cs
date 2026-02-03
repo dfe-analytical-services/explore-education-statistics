@@ -36,11 +36,11 @@ public class UpdateSpecificReleaseVersionAuthorizationHandler
             return;
         }
 
-        var allowedPublicationRoles = ListOf(PublicationRole.Owner, PublicationRole.Allower);
+        var allowedPublicationRoles = SetOf(PublicationRole.Owner, PublicationRole.Allower);
         var allowedReleaseRoles = ReleaseEditorAndApproverRoles;
 
         if (
-            await _authorizationHandlerService.HasRolesOnPublicationOrReleaseVersion(
+            await _authorizationHandlerService.UserHasAnyRoleOnPublicationOrReleaseVersion(
                 context.User.GetUserId(),
                 releaseVersion.PublicationId,
                 releaseVersion.Id,
