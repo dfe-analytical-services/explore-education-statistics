@@ -2,8 +2,11 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -33,58 +36,7 @@ public abstract class UserReleaseRoleRepositoryTests
     public class CreateTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
-        public async Task Create()
-        {
-            User user = _fixture.DefaultUser();
-            User createdBy = _fixture.DefaultUser();
-
-            var releaseVersion = new ReleaseVersion();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.Users.AddRange(user, createdBy);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = CreateRepository(contentDbContext);
-
-                var result = await repository.Create(
-                    userId: user.Id,
-                    releaseVersionId: releaseVersion.Id,
-                    ReleaseRole.Contributor,
-                    createdById: createdBy.Id
-                );
-
-                Assert.NotEqual(Guid.Empty, result.Id);
-                Assert.Equal(user.Id, result.UserId);
-                Assert.Equal(releaseVersion.Id, result.ReleaseVersionId);
-                Assert.Equal(ReleaseRole.Contributor, result.Role);
-                Assert.Equal(createdBy.Id, result.CreatedById);
-                result.Created.AssertUtcNow();
-                Assert.Null(result.EmailSent);
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var userReleaseRole = await contentDbContext.UserReleaseRoles.AsQueryable().SingleAsync();
-
-                Assert.NotEqual(Guid.Empty, userReleaseRole.Id);
-                Assert.Equal(user.Id, userReleaseRole.UserId);
-                Assert.Equal(releaseVersion.Id, userReleaseRole.ReleaseVersionId);
-                Assert.Equal(ReleaseRole.Contributor, userReleaseRole.Role);
-                Assert.Equal(createdBy.Id, userReleaseRole.CreatedById);
-                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRole.Created).Milliseconds, 0, 1500);
-                Assert.Null(userReleaseRole.EmailSent);
-            }
-        }
-
-        [Fact]
-        public async Task Create_NoNewPermissionsSystemPublicationRoleChanges()
+        public async Task NoNewPermissionsSystemPublicationRoleChanges()
         {
             var releaseRoleToCreate = ReleaseRole.Contributor;
             var newPublicationRoleToRemain = PublicationRole.Approver;
@@ -106,28 +58,32 @@ public abstract class UserReleaseRoleRepositoryTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.ReleaseVersions.Add(releaseVersion);
-                contentDbContext.UserPublicationRoles.Add(existingPublicationRole);
                 await contentDbContext.SaveChangesAsync();
             }
+
+            // Should not have tried to remove any existing publication role
+            // Should not have tried to create any new publication roles
+            // So we have purposefully not set up any 'Create' or 'Remove' method calls on this mock
+            var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.All, true, existingPublicationRole);
 
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
             newPermissionsSystemHelperMock
                 .Setup(rvr =>
                     rvr.DetermineNewPermissionsSystemChanges(
-                        releaseRoleToCreate,
-                        user.Id,
-                        releaseVersion.Release.PublicationId
+                        CollectionUtils.SetOf(existingPublicationRole.Role),
+                        releaseRoleToCreate
                     )
                 )
-                .ReturnsAsync((null, null));
+                .Returns((null, null));
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                // Should not have tried to remove any existing publication role
-                // Should not have tried to create any new publication role
-                // Hence, letting the mock for 'userPublicationRoleRepository' default to
-                // expecting no method calls, with Strict Mock behaviour
-                var repository = CreateRepository(contentDbContext, newPermissionsSystemHelperMock.Object);
+                var repository = CreateRepository(
+                    contentDbContext: contentDbContext,
+                    newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepositoryMock.Object
+                );
 
                 var result = await repository.Create(
                     userId: user.Id,
@@ -158,16 +114,13 @@ public abstract class UserReleaseRoleRepositoryTests
                 Assert.Equal(releaseRoleToCreate, createdReleaseRole.Role);
                 Assert.Equal(createdBy.Id, createdReleaseRole.CreatedById);
                 Assert.Null(createdReleaseRole.EmailSent);
-
-                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
-
-                // Should not have created any new publication roles
-                Assert.Empty(userPublicationRoles);
             }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock, userPublicationRoleRepositoryMock);
         }
 
         [Fact]
-        public async Task Create_NewPermissionsSystemPublicationRolesToRemoveAndCreateFromOldRole()
+        public async Task NewPermissionsSystemPublicationRolesToRemoveAndCreateFromOldRole()
         {
             var releaseRoleToCreate = ReleaseRole.Approver;
             var newPublicationRoleToCreate = PublicationRole.Approver;
@@ -195,10 +148,16 @@ public abstract class UserReleaseRoleRepositoryTests
 
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
             newPermissionsSystemHelperMock
-                .Setup(rvr => rvr.DetermineNewPermissionsSystemChanges(releaseRoleToCreate, user.Id, publication.Id))
-                .ReturnsAsync((newPublicationRoleToRemove, newPublicationRoleToCreate));
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChanges(
+                        CollectionUtils.SetOf(existingPublicationRole.Role),
+                        releaseRoleToCreate
+                    )
+                )
+                .Returns((newPublicationRoleToRemove, newPublicationRoleToCreate));
 
             var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.All, true, existingPublicationRole);
             userPublicationRoleRepositoryMock
                 .Setup(rvr =>
                     rvr.GetByCompositeKey(
@@ -211,22 +170,24 @@ public abstract class UserReleaseRoleRepositoryTests
                 )
                 .ReturnsAsync(existingPublicationRole);
             // Should have tried to remove the existing publication role
-            userPublicationRoleRepositoryMock.Setup(rvr =>
-                rvr.Remove(existingPublicationRole, It.IsAny<CancellationToken>())
-            );
+            userPublicationRoleRepositoryMock
+                .Setup(rvr => rvr.Remove(existingPublicationRole, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
             // Should have tried to create the new 'Approver' publication role
-            userPublicationRoleRepositoryMock.Setup(rvr =>
-                rvr.Create(
-                    user.Id,
-                    publication.Id,
-                    newPublicationRoleToCreate,
-                    createdBy.Id,
-                    It.Is<DateTime>(createdDate =>
-                        Math.Abs((createdDate - DateTime.UtcNow).Milliseconds) <= AssertExtensions.TimeWithinMillis
-                    ),
-                    It.IsAny<CancellationToken>()
+            userPublicationRoleRepositoryMock
+                .Setup(rvr =>
+                    rvr.Create(
+                        user.Id,
+                        publication.Id,
+                        newPublicationRoleToCreate,
+                        createdBy.Id,
+                        It.Is<DateTime>(createdDate =>
+                            Math.Abs((createdDate - DateTime.UtcNow).Milliseconds) <= AssertExtensions.TimeWithinMillis
+                        ),
+                        It.IsAny<CancellationToken>()
+                    )
                 )
-            );
+                .ReturnsAsync(It.IsAny<UserPublicationRole>());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -268,10 +229,12 @@ public abstract class UserReleaseRoleRepositoryTests
                 Assert.Equal(createdBy.Id, createdReleaseRole.CreatedById);
                 Assert.Null(createdReleaseRole.EmailSent);
             }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock, userPublicationRoleRepositoryMock);
         }
 
         [Fact]
-        public async Task Create_NewPermissionsSystemPublicationRoleToCreate()
+        public async Task NewPermissionsSystemPublicationRoleToCreate()
         {
             var releaseRoleToCreate = ReleaseRole.Contributor;
             var newPublicationRoleToCreate = PublicationRole.Drafter;
@@ -294,24 +257,29 @@ public abstract class UserReleaseRoleRepositoryTests
 
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
             newPermissionsSystemHelperMock
-                .Setup(rvr => rvr.DetermineNewPermissionsSystemChanges(releaseRoleToCreate, user.Id, publication.Id))
-                .ReturnsAsync((null, newPublicationRoleToCreate));
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChanges(new HashSet<PublicationRole>(), releaseRoleToCreate)
+                )
+                .Returns((null, newPublicationRoleToCreate));
 
             var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.All, true, []);
             // Should not have tried to remove any existing publication role
             // Should have tried to create the new 'Approver' publication role
-            userPublicationRoleRepositoryMock.Setup(rvr =>
-                rvr.Create(
-                    user.Id,
-                    publication.Id,
-                    newPublicationRoleToCreate,
-                    createdBy.Id,
-                    It.Is<DateTime>(createdDate =>
-                        Math.Abs((createdDate - DateTime.UtcNow).Milliseconds) <= AssertExtensions.TimeWithinMillis
-                    ),
-                    It.IsAny<CancellationToken>()
+            userPublicationRoleRepositoryMock
+                .Setup(rvr =>
+                    rvr.Create(
+                        user.Id,
+                        publication.Id,
+                        newPublicationRoleToCreate,
+                        createdBy.Id,
+                        It.Is<DateTime>(createdDate =>
+                            Math.Abs((createdDate - DateTime.UtcNow).Milliseconds) <= AssertExtensions.TimeWithinMillis
+                        ),
+                        It.IsAny<CancellationToken>()
+                    )
                 )
-            );
+                .ReturnsAsync(It.IsAny<UserPublicationRole>());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -352,20 +320,81 @@ public abstract class UserReleaseRoleRepositoryTests
                 Assert.Equal(releaseRoleToCreate, createdReleaseRole.Role);
                 Assert.Equal(createdBy.Id, createdReleaseRole.CreatedById);
                 Assert.Null(createdReleaseRole.EmailSent);
-
-                var userPublicationRoles = await contentDbContext.UserPublicationRoles.ToListAsync();
-
-                // Should just be 1 as the the 'Drafter` role should have been created
-                var createdNewPublicationRole = Assert.Single(userPublicationRoles);
-
-                Assert.NotEqual(Guid.Empty, createdNewPublicationRole.Id);
-                Assert.Equal(user.Id, createdNewPublicationRole.UserId);
-                Assert.Equal(publication.Id, createdNewPublicationRole.PublicationId);
-                Assert.Equal(newPublicationRoleToCreate, createdNewPublicationRole.Role);
-                createdNewPublicationRole.Created.AssertUtcNow();
-                Assert.Equal(createdBy.Id, createdNewPublicationRole.CreatedById);
-                Assert.Null(createdNewPublicationRole.EmailSent);
             }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock, userPublicationRoleRepositoryMock);
+        }
+
+        // Checking all types of user ensures that we are correctly considering roles for any user state
+        // (e.g. active, pending invite, expired invite, soft deleted)
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task OnlyRolesForSpecifiedUserAndPublicationAreCheckedWhenDeterminingChanges(
+            Func<DataFixture, User> userFactory
+        )
+        {
+            const ReleaseRole releaseRoleToCreate = ReleaseRole.Contributor;
+            var user = userFactory(_fixture);
+            User createdBy = _fixture.DefaultUser();
+            Publication publication = _fixture.DefaultPublication();
+            ReleaseVersion releaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(publication));
+            var existingPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .ForIndex(0, s => s.SetUser(user).SetPublication(publication).SetRole(PublicationRole.Allower)) // OLD system role
+                .ForIndex(1, s => s.SetUser(user).SetPublication(publication).SetRole(PublicationRole.Approver)) // NEW system role
+                // Should not be considered when determining changes, as different user
+                .ForIndex(
+                    2,
+                    s => s.SetUser(_fixture.DefaultUser()).SetPublication(publication).SetRole(PublicationRole.Owner)
+                ) // different OLD system role
+                // Should not be considered when determining changes, as different publication
+                .ForIndex(
+                    3,
+                    s => s.SetUser(user).SetPublication(_fixture.DefaultPublication()).SetRole(PublicationRole.Drafter)
+                ) // different NEW system role
+                .GenerateList(4);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.Users.AddRange(user, createdBy);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.All, true, [.. existingPublicationRoles]);
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemChanges(
+                        CollectionUtils.SetOf(PublicationRole.Allower, PublicationRole.Approver), // Checking correct set of roles were considered
+                        releaseRoleToCreate
+                    )
+                )
+                .Returns((null, null));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(
+                    contentDbContext: contentDbContext,
+                    newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepositoryMock.Object
+                );
+
+                await repository.Create(
+                    userId: user.Id,
+                    releaseVersionId: releaseVersion.Id,
+                    releaseRoleToCreate,
+                    createdById: createdBy.Id
+                );
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock, userPublicationRoleRepositoryMock);
         }
     }
 
@@ -854,32 +883,53 @@ public abstract class UserReleaseRoleRepositoryTests
     public class RemoveTests : UserReleaseRoleRepositoryTests
     {
         [Fact]
-        public async Task Success()
+        public async Task NoNewPermissionsSystemPublicationRoleToRemove()
         {
-            UserReleaseRole userReleaseRole = _fixture
+            var releaseRoleToRemove = ReleaseRole.Approver;
+
+            User user = _fixture.DefaultUser();
+            ReleaseVersion releaseVersion = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+            UserReleaseRole userReleaseRoleToRemove = _fixture
                 .DefaultUserReleaseRole()
-                .WithUser(_fixture.DefaultUser())
-                .WithReleaseVersion(
-                    _fixture
-                        .DefaultReleaseVersion()
-                        .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
-                )
-                .WithRole(ReleaseRole.Approver);
+                .WithRole(releaseRoleToRemove)
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion);
+            UserReleaseRole otherUserReleaseRole = _fixture
+                .DefaultUserReleaseRole()
+                .WithRole(ReleaseRole.Contributor)
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.Add(userReleaseRole);
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoleToRemove, otherUserReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemRoleToRemove(
+                        new HashSet<PublicationRole>(),
+                        CollectionUtils.SetOf(releaseRoleToRemove, otherUserReleaseRole.Role),
+                        releaseRoleToRemove
+                    )
+                )
+                .Returns((PublicationRole?)null);
+
+            var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.All, true, []);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = CreateRepository(contentDbContext);
-
-                var userReleaseRoleToRemove = await contentDbContext.UserReleaseRoles.SingleAsync(urr =>
-                    urr.Id == userReleaseRole.Id
+                var repository = CreateRepository(
+                    contentDbContext: contentDbContext,
+                    newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepositoryMock.Object
                 );
 
                 await repository.Remove(userReleaseRoleToRemove);
@@ -887,62 +937,12 @@ public abstract class UserReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedReleaseRole = await contentDbContext.UserReleaseRoles.SingleOrDefaultAsync(urr =>
-                    urr.Id == userReleaseRole.Id
-                );
+                var updatedUserReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
 
-                Assert.Null(updatedReleaseRole);
-            }
-        }
-
-        [Fact]
-        public async Task Remove_NoNewPermissionsSystemPublicationRoleToRemove()
-        {
-            var releaseRoleToDelete = ReleaseRole.Approver;
-
-            User user = _fixture.DefaultUser();
-            ReleaseVersion releaseVersion = _fixture
-                .DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-            UserReleaseRole userReleaseRole = _fixture
-                .DefaultUserReleaseRole()
-                .WithRole(releaseRoleToDelete)
-                .WithUser(user)
-                .WithReleaseVersion(releaseVersion);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.UserReleaseRoles.Add(userReleaseRole);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
-            newPermissionsSystemHelperMock
-                .Setup(rvr => rvr.DetermineNewPermissionsSystemRoleToDelete(userReleaseRole))
-                .ReturnsAsync((UserPublicationRole?)null);
-
-            var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = CreateRepository(
-                    contentDbContext: contentDbContext,
-                    newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object,
-                    userPublicationRoleRepository: userPublicationRoleRepositoryMock.Object
-                );
-
-                await repository.Remove(userReleaseRole);
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var storedUserReleaseRole = await contentDbContext.UserReleaseRoles.SingleOrDefaultAsync(urr =>
-                    urr.Id == userReleaseRole.Id
-                );
-
-                Assert.Null(storedUserReleaseRole);
+                // The existing 'Approver' role should have been deleted, but the other role should remain
+                var remainingUserReleaseRole = Assert.Single(updatedUserReleaseRoles);
+                Assert.Equal(otherUserReleaseRole.Role, remainingUserReleaseRole.Role);
+                Assert.Equal(otherUserReleaseRole.Id, remainingUserReleaseRole.Id);
             }
 
             // Should not have tried to remove any publication roles
@@ -950,27 +950,34 @@ public abstract class UserReleaseRoleRepositoryTests
                 mock => mock.Remove(It.IsAny<UserPublicationRole>(), It.IsAny<CancellationToken>()),
                 Times.Never
             );
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock, userPublicationRoleRepositoryMock);
         }
 
         [Fact]
-        public async Task Remove_NewPermissionsSystemPublicationRoleToRemove()
+        public async Task NewPermissionsSystemPublicationRoleToRemove()
         {
-            var releaseRoleToDelete = ReleaseRole.Approver;
-            var newPublicationRoleToDelete = PublicationRole.Approver;
+            var releaseRoleToRemove = ReleaseRole.Approver;
+            var newPublicationRoleToRemove = PublicationRole.Approver;
 
             User user = _fixture.DefaultUser();
             Publication publication = _fixture.DefaultPublication();
             ReleaseVersion releaseVersion = _fixture
                 .DefaultReleaseVersion()
                 .WithRelease(_fixture.DefaultRelease().WithPublication(publication));
-            UserReleaseRole userReleaseRole = _fixture
+            UserReleaseRole userReleaseRoleToRemove = _fixture
                 .DefaultUserReleaseRole()
-                .WithRole(releaseRoleToDelete)
+                .WithRole(releaseRoleToRemove)
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion);
+            UserReleaseRole otherUserReleaseRole = _fixture
+                .DefaultUserReleaseRole()
+                .WithRole(ReleaseRole.Contributor)
                 .WithUser(user)
                 .WithReleaseVersion(releaseVersion);
             UserPublicationRole userPublicationRole = _fixture
                 .DefaultUserPublicationRole()
-                .WithRole(newPublicationRoleToDelete)
+                .WithRole(newPublicationRoleToRemove)
                 .WithUser(user)
                 .WithPublication(publication);
 
@@ -978,20 +985,27 @@ public abstract class UserReleaseRoleRepositoryTests
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                contentDbContext.UserReleaseRoles.Add(userReleaseRole);
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoleToRemove, otherUserReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
             newPermissionsSystemHelperMock
-                .Setup(rvr => rvr.DetermineNewPermissionsSystemRoleToDelete(userReleaseRole))
-                .ReturnsAsync(userPublicationRole);
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemRoleToRemove(
+                        CollectionUtils.SetOf(newPublicationRoleToRemove),
+                        CollectionUtils.SetOf(releaseRoleToRemove, otherUserReleaseRole.Role),
+                        releaseRoleToRemove
+                    )
+                )
+                .Returns(userPublicationRole.Role);
 
             var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.All, true, userPublicationRole);
             // Should have tried to remove the existing publication role
-            userPublicationRoleRepositoryMock.Setup(rvr =>
-                rvr.Remove(userPublicationRole, It.IsAny<CancellationToken>())
-            );
+            userPublicationRoleRepositoryMock
+                .Setup(rvr => rvr.Remove(userPublicationRole, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -1001,17 +1015,123 @@ public abstract class UserReleaseRoleRepositoryTests
                     userPublicationRoleRepository: userPublicationRoleRepositoryMock.Object
                 );
 
-                await repository.Remove(userReleaseRole);
+                await repository.Remove(userReleaseRoleToRemove);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var storedUserReleaseRole = await contentDbContext.UserReleaseRoles.SingleOrDefaultAsync(urr =>
-                    urr.Id == userReleaseRole.Id
+                var updatedReleaseRoles = await contentDbContext.UserReleaseRoles.ToListAsync();
+
+                // The existing release 'Approver' role should have been deleted, but the other role should remain
+                var remainingUserReleaseRole = Assert.Single(updatedReleaseRoles);
+                Assert.Equal(otherUserReleaseRole.Role, remainingUserReleaseRole.Role);
+                Assert.Equal(otherUserReleaseRole.Id, remainingUserReleaseRole.Id);
+            }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock, userPublicationRoleRepositoryMock);
+        }
+
+        // Checking all types of user ensures that we are correctly considering roles for any user state
+        // (e.g. active, pending invite, expired invite, soft deleted)
+        [Theory]
+        [MemberData(nameof(AllTypesOfUser))]
+        public async Task OnlyRolesForSpecifiedUserAndPublicationAreCheckedWhenDeterminingChanges(
+            Func<DataFixture, User> userFactory
+        )
+        {
+            var releaseRoleToRemove = ReleaseRole.Contributor;
+
+            var user = userFactory(_fixture);
+            Publication publication = _fixture.DefaultPublication();
+            ReleaseVersion releaseVersion1 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(publication));
+            ReleaseVersion releaseVersion2 = _fixture
+                .DefaultReleaseVersion()
+                .WithRelease(_fixture.DefaultRelease().WithPublication(publication));
+            // Checking both NEW and OLD permissions system roles ensures we are correctly considering both types when determining changes
+            var existingPublicationRoles = _fixture
+                .DefaultUserPublicationRole()
+                .ForIndex(0, s => s.SetUser(user).SetPublication(publication).SetRole(PublicationRole.Owner)) // OLD system role
+                .ForIndex(1, s => s.SetUser(user).SetPublication(publication).SetRole(PublicationRole.Approver)) // NEW system role
+                // Should not be considered when determining changes, as different user
+                .ForIndex(
+                    2,
+                    s => s.SetUser(_fixture.DefaultUser()).SetPublication(publication).SetRole(PublicationRole.Allower)
+                ) // different OLD system role
+                // Should not be considered when determining changes, as different publication
+                .ForIndex(
+                    3,
+                    s => s.SetUser(user).SetPublication(_fixture.DefaultPublication()).SetRole(PublicationRole.Drafter)
+                ) // different NEW system role
+                .GenerateList(4);
+            var existingReleaseRoles = _fixture
+                .DefaultUserReleaseRole()
+                .ForIndex(0, s => s.SetUser(user).SetReleaseVersion(releaseVersion1).SetRole(releaseRoleToRemove))
+                // Different release version, but same publication - so should still be considered
+                .ForIndex(1, s => s.SetUser(user).SetReleaseVersion(releaseVersion2).SetRole(ReleaseRole.Approver))
+                // Should not be considered when determining changes, as different user
+                .ForIndex(
+                    2,
+                    s =>
+                        s.SetUser(_fixture.DefaultUser())
+                            .SetReleaseVersion(releaseVersion1)
+                            .SetRole(ReleaseRole.PrereleaseViewer)
+                )
+                // Should not be considered when determining changes, as different publication
+                .ForIndex(
+                    3,
+                    s =>
+                        s.SetUser(user)
+                            .SetReleaseVersion(
+                                _fixture
+                                    .DefaultReleaseVersion()
+                                    .WithRelease(
+                                        _fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication())
+                                    )
+                            )
+                            .SetRole(ReleaseRole.PrereleaseViewer)
+                )
+                .GenerateList(4);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.UserPublicationRoles.AddRange(existingPublicationRoles);
+                contentDbContext.UserReleaseRoles.AddRange(existingReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
+            newPermissionsSystemHelperMock
+                .Setup(rvr =>
+                    rvr.DetermineNewPermissionsSystemRoleToRemove(
+                        // Checking correct set of roles were considered
+                        CollectionUtils.SetOf(PublicationRole.Owner, PublicationRole.Approver),
+                        CollectionUtils.SetOf(ReleaseRole.Contributor, ReleaseRole.Approver),
+                        releaseRoleToRemove
+                    )
+                )
+                .Returns((PublicationRole?)null);
+
+            var userPublicationRoleRepositoryMock = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+            userPublicationRoleRepositoryMock.SetupQuery(ResourceRoleFilter.All, true, [.. existingPublicationRoles]);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var repository = CreateRepository(
+                    contentDbContext: contentDbContext,
+                    newPermissionsSystemHelper: newPermissionsSystemHelperMock.Object,
+                    userPublicationRoleRepository: userPublicationRoleRepositoryMock.Object
                 );
 
-                Assert.Null(storedUserReleaseRole);
+                var userReleaseRoleToRemove = existingReleaseRoles.Single(urr => urr.Role == releaseRoleToRemove);
+
+                await repository.Remove(userReleaseRoleToRemove);
             }
+
+            MockUtils.VerifyAllMocks(newPermissionsSystemHelperMock, userPublicationRoleRepositoryMock);
         }
     }
 
@@ -4098,22 +4218,13 @@ public abstract class UserReleaseRoleRepositoryTests
     {
         contentDbContext ??= InMemoryApplicationDbContext();
 
-        var newPermissionsSystemHelperMock = new Mock<INewPermissionsSystemHelper>(MockBehavior.Strict);
-        newPermissionsSystemHelperMock
-            .Setup(rvr =>
-                rvr.DetermineNewPermissionsSystemChanges(
-                    It.IsAny<PublicationRole>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<Guid>()
-                )
-            )
-            .ReturnsAsync((null, null));
-
         return new(
             contentDbContext: contentDbContext,
-            newPermissionsSystemHelper: newPermissionsSystemHelper ?? newPermissionsSystemHelperMock.Object,
+            newPermissionsSystemHelper: newPermissionsSystemHelper
+                ?? Mock.Of<INewPermissionsSystemHelper>(MockBehavior.Strict),
             userPublicationRoleRepository: userPublicationRoleRepository
-                ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict)
+                ?? Mock.Of<IUserPublicationRoleRepository>(MockBehavior.Strict),
+            userReleaseRoleQueryRepository: new UserReleaseRoleQueryRepository(contentDbContext)
         );
     }
 }

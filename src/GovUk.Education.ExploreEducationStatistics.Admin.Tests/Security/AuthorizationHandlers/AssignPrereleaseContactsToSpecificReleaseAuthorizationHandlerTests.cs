@@ -126,8 +126,22 @@ public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandlerTests
 
     private static IAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
-        var userReleaseRoleRepository = new UserReleaseRoleRepository(contentDbContext);
-        var userPublicationRoleRepository = new UserPublicationRoleRepository(contentDbContext);
+        var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
+
+        var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(contentDbContext);
+
+        var userPublicationRoleRepository = new UserPublicationRoleRepository(
+            contentDbContext: contentDbContext,
+            newPermissionsSystemHelper: newPermissionsSystemHelper,
+            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+        );
+
+        var userReleaseRoleRepository = new UserReleaseRoleRepository(
+            contentDbContext: contentDbContext,
+            userPublicationRoleRepository: userPublicationRoleRepository,
+            newPermissionsSystemHelper: newPermissionsSystemHelper,
+            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+        );
 
         return new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
             new AuthorizationHandlerService(

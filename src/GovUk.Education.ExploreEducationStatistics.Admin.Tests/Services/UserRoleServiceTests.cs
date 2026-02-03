@@ -1827,7 +1827,7 @@ public abstract class UserRoleServiceTests
                 .ReturnsAsync(new IdentityResult());
 
             userPublicationRoleRepository
-                .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(m => m.GetById(userPublicationRole.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
             userPublicationRoleRepository
                 .Setup(m => m.Remove(userPublicationRole, It.IsAny<CancellationToken>()))
@@ -1860,7 +1860,7 @@ public abstract class UserRoleServiceTests
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
-                .Setup(m => m.GetById(userPublicationRoleGuid, It.IsAny<CancellationToken>()))
+                .Setup(m => m.GetById(userPublicationRoleGuid, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((UserPublicationRole?)null);
 
             var service = SetupUserRoleService(userPublicationRoleRepository: userPublicationRoleRepository.Object);
@@ -1904,7 +1904,7 @@ public abstract class UserRoleServiceTests
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
-                .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(m => m.GetById(userPublicationRole.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
             userPublicationRoleRepository
                 .Setup(m => m.Remove(It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id), default))
@@ -1966,7 +1966,7 @@ public abstract class UserRoleServiceTests
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
-                .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(m => m.GetById(userPublicationRole.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
             userPublicationRoleRepository
                 .Setup(m => m.Remove(It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id), default))
@@ -2032,7 +2032,7 @@ public abstract class UserRoleServiceTests
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
-                .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(m => m.GetById(userPublicationRole.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
             userPublicationRoleRepository
                 .Setup(m => m.Remove(It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id), default))
@@ -2108,7 +2108,7 @@ public abstract class UserRoleServiceTests
 
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             userPublicationRoleRepository
-                .Setup(m => m.GetById(userPublicationRole.Id, It.IsAny<CancellationToken>()))
+                .Setup(m => m.GetById(userPublicationRole.Id, false, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userPublicationRole);
             userPublicationRoleRepository
                 .Setup(m => m.Remove(It.Is<UserPublicationRole>(urr => urr.Id == userPublicationRole.Id), default))

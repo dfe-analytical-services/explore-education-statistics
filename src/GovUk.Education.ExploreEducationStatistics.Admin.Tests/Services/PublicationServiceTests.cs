@@ -3491,17 +3491,14 @@ public class PublicationServiceTests
         IRedirectsCacheService? redirectsCacheService = null
     )
     {
+        publicationRepository ??= CreatePublicationRepository(context, publicationRepository);
+
         return new(
             context,
             AdminMapper(),
             new PersistenceHelper<ContentDbContext>(context),
             userService ?? AlwaysTrueUserService().Object,
-            publicationRepository
-                ?? new PublicationRepository(
-                    context: context,
-                    userReleaseRoleRepository: new UserReleaseRoleRepository(context),
-                    userPublicationRoleRepository: new UserPublicationRoleRepository(context)
-                ),
+            publicationRepository,
             releaseVersionRepository ?? new ReleaseVersionRepository(context),
             methodologyService ?? Mock.Of<IMethodologyService>(Strict),
             publicationCacheService ?? _publicationCacheServiceMockBuilder.Build(),
@@ -3509,6 +3506,35 @@ public class PublicationServiceTests
             methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
             _adminEventRaiserMockBuilder.Build()
+        );
+    }
+
+    private static PublicationRepository CreatePublicationRepository(
+        ContentDbContext context,
+        IPublicationRepository? publicationRepository
+    )
+    {
+        var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
+
+        var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(context);
+
+        var userPublicationRoleRepository = new UserPublicationRoleRepository(
+            contentDbContext: context,
+            newPermissionsSystemHelper: newPermissionsSystemHelper,
+            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+        );
+
+        var userReleaseRoleRepository = new UserReleaseRoleRepository(
+            contentDbContext: context,
+            userPublicationRoleRepository: userPublicationRoleRepository,
+            newPermissionsSystemHelper: newPermissionsSystemHelper,
+            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+        );
+
+        return new PublicationRepository(
+            context: context,
+            userReleaseRoleRepository: userReleaseRoleRepository,
+            userPublicationRoleRepository: userPublicationRoleRepository
         );
     }
 

@@ -132,14 +132,29 @@ public class ViewSpecificPublicationAuthorizationHandlersTests
         IPreReleaseService? preReleaseService = null
     )
     {
-        userReleaseRoleRepository ??= new UserReleaseRoleRepository(contentDbContext: context);
+        var newPermissionsSystemHelper = new NewPermissionsSystemHelper();
+
+        var userReleaseRoleQueryRepository = new UserReleaseRoleQueryRepository(context);
+
+        userPublicationRoleRepository ??= new UserPublicationRoleRepository(
+            contentDbContext: context,
+            newPermissionsSystemHelper: newPermissionsSystemHelper,
+            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+        );
+
+        userReleaseRoleRepository ??= new UserReleaseRoleRepository(
+            contentDbContext: context,
+            userPublicationRoleRepository: userPublicationRoleRepository,
+            newPermissionsSystemHelper: newPermissionsSystemHelper,
+            userReleaseRoleQueryRepository: userReleaseRoleQueryRepository
+        );
 
         return new ViewSpecificPublicationAuthorizationHandler(
             userReleaseRoleRepository,
             new AuthorizationHandlerService(
                 releaseVersionRepository ?? new ReleaseVersionRepository(context),
                 userReleaseRoleRepository,
-                userPublicationRoleRepository ?? new UserPublicationRoleRepository(contentDbContext: context),
+                userPublicationRoleRepository,
                 preReleaseService ?? Mock.Of<IPreReleaseService>(Strict)
             )
         );

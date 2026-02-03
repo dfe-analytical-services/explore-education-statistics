@@ -13,7 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class UserReleaseRoleRepository(
     ContentDbContext contentDbContext,
     INewPermissionsSystemHelper newPermissionsSystemHelper,
-    IUserPublicationRoleRepository userPublicationRoleRepository
+    IUserPublicationRoleRepository userPublicationRoleRepository,
+    UserReleaseRoleQueryRepository userReleaseRoleQueryRepository
 ) : IUserReleaseRoleRepository
 {
     // This method will remain but be amended slightly in EES-6196, when we no longer have to cater for
@@ -34,11 +35,19 @@ public class UserReleaseRoleRepository(
             .Select(r => r.Release.PublicationId)
             .SingleAsync(cancellationToken);
 
+        var existingUserPublicationRoles = (
+            await userPublicationRoleRepository
+                .Query(ResourceRoleFilter.All, includeNewPermissionsSystemRoles: true)
+                .WhereForUser(userId)
+                .WhereForPublication(publicationId)
+                .Select(upr => upr.Role)
+                .ToListAsync(cancellationToken)
+        ).ToHashSet();
+
         var (newSystemPublicationRoleToRemove, newSystemPublicationRoleToCreate) =
-            await newPermissionsSystemHelper.DetermineNewPermissionsSystemChanges(
-                releaseRoleToCreate: role,
-                userId: userId,
-                publicationId: publicationId
+            newPermissionsSystemHelper.DetermineNewPermissionsSystemChanges(
+                existingPublicationRoles: existingUserPublicationRoles,
+                releaseRoleToCreate: role
             );
 
         if (newSystemPublicationRoleToRemove.HasValue)
@@ -71,7 +80,7 @@ public class UserReleaseRoleRepository(
             UserId = userId,
             ReleaseVersionId = releaseVersionId,
             Role = role,
-            Created = createdDate,
+            Created = createdDate!.Value,
             CreatedById = createdById,
         };
 
@@ -126,32 +135,48 @@ public class UserReleaseRoleRepository(
     }
 
     public IQueryable<UserReleaseRole> Query(ResourceRoleFilter resourceRoleFilter = ResourceRoleFilter.ActiveOnly) =>
-        resourceRoleFilter switch
-        {
-            ResourceRoleFilter.ActiveOnly => contentDbContext.UserReleaseRoles.WhereUserIsActive(),
-            ResourceRoleFilter.PendingOnly => contentDbContext.UserReleaseRoles.WhereUserHasPendingInvite(),
-            ResourceRoleFilter.AllButExpired => contentDbContext.UserReleaseRoles.WhereUserIsActiveOrHasPendingInvite(),
-            ResourceRoleFilter.All => contentDbContext.UserReleaseRoles,
-            _ => throw new ArgumentOutOfRangeException(nameof(resourceRoleFilter), resourceRoleFilter, null),
-        };
+        userReleaseRoleQueryRepository.Query(resourceRoleFilter);
 
     // This method will remain but be amended slightly in EES-6196, when we no longer have to cater
     // for the old roles.
     public async Task Remove(UserReleaseRole userReleaseRole, CancellationToken cancellationToken = default)
     {
-        contentDbContext.UserReleaseRoles.Remove(userReleaseRole);
+        var allReleaseRolesForUserAndPublication = (
+            await Query(ResourceRoleFilter.All)
+                .WhereForUser(userReleaseRole.UserId)
+                .WhereForPublication(userReleaseRole.ReleaseVersion.Release.PublicationId)
+                .Select(urr => urr.Role)
+                .ToListAsync(cancellationToken)
+        ).ToHashSet();
 
+        var allUserPublicationRolesForUserAndPublicationByRole = await userPublicationRoleRepository
+            .Query(ResourceRoleFilter.All, includeNewPermissionsSystemRoles: true)
+            .WhereForUser(userReleaseRole.UserId)
+            .WhereForPublication(userReleaseRole.ReleaseVersion.Release.PublicationId)
+            .ToDictionaryAsync(upr => upr.Role, cancellationToken);
+
+        var allPublicationRolesForUserAndPublication =
+            allUserPublicationRolesForUserAndPublicationByRole.Keys.ToHashSet();
+
+        var newSystemPublicationRoleToRemove = newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToRemove(
+            existingPublicationRoles: allPublicationRolesForUserAndPublication,
+            existingReleaseRoles: allReleaseRolesForUserAndPublication,
+            releaseRoleToRemove: userReleaseRole.Role
+        );
+
+        contentDbContext.UserReleaseRoles.Remove(userReleaseRole);
         await contentDbContext.SaveChangesAsync(cancellationToken);
 
-        var newSystemPublicationRoleToRemove =
-            await newPermissionsSystemHelper.DetermineNewPermissionsSystemRoleToDelete(userReleaseRole);
-
-        if (newSystemPublicationRoleToRemove is null)
+        if (!newSystemPublicationRoleToRemove.HasValue)
         {
             return;
         }
 
-        await userPublicationRoleRepository.Remove(newSystemPublicationRoleToRemove, cancellationToken);
+        var newSystemUserPublicationRoleToRemove = allUserPublicationRolesForUserAndPublicationByRole[
+            newSystemPublicationRoleToRemove.Value
+        ];
+
+        await userPublicationRoleRepository.Remove(newSystemUserPublicationRoleToRemove, cancellationToken);
     }
 
     public async Task RemoveMany(
