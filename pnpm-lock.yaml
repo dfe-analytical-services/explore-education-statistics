@@ -195,9 +195,6 @@ importers:
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
-      cross-fetch:
-        specifier: ^3.1.6
-        version: 3.1.6
       css-loader:
         specifier: ^6.7.3
         version: 6.8.1(webpack@5.88.1)
@@ -541,9 +538,6 @@ importers:
       core-js:
         specifier: ^3.48.0
         version: 3.48.0
-      cross-fetch:
-        specifier: ^3.0.6
-        version: 3.1.5
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0
@@ -770,9 +764,6 @@ importers:
       cross-env:
         specifier: ^7.0.2
         version: 7.0.3
-      cross-fetch:
-        specifier: ^3.0.6
-        version: 3.1.5
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0
@@ -11215,22 +11206,6 @@ packages:
       cross-spawn: 7.0.3
     dev: false
 
-  /cross-fetch@3.1.5:
-    resolution: {integrity: sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==}
-    dependencies:
-      node-fetch: 2.6.7
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
-  /cross-fetch@3.1.6:
-    resolution: {integrity: sha512-riRvo06crlE8HiqOwIpQhxwdOk4fOeR7FVM/wXoxchFEqMNUjvbs3bfo4OTgMEMHzppd4DxFBDbyySj8Cv781g==}
-    dependencies:
-      node-fetch: 2.6.12
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
   /cross-process-lock@2.1.1:
     resolution: {integrity: sha512-CV2vQQmEZaz2RmA8lhu7+pQWePJPKCVLDL+IMch3hrednzp+dsr/2XBPcAp/Fd8xY7b3GV3UkaBL97yQwte/qw==}
     engines: {node: '>=14.0.0'}
@@ -17518,18 +17493,6 @@ packages:
 
   /node-fetch@2.6.12:
     resolution: {integrity: sha512-C/fGU2E8ToujUivIO0H+tpQ6HWo4eEmchoPIoXtxCrVghxdKq+QOHqEZW7tuP3KlV3bC8FRMO5nMCC7Zm1VP6g==}
-    engines: {node: 4.x || >=6.0.0}
-    peerDependencies:
-      encoding: ^0.1.0
-    peerDependenciesMeta:
-      encoding:
-        optional: true
-    dependencies:
-      whatwg-url: 5.0.0
-    dev: false
-
-  /node-fetch@2.6.7:
-    resolution: {integrity: sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==}
     engines: {node: 4.x || >=6.0.0}
     peerDependencies:
       encoding: ^0.1.0
