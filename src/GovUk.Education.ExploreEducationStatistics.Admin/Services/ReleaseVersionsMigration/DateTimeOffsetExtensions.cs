@@ -25,7 +25,6 @@ public static class DateTimeOffsetExtensions
         var ukLocalDateTimeOffset = TimeZoneInfo.ConvertTime(dateTimeOffset, TimeZoneUtils.GetUkTimeZone());
 
         // Return true if the time element is exactly 00:00:00
-        var timeOfDay = ukLocalDateTimeOffset.TimeOfDay;
-        return timeOfDay == TimeSpan.Zero;
+        return ukLocalDateTimeOffset.TimeOfDay == TimeSpan.Zero;
     }
 }
