@@ -72,8 +72,8 @@
     "normalize.css": "^8.0.1",
     "react-test-renderer": "^19.2.3",
     "sass": "1.32.13",
-    "stylelint": "^15.7.0",
-    "stylelint-webpack-plugin": "^4.1.1",
+    "stylelint": "^16.26.1",
+    "stylelint-webpack-plugin": "^5.0.1",
     "typescript": "^5.5.4",
     "urlpattern-polyfill": "^10.0.0",
     "webpack-dev-server": "^4.15.1"

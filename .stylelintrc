@@ -4,6 +4,7 @@
     "stylelint-prettier/recommended"
   ],
   "rules": {
+    "@stylistic/function-parentheses-space-inside": null,
     "property-no-unknown": [
       true,
       {

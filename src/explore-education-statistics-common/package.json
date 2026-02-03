@@ -76,7 +76,7 @@
     "jest-watch-typeahead": "^3.0.1",
     "open": "^8.4.1",
     "react-test-renderer": "19.2.3",
-    "stylelint": "^15.7.0",
+    "stylelint": "^16.26.1",
     "typescript": "^5.5.4",
     "xhr-mock": "^2.5.1"
   },
