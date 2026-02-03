@@ -1,6 +1,6 @@
 import { responseTimeConfig, dynamicTotalGreaterThan } from 'alerts/dynamicAlertConfig.bicep'
 import { staticAverageGreaterThanZero } from 'alerts/staticAlertConfig.bicep'
-import { removeMultiple } from '../functions.bicep'
+import { removeMultiple } from '../../common/functions.bicep'
 
 import {
   AppGatewayBackend
@@ -275,7 +275,6 @@ resource appGateway 'Microsoft.Network/applicationGateways@2024-01-01' = {
     publicIPAddresses
     keyVaultSecretsUserRoleAssignmentModule
     keyVaultCertificateUserRoleAssignmentModule
-    keyVaultAccessPolicyModule
   ]
 }
 
