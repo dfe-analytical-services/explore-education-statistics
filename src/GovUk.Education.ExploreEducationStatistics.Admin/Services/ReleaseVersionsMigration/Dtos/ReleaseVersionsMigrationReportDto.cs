@@ -63,6 +63,10 @@ public record ReleaseVersionsMigrationReportReleaseVersionDto
 
     public required DateTimeOffset? PublishedProposed { get; init; }
 
+    public required DateOnly? PublishedOriginalUkDateOnly { get; init; }
+
+    public required DateOnly? PublishedProposedUkDateOnly { get; init; }
+
     public required ReleaseVersionsMigrationReportPublishingInfoDto PublishingInfo { get; init; }
 
     public required ReleaseVersionsMigrationReportUpdateNotesDto UpdateNotes { get; init; }

@@ -190,6 +190,8 @@ public class ReleaseVersionsMigrationService(
                 // The proposed published date is the last updated timestamp of the latest successful publishing attempt
                 // which reached overall stage 'Complete'. If this doesn't exist, the release version won't be updated.
                 PublishedProposed = publishingInfo.LatestAttemptTimestamp,
+                PublishedOriginalUkDateOnly = releaseVersion.Published?.ToUkDateOnly(),
+                PublishedProposedUkDateOnly = publishingInfo.LatestAttemptTimestamp?.ToUkDateOnly(),
                 UpdateNotes = updateNotes,
                 Warnings = warnings,
             };
