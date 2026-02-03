@@ -43,7 +43,7 @@
     <PackageReference Include="ObjectCloner" Version="2.2.2" />
     <PackageReference Include="Semver" Version="3.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
-    <PackageReference Include="System.Linq.Async" Version="6.0.3" />
+    <PackageReference Include="System.Linq.Async" Version="7.0.0" />
     <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
     <PackageReference Include="Mime" Version="3.8.0" />
     <PackageReference Include="Mime-Detective" Version="0.0.6-beta5" />
