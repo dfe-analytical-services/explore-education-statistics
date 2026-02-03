@@ -93,8 +93,7 @@ const TableToolShare = ({ tableHeaders, query, isCropped }: Props) => {
                   <WarningMessage>
                     The table and file downloads provided by this permalink will
                     contain only the subset of data displayed above, rather than
-                    data based on the full selection. The CSV download below
-                    includes data based on the full selection.
+                    data based on the full selection.
                   </WarningMessage>
                 )}
               </>

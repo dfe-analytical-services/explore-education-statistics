@@ -136,7 +136,6 @@ const TableToolFinalStep = ({
             fullTable={table}
             fileName={`data-${selectedPublication.slug}`}
             onCsvDownload={() => tableBuilderService.getTableCsv(query)}
-            hideOdsDownload={table.subjectMeta.isCroppedTable}
             tableRef={dataTableRef}
             onSubmit={fileFormat => {
               logEvent({
