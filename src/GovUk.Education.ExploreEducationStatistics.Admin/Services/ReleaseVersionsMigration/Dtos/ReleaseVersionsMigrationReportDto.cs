@@ -1,6 +1,6 @@
 ﻿#nullable enable
-using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionsMigration.Dtos;
