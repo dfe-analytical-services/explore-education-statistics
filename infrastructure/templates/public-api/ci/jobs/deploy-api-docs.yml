@@ -33,7 +33,7 @@ jobs:
             - task: UseRubyVersion@0
               displayName: Install Ruby $(rubyVersion)
               inputs:
-                versionSpec: '>= $(rubyVersion)'
+                versionSpec: '$(rubyVersion)'
 
             - task: Bash@3
               displayName: Create middleman binary
