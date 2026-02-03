@@ -22,7 +22,9 @@ public class ReleaseVersionsMigrationController(IReleaseVersionsMigrationService
         [FromQuery] bool dryRun = true,
         CancellationToken cancellationToken = default
     ) =>
+        // TODO EES-6830 Dry run has been deliberately set to true to prevent accidental runs
+        // while it is being tested.
         releaseVersionsMigrationService
-            .MigrateReleaseVersionsPublishedDate(dryRun, cancellationToken)
+            .MigrateReleaseVersionsPublishedDate(dryRun: true, cancellationToken)
             .HandleFailuresOrOk();
 }
