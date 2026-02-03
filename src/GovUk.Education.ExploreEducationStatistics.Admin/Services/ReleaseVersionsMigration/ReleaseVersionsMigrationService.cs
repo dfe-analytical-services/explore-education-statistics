@@ -184,13 +184,13 @@ public class ReleaseVersionsMigrationService(
             return new ReleaseVersionsMigrationReportReleaseVersionDto
             {
                 ReleaseVersionId = releaseVersion.Id,
+                Version = releaseVersion.Version,
                 PublishingInfo = publishingInfo,
                 PublishedOriginal = releaseVersion.Published,
                 // The proposed published date is the last updated timestamp of the latest successful publishing attempt
                 // which reached overall stage 'Complete'. If this doesn't exist, the release version won't be updated.
                 PublishedProposed = publishingInfo.LatestAttemptTimestamp,
                 UpdateNotes = updateNotes,
-                Version = releaseVersion.Version,
                 Warnings = warnings,
             };
         };
@@ -206,11 +206,12 @@ public class ReleaseVersionsMigrationService(
                 : releaseVersion.PublishScheduled;
 
         // See the comment in ReleaseVersionsMigrationReportPublishingInfoDto for the rationale behind including this calculation.
-        TimeSpan? timeSinceScheduledTriggerToCompletion =
+        TimeSpan? timeSinceScheduledPublishFinalStageTriggerToCompletion =
             publishingInfo.LatestAttemptTimestamp.HasValue && scheduledPublishFinalStageTrigger.HasValue
                 ? publishingInfo.LatestAttemptTimestamp.Value - scheduledPublishFinalStageTrigger.Value
                 : null;
-        var timeSinceScheduledTriggerToCompletionPretty = timeSinceScheduledTriggerToCompletion?.PrettyPrint();
+        var timeSinceScheduledPublishFinalStageTriggerToCompletionPretty =
+            timeSinceScheduledPublishFinalStageTriggerToCompletion?.PrettyPrint();
 
         return new ReleaseVersionsMigrationReportPublishingInfoDto
         {
@@ -219,8 +220,8 @@ public class ReleaseVersionsMigrationService(
             ScheduledPublishTrigger = releaseVersion.PublishScheduled,
             ScheduledPublishFinalStageTrigger = scheduledPublishFinalStageTrigger,
             SuccessfulPublishingAttempts = publishingInfo.SuccessfulPublishingAttempts,
-            ScheduledPublishTriggerToCompletionTimeSpan = timeSinceScheduledTriggerToCompletion,
-            TimeSinceScheduledTriggerToCompletion = timeSinceScheduledTriggerToCompletionPretty,
+            TimeSinceScheduledTriggerToCompletion = timeSinceScheduledPublishFinalStageTriggerToCompletion,
+            TimeSinceScheduledTriggerToCompletionPretty = timeSinceScheduledPublishFinalStageTriggerToCompletionPretty,
         };
     }
 
@@ -231,7 +232,7 @@ public class ReleaseVersionsMigrationService(
 
         return new ReleaseVersionsMigrationReportUpdateNotesDto
         {
-            LatestUpdateNote = latestUpdateNoteUkDateOnly,
+            LatestUpdateNoteUkDateOnly = latestUpdateNoteUkDateOnly,
             UpdatesCount = updatesCount,
         };
     }
@@ -249,8 +250,8 @@ public class ReleaseVersionsMigrationService(
         var updatesCountDoesNotMatchVersion = releaseVersion.Updates.Count != releaseVersion.Version;
 
         var proposedPublishedUkDateOnly = publishingInfo.LatestAttemptTimestamp?.ToUkDateOnly();
-        var latestUpdateNoteUkDateOnly = updateNotes.LatestUpdateNote;
-        var latestUpdateNoteDateDoesNotMatchProposedPublishedDate =
+        var latestUpdateNoteUkDateOnly = updateNotes.LatestUpdateNoteUkDateOnly;
+        var proposedPublishedDateDoesNotMatchLatestUpdateNote =
             proposedPublishedUkDateOnly.HasValue
             && latestUpdateNoteUkDateOnly.HasValue
             && proposedPublishedUkDateOnly.Value != latestUpdateNoteUkDateOnly.Value;
@@ -260,7 +261,7 @@ public class ReleaseVersionsMigrationService(
                 ? TimeSpan.FromHours(6)
                 : TimeSpan.FromMinutes(5);
         var proposedPublishedDateIsNotSimilarToScheduledTriggerDate =
-            publishingInfo.ScheduledPublishTriggerToCompletionTimeSpan > publishingTolerance;
+            publishingInfo.TimeSinceScheduledTriggerToCompletion > publishingTolerance;
 
         // Use nullable flags with null values to represent absent warnings.
         // The JSON serializer is configured to ignore nulls and omitting these fields produces a more compact report.
@@ -269,7 +270,7 @@ public class ReleaseVersionsMigrationService(
             NoSuccessfulPublishingAttempts = noSuccessfulPublishingAttempts ? true : null,
             MultipleSuccessfulPublishingAttempts = multipleSuccessfulPublishingAttempts ? true : null,
             UpdatesCountDoesNotMatchVersion = updatesCountDoesNotMatchVersion ? true : null,
-            ProposedPublishedDateDoesNotMatchLatestUpdateNote = latestUpdateNoteDateDoesNotMatchProposedPublishedDate
+            ProposedPublishedDateDoesNotMatchLatestUpdateNote = proposedPublishedDateDoesNotMatchLatestUpdateNote
                 ? true
                 : null,
             ProposedPublishedDateIsNotSimilarToScheduledTriggerDate =

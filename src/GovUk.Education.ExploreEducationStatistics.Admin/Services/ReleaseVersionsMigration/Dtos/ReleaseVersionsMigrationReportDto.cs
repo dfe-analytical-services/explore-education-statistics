@@ -56,6 +56,8 @@ public record ReleaseVersionsMigrationReportReleaseVersionDto
 {
     public required Guid ReleaseVersionId { get; init; }
 
+    public required int Version { get; init; }
+
     public required DateTimeOffset? PublishedOriginal { get; init; }
 
     public required DateTimeOffset? PublishedProposed { get; init; }
@@ -65,8 +67,6 @@ public record ReleaseVersionsMigrationReportReleaseVersionDto
     public required ReleaseVersionsMigrationReportUpdateNotesDto UpdateNotes { get; init; }
 
     public required ReleaseVersionsMigrationReportWarningsDto Warnings { get; init; }
-
-    public required int Version { get; init; }
 }
 
 public record ReleaseVersionsMigrationReportUpdateNotesDto
@@ -74,7 +74,7 @@ public record ReleaseVersionsMigrationReportUpdateNotesDto
     /// <summary>
     /// The date-only element in UK local time of the latest update note associated with the release version.
     /// </summary>
-    public required DateOnly? LatestUpdateNote { get; init; }
+    public required DateOnly? LatestUpdateNoteUkDateOnly { get; init; }
 
     public int UpdatesCount { get; init; }
 }
@@ -112,12 +112,12 @@ public record ReleaseVersionsMigrationReportPublishingInfoDto
     /// maintenance task at a later time and the timestamp no longer reflects the actual publishing completion time.
     /// </summary>
     [JsonIgnore]
-    public required TimeSpan? ScheduledPublishTriggerToCompletionTimeSpan { get; init; }
+    public required TimeSpan? TimeSinceScheduledTriggerToCompletion { get; init; }
 
     /// <summary>
     /// Pretty version of <c>ScheduledPublishTriggerToCompletionTimeSpan</c>.
     /// </summary>
-    public required string? TimeSinceScheduledTriggerToCompletion { get; init; }
+    public required string? TimeSinceScheduledTriggerToCompletionPretty { get; init; }
 }
 
 public record ReleaseVersionsMigrationReportWarningsDto
