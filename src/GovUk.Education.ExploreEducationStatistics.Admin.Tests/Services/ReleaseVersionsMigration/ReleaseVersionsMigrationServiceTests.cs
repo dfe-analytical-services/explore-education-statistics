@@ -40,7 +40,7 @@ public abstract class ReleaseVersionsMigrationServiceTests
                                         .DefaultReleaseVersion()
                                         .WithVersion(0)
                                         .WithPublished(published)
-                                        .WithUpdatePublishedDate(false),
+                                        .WithUpdatePublishedDisplayDate(false),
                                 ]
                             ),
                     ]
@@ -94,7 +94,7 @@ public abstract class ReleaseVersionsMigrationServiceTests
                                         .DefaultReleaseVersion()
                                         .WithVersion(1)
                                         .WithPublished(null)
-                                        .WithUpdatePublishedDate(false),
+                                        .WithUpdatePublishedDisplayDate(false),
                                 ]
                             ),
                     ]
@@ -149,7 +149,7 @@ public abstract class ReleaseVersionsMigrationServiceTests
                                         .DefaultReleaseVersion()
                                         .WithVersion(1)
                                         .WithPublished(published)
-                                        .WithUpdatePublishedDate(true),
+                                        .WithUpdatePublishedDisplayDate(true),
                                 ]
                             ),
                     ]

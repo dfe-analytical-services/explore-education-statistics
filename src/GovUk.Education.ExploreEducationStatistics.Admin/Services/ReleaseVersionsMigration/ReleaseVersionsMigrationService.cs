@@ -126,8 +126,8 @@ public class ReleaseVersionsMigrationService(
             .Where(rv => rv.Published.HasValue)
             // Ignore first versions (where `Version` is 0) as these already have `Published` set as the actual published date.
             .Where(rv => rv.Version > 0)
-            // Ignore versions where `UpdatePublishedDate` is true as these already have `Published` set as the actual published date.
-            .Where(rv => rv.UpdatePublishedDate == false)
+            // Ignore versions where `UpdatePublishedDisplayDate` (formerly named `UpdateDisplayDate`) is true as these already have `Published` set as the actual published date.
+            .Where(rv => rv.UpdatePublishedDisplayDate == false)
             .ToListAsync(cancellationToken: cancellationToken);
 
     private Func<IGrouping<Publication, ReleaseVersion>, ReleaseVersionsMigrationReportPublicationDto> MapPublication(

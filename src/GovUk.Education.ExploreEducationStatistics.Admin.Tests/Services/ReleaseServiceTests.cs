@@ -116,7 +116,7 @@ public abstract class ReleaseServiceTests
                 Assert.Null(actualReleaseVersion.NextReleaseDate);
                 Assert.Null(actualReleaseVersion.NotifiedOn);
                 Assert.False(actualReleaseVersion.NotifySubscribers);
-                Assert.False(actualReleaseVersion.UpdatePublishedDate);
+                Assert.False(actualReleaseVersion.UpdatePublishedDisplayDate);
                 Assert.Empty(actualReleaseVersion.PublishingOrganisations);
             }
         }
