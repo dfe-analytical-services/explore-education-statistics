@@ -188,7 +188,7 @@ public class BlobStorageServiceTests
                     filename,
                     path,
                     TimeSpan.FromMinutes(5),
-                    default
+                    CancellationToken.None
                 )
             )
             .ReturnsAsync(tokenCreated);
@@ -202,7 +202,7 @@ public class BlobStorageServiceTests
             container: PublicReleaseFiles,
             filename: filename,
             path: path,
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         var tokenReturned = result.AssertRight();
@@ -246,7 +246,7 @@ public class BlobStorageServiceTests
             blobSasService: blobSasService.Object
         );
 
-        var result = await service.StreamWithToken(token: token, cancellationToken: default);
+        var result = await service.StreamWithToken(token: token, cancellationToken: CancellationToken.None);
 
         var fileStreamResult = result.AssertRight();
 
@@ -369,13 +369,15 @@ public class BlobStorageServiceTests
         );
 
         blobContainerClient
-            .Setup(s => s.GetBlobsAsync(default, default, "directory/", default))
+            .Setup(s =>
+                s.GetBlobsAsync(It.Is<GetBlobsOptions>(actual => actual.Prefix == "directory/"), CancellationToken.None)
+            )
             .Returns(new TestAsyncPageable<BlobItem>(pages));
 
         var deletedBlobs = new List<string>();
 
         blobContainerClient
-            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default))
+            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, CancellationToken.None))
             .ReturnsAsync(Response.FromValue(true, null!));
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
@@ -402,18 +404,20 @@ public class BlobStorageServiceTests
         );
 
         blobContainerClient
-            .Setup(s => s.GetBlobsAsync(default, default, default, default))
+            .Setup(s =>
+                s.GetBlobsAsync(It.Is<GetBlobsOptions>(actual => actual.Prefix == null), CancellationToken.None)
+            )
             .Returns(new TestAsyncPageable<BlobItem>(pages));
 
         var deletedBlobs = new List<string>();
 
         blobContainerClient
-            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default))
+            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, CancellationToken.None))
             .ReturnsAsync(Response.FromValue(true, null!));
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
-        await service.DeleteBlobs(PublicReleaseFiles);
+        await service.DeleteBlobs(PublicReleaseFiles, directoryPath: null);
 
         MockUtils.VerifyAllMocks(blobContainerClient);
 
@@ -435,13 +439,13 @@ public class BlobStorageServiceTests
         );
 
         blobContainerClient
-            .Setup(s => s.GetBlobsAsync(default, default, default, default))
+            .Setup(s => s.GetBlobsAsync(It.IsAny<GetBlobsOptions>(), CancellationToken.None))
             .Returns(new TestAsyncPageable<BlobItem>(pages));
 
         var deletedBlobs = new List<string>();
 
         blobContainerClient
-            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default))
+            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, CancellationToken.None))
             .ReturnsAsync(Response.FromValue(true, null!));
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
@@ -469,13 +473,13 @@ public class BlobStorageServiceTests
         );
 
         blobContainerClient
-            .Setup(s => s.GetBlobsAsync(default, default, default, default))
+            .Setup(s => s.GetBlobsAsync(It.IsAny<GetBlobsOptions>(), CancellationToken.None))
             .Returns(new TestAsyncPageable<BlobItem>(pages));
 
         var deletedBlobs = new List<string>();
 
         blobContainerClient
-            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default))
+            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, CancellationToken.None))
             .ReturnsAsync(Response.FromValue(true, null!));
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
@@ -503,13 +507,13 @@ public class BlobStorageServiceTests
         );
 
         blobContainerClient
-            .Setup(s => s.GetBlobsAsync(default, default, default, default))
+            .Setup(s => s.GetBlobsAsync(It.IsAny<GetBlobsOptions>(), CancellationToken.None))
             .Returns(new TestAsyncPageable<BlobItem>(pages));
 
         var deletedBlobs = new List<string>();
 
         blobContainerClient
-            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default))
+            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, CancellationToken.None))
             .ReturnsAsync(Response.FromValue(true, null!));
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
@@ -546,13 +550,13 @@ public class BlobStorageServiceTests
         );
 
         blobContainerClient
-            .Setup(s => s.GetBlobsAsync(default, default, default, default))
+            .Setup(s => s.GetBlobsAsync(It.IsAny<GetBlobsOptions>(), CancellationToken.None))
             .Returns(new TestAsyncPageable<BlobItem>(pages));
 
         var deletedBlobs = new List<string>();
 
         blobContainerClient
-            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default))
+            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, CancellationToken.None))
             .ReturnsAsync(Response.FromValue(true, null!));
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
@@ -585,13 +589,13 @@ public class BlobStorageServiceTests
         );
 
         blobContainerClient
-            .Setup(s => s.GetBlobsAsync(default, default, default, default))
+            .Setup(s => s.GetBlobsAsync(It.IsAny<GetBlobsOptions>(), CancellationToken.None))
             .Returns(new TestAsyncPageable<BlobItem>(pages));
 
         var deletedBlobs = new List<string>();
 
         blobContainerClient
-            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default))
+            .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, CancellationToken.None))
             .ReturnsAsync(Response.FromValue(true, null!));
 
         var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
