@@ -1,19 +1,27 @@
 import { check } from 'k6';
-import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
-import loggingUtils from '../../utils/loggingUtils';
 import getStandardOptions from '../../configuration/options';
-import testPageAndDataUrls from './utils/publicPageTest';
+import testPageAndDataUrls, {
+  getPrefetchRequestConfig,
+  PublicPageSetupData,
+  setupPublicPageTest,
+} from './utils/publicPageTest';
 
 const name = 'homePage.test.ts';
 
 export const options = getStandardOptions();
 
-export function setup() {
-  loggingUtils.logDashboardUrls();
-}
+const dataUrls = [
+  '/find-statistics.json',
+  '/data-catalogue.json',
+  '/data-tables.json',
+  '/methodology.json',
+];
 
-const performTest = () =>
+export const setup = () => setupPublicPageTest(name);
+
+const performTest = ({ buildId }: PublicPageSetupData) =>
   testPageAndDataUrls({
+    buildId,
     mainPageUrl: {
       url: '/',
       prefetch: false,
@@ -25,12 +33,13 @@ const performTest = () =>
             res.html().text().includes('Explore our statistics and data'),
         }),
     },
+    dataUrls: dataUrls.map(getPrefetchRequestConfig),
   });
 
-export function handleSummary(data: unknown) {
-  return {
-    [`${name}.html`]: htmlReport(data),
-  };
-}
+// export function handleSummary(data: unknown) {
+//   return {
+//     [`${name}.html`]: htmlReport(data),
+//   };
+// }
 
 export default performTest;

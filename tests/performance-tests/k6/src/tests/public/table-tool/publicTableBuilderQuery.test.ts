@@ -3,7 +3,6 @@ import { check } from 'k6';
 import exec from 'k6/execution';
 import { Counter, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
-import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import createAdminService, {
   getDataFileUploadStrategy,
 } from '../../../utils/adminService';
@@ -81,16 +80,17 @@ function getOrCreateReleaseWithSubject() {
     title: publicationTitle,
   });
 
-  const { id: releaseId, approvalStatus } = adminService.getOrCreateRelease({
-    publicationId,
-    publicationTitle,
-    themeId,
-    year: 2000,
-    timePeriodCoverage: 'AY',
-  });
+  const { id: releaseVersionId, approvalStatus } =
+    adminService.getOrCreateRelease({
+      publicationId,
+      publicationTitle,
+      themeId,
+      year: 2000,
+      timePeriodCoverage: 'AY',
+    });
 
   const { subjects: existingSubjects } = adminService.getSubjects({
-    releaseId,
+    releaseVersionId,
   });
 
   if (!existingSubjects.length) {
@@ -98,25 +98,25 @@ function getOrCreateReleaseWithSubject() {
 
     const { id: fileId } = uploadFileStrategy.getOrImportSubject(
       adminService,
-      releaseId,
+      releaseVersionId,
     );
 
     console.log('Waiting for data file to import');
 
     adminService.waitForDataFileToImport({
-      releaseId,
+      releaseVersionId,
       fileId,
     });
 
     console.log('Data file imported successfully');
   }
 
-  const { subjects } = adminService.getSubjects({ releaseId });
+  const { subjects } = adminService.getSubjects({ releaseVersionId });
   const subjectId = subjects[0].id;
 
   if (approvalStatus !== 'Approved') {
     adminService.addDataGuidance({
-      releaseId,
+      releaseVersionId,
       subjects: [
         {
           id: subjectId,
@@ -127,18 +127,18 @@ function getOrCreateReleaseWithSubject() {
 
     console.log('Approving Release');
 
-    adminService.approveRelease({ releaseId });
+    adminService.approveRelease({ releaseVersionId });
 
     console.log(`Waiting for Release to be published`);
 
-    adminService.waitForReleaseToBePublished({ releaseId });
+    adminService.waitForReleaseToBePublished({ releaseVersionId });
 
     console.log(`Release published successfully`);
   }
 
   return {
     themeId,
-    releaseId,
+    releaseVersionId,
     subjectId,
   };
 }
@@ -146,9 +146,13 @@ function getOrCreateReleaseWithSubject() {
 export function setup(): SetupData {
   const adminService = createAdminService(adminUrl, authTokens.accessToken);
 
-  const { themeId, releaseId, subjectId } = getOrCreateReleaseWithSubject();
+  const { themeId, releaseVersionId, subjectId } =
+    getOrCreateReleaseWithSubject();
 
-  const { subjectMeta } = adminService.getSubjectMeta({ releaseId, subjectId });
+  const { subjectMeta } = adminService.getSubjectMeta({
+    releaseVersionId,
+    subjectId,
+  });
 
   loggingUtils.logDashboardUrls();
 
@@ -203,11 +207,5 @@ export const teardown = ({ themeId }: SetupData) => {
     console.log(`Deleted Theme ${themeId}`);
   }
 };
-
-export function handleSummary(data: unknown) {
-  return {
-    'publicTableBuilderQuery.html': htmlReport(data),
-  };
-}
 
 export default performTest;

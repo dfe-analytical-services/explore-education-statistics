@@ -1,8 +1,9 @@
+/* eslint-disable no-console */
 import { Counter, Trend } from 'k6/metrics';
 import http, { RefinedResponse, ResponseType } from 'k6/http';
 import { Options } from 'k6/options';
 import execution from 'k6/execution';
-import { fail } from 'k6';
+import { check, fail } from 'k6';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 import loggingUtils from '../../../utils/loggingUtils';
 import grafanaService from '../../../utils/grafanaService';
@@ -31,24 +32,21 @@ export interface PublicPageSetupData {
   response: RefinedResponse<ResponseType | undefined>;
 }
 
-export function setupPublicPageTest(
-  publicPageUrl: string,
-  name: string,
-): PublicPageSetupData {
+export function setupPublicPageTest(name: string): PublicPageSetupData {
   loggingUtils.logDashboardUrls();
 
-  const url = `${environmentAndUsers.environment.publicUrl}${publicPageUrl}`;
-
-  console.log(`Getting buildId from page ${url}`);
-
-  const response = http.get(
-    `${environmentAndUsers.environment.publicUrl}${publicPageUrl}`,
+  console.log(
+    `Getting buildId from page ${environmentAndUsers.environment.publicUrl}`,
   );
+
+  const response = http.get(environmentAndUsers.environment.publicUrl);
   const regexp = /"buildId":"([-0-9a-zA-Z_]*)"/g;
   const buildIdMatches = regexp.exec(response.body as string);
 
   if (!buildIdMatches || buildIdMatches.length === 0) {
-    fail(`Could not determine Next.JS buildId from page ${url}`);
+    fail(
+      `Could not determine Next.JS buildId from page ${environmentAndUsers.environment.publicUrl}`,
+    );
   }
 
   const buildId = buildIdMatches[1];
@@ -163,6 +161,32 @@ function testRequest({
       `Failure to get page at url ${absoluteUrl}.\nGot response code ${response.status}`,
     );
   }
+}
+
+export function getPagePropsRequestConfig(
+  url: string,
+): PublicPageTestUrlConfig {
+  return {
+    url,
+    prefetch: false,
+    successCheck: response =>
+      check(response, {
+        'response code was 200': ({ status }) => status === 200,
+        'response should have contained body': ({ body }) => body != null,
+        'response contains pageProps': res => res.json('pageProps') != null,
+      }),
+  };
+}
+
+export function getPrefetchRequestConfig(url: string): PublicPageTestUrlConfig {
+  return {
+    url,
+    prefetch: true,
+    successCheck: response =>
+      check(response, {
+        'response code was 200': ({ status }) => status === 200,
+      }),
+  };
 }
 
 export interface PublicPageTestConfig {

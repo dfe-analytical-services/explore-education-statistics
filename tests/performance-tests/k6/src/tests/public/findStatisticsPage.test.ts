@@ -1,7 +1,9 @@
+/* eslint-disable no-console */
 import { check } from 'k6';
 import http from 'k6/http';
 import getStandardOptions from '../../configuration/options';
 import testPageAndDataUrls, {
+  getPrefetchRequestConfig,
   PublicPageSetupData,
   setupPublicPageTest,
 } from './utils/publicPageTest';
@@ -23,7 +25,7 @@ export const options = getStandardOptions();
 const name = 'findStatisticsPage.test.ts';
 
 export function setup(): SetupData {
-  const { buildId, response } = setupPublicPageTest('/find-statistics', name);
+  const { buildId, response } = setupPublicPageTest(name);
 
   let dataUrls: string[];
 
@@ -75,14 +77,7 @@ const performTest = ({ buildId, dataUrls }: SetupData) =>
             res.html().text().includes(expectedTitle),
         }),
     },
-    dataUrls: dataUrls.map(dataUrl => ({
-      url: dataUrl,
-      prefetch: true,
-      successCheck: response =>
-        check(response, {
-          'response code was 200': ({ status }) => status === 200,
-        }),
-    })),
+    dataUrls: dataUrls.map(getPrefetchRequestConfig),
   });
 
 export default performTest;

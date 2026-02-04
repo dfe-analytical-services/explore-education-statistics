@@ -1,7 +1,7 @@
 import { check } from 'k6';
-import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import getOptions from '../../configuration/options';
 import testPageAndDataUrls, {
+  getPrefetchRequestConfig,
   PublicPageSetupData,
   setupPublicPageTest,
 } from './utils/publicPageTest';
@@ -29,7 +29,7 @@ const dataUrls: string[] = [
 export const options = getOptions();
 
 export function setup(): PublicPageSetupData {
-  return setupPublicPageTest(`${releasePageUrl}?redesign=true`, name);
+  return setupPublicPageTest(name);
 }
 
 const performTest = ({ buildId }: PublicPageSetupData) =>
@@ -48,20 +48,7 @@ const performTest = ({ buildId }: PublicPageSetupData) =>
             res.html().text().includes(expectedContentSnippet),
         }),
     },
-    dataUrls: dataUrls.map(dataUrl => ({
-      url: dataUrl,
-      prefetch: true,
-      successCheck: response =>
-        check(response, {
-          'response code was 200': ({ status }) => status === 200,
-        }),
-    })),
+    dataUrls: dataUrls.map(getPrefetchRequestConfig),
   });
-
-export function handleSummary(data: unknown) {
-  return {
-    [`${name}.html`]: htmlReport(data),
-  };
-}
 
 export default performTest;

@@ -1,10 +1,7 @@
 import { check } from 'k6';
-import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import loggingUtils from '../../utils/loggingUtils';
 import getStandardOptions from '../../configuration/options';
 import testPageAndDataUrls from './utils/publicPageTest';
-
-const name = 'permalinkPage.test.ts';
 
 // slowest permalink on dev at the time of writing
 // (after changing max table size to 6 million)
@@ -33,11 +30,5 @@ const performTest = () =>
         }),
     },
   });
-
-export function handleSummary(data: unknown) {
-  return {
-    [`${name}.html`]: htmlReport(data),
-  };
-}
 
 export default performTest;

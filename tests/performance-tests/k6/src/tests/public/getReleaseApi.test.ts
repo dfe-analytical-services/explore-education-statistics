@@ -1,7 +1,7 @@
+/* eslint-disable no-console */
 import http from 'k6/http';
 import { Counter, Trend } from 'k6/metrics';
 import { check, fail } from 'k6';
-import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
 import loggingUtils from '../../utils/loggingUtils';
 import getStandardOptions from '../../configuration/options';
@@ -59,11 +59,5 @@ const performTest = () => {
     fail('Failure to Get Release page');
   }
 };
-
-export function handleSummary(data: unknown) {
-  return {
-    'getReleaseApi.html': htmlReport(data),
-  };
-}
 
 export default performTest;
