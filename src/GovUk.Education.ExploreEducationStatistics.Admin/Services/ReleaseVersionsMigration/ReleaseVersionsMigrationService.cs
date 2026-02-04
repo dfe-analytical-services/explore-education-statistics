@@ -191,7 +191,7 @@ public class ReleaseVersionsMigrationService(
                 // which reached overall stage 'Complete'. If this doesn't exist, the release version won't be updated.
                 PublishedProposed = publishingInfo.LatestAttemptTimestamp,
                 PublishedOriginalUkDateOnly = releaseVersion.Published?.ToUkDateOnly(),
-                PublishedProposedUkDateOnly = publishingInfo.LatestAttemptTimestamp?.ToUkDateOnly(),
+                PublishedProposedUkDateOnly = publishingInfo.LatestAttemptTimestampUkDateOnly,
                 UpdateNotes = updateNotes,
                 Warnings = warnings,
             };
@@ -219,6 +219,7 @@ public class ReleaseVersionsMigrationService(
         {
             PublishMethod = publishingInfo.LatestAttemptMethod,
             LatestAttemptTimestamp = publishingInfo.LatestAttemptTimestamp,
+            LatestAttemptTimestampUkDateOnly = publishingInfo.LatestAttemptTimestamp?.ToUkDateOnly(),
             ScheduledPublishTrigger = releaseVersion.PublishScheduled,
             ScheduledPublishFinalStageTrigger = scheduledPublishFinalStageTrigger,
             SuccessfulPublishingAttempts = publishingInfo.SuccessfulPublishingAttempts,
@@ -251,12 +252,10 @@ public class ReleaseVersionsMigrationService(
         var multipleSuccessfulPublishingAttempts = publishingInfo.SuccessfulPublishingAttempts > 1;
         var updatesCountDoesNotMatchVersion = releaseVersion.Updates.Count != releaseVersion.Version;
 
-        var proposedPublishedUkDateOnly = publishingInfo.LatestAttemptTimestamp?.ToUkDateOnly();
-        var latestUpdateNoteUkDateOnly = updateNotes.LatestUpdateNoteUkDateOnly;
-        var proposedPublishedDateDoesNotMatchLatestUpdateNote =
-            proposedPublishedUkDateOnly.HasValue
-            && latestUpdateNoteUkDateOnly.HasValue
-            && proposedPublishedUkDateOnly.Value != latestUpdateNoteUkDateOnly.Value;
+        var proposedPublishedDateDoesNotMatchLatestUpdateNoteDate =
+            publishingInfo.LatestAttemptTimestampUkDateOnly.HasValue
+            && updateNotes.LatestUpdateNoteUkDateOnly.HasValue
+            && publishingInfo.LatestAttemptTimestampUkDateOnly.Value != updateNotes.LatestUpdateNoteUkDateOnly.Value;
 
         var publishingTolerance =
             publishingInfo.PublishMethod == ReleasePublishingMethod.Immediate
@@ -272,9 +271,8 @@ public class ReleaseVersionsMigrationService(
             NoSuccessfulPublishingAttempts = noSuccessfulPublishingAttempts ? true : null,
             MultipleSuccessfulPublishingAttempts = multipleSuccessfulPublishingAttempts ? true : null,
             UpdatesCountDoesNotMatchVersion = updatesCountDoesNotMatchVersion ? true : null,
-            ProposedPublishedDateDoesNotMatchLatestUpdateNote = proposedPublishedDateDoesNotMatchLatestUpdateNote
-                ? true
-                : null,
+            ProposedPublishedDateDoesNotMatchLatestUpdateNoteDate =
+                proposedPublishedDateDoesNotMatchLatestUpdateNoteDate ? true : null,
             ProposedPublishedDateIsNotSimilarToScheduledTriggerDate =
                 proposedPublishedDateIsNotSimilarToScheduledTriggerDate ? true : null,
         };

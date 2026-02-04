@@ -95,6 +95,12 @@ public record ReleaseVersionsMigrationReportPublishingInfoDto
     public required DateTimeOffset? LatestAttemptTimestamp { get; init; }
 
     /// <summary>
+    /// The date-only element in UK local time of the latest 'Complete' publishing attempt.
+    /// </summary>
+    [JsonIgnore]
+    public required DateOnly? LatestAttemptTimestampUkDateOnly { get; init; }
+
+    /// <summary>
     /// The time when publishing the release version was due to start in UTC. This is midnight UK local time on the scheduled date
     /// when <c>PublishMethod</c> is <c>Scheduled</c>, or the time when the release version was approved when it is <c>Immediate</c>.
     /// The source of this value is <see cref="ReleaseVersion.PublishScheduled"/>.
@@ -158,7 +164,7 @@ public record ReleaseVersionsMigrationReportWarningsDto
     /// It's included in the report because it indicates that public facing 'last updated' date will differ when EES-6833
     /// alters that field to use the actual published date.
     /// </summary>
-    public required bool? ProposedPublishedDateDoesNotMatchLatestUpdateNote { get; init; }
+    public required bool? ProposedPublishedDateDoesNotMatchLatestUpdateNoteDate { get; init; }
 
     /// <summary>
     /// True if the proposed published date is not similar to the publishing trigger date.
@@ -175,6 +181,6 @@ public record ReleaseVersionsMigrationReportWarningsDto
         NoSuccessfulPublishingAttempts == true
         || MultipleSuccessfulPublishingAttempts == true
         || UpdatesCountDoesNotMatchVersion == true
-        || ProposedPublishedDateDoesNotMatchLatestUpdateNote == true
+        || ProposedPublishedDateDoesNotMatchLatestUpdateNoteDate == true
         || ProposedPublishedDateIsNotSimilarToScheduledTriggerDate == true;
 }
