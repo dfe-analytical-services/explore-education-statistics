@@ -119,7 +119,7 @@ user opens data set details for subject
     Run Keyword And Ignore Error
     ...    Click Element    xpath=${toggle_xpath}
 
-user checks main links for page 'Explore and download data' are persistent
+user checks main links for page 'Explore and download data' are present
     [Arguments]    @{expected_link_texts}
     FOR    ${link_text}    IN    @{expected_link_texts}
         ${button_xpath}=    Set Variable

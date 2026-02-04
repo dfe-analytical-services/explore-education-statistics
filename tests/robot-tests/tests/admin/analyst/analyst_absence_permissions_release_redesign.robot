@@ -142,7 +142,7 @@ Validate Analyst1 can see 'Content' page sections
     user checks section is in position    Pupil referral unit absence    8
     user checks section is in position    Regional and local authority (LA) breakdown    9
 
-Validate navigation tabs are persistent
+Validate navigation tabs are present
     user checks the page contains the tabs
     ...    Release home
     ...    Explore and download data

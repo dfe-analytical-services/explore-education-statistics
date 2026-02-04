@@ -300,7 +300,7 @@ Verify release associated files
     user clicks link    Explore and download data
     user waits until h2 is visible    Explore data used in this release
     user waits until h2 is visible    Data sets: download or create tables
-    user checks main links for page 'Explore and download data' are persistent
+    user checks main links for page 'Explore and download data' are present
     ...    Download all data from this release (ZIP)
     ...    Data sets: download or create tables
     ...    Data guidance
@@ -758,7 +758,7 @@ Verify amendment files
     user waits until h2 is visible    Explore data used in this release
     user waits until h2 is visible    Data sets: download or create tables
 
-    user checks main links for page 'Explore and download data' are persistent
+    user checks main links for page 'Explore and download data' are present
     ...    Download all data from this release (ZIP)
     ...    Data sets: download or create tables
     ...    Data guidance

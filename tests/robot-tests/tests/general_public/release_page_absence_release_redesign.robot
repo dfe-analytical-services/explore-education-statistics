@@ -404,7 +404,7 @@ Verify Explore and Download data
     ...    Data guidance
     ...    Contact us
     ...    Back to top
-    user checks main links for page 'Explore and download data' are persistent
+    user checks main links for page 'Explore and download data' are present
     ...    Download all data from this release (ZIP)
     ...    Data sets: download or create tables
     ...    Data guidance
