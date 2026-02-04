@@ -4,7 +4,7 @@ import spikeProfile from './spikeProfile';
 import rampingRequestRateProfile from './rampingRequestRateProfile';
 import sequentialRequestProfile from './sequentialRequestsProfile';
 
-export default function getOptions(): Options {
+export default function getStandardOptions(): Options {
   const profile = (__ENV.PROFILE ?? 'sequential') as
     | 'load'
     | 'spike'

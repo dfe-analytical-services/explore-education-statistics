@@ -1,29 +1,14 @@
-/* eslint-disable no-console */
-import { Counter, Rate, Trend } from 'k6/metrics';
-import { Options } from 'k6/options';
 import http from 'k6/http';
+import { Counter, Trend } from 'k6/metrics';
 import { check, fail } from 'k6';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
 import loggingUtils from '../../utils/loggingUtils';
+import getStandardOptions from '../../configuration/options';
+import { errorRate } from '../../configuration/commonMetrics';
 
-export const options: Options = {
-  stages: [
-    {
-      duration: '0.1s',
-      target: 80,
-    },
-    {
-      duration: '10m',
-      target: 80,
-    },
-  ],
-  noConnectionReuse: true,
-  insecureSkipTLSVerify: true,
-  linger: true,
-};
+export const options = getStandardOptions();
 
-export const errorRate = new Rate('ees_errors');
 export const getReleaseSuccessCount = new Counter('ees_get_release_success');
 export const getReleaseFailureCount = new Counter('ees_get_release_failure');
 export const getReleaseRequestDuration = new Trend(
@@ -74,9 +59,11 @@ const performTest = () => {
     fail('Failure to Get Release page');
   }
 };
+
 export function handleSummary(data: unknown) {
   return {
     'getReleaseApi.html': htmlReport(data),
   };
 }
+
 export default performTest;

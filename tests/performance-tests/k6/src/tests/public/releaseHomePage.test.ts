@@ -1,11 +1,12 @@
-/* eslint-disable no-console */
-import { Counter, Trend } from 'k6/metrics';
 import { check } from 'k6';
+import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import getOptions from '../../configuration/options';
-import testPageAndDataUrls from './utils/publicPageTest';
-import setupReleasePageTest, {
-  ReleasePageSetupData,
-} from './utils/releasePageTest';
+import testPageAndDataUrls, {
+  PublicPageSetupData,
+  setupPublicPageTest,
+} from './utils/publicPageTest';
+
+const name = 'releaseHomePage.test.ts';
 
 const releasePageUrl =
   __ENV.URL ??
@@ -21,39 +22,16 @@ const dataUrls: string[] = excludeDataUrls ? [] : [`/find-statistics.json`];
 
 export const options = getOptions();
 
-const name = 'releasePage.ts';
-
-export const getReleaseSuccessCount = new Counter('ees_get_release_success');
-export const getReleaseFailureCount = new Counter('ees_get_release_failure');
-export const getReleaseRequestDuration = new Trend(
-  'ees_get_release_duration',
-  true,
-);
-
-export const getReleaseDataRequestDuration = new Trend(
-  'ees_get_release_data_duration',
-  true,
-);
-export const getReleaseDataSuccessCount = new Counter(
-  'ees_get_release_data_success',
-);
-export const getReleaseDataFailureCount = new Counter(
-  'ees_get_release_data_failure',
-);
-
-export function setup(): ReleasePageSetupData {
-  return setupReleasePageTest(releasePageUrl, name);
+export function setup(): PublicPageSetupData {
+  return setupPublicPageTest(`${releasePageUrl}?redesign=true`, name);
 }
 
-const performTest = ({ buildId }: ReleasePageSetupData) => {
+const performTest = ({ buildId }: PublicPageSetupData) =>
   testPageAndDataUrls({
     buildId,
     mainPageUrl: {
       url: `${releasePageUrl}?redesign=true`,
       prefetch: false,
-      successCounter: getReleaseSuccessCount,
-      failureCounter: getReleaseFailureCount,
-      durationTrend: getReleaseRequestDuration,
       successCheck: response =>
         check(response, {
           'response code was 200': ({ status }) => status === 200,
@@ -67,15 +45,17 @@ const performTest = ({ buildId }: ReleasePageSetupData) => {
     dataUrls: dataUrls.map(dataUrl => ({
       url: dataUrl,
       prefetch: true,
-      successCounter: getReleaseDataSuccessCount,
-      failureCounter: getReleaseDataFailureCount,
-      durationTrend: getReleaseDataRequestDuration,
       successCheck: response =>
         check(response, {
           'response code was 200': ({ status }) => status === 200,
         }),
     })),
   });
-};
+
+export function handleSummary(data: unknown) {
+  return {
+    [`${name}.html`]: htmlReport(data),
+  };
+}
 
 export default performTest;

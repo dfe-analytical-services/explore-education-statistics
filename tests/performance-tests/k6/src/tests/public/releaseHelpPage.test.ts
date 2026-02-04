@@ -1,11 +1,12 @@
-/* eslint-disable no-console */
-import { Counter, Trend } from 'k6/metrics';
 import { check } from 'k6';
+import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import getOptions from '../../configuration/options';
-import testPageAndDataUrls from './utils/publicPageTest';
-import setupReleasePageTest, {
-  ReleasePageSetupData,
-} from './utils/releasePageTest';
+import testPageAndDataUrls, {
+  PublicPageSetupData,
+  setupPublicPageTest,
+} from './utils/publicPageTest';
+
+const name = 'releaseHelpPage.test.ts';
 
 const releasePageUrl =
   __ENV.URL ??
@@ -17,75 +18,41 @@ const releaseSlug = urlSlugs[2];
 
 export const options = getOptions();
 
-const name = 'releaseHelpPage.ts';
-
-export const getReleaseRequestDuration = new Trend(
-  'ees_get_release_duration',
-  true,
-);
-export const getReleaseSuccessCount = new Counter('ees_get_release_success');
-export const getReleaseFailureCount = new Counter('ees_get_release_failure');
-export const getReleaseDataRequestDuration = new Trend(
-  'ees_get_release_data_duration',
-  true,
-);
-export const getReleaseDataSuccessCount = new Counter(
-  'ees_get_release_data_success',
-);
-export const getReleaseDataFailureCount = new Counter(
-  'ees_get_release_data_failure',
-);
-
-export function setup(): ReleasePageSetupData {
-  return setupReleasePageTest(releasePageUrl, name);
+export function setup(): PublicPageSetupData {
+  return setupPublicPageTest(`${releasePageUrl}?redesign=true`, name);
 }
 
-const performTest = ({ buildId }: ReleasePageSetupData) => {
-  const startTime = Date.now();
+const performTest = ({ buildId }: PublicPageSetupData) =>
+  testPageAndDataUrls({
+    buildId,
+    dataUrls: [
+      // This request occurs on hover-over of the navigation link to the Help tab.
+      {
+        url: `${releasePageUrl}/help.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
+        prefetch: true,
+        successCheck: response =>
+          check(response, {
+            'response code was 200': ({ status }) => status === 200,
+          }),
+      },
+      // This request occurs when actually navigating to the Help tab.
+      {
+        url: `${releasePageUrl}/help.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
+        prefetch: false,
+        successCheck: response =>
+          check(response, {
+            'response code was 200': ({ status }) => status === 200,
+            'response should have contained body': ({ body }) => body != null,
+            'response contains pageProps': res => res.json('pageProps') != null,
+          }),
+      },
+    ],
+  });
 
-  try {
-    testPageAndDataUrls({
-      buildId,
-      dataUrls: [
-        // This request occurs on hover-over of the navigation link to the Help tab.
-        {
-          url: `${releasePageUrl}/help.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
-          prefetch: true,
-          successCounter: getReleaseDataSuccessCount,
-          failureCounter: getReleaseDataFailureCount,
-          durationTrend: getReleaseDataRequestDuration,
-          successCheck: response =>
-            check(response, {
-              'response code was 200': ({ status }) => status === 200,
-              'response should have contained body': ({ body }) => body != null,
-              'response contains expected content': res =>
-                res.html().text().includes('pageProps'),
-            }),
-        },
-        // This request occurs when actually navigating to the Help tab.
-        {
-          url: `${releasePageUrl}/help.json?publication=${publicationSlug}&release=${releaseSlug}&tab=help`,
-          prefetch: false,
-          successCounter: getReleaseDataSuccessCount,
-          failureCounter: getReleaseDataFailureCount,
-          durationTrend: getReleaseDataRequestDuration,
-          successCheck: response =>
-            check(response, {
-              'response code was 200': ({ status }) => status === 200,
-              'response should have contained body': ({ body }) => body != null,
-              'response contains expected content': res =>
-                res.html().text().includes('pageProps'),
-            }),
-        },
-      ],
-    });
-
-    getReleaseRequestDuration.add(Date.now() - startTime);
-    getReleaseSuccessCount.add(1);
-  } catch (error) {
-    getReleaseFailureCount.add(1);
-    throw error;
-  }
-};
+export function handleSummary(data: unknown) {
+  return {
+    [`${name}.html`]: htmlReport(data),
+  };
+}
 
 export default performTest;
