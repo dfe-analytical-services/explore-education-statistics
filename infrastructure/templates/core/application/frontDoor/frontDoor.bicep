@@ -110,19 +110,28 @@ module publicSiteCertificateModule 'publicSiteCertificate.bicep' = if (certifica
   }
 }
 
-resource customDomain 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = {
+resource customDomainWithCertificate 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = if (certificateType == 'BringYourOwn') {
   parent: frontDoor
   name: '${resourcePrefix}-public-site-${abbreviations.frontDoorDomains}'
   properties: {
     hostName: publicSiteHostName
-    tlsSettings: publicSiteCertificateModule != null ? {
+    tlsSettings: {
       certificateType: 'CustomerCertificate'
       minimumTlsVersion: 'TLS12'
       cipherSuiteSetType: 'TLS12_2023'
       secret: {
         id: publicSiteCertificateModule!.outputs.certificateSecretId
       }
-    } : {
+    }
+  }
+}
+
+resource customDomainWithoutCertificate 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = if (certificateType == 'Provisioned') {
+  parent: frontDoor
+  name: '${resourcePrefix}-public-site-${abbreviations.frontDoorDomains}'
+  properties: {
+    hostName: publicSiteHostName
+    tlsSettings: {
       certificateType: 'ManagedCertificate'
       minimumTlsVersion: 'TLS12'
       cipherSuiteSetType: 'TLS12_2023'
@@ -190,7 +199,7 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
     }
     customDomains: [
       {
-        id: customDomain.id
+        id: certificateType == 'BringYourOwn' ? customDomainWithCertificate.id : customDomainWithoutCertificate.id
       }
     ]
     originGroup: {
