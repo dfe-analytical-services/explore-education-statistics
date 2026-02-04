@@ -14,6 +14,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import React, { useEffect, useRef } from 'react';
 import { generatePath } from 'react-router';
 import { Publication } from '@admin/services/publicationService';
+import BackToTopLink from '@common/components/BackToTopLink';
 import { PublishedStatusGuidanceModal } from './PublicationGuidance';
 import ReleaseLabelEditModal, {
   ReleaseLabelFormValues,
@@ -28,6 +29,7 @@ interface PublishedReleasesTableProps {
     releaseId: string,
     releaseDetailsFormValues: ReleaseLabelFormValues,
   ) => Promise<void>;
+  showBackToTopLink?: boolean;
 }
 
 export default function PublicationPublishedReleasesTable({
@@ -36,6 +38,7 @@ export default function PublicationPublishedReleasesTable({
   releases,
   onAmend,
   onEdit,
+  showBackToTopLink,
 }: PublishedReleasesTableProps) {
   const rowRef = useRef<HTMLTableRowElement>(null);
 
@@ -151,6 +154,7 @@ export default function PublicationPublishedReleasesTable({
         </tbody>
       </table>
       <PublishedStatusGuidanceModal />
+      {showBackToTopLink && <BackToTopLink className="govuk-!-margin-top-2" />}
     </>
   );
 }

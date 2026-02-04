@@ -7,18 +7,21 @@ import {
 import { ReleaseVersionSummaryWithPermissions } from '@admin/services/releaseVersionService';
 import InsetText from '@common/components/InsetText';
 import ButtonGroup from '@common/components/ButtonGroup';
+import BackToTopLink from '@common/components/BackToTopLink';
 import React from 'react';
 
 interface Props {
   publicationId: string;
   releases: ReleaseVersionSummaryWithPermissions[];
   onAmendmentDelete?: () => void;
+  showBackToTopLink?: boolean;
 }
 
 const PublicationDraftReleases = ({
   publicationId,
   releases,
   onAmendmentDelete,
+  showBackToTopLink,
 }: Props) => {
   if (releases.length === 0) {
     return <InsetText>You have no draft releases.</InsetText>;
@@ -55,10 +58,13 @@ const PublicationDraftReleases = ({
           ))}
         </tbody>
       </table>
-      <ButtonGroup>
+      <ButtonGroup
+        className={showBackToTopLink ? 'govuk-!-margin-bottom-2' : undefined}
+      >
         <IssuesGuidanceModal />
         <DraftStatusGuidanceModal />
       </ButtonGroup>
+      {showBackToTopLink && <BackToTopLink />}
     </>
   );
 };

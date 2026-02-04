@@ -329,6 +329,38 @@ describe('PublicationUnpublishedReleases', () => {
       expect(handleAmendmentDelete).toHaveBeenCalled();
     });
   });
+  test('shows Back To Top Link when boolean BackToTopLink prop is true', () => {
+    const handleAmendmentDelete = jest.fn();
+
+    render(
+      <PublicationUnpublishedReleases
+        publicationId={testPublicationId}
+        onAmendmentDelete={handleAmendmentDelete}
+        showBackToTopLink
+      />,
+    );
+    waitFor(() => {
+      expect(
+        screen.getByRole('link', { name: 'Back to top' }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('does not show Back To Top Link when boolean BackToTopLink prop is false', () => {
+    const handleAmendmentDelete = jest.fn();
+
+    render(
+      <PublicationUnpublishedReleases
+        publicationId={testPublicationId}
+        onAmendmentDelete={handleAmendmentDelete}
+      />,
+    );
+    waitFor(() => {
+      expect(
+        screen.getByRole('link', { name: 'Back to top' }),
+      ).not.toBeInTheDocument();
+    });
+  });
 });
 
 function render(element: ReactElement) {

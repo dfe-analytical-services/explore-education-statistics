@@ -544,6 +544,39 @@ describe('PublicationPublishedReleases', () => {
       within(rows[1]).queryByRole('button', { name: 'Amend Release 1' }),
     ).not.toBeInTheDocument();
   });
+
+  test('shows Back To Top Link when boolean BackToTopLink prop is true', () => {
+    render(
+      <TestConfigContextProvider>
+        <PublicationPublishedReleases
+          publication={testPublication}
+          onEdit={Promise.resolve}
+          showBackToTopLink
+        />
+      </TestConfigContextProvider>,
+    );
+    waitFor(() => {
+      expect(
+        screen.getByRole('link', { name: 'Back to top' }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('does not show Back To Top Link when boolean BackToTopLink prop is false', () => {
+    render(
+      <TestConfigContextProvider>
+        <PublicationPublishedReleases
+          publication={testPublication}
+          onEdit={Promise.resolve}
+        />
+      </TestConfigContextProvider>,
+    );
+    waitFor(() => {
+      expect(
+        screen.getByRole('link', { name: 'Back to top' }),
+      ).not.toBeInTheDocument();
+    });
+  });
 });
 
 function render(element: ReactElement) {

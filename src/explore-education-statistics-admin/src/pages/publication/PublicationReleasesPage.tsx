@@ -7,7 +7,7 @@ import { releaseCreateRoute } from '@admin/routes/routes';
 import releaseService from '@admin/services/releaseService';
 import { useQueryClient } from '@tanstack/react-query';
 import noop from 'lodash/noop';
-import React, { useRef } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { generatePath } from 'react-router';
 import publicationQueries from '@admin/queries/publicationQueries';
 import { ReleaseLabelFormValues } from './components/ReleaseLabelEditModal';
@@ -16,9 +16,14 @@ const PublicationReleasesPage = () => {
   const { publicationId, publication } = usePublicationContext();
 
   const publishedReleasesRefetchRef = useRef<() => void>(noop);
-
+  const [unpublishedVisibleCount, setUnpublishedVisibleCount] = useState(0);
+  const [publishedVisibleCount, setPublishedVisibleCount] = useState(0);
   const queryClient = useQueryClient();
 
+  const itemsCount = useMemo(
+    () => unpublishedVisibleCount + publishedVisibleCount,
+    [unpublishedVisibleCount, publishedVisibleCount],
+  );
   const onEditingPublishedRelease = async (
     releaseId: string,
     releaseDetailsFormValues: ReleaseLabelFormValues,
@@ -34,7 +39,15 @@ const PublicationReleasesPage = () => {
       publicationQueries.listPublishedReleaseVersions(publicationId).queryKey,
     );
   };
+  const handleUnpublishedCountChange = useCallback((count: number) => {
+    setUnpublishedVisibleCount(count);
+  }, []);
 
+  const handlePublishedCountChange = useCallback((count: number) => {
+    setPublishedVisibleCount(count);
+  }, []);
+
+  const showBackToTopLink = itemsCount > 10;
   return (
     <>
       <h2>Manage releases</h2>
@@ -56,12 +69,15 @@ const PublicationReleasesPage = () => {
         onAmendmentDelete={() => {
           publishedReleasesRefetchRef.current();
         }}
+        addItemsCount={handleUnpublishedCountChange}
+        showBackToTopLink={showBackToTopLink}
       />
-
       <PublicationPublishedReleases
         publication={publication}
         refetchRef={publishedReleasesRefetchRef}
         onEdit={onEditingPublishedRelease}
+        addItemsCount={handlePublishedCountChange}
+        showBackToTopLink={showBackToTopLink}
       />
     </>
   );

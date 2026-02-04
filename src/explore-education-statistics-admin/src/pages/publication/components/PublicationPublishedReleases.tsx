@@ -26,6 +26,8 @@ interface Props {
     releaseId: string,
     releaseDetailsFormValues: ReleaseLabelFormValues,
   ) => Promise<void>;
+  addItemsCount?: (count: number) => void;
+  showBackToTopLink?: boolean;
 }
 
 export default function PublicationPublishedReleases({
@@ -33,6 +35,8 @@ export default function PublicationPublishedReleases({
   pageSize = 5,
   refetchRef,
   onEdit,
+  addItemsCount,
+  showBackToTopLink,
 }: Props) {
   const history = useHistory();
 
@@ -74,6 +78,10 @@ export default function PublicationPublishedReleases({
     () => releases?.pages.flatMap(page => page.results) ?? [],
     [releases?.pages],
   );
+
+  useEffect(() => {
+    addItemsCount?.(allReleases.length);
+  }, [addItemsCount, allReleases.length]);
 
   const showMoreNumber = useMemo(() => {
     if (!lastPage || !allReleases.length) {
@@ -117,6 +125,7 @@ export default function PublicationPublishedReleases({
                 );
               }}
               onEdit={onEdit}
+              showBackToTopLink={showBackToTopLink}
             />
 
             {hasNextPage && showMoreNumber > 0 && (
