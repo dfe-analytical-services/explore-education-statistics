@@ -15,9 +15,11 @@ import {
   getPublicPageMainRequestDuration,
   getPublicPageMainRequestFailureCount,
   getPublicPageMainRequestSuccessCount,
-  getPublicPageFullRequestsDuration,
-  getPublicPageFullRequestsSuccessCount,
-  getPublicPageFullRequestsFailureCount,
+  getPublicPageOverallRequestsDuration,
+  getPublicPageOverallRequestsSuccessCount,
+  getPublicPageOverallRequestsFailureCount,
+  getPublicPageOverallDataRequestsSuccessCount,
+  getPublicPageOverallDataRequestsDuration,
 } from '../publicPageMetrics';
 import { errorRate } from '../../../configuration/commonMetrics';
 
@@ -26,6 +28,7 @@ const environmentAndUsers = getEnvironmentAndUsersFromFile(
 );
 
 const useCdn = __ENV.USE_CDN?.toLowerCase() === 'true';
+const excludeDataUrls = __ENV.EXCLUDE_DATA_REQUESTS?.toLowerCase() === 'true';
 
 export interface PublicPageSetupData {
   buildId: string;
@@ -78,7 +81,7 @@ const testPageAndDataUrls = ({
   dataUrls,
   buildId,
 }: PublicPageTestConfig & { buildId?: string }) => {
-  const startTime = Date.now();
+  const overallStartTime = Date.now();
 
   try {
     if (mainPageUrl) {
@@ -90,20 +93,29 @@ const testPageAndDataUrls = ({
       });
     }
 
-    dataUrls?.forEach(dataUrl => {
-      testRequest({
-        ...dataUrl,
-        url: `/_next/data/${buildId}${dataUrl.url}`,
-        successCounter: getPublicPageDataRequestSuccessCount,
-        failureCounter: getPublicPageDataRequestFailureCount,
-        durationTrend: getPublicPageDataRequestDuration,
-      });
-    });
+    if (!excludeDataUrls && dataUrls && dataUrls.length > 0) {
+      const dataRequestsStartTime = Date.now();
 
-    getPublicPageFullRequestsDuration.add(Date.now() - startTime);
-    getPublicPageFullRequestsSuccessCount.add(1);
+      dataUrls?.forEach(dataUrl => {
+        testRequest({
+          ...dataUrl,
+          url: `/_next/data/${buildId}${dataUrl.url}`,
+          successCounter: getPublicPageDataRequestSuccessCount,
+          failureCounter: getPublicPageDataRequestFailureCount,
+          durationTrend: getPublicPageDataRequestDuration,
+        });
+      });
+
+      getPublicPageOverallDataRequestsDuration.add(
+        Date.now() - dataRequestsStartTime,
+      );
+      getPublicPageOverallDataRequestsSuccessCount.add(1);
+    }
+
+    getPublicPageOverallRequestsDuration.add(Date.now() - overallStartTime);
+    getPublicPageOverallRequestsSuccessCount.add(1);
   } catch (error) {
-    getPublicPageFullRequestsFailureCount.add(1);
+    getPublicPageOverallRequestsFailureCount.add(1);
     throw error;
   }
 };
@@ -185,6 +197,7 @@ export function getPrefetchRequestConfig(url: string): PublicPageTestUrlConfig {
     successCheck: response =>
       check(response, {
         'response code was 200': ({ status }) => status === 200,
+        'body was empty JSON': ({ body }) => body === '{}',
       }),
   };
 }

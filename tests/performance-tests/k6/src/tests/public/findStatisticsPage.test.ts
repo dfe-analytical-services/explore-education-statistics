@@ -13,8 +13,9 @@ type SetupData = PublicPageSetupData & {
   dataUrls: string[];
 };
 
-const expectedTitle = 'Find statistics and data';
 const excludeDataUrls = __ENV.EXCLUDE_DATA_REQUESTS?.toLowerCase() === 'true';
+
+const expectedTitle = 'Find statistics and data';
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT,

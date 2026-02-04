@@ -36,10 +36,4 @@ const performTest = ({ buildId }: PublicPageSetupData) =>
     dataUrls: dataUrls.map(getPrefetchRequestConfig),
   });
 
-// export function handleSummary(data: unknown) {
-//   return {
-//     [`${name}.html`]: htmlReport(data),
-//   };
-// }
-
 export default performTest;

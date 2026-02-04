@@ -16,9 +16,6 @@ const expectedPublicationTitle =
   'Seed publication - Pupil absence in schools in England';
 const expectedContentSnippet =
   __ENV.CONTENT_SNIPPET ?? 'Pupils missed on average 8.2 school days';
-const excludeDataUrls = __ENV.EXCLUDE_DATA_REQUESTS?.toLowerCase() === 'true';
-
-const dataUrls: string[] = excludeDataUrls ? [] : [`/find-statistics.json`];
 
 export const options = getOptions();
 
@@ -42,7 +39,7 @@ const performTest = ({ buildId }: PublicPageSetupData) =>
             res.html().text().includes(expectedContentSnippet),
         }),
     },
-    dataUrls: dataUrls.map(getPrefetchRequestConfig),
+    dataUrls: [getPrefetchRequestConfig(`/find-statistics.json`)],
   });
 
 export default performTest;

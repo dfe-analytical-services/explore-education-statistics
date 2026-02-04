@@ -1,14 +1,14 @@
 import { Counter, Trend } from 'k6/metrics';
 
-export const getPublicPageFullRequestsSuccessCount = new Counter(
+export const getPublicPageOverallRequestsSuccessCount = new Counter(
   'ees_public_page_overall_requests_success',
 );
 
-export const getPublicPageFullRequestsFailureCount = new Counter(
+export const getPublicPageOverallRequestsFailureCount = new Counter(
   'ees_public_page_overall_requests_failure',
 );
 
-export const getPublicPageFullRequestsDuration = new Trend(
+export const getPublicPageOverallRequestsDuration = new Trend(
   'ees_get_public_page_overall_requests_duration',
   true,
 );
@@ -23,6 +23,15 @@ export const getPublicPageMainRequestFailureCount = new Counter(
 
 export const getPublicPageMainRequestDuration = new Trend(
   'ees_get_public_page_main_request_duration',
+  true,
+);
+
+export const getPublicPageOverallDataRequestsSuccessCount = new Counter(
+  'ees_public_page_overall_data_requests_success',
+);
+
+export const getPublicPageOverallDataRequestsDuration = new Trend(
+  'ees_get_public_page_overall_data_requests_duration',
   true,
 );
 
