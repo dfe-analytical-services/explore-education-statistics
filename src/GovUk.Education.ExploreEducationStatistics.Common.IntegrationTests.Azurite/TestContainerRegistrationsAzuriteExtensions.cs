@@ -6,7 +6,7 @@ public static class TestContainerRegistrationsAzuriteExtensions
 {
     public static AzuriteWrapper RegisterAzuriteContainer(this TestContainerRegistrations registrations)
     {
-        var container = new AzuriteBuilder("mcr.microsoft.com/azure-storage/azurite:3.34.0")
+        var container = new AzuriteBuilder("mcr.microsoft.com/azure-storage/azurite:3.35.0")
             .WithCommand("--skipApiVersionCheck")
             .Build();
 
