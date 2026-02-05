@@ -7,7 +7,7 @@ import { releaseCreateRoute } from '@admin/routes/routes';
 import releaseService from '@admin/services/releaseService';
 import { useQueryClient } from '@tanstack/react-query';
 import noop from 'lodash/noop';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { generatePath } from 'react-router';
 import publicationQueries from '@admin/queries/publicationQueries';
 import { ReleaseLabelFormValues } from './components/ReleaseLabelEditModal';
@@ -20,10 +20,7 @@ const PublicationReleasesPage = () => {
   const [publishedVisibleCount, setPublishedVisibleCount] = useState(0);
   const queryClient = useQueryClient();
 
-  const itemsCount = useMemo(
-    () => unpublishedVisibleCount + publishedVisibleCount,
-    [unpublishedVisibleCount, publishedVisibleCount],
-  );
+  const itemsCount = unpublishedVisibleCount + publishedVisibleCount;
   const onEditingPublishedRelease = async (
     releaseId: string,
     releaseDetailsFormValues: ReleaseLabelFormValues,
