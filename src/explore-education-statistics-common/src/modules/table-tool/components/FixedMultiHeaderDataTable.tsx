@@ -148,7 +148,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
           <DataSymbolsModal />
         </p>
         {props.tableJson.tbody.length > 10 && (
-          <BackToTopLink className="govuk-!-margin-top-4" />
+          <BackToTopLink className="govuk-!-margin-top-4 govuk-!-margin-bottom-4" />
         )}
         <div className={footnotesClassName}>
           <FigureFootnotes
