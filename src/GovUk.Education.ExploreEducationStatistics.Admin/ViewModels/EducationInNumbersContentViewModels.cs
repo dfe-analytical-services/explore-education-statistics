@@ -124,8 +124,8 @@ public record EinTileViewModel
     {
         return tile switch
         {
-            EinFreeTextStatTile statTile => EinFreeTextStatTileViewModel.FromModel(statTile),
-            EinApiQueryStatTile statTile => EinApiQueryStatTileViewModel.FromModel(statTile),
+            EinFreeTextStatTile freeTextStatTile => EinFreeTextStatTileViewModel.FromModel(freeTextStatTile),
+            EinApiQueryStatTile apiQueryStatTile => EinApiQueryStatTileViewModel.FromModel(apiQueryStatTile),
             _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found"),
         };
     }
@@ -168,11 +168,16 @@ public record EinApiQueryStatTileViewModel : EinTileViewModel
     public required IndicatorUnit? IndicatorUnit { get; init; }
 
     public required int? DecimalPlaces { get; init; }
-    public required string PublicationSlug { get; init; }
-    public required string ReleaseSlug { get; init; }
+    public required string? PublicationSlug { get; init; }
+    public required string? ReleaseSlug { get; init; }
 
     public static EinApiQueryStatTileViewModel FromModel(EinApiQueryStatTile statTile)
     {
+        if (statTile.ReleaseId != null && statTile.Release?.Publication == null)
+        {
+            throw new ArgumentException("Must Include .Release.Publication when fetching apiQueryStatTile");
+        }
+
         return new EinApiQueryStatTileViewModel
         {
             Id = statTile.Id,
@@ -186,8 +191,8 @@ public record EinApiQueryStatTileViewModel : EinTileViewModel
             Statistic = statTile.Statistic,
             IndicatorUnit = statTile.IndicatorUnit,
             DecimalPlaces = statTile.DecimalPlaces,
-            PublicationSlug = statTile.PublicationSlug,
-            ReleaseSlug = statTile.ReleaseSlug,
+            PublicationSlug = statTile.Release?.Publication.Slug ?? null,
+            ReleaseSlug = statTile.Release?.Slug ?? null,
         };
     }
 }

@@ -989,8 +989,8 @@ public class EducationInNumbersContentServiceTests
             Assert.Null(apiTile.IndicatorUnit);
             Assert.Null(apiTile.Statistic);
             Assert.Null(apiTile.DecimalPlaces);
-            Assert.Empty(apiTile.PublicationSlug);
-            Assert.Empty(apiTile.ReleaseSlug);
+            Assert.Null(apiTile.PublicationSlug);
+            Assert.Null(apiTile.ReleaseSlug);
 
             var dbTile = await context.EinTiles.SingleAsync();
             Assert.Equal(viewModel.Id, dbTile.Id);

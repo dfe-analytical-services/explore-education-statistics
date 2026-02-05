@@ -328,7 +328,6 @@ public class EducationInNumbersContentService(
         return await contentDbContext
             .EinContentSections.Include(section => section.Content)
                 .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
-                    .ThenInclude(tile => (tile as EinApiQueryStatTile))
             .SingleOrNotFoundAsync(s => s.Id == sectionId && s.EducationInNumbersPageId == pageId, cancellationToken)
             .OnSuccess(async section =>
             {

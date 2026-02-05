@@ -70,8 +70,7 @@ public static class EducationInNumbersContentExtensions
                 IndicatorUnit = statTile.IndicatorUnit,
                 DecimalPlaces = statTile.DecimalPlaces,
                 QueryResult = statTile.QueryResult,
-                PublicationSlug = statTile.PublicationSlug,
-                ReleaseSlug = statTile.ReleaseSlug,
+                ReleaseId = statTile.ReleaseId,
             },
             _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found"),
         };
