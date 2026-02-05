@@ -167,7 +167,7 @@ public record ReleaseVersionsMigrationReportWarningsDto
     public required bool? ProposedPublishedDateDoesNotMatchLatestUpdateNoteDate { get; init; }
 
     /// <summary>
-    /// True if the proposed published date is not similar to the publishing trigger date.
+    /// True if the proposed published date is not similar to the publishing trigger date, otherwise null.
     /// It's included in the report because it may indicate an issue with the proposed date that needs manually reviewing.
     /// It allows a tolerance for the duration taken to complete publishing and differs depending on the publishing method:
     /// Scheduled = 5 minutes (The final stage trigger is at 09:30 UK local time and would normally be expected to complete within a minute or so).
@@ -176,11 +176,23 @@ public record ReleaseVersionsMigrationReportWarningsDto
     /// </summary>
     public required bool? ProposedPublishedDateIsNotSimilarToScheduledTriggerDate { get; init; }
 
+    /// <summary>
+    /// True if the publishing method is 'Scheduled' and the scheduled trigger date of the release version is not midnight UK local time, otherwise null.
+    /// It's included in the report because the report also includes <c>ScheduledPublishFinalStageTrigger</c>, which for
+    /// this publishing method is the scheduled trigger date adjusted from midnight to 09:30 UK local time. It also has
+    /// another warning <c>ProposedPublishedDateIsNotSimilarToScheduledTriggerDate</c> which indicates that the proposed
+    /// date is not similar to that adjusted date.
+    /// This warning indicates that no adjustment took place, which is unexpected, and that these two values are based on
+    /// the unadjusted scheduled trigger date.
+    /// </summary>
+    public required bool? ScheduledTriggerDateIsNotMidnightUkLocalTime { get; init; }
+
     [JsonIgnore]
     public bool HasWarnings =>
         NoSuccessfulPublishingAttempts == true
         || MultipleSuccessfulPublishingAttempts == true
         || UpdatesCountDoesNotMatchVersion == true
         || ProposedPublishedDateDoesNotMatchLatestUpdateNoteDate == true
-        || ProposedPublishedDateIsNotSimilarToScheduledTriggerDate == true;
+        || ProposedPublishedDateIsNotSimilarToScheduledTriggerDate == true
+        || ScheduledTriggerDateIsNotMidnightUkLocalTime == true;
 }

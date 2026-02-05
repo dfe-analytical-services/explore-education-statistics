@@ -14,15 +14,19 @@ public static class DateTimeOffsetExtensions
         {
             return null;
         }
-        return IsUkLocalMidnight(dateTimeOffset.Value)
-            ? dateTimeOffset.Value.AddHours(9).AddMinutes(30)
-            : dateTimeOffset;
+
+        return dateTimeOffset.IsUkLocalMidnight() ? dateTimeOffset.Value.AddHours(9).AddMinutes(30) : dateTimeOffset;
     }
 
-    private static bool IsUkLocalMidnight(DateTimeOffset dateTimeOffset)
+    public static bool IsUkLocalMidnight(this DateTimeOffset? dateTimeOffset)
     {
+        if (!dateTimeOffset.HasValue)
+        {
+            return false;
+        }
+
         // Convert the DateTimeOffset to UK local time
-        var ukLocalDateTimeOffset = TimeZoneInfo.ConvertTime(dateTimeOffset, TimeZoneUtils.GetUkTimeZone());
+        var ukLocalDateTimeOffset = TimeZoneInfo.ConvertTime(dateTimeOffset.Value, TimeZoneUtils.GetUkTimeZone());
 
         // Return true if the time element is exactly 00:00:00
         return ukLocalDateTimeOffset.TimeOfDay == TimeSpan.Zero;

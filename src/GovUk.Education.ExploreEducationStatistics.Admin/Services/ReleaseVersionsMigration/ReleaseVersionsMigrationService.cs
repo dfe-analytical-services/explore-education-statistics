@@ -202,6 +202,13 @@ public class ReleaseVersionsMigrationService(
         ReleaseVersionPublishingInfo publishingInfo
     )
     {
+        // Determine the final stage trigger date.
+        // For method 'Scheduled', ReleaseVersion.PublishScheduled represents the
+        // first stage trigger at midnight UK local time and needs adjusting to the final stage at 09:30 UK local time.
+        // If the value isn't at midnight UK local time, leave it unchanged. Rather than throwing an exception,
+        // the warning 'ScheduledTriggerDateIsNotMidnightUkLocalTime' will be added to the report, allowing a 'dry run'
+        // to proceed.
+        // For method 'Immediate', ReleaseVersion.PublishScheduled needs no adjustment because all stages trigger together.
         var scheduledPublishFinalStageTrigger =
             publishingInfo.LatestAttemptMethod == ReleasePublishingMethod.Scheduled
                 ? releaseVersion.PublishScheduled.AdjustUkLocalMidnightTo0930()
@@ -264,6 +271,11 @@ public class ReleaseVersionsMigrationService(
         var proposedPublishedDateIsNotSimilarToScheduledTriggerDate =
             publishingInfo.TimeSinceScheduledTriggerToCompletion > publishingTolerance;
 
+        var scheduledTriggerDateIsNotMidnightUkLocalTime =
+            publishingInfo.PublishMethod == ReleasePublishingMethod.Scheduled
+            // Note, publishingInfo.ScheduledPublishTrigger is interchangeable with releaseVersion.PublishScheduled here
+            && !publishingInfo.ScheduledPublishTrigger.IsUkLocalMidnight();
+
         // Use nullable flags with null values to represent absent warnings.
         // The JSON serializer is configured to ignore nulls and omitting these fields produces a more compact report.
         return new ReleaseVersionsMigrationReportWarningsDto
@@ -275,6 +287,7 @@ public class ReleaseVersionsMigrationService(
                 proposedPublishedDateDoesNotMatchLatestUpdateNoteDate ? true : null,
             ProposedPublishedDateIsNotSimilarToScheduledTriggerDate =
                 proposedPublishedDateIsNotSimilarToScheduledTriggerDate ? true : null,
+            ScheduledTriggerDateIsNotMidnightUkLocalTime = scheduledTriggerDateIsNotMidnightUkLocalTime ? true : null,
         };
     }
 
