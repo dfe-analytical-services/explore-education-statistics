@@ -4,16 +4,20 @@ import publicationQueries from '@admin/queries/publicationQueries';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import { useQuery } from '@tanstack/react-query';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 interface Props {
   publicationId: string;
   onAmendmentDelete?: () => void;
+  setVisibleCount?: (count: number) => void; // reports CURRENT visible count for this section
+  showBackToTopLink?: boolean;
 }
 
 export default function PublicationUnpublishedReleases({
   publicationId,
   onAmendmentDelete,
+  setVisibleCount,
+  showBackToTopLink,
 }: Props) {
   const {
     data: releases,
@@ -44,6 +48,11 @@ export default function PublicationUnpublishedReleases({
       ) ?? []
     );
   }, [releases?.results]);
+  const visibleCount = draftReleases.length + scheduledReleases.length;
+
+  useEffect(() => {
+    setVisibleCount?.(visibleCount);
+  }, [setVisibleCount, visibleCount]);
 
   return (
     <>
@@ -59,6 +68,7 @@ export default function PublicationUnpublishedReleases({
             <PublicationScheduledReleases
               publicationId={publicationId}
               releases={scheduledReleases}
+              showBackToTopLink={showBackToTopLink}
             />
           ) : (
             <WarningMessage>
@@ -84,6 +94,7 @@ export default function PublicationUnpublishedReleases({
                 await refetch();
                 onAmendmentDelete?.();
               }}
+              showBackToTopLink={showBackToTopLink}
             />
           ) : (
             <WarningMessage>
