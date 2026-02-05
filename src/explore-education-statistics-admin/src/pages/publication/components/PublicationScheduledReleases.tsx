@@ -55,7 +55,7 @@ const PublicationScheduledReleases = ({
         </tbody>
       </table>
       <ButtonGroup
-        className={showBackToTopLink ? 'govuk-!-margin-bottom-2' : undefined}
+        className={showBackToTopLink ? 'govuk-!-margin-bottom-4' : undefined}
       >
         <ScheduledStatusGuidanceModal />
         <ScheduledStagesGuidanceModal />

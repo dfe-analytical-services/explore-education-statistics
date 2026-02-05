@@ -9,14 +9,14 @@ import React, { useEffect, useMemo } from 'react';
 interface Props {
   publicationId: string;
   onAmendmentDelete?: () => void;
-  addItemsCount?: (count: number) => void; // reports CURRENT visible count for this section
+  setVisibleCount?: (count: number) => void; // reports CURRENT visible count for this section
   showBackToTopLink?: boolean;
 }
 
 export default function PublicationUnpublishedReleases({
   publicationId,
   onAmendmentDelete,
-  addItemsCount,
+  setVisibleCount,
   showBackToTopLink,
 }: Props) {
   const {
@@ -51,8 +51,8 @@ export default function PublicationUnpublishedReleases({
   const visibleCount = draftReleases.length + scheduledReleases.length;
 
   useEffect(() => {
-    addItemsCount?.(visibleCount);
-  }, [addItemsCount, visibleCount]);
+    setVisibleCount?.(visibleCount);
+  }, [setVisibleCount, visibleCount]);
 
   return (
     <>

@@ -59,7 +59,7 @@ const PublicationDraftReleases = ({
         </tbody>
       </table>
       <ButtonGroup
-        className={showBackToTopLink ? 'govuk-!-margin-bottom-2' : undefined}
+        className={showBackToTopLink ? 'govuk-!-margin-bottom-4' : undefined}
       >
         <IssuesGuidanceModal />
         <DraftStatusGuidanceModal />

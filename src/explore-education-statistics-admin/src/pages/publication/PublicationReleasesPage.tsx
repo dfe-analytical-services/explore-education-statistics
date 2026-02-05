@@ -7,7 +7,7 @@ import { releaseCreateRoute } from '@admin/routes/routes';
 import releaseService from '@admin/services/releaseService';
 import { useQueryClient } from '@tanstack/react-query';
 import noop from 'lodash/noop';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { generatePath } from 'react-router';
 import publicationQueries from '@admin/queries/publicationQueries';
 import { ReleaseLabelFormValues } from './components/ReleaseLabelEditModal';
@@ -39,13 +39,6 @@ const PublicationReleasesPage = () => {
       publicationQueries.listPublishedReleaseVersions(publicationId).queryKey,
     );
   };
-  const handleUnpublishedCountChange = useCallback((count: number) => {
-    setUnpublishedVisibleCount(count);
-  }, []);
-
-  const handlePublishedCountChange = useCallback((count: number) => {
-    setPublishedVisibleCount(count);
-  }, []);
 
   const showBackToTopLink = itemsCount > 10;
   return (
@@ -69,14 +62,14 @@ const PublicationReleasesPage = () => {
         onAmendmentDelete={() => {
           publishedReleasesRefetchRef.current();
         }}
-        addItemsCount={handleUnpublishedCountChange}
+        setVisibleCount={setUnpublishedVisibleCount}
         showBackToTopLink={showBackToTopLink}
       />
       <PublicationPublishedReleases
         publication={publication}
         refetchRef={publishedReleasesRefetchRef}
         onEdit={onEditingPublishedRelease}
-        addItemsCount={handlePublishedCountChange}
+        setVisibleCount={setPublishedVisibleCount}
         showBackToTopLink={showBackToTopLink}
       />
     </>

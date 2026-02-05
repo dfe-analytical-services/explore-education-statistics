@@ -545,7 +545,9 @@ describe('PublicationPublishedReleases', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('shows Back To Top Link when boolean BackToTopLink prop is true', () => {
+  test('hows Back to top link when showBackToTopLink prop is true', async () => {
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
+
     render(
       <TestConfigContextProvider>
         <PublicationPublishedReleases
@@ -555,14 +557,17 @@ describe('PublicationPublishedReleases', () => {
         />
       </TestConfigContextProvider>,
     );
-    waitFor(() => {
+
+    await waitFor(() => {
       expect(
         screen.getByRole('link', { name: 'Back to top' }),
       ).toBeInTheDocument();
     });
   });
 
-  test('does not show Back To Top Link when boolean BackToTopLink prop is false', () => {
+  test('does not show Back to top link when showBackToTopLink prop is not provided', async () => {
+    publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
+
     render(
       <TestConfigContextProvider>
         <PublicationPublishedReleases
@@ -571,9 +576,10 @@ describe('PublicationPublishedReleases', () => {
         />
       </TestConfigContextProvider>,
     );
-    waitFor(() => {
+
+    await waitFor(() => {
       expect(
-        screen.getByRole('link', { name: 'Back to top' }),
+        screen.queryByRole('link', { name: 'Back to top' }),
       ).not.toBeInTheDocument();
     });
   });
