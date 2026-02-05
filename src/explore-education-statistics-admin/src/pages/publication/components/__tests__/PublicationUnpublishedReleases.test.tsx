@@ -329,6 +329,7 @@ describe('PublicationUnpublishedReleases', () => {
       expect(handleAmendmentDelete).toHaveBeenCalled();
     });
   });
+
   test('shows Back to top link when showBackToTopLink prop is true', async () => {
     const handleAmendmentDelete = jest.fn();
     publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
