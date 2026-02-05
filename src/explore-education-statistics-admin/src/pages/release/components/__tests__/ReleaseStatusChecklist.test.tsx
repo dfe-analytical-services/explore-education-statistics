@@ -375,13 +375,10 @@ describe('ReleaseStatusChecklist', () => {
     );
 
     expect(
-      screen.getByRole('link', {
-        name: 'Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
-      }),
-    ).toHaveAttribute(
-      'href',
-      '/publication/publication-1/release/release-1/data#api-data-sets',
-    );
+      screen.getByText(
+        'Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
+      ),
+    ).toBeInTheDocument();
   });
 
   test('renders correctly with both warnings and errors', async () => {

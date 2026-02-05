@@ -7,7 +7,7 @@ public interface IReleasePublishingValidator
 {
     Task<bool> IsMissingUpdatedApiDataSet(
         ReleaseVersion releaseVersion,
-        IList<File> dataFiles,
+        IList<File> dataFileUploads,
         CancellationToken cancellationToken = default
     );
 }

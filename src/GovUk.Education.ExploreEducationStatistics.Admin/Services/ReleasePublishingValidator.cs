@@ -1,6 +1,5 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -11,49 +10,50 @@ public class ReleasePublishingValidator(IDataSetService dataSetService) : IRelea
 {
     public async Task<bool> IsMissingUpdatedApiDataSet(
         ReleaseVersion releaseVersion,
-        IList<File> dataFiles,
+        IList<File> dataFileUploads,
         CancellationToken cancellationToken = default
     )
     {
-        // if it's a new/unpublished publication, there's no previous release to check
-        if (releaseVersion.Release.Publication.LatestPublishedReleaseVersionId is null)
+        if (IsNewRelease(releaseVersion))
         {
             return false;
         }
 
-        // if no data files were uploaded, there's no data to associate with an existing API data set
-        if (!dataFiles.Any())
+        if (dataFileUploads.Count == 0)
         {
             return false;
         }
 
-        // get data sets associated to this publication
-        // TODO: Use results pattern
-        var existingDataSetsForPublication = await dataSetService.ListDataSets(releaseVersion.Release.PublicationId);
+        var existingDataSetsForPublication = await dataSetService.ListDataSets(
+            releaseVersion.Release.PublicationId,
+            cancellationToken
+        );
+        var existingDataSets = existingDataSetsForPublication.Right;
 
-        // if there are fewer uploads than API data sets, this may be intentional (e.g. two API data sets, but only one needs updating)
-        if (dataFiles.Count < existingDataSetsForPublication.Right.Count)
+        if (existingDataSets.Count == 0)
         {
             return false;
         }
 
-        // if no new data set version has been associated to this release, add the warning
-        if (existingDataSetsForPublication.Right.Any(r => DataSetVersionIsNotAssociatedToRelease(r, releaseVersion.Id)))
+        var draftVersionFileIds = existingDataSets
+            .Where(ds =>
+                ds.DraftVersion is not null
+                && ds.DraftVersion.Status is DataSetVersionStatus.Mapping or DataSetVersionStatus.Draft
+            )
+            .Select(d => d.DraftVersion.File.Id)
+            .ToList();
+
+        foreach (var upload in dataFileUploads)
         {
-            return true;
+            if (!draftVersionFileIds.Contains((Guid)upload.DataSetFileId) && !releaseVersion.Live)
+            {
+                return true;
+            }
         }
 
         return false;
     }
 
-    private static bool DataSetVersionIsNotAssociatedToRelease(
-        DataSetSummaryViewModel dataSet,
-        Guid releaseVersionId
-    ) => // might be wrong logic? Been suggested that this shouldn't work with amendment scenarios when comparing releaseVersionIds
-        dataSet.LatestLiveVersion?.ReleaseVersion.Id != releaseVersionId
-        && (
-            dataSet.DraftVersion is null
-            || dataSet.DraftVersion.ReleaseVersion.Id != releaseVersionId
-            || dataSet.DraftVersion.Status is not DataSetVersionStatus.Mapping and not DataSetVersionStatus.Draft
-        );
+    private static bool IsNewRelease(ReleaseVersion releaseVersion) =>
+        releaseVersion.Release.Publication.LatestPublishedReleaseVersionId is null;
 }
