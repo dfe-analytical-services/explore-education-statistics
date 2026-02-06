@@ -36,10 +36,7 @@ public class ReleasePublishingValidator(IDataSetService dataSetService) : IRelea
         }
 
         var draftVersionFileIds = existingDataSets
-            .Where(ds =>
-                ds.DraftVersion is not null
-                && ds.DraftVersion.Status is DataSetVersionStatus.Mapping or DataSetVersionStatus.Draft
-            )
+            .Where(ds => ds.DraftVersion?.Status is DataSetVersionStatus.Mapping or DataSetVersionStatus.Draft)
             .Select(d => d.DraftVersion.File.Id)
             .ToList();
 

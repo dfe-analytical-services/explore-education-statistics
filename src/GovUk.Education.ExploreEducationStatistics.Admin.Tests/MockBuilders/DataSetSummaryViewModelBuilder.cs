@@ -9,7 +9,7 @@ public class DataSetSummaryViewModelBuilder
     private DataSetVersionSummaryViewModel? _draftVersion;
     private DataSetLiveVersionSummaryViewModel? _liveVersion;
 
-    public async Task<DataSetSummaryViewModel> Build()
+    public DataSetSummaryViewModel Build()
     {
         return new()
         {

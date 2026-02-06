@@ -50,11 +50,7 @@ internal class DataSetService(
                     .Paginate(page: page, pageSize: pageSize)
                     .ToListAsync(cancellationToken);
 
-                var dataSetReleaseVersions = await GetDataSetReleaseVersions(dataSets, cancellationToken);
-
-                var results = dataSets
-                    .Select(ds => MapDataSetSummary(ds, dataSetReleaseVersions[ds.Id].ReleaseFilesByDataSetVersionId))
-                    .ToList();
+                var results = await MapDataSetSummaries(dataSets, cancellationToken);
 
                 return new PaginatedListViewModel<DataSetSummaryViewModel>(
                     results,
@@ -80,14 +76,24 @@ internal class DataSetService(
                     .Include(ds => ds.LatestDraftVersion)
                     .Include(ds => ds.LatestLiveVersion)
                     .Where(ds => ds.PublicationId == publicationId)
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
-                var dataSetReleaseVersions = await GetDataSetReleaseVersions(dataSets, cancellationToken);
-
-                return dataSets
-                    .Select(ds => MapDataSetSummary(ds, dataSetReleaseVersions[ds.Id].ReleaseFilesByDataSetVersionId))
-                    .ToList();
+                return await MapDataSetSummaries(dataSets, cancellationToken);
             });
+    }
+
+    private async Task<List<DataSetSummaryViewModel>> MapDataSetSummaries(
+        List<DataSet> dataSets,
+        CancellationToken cancellationToken
+    )
+    {
+        var dataSetReleaseVersions = await GetDataSetReleaseVersions(dataSets, cancellationToken);
+        return
+        [
+            .. dataSets.Select(ds =>
+                MapDataSetSummary(ds, dataSetReleaseVersions[ds.Id].ReleaseFilesByDataSetVersionId)
+            ),
+        ];
     }
 
     public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(

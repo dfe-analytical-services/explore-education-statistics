@@ -65,7 +65,7 @@ public class ReleaseChecklistService : IReleaseChecklistService
     {
         return await _contentDbContext
             .ReleaseVersions.HydrateReleaseForChecklist()
-            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async release => new ReleaseChecklistViewModel(
                 await GetErrors(release, cancellationToken),
@@ -92,7 +92,10 @@ public class ReleaseChecklistService : IReleaseChecklistService
             errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.DataFileReplacementsMustBeCompleted));
         }
 
-        var isDataGuidanceValid = await _dataGuidanceService.ValidateForReleaseChecklist(releaseVersion.Id);
+        var isDataGuidanceValid = await _dataGuidanceService.ValidateForReleaseChecklist(
+            releaseVersion.Id,
+            cancellationToken
+        );
 
         if (isDataGuidanceValid.IsLeft)
         {
@@ -138,7 +141,10 @@ public class ReleaseChecklistService : IReleaseChecklistService
             );
         }
 
-        var dataSetVersionStatuses = await _dataSetVersionService.GetStatusesForReleaseVersion(releaseVersion.Id);
+        var dataSetVersionStatuses = await _dataSetVersionService.GetStatusesForReleaseVersion(
+            releaseVersion.Id,
+            cancellationToken
+        );
 
         if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Processing))
         {

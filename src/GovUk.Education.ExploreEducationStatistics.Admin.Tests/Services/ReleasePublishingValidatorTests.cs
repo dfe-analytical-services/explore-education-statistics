@@ -73,9 +73,14 @@ public class ReleasePublishingValidatorTests
         var builder = new DataSetSummaryViewModelBuilder();
         var dataSets = new List<DataSetSummaryViewModel>
         {
-            await builder.WithDraftVersion(releaseVersion.Id, dataSetVersionStatus).Build(),
+            builder.WithDraftVersion(releaseVersion.Id, dataSetVersionStatus).Build(),
+            builder.WithDraftVersion(releaseVersion.Id, dataSetVersionStatus).Build(),
         };
-        var dataFileUploads = new List<File> { new() { DataSetFileId = dataSets[0].DraftVersion!.File.Id } };
+        var dataFileUploads = new List<File>
+        {
+            new() { DataSetFileId = dataSets[0].DraftVersion!.File.Id },
+            new() { DataSetFileId = dataSets[1].DraftVersion!.File.Id },
+        };
 
         var dataSetService = new Mock<IDataSetService>();
         dataSetService.Setup(s => s.ListDataSets(releaseVersion.Release.PublicationId, default)).ReturnsAsync(dataSets);
@@ -99,8 +104,42 @@ public class ReleasePublishingValidatorTests
             .Generate();
 
         var builder = new DataSetSummaryViewModelBuilder();
-        var dataSets = new List<DataSetSummaryViewModel> { await builder.WithLiveVersion(Guid.NewGuid()).Build() };
+        var dataSets = new List<DataSetSummaryViewModel> { builder.WithLiveVersion(Guid.NewGuid()).Build() };
         var dataFileUploads = new List<File> { new() { DataSetFileId = Guid.NewGuid() } };
+
+        var dataSetService = new Mock<IDataSetService>();
+        dataSetService.Setup(s => s.ListDataSets(releaseVersion.Release.PublicationId, default)).ReturnsAsync(dataSets);
+
+        var validator = BuildReleasePublishingValidator(dataSetService: dataSetService.Object);
+
+        var result = await validator.IsMissingUpdatedApiDataSet(releaseVersion, dataFileUploads);
+
+        Assert.True(result);
+    }
+
+    [Fact]
+    public async Task IsMissingUpdatedApiDataSet_DataSetNotAssociatedMultiple_ReturnsTrue()
+    {
+        var releaseVersion = _dataFixture.DefaultReleaseVersion().Generate();
+
+        _dataFixture
+            .DefaultPublication()
+            .WithReleases([_dataFixture.DefaultRelease().WithVersions([releaseVersion])])
+            .WithLatestPublishedReleaseVersion(releaseVersion)
+            .Generate();
+
+        var builder = new DataSetSummaryViewModelBuilder();
+        var dataSets = new List<DataSetSummaryViewModel>
+        {
+            builder.WithLiveVersion(Guid.NewGuid()).Build(),
+            builder.WithLiveVersion(Guid.NewGuid()).Build(),
+            builder.WithLiveVersion(Guid.NewGuid()).Build(),
+        };
+        var dataFileUploads = new List<File>
+        {
+            new() { DataSetFileId = Guid.NewGuid() },
+            new() { DataSetFileId = Guid.NewGuid() },
+        };
 
         var dataSetService = new Mock<IDataSetService>();
         dataSetService.Setup(s => s.ListDataSets(releaseVersion.Release.PublicationId, default)).ReturnsAsync(dataSets);
@@ -127,7 +166,7 @@ public class ReleasePublishingValidatorTests
             .Generate();
 
         var builder = new DataSetSummaryViewModelBuilder();
-        var dataSets = new List<DataSetSummaryViewModel> { await builder.WithDraftVersion(releaseVersion.Id).Build() };
+        var dataSets = new List<DataSetSummaryViewModel> { builder.WithDraftVersion(releaseVersion.Id).Build() };
         var dataFileUploads = new List<File> { new() { DataSetFileId = Guid.NewGuid() } };
 
         var dataSetService = new Mock<IDataSetService>();
@@ -154,7 +193,7 @@ public class ReleasePublishingValidatorTests
         var builder = new DataSetSummaryViewModelBuilder();
         var dataSets = new List<DataSetSummaryViewModel>
         {
-            await builder.WithDraftVersion(releaseVersion.Id, DataSetVersionStatus.Failed).Build(),
+            builder.WithDraftVersion(releaseVersion.Id, DataSetVersionStatus.Failed).Build(),
         };
         var dataFileUploads = new List<File> { new() { DataSetFileId = dataSets[0].DraftVersion!.File.Id } };
 
