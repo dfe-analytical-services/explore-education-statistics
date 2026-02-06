@@ -198,7 +198,6 @@ describe('DataReplacementPlan', () => {
           valid: false,
         },
         valid: false,
-        fixable: true,
       },
       {
         id: 'block-2',
@@ -207,7 +206,6 @@ describe('DataReplacementPlan', () => {
         indicatorGroups: {},
         locations: {},
         valid: true,
-        fixable: false,
       },
     ],
     footnotes: [
@@ -351,7 +349,6 @@ describe('DataReplacementPlan', () => {
         locations: {},
         filters: {},
         valid: true,
-        fixable: false,
       },
       {
         id: 'block-2',
@@ -360,7 +357,6 @@ describe('DataReplacementPlan', () => {
         locations: {},
         filters: {},
         valid: true,
-        fixable: false,
       },
     ],
     footnotes: [
@@ -1087,13 +1083,12 @@ describe('DataReplacementPlan', () => {
     );
   });
 
-  test("does not render 'Edit data block' link if data block is not fixable", async () => {
+  test("renders 'Edit data block' link", async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue({
       ...testReplacementPlan,
       dataBlocks: [
         {
           ...testReplacementPlan.dataBlocks[0],
-          fixable: false,
         },
         testReplacementPlan.dataBlocks[1],
       ],
@@ -1113,17 +1108,10 @@ describe('DataReplacementPlan', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/Data block 1/)).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: /Edit data block for Data block 1/ }),
+      ).toBeInTheDocument();
     });
-
-    expect(
-      screen.getByRole('button', { name: /Data block 1/ }),
-    ).toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
-    expect(
-      screen.queryByRole('link', { name: 'Edit data block' }),
-    ).not.toBeInTheDocument();
   });
 
   test("clicking 'Delete data block' button renders confirmation modal", async () => {

@@ -35,6 +35,10 @@ const ReleaseDataBlockEditPage = ({
     params: { publicationId, releaseVersionId, dataBlockId },
   } = match;
 
+  const useBrowserBackNav =
+    new URLSearchParams(window.location.search).get('backToReplacement') ===
+    'true';
+
   const config = useConfig();
   const pageRef = useRef<HTMLDivElement>(null);
 
@@ -87,21 +91,25 @@ const ReleaseDataBlockEditPage = ({
   }, [history, publicationId, releaseVersionId]);
 
   const { canUpdateRelease, dataBlock } = model ?? {};
+  const backLink = generatePath<ReleaseRouteParams>(
+    releaseDataBlocksRoute.path,
+    {
+      publicationId,
+      releaseVersionId,
+    },
+  );
 
   const pageTitle = canUpdateRelease ? 'Edit data block' : 'View data block';
-
   return (
     <div ref={pageRef}>
       <PageMetaTitle title={pageTitle} />
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
-          publicationId,
-          releaseVersionId,
-        })}
+        to={useBrowserBackNav ? '' : backLink}
+        onClick={useBrowserBackNav ? () => history.goBack() : undefined}
       >
-        Back
+        {useBrowserBackNav ? 'Back to data replacement page' : 'Back'}
       </Link>
 
       <LoadingSpinner loading={isLoading}>
