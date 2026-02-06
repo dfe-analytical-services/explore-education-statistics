@@ -3,7 +3,7 @@ import _preReleaseUserService, {
   PreReleaseUser,
 } from '@admin/services/preReleaseUserService';
 import render from '@common-test/render';
-import { act, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 
 const preReleaseUserService = _preReleaseUserService as jest.Mocked<
   typeof _preReleaseUserService

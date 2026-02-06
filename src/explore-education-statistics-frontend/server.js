@@ -1,6 +1,3 @@
-require('core-js/features/array/flat-map');
-require('core-js/features/array/flat');
-
 const next = require('next');
 const path = require('path');
 const { loadEnvConfig } = require('@next/env');
