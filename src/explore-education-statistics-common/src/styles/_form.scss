@@ -12,6 +12,7 @@
 // This has been suggested as a change to the design system,
 // if it's adopted we can remove this override.
 // https://github.com/alphagov/govuk-design-system-backlog/issues/59#issuecomment-2610085003
+// stylelint-disable @stylistic/indentation
 // stylelint-disable-next-line selector-max-compound-selectors
 .govuk-radios--small
   .govuk-radios__item:hover

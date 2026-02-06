@@ -23,7 +23,7 @@
 td > .group {
   // Avoid centering within a table cell as this
   // is likely to be an 'Actions' column.
-  align-items: start;
+  align-items: flex-start;
 }
 
 .horizontalSpacing--m {
