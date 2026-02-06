@@ -15,6 +15,11 @@ public interface IDataSetService
         CancellationToken cancellationToken = default
     );
 
+    Task<Either<ActionResult, List<DataSetSummaryViewModel>>> ListDataSets(
+        Guid publicationId,
+        CancellationToken cancellationToken = default
+    );
+
     Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
         Guid dataSetId,
         CancellationToken cancellationToken = default

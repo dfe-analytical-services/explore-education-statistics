@@ -31,6 +31,7 @@ public class ReleaseChecklistService : IReleaseChecklistService
     private readonly IFootnoteRepository _footnoteRepository;
     private readonly IDataBlockService _dataBlockService;
     private readonly IDataSetVersionService _dataSetVersionService;
+    private readonly IReleasePublishingValidator _releasePublishingValidator;
 
     public ReleaseChecklistService(
         ContentDbContext contentDbContext,
@@ -41,7 +42,8 @@ public class ReleaseChecklistService : IReleaseChecklistService
         IMethodologyVersionRepository methodologyVersionRepository,
         IFootnoteRepository footnoteRepository,
         IDataBlockService dataBlockService,
-        IDataSetVersionService dataSetVersionService
+        IDataSetVersionService dataSetVersionService,
+        IReleasePublishingValidator releasePublishingValidator
     )
     {
         _contentDbContext = contentDbContext;
@@ -53,21 +55,28 @@ public class ReleaseChecklistService : IReleaseChecklistService
         _footnoteRepository = footnoteRepository;
         _dataBlockService = dataBlockService;
         _dataSetVersionService = dataSetVersionService;
+        _releasePublishingValidator = releasePublishingValidator;
     }
 
-    public async Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(Guid releaseVersionId)
+    public async Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default
+    )
     {
         return await _contentDbContext
             .ReleaseVersions.HydrateReleaseForChecklist()
-            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async release => new ReleaseChecklistViewModel(
-                await GetErrors(release),
-                await GetWarnings(release)
+                await GetErrors(release, cancellationToken),
+                await GetWarnings(release, cancellationToken)
             ));
     }
 
-    public async Task<List<ReleaseChecklistIssue>> GetErrors(ReleaseVersion releaseVersion)
+    public async Task<List<ReleaseChecklistIssue>> GetErrors(
+        ReleaseVersion releaseVersion,
+        CancellationToken cancellationToken = default
+    )
     {
         var errors = new List<ReleaseChecklistIssue>();
 
@@ -83,7 +92,10 @@ public class ReleaseChecklistService : IReleaseChecklistService
             errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.DataFileReplacementsMustBeCompleted));
         }
 
-        var isDataGuidanceValid = await _dataGuidanceService.ValidateForReleaseChecklist(releaseVersion.Id);
+        var isDataGuidanceValid = await _dataGuidanceService.ValidateForReleaseChecklist(
+            releaseVersion.Id,
+            cancellationToken
+        );
 
         if (isDataGuidanceValid.IsLeft)
         {
@@ -129,7 +141,10 @@ public class ReleaseChecklistService : IReleaseChecklistService
             );
         }
 
-        var dataSetVersionStatuses = await _dataSetVersionService.GetStatusesForReleaseVersion(releaseVersion.Id);
+        var dataSetVersionStatuses = await _dataSetVersionService.GetStatusesForReleaseVersion(
+            releaseVersion.Id,
+            cancellationToken
+        );
 
         if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Processing))
         {
@@ -190,7 +205,10 @@ public class ReleaseChecklistService : IReleaseChecklistService
             .AnyAsync(htmlBlock => !string.IsNullOrEmpty(htmlBlock.Body));
     }
 
-    public async Task<List<ReleaseChecklistIssue>> GetWarnings(ReleaseVersion releaseVersion)
+    public async Task<List<ReleaseChecklistIssue>> GetWarnings(
+        ReleaseVersion releaseVersion,
+        CancellationToken cancellationToken = default
+    )
     {
         var warnings = new List<ReleaseChecklistIssue>();
 
@@ -246,6 +264,11 @@ public class ReleaseChecklistService : IReleaseChecklistService
         if (await HasUnresolvedComments(releaseVersion.Id))
         {
             warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.UnresolvedComments));
+        }
+
+        if (await _releasePublishingValidator.IsMissingUpdatedApiDataSet(releaseVersion, dataFiles, cancellationToken))
+        {
+            warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.MissingUpdatedApiDataSet));
         }
 
         return warnings;

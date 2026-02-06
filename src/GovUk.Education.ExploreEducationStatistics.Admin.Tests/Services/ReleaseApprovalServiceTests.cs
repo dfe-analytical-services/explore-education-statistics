@@ -126,7 +126,9 @@ public class ReleaseApprovalServiceTests
             .ReturnsAsync(new List<HtmlBlock>());
 
         releaseChecklistService
-            .Setup(s => s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
+            .Setup(s =>
+                s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync(
                 new List<ReleaseChecklistIssue>
                 {
@@ -599,7 +601,9 @@ public class ReleaseApprovalServiceTests
         var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(MockBehavior.Strict);
 
         releaseChecklistService
-            .Setup(s => s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
+            .Setup(s =>
+                s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync([]);
 
         publishingService
@@ -704,7 +708,9 @@ public class ReleaseApprovalServiceTests
         var contentService = new Mock<IContentService>(MockBehavior.Strict);
 
         releaseChecklistService
-            .Setup(s => s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
+            .Setup(s =>
+                s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync(new List<ReleaseChecklistIssue>());
 
         publishingService
@@ -796,7 +802,12 @@ public class ReleaseApprovalServiceTests
         var contentService = new Mock<IContentService>(MockBehavior.Strict);
 
         releaseChecklistService
-            .Setup(s => s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == amendedReleaseVersion.Id)))
+            .Setup(s =>
+                s.GetErrors(
+                    It.Is<ReleaseVersion>(rv => rv.Id == amendedReleaseVersion.Id),
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ReturnsAsync(new List<ReleaseChecklistIssue>());
 
         publishingService
@@ -1104,7 +1115,9 @@ public class ReleaseApprovalServiceTests
         var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(MockBehavior.Strict);
 
         releaseChecklistService
-            .Setup(s => s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
+            .Setup(s =>
+                s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync([]);
 
         contentService
@@ -1192,7 +1205,9 @@ public class ReleaseApprovalServiceTests
         var userResourceRoleNotificationService = new Mock<IUserResourceRoleNotificationService>(MockBehavior.Strict);
 
         releaseChecklistService
-            .Setup(s => s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
+            .Setup(s =>
+                s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id), It.IsAny<CancellationToken>())
+            )
             .ReturnsAsync([]);
 
         userReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, userReleaseRole);
