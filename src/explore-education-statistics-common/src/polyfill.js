@@ -37,8 +37,4 @@ if (typeof window !== 'undefined') {
       Object.defineProperty(SVGElement.prototype, propertyName, desc);
     }
   });
-
-  if (!window.IntersectionObserver) {
-    require('intersection-observer');
-  }
 }

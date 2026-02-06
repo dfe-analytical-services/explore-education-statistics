@@ -356,8 +356,8 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0
       intersection-observer:
-        specifier: ^0.11.0
-        version: 0.11.0
+        specifier: ^0.12.2
+        version: 0.12.2
       jest:
         specifier: ^30.2.0
         version: 30.2.0(@types/node@22.19.7)
@@ -678,8 +678,8 @@ importers:
         specifier: ^8.57.0
         version: 8.57.0
       intersection-observer:
-        specifier: ^0.11.0
-        version: 0.11.0
+        specifier: ^0.12.2
+        version: 0.12.2
       jest:
         specifier: ^30.2.0
         version: 30.2.0(@types/node@22.19.7)
@@ -880,8 +880,8 @@ importers:
         specifier: 3.0.0
         version: 3.0.0
       intersection-observer:
-        specifier: ^0.11.0
-        version: 0.11.0
+        specifier: ^0.12.2
+        version: 0.12.2
       jest:
         specifier: ^30.2.0
         version: 30.2.0(@types/node@22.19.7)
@@ -14636,8 +14636,9 @@ packages:
     engines: {node: '>=10.13.0'}
     dev: true
 
-  /intersection-observer@0.11.0:
-    resolution: {integrity: sha512-KZArj2QVnmdud9zTpKf279m2bbGfG+4/kn16UU0NL3pTVl52ZHiJ9IRNSsnn6jaHrL9EGLFM5eWjTx2fz/+zoQ==}
+  /intersection-observer@0.12.2:
+    resolution: {integrity: sha512-7m1vEcPCxXYI8HqnL8CKI6siDyD+eIWSwgB3DZA+ZTogxk9I4CDnj4wilt9x/+/QbHI4YG5YZNmC6458/e9Ktg==}
+    deprecated: The Intersection Observer polyfill is no longer needed and can safely be removed. Intersection Observer has been Baseline since 2019.
     dev: true
 
   /ipaddr.js@1.9.1:
