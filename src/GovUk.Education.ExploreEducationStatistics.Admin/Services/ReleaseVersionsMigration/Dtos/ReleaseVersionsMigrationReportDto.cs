@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -10,6 +11,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersi
 /// </summary>
 public record ReleaseVersionsMigrationReportDto
 {
+    /// <summary>
+    /// The <see cref="AppEnvironment"/>, determined from the <see cref="AppOptions.Url"/> property which is initialised from application settings on startup.
+    /// It is indicated in the report so that it can be verified when the migration is run because of the way the
+    /// <c>ProposedPublishedDateIsNotSimilarToScheduledTriggerDate</c> warning calculation is dependent on it.
+    /// </summary>
+    [JsonConverter(typeof(StringEnumConverter))]
+    public required AppEnvironment AppEnvironment { get; init; }
+
     public required bool DryRun { get; init; }
 
     public required List<Guid> ReleaseVersionsWithWarnings { get; init; }
