@@ -16,8 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 table: "EinTiles",
                 type: "nvarchar(2048)",
                 maxLength: 2048,
-                nullable: false,
-                defaultValue: "",
+                nullable: true,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)",
                 oldNullable: true
@@ -25,6 +24,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             migrationBuilder.AddColumn<Guid>(
                 name: "DataSetId",
+                table: "EinTiles",
+                type: "uniqueidentifier",
+                nullable: true
+            );
+
+            migrationBuilder.AddColumn<Guid>(
+                name: "DataSetVersionId",
                 table: "EinTiles",
                 type: "uniqueidentifier",
                 nullable: true
@@ -47,19 +53,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 nullable: true
             );
 
-            migrationBuilder.AddColumn<string>(
-                name: "LatestPublishedVersion",
+            migrationBuilder.AddColumn<Guid>(
+                name: "LatestDataSetVersionId",
                 table: "EinTiles",
-                type: "nvarchar(32)",
-                maxLength: 32,
-                nullable: true
-            );
-
-            migrationBuilder.AddColumn<string>(
-                name: "PublicationSlug",
-                table: "EinTiles",
-                type: "nvarchar(512)",
-                maxLength: 512,
+                type: "uniqueidentifier",
                 nullable: true
             );
 
@@ -72,11 +69,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 nullable: true
             );
 
-            migrationBuilder.AddColumn<string>(
-                name: "ReleaseSlug",
+            migrationBuilder.AddColumn<Guid>(
+                name: "ReleaseId",
                 table: "EinTiles",
-                type: "nvarchar(512)",
-                maxLength: 512,
+                type: "uniqueidentifier",
                 nullable: true
             );
 
@@ -88,6 +84,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 nullable: true
             );
 
+            migrationBuilder.CreateIndex(name: "IX_EinTiles_ReleaseId", table: "EinTiles", column: "ReleaseId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_EinTiles_Releases_ReleaseId",
+                table: "EinTiles",
+                column: "ReleaseId",
+                principalTable: "Releases",
+                principalColumn: "Id"
+            );
+
             migrationBuilder.Sql("GRANT SELECT ON dbo.EinTiles TO [publisher]");
             migrationBuilder.Sql("GRANT UPDATE ON dbo.EinTiles TO [publisher]");
         }
@@ -95,7 +101,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(name: "FK_EinTiles_Releases_ReleaseId", table: "EinTiles");
+
+            migrationBuilder.DropIndex(name: "IX_EinTiles_ReleaseId", table: "EinTiles");
+
             migrationBuilder.DropColumn(name: "DataSetId", table: "EinTiles");
+
+            migrationBuilder.DropColumn(name: "DataSetVersionId", table: "EinTiles");
 
             migrationBuilder.DropColumn(name: "DecimalPlaces", table: "EinTiles");
 
@@ -103,15 +115,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             migrationBuilder.DropColumn(name: "IndicatorUnit", table: "EinTiles");
 
-            migrationBuilder.DropColumn(name: "LatestPublishedVersion", table: "EinTiles");
-
-            migrationBuilder.DropColumn(name: "PublicationSlug", table: "EinTiles");
+            migrationBuilder.DropColumn(name: "LatestDataSetVersionId", table: "EinTiles");
 
             migrationBuilder.DropColumn(name: "Query", table: "EinTiles");
 
             migrationBuilder.DropColumn(name: "QueryResult", table: "EinTiles");
 
-            migrationBuilder.DropColumn(name: "ReleaseSlug", table: "EinTiles");
+            migrationBuilder.DropColumn(name: "ReleaseId", table: "EinTiles");
 
             migrationBuilder.DropColumn(name: "Version", table: "EinTiles");
 
@@ -122,7 +132,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 nullable: true,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(2048)",
-                oldMaxLength: 2048
+                oldMaxLength: 2048,
+                oldNullable: true
             );
 
             migrationBuilder.Sql("REVOKE SELECT ON dbo.EinTiles TO [publisher]");

@@ -37,7 +37,7 @@ public class PublicDataApiClient(
         );
     }
 
-    public async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> QueryDataSetPost( // @MarkFix add tests
+    public async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> QueryDataSetPost(
         Guid dataSetId,
         string dataSetVersion,
         string queryBody,

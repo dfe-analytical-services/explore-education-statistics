@@ -32,12 +32,11 @@ public class EducationInNumbersService(ContentDbContext contentDbContext, Public
         foreach (var tile in apiQueryTiles)
         {
             var dataSet = dataSets.Single(ds => ds.Id == tile.DataSetId);
-            var dataSetLatestVersion =
-                $"{dataSet.LatestLiveVersion!.VersionMajor}.{dataSet.LatestLiveVersion.VersionMinor}.{dataSet.LatestLiveVersion.VersionPatch}";
+            var dataSetLatestVersionId = dataSet.LatestLiveVersionId;
 
-            if (tile.LatestPublishedVersion != dataSetLatestVersion)
+            if (tile.DataSetVersionId != dataSetLatestVersionId)
             {
-                tile.LatestPublishedVersion = dataSetLatestVersion;
+                tile.LatestDataSetVersionId = dataSetLatestVersionId;
                 // TODO EES-6868 Send email to inform BAU that a tile's papi query needs updating
             }
         }

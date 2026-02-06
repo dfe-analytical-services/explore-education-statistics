@@ -1,4 +1,8 @@
 #nullable enable
+using System.Text.Json;
+using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -37,19 +41,40 @@ public record EinTileAddRequest
     public int? Order { get; set; }
 }
 
-public record EinFreeTextStatTileUpdateRequest // @MarkFix add fluent validation
+public record EinFreeTextStatTileUpdateRequest
 {
-    public string Title { get; set; } = string.Empty;
-    public string Statistic { get; set; } = string.Empty;
-    public string Trend { get; set; } = string.Empty;
-    public string? LinkUrl { get; set; }
-    public string? LinkText { get; set; }
+    public string Title { get; init; } = string.Empty;
+    public string Statistic { get; init; } = string.Empty;
+    public string Trend { get; init; } = string.Empty;
+    public string? LinkUrl { get; init; }
+    public string? LinkText { get; init; }
+
+    public class Validator : AbstractValidator<EinFreeTextStatTileUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(r => r.Title).NotEmpty().MaximumLength(2048);
+            RuleFor(r => r.Statistic).NotEmpty();
+            RuleFor(x => x.LinkUrl).IsValidUrl().When(r => r.LinkUrl != null && r.LinkText != null);
+            RuleFor(x => x.LinkText).MinimumLength(1).When(r => r.LinkText != null && r.LinkUrl != null);
+        }
+    }
 }
 
-public record EinApiQueryStatTileUpdateRequest // @MarkFix add fluent validation
+public record EinApiQueryStatTileUpdateRequest
 {
-    public string Title { get; set; } = string.Empty;
-    public Guid DataSetId { get; set; }
-    public string Version { get; set; }
-    public string Query { get; set; }
+    public string Title { get; init; } = string.Empty;
+    public Guid DataSetId { get; init; }
+    public string Version { get; init; } = string.Empty;
+    public string Query { get; init; } = string.Empty;
+
+    public class Validator : AbstractValidator<EinApiQueryStatTileUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(r => r.Title).NotEmpty().MaximumLength(2048);
+            RuleFor(r => r.Version).NotEmpty().MaximumLength(32);
+            RuleFor(r => r.Query).NotEmpty().IsValidJson();
+        }
+    }
 }

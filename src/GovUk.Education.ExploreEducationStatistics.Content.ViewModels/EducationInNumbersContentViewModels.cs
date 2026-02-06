@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
@@ -90,7 +91,7 @@ public static class EducationInNumbersContentViewModels
     {
         public Guid Id { get; set; }
 
-        public string Title { get; init; } = string.Empty;
+        public string? Title { get; init; } = string.Empty;
 
         public int Order { get; set; }
 
@@ -110,8 +111,8 @@ public static class EducationInNumbersContentViewModels
 
     public record EinFreeTextStatTileViewModel : EinTileViewModel
     {
-        public string Statistic { get; set; } = string.Empty;
-        public string Trend { get; set; } = string.Empty;
+        public string? Statistic { get; set; } = string.Empty;
+        public string? Trend { get; set; } = string.Empty;
         public string? LinkUrl { get; set; }
         public string? LinkText { get; set; }
 
@@ -133,16 +134,28 @@ public static class EducationInNumbersContentViewModels
 
     public record EinApiQueryStatTileViewModel : EinTileViewModel
     {
-        public Guid? DataSetId { get; init; }
-        public string Statistic { get; init; } = string.Empty;
-        public IndicatorUnit? IndicatorUnit { get; init; }
-        public int? DecimalPlaces { get; set; }
-        public string Version { get; init; } = string.Empty;
-        public string LatestPublishedVersion { get; init; } = string.Empty;
-        public string Query { get; init; } = string.Empty;
+        public required Guid? DataSetId { get; init; }
+        public required string? Version { get; init; }
+        public required bool IsLatestVersion { get; init; }
+        public required string? Query { get; init; } = string.Empty;
+        public required string? Statistic { get; init; } = string.Empty;
+
+        [JsonConverter(typeof(EnumToEnumValueJsonConverter<IndicatorUnit>))]
+        public required IndicatorUnit? IndicatorUnit { get; init; }
+
+        public required int? DecimalPlaces { get; init; }
+        public required string? PublicationSlug { get; init; }
+        public required string? ReleaseSlug { get; init; }
 
         public static EinApiQueryStatTileViewModel FromModel(EinApiQueryStatTile statTile)
         {
+            if (statTile.ReleaseId != null && statTile.Release?.Publication == null)
+            {
+                throw new ArgumentException(
+                    "Include .Release.Publication when fetching apiQueryStatTile with ReleaseId"
+                );
+            }
+
             return new EinApiQueryStatTileViewModel
             {
                 Id = statTile.Id,
@@ -150,12 +163,15 @@ public static class EducationInNumbersContentViewModels
                 Type = EinTileType.ApiQueryStatTile,
                 Title = statTile.Title,
                 DataSetId = statTile.DataSetId,
+                Version = statTile.Version,
+                IsLatestVersion =
+                    statTile.DataSetVersionId == null || statTile.DataSetVersionId == statTile.LatestDataSetVersionId,
+                Query = statTile.Query,
                 Statistic = statTile.Statistic,
                 IndicatorUnit = statTile.IndicatorUnit,
                 DecimalPlaces = statTile.DecimalPlaces,
-                Version = statTile.Version,
-                LatestPublishedVersion = statTile.LatestPublishedVersion,
-                Query = statTile.Query,
+                PublicationSlug = statTile.Release?.Publication.Slug ?? null,
+                ReleaseSlug = statTile.Release?.Slug ?? null,
             };
         }
     }

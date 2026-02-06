@@ -15,7 +15,7 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
     private readonly DataFixture _dataFixture = new();
 
     [Fact]
-    public async Task UpdateEinTiles_Success_UpdateEinTileLatestPublishedVersion()
+    public async Task UpdateEinTiles_Success_UpdateEinTileLatestDataSetVersionId()
     {
         Publication publication = _dataFixture
             .DefaultPublication()
@@ -31,7 +31,9 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
 
         DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
 
-        DataSetVersion dataSetVersion = _dataFixture
+        var oldDataSetVersionId = Guid.NewGuid();
+
+        DataSetVersion latestDataSetVersion = _dataFixture
             .DefaultDataSetVersion()
             .WithDataSetId(dataSet.Id)
             .WithRelease(_dataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseDataFile.Id))
@@ -41,7 +43,8 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
         {
             DataSetId = dataSet.Id,
             Version = "1.0.0",
-            LatestPublishedVersion = "1.0.0",
+            DataSetVersionId = oldDataSetVersionId,
+            LatestDataSetVersionId = latestDataSetVersion.Id,
         };
 
         await AddTestData<ContentDbContext>(contentDbContext =>
@@ -56,10 +59,10 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
             publicDataDbContext.DataSets.Add(dataSet);
             publicDataDbContext.SaveChanges();
 
-            publicDataDbContext.DataSetVersions.Add(dataSetVersion);
+            publicDataDbContext.DataSetVersions.Add(latestDataSetVersion);
             publicDataDbContext.SaveChanges();
 
-            dataSet.LatestLiveVersionId = dataSetVersion.Id; // cannot be set earlier due to db referential integration
+            dataSet.LatestLiveVersionId = latestDataSetVersion.Id; // cannot be set earlier due to db referential integration
         });
 
         var einService = GetRequiredService<Publisher.Services.Interfaces.IEducationInNumbersService>();
@@ -75,7 +78,8 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
 
         Assert.Equal(dataSet.Id, apiQueryStatTile.DataSetId);
         Assert.Equal("1.0.0", apiQueryStatTile.Version);
-        Assert.Equal("1.0.1", apiQueryStatTile.LatestPublishedVersion);
+        Assert.Equal(oldDataSetVersionId, apiQueryStatTile.DataSetVersionId);
+        Assert.Equal(latestDataSetVersion.Id, apiQueryStatTile.LatestDataSetVersionId);
     }
 
     [Fact]
@@ -95,7 +99,9 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
 
         DataSet dataSet = _dataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
 
-        DataSetVersion dataSetVersion = _dataFixture
+        var dataSetVersionId = Guid.NewGuid();
+
+        DataSetVersion latestDataSetVersion = _dataFixture
             .DefaultDataSetVersion()
             .WithDataSetId(dataSet.Id)
             .WithRelease(_dataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseDataFile.Id))
@@ -105,7 +111,8 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
         {
             DataSetId = Guid.NewGuid(), // for a different data set
             Version = "1.0.0",
-            LatestPublishedVersion = "1.0.0",
+            DataSetVersionId = dataSetVersionId,
+            LatestDataSetVersionId = dataSetVersionId,
         };
 
         await AddTestData<ContentDbContext>(contentDbContext =>
@@ -120,10 +127,10 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
             publicDataDbContext.DataSets.Add(dataSet);
             publicDataDbContext.SaveChanges();
 
-            publicDataDbContext.DataSetVersions.Add(dataSetVersion);
+            publicDataDbContext.DataSetVersions.Add(latestDataSetVersion);
             publicDataDbContext.SaveChanges();
 
-            dataSet.LatestLiveVersionId = dataSetVersion.Id; // cannot be set earlier due to db referential integration
+            dataSet.LatestLiveVersionId = latestDataSetVersion.Id; // cannot be set earlier due to db referential integration
         });
 
         var einService = GetRequiredService<Publisher.Services.Interfaces.IEducationInNumbersService>();
@@ -139,6 +146,7 @@ public class EducationInNumbersServiceTests(PublisherFunctionsIntegrationTestFix
 
         Assert.Equal(einApiQueryStatTile.DataSetId, apiQueryStatTile.DataSetId);
         Assert.Equal("1.0.0", apiQueryStatTile.Version);
-        Assert.Equal("1.0.0", apiQueryStatTile.LatestPublishedVersion);
+        Assert.Equal(dataSetVersionId, apiQueryStatTile.DataSetVersionId);
+        Assert.Equal(dataSetVersionId, apiQueryStatTile.LatestDataSetVersionId); // no update
     }
 }

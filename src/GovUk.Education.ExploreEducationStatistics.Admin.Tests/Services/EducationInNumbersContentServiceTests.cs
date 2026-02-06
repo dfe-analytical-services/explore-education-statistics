@@ -79,12 +79,37 @@ public class EducationInNumbersContentServiceTests
                                         new EinFreeTextStatTile
                                         {
                                             Id = Guid.NewGuid(),
-                                            Title = "Tile title",
+                                            Title = "Free text stat tile",
+                                            Order = 0,
                                             Statistic = "Over 9000!",
                                             Trend = "It's up",
-                                            Order = 0,
                                             LinkText = "Link text",
                                             LinkUrl = "http://link.url",
+                                        },
+                                        new EinApiQueryStatTile
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            Title = "Api query stat tile",
+                                            Order = 1,
+                                            DataSetId = Guid.NewGuid(),
+                                            Version = "1.0.1",
+                                            DataSetVersionId = Guid.NewGuid(),
+                                            LatestDataSetVersionId = Guid.NewGuid(),
+                                            Query = "query-json",
+                                            Statistic = "93",
+                                            IndicatorUnit = IndicatorUnit.Percent,
+                                            DecimalPlaces = 2,
+                                            QueryResult = "query-result-json",
+                                            ReleaseId = Guid.NewGuid(),
+                                            Release = new Content.Model.Release
+                                            {
+                                                Slug = "release-slug",
+                                                PublicationId = Guid.NewGuid(),
+                                                Publication = new Publication { Slug = "publication-slug" },
+
+                                                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                                                Year = 1984,
+                                            },
                                         },
                                     ],
                                 },
@@ -120,14 +145,26 @@ public class EducationInNumbersContentServiceTests
             Assert.Equal(0, blockA.Order);
             Assert.Equal("TileGroupBlock title", blockA.Title);
 
-            var tile = Assert.Single(blockA.Tiles);
-            var freeTextStatTile = Assert.IsType<EinFreeTextStatTileViewModel>(tile);
-            Assert.Equal("Tile title", freeTextStatTile.Title);
+            Assert.Equal(2, blockA.Tiles.Count);
+            var freeTextStatTile = Assert.IsType<EinFreeTextStatTileViewModel>(blockA.Tiles[0]);
+            Assert.Equal("Free text stat tile", freeTextStatTile.Title);
+            Assert.Equal(0, freeTextStatTile.Order);
             Assert.Equal("Over 9000!", freeTextStatTile.Statistic);
             Assert.Equal("It's up", freeTextStatTile.Trend);
-            Assert.Equal(0, freeTextStatTile.Order);
             Assert.Equal("Link text", freeTextStatTile.LinkText);
             Assert.Equal("http://link.url", freeTextStatTile.LinkUrl);
+
+            var apiQueryStatTile = Assert.IsType<EinApiQueryStatTileViewModel>(blockA.Tiles[1]);
+            Assert.Equal("Api query stat tile", apiQueryStatTile.Title);
+            Assert.Equal(1, apiQueryStatTile.Order);
+            Assert.Equal("1.0.1", apiQueryStatTile.Version);
+            Assert.False(apiQueryStatTile.IsLatestVersion);
+            Assert.Equal("query-json", apiQueryStatTile.Query);
+            Assert.Equal("93", apiQueryStatTile.Statistic);
+            Assert.Equal(IndicatorUnit.Percent, apiQueryStatTile.IndicatorUnit);
+            Assert.Equal(2, apiQueryStatTile.DecimalPlaces);
+            Assert.Equal("publication-slug", apiQueryStatTile.PublicationSlug);
+            Assert.Equal("release-slug", apiQueryStatTile.ReleaseSlug);
 
             var blockBGenericType = Assert.Single(viewModel.Content[1].Content);
             var blockB = Assert.IsType<EinHtmlBlockViewModel>(blockBGenericType);
@@ -984,7 +1021,7 @@ public class EducationInNumbersContentServiceTests
             Assert.Null(apiTile.Title);
             Assert.Null(apiTile.DataSetId);
             Assert.Null(apiTile.Version);
-            Assert.Null(apiTile.LatestPublishedVersion);
+            Assert.True(apiTile.IsLatestVersion); // we only need this to be false if it needs updating, not when its blank
             Assert.Null(apiTile.Query);
             Assert.Null(apiTile.IndicatorUnit);
             Assert.Null(apiTile.Statistic);
@@ -1086,6 +1123,7 @@ public class EducationInNumbersContentServiceTests
 
         var originalDataSetId = Guid.NewGuid();
         var newDataSetId = Guid.NewGuid();
+        var originalDataSetVersionId = Guid.NewGuid();
         var latestDataSetVersionId = Guid.NewGuid();
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1109,7 +1147,8 @@ public class EducationInNumbersContentServiceTests
 
                             DataSetId = originalDataSetId,
                             Version = "1.0.0",
-                            LatestPublishedVersion = "1.0.1",
+                            DataSetVersionId = originalDataSetVersionId,
+                            LatestDataSetVersionId = latestDataSetVersionId,
                             Query = """
                             {"indicators":["aaaaa"]}
                             """,
@@ -1124,7 +1163,7 @@ public class EducationInNumbersContentServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var dataSet = new DataSet
+        var newDataSet = new DataSet
         {
             Id = newDataSetId,
             Title = "Old dataset title",
@@ -1154,7 +1193,7 @@ public class EducationInNumbersContentServiceTests
         var publicDataSetRepository = new Mock<IPublicDataSetRepository>(MockBehavior.Strict);
         publicDataSetRepository
             .Setup(c => c.GetDataSet(It.Is<Guid>(id => id == newDataSetId), CancellationToken.None))
-            .ReturnsAsync(dataSet);
+            .ReturnsAsync(newDataSet);
         publicDataSetRepository
             .Setup(c =>
                 c.GetIndicatorMeta(
@@ -1191,7 +1230,7 @@ public class EducationInNumbersContentServiceTests
                 new DataSetQueryPaginatedResultsViewModel
                 {
                     Warnings = [],
-                    Paging = new PagingViewModel(1, 100, 10),
+                    Paging = new PagingViewModel(1, 100, 3),
                     Results =
                     [
                         new DataSetQueryResultViewModel
@@ -1269,9 +1308,15 @@ public class EducationInNumbersContentServiceTests
                 """,
                 apiTile.Query
             );
+
+            Assert.Equal(newDataSetId, apiTile.DataSetId);
+            Assert.Equal("1.0.1", apiTile.Version);
+            Assert.True(apiTile.IsLatestVersion);
+
             Assert.Equal("9393", apiTile.Statistic);
             Assert.Equal(IndicatorUnit.MillionPounds, apiTile.IndicatorUnit);
             Assert.Equal(2, apiTile.DecimalPlaces);
+
             Assert.Equal(publication.Slug, apiTile.PublicationSlug);
             Assert.Equal(publication.Releases[0].Slug, apiTile.ReleaseSlug);
 
@@ -1279,6 +1324,10 @@ public class EducationInNumbersContentServiceTests
             Assert.Equal(_tileAId, dbTile.Id);
             Assert.Equal("New title", dbTile.Title);
             Assert.Equal("9393", dbTile.Statistic);
+
+            Assert.Equal("1.0.1", dbTile.Version);
+            Assert.Equal(latestDataSetVersionId, dbTile.DataSetVersionId);
+            Assert.Equal(latestDataSetVersionId, dbTile.LatestDataSetVersionId);
         }
     }
 
@@ -1299,6 +1348,7 @@ public class EducationInNumbersContentServiceTests
             .WithReleaseVersion(publication.Releases[0].Versions[0]);
 
         var originalDataSetId = Guid.NewGuid();
+        var originalDataSetVersionId = Guid.NewGuid();
         var newDataSetId = Guid.NewGuid();
         var latestDataSetVersionId = Guid.NewGuid();
 
@@ -1323,7 +1373,8 @@ public class EducationInNumbersContentServiceTests
 
                             DataSetId = originalDataSetId,
                             Version = "1.0.0",
-                            LatestPublishedVersion = "1.0.1",
+                            DataSetVersionId = originalDataSetVersionId,
+                            LatestDataSetVersionId = latestDataSetVersionId,
                             Query = """
                             {"indicators":["aaaaa"]}
                             """,
@@ -1425,6 +1476,7 @@ public class EducationInNumbersContentServiceTests
             .WithReleaseVersion(publication.Releases[0].Versions[0]);
 
         var originalDataSetId = Guid.NewGuid();
+        var originalDataSetVersionId = Guid.NewGuid();
         var newDataSetId = Guid.NewGuid();
         var latestDataSetVersionId = Guid.NewGuid();
 
@@ -1449,7 +1501,8 @@ public class EducationInNumbersContentServiceTests
 
                             DataSetId = originalDataSetId,
                             Version = "1.0.0",
-                            LatestPublishedVersion = "1.0.1",
+                            DataSetVersionId = originalDataSetVersionId,
+                            LatestDataSetVersionId = latestDataSetVersionId,
                             Query = """
                             {"indicators":["aaaaa"]}
                             """,
@@ -1582,6 +1635,7 @@ public class EducationInNumbersContentServiceTests
             .WithReleaseVersion(publication.Releases[0].Versions[0]);
 
         var originalDataSetId = Guid.NewGuid();
+        var originalDataSetVersionId = Guid.NewGuid();
         var newDataSetId = Guid.NewGuid();
         var latestDataSetVersionId = Guid.NewGuid();
 
@@ -1606,7 +1660,8 @@ public class EducationInNumbersContentServiceTests
 
                             DataSetId = originalDataSetId,
                             Version = "1.0.0",
-                            LatestPublishedVersion = "1.0.1",
+                            DataSetVersionId = originalDataSetVersionId,
+                            LatestDataSetVersionId = latestDataSetVersionId,
                             Query = """
                             {"indicators":["aaaaa"]}
                             """,

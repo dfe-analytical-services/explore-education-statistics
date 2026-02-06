@@ -1,9 +1,11 @@
 ﻿#nullable enable
 using System.ComponentModel.DataAnnotations;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -48,9 +50,8 @@ public class EinTileGroupBlock : EinContentBlock
 
 public class EinTile
 {
-    public Guid Id { get; set; } // @MarkFix Add required to all these?
+    public Guid Id { get; set; }
 
-    [MaxLength(2048)]
     public string? Title { get; set; }
 
     public int Order { get; set; }
@@ -58,7 +59,7 @@ public class EinTile
     public Guid EinParentBlockId { get; set; }
     public EinTileGroupBlock EinParentBlock { get; set; } = null!;
 
-    internal class EinTileConfig : IEntityTypeConfiguration<EinTile> // @MarkFix redo migration
+    internal class EinTileConfig : IEntityTypeConfiguration<EinTile>
     {
         public void Configure(EntityTypeBuilder<EinTile> builder)
         {
@@ -90,13 +91,18 @@ public class EinFreeTextStatTile : EinTile
 public class EinApiQueryStatTile : EinTile
 {
     public Guid? DataSetId { get; set; }
+
     public string? Version { get; set; }
-    public string? LatestPublishedVersion { get; set; }
+    public Guid? DataSetVersionId { get; set; }
+
+    // NOTE: This records the latest version of DataSetId, not necessarily used in the query
+    // This is so we can determine if the tile's query is using a data set version which is out-of-date
+    public Guid? LatestDataSetVersionId { get; set; }
     public string? Query { get; set; }
     public string? Statistic { get; set; }
     public IndicatorUnit? IndicatorUnit { get; set; }
     public int? DecimalPlaces { get; set; }
-    public string? QueryResult { get; set; }
+    public string? QueryResult { get; set; } // TODO: Once Admin has switched to System.Text.Json, use view model instead of string
     public Guid? ReleaseId { get; set; }
     public Release? Release { get; set; }
 
@@ -107,7 +113,6 @@ public class EinApiQueryStatTile : EinTile
             builder.Property(e => e.IndicatorUnit).HasConversion(new EnumToStringConverter<IndicatorUnit>());
 
             builder.Property(o => o.Version).HasMaxLength(32);
-            builder.Property(o => o.LatestPublishedVersion).HasMaxLength(32);
             builder.Property(o => o.Statistic).HasMaxLength(64);
         }
     }

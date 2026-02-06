@@ -453,10 +453,10 @@ public class EducationInNumbersContentService(
                     return new BadRequestObjectResult("API data set has no live version");
                 }
 
-                var apiDataSetLatest = apiDataSet.LatestLiveVersion;
+                var apiDataSetLatestVersion = apiDataSet.LatestLiveVersion;
 
                 var latestVersion =
-                    $"{apiDataSetLatest.VersionMajor}.{apiDataSetLatest.VersionMinor}.{apiDataSetLatest.VersionPatch}";
+                    $"{apiDataSetLatestVersion.VersionMajor}.{apiDataSetLatestVersion.VersionMinor}.{apiDataSetLatestVersion.VersionPatch}";
                 if (latestVersion != request.Version) // we always expect the full api data set version to be provided in the request
                 {
                     return new BadRequestObjectResult(
@@ -465,24 +465,24 @@ public class EducationInNumbersContentService(
                 }
 
                 var releaseInfo = await contentDbContext
-                    .ReleaseFiles.Where(rf => rf.Id == apiDataSetLatest.Release.ReleaseFileId)
+                    .ReleaseFiles.Where(rf => rf.Id == apiDataSetLatestVersion.Release.ReleaseFileId)
                     .Select(rf => new
                     {
-                        ReleaseId = rf.ReleaseVersion.ReleaseId,
+                        rf.ReleaseVersion.ReleaseId,
                         ReleaseSlug = rf.ReleaseVersion.Release.Slug,
                         PublicationSlug = rf.ReleaseVersion.Release.Publication.Slug,
                     })
                     .SingleAsync(cancellationToken);
 
                 var indicatorMeta = await publicDataSetRepository.GetIndicatorMeta(
-                    apiDataSetLatest.Id,
+                    apiDataSetLatestVersion.Id,
                     indicatorPublicId,
                     cancellationToken
                 );
                 if (indicatorMeta == null)
                 {
                     return new BadRequestObjectResult(
-                        $"Could not find indicator meta for {indicatorPublicId} for API data set {apiDataSetLatest.Id}"
+                        $"Could not find indicator meta for {indicatorPublicId} for API data set {apiDataSetLatestVersion.Id}"
                     );
                 }
 
@@ -527,7 +527,8 @@ public class EducationInNumbersContentService(
                         tileToUpdate.Title = request.Title;
                         tileToUpdate.DataSetId = request.DataSetId;
                         tileToUpdate.Version = request.Version;
-                        tileToUpdate.LatestPublishedVersion = latestVersion;
+                        tileToUpdate.DataSetVersionId = apiDataSetLatestVersion.Id; // we check this matches the latest version above
+                        tileToUpdate.LatestDataSetVersionId = apiDataSetLatestVersion.Id;
                         tileToUpdate.Query = request.Query;
                         tileToUpdate.Statistic = theStat;
                         tileToUpdate.IndicatorUnit = indicatorUnit;

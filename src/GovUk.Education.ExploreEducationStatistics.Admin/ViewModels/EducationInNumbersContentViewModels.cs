@@ -115,6 +115,8 @@ public record EinTileViewModel
 {
     public required Guid Id { get; init; }
 
+    public required string? Title { get; init; }
+
     public required int Order { get; init; }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -133,7 +135,6 @@ public record EinTileViewModel
 
 public record EinFreeTextStatTileViewModel : EinTileViewModel
 {
-    public required string? Title { get; init; }
     public required string? Statistic { get; init; }
     public required string? Trend { get; init; }
     public required string? LinkUrl { get; init; }
@@ -157,10 +158,9 @@ public record EinFreeTextStatTileViewModel : EinTileViewModel
 
 public record EinApiQueryStatTileViewModel : EinTileViewModel
 {
-    public required string? Title { get; init; }
     public required Guid? DataSetId { get; init; }
     public required string? Version { get; init; }
-    public required string? LatestPublishedVersion { get; init; }
+    public required bool IsLatestVersion { get; init; }
     public required string? Query { get; init; }
     public required string? Statistic { get; init; }
 
@@ -175,7 +175,7 @@ public record EinApiQueryStatTileViewModel : EinTileViewModel
     {
         if (statTile.ReleaseId != null && statTile.Release?.Publication == null)
         {
-            throw new ArgumentException("Must Include .Release.Publication when fetching apiQueryStatTile");
+            throw new ArgumentException("Include .Release.Publication when fetching apiQueryStatTile");
         }
 
         return new EinApiQueryStatTileViewModel
@@ -186,7 +186,8 @@ public record EinApiQueryStatTileViewModel : EinTileViewModel
             Title = statTile.Title,
             DataSetId = statTile.DataSetId,
             Version = statTile.Version,
-            LatestPublishedVersion = statTile.LatestPublishedVersion,
+            IsLatestVersion =
+                statTile.DataSetVersionId == null || statTile.DataSetVersionId == statTile.LatestDataSetVersionId,
             Query = statTile.Query,
             Statistic = statTile.Statistic,
             IndicatorUnit = statTile.IndicatorUnit,
