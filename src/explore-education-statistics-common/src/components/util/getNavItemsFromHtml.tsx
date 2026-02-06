@@ -24,7 +24,7 @@ export default function getNavItemsFromHtml({
     parseHtmlString(html, {
       replace: (node: DOMNode) => {
         if (node instanceof Element && headingLevels.includes(node.name)) {
-          const text = domToReact(node.children);
+          const text = domToReact(node.children as DOMNode[]);
 
           if (typeof text === 'string') {
             result.push({
