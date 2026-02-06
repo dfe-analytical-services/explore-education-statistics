@@ -4,7 +4,6 @@ import PageTitle from '@admin/components/PageTitle';
 import PhaseBanner from '@common/components/PhaseBanner';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
-import { Helmet } from 'react-helmet';
 import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
 import PageHeader from './PageHeader';
 
@@ -32,13 +31,6 @@ const Page = ({
     <>
       {/* eslint-disable-next-line jsx-a11y/anchor-has-content */}
       <a id="top" />
-      <Helmet>
-        <title>
-          {title
-            ? `${title} - Explore education statistics - GOV.UK`
-            : 'Explore education statistics - GOV.UK'}
-        </title>
-      </Helmet>
       <PageHeader wide={wide} />
       <div
         className={classNames('govuk-width-container', {
