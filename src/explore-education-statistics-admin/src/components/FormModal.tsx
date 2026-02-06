@@ -9,7 +9,7 @@ import Modal, { ModalProps } from '@common/components/Modal';
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
 import React, { ReactNode, useCallback, useState } from 'react';
-import { DeepPartial, FieldValues } from 'react-hook-form';
+import { DefaultValues, FieldValues } from 'react-hook-form';
 
 interface Props<TFormValues extends FieldValues>
   extends Pick<
@@ -135,7 +135,7 @@ export default function FormModal<TFormValues extends FieldValues>({
       onToggleOpen={toggleOpen}
     >
       <FormProvider
-        initialValues={formValues as DeepPartial<TFormValues>}
+        initialValues={formValues as DefaultValues<TFormValues>}
         validationSchema={validationSchema}
         errorMappings={errorMappings}
         mode="onBlur"
