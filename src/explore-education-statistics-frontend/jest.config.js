@@ -33,6 +33,8 @@ const config = {
     '^@common-test/(.*)$':
       '<rootDir>/../explore-education-statistics-common/test/$1',
     '^axios$': '<rootDir>/node_modules/axios/dist/axios.js',
+    '^@hello-pangea/dnd$':
+      '<rootDir>/node_modules/@hello-pangea/dnd/dist/dnd.js',
   },
   moduleFileExtensions: [
     'web.js',

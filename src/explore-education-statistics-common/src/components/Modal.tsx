@@ -98,7 +98,7 @@ const Modal = ({
               !closeOnOutsideClick ? event.preventDefault() : undefined
             }
           >
-            <Dialog.Title data-testId="modal-title">
+            <Dialog.Title data-testid="modal-title">
               <span
                 className={classNames('govuk-heading-l', {
                   'govuk-visually-hidden': hideTitle,

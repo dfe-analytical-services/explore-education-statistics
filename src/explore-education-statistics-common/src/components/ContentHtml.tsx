@@ -10,13 +10,13 @@ import sanitizeHtml, {
 import formatContentLinkUrl from '@common/utils/url/formatContentLinkUrl';
 import getUrlAttributes from '@common/utils/url/getUrlAttributes';
 import classNames from 'classnames';
-import { Element } from 'domhandler/lib/node';
+import { Element, isTag } from 'domhandler';
 import parseHtmlString, {
   DOMNode,
   attributesToProps,
   domToReact,
 } from 'html-react-parser';
-import React, { ReactNode, useMemo, type JSX } from 'react';
+import React, { ReactElement, useMemo, type JSX } from 'react';
 
 export interface ContentHtmlProps {
   blockId?: string;
@@ -56,13 +56,13 @@ export default function ContentHtml({
 
   const parsedContent = parseHtmlString(cleanHtml, {
     replace: (node: DOMNode) => {
-      if (!(node instanceof Element)) {
+      if (!isTag(node)) {
         return undefined;
       }
 
       // Links
       if (node.name === 'a') {
-        const text = domToReact(node.children);
+        const text = domToReact(node.children as DOMNode[]);
 
         // Glossary links
         if (
@@ -121,7 +121,7 @@ export default function ContentHtml({
       }
 
       if (node.name === 'h3') {
-        const text = domToReact(node.children);
+        const text = domToReact(node.children as DOMNode[]);
         return typeof text === 'string' ? (
           // generate an id optionally using 4 chars of the block id to ensure uniqueness
           <h3 id={generateIdFromHeading(text, blockId?.substring(0, 4))}>
@@ -151,11 +151,11 @@ export default function ContentHtml({
  * replacing the figure/figcaption implementation (which does not
  * get read out correctly) with a standard table/caption.
  */
-function renderTable(element: Element): ReactNode | undefined {
+function renderTable(element: Element): ReactElement | undefined {
   const { children } = element;
 
   const table = children.find(
-    child => child instanceof Element && child.name === 'table',
+    child => isTag(child) && child.name === 'table',
   ) as Element | undefined;
 
   if (!table) {
@@ -163,7 +163,7 @@ function renderTable(element: Element): ReactNode | undefined {
   }
 
   const figcaption = children.find(
-    child => child instanceof Element && child.name === 'figcaption',
+    child => isTag(child) && child.name === 'figcaption',
   ) as Element | undefined;
 
   return (
@@ -173,8 +173,10 @@ function renderTable(element: Element): ReactNode | undefined {
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...attributesToProps(table.attribs)}
       >
-        {figcaption && <caption>{domToReact(figcaption.children)}</caption>}
-        {domToReact(table.children, { trim: true })}
+        {figcaption && (
+          <caption>{domToReact(figcaption.children as DOMNode[])}</caption>
+        )}
+        {domToReact(table.children as DOMNode[], { trim: true })}
       </table>
     </div>
   );

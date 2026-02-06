@@ -195,7 +195,7 @@ describe('ImporterStatus', () => {
     const details = within(screen.getByRole('group'));
 
     expect(
-      details.getByRole('button', { name: 'See errors' }),
+      details.getByText('See errors', { selector: 'summary *' }),
     ).toBeInTheDocument();
 
     const errors = details.getAllByRole('listitem', { hidden: true });
