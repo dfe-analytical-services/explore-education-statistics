@@ -30,7 +30,6 @@ const config = {
     '^@common-test/(.*)$':
       '<rootDir>/../explore-education-statistics-common/test/$1',
     '^axios$': '<rootDir>/node_modules/axios/dist/axios.js',
-    '^marked$': '<rootDir>/node_modules/marked/lib/marked.umd.js',
     '^@hello-pangea/dnd$':
       '<rootDir>/node_modules/@hello-pangea/dnd/dist/dnd.js',
     // Stub out CKEditor to prevent errors from its CSS build polluting the
