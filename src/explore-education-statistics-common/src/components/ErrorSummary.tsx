@@ -1,9 +1,9 @@
 import classNames from 'classnames';
 import React, {
   createElement,
-  forwardRef,
   MouseEventHandler,
   ReactNode,
+  Ref,
   useEffect,
   useRef,
 } from 'react';
@@ -16,19 +16,18 @@ export interface ErrorSummaryMessage {
 interface BaseErrorSummaryProps {
   children: ReactNode;
   headingTag?: 'h2' | 'h3' | 'h4';
+  ref?: Ref<HTMLDivElement>;
   testId?: string;
   title: string;
   updateDocumentTitle?: boolean;
   visuallyHidden?: boolean;
 }
 
-export const BaseErrorSummary = forwardRef<
-  HTMLDivElement,
-  BaseErrorSummaryProps
->((props, ref) => {
+export const BaseErrorSummary = (props: BaseErrorSummaryProps) => {
   const {
     children,
     headingTag = 'h2',
+    ref,
     testId = 'errorSummary',
     title,
     updateDocumentTitle = true,
@@ -63,7 +62,8 @@ export const BaseErrorSummary = forwardRef<
       </div>
     </div>
   );
-});
+};
+
 BaseErrorSummary.displayName = 'BaseErrorSummary';
 
 interface ErrorSummaryProps {

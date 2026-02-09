@@ -1,17 +1,20 @@
 import styles from '@common/components/ButtonText.module.scss';
 import useButton, { ButtonOptions } from '@common/hooks/useButton';
 import classNames from 'classnames';
-import React, { forwardRef, Ref } from 'react';
+import React, { Ref } from 'react';
 
 export interface ButtonTextProps extends ButtonOptions {
+  ref?: Ref<HTMLButtonElement>;
   underline?: boolean;
   variant?: 'secondary' | 'warning';
 }
 
-const ButtonText = (
-  { underline = true, variant, ...props }: ButtonTextProps,
-  ref: Ref<HTMLButtonElement>,
-) => {
+const ButtonText = ({
+  ref,
+  underline = true,
+  variant,
+  ...props
+}: ButtonTextProps) => {
   const { className, ...button } = useButton(props);
 
   return (
@@ -33,4 +36,4 @@ const ButtonText = (
   );
 };
 
-export default forwardRef(ButtonText);
+export default ButtonText;

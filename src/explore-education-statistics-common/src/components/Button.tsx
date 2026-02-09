@@ -1,16 +1,14 @@
 import styles from '@common/components/Button.module.scss';
 import useButton, { ButtonOptions } from '@common/hooks/useButton';
 import classNames from 'classnames';
-import React, { forwardRef, Ref } from 'react';
+import React, { Ref } from 'react';
 
 export interface ButtonProps extends ButtonOptions {
+  ref?: Ref<HTMLButtonElement>;
   variant?: 'secondary' | 'warning';
 }
 
-function Button(
-  { variant, ...props }: ButtonProps,
-  ref: Ref<HTMLButtonElement>,
-) {
+function Button({ ref, variant, ...props }: ButtonProps) {
   const { className, ...button } = useButton(props);
 
   return (
@@ -32,4 +30,4 @@ function Button(
   );
 }
 
-export default forwardRef(Button);
+export default Button;
